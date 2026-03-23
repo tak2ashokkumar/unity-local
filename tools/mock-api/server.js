@@ -9,33 +9,35 @@ const baseDir = path.join(__dirname);
 
 app.use((req, res) => {
 
-    let urlPath = req.path;
+  let urlPath = req.path;
+  // remove leading slash
+  urlPath = urlPath.replace(/^\/+/, "");
+  // remove trailing slash
+  urlPath = urlPath.replace(/\/$/, "");
+  // remove UUIDs (colo_cloud ids etc)
+  urlPath = urlPath.replace(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+    ""
+  );
+  // remove double slashes if created
+  urlPath = urlPath.replace(/\/+/g, "/");
+  // remove trailing slash again
+  urlPath = urlPath.replace(/\/$/, "");
 
-    // remove leading /
-    urlPath = urlPath.replace(/^\/+/, "");
+  const filePath = path.join(baseDir, urlPath + ".json");
 
-    // remove trailing /
-    urlPath = urlPath.replace(/\/$/, "");
+  if (fs.existsSync(filePath)) {
 
-    // special mapping for uldbusers
-    // if (urlPath === "customer/uldbusers") {
-    //     urlPath = "customer/users/uldbusers";
-    // }
+    const data = fs.readFileSync(filePath);
+    res.json(JSON.parse(data));
 
-    const filePath = path.join(baseDir, urlPath + ".json");
-
-    if (fs.existsSync(filePath)) {
-
-        const data = fs.readFileSync(filePath);
-        res.json(JSON.parse(data));
-
-    } else {
-        res.status(404).json({
-            error: "Mock API not found",
-            request: req.path,
-            expectedFile: filePath
-        });
-    }
+  } else {
+    res.status(404).json({
+      error: "Mock API not found",
+      request: req.path,
+      expectedFile: filePath
+    });
+  }
 
 });
 

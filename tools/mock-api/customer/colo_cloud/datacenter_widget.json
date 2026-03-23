@@ -1,0 +1,103 @@
+[
+    {
+        "datacenter_uuid": "abd483ee-5644-41c0-8838-ffcd5baa1641",
+        "datacenter_name": "DC5-Demo",
+        "cabinets": [],
+        "co2_run_rate": 0.0
+    },
+    {
+        "datacenter_uuid": "9cbde93f-26e9-4185-ae8e-83e016caa808",
+        "datacenter_name": "DataCenter2 - Aus",
+        "cabinets": [
+            {
+                "total_power": 0.0,
+                "capacity": 45,
+                "down_count": 3,
+                "alerts": 0,
+                "pdus": [
+                    {
+                        "status": 2,
+                        "sockets": 0,
+                        "name": "UnityDemo-pdua-1c02b2.sf9.unitedlayer.com",
+                        "uuid": "d30d6fb4-3e44-414b-b184-af592731e735"
+                    },
+                    {
+                        "status": 1,
+                        "sockets": 0,
+                        "name": "UnityDemo-pdub-1c02b3.sf9.unitedlayer.com",
+                        "uuid": "52689cad-eccf-4f27-aff3-6a6eabdd9feb"
+                    }
+                ],
+                "max_temperature": 0,
+                "occupied": 1,
+                "cabinet_uuid": "a7b71f1d-fd7e-4ba1-82ed-ba9a77d04ee2",
+                "cabinet_name": "CB1-Aus01",
+                "up_count": 0
+            }
+        ],
+        "co2_run_rate": 0.0
+    },
+    {
+        "datacenter_uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+        "datacenter_name": "DataCenter1 - SF10",
+        "cabinets": [
+            {
+                "total_power": 0.0,
+                "capacity": 45,
+                "down_count": 9,
+                "alerts": 0,
+                "pdus": [
+                    {
+                        "status": 2,
+                        "sockets": 0,
+                        "name": "testpdu",
+                        "uuid": "b58f5748-35ea-4673-a92f-f8cdb972c12a"
+                    },
+                    {
+                        "status": 2,
+                        "sockets": 6,
+                        "name": "UnityDemo-pdub-1c02b3.sf9",
+                        "uuid": "28319322-da20-4bac-a559-f99c3226f679"
+                    },
+                    {
+                        "status": 2,
+                        "sockets": 8,
+                        "name": "UnityDemo-pdua-110t.sf10.unitedlayer.com",
+                        "uuid": "bf0efa8a-90a6-4ea1-8215-de2a9f53dcda"
+                    }
+                ],
+                "max_temperature": 0,
+                "occupied": 14,
+                "cabinet_uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
+                "cabinet_name": "CB1-SF10",
+                "up_count": 0
+            }
+        ],
+        "co2_run_rate": 0.0
+    },
+    {
+        "datacenter_uuid": "6340900a-d401-4895-a8d2-993ac60f953e",
+        "datacenter_name": "DC3-Fin",
+        "cabinets": [
+            {
+                "total_power": 0.0,
+                "capacity": 45,
+                "down_count": 2,
+                "alerts": 0,
+                "pdus": [],
+                "max_temperature": 0,
+                "occupied": 8,
+                "cabinet_uuid": "921bd445-b7c6-47e4-b815-8de7b427819e",
+                "cabinet_name": "CAB1-Fin",
+                "up_count": 1
+            }
+        ],
+        "co2_run_rate": 0.0
+    },
+    {
+        "datacenter_uuid": "a6d76e20-175d-4b34-9189-fbcb0972f684",
+        "datacenter_name": "DC4-Test",
+        "cabinets": [],
+        "co2_run_rate": 0.0
+    }
+]

@@ -30,6 +30,11 @@ app.use((req, res, next) => {
     return mockProxy(req, res, next);
   }
 
+  if (req.url.startsWith("/chatbot")) {
+    console.log("→ MOCK:", req.url);
+    return mockProxy(req, res, next);
+  }
+
   console.log("→ UNITY:", req.url);
   return unityProxy(req, res, next);
 
