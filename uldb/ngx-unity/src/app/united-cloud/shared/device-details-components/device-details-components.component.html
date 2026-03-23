@@ -1,0 +1,3070 @@
+<ng-container>
+    <ng-contaner
+        *ngIf="showBGPPeers || showServices || showEvents || showTasks || showPerformanceOverview || showSystem || showStorage || showNetwork || showViptelaInterfaces || showLicense || showMerakiDeviceInterfaces || redfishInteg.redfish || deviceType==deviceMapping.STORAGE_DEVICES">
+        <div class="d-flex align-items-start">
+            <!-- Left scroll button -->
+            <button *ngIf="showScrollButtons" class="btn btn-sm btn-secondary py-2"
+                (click)="scrollTabs('left')">&lt;</button>
+
+            <!-- Scrollable Tabs -->
+            <div #tabHeaderContainer class="flex-grow-1 overflow-hidden">
+                <div class="tab-scroll-wrapper d-flex"
+                    style="overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+                    <style>
+                        .tab-scroll-wrapper::-webkit-scrollbar {
+                            display: none;
+                        }
+                    </style>
+                    <tabset ariaLabel="customTabs" id="tabset-container"
+                        *ngIf="(showViptelaInterfaces || showMerakiDeviceInterfaces || showLicense) ? (deviceInterfaceSummary?.total || tunnelViewDataCount || tlocViewDataCount || controlConnectionsViewDataCount || merakiDeviceEventsCount || licenseViewDataCount || merakiNetworkViewDataCount) : true">
+                        <ng-container
+                            *ngIf="(showViptelaInterfaces || showMerakiDeviceInterfaces) ? deviceInterfaceSummary?.total : (!showLicense && !showDatabases && !hideOldInterfacesTab)">
+                            <tab id="interfaces" heading="Interfaces" class="p-0" [active]="view === 'interfaces'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showBGPPeers">
+                            <tab id="bgp_peers" heading="BGP Peers" class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="redfishInteg.redfish">
+                            <ng-container>
+                                <tab id="Fans" heading="Fans" class="p-0" [active]="view === 'Fans'"
+                                    (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Power supplies" heading="Power Supplies" [active]="view === 'Power supplies'"
+                                    class="p-0" (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Chassis" heading="Chassis" class="p-0" [active]="view === 'Chassis'"
+                                    (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Temperatures" heading="Temperature" [active]="view === 'Temperatures'"
+                                    class="p-0" (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Voltages" heading="Voltage" class="p-0" [active]="view === 'Voltages'"
+                                    (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Processors" heading="Processors" class="p-0" [active]="view === 'Processors'"
+                                    (selectTab)="switchView($event)">
+
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Virtual disks" heading="Virtual Disk" class="p-0"
+                                    [active]="view === 'Virtual disks'" (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Physical disks" heading="Physical Disk" class="p-0"
+                                    [active]="view === 'Physical disks'" (selectTab)="switchView($event)">
+
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Managers" heading="Managers" class="p-0" [active]="view === 'Managers'"
+                                    (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Enclosures" heading="Enclosures" class="p-0" [active]="view === 'Enclosures'"
+                                    (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <tab id="Storage controllers" heading="Storage Controllers"
+                                    [active]="view === 'Storage controllers'" class="p-0"
+                                    (selectTab)="switchView($event)">
+                                </tab>
+                            </ng-container>
+                            <ng-container>
+                                <div #tab_batteries>
+                                    <tab id="Batteries" heading="Batteries" class="p-0" [active]="view === 'Batteries'"
+                                        (selectTab)="switchView($event)">
+                                    </tab>
+                                </div>
+                            </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="showServices">
+                            <tab id="services" heading="Services" class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+
+                        <ng-container *ngIf="isNetworkDeviceType">
+                            <tab id="ipAddress" heading="IP Address" [active]="view === 'ipAddress'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="macAddress" heading="MAC Address" [active]="view === 'macAddress'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="interface" heading="Interfaces" [active]="view === 'interface'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="os" heading="Operation System" [active]="view === 'os'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="hardwareComponents" heading="Hardware Components"
+                                [active]="view === 'hardwareComponents'" class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+
+                        <ng-container *ngIf="deviceType==deviceMapping.BARE_METAL_SERVER">
+                            <tab id="ipAddress" heading="IP Address" [active]="view === 'ipAddress'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="macAddress" heading="MAC Address" [active]="view === 'macAddress'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="cpuProcessors" heading="CPU Processors" [active]="view === 'cpuProcessors'"
+                                class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="interface" heading="Interface" [active]="view === 'interface'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="product" heading="Product" [active]="view === 'product'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="fileSystem" heading="File System" [active]="view === 'fileSystem'" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="operationSystem" heading="Operation System" [active]="view === 'operationSystem'"
+                                class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="softwareServer" heading="Software Server" [active]="view === 'softwareServer'"
+                                class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+
+                        <ng-container *ngIf="deviceType==deviceMapping.STORAGE_DEVICES">
+                            <tab id="ipAddress" heading="IP Address" class="p-0" [active]="view === 'ipAddress'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="macAddress" heading="MAC Address" class="p-0" [active]="view === 'macAddress'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="interface" heading="Interface" class="p-0" [active]="view === 'interface'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="operationSystem" heading="Operation System" class="p-0"
+                                [active]="view === 'operationSystem'" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+
+                        <ng-container *ngIf="showPerformanceOverview">
+                            <tab id="performance_overview" heading="Performace Overview" class="p-0"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showEvents">
+                            <tab id="events" heading="Events" class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showTasks">
+                            <tab id="tasks" heading="Tasks" class="p-0" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+
+                        <ng-container *ngIf="deviceType==deviceMapping.VMWARE_VIRTUAL_MACHINE">
+                            <tab id="ip_address" heading="IP Address" class="p-0" [active]="view === 'ip_address'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="mac_address" heading="MAC Address" class="p-0" [active]="view === 'mac_address'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="cpu_processor" heading="CPU Processor" class="p-0"
+                                [active]="view === 'cpu_processor'" (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="interface" heading="Interface" class="p-0" [active]="view === 'interface'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="product" heading="Product" class="p-0" [active]="view === 'product'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="file_system" heading="File System" class="p-0" [active]="view === 'file_system'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="os" heading="Operating System" class="p-0" [active]="view === 'os'"
+                                (selectTab)="switchView($event)">
+                            </tab>
+                            <tab id="software_server" heading="Software Server" class="p-0"
+                                [active]="view === 'software_server'" (selectTab)="switchView($event)">
+                            </tab>
+                        </ng-container>
+
+                        <ng-container *ngIf="showSystem">
+                            <tab id="system" heading="System" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="systemDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showStorage">
+                            <tab id="storage" heading="Storage" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="storageDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showNetwork">
+                            <tab id="network" heading="Network" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="networkDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <!-- <ng-container *ngIf="showSdwanInterface">
+                <tab id="sdwanInterface" heading="Interface" class="p-0" (selectTab)="switchView($event)">
+                    <ng-container *ngTemplateOutlet="sdwanInterfaceDetails"></ng-container>
+                </tab>
+            </ng-container> -->
+                        <ng-container *ngIf="showTunnels && tunnelViewDataCount">
+                            <tab id="tunnels" heading="Tunnel" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="tunnelDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showTLOC && tlocViewDataCount">
+                            <tab id="tloc" heading="TLOC" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="tlocDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showControlConnections && controlConnectionsViewDataCount">
+                            <tab id="controlConnections" heading="Control Connections" class="p-0"
+                                (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="controlConnectionDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showLicense && licenseViewDataCount">
+                            <tab id="merakiLicense" heading="License" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="licenseDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <ng-container *ngIf="showMerakiNetwork && merakiNetworkViewDataCount">
+                            <tab id="merakiOrgNetwork" heading="Networks" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="merakiNetworkDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                        <!-- <ng-container *ngIf="showSystem">
+                <tab id="system" heading="System" class="p-0" (selectTab)="switchView($event)">
+                    <ng-container *ngTemplateOutlet="systemDetails"></ng-container>
+                </tab>
+            </ng-container> -->
+                        <ng-container *ngIf="showMerakiDeviceEvents && merakiDeviceEventsCount">
+                            <tab id="merakiDeviceEvents" heading="Events" class="p-0" (selectTab)="switchView($event)">
+                                <ng-container *ngTemplateOutlet="merakiDeviceEventsDetails"></ng-container>
+                            </tab>
+                        </ng-container>
+                    </tabset>
+                </div>
+            </div>
+            <button *ngIf="showScrollButtons" class="btn btn-sm btn-secondary py-2"
+                (click)="scrollTabs('right')">&gt;</button>
+        </div>
+
+        <div class="tab-content-container">
+            <ng-container *ngIf="view == 'interfaces'">
+                <ng-container *ngTemplateOutlet="interfaceDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view == 'bgp_peers'">
+                <ng-container *ngTemplateOutlet="bgpPeerDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Fans'">
+                <ng-container *ngTemplateOutlet="fansDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Power supplies'">
+                <ng-container *ngTemplateOutlet="powerSupplyDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Chassis'">
+                <ng-container *ngTemplateOutlet="chassisDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Temperatures'">
+                <ng-container *ngTemplateOutlet="temperatureDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Voltages'">
+                <ng-container *ngTemplateOutlet="voltageDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Processors'">
+                <ng-container *ngTemplateOutlet="processorsDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Virtual disks'">
+                <ng-container *ngTemplateOutlet="virtualDiskDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Physical disks'">
+                <ng-container *ngTemplateOutlet="physicalDiskDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Managers'">
+                <ng-container *ngTemplateOutlet="managersDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Enclosures'">
+                <ng-container *ngTemplateOutlet="enclosersDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Storage controllers'">
+                <ng-container *ngTemplateOutlet="storageControllersDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view === 'Batteries'">
+                <ng-container *ngTemplateOutlet="batteriesDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view == 'services'">
+                <ng-container *ngTemplateOutlet="serviceDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="isNetworkDeviceType">
+                <ng-container *ngTemplateOutlet="networkDevicesTabsContentRef"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="deviceType==deviceMapping.BARE_METAL_SERVER">
+                <ng-container *ngTemplateOutlet="baremetalTabsContentRef"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="deviceType==deviceMapping.STORAGE_DEVICES">
+                <ng-container *ngTemplateOutlet="storageTabsContentRef"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view == 'performance_overview'">
+                <ng-container *ngTemplateOutlet="performanceOverviewDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view == 'events'">
+                <ng-container *ngTemplateOutlet="eventsDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="view == 'tasks'">
+                <ng-container *ngTemplateOutlet="tasksDetails"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="deviceType==deviceMapping.VMWARE_VIRTUAL_MACHINE">
+                <ng-container *ngTemplateOutlet="vmwareVmTabsContentRef"></ng-container>
+            </ng-container>
+        </div>
+
+    </ng-contaner>
+
+    <ng-contaner
+        *ngIf="!showBGPPeers && !showServices && !showViptelaInterfaces && !showLicense && !showMerakiDeviceEvents && (!redfishInteg.redfish && deviceType!=deviceMapping.STORAGE_DEVICES) && !showDatabases">
+        <ng-container *ngTemplateOutlet="interfaceDetails"></ng-container>
+    </ng-contaner>
+
+    <ng-contaner *ngIf="showDatabases">
+        <ng-container *ngTemplateOutlet="databaseDetails"></ng-container>
+    </ng-contaner>
+    <device-interface-crud (onCrud)="onCrud($event)"></device-interface-crud>
+</ng-container>
+
+<ng-template #networkDevicesTabsContentRef>
+    <ng-container *ngIf="view">
+        <ng-container [ngSwitch]="view">
+            <ng-container *ngSwitchCase="'ipAddress'">
+                <network-devices-details-components [activeTabId]="'ipAddress'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></network-devices-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'macAddress'">
+                <network-devices-details-components [activeTabId]="'macAddress'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></network-devices-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'interface'">
+                <network-devices-details-components [activeTabId]="'interface'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></network-devices-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'os'">
+                <network-devices-details-components [activeTabId]="'os'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></network-devices-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'hardwareComponents'">
+                <network-devices-details-components [activeTabId]="'hardwareComponents'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></network-devices-details-components>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #baremetalTabsContentRef>
+    <ng-container *ngIf="view">
+        <ng-container [ngSwitch]="view">
+            <ng-container *ngSwitchCase="'ipAddress'">
+                <baremetal-details-components [activeTabId]="'ipAddress'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'macAddress'">
+                <baremetal-details-components [activeTabId]="'macAddress'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'cpuProcessors'">
+                <baremetal-details-components [activeTabId]="'cpuProcessors'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'interface'">
+                <baremetal-details-components [activeTabId]="'interface'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'product'">
+                <baremetal-details-components [activeTabId]="'product'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'fileSystem'">
+                <baremetal-details-components [activeTabId]="'fileSystem'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'operationSystem'">
+                <baremetal-details-components [activeTabId]="'operationSystem'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'softwareServer'">
+                <baremetal-details-components [activeTabId]="'softwareServer'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></baremetal-details-components>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #storageTabsContentRef>
+    <ng-container *ngIf="view">
+        <ng-container [ngSwitch]="view">
+            <ng-container *ngSwitchCase="'ipAddress'">
+                <storage-details-components [activeTabId]="'ipAddress'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></storage-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'macAddress'">
+                <storage-details-components [activeTabId]="'macAddress'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></storage-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'interface'">
+                <storage-details-components [activeTabId]="'interface'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></storage-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'operationSystem'">
+                <storage-details-components [activeTabId]="'operationSystem'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></storage-details-components>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #vmwareVmTabsContentRef>
+    <ng-container *ngIf="view">
+        <ng-container [ngSwitch]="view">
+            <ng-container *ngSwitchCase="'ip_address'">
+                <vm-details-components [activeTabId]="'ip_address'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'mac_address'">
+                <vm-details-components [activeTabId]="'mac_address'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'cpu_processor'">
+                <vm-details-components [activeTabId]="'cpu_processor'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'interface'">
+                <vm-details-components [activeTabId]="'interface'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'product'">
+                <vm-details-components [activeTabId]="'product'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'file_system'">
+                <vm-details-components [activeTabId]="'file_system'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'os'">
+                <vm-details-components [activeTabId]="'os'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+            <ng-container *ngSwitchCase="'software_server'">
+                <vm-details-components [activeTabId]="'software_server'" [deviceType]="deviceType"
+                    [deviceId]="deviceId"></vm-details-components>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #interfaceDetails>
+    <div class="card mb-0 rounded-0" [class.border-0]="showBGPPeers">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{selectedInterfaceStatus ? selectedInterfaceStatus.value :
+                    deviceInterfaceSummary?.total}}</span>
+                <span class="ml-1 font-lg">Interfaces</span>
+            </div>
+            <div class="row mx-0 status font-xs-sm" [ngClass]="deviceType=='Meraki Device'? 'w-38':'w-75'">
+                <div class="col pl-0">
+                    <div class="card text-muted font-500 pointer-link mb-0" [class.active]="!selectedInterfaceStatus"
+                        (click)="getInterfacesByStatus(null)">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Total </span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.total}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedInterfaceStatus?.label == 'up'" (click)="getInterfacesByStatus('up')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Up</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.up}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedInterfaceStatus?.label == 'down'"
+                        (click)="getInterfacesByStatus('down')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Down</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.down}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedInterfaceStatus?.label == 'unknown'"
+                        (click)="getInterfacesByStatus('unknown')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">UnKnown</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.unknown}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col px-0" *ngIf="deviceType!='Meraki Device'">
+                    <div class="card text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedInterfaceStatus?.label == 'lowerLayerDown'"
+                        (click)="getInterfacesByStatus('lowerLayerDown')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Lower Layer Down</span>
+                            <span
+                                class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.lowerLayerDown}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pr-0" *ngIf="deviceType!='Meraki Device'">
+                    <div class="card text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedInterfaceStatus?.label == 'dormant'"
+                        (click)="getInterfacesByStatus('dormant')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Dormant</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.dormant}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pr-0" *ngIf="deviceType!='Meraki Device'">
+                    <div class="card text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedInterfaceStatus?.label == 'notPresent'"
+                        (click)="getInterfacesByStatus('notPresent')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Not Present</span>
+                            <span
+                                class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.notPresent}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pr-0" *ngIf="deviceType!='Meraki Device'">
+                    <div class="card text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedInterfaceStatus?.label == 'testing'"
+                        (click)="getInterfacesByStatus('testing')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Testing</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceInterfaceSummary?.testing}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'deviceInterfaceList'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-2">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                                <th>Mac Address</th>
+                                <th>Target Devices</th>
+                                <th>Target Interface</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let inf of deviceInterfaces;let i = index" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="inf.name"
+                                        *ngIf="!inf.interface_id || deviceType=='Viptela Device'|| deviceType=='Meraki Device'">
+                                        {{inf.name}}</div>
+                                    <button class="btn btn-link text-decoration-none table-column-btn p-0" type="button"
+                                        [tooltip]="inf.name" (click)="goToInterfaceDetails(inf.interface_id)"
+                                        *ngIf="inf.interface_id && deviceType!='Viptela Device'&& deviceType!='Meraki Device'">{{inf.name}}</button>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="inf.description">{{inf.description}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <shared-device-status [status]="inf.status"></shared-device-status>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="inf.type">{{inf.type}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="inf.mac_address">{{inf.mac_address}}</div>
+                                </td>
+                                <td [ngClass]="{'tdw-15':inf.remote_devices}">
+                                    <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                        [tooltip]="inf.remote_devices?.target_device" *ngIf="inf.remote_devices"
+                                        (click)="goToTargetDeviceDetails(inf.remote_devices)">{{inf.remote_devices?.target_device
+                                        || 'NA'}}</button>
+                                    <button class="action-icons fas fa-plus"
+                                        [ngClass]="{'action-icons-disabled':!inf.name || !inf.description}"
+                                        [tooltip]="getTooltipMsgForAddTargetDevice(inf)"
+                                        [disabled]="!inf.name || !inf.description" *ngIf="!inf.remote_devices"
+                                        (click)="addTargetDevice(inf)" accessControl moduleName="Monitoring"
+                                        accessType="Manage Monitoring" elementType="actionbtn"></button>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="inf.remote_devices?.interfaces?.description">
+                                        {{inf.remote_devices?.interfaces?.description || 'NA'}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="selectedInterfaceStatus ? selectedInterfaceStatus.value : deviceInterfaceSummary?.total">
+                        </table-entries>
+                        <table-pager
+                            *ngIf="selectedInterfaceStatus ? selectedInterfaceStatus.value : deviceInterfaceSummary?.total"
+                            [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="selectedInterfaceStatus ? selectedInterfaceStatus.value : deviceInterfaceSummary?.total"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!deviceInterfaces.length">No associated
+                            Interfaces
+                            found.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #fansDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{fansCount}}</span>
+                <span class="ml-1 font-lg">Fans</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'FansEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Reading</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Lower Threshold Warning</th>
+                                <th>Lower Threshold Critical</th>
+                                <th>UpperThreshold Warning</th>
+                                <th>Upper Threshold Critical</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of fansViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.reading">{{peer.reading}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.lowerThresholdWarning">{{peer.lowerThresholdWarning}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.lowerThresholdCritical">{{peer.lowerThresholdCritical}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.upperThresholdWarning">{{peer.upperThresholdWarning}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.upperThresholdCritical">{{peer.upperThresholdCritical}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="fansCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="fansCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!fansViewData.length">No Fans Data found.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #powerSupplyDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{powerSupplyCount}}</span>
+                <span class="ml-1 font-lg">Power Supply</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'PowerSupplyEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Firmware Version</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Part Number</th>
+                                <th>Power Supply Type</th>
+                                <th>Serial Number</th>
+                                <th>Output Wattage</th>
+                                <th>Input Wattage</th>
+                                <th>Input Voltage</th>
+                                <th>Input Voltage Type</th>
+                                <th>Power Output</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of powerSupplyViewData;let i = index" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.firmwareVersion">{{peer.firmwareVersion}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.partNumber">{{peer.partNumber}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.powerSupplyType">{{peer.powerSupplyType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.serialNumber">{{peer.serialNumber}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.outputWattage">{{peer.outputWattage}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.inputWattage">{{peer.inputWattage}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [tooltip]="peer.inputVoltage">{{peer.inputVoltage}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [tooltip]="peer.inputVoltageType">{{peer.inputVoltageType}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [tooltip]="peer.powerOutput">{{peer.powerOutput}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="powerSupplyCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="powerSupplyCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!powerSupplyViewData.length">No Power Supply
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #chassisDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{chassisCount}}</span>
+                <span class="ml-1 font-lg">Chassis</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'ChassisEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Chassis Type</th>
+                                <th>Part Number</th>
+                                <th>SKU</th>
+                                <th>Serial Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of chassisViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.manufacturer">{{peer.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.model">{{peer.model}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.chassisType">{{peer.chassisType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.partNumber">{{peer.partNumber}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.sku">{{peer.sku}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.serialNumber">{{peer.serialNumber}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="chassisCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="chassisCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!chassisViewData.length">No Chassis
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #temperatureDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{temperatureCount}}</span>
+                <span class="ml-1 font-lg">Temperature</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'TemperatureEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Reading Celsius</th>
+                                <th>Upper Threshold Critical (RPM)</th>
+                                <th>Lower Threshold Warning (RPM)</th>
+                                <th>Lower Threshold Critical (RPM)</th>
+                                <th>Upper Threshold Warning (RPM)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of temperatureViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.readingCelsius">{{peer.readingCelsius}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.upperThresholdCritical">{{peer.upperThresholdCritical}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.lowerThresholdWarning">{{peer.lowerThresholdWarning}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.lowerThresholdCritical">{{peer.lowerThresholdCritical}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.upperThresholdWarning">{{peer.upperThresholdWarning}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="temperatureCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="temperatureCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!temperatureViewData.length">No Temperature
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #voltageDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{voltageCount}}</span>
+                <span class="ml-1 font-lg">Voltage</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'VoltageEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Reading Volts</th>
+                                <!-- <th>Upper Threshold Critical</th>
+                                <th>Lower Threshold Warning</th>
+                                <th>Lower Threshold Critical</th>
+                                <th>Upper Threshold Warning</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of voltageViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.readingVolts">{{peer.readingVolts}}</div>
+                                </td>
+                                <!-- <td class="tdw-10">
+                                    <div [tooltip]="peer.upperThresholdCritical">{{peer.upperThresholdCritical}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.lowerThresholdWarning">{{peer.lowerThresholdWarning}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.lowerThresholdCritical">{{peer.lowerThresholdCritical}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.upperThresholdWarning">{{peer.upperThresholdWarning}}</div>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="voltageCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="voltageCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!voltageViewData.length">No Voltage
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #processorsDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{processorsCount}}</span>
+                <span class="ml-1 font-lg">Processors</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'ProcessorsEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Manufacturer</th>
+                                <th>Total Core</th>
+                                <th>Total Threads</th>
+                                <th>Processor Type</th>
+                                <th>model</th>
+                                <th>Max Speed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of processorsViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.manufacturer">{{peer.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.totalCore">{{peer.totalCore}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.totalThreads">{{peer.totalThreads}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.processorType">{{peer.processorType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.model">{{peer.model}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.maxSpeed">{{peer.maxSpeed}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="processorsCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="processorsCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!processorsViewData.length">No Chassis
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #virtualDiskDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{virtualDiskCount}}</span>
+                <span class="ml-1 font-lg">Virtual Disk</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'VirtualDiskEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Disk Type</th>
+                                <th>Media Type</th>
+                                <th>Size</th>
+                                <th>Serial Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of virtualDiskViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.manufacturer">{{peer.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.model">{{peer.model}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.diskType">{{peer.diskType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.mediaType">{{peer.mediaType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.size">{{peer.size}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.serialNumber">{{peer.serialNumber}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="virtualDiskCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="virtualDiskCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!virtualDiskViewData.length">No Virtual Disk
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #physicalDiskDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{physicalDiskCount}}</span>
+                <span class="ml-1 font-lg">Physical Disk</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'PhysicalDiskEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Disk Type</th>
+                                <th>Media Type</th>
+                                <th>Size(GB)</th>
+                                <th>Serial Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of physicalDiskViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.manufacturer">{{peer.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.model">{{peer.model}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.diskType">{{peer.diskType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.mediaType">{{peer.mediaType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.size">{{peer.size}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.serialNumber">{{peer.serialNumber}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="physicalDiskCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="physicalDiskCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!physicalDiskViewData.length">No Physical Disk
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #managersDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{managersCount}}</span>
+                <span class="ml-1 font-lg">Managers</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'ManagersEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Firmware Version</th>
+                                <th>Manager Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of managersViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.manufacturer">{{peer.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.model">{{peer.model}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.firmwareVersion">{{peer.firmwareVersion}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.managerType">{{peer.managerType}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="managersCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="managersCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!managersViewData.length">No Managers
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #enclosersDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{enclosersCount}}</span>
+                <span class="ml-1 font-lg">Enclosures</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'EnclosuresEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Asset Tag</th>
+                                <th>Chassis Type</th>
+                                <th>Part Number</th>
+                                <th>SKU</th>
+                                <th>Serial Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of enclosersViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.manufacturer">{{peer.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.model">{{peer.model}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.assetTag">{{peer.assetTag}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.chassisType">{{peer.chassisType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.partNumber">{{peer.partNumber}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.sku">{{peer.sku}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.serialNumber">{{peer.serialNumber}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="enclosersCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="enclosersCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!enclosersViewData.length">No Enclosures
+                            Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #storageControllersDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{storageControllersCount}}</span>
+                <span class="ml-1 font-lg">Storage Controllers</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'StorageEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Firmware Version</th>
+                                <th>Speed</th>
+                                <th>Serial Number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of storageControllersViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.manufacturer">{{peer.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.model">{{peer.model}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.firmwareVersion">{{peer.firmwareVersion}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.speed">{{peer.speed}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.serialNumber">{{peer.serialNumber}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="storageControllersCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="storageControllersCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!storageControllersViewData.length">No Storage
+                            Controllers Data found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #batteriesDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{batteriesCount}}</span>
+                <span class="ml-1 font-lg">Batteries</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'BatteriesEventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>State</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of batteriesViewData;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.name">{{peer.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.status">{{peer.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="peer.state">{{peer.state}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="batteriesCount">
+                        </table-entries>
+                        <table-pager *ngIf="fansViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="batteriesCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!batteriesViewData.length">No Batteries Data
+                            found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #bgpPeerDetails>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{selectedBgpPeerStatus ? selectedBgpPeerStatus.value :
+                    deviceBGPPeersSummary.total}}</span>
+                <span class="ml-1 font-lg">BGP Peers</span>
+            </div>
+            <div class="row mx-0 w-70 status font-xs-sm">
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="!selectedBgpPeerStatus" (click)="getBGPPeersByStatus(null)">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Total </span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceBGPPeersSummary?.total}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedBgpPeerStatus?.label == 'Idle'" (click)="getBGPPeersByStatus('Idle')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Idle</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceBGPPeersSummary?.Idle}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedBgpPeerStatus?.label == 'Connect'"
+                        (click)="getBGPPeersByStatus('Connect')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Connect</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceBGPPeersSummary?.Connect}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedBgpPeerStatus?.label == 'Active'"
+                        (click)="getBGPPeersByStatus('Active')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Active</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceBGPPeersSummary?.Active}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedBgpPeerStatus?.label == 'OpenSent'"
+                        (click)="getBGPPeersByStatus('OpenSent')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Open Sent</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceBGPPeersSummary?.OpenSent}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col px-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedBgpPeerStatus?.label == 'OpenConfirm'"
+                        (click)="getBGPPeersByStatus('OpenConfirm')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Open Confirm</span>
+                            <span
+                                class="ml-2 font-lg font-weight-bold value">{{deviceBGPPeersSummary?.OpenConfirm}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pr-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedBgpPeerStatus?.label == 'Established'"
+                        (click)="getBGPPeersByStatus('Established')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Established</span>
+                            <span
+                                class="ml-2 font-lg font-weight-bold value">{{deviceBGPPeersSummary?.Established}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'deviceBGPPeerList'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>name</th>
+                                <th>Status</th>
+                                <th>Local Address</th>
+                                <th>Remote Address</th>
+                                <th>Local Port</th>
+                                <th>Remote Port</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let peer of deviceBGPPeers;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.identifier">{{peer.identifier}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <shared-device-status [status]="peer.state"></shared-device-status>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.local_addr">{{peer.local_addr}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="peer.remote_addr">{{peer.remote_addr}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="peer.local_port">{{peer.local_port}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="peer?.remote_port">{{peer?.remote_port}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="selectedBgpPeerStatus ? selectedBgpPeerStatus.value : deviceBGPPeersSummary.total">
+                        </table-entries>
+                        <table-pager
+                            *ngIf="selectedBgpPeerStatus ? selectedBgpPeerStatus.value : deviceBGPPeersSummary.total"
+                            [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="selectedBgpPeerStatus ? selectedBgpPeerStatus.value : deviceBGPPeersSummary.total"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!deviceBGPPeers.length">No associated BGP Peers
+                            found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #serviceDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{selectedServiceStatus ? selectedServiceStatus.value :
+                    deviceServicesSummary.total}}</span>
+                <span class="ml-1 font-lg">Services</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-center w-25">
+                <div class="w-100">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+            </div>
+            <div class="row mx-0 w-60 status font-xs-sm">
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="!selectedServiceStatus" (click)="getServicesByStatus(null)">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Total </span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceServicesSummary?.total}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedServiceStatus?.label == 'running'"
+                        (click)="getServicesByStatus('running')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Running</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceServicesSummary?.running}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedServiceStatus?.label == 'stopped'"
+                        (click)="getServicesByStatus('stopped')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Stopped</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceServicesSummary?.stopped}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col pl-0">
+                    <div class="card round-edge text-muted font-500 pointer-link mb-0"
+                        [class.active]="selectedServiceStatus?.label == 'unknown'"
+                        (click)="getServicesByStatus('unknown')">
+                        <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                            <span class="text-truncate">Unknown</span>
+                            <span class="ml-2 font-lg font-weight-bold value">{{deviceServicesSummary?.unknown}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'ServicesSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-2">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Discovery Time</th>
+                                <!-- <th>Updated At</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of deviceServices;let i = index" truncateText>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.name">{{view.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <span *ngIf="view.status"><i class="fa" [ngClass]="view.statusIcon"
+                                            [tooltip]="view.status" container="body"></i></span>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.description">{{view.description}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="view.type">{{view.type}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="view.createdAt">{{view.createdAt}}</div>
+                                </td>
+                                <!-- <td class="tdw-15">
+                                    <div [tooltip]="view.updatedAt">{{view.updatedAt}}</div>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="selectedServiceStatus ? selectedServiceStatus.value : deviceServicesSummary.total">
+                        </table-entries>
+                        <table-pager
+                            *ngIf="selectedServiceStatus ? selectedServiceStatus.value : deviceServicesSummary.total"
+                            [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="selectedServiceStatus ? selectedServiceStatus.value : deviceServicesSummary.total"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!deviceServices.length">No Services found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #performanceOverviewDetails>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <app-spinner [name]="'PerformanceOverviewSpinner'"></app-spinner>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8" *ngIf="devicePerformanceOverview">
+                    <div class="row border">
+                        <div class="col-3 border-right performance-overview-bg-color py-2">
+                            <span class="align-middle">Memory(MB)</span>
+                        </div>
+                        <div class="col-9">
+                            <div class="row pt-1">
+                                <div class="col-4 py-1 performance-overview-bg-color ml-2 rounded border">
+                                    <span>{{devicePerformanceOverview.memory}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row border border-top-0">
+                        <div class="col-3 border-right performance-overview-bg-color py-2">
+                            <span class="align-middle">CPUs</span>
+                        </div>
+                        <div class="col-9">
+                            <div class="row pt-1">
+                                <div class="col-4 py-1 performance-overview-bg-color ml-2 rounded border">
+                                    <span>{{devicePerformanceOverview.vCpus}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row border border-top-0" *ngFor="let disk of devicePerformanceOverview.hardDisks">
+                        <div class="col-3 border-right performance-overview-bg-color py-2">
+                            <span class="align-middle">{{disk.diskLabel}}</span>
+                        </div>
+                        <div class="col-9">
+                            <div class="row pt-1">
+                                <div class="col-4 py-1 performance-overview-bg-color ml-2 rounded border">
+                                    <span>{{disk.diskSize}} {{disk.diskSizeUnit}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row border border-top-0"
+                        *ngFor="let networkAdapter of devicePerformanceOverview.networkAdapters">
+                        <div class="col-3 border-right performance-overview-bg-color py-2">
+                            <span class="align-middle">{{networkAdapter.adapterLabel}}</span>
+                        </div>
+                        <div class="col-9">
+                            <div class="row pt-1">
+                                <div class="col-4 py-1 performance-overview-bg-color ml-2 rounded border">
+                                    <span>{{networkAdapter.adapterName}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="text-center text-muted py-4" *ngIf="!devicePerformanceOverview">No Performance Overview
+                        found.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #eventsDetails>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <div class="card-header bg-transparent p-2">
+            <div class="row">
+                <div class="col-1 pl-2 mt-1">
+                    <div class="d-flex justify-content-start align-items-center font-500 pl-1">
+                        <span class="badge badge-secondary font-sm">{{deviceEventsCount}}</span>
+                        <span class="ml-1 font-lg">Events</span>
+                    </div>
+                </div>
+                <div class="col-3 pr-0">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div class="col-7 ml-5">
+                    <form class="form-inline" [formGroup]="eventsFilterForm" *ngIf="eventsFilterForm">
+                        <div class="row w-100">
+                            <div class="form-group col-3">
+                                <select class="form-control w-100" formControlName="period"
+                                    [class.is-invalid]="eventsFilterFormErrors.period">
+                                    <option [value]="eventsTimeRange.LAST_24_HOURS">Last 24 Hours</option>
+                                    <option [value]="eventsTimeRange.YESTERDAY">Yesterday</option>
+                                    <option [value]="eventsTimeRange.LAST_WEEK">Last Week</option>
+                                    <option [value]="eventsTimeRange.LAST_MONTH">Last Month</option>
+                                    <option [value]="eventsTimeRange.LAST_YEAR">Last Year</option>
+                                    <option [value]="eventsTimeRange.CUSTOM">Custom</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="eventsFilterFormErrors.period">
+                                    {{eventsFilterFormErrors.period}}</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <label for="from">From :&nbsp;</label>
+                                    <owl-date-time #from [hour12Timer]="true"
+                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                    <input class="form-control rounded-left" formControlName="from"
+                                        [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from"
+                                        placeholder="from" [max]="now">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="from">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <label for="to">To :&nbsp;</label>
+                                    <owl-date-time #to [hour12Timer]="true"
+                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                    <input class="form-control rounded-left" formControlName="to"
+                                        [owlDateTimeTrigger]="to" [owlDateTime]="to" type="text" name="to"
+                                        placeholder="to" [min]="eventsFilterForm.controls.from.value" [max]="now">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="to">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-1 pr-0">
+                                <button class="btn btn-warning btn-pill pull-left" [disabled]="eventsFilterForm.invalid"
+                                    (click)="onEventsFilterFormSubmit()">Update</button>
+                            </div>
+                        </div>
+                        <div class="row w-100 offset-6 invalid-credentials"
+                            *ngIf="eventsFilterForm.errors && eventsFilterForm.errors.fromSameAsOrAfterTo">
+                            Start date and time should be less than end date and time
+                        </div>
+                    </form>
+                </div>
+                <div class="w-3 ml-2">
+                    <button class="action-icons fas fa-sync font-sm pull-right" (click)="syncEvents()"
+                        [tooltip]="deviceEventsSyncInProgress ? 'In Progress': 'Sync Now'"
+                        [ngClass]="{'action-icons-disabled fa-spin': deviceEventsSyncInProgress}" accessControl
+                        moduleName="Private Cloud" accessType="Manage Private Cloud" elementType="actionbtn">
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'EventsSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Description</th>
+                                <th>Event Type</th>
+                                <th>Native Event Type</th>
+                                <th>Created On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let event of deviceEvents;let i = index" truncateText>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.username">{{event.username}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="event.description">{{event.description}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="event.eventType">{{event.eventType}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="event.nativeEventType">{{event.nativeEventType}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="event.createdOn">{{event.createdOn}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="deviceEventsCount">
+                        </table-entries>
+                        <table-pager *ngIf="deviceEventsCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="deviceEventsCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!deviceEvents?.length">No associated Events
+                            found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tasksDetails>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <div class="card-header bg-transparent p-2">
+            <div class="row">
+                <div class="col-1 pl-2 mt-1">
+                    <div class="d-flex justify-content-start align-items-center font-500 pl-1">
+                        <span class="badge badge-secondary font-sm">{{deviceTasksCount}}</span>
+                        <span class="ml-1 font-lg">Tasks</span>
+                    </div>
+                </div>
+                <div class="col-3 pr-0">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div class="col-7 ml-5">
+                    <form class="form-inline" [formGroup]="tasksFilterForm" *ngIf="tasksFilterForm">
+                        <div class="row w-100">
+                            <div class="form-group col-3">
+                                <select class="form-control w-100" formControlName="period"
+                                    [class.is-invalid]="tasksFilterFormErrors.period">
+                                    <option [value]="tasksTimeRange.LAST_24_HOURS">Last 24 Hours</option>
+                                    <option [value]="tasksTimeRange.YESTERDAY">Yesterday</option>
+                                    <option [value]="tasksTimeRange.LAST_WEEK">Last Week</option>
+                                    <option [value]="tasksTimeRange.LAST_MONTH">Last Month</option>
+                                    <option [value]="tasksTimeRange.LAST_YEAR">Last Year</option>
+                                    <option [value]="tasksTimeRange.CUSTOM">Custom</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="tasksFilterFormErrors.period">
+                                    {{tasksFilterFormErrors.period}}</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <label for="from">From :&nbsp;</label>
+                                    <owl-date-time #from [hour12Timer]="true"
+                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                    <input class="form-control rounded-left" formControlName="from"
+                                        [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from"
+                                        placeholder="from" [max]="now">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="from">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="input-group">
+                                    <label for="to">To :&nbsp;</label>
+                                    <owl-date-time #to [hour12Timer]="true"
+                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                    <input class="form-control rounded-left" formControlName="to"
+                                        [owlDateTimeTrigger]="to" [owlDateTime]="to" type="text" name="to"
+                                        placeholder="to" [min]="tasksFilterForm.controls.from.value" [max]="now">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="to">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-1 pr-0">
+                                <button class="btn btn-warning btn-pill pull-left" [disabled]="tasksFilterForm.invalid"
+                                    (click)="onTasksFilterFormSubmit()">Update</button>
+                            </div>
+                        </div>
+                        <div class="row w-100 offset-6 invalid-credentials"
+                            *ngIf="tasksFilterForm.errors && tasksFilterForm.errors.fromSameAsOrAfterTo">
+                            Start date and time should be less than end date and time
+                        </div>
+                    </form>
+                </div>
+                <div class="w-3 ml-2">
+                    <button class="action-icons fas fa-sync font-sm pull-right" (click)="syncTasks()"
+                        [tooltip]="deviceTasksSyncInProgress ? 'In Progress': 'Sync Now'"
+                        [ngClass]="{'action-icons-disabled fa-spin': deviceTasksSyncInProgress}" accessControl
+                        moduleName="Private Cloud" accessType="Manage Private Cloud" elementType="actionbtn">
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'TasksSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Start Time</th>
+                                <th>Completion Time</th>
+                                <th>Queued Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let task of deviceTasks;let i = index" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="task.username">{{task.username}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="task.description">{{task.description}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="task.status">{{task.status}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="task.startTime">{{task.startTime}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="task.completionTime">{{task.completionTime}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="task.queuedTime">{{task.queuedTime}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="deviceTasksCount">
+                        </table-entries>
+                        <table-pager *ngIf="deviceTasksCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="deviceTasksCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!deviceTasks?.length">No associated Tasks
+                            found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #systemDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <div class="row w-35 font-xs-sm status">
+                        <div class="col-3 pr-0">
+                            <div class="card text-muted font-500 pointer-link mb-0" [class.active]="view == 'system'"
+                                (click)="switchView('system')">
+                                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate">Firewall</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-2">
+                    <div class="row pb-2 d-flex justify-content-between">
+                        <div class="col-2">
+                            <!-- <search-box [searchValue]="hypervisorCurrentCriteria.searchValue"
+                                (searched)="onSearched($event)"></search-box> -->
+                        </div>
+                        <div class="col-3 d-flex justify-content-end">
+                            <table-page-size [currentPageSize]="hypervisorCurrentCriteria.pageSize"
+                                [totalCount]="systemFirewallCount"
+                                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                        </div>
+                    </div>
+                    <app-spinner [name]="'FireWallSpinner'"></app-spinner>
+                    <table class="table table-sm text-left">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Service Name</th>
+                                <th>Enabled</th>
+                                <th>Allowed IP Address</th>
+                                <th>TCP Ports</th>
+                                <th>UDP Ports</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let systemFirewall of systemFirewallViewData" truncateText>
+                                <td class="tdw-15">
+                                    <div [tooltip]="systemFirewall.serviceName">{{systemFirewall.serviceName}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="systemFirewall.enabled">
+                                        {{systemFirewall.enabled}}
+                                    </div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="systemFirewall.allowedIpAddresses">
+                                        {{systemFirewall.allowedIpAddresses}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="systemFirewall.tcpPorts">{{systemFirewall.tcpPorts}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="systemFirewall.udpPorts">{{systemFirewall.udpPorts}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                        [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="systemFirewallCount">
+                    </table-entries>
+                    <table-pager *ngIf="systemFirewallViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                        [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="systemFirewallCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!systemFirewallViewData.length" class="text-center text-muted py-4">No Firewall Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #storageDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <div class="row w-35 font-xs-sm status">
+                        <div class="col-4 pr-0">
+                            <div class="card text-muted font-500 pointer-link mb-0"
+                                [class.active]="selectedViewStorage == 'storageAdapters'"
+                                (click)="getSelectedViewStorage('storageAdapters')">
+                                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate">Storage Adapter</span>
+                                    <!-- <span
+                                        class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.distributedPortGroups}}</span> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 pr-0">
+                            <div class="card text-muted font-500 pointer-link mb-0"
+                                [class.active]="selectedViewStorage == 'storageDevices'"
+                                (click)="getSelectedViewStorage('storageDevices')">
+                                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate">Storage Devices</span>
+                                    <!-- <span
+                                        class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.distributedPortGroups}}</span> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row pb-2 d-flex justify-content-between">
+                        <div class="col-2">
+                            <!-- <search-box [searchValue]="hypervisorCurrentCriteria.searchValue"
+                                (searched)="onSearched($event)"></search-box> -->
+                        </div>
+                        <div class="col-3 d-flex justify-content-end">
+                            <table-page-size [currentPageSize]="hypervisorCurrentCriteria.pageSize"
+                                [totalCount]="storageAdapterViewDataCount"
+                                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                        </div>
+                    </div>
+                    <div *ngIf="selectedViewStorage == 'storageAdapters'">
+                        <table class="table table-sm text-left">
+                            <!-- <app-spinner [name]="'StorageSpinner'"></app-spinner> -->
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Model</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Targets</th>
+                                    <th>Devices</th>
+                                    <th>Paths</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let storageAdapter of storageAdapterViewData" truncateText>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="storageAdapter.name">{{storageAdapter.name}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="storageAdapter.model">
+                                            {{storageAdapter.model}}
+                                        </div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="storageAdapter.type">{{storageAdapter.type}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="storageAdapter.status">{{storageAdapter.status}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="storageAdapter.targets">{{storageAdapter.targets}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="storageAdapter.devices">{{storageAdapter.devices}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="storageAdapter.paths">{{storageAdapter.paths}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="storageAdapterViewDataCount">
+                        </table-entries>
+                        <table-pager *ngIf="storageAdapterViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="storageAdapterViewDataCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <p *ngIf="!storageAdapterViewData.length" class="text-center text-muted py-4">No Storage
+                            Adapters Available.
+                        </p>
+                    </div>
+
+                    <div *ngIf="selectedViewStorage == 'storageDevices'">
+                        <table class="table table-sm text-left">
+                            <!-- <app-spinner [name]="'StorageSpinner'"></app-spinner> -->
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Path</th>
+                                    <th>Type</th>
+                                    <th>Capacity</th>
+                                    <th>Operational State</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let storageDevices of storageDevicesViewData" truncateText>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="storageDevices.name">{{storageDevices.name}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="storageDevices.path">
+                                            {{storageDevices.path}}
+                                        </div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="storageDevices.type">{{storageDevices.type}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="storageDevices.capacity">{{storageDevices.capacity}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="storageDevices.operationalState">
+                                            {{storageDevices.operationalState}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="storageAdapterViewDataCount">
+                        </table-entries>
+                        <table-pager *ngIf="storageDevicesViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="storageAdapterViewDataCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <p *ngIf="!storageDevicesViewData.length" class="text-center text-muted py-4">No Storage Devices
+                            Available.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <ng-template #storageAdapterRef> -->
+
+</ng-template>
+
+<ng-template #networkDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-header bg-transparent">
+                    <div class="row w-35 font-xs-sm status">
+                        <div class="col-4 pr-0">
+                            <div class="card text-muted font-500 pointer-link mb-0"
+                                [class.active]="networkTabSwitches == 'vswitches'"
+                                (click)="switchNetworkView('vswitches')">
+                                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate">Virtual Switches</span>
+                                    <!-- <span
+                                        class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.distributedPortGroups}}</span> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 pr-0">
+                            <div class="card text-muted font-500 pointer-link mb-0"
+                                [class.active]="networkTabSwitches == 'vmKernelAdp'"
+                                (click)="switchNetworkView('vmKernelAdp')">
+                                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate">Vm Kernel Adapters</span>
+                                    <!-- <span
+                                        class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.distributedPortGroups}}</span> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4 pr-0">
+                            <div class="card text-muted font-500 pointer-link mb-0"
+                                [class.active]="networkTabSwitches == 'phyAdp'" (click)="switchNetworkView('phyAdp')">
+                                <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                    <span class="text-truncate">Physical Adapters</span>
+                                    <!-- <span
+                                        class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.distributedPortGroups}}</span> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="card-body pt-2">
+                    <ng-container *ngSwitchCase="'system'">
+                        <ng-container *ngTemplateOutlet="systemRef"></ng-container>
+                    </ng-container>
+                </div> -->
+                <div class="card-body pt-2">
+                    <div class="row pb-2 d-flex justify-content-between">
+                        <div class="col-2">
+                            <!-- <search-box [searchValue]="hypervisorCurrentCriteria.searchValue"
+                                (searched)="onSearched($event)"></search-box> -->
+                        </div>
+                        <div class="col-3 d-flex justify-content-end">
+                            <table-page-size [currentPageSize]="hypervisorCurrentCriteria.pageSize"
+                                [totalCount]="networkCountData"
+                                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                        </div>
+                    </div>
+                    <div *ngIf="networkTabSwitches == 'vswitches'">
+                        <table class="table table-sm text-left">
+                            <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Physical Adapter</th>
+                                    <th>Port Group</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let vSwitches of vSwitchesViewData" truncateText>
+                                    <td class="tdw-30">
+                                        <div [tooltip]="vSwitches.name">{{vSwitches.name}}</div>
+                                    </td>
+                                    <td class="tdw-30">
+                                        <div [tooltip]="vSwitches.physicalAdapter">{{vSwitches.physicalAdapter}}</div>
+                                    </td>
+                                    <td class="tdw-40">
+                                        <div [tooltip]="vSwitches.portGroup">{{vSwitches.portGroup}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="networkCountData">
+                        </table-entries>
+                        <table-pager *ngIf="vSwitchesViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="networkCountData"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <p *ngIf="!vSwitchesViewData.length" class="text-center text-muted py-4">No Virtual Switches
+                            display.
+                        </p>
+                    </div>
+                    <div *ngIf="networkTabSwitches == 'vmKernelAdp'">
+                        <table class="table table-sm text-left">
+                            <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Network Label</th>
+                                    <th>Switch</th>
+                                    <th>IP Address</th>
+                                    <th>MAC Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let vmKernelAdapter of vmKernelAdapterViewData" truncateText>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="vmKernelAdapter.device">{{vmKernelAdapter.device}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="vmKernelAdapter.networkLabel">{{vmKernelAdapter.networkLabel}}
+                                        </div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="vmKernelAdapter.switch">{{vmKernelAdapter.switch}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="vmKernelAdapter.ipAddress">{{vmKernelAdapter.ipAddress}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="vmKernelAdapter.macAddress">{{vmKernelAdapter.macAddress}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="networkCountData">
+                        </table-entries>
+                        <table-pager *ngIf="vmKernelAdapterViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="networkCountData"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <p *ngIf="!vmKernelAdapterViewData.length" class="text-center text-muted py-4">No Virtual
+                            Kernel Adapter Available.
+                        </p>
+                    </div>
+                    <div *ngIf="networkTabSwitches == 'phyAdp'">
+                        <table class="table table-sm text-left">
+                            <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Actual Speed</th>
+                                    <th>Configured Speed</th>
+                                    <th>Switch</th>
+                                    <th>MAC Address</th>
+                                    <th>IP Address</th>
+                                    <th>Wake On Lan Supported</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let physicalAdapter of physicalAdapterViewData" truncateText>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="physicalAdapter.device">{{physicalAdapter.device}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="physicalAdapter.actualSpeed">{{physicalAdapter.actualSpeed}}
+                                        </div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="physicalAdapter.configuredSpeed">
+                                            {{physicalAdapter.configuredSpeed}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="physicalAdapter.switch">{{physicalAdapter.switch}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="physicalAdapter.macAddress">{{physicalAdapter.macAddress}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="physicalAdapter.ipAddress">{{physicalAdapter.ipAddress}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="physicalAdapter.wakeOnLanSupported">
+                                            {{physicalAdapter.wakeOnLanSupported}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="networkCountData">
+                        </table-entries>
+                        <table-pager *ngIf="physicalAdapterViewData.length" [pageNo]="hypervisorCurrentCriteria.pageNo"
+                            [pageSize]="hypervisorCurrentCriteria.pageSize" [totalCount]="networkCountData"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <p *ngIf="!physicalAdapterViewData.length" class="text-center text-muted py-4">No Physical
+                            Adapter Available.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+
+    <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+
+</ng-template>
+
+<ng-template #controlConnectionDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-body px-1 py-0">
+                    <table class="table table-sm text-left">
+                        <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Peer Type</th>
+                                <th>Peer System IP</th>
+                                <th>Peer Protocol</th>
+                                <th>Private IP</th>
+                                <th>Private Port</th>
+                                <th>Public IP</th>
+                                <th>Public Port</th>
+                                <th>Up Time</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let controlConnections of controlConnectionsViewData" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.connectedDevice?.deviceType">
+                                        {{controlConnections.connectedDevice?.deviceType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.connectedDevice?.localSystemIp">
+                                        {{controlConnections.connectedDevice?.localSystemIp}}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.protocol">{{controlConnections.protocol}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.privateIp">{{controlConnections.privateIp}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.privatePort">{{controlConnections.privatePort}}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.publicIp">{{controlConnections.publicIp}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.publicPort">{{controlConnections.publicPort}}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.uptime">{{controlConnections.uptime}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="controlConnections.lastUpdated">{{controlConnections.lastUpdated}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="controlConnectionsViewDataCount">
+                    </table-entries>
+                    <table-pager *ngIf="controlConnectionsViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="controlConnectionsViewDataCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!controlConnectionsViewData.length" class="text-center text-muted py-4">No Control
+                        Connections Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #sdwanInterfaceDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-body px-1 py-0">
+                    <table class="table table-sm text-left">
+                        <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                        <thead class="bg-light">
+                            <tr>
+                                <th>VPN(VRF)</th>
+                                <th>Interface Name</th>
+                                <th>Interface Description</th>
+                                <th>Physical Address</th>
+                                <th>IPv4 Address</th>
+                                <th>IPv4 Subnet Mask</th>
+                                <th>Status</th>
+                                <th>Interface Type</th>
+                                <th>Speed</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let sdwanInterface of sdwanInterfaceViewData" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.vpnId">{{sdwanInterface.vpnId}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.name">{{sdwanInterface.name}}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.description">{{sdwanInterface.description}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.macAddress">{{sdwanInterface.macAddress}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.ipAddress">{{sdwanInterface.ipAddress}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.ipAddress">{{sdwanInterface.ipAddress}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <shared-device-status
+                                        [status]="sdwanInterface.operationalStatus"></shared-device-status>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.interfaceType">{{sdwanInterface.interfaceType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.speed">{{sdwanInterface.speed}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="sdwanInterface.lastUpdated">{{sdwanInterface.lastUpdated}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="sdwanInterfaceViewDataCount">
+                    </table-entries>
+                    <table-pager *ngIf="sdwanInterfaceViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="sdwanInterfaceViewDataCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!sdwanInterfaceViewData.length" class="text-center text-muted py-4">No SDWan Interfaces
+                        Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #tunnelDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-body px-1 py-0">
+                    <table class="table table-sm text-left">
+                        <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Tunnel Endpoints</th>
+                                <th>Interface Description</th>
+                                <th>Interface Endpoints</th>
+                                <th>Protocol</th>
+                                <th>Jitter</th>
+                                <th>Status</th>
+                                <th>Loss(%)</th>
+                                <th>FEC Loss Recovery</th>
+                                <th>Latency</th>
+                                <th>QoE Score</th>
+                                <th>Total Tx Bytes</th>
+                                <th>Total Rx Bytes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let tunnel of tunnelViewData" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="tunnel.tunnelEndpoints">{{tunnel.tunnelEndpoints}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.localInterfaceDescription">
+                                        {{tunnel.localInterfaceDescription}}
+                                    </div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.localRemoteInterfaceName">
+                                        {{tunnel.localRemoteInterfaceName}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.protocol">{{tunnel.protocol}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.jitter">{{tunnel.jitter}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <shared-device-status [status]="tunnel.state"></shared-device-status>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.lossPercentage">{{tunnel.lossPercentage}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.fecLossRecovery">{{tunnel.fecLossRecovery}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.latency">{{tunnel.latency}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.vqoeScore">{{tunnel.vqoeScore}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.txOctets">{{tunnel.txOctets}}</div>
+                                </td>
+                                <td class="tdw-8">
+                                    <div [tooltip]="tunnel.rxOctets">{{tunnel.rxOctets}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="tunnelViewDataCount">
+                    </table-entries>
+                    <table-pager *ngIf="tunnelViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="tunnelViewDataCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!tunnelViewData.length" class="text-center text-muted py-4">No Tunnel Details
+                        Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tlocDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-body px-1 py-0">
+                    <table class="table table-sm text-left">
+                        <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Local Color</th>
+                                <th>Status</th>
+                                <th>Jitter(ms)</th>
+                                <th>Loss(%)</th>
+                                <th>Latency(ms)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let tloc of tlocViewData" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="tloc.tlocType">{{tloc.tlocType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <shared-device-status [status]="tloc.status"></shared-device-status>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="tloc.jitter">{{tloc.jitter}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="tloc.lossPercentage">{{tloc.lossPercentage}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="tloc.latency">{{tloc.latency}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="tlocViewDataCount">
+                    </table-entries>
+                    <table-pager *ngIf="tlocViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="tlocViewDataCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!tlocViewData.length" class="text-center text-muted py-4">No TLOC Details
+                        Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #licenseDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-body px-1 py-0">
+                    <table class="table table-sm text-left">
+                        <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                        <thead class="bg-light">
+                            <tr>
+                                <th>License Type</th>
+                                <th>Device Serial</th>
+                                <th>Network ID</th>
+                                <th>State</th>
+                                <th>Seat Count</th>
+                                <th>Claim Date</th>
+                                <th>Activation Date</th>
+                                <th>Expiration Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let license of licenseViewData" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.licenseType">{{license.licenseType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.deviceSerial">{{license.deviceSerial}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.networkId">{{license.networkId}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.state">{{license.state}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.seatCount">{{license.seatCount}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.claimDate">{{license.claimDate}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.activationDate">{{license.activationDate}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="license.expirationDate">{{license.expirationDate}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="licenseViewDataCount">
+                    </table-entries>
+                    <table-pager *ngIf="licenseViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="licenseViewDataCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!licenseViewData.length" class="text-center text-muted py-4">No License Details
+                        Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #merakiNetworkDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-body px-1 py-0">
+                    <table class="table table-sm text-left">
+                        <!-- <app-spinner [name]="'NetworkSpinner'"></app-spinner> -->
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 10%;">Network Id</th>
+                                <th style="width: 10%;">Name</th>
+                                <th style="width: 10%;">Product Types</th>
+                                <th style="width: 10%;">Is Virtual</th>
+                                <th style="width: 10%;">Org Name</th>
+                                <th style="width: 10%;">Organization ID</th>
+                                <th style="width: 10%;">URL</th>
+                                <th style="width: 10%;">Time Zone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let network of merakiNetworkViewData" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="network.networkId">{{network.networkId}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="network.name">{{network.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="network.productTypes">{{network.productTypes}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="network.isVirtual">{{network.isVirtual}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="network.merakiOrganizationName">{{network.merakiOrganizationName}}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="network.merakiOrganizationId">{{network.merakiOrganizationId}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div class="text-primary pointer-link" (click)="openInNewTab(network)">Client URL
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="network.timezone">{{network.timezone}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="merakiNetworkViewDataCount">
+                    </table-entries>
+                    <table-pager *ngIf="merakiNetworkViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="merakiNetworkViewDataCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!merakiNetworkViewData.length" class="text-center text-muted py-4">No Network Details
+                        Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #merakiDeviceEventsDetails>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-body px-1 py-0">
+                    <app-spinner [name]="'MerakiDeviceEventsSpinner'"></app-spinner>
+                    <table class="table table-sm text-left">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Event Type</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Occured At</th>
+                                <th>Details</th>
+                                <th>Event Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let event of merakiDeviceEventsViewData" truncateText>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.eventType">{{event.eventType}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.description">{{event.description}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.category">{{event.category}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.occuredAt">{{event.occuredAt}}</div>
+                                </td>
+                                <td class="tdw-17">
+                                    <div [tooltip]="event.eventDetails">{{event.eventDetails}}
+                                    </div>
+                                </td>
+                                <td class="tdw-17">
+                                    <div [tooltip]="event.eventData">{{event.eventData}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="merakiDeviceEventsCount">
+                    </table-entries>
+                    <table-pager *ngIf="merakiDeviceEventsViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="merakiDeviceEventsCount"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <p *ngIf="!merakiDeviceEventsViewData.length" class="text-center text-muted py-4">No Events Details
+                        Available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #databaseDetails>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{databasesCount}}</span>
+                <span class="ml-1 font-lg">Databases</span>
+            </div>
+            <div class="d-flex justify-content-end align-items-center">
+                <devices-file-upload [deviceType]="'database_entity'"
+                    [uuids]="selectedDbEntityIds"></devices-file-upload>
+
+                <ng-container *ngIf="selectedDbEntityIds?.length">
+                    <button class="btn btn-sm btn-pill btn-warning ml-1 font-500" type="button"
+                        (click)="bulkUpdate()">Update</button>
+                    <!-- <button class="btn btn-sm btn-pill btn-danger ml-1 font-500" type="button"
+                      (click)="bulkDelete()">Delete</button> -->
+                </ng-container>
+
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'DatabaseEventSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-2">
+                        <thead class="bg-light">
+                            <tr>
+                                <th scope="col">
+                                    <span class="bg-white text-primary">
+                                        <i class="fa-check-square" [ngClass]="selectedAll? 'fas':'far'"
+                                            (click)="$event.stopPropagation();selectAll()"></i>
+                                    </span>
+                                </th>
+                                <th>Name</th>
+                                <th>Short Description</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Description</th>
+                                <th>Version</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let db of databasesViewData;let i = index" truncateText>
+                                <td class="tdw-2">
+                                    <span class="bg-white mr-1 text-primary"
+                                        (click)="$event.stopPropagation();select(db);" accessControl
+                                        moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn"
+                                        [modulePermissions]="db.applicableModulePermissions">
+                                        <i [ngClass]="db.isSelected? 'fas fa-check-square': 'far fa-square'"></i>
+                                    </span>
+                                </td>
+                                <td class="tdw-15">
+                                    <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                        [tooltip]="db.name" (click)="goToDatabaseDetails(db)">{{db.name}}</button>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="db.shortDescription">{{db.shortDescription}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="db.manufacturer">{{db.manufacturer}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="db.model">{{db.model}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="db.description">{{db.description}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="db.version">{{db.version}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="databaseCurrentCriteria.pageNo"
+                            [pageSize]="databaseCurrentCriteria.pageSize" [totalCount]="databasesCount">
+                        </table-entries>
+                        <table-pager *ngIf="databasesViewData?.length" [pageNo]="databaseCurrentCriteria.pageNo"
+                            [pageSize]="databaseCurrentCriteria.pageSize" [totalCount]="databasesCount"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!databasesViewData?.length">No Databases found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #bulkEditModel>
+    <device-details-bulk-update-popup [deviceType]="'database_entity'" [fieldsList]="fields" (close)="cancelButton()"
+        (onSubmit)="submit($event)"></device-details-bulk-update-popup>
+</ng-template>

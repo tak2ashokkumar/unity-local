@@ -1,0 +1,283 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-2">
+            <div class="card-body pt-0 pb-2 px-1 d-flex">
+                <div class="w-50 mx-2">
+                    <label for="status" class="col-form-label font-lg">Status </label>
+                    <multiselect-dropdown [options]="statusOptions" [settings]="statusSettings"
+                        class="form-control form-control-sm p-0" style="height:auto;"
+                        [(ngModel)]="currentCriteria.multiValueParam.status"></multiselect-dropdown>
+                </div>
+                <div class="w-50 mx-2">
+                    <label for="datacenter" class="col-form-label font-lg">Datacenter </label>
+                    <multiselect-dropdown [options]="datacenters" [settings]="dcSettings"
+                        class="form-control form-control-sm p-0" style="height:auto;"
+                        [(ngModel)]="currentCriteria.multiValueParam.datacenter"></multiselect-dropdown>
+                </div>
+                <div class="w-50 mx-2">
+                    <label for="device_type" class="col-form-label font-lg">Device Type </label>
+                    <select name="device_type" id="device_type" class="form-control"
+                        [(ngModel)]="currentCriteria.params[0].device_type"
+                        (ngModelChange)="onManufacturerFilterChange()">
+                        <option [value]="''">Select Device Type</option>
+                        <option value="switch">Switch</option>
+                        <option value="firewall">Firewall</option>
+                        <option value="load_balancer">Load Balancer</option>
+                    </select>
+                </div>
+                <div class="w-50 mx-2">
+                    <label for="manufacturer" class="col-form-label font-lg">Manufacturer </label>
+                    <select name="manufacturer" id="device_type" class="form-control"
+                        [(ngModel)]="currentCriteria.params[0].manufacturer"
+                        (ngModelChange)="onManufacturerFilterChange()">
+                        <option [value]="''">Select Manufacturer</option>
+                        <option *ngFor="let manufacturer of manufacturers" [value]="manufacturer.id">
+                            {{manufacturer.name}}</option>
+                    </select>
+                </div>
+                <div class="w-50 mx-2">
+                    <label for="model" class="col-form-label font-lg">Model </label>
+                    <multiselect-dropdown [options]="models" [settings]="modelSettings"
+                        class="form-control form-control-sm p-0" style="height:auto;"
+                        [(ngModel)]="currentCriteria.multiValueParam.model"
+                        (dropdownClosed)="onModelFilterChange()"></multiselect-dropdown>
+                    <div *ngIf="manufacturerCheck" class="text-warning">{{manufacturerCheck}}</div>
+                </div>
+                <div class="w-50 mx-2">
+                    <label for="collector" class="col-form-label font-lg">Collector</label>
+                    <select name="collector" id="collector" class="form-control"
+                        [(ngModel)]="currentCriteria.params[0].collector">
+                        <option [value]="''">Select Collector</option>
+                        <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                        </option>
+                    </select>
+                </div>
+                <div class="mr-1 mt-4">
+                    <button class="btn btn-md btn-warning px-3" style="margin-top: 14px;" type="button"
+                        (click)="applyFilters()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-3 pr-2">
+        <div class="card mb-2">
+            <div class="card-body py-1">
+                <div class="font-lg">Total Devices</div>
+                <div class="text-primary font-500 font-xl">
+                    <span class="fas fa-spinner fa-spin" *ngIf="!summaryData"></span>
+                    <span *ngIf="summaryData">{{summaryData.total}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pl-0 pr-2">
+        <div class="card mb-2">
+            <div class="card-body py-1">
+                <div class="font-lg">Backedup</div>
+                <div class="text-primary font-500 font-xl">
+                    <span class="fas fa-spinner fa-spin" *ngIf="!summaryData"></span>
+                    <span *ngIf="summaryData">{{summaryData.backed_up}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pl-0 pr-2">
+        <div class="card mb-2">
+            <div class="card-body py-1">
+                <div class="font-lg">Not Backedup</div>
+                <div class="text-primary font-500 font-xl">
+                    <span class="fas fa-spinner fa-spin" *ngIf="!summaryData"></span>
+                    <span *ngIf="summaryData">{{summaryData.not_backed_up}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pl-0">
+        <div class="card mb-2">
+            <div class="card-body py-1">
+                <div class="font-lg">Backedup Since 24 Hours</div>
+                <div class="text-primary font-500 font-xl">
+                    <span class="fas fa-spinner fa-spin" *ngIf="!summaryData"></span>
+                    <span *ngIf="summaryData">{{summaryData.last_24_hours}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-1 border-top-0">
+            <div class="card-body py-2">
+                <div class="row d-flex justify-content-between align-items-center pb-2 mx-0">
+                    <div class="w-25">
+                        <table-search-box (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div>
+                        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+                <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>IP Address</th>
+                            <th>Manufacturer</th>
+                            <th>Model</th>
+                            <th class="text-center">Status</th>
+                            <th>Last Backup</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of ncmDevicesViewData" truncateText>
+                            <td class="tdw-20">
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                    [tooltip]="view.name" (click)="goToDetails(view)">
+                                    {{view.name}}
+                                </button>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.mangementIp">{{view.mangementIp}}</div>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.manufacturer">{{view.manufacturer}}</div>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.model">{{view.model}}</div>
+                            </td>
+                            <td class="w-10 text-center">
+                                <shared-device-status [status]="view.status"></shared-device-status>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.lastBackupDate">{{view.lastBackupDate}}</div>
+                            </td>
+                            <td class="action-icons-column">
+                                <button class="action-icons mb-0 fas fa-cog font-sm ml-1"
+                                    [ngClass]="{'action-icons-disabled':!view.hasStartupConfig}"
+                                    tooltip="Startup Configuration" (click)="openStartupConfig(view)"></button>
+                                <button class="action-icons mb-0 fas fa-hourglass-start font-sm ml-1"
+                                    tooltip="Running Configuration"
+                                    [ngClass]="{'action-icons-disabled':view.isRunningConfigEncrypted}"
+                                    (click)="openRunningConfig(view)"></button>
+                                <button class="action-icons mb-0 fas fa-history font-sm ml-1" tooltip="History"
+                                    (click)="goToHistory(view)"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+                <table-pager *ngIf="ncmDevicesViewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div *ngIf="!ncmDevicesViewData.length" class="d-flex py-5 justify-content-center align-items-center">
+                    No Network Configurations are available.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #credentialForm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Credentials
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="credentialFormModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="credentialsForm" [formGroup]="credentialsForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="username">Username<em>*</em></label>
+                    <input id="username" type="text" class="form-control" formControlName="username"
+                        [ngClass]="{'is-invalid' : credentialsFormErrors.username}">
+                    <small class="text-danger"
+                        *ngIf="credentialsFormErrors.username">{{credentialsFormErrors.username}}</small>
+                </div>
+                <div class="form-group">
+                    <label for="description">Password<em>*</em></label>
+                    <input id="password" type="password" class="form-control" formControlName="password"
+                        [ngClass]="{'is-invalid' : credentialsFormErrors.password}">
+                    <small class="text-danger"
+                        *ngIf="credentialsFormErrors.password">{{credentialsFormErrors.password}}</small>
+                </div>
+                <div class="form-group">
+                    <label for="description">Enable / Encrypted Password</label>
+                    <input id="enable_or_encrypted_password" type="password" class="form-control"
+                        formControlName="enable_or_encrypted_password">
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="submitCredentialsForm()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="credentialFormModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #openStartupConfigDetails>
+    <div class="card mb-0">
+        <div class="card-header d-flex justify-content-between">
+            <div>{{selectedNCMDeviceView.name}}</div>
+            <div class="d-flex">
+                <div class="pull-right">{{selectedNCMDeviceView.lastBackupDate}}</div>
+                <!-- <shared-device-status [status]="selectedNCMDeviceView.status" class="mx-1"></shared-device-status> -->
+                <div [class]="ncmStartupConfigDetails?.statusIcon" class="fas fa-lg mt-1 mx-1"
+                    [tooltip]="ncmStartupConfigDetails?.statusTooltip"></div>
+                <a class="card-header-action btn-close" (click)="openStartupConfigDetailsModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <pre *ngIf="ncmStartupConfigDetails?.data">{{ncmStartupConfigDetails?.data}}</pre>
+            <div *ngIf="!ncmStartupConfigDetails?.data" class="d-flex py-5 justify-content-center align-items-center">
+                No Startup Configuration available to display.
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="openStartupConfigDetailsModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #openRunningConfigDetails>
+    <div class="card mb-0">
+        <div class="card-header d-flex justify-content-between">
+            <div>{{selectedNCMDeviceView.name}}</div>
+            <div class="d-flex">
+                <div class="pull-right">{{selectedNCMDeviceView.lastBackupDate}}</div>
+                <!-- <shared-device-status [status]="selectedNCMDeviceView.status" class="mx-1"></shared-device-status> -->
+                <div [class]="ncmRunningConfigDetails?.statusIcon" class="fas fa-lg mt-1 mx-1"
+                    [tooltip]="ncmRunningConfigDetails?.statusTooltip"></div>
+                <a class="card-header-action btn-close" (click)="openRunningConfigDetailsModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <pre *ngIf="ncmRunningConfigDetails?.data">{{ncmRunningConfigDetails?.data}}</pre>
+            <div *ngIf="!ncmRunningConfigDetails?.data" class="d-flex py-5 justify-content-center align-items-center">
+                No Running Configuration available to display.
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="openRunningConfigDetailsModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

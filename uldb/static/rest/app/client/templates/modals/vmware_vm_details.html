@@ -1,0 +1,68 @@
+<div class="modal-header">
+    <h3 class="modal-title">Virtual Machine details</h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="col-md-4 table_no_top_border">
+                                <div>Name</div>
+                            </th>
+                            <td class="table_no_top_border">
+                              <div>{{vm_details.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>CPU Cores</div>
+                            </th>
+                            <td>
+                              <div>{{vm_details.cpu_core}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>vCPUs</div>
+                            </th>
+                            <td>
+                              <div>{{vm_details.vcpus}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Memory </div>
+                            </th>
+                            <td>
+                              <div>{{(vm_details.guest_memory / 1024 ) + ' GB'}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Storage</div>
+                            </th>
+                            <td>
+                              <div>{{vm_details.disk_space + ' GB'}} </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Hypervisor</div>
+                            </th>
+                            <td>
+                              <div>{{vm_details.host_name}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer modal-buttons">
+    <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+      Close
+    </button>
+</div>

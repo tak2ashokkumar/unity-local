@@ -1,0 +1,35 @@
+<app-main-tab [tabItems]="tabItems"></app-main-tab>
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body p-0">
+            <form class="form-horizontal">
+              <div class="form-group row mb-0">
+                <div class="col-2 border-right py-2">
+                  <label class="col-form-label ml-3" for="hf-email">Select Cloud</label>
+                </div>
+                <div class="col-3 border-right py-2">
+                  <select class="form-control text-capitalize" id="clouds" name="clouds" [(ngModel)]="cloud">
+                    <option [value]="''" disabled>Select Cloud Type</option>
+                    <option *ngFor="let c of clouds" [ngValue]="c">{{c.name}}</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12" *ngIf="cloud">
+        <div [ngSwitch]="cloud.platform_type">
+          <vmware-vm-migration *ngSwitchCase="PLATFORM_TYPE.VMWARE" [cloud]="cloud"></vmware-vm-migration>
+          <openstack-vm-migration *ngSwitchCase="PLATFORM_TYPE.OPENSTACK" [cloud]="cloud"></openstack-vm-migration>
+          <platform-not-supported *ngSwitchDefault [platform_type]="cloud.platform_type"></platform-not-supported>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

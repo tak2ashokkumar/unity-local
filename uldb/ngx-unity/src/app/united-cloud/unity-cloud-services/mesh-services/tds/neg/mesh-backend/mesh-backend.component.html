@@ -1,0 +1,167 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body p-0">
+        <form class="form-horizontal">
+          <div class="form-group row mb-0">
+            <div class="col py-2 text-warning text-right">
+              <a class="nav-link py-0 align-middle" (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>NEG
+                List</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 mt-3">
+    <div class="card rounded-0 border-top-0">
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+          <span class="badge badge-secondary font-sm">{{filteredViewData.length}}</span>
+          <span class="ml-1 font-lg">Backend</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+          <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+        </div>
+      </div>
+      <div class="card-body py-2">
+        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+          <div class="w-25">
+            <search-box (searched)="onSearched($event)"></search-box>
+          </div>
+          <div>
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+        </div>
+        <table class="table text-left">
+          <thead class="bg-light">
+            <tr>
+              <th>IP Address</th>
+              <th>Health</th>
+              <th>Port</th>
+              <th>Host VM</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let view of pagedviewData; let i = index;" setTableColumnWidth>
+              <td>
+                <div [tooltip]="view.ipAddress">{{view.ipAddress}}</div>
+              </td>
+              <td>
+                <div [tooltip]="view.status" class="text-capitalize">
+                  <span *ngIf="!view.status"><i class="fa fa-spinner fa-spin">&nbsp;</i></span>
+                  <span *ngIf="view.status"><i class="fa status-icon" [ngClass]="view.statusIcon"></i></span>
+                </div>
+              </td>
+              <td>
+                <div [tooltip]="view.port">{{view.port}}</div>
+              </td>
+              <td>
+                <div [tooltip]="view.instance">{{view.instance}}</div>
+              </td>
+              <td class="action-icons-column">
+                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Map Device"
+                  (click)="mapVM(view.uuid)" accessControl moduleName="Services" accessType="Manage Services"
+                  elementType="actionbtn">
+                </button>
+                <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                  tooltip="Manage by creating support ticket" (click)="createTicket(view)">
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="filteredViewData.length"></table-entries>
+        <table-pager *ngIf="filteredViewData.length" [pageNo]="currentCriteria.pageNo"
+          [pageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+          (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted py-4" *ngIf="!filteredViewData.length">No backends were found.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #create>
+  <div class="card mb-0">
+    <div class="card-header">
+      Map Device
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="createModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="createForm" [formGroup]="createForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="cloudType">Cloud Type<em>*</em></label>
+          <select class="form-control" id="cloudType" formControlName="cloudType"
+            [ngClass]="{'is-invalid' : vmMappingFormErrors.cloudType}">
+            <option [value]="''" disabled>Select Cloud Type</option>
+            <option [value]="VMCloudMappingEnum.AWS">{{VMCloudMappingEnum.AWS}}</option>
+            <option [value]="VMCloudMappingEnum.AZURE">{{VMCloudMappingEnum.AZURE}}</option>
+            <option [value]="VMCloudMappingEnum.GCP">{{VMCloudMappingEnum.GCP}}</option>
+            <option [value]="VMCloudMappingEnum.OPENSTACK">{{VMCloudMappingEnum.OPENSTACK}}</option>
+            <option [value]="VMCloudMappingEnum.VCLOUD">{{VMCloudMappingEnum.VCLOUD}}</option>
+            <option [value]="VMCloudMappingEnum.VMWARE">{{VMCloudMappingEnum.VMWARE}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="vmMappingFormErrors.cloudType">{{vmMappingFormErrors.cloudType}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="cloud">Cloud<em>*</em></label>
+          <select class="form-control" id="cloud" name="cloud" formControlName="cloud"
+            [ngClass]="{'is-invalid' : vmMappingFormErrors.cloud}">
+            <option value="" disabled>Select Cloud</option>
+            <option *ngFor="let z of clouds" [value]="z.uuid">{{z.name||z.account_name}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="vmMappingFormErrors.cloud">{{vmMappingFormErrors.cloud}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="deviceType">Device Type<em>*</em></label>
+          <select class="form-control" id="deviceType" formControlName="deviceType"
+            [ngClass]="{'is-invalid' : vmMappingFormErrors.deviceType}">
+            <option value="" disabled>Select Device Type</option>
+            <option value="Container">Container</option>
+            <option value="Virtual Machine">Virtual Machine</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="vmMappingFormErrors.deviceType">{{vmMappingFormErrors.deviceType}}</div>
+        </div>
+        <div class="form-group" *ngIf="createForm.controls.vm">
+          <label class="form-col-form-label" for="vm">Virtual Machine<em>*</em></label>
+          <select class="form-control" id="vm" name="vm" formControlName="vm"
+            [ngClass]="{'is-invalid' : vmMappingFormErrors.vm}">
+            <option value="" disabled>Select Virtual Machine</option>
+            <option *ngFor="let z of vms" [value]="z.uuid">{{z.name||z.instance_id}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="vmMappingFormErrors.vm">{{vmMappingFormErrors.vm}}</div>
+        </div>
+        <div class="form-group" *ngIf="createForm.controls.cluster">
+          <label class="form-col-form-label" for="vm">Kubernetes Cluster <em>*</em></label>
+          <select class="form-control" id="cluster" name="cluster" formControlName="cluster"
+            [ngClass]="{'is-invalid' : vmMappingFormErrors.cluster}">
+            <option value="" disabled>Select Cluster</option>
+            <option *ngFor="let z of clusters" [value]="z.uuid">{{z.name}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="vmMappingFormErrors.cluster">{{vmMappingFormErrors.cluster}}</div>
+        </div>
+        <div class="form-group" *ngIf="createForm.controls.container">
+          <label class="form-col-form-label" for="container">Container<em>*</em></label>
+          <select class="form-control" id="container" name="container" formControlName="container"
+            [ngClass]="{'is-invalid' : vmMappingFormErrors.container}">
+            <option value="" disabled>Select Container</option>
+            <option *ngFor="let z of containers" [value]="z.uuid">{{z.pod_name}} / {{z.name}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="vmMappingFormErrors.container">{{vmMappingFormErrors.container}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmMapping()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="createModalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

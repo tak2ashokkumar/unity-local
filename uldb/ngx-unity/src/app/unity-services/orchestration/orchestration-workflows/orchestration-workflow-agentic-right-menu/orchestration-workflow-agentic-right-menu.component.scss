@@ -1,0 +1,98 @@
+.right-sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 0 0 rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    scrollbar-width: none;
+    z-index: 1050;
+}
+
+.accordion-headers {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #e0e0e0;
+    // background-color: #f8f9fa;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.accordion-sub-headers {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.accordion .accordion .accordion-headers {
+    background-color: #ffffff;
+    // border: 1px solid #f0f0f0;
+    font-size: 12px;
+    font-weight: 500;
+    padding-left: 15px;
+    padding: 6px;
+}
+
+/* Sub accordion body */
+.accordion .accordion .accordion-body {
+    padding-left: 20px;
+}
+
+/* Step styling */
+ul {
+    margin-bottom: 0;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+    /* space between steps */
+    line-height: 1.5;
+}
+
+/* Make Step text bold using a regex-friendly wrap */
+ul li strong:first-child {
+    font-weight: 600;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    /* adjust if needed */
+    cursor: pointer;
+    outline: none;
+    /* remove outline */
+}
+
+.btn-close:focus {
+    outline: none;
+    /* remove focus ring */
+    box-shadow: none;
+    /* remove any box-shadow */
+}
+
+:host {
+    display: block;
+    background: #fff;
+    box-shadow: -2px 0 0 rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+}
+
+.resize-handle-right {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+}
+
+.resize-handle-right:hover {
+    background: rgba(0, 0, 0, 0.1);
+}

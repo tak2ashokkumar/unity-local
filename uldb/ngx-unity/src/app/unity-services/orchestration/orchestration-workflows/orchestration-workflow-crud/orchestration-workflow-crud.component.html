@@ -1,0 +1,785 @@
+<div class="row mx-2 mt-2">
+    <div class="col-12 p-0">
+        <div class="card rounded">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex align-items-center">
+                    <span class="font-lg-xl font-500">{{viewData?.workflow_name}}</span>
+                    <span *ngIf="viewData?.workflow_name" class="fas fa-edit text-warning font-sm ml-2 pointer-link"
+                        (click)="manageWorkflowDetails()"></span>
+                </div>
+                <span [popover]="popTemplate" containerClass="box" [isOpen]="isOpen" [outsideClick]="false"
+                    [style.position]="'absolute'" [style.top]="widgetAddMenuStyle.top"
+                    [style.left]="widgetAddMenuStyle.left"></span>
+                <div>
+                    <span *ngIf="viewData?.isInProgress" class="text-success font-500">Workflow is being saved.</span>
+                    <button class="btn btn-sm btn-success font-500" type="button" [disabled]="viewData?.isInProgress" (click)="saveWorkFlow()">
+                        <span class="fas fa-spinner fa-spin" *ngIf="viewData?.isInProgress"></span>
+                        <span class="font-xs-sm mx-1">Save Changes</span>
+                    </button>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                        (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center workflow-body">
+                <div class="d-flex justify-content-around align-items-center w-100 py-4" id="task_wrapper_flex_div"
+                    *ngFor="let tasks of viewData?.multiLevelTasks; let i = index;">
+                    <div class="" *ngFor="let task of tasks; let k = index;">
+                        <ng-container [ngSwitch]="task.type">
+                            <ng-container *ngSwitchCase="taskTypes.START">
+                                <ng-container *ngTemplateOutlet="startTask; context: { $implicit: task}"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.INTEGRATION">
+                                <ng-container
+                                    *ngTemplateOutlet="integrationTask; context: { $implicit: task, index:i }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.CONDITION">
+                                <ng-container
+                                    *ngTemplateOutlet="conditionTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.ANSIBLE">
+                                <ng-container
+                                    *ngTemplateOutlet="ansibleTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.TERRAFORM">
+                                <ng-container
+                                    *ngTemplateOutlet="ansibleTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.BASH">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.POWERSHELL">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.PYTHON">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.REST_API">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.END">
+                                <ng-container *ngTemplateOutlet="endTask; context: { $implicit: task}"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Task details Side Panel -->
+<div class="row">
+    <div class="col-12 p-0">
+        <div id="task-details-card" class="card task-details-card mb-0 rounded" *ngIf="showTaskDetails">
+            <div class="card-header d-flex justify-content-between align-items-center px-3 py-2">
+                <div>
+                    <span class="font-sm" [ngClass]="selectedTask.taskTypeIcon"></span>
+                    <span class="ml-1 font-sm">{{selectedTask.name}}</span>
+                </div>
+                <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeTaskDetails()"></a>
+            </div>
+            <div class="card-body p-0 d-flex flex-column font-sm">
+                <div *ngIf="selectedTask.taskImage" class="d-flex justify-content-center align-items-center p-1">
+                    <img [src]="selectedTask.taskImage" [alt]="altText" loading="eager"
+                        style="height: 30px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    <span class="ml-2 font-sm">{{selectedTask.type}}</span>
+                </div>
+                <div class="card mb-0 border-0">
+                    <div class="card-header py-2 border-0">Details</div>
+                    <div class="card-body d-flex flex-column font-sm py-1">
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted w-40 text-truncate">Category :</span>
+                            <span class="font-sm-xs font-500 mr-2">{{selectedTask.category || 'NA'}}</span>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <span class="text-muted w-40 text-truncate">Target Type :</span>
+                            <span class="font-sm-xs font-500 mr-2">{{selectedTask.target_type|| 'NA'}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-0 border-0">
+                    <div class="card-header py-2 border-0">Input Parameters</div>
+                    <div class="card-body pt-2 pb-0">
+                        <div *ngIf="selectedTask.inputForm?.get('inputs')">
+                            <form [formGroup]="selectedTask.inputForm">
+                                <div class="row mx-0" formArrayName="inputs">
+                                    <div class="col-12 p-0"
+                                        *ngFor="let control of selectedTask.inputForm.get('inputs').controls; let i = index; let last=last;">
+                                        <div [formGroupName]="i" class="row">
+                                            <div
+                                                class="col-12 p-0 form-group mb-2 d-flex justify-content-between align-items-center">
+                                                <span
+                                                    class="form-col-form-label text-left w-30 font-xs-sm">${{selectedTask.inputForm.get('inputs').controls[i].get('name').value}}</span>
+                                                <input class="form-control form-control-sm ml-1" type="text"
+                                                    formControlName="default_value" placeholder="value"
+                                                    *ngIf="selectedTask.inputForm.get('inputs').controls[i].get('default_value')">
+                                                <select class="form-control form-control-sm ml-1"
+                                                    formControlName="template"
+                                                    *ngIf="selectedTask.inputForm.get('inputs').controls[i].get('template')">
+                                                    <option *ngFor="let t of taskInputTemplates" [value]="t.uuid">
+                                                        {{t.name}}</option>
+                                                </select>
+                                                <input class="form-control form-control-sm ml-1" type="text"
+                                                    formControlName="attribute" placeholder="attribute"
+                                                    *ngIf="selectedTask.inputForm.get('inputs').controls[i].get('attribute')">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div *ngIf="selectedTask.inputForm?.get('name')">
+                            <form [formGroup]="selectedTask.inputForm">
+                                <div
+                                    class="col-12 px-0 form-group mb-2 d-flex justify-content-between align-items-center">
+                                    <span
+                                        class="form-col-form-label text-left w-40 text-right font-xs-sm">${{selectedTask.inputForm.get('name').value}}</span>
+                                    <input class="form-control form-control-sm ml-2" type="text" formControlName="value"
+                                        placeholder="value">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center py-4"
+                            *ngIf="!selectedTask.inputForm">
+                            No inputs available.
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-0 border-0">
+                    <div class="card-header py-2 border-0">Outputs</div>
+                    <div class="card-body pt-2 pb-0">
+                        <div *ngIf="selectedTask.outputForm?.get('name')">
+                            <form [formGroup]="selectedTask.outputForm">
+                                <div
+                                    class="col-12 px-0 form-group mb-2 d-flex justify-content-between align-items-center">
+                                    <span
+                                        class="form-col-form-label text-left w-40 text-right font-xs-sm">${{selectedTask.outputForm.get('name').value}}</span>
+                                    <input class="form-control form-control-sm ml-2" type="text" formControlName="value"
+                                        placeholder="value">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center py-4"
+                            *ngIf="!selectedTask.outputForm">
+                            No outputs available.
+                        </div>
+                    </div>
+                </div>
+                <div class="card border-0">
+                    <div class="card-body py-2 d-flex justify-content-center align-items-center">
+                        <button class="btn btn-sm btn-success font-500" type="button" (click)="saveTaskDetails()">
+                            <span class="font-xs-sm mx-1">Save</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #startTask let-view>
+    <div id="task_wrapper_div" class="mt--4">
+        <div [id]="view.name_id" class="dot workflow-start main_task">{{view.name}}</div>
+    </div>
+</ng-template>
+<ng-template #integrationTask let-view let-index="index">
+    <div id="task_wrapper_div" class="">
+        <div [id]="view.name_id" class="card widget-card main_task">
+            <div class="card-header font-sm d-flex justify-content-between font-500 px-2 py-1">
+                <div class="d-flex justify-content-around align-items-center">
+                    <span class="fa-sm" [ngClass]="view.taskTypeIcon"></span>
+                    <span class="ml-1">{{view.name}}</span>
+                </div>
+                <div class="ml-2">
+                    <span class="fa fa-ellipsis-v"></span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group">
+                    <span *ngIf="view.taskImage" class="list-group-item px-2 py-1">
+                        <img [src]="view.taskImage" class="w-100" [alt]="altText" loading="eager"
+                            style="height: 22px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </span>
+                    <span *ngIf="view.inputs?.length"
+                        class="list-group-item list-group-item-secondary text-dark font-xs-sm px-2 py-1">Input
+                        Parameters</span>
+                    <span *ngFor="let p of view.inputs"
+                        class="list-group-item text-muted font-xs-sm px-2 py-1">${{p.name}}</span>
+                    <span *ngIf="view.outputs?.length"
+                        class="list-group-item list-group-item-secondary text-dark font-xs-sm px-2 py-1">Output
+                        Parameters</span>
+                    <span *ngFor="let p of view.outputs"
+                        class="list-group-item text-muted font-xs-sm px-2 py-1">${{p.name}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #bashTask let-view let-i="i" let-k="k">
+    <div id="task_wrapper_div" class="mt-0">
+        <div [id]="view.name_id" class="card widget-card main_task"
+            [class.active]="selectedTaskIndex?.i == i && selectedTaskIndex?.k ==k">
+            <div class="card-header font-sm d-flex justify-content-between font-500 px-2 py-1">
+                <div class="d-flex justify-content-around align-items-center pointer-link"
+                    (click)="viewTaskDetails(i, k)">
+                    <span class="fa-sm" [ngClass]="view.taskTypeIcon"></span>
+                    <span class="ml-1">{{view.name}}</span>
+                </div>
+                <div class="ml-2" hideForReadOnly>
+                    <div dropdown container="body">
+                        <div class="nav-item" data-toggle="dropdown" aria-controls="dropdown-container" dropdownToggle>
+                            <a class="nav-link rounded-top border-0 p-0"><i
+                                    class="fa fa-ellipsis-v align-middle"></i></a>
+                        </div>
+                        <div id="dropdown-container" class="dropdown-menu mt-0" *dropdownMenu
+                            aria-labelledby="button-container">
+                            <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                                (click)="viewTaskDetails(i, k)">
+                                <span class="fas fa-eye text-primary font-xs"></span>
+                                <span class="ml-1 font-xs-sm">View Details</span>
+                            </span>
+                            <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                                (click)="editTask(i, k)">
+                                <span class="fas fa-pencil-alt text-primary font-xs"></span>
+                                <span class="ml-1 font-xs-sm">Edit</span>
+                            </span>
+                            <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                                (click)="deleteTask(i, k)">
+                                <span class="far fa-trash-alt text-primary font-xs"></span>
+                                <span class="ml-1 font-xs-sm">Delete</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group">
+                    <span *ngIf="view.taskImage" class="list-group-item px-2 py-1">
+                        <img [src]="view.taskImage" class="w-100" [alt]="altText" loading="eager"
+                            style="height: 22px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #ansibleTask let-view let-i="i" let-k="k">
+    <div id="task_wrapper_div" class="mt-0">
+        <div [id]="view.name_id" class="card widget-card main_task"
+            [class.active]="selectedTaskIndex?.i == i && selectedTaskIndex?.k ==k">
+            <div class="card-header font-sm d-flex justify-content-between font-500 px-2 py-1">
+                <div class="d-flex justify-content-around align-items-center pointer-link"
+                    (click)="viewTaskDetails(i, k)">
+                    <span class="fa-sm" [ngClass]="view.taskTypeIcon"></span>
+                    <span class="ml-1">{{view.name}}</span>
+                </div>
+                <div class="ml-2" hideForReadOnly>
+                    <div dropdown container="body">
+                        <div class="nav-item" data-toggle="dropdown" aria-controls="dropdown-container" dropdownToggle>
+                            <a class="nav-link rounded-top border-0 p-0"><i
+                                    class="fa fa-ellipsis-v align-middle"></i></a>
+                        </div>
+                        <div id="dropdown-container" class="dropdown-menu mt-0" *dropdownMenu
+                            aria-labelledby="button-container">
+                            <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                                (click)="viewTaskDetails(i, k)">
+                                <span class="fas fa-eye text-primary font-xs"></span>
+                                <span class="ml-1 font-xs-sm">View Details</span>
+                            </span>
+                            <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                                (click)="editTask(i, k)">
+                                <span class="fas fa-pencil-alt text-primary font-xs"></span>
+                                <span class="ml-1 font-xs-sm">Edit</span>
+                            </span>
+                            <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                                (click)="deleteTask(i, k)">
+                                <span class="far fa-trash-alt text-primary font-xs"></span>
+                                <span class="ml-1 font-xs-sm">Delete</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group">
+                    <span *ngIf="view.taskImage" class="list-group-item px-2 py-1">
+                        <img [src]="view.taskImage" class="w-100" [alt]="altText" loading="eager"
+                            style="height: 22px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #conditionTask let-view let-i="i" let-k="k">
+    <div id="task_wrapper_div" class="mt--4">
+        <div [id]="view.name_id" class="d-flex justify-content-center align-items-center condition main_task px-2">
+            <div class="rhombus d-flex flex-column">
+                <div dropdown container="body" [tooltip]="view.name" container="body">
+                    <p class="text-truncate w-100 pt-2 pl--3 mb-0">{{view.name}}</p>
+                </div>
+                <div dropdown container="body">
+                    <div class="nav-item" data-toggle="dropdown" aria-controls="dropdown-container" dropdownToggle>
+                        <a class="nav-link rounded-top border-0 p-0">
+                            <span class="fa fa-ellipsis-v fa-lg text-primary w-100 text-center mt-2 ml-3"
+                                style="transform: rotateZ(317deg);"></span>
+                        </a>
+                    </div>
+                    <div id="dropdown-container" class="dropdown-menu mt-0" *dropdownMenu
+                        aria-labelledby="button-container">
+                        <!-- <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                            (click)="editTask(i, k)">
+                            <span class="fas fa-pencil-alt text-primary font-xs"></span>
+                            <span class="ml-1 font-xs-sm">Edit</span>
+                        </span> -->
+                        <span class="dropdown-item px-2 py-1 pointer-link d-flex align-items-center"
+                            (click)="deleteCondition(i, k)">
+                            <span class="far fa-trash-alt text-primary font-xs"></span>
+                            <span class="ml-1 font-xs-sm">Delete</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #endTask let-view>
+    <div id="task_wrapper_div" class="mt--4">
+        <span [id]="view.name_id" class="dot workflow-end main_task">{{view.name}}</span>
+    </div>
+</ng-template>
+
+<ng-template #popTemplate>
+    <div class="list-group">
+        <!-- <div class="list-group-item font-sm px-2 py-1 pointer-link" (click)="addIntegration()">
+            <span class="fas fa-wrench text-primary"></span>
+            <span class="ml-2">Integration</span>
+        </div>
+        <div class="list-group-item font-sm px-2 py-1 pointer-link" (click)="addWorkFlow()">
+            <span class="fas fa-network-wired text-primary"></span>
+            <span class="ml-2">Workflow</span>
+        </div> -->
+        <div class="list-group-item font-sm px-2 py-1 pointer-link" (click)="addTaskWidget()">
+            <span class="fas fa-clipboard-check text-primary"></span>
+            <span class="ml-2">Task</span>
+        </div>
+        <div *ngIf="activeLinePosition > 1" class="list-group-item font-sm px-2 py-1 pointer-link"
+            (click)="addConditionWidget()">
+            <span class="fas fa-tasks text-primary"></span>
+            <span class="ml-2">Condition</span>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #confirmDeleteTaskRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Task will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmTaskDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeDeleteTask()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDeleteConditionRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Condition will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmConditionDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeDeleteCondition()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- Task add forms -->
+
+<ng-template #workflowDetailsFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Workflow Details
+        </div>
+        <div class="card-body">
+            <form *ngIf="workflowDetailsForm" [formGroup]="workflowDetailsForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="workflow_name" class="form-col-form-label">Name<em>*</em></label>
+                        <input id="workflow_name" class="form-control" type="text" formControlName="workflow_name"
+                            [class.is-invalid]="workflowDetailsFormErrors.workflow_name">
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.workflow_name">
+                            {{workflowDetailsFormErrors.workflow_name}}
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="description" class="form-col-form-label">Description</label>
+                        <textarea id="description" class="form-control static" rows='2' formControlName="description"
+                            [class.is-invalid]="workflowDetailsFormErrors.description"
+                            placeholder="Description"></textarea>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.description">
+                            {{workflowDetailsFormErrors.description}}
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="category" class="font-col-form-label">Category<em>*</em></label>
+                        <select id="category" class="form-control" formControlName="category"
+                            [class.is-invalid]="workflowDetailsFormErrors.category">
+                            <option value="" disabled> Select Category </option>
+                            <option *ngFor="let c of workflowMetadata?.category" [value]="c">{{c}} </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.category">
+                            {{workflowDetailsFormErrors.category}}</div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="target_type" class="font-col-form-label">Target Type<em>*</em></label>
+                        <select id="target_type" class="form-control" formControlName="target_type"
+                            [class.is-invalid]="workflowDetailsFormErrors.target_type">
+                            <option value="" disabled> Select Target Type </option>
+                            <option *ngFor="let tt of workflowMetadata?.target_type" [value]="tt">{{tt}} </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.target_type">
+                            {{workflowDetailsFormErrors.target_type}}</div>
+                    </div>
+                    <div class="form-group col-12" *ngIf="workflowDetailsForm.get('cloud')">
+                        <label for="cloud" class="font-col-form-label">Cloud<em>*</em></label>
+                        <select id="cloud" class="form-control" formControlName="cloud"
+                            [class.is-invalid]="workflowDetailsFormErrors.cloud">
+                            <option value="" disabled> Select Cloud Type </option>
+                            <option *ngFor="let c of workflowMetadata?.cloud" [value]="c.type">{{c.type}} </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.cloud">
+                            {{workflowDetailsFormErrors.cloud}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onSubmitWorkflowDetails()">Start</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="onCloseWorkFlowDetails()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #integrationFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add New Integration
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="integrationForm" [formGroup]="integrationForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="name" class="form-col-form-label">Name<em>*</em></label>
+                        <input id="name" class="form-control" type="text" formControlName="name"
+                            [class.is-invalid]="integrationFormErrors.name">
+                        <div class="invalid-feedback" *ngIf="integrationFormErrors.name">{{integrationFormErrors.name}}
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="integration_type" class="font-col-form-label">Integration Type<em>*</em></label>
+                        <select id="integration_type" class="form-control" formControlName="integration_type"
+                            [class.is-invalid]="integrationFormErrors.integration_type">
+                            <option value="bmc-helix"> BMC Helix </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="integrationFormErrors.integration_type">
+                            {{integrationFormErrors.integration_type}}</div>
+                    </div>
+                    <div class="form-group col-12" *ngIf="integrationForm.get('catalogue')">
+                        <label for="integration_type" class="font-col-form-label">Integration Type<em>*</em></label>
+                        <select id="integration_type" class="form-control" formControlName="integration_type"
+                            [class.is-invalid]="integrationFormErrors.integration_type">
+                            <option value="bmc-helix"> BMC Helix </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="integrationFormErrors.integration_type">
+                            {{integrationFormErrors.integration_type}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmIntegrationAdd()">Add</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #workflowFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add New Workflow
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="workflowForm" [formGroup]="workflowForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="name" class="form-col-form-label">Name<em>*</em></label>
+                        <input id="name" class="form-control" type="text" formControlName="name"
+                            [class.is-invalid]="workflowFormErrors.name">
+                        <div class="invalid-feedback" *ngIf="workflowFormErrors.name">{{workflowFormErrors.name}}
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="workflow_type" class="font-col-form-label">Workflow Type<em>*</em></label>
+                        <select id="workflow_type" class="form-control" formControlName="workflow_type"
+                            [class.is-invalid]="workflowFormErrors.workflow_type">
+                            <option value="bmc-helix"> BMC Helix </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="workflowFormErrors.workflow_type">
+                            {{workflowFormErrors.workflow_type}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmIntegrationAdd()">Add</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #taskFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            <span *ngIf="selectedTask">Edit Task</span>
+            <span *ngIf="!selectedTask">Add Task</span>
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="taskForm" [formGroup]="taskForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="task_category" class="font-col-form-label">Task Category<em>*</em></label>
+                        <select id="task_category" class="form-control" formControlName="task_category"
+                            [class.is-invalid]="taskFormErrors.task_category">
+                            <option value="" disabled> Select Category </option>
+                            <option *ngFor="let c of taskCategories" [ngValue]="c.category">{{c.category}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="taskFormErrors.task_category">
+                            {{taskFormErrors.task_category}}</div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="task" class="font-col-form-label">Task<em>*</em></label>
+                        <select id="task" class="form-control" formControlName="task"
+                            [class.is-invalid]="taskFormErrors.task">
+                            <option value="" disabled> Select Task </option>
+                            <option *ngFor="let t of tasks" [ngValue]="t">{{t.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="taskFormErrors.task">{{taskFormErrors.task}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmitSelectedTask()">
+                <span *ngIf="selectedTask">Update</span>
+                <span *ngIf="!selectedTask">Add</span>
+            </button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeAddorEditTask()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #conditionFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add New Condition
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="conditionForm" [formGroup]="conditionForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="col-6 px-0 form-group">
+                    <label for="conditionName" class="form-col-form-label text-left">Name</label>
+                    <input id="conditionName" class="form-control" type="text" formControlName="name"
+                        placeholder="Enter Condition Name">
+                </div>
+                <div class="row mx-0" formArrayName="conditions">
+                    <div class="col-12 p-0"
+                        *ngFor="let control of conditionForm.get('conditions').controls; let i = index; let last=last;">
+                        <div [formGroupName]="i" class="row">
+                            <div class="col pr-0 form-group">
+                                <label class="form-col-form-label text-left">Task<em>*</em></label>
+                                <select class="form-control fa" type="text" formControlName="source_task"
+                                    [class.is-invalid]="conditionFormErrors.conditions[i].source_task">
+                                    <option *ngFor="let t of viewData.tasks" [ngValue]="t.name_id">
+                                        {{t?.name}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="conditionFormErrors.conditions[i].source_task">
+                                    {{conditionFormErrors.conditions[i].source_task}}
+                                </div>
+                            </div>
+                            <div class="col-2 pr-0 form-group">
+                                <label class="form-col-form-label text-left">Outputs</label>
+                                <input class="form-control" type="text" formControlName="output_parameter"
+                                    placeholder="Output Parameter">
+                            </div>
+                            <div class="col-2 pr-0 form-group">
+                                <label class="form-col-form-label text-left">Operator<em>*</em></label>
+                                <select class="form-control" type="text" formControlName="operator"
+                                    [class.is-invalid]="conditionFormErrors.conditions[i].operator">
+                                    <option [value]="''" disabled>Select Operator</option>
+                                    <option *ngFor="let op of conditionOperators" [value]="op.value">
+                                        {{op.label}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="conditionFormErrors.conditions[i].operator">
+                                    {{conditionFormErrors.conditions[i].operator}}
+                                </div>
+                            </div>
+                            <div class="col-2 form-group">
+                                <label class="form-col-form-label text-left">Value<em>*</em></label>
+                                <input class="form-control" type="text" formControlName="value" placeholder="Value"
+                                    [class.is-invalid]="conditionFormErrors.conditions[i].value">
+                                <div class="invalid-feedback" *ngIf="conditionFormErrors.conditions[i].value">
+                                    {{conditionFormErrors.conditions[i].value}}</div>
+                            </div>
+                            <div class="col-2 px-0 form-group">
+                                <label class="form-col-form-label text-left">Execute<em>*</em></label>
+                                <!-- <select class="form-control" formControlName="target_task"
+                                    [class.is-invalid]="conditionFormErrors.conditions[i].target_task">
+                                    <option *ngFor="let t of conditionTargetTasks" [ngValue]="t.name_id">
+                                        {{t?.name}}
+                                    </option>
+                                    <option [value]="'new__task'">&#xf055; New Task</option>
+                                </select> -->
+                                <select class="form-control fa" formControlName="target_task"
+                                    [class.is-invalid]="conditionFormErrors.conditions[i].target_task">
+                                    <option class="fa" *ngFor="let t of updatedConditionTargetTasks(i)"
+                                        [ngValue]="t.name_id">
+                                        {{t?.name}}
+                                    </option>
+                                    <option class="fa" value="new__task">&#xf055; New Task</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="conditionFormErrors.conditions[i].target_task">
+                                    {{conditionFormErrors.conditions[i].target_task}}
+                                </div>
+                            </div>
+                            <div class="col-2 pr-0 mt-4 pt-1">
+                                <div class="w-100 d-flex justify-content-start align-items-center">
+                                    <button tooltip="Remove Condition" (click)="removeCondition(i)"
+                                        class="action-icons fas fa-minus font-sm ml-1"
+                                        *ngIf="conditionForm?.get('conditions')?.controls?.length > 1"></button>
+                                    <button tooltip="Add Condition" class="action-icons fas fa-plus font-sm ml-1"
+                                        *ngIf="last && i <2" (click)="addCondition(i)"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="row mx-0" *ngIf="addNewTaskAtIndex">
+                <div class="col-3 offset-7 pr-0">
+                    <div class="card mb-0">
+                        <div class="card-header py-2">
+                            Add Task
+                            <div class="card-header-actions">
+                                <a class="card-header-action btn-close" (click)="cancelNewTask()">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <form *ngIf="taskForm" [formGroup]="taskForm">
+                                <div class="row">
+                                    <div class="form-group mb-2 col-12">
+                                        <select id="task_category" class="form-control" formControlName="task_category"
+                                            [class.is-invalid]="taskFormErrors.task_category">
+                                            <option value="" disabled> Select Task Category </option>
+                                            <option *ngFor="let c of taskCategories" [ngValue]="c.category">
+                                                {{c.category}}</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="taskFormErrors.task_category">
+                                            {{taskFormErrors.task_category}}</div>
+                                    </div>
+                                    <div class="form-group mb-0 col-12">
+                                        <select id="task" class="form-control" formControlName="task"
+                                            [class.is-invalid]="taskFormErrors.task">
+                                            <option value="" disabled> Select Task </option>
+                                            <option *ngFor="let t of tasks" [ngValue]="t">{{t.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="taskFormErrors.task">
+                                            {{taskFormErrors.task}}</div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="card-footer border-0 bg-transparent p-2 text-center">
+                            <button class="btn btn-sm btn-success" type="button" (click)="addNewTaskToCondition()">Add
+                                Task To Condition</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onSubmitSelectedCondition()">Add</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

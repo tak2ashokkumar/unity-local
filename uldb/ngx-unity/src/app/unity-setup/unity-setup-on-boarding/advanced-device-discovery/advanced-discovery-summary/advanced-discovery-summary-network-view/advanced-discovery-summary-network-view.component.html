@@ -1,0 +1,250 @@
+<div class="row">
+    <div class="col-12" *ngIf="networkViewData && networkViewData.nodes.length" style="height:0px;">
+        <div class="tab-content border-0">
+            <div class="tab-pane active px-2 pt-2 pb-0">
+                <ul class="nav">
+                    <li class="nav-item" style="margin-top:-35px;">
+                        <span dropdown class="ml-3">
+                            <a href id="basic-link" dropdownToggle (click)="false" aria-controls="basic-link-dropdown">
+                                <i class="fas fa-filter fa-lg"></i>
+                            </a>
+                            <ul id="basic-link-dropdown" *dropdownMenu class="dropdown-menu ml-3" role="menu"
+                                aria-labelledby="basic-link" style="margin-top:-10px;">
+                                <li role="menuitem"><a class="dropdown-item py-1" (click)="filterNodes('all')">All</a></li>
+                                <li role="menuitem"><a class="dropdown-item py-1" (click)="filterNodes('not_onboarded')">Not
+                                        Onboarded</a></li>
+                                <li role="menuitem"><a class="dropdown-item py-1" (click)="filterNodes('onboarded')">Onboarded</a></li>
+                            </ul>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card border-0 topology-card">
+            <app-spinner [name]="'summary-network'"></app-spinner>
+            <div class="card-body pt-0">
+                <div class="text-center text-muted m-5 p-5 font-lg" *ngIf="!networkViewData || !networkViewData.nodes.length">No
+                    devices discovered.</div>
+                <div id="node-title-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo"></div>
+                <div class="discovery-network-container" #visGraph></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #nodeDetails>
+    <div class="card border-0 mb-0">
+        <div class="card-body p-0 pt-1">
+            <p class="card-text mb-1">Name: <span class="text-muted">{{selectedNode.hostname}}</span></p>
+            <p class="card-text mb-1">Management IP: <span class="text-muted">{{selectedNode.ip_address}}</span></p>
+            <p class="card-text mb-1">Device Type: <span class="text-muted">{{selectedNode.device_type}}</span></p>
+            <p class="card-text mb-1">Onboarding Status: <span class="text-muted">{{selectedNode.onboarded ?
+                    'Onboarded' : 'Not Onboarded'}}</span></p>
+            <!-- <p class="card-text mb-1">Status: <span class="text-muted">N/A</span></p> -->
+            <div class="col-12 text-center py-0">
+                <a class="btn btn-sm btn-primary text-white" (click)="viewDeviceData()">View device details</a>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deviceInfoRef>
+    <div class="card mb-0">
+        <div class="card-header py-1 d-flex align-items-center font-lg bg-white">
+            <div class="w-65 py-1">
+                <span class="fas {{selectedNode.fa_icon}}"></span>
+                <span> {{selectedNode.hostname}}</span>
+            </div>
+            <div class="w-35">
+                <button class="action-icons mb-0 fas fa-times ml-1 pull-right " (click)="closeDeviceData()" tooltip="close"
+                    container="body"></button>
+            </div>
+        </div>
+        <div class="card-body pt-1 px-0 pb-0" style="min-height: 300px;">
+            <tabset>
+                <tab heading="Summary" customClass="customClass px-0 py-0 bg-secondary">
+                    <ng-container [ngTemplateOutlet]="deviceInfoSummeryRef"></ng-container>
+                </tab>
+                <tab heading="Details" customClass="customClass px-0 py-0 bg-secondary">
+                    <ng-container [ngTemplateOutlet]="deviceInfoDetailsRef"></ng-container>
+                </tab>
+                <tab heading="Location" customClass="customClass px-0 py-0 bg-secondary">
+                    <ng-container [ngTemplateOutlet]="deviceInfoLocationRef"></ng-container>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deviceInfoSummeryRef>
+    <div class="card border-0 mb-0">
+        <div class="card-body p-2" style="min-height: 300px;">
+            <form class="pt-3">
+                <div class="form-group row">
+                    <label for="name" class="col-sm-3 col-form-label text-right">Name</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="name" name="name" [(ngModel)]="selectedNode.hostname"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="device_type" class="col-sm-3 col-form-label text-right">Device Type</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="device_type" name="device_type" [(ngModel)]="selectedNode.device_type"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="manufacturer" class="col-sm-3 col-form-label text-right">Manufacturer</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="manufacturer" name="manufacturer" [(ngModel)]="selectedNode.manufacturer"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="model" class="col-sm-3 col-form-label text-right">Model</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="model" name="model" [(ngModel)]="selectedNode.model"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="ip_address" class="col-sm-3 col-form-label text-right">IP</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="ip_address" name="ip_address" [(ngModel)]="selectedNode.ip_address"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Device Status</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="os" class="col-sm-3 col-form-label text-right">OS</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="os" name="os" [(ngModel)]="selectedNode.os"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="os_version" class="col-sm-3 col-form-label text-right">OS Version</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="os_version" name="os_version" [(ngModel)]="selectedNode.version"
+                            readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deviceInfoDetailsRef>
+    <div class="card border-0 mb-0">
+        <div class="card-body p-2" style="min-height: 300px;">
+            <form class="pt-3">
+                <div class="form-group row">
+                    <label for="MacAddress" class="col-4 col-form-label text-right">MacAddress</label>
+                    <div class="col-8">
+                        <input type="email" class="form-control" id="MacAddress" name="MacAddress" [(ngModel)]="selectedNode.MacAddress"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="Processor" class="col-4 col-form-label text-right">Processor</label>
+                    <div class="col-8">
+                        <input type="email" class="form-control" id="Processor" name="Processor" [(ngModel)]="selectedNode.Processor"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="number_of_cpu" class="col-4 col-form-label text-right">Number of CPU</label>
+                    <div class="col-8">
+                        <input type="email" class="form-control" id="number_of_cpu" name="number_of_cpu" [(ngModel)]="selectedNode.CPU"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="Memory" class="col-4 col-form-label text-right">Memory</label>
+                    <div class="col-8">
+                        <input type="email" class="form-control" id="Memory" name="Memory" [(ngModel)]="selectedNode.Memory"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="DiskSize" class="col-4 col-form-label text-right">DiskSize</label>
+                    <div class="col-8">
+                        <input type="email" class="form-control" id="DiskSize" name="DiskSize" [(ngModel)]="selectedNode.DiskSize"
+                            readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-4 col-form-label text-right">Last Boot Time</label>
+                    <div class="col-8">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-4 col-form-label text-right">SNMP Community String</label>
+                    <div class="col-8">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deviceInfoLocationRef>
+    <div class="card border-0 mb-0">
+        <div class="card-body p-2" style="min-height: 300px;">
+            <form class="pt-3">
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Datacenter</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Cabinet</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Private Cloud</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Size</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Position</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Address</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="colFormLabel" class="col-sm-3 col-form-label text-right">Power Socket</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="colFormLabel" readonly>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>

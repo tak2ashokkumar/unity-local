@@ -1,0 +1,95 @@
+<ng-template #alertinfo>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{alertInput.deviceType}} Alerts
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table table-sm text-left">
+        <thead>
+          <tr>
+            <th>Alert</th>
+            <th>Status</th>
+            <th>Checked</th>
+            <th>Changed</th>
+            <th>Alerted</th>
+            <th>Entity ID</th>
+            <th>Entity Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of viewData" setTableColumnWidth>
+            <td>
+              <div [tooltip]="view.alert_name">{{view.alert_name}}</div>
+            </td>
+            <td>
+              <div [tooltip]="view.status">{{view.status}}</div>
+            </td>
+            <td>
+              <div [tooltip]="view.checked">{{view.checked}}</div>
+            </td>
+            <td>
+              <div [tooltip]="view.changed">{{view.changed}}</div>
+            </td>
+            <td>
+              <div [tooltip]="view.alerted">{{view.alerted}}</div>
+            </td>
+            <td>
+              <div [tooltip]="view.entity_id">{{view.entity_id}}</div>
+            </td>
+            <td>
+              <div [tooltip]="view.entity_type">{{view.entity_type}}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!viewData.length" class="py-4 font-sm text-center"> No alerts to display </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #zabbixAlertInfo>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{alertInput.deviceType}} Alerts
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table table-sm text-left">
+        <thead>
+          <tr>
+            <th>Device Name</th>
+            <th>Description</th>
+            <th>Severity</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of zabbixViewData">
+            <td>{{view.deviceName}}</td>
+            <td>{{view.alertDesc}}</td>
+            <td class="text-capitalize">{{view.severity}} </td>
+            <td>{{view.alertTime}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!zabbixViewData.length" class="py-4 font-sm text-center">
+        No alerts to display
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>

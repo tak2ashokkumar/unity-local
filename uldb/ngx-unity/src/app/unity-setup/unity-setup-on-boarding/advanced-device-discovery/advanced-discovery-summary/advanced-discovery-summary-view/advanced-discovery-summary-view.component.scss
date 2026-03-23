@@ -1,0 +1,48 @@
+@import "variables";
+
+.summary-icons {
+  &-hypervisor {
+    background-color: $hypervisor;
+    color: $white;
+  }
+  &-vms {
+    background-color: $vms;
+    color: $white;
+  }
+  &-bms {
+    background-color: $bms;
+    color: $white;
+  }
+  &-otherdev {
+    background-color: $otherdev;
+    color: $white;
+  }
+  &-firewalls {
+    background-color: $firewalls;
+    color: $white;
+  }
+  &-lbs {
+    background-color: $lbs;
+    color: $white;
+  }
+  &-switches {
+    background-color: $switches;
+    color: $white;
+  }
+  &-cfa-kubernetes {
+    background-color: $pdus;
+    color: $white;
+  }
+  &-storage {
+    background-color: $storage;
+    color: $white;
+  }
+  &-mac {
+    background-color: $otherdev;
+    color: $white;
+  }
+  &-pdu {
+    background-color: $pdus;
+    color: $white;
+  }
+}

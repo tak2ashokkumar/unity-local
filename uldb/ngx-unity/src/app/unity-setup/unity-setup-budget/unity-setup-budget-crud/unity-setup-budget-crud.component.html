@@ -1,0 +1,536 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="card round-edge">
+            <div class="card-header d-flex justify-content-between bg-white align-items-center py-2">
+                <div class="font-500">{{actionMessage}} Budget</div>
+                <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back" (click)="goBack()">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <form *ngIf="form" [formGroup]="form">
+                    <div *ngIf="nonFieldErr" class="row form-group offset-1">
+                        <div class="invalid-credentials text-left">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-2 text-right pt-1">Name<em>* </em>:</div>
+                        <div class="col-3">
+                            <input class="form-control" type="text" placeholder="Enter Name" formControlName="name"
+                                [class.is-invalid]="formErrors.name">
+                            <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}} </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right pt-1">Description<em>* </em>:</div>
+                        <div class="col-6">
+                            <textarea class="form-control" style="height: calc(1.5em + 0.75rem + 2px)" type="text"
+                                placeholder="Enter Description" formControlName="description"
+                                [class.is-invalid]="formErrors.description"></textarea>
+                            <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right pt-1">Scope<em>* </em>:</div>
+                        <div class="col-10 row">
+                            <div class="col-3">
+                                <select class="form-control" type="text" formControlName="scope"
+                                    [class.is-invalid]="formErrors.scope">
+                                    <option [value]="''" disabled>Select</option>
+                                    <option *ngFor="let scope of scopeTypes" [value]="scope.value">{{scope.label}}
+                                    </option>
+                                </select>
+                                <!-- <multiselect-dropdown [options]="scopeTypes" [settings]="scopeTypesSettings" class="form-control p-0" 
+                                    formControlName="scope" [class.is-invalid]="formErrors.scope">
+                                </multiselect-dropdown> -->
+                                <div class="invalid-feedback" *ngIf="formErrors.scope">{{formErrors.scope}}
+                                </div>
+                            </div>
+                            <div class="col-3" *ngIf="form.get('scope')?.value == 'Cloud'">
+                                <select class="form-control" type="text" formControlName="cloud_type"
+                                    [class.is-invalid]="formErrors.cloud_type">
+                                    <option [value]="''" disabled>Select</option>
+                                    <option *ngFor="let cloud of cloudTypes" [value]="cloud">{{cloud}}</option>
+                                </select>
+
+                                <!-- <image-dropdown [onlyImage]="true" [values]="cloudTypesList" [defaultLabel]="'cloud'"
+                                    (selectedDropdownValue)="getDropdownValue($event)" [class.is-invalid]="formErrors.cloud_type"
+                                    [editCaseImageValue]="selectedCloud"></image-dropdown> -->
+
+                                <!-- <multiselect-dropdown [options]="cloudTypes" [settings]="cloudTypesSettings" class="form-control p-0" 
+                                    formControlName="cloud_type" [class.is-invalid]="formErrors.cloud_type">
+                                </multiselect-dropdown> -->
+                                <div class="invalid-feedback" *ngIf="formErrors.cloud_type">{{formErrors.cloud_type}}
+                                </div>
+                            </div>
+                            <div class="col-3" *ngIf="form.get('scope')?.value == 'Cloud Account'">
+                                <select class="form-control" type="text" formControlName="cloud_uuid"
+                                    (change)="onCloudAccountChange($event.target.value)"
+                                    [class.is-invalid]="formErrors.cloud_uuid">
+                                    <option [value]="''" disabled>Select</option>
+                                    <option *ngFor="let acc of cloudAccountsFiltered" [value]="acc.uuid">
+                                        {{acc.cloud_type+' : '+acc.account_name}}</option>
+                                </select>
+                                <!-- <multiselect-dropdown [options]="cloudAccountsFiltered" [settings]="cloudAccountsSettings" class="form-control p-0" 
+                                    formControlName="cloud_uuid" [class.is-invalid]="formErrors.cloud_uuid">
+                                </multiselect-dropdown> -->
+                                <div class="invalid-feedback" *ngIf="formErrors.cloud_uuid">{{formErrors.cloud_uuid}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right pt-1">Period<em>* </em>:</div>
+                        <div class="col-8">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link px-4"
+                                            [class.active]="form.get('period').value=='Year'">
+                                            <input type="radio" formControlName="period" [value]="'Year'">
+                                            <span class="font-sm">Year</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link px-4"
+                                            [class.active]="form.get('period').value=='Quarter'">
+                                            <input type="radio" formControlName="period" [value]="'Quarter'">
+                                            <span class="font-sm">Quarter</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link px-4"
+                                            [class.active]="form.get('period').value=='Month'">
+                                            <input type="radio" formControlName="period" [value]="'Month'">
+                                            <span class="font-sm">Month</span>
+                                        </label>
+                                    </li>
+                                    <!-- custom option can be integrated on the basis of requirement  -->
+                                    <!-- <li>
+                                        <label class="pointer-link px-4"
+                                            [class.active]="form.get('period').value=='Custom'">
+                                            <input type="radio" formControlName="period" [value]="'Custom'">
+                                            <span class="font-sm">Custom</span>
+                                        </label>
+                                    </li> -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right pt-4">Period Selection<em>* </em>:</div>
+                        <ng-container [ngSwitch]="form.get('period').value">
+                            <!-- Year selection - Sugg:Not date picker just input number -->
+                            <div class="row col-10" *ngSwitchCase="'Year'">
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="period_selection_start" class="form-col-form-label">Start
+                                            Year:<em>*</em></label>
+                                        <div class="input-group">
+                                            <owl-date-time #period_selection_start [pickerType]="'calendar'"
+                                                [startView]="'multi-years'"
+                                                (yearSelected)="startYearHandler($event,period_selection_start)"></owl-date-time>
+                                            <input class="form-control rounded-left" [min]="startYearDate"
+                                                formControlName="period_selection_start" name="period_selection_start"
+                                                [owlDateTimeTrigger]="period_selection_start"
+                                                [owlDateTime]="period_selection_start" type="text"
+                                                [ngClass]="{'is-invalid' : formErrors.period_selection_start}"
+                                                placeholder="Select Start Year">
+                                            <div class="input-group-append"
+                                                [owlDateTimeTrigger]="period_selection_start">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.period_selection_start">
+                                            {{formErrors.period_selection_start}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="period_selection_end" class="form-col-form-label">End
+                                            Year:<em>*</em></label>
+                                        <div class="input-group">
+                                            <owl-date-time #period_selection_end [pickerType]="'calendar'"
+                                                [startView]="'multi-years'"
+                                                (yearSelected)="endYearHandler($event,period_selection_end)"></owl-date-time>
+                                            <input class="form-control rounded-left" [min]="minEndYear"
+                                                [max]="maxEndYear" formControlName="period_selection_end"
+                                                name="period_selection_end" [owlDateTimeTrigger]="period_selection_end"
+                                                [owlDateTime]="period_selection_end" type="text"
+                                                [ngClass]="{'is-invalid' : formErrors.period_selection_end}"
+                                                placeholder="Select End Year">
+                                            <div class="input-group-append" [owlDateTimeTrigger]="period_selection_end">
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.period_selection_end">
+                                            {{formErrors.period_selection_end}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quarter selection  - Sugg:Not date picker just dropdown  -->
+                            <div class="row col-10" *ngSwitchCase="'Quarter'">
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="period_selection_start" class="form-col-form-label">Start
+                                            Quarter:<em>*</em></label>
+                                        <select class="form-control" formControlName="period_selection_start"
+                                            [ngClass]="{'is-invalid' : formErrors.period_selection_start}">
+                                            <option value="" disabled>Select Start Quarter</option>
+                                            <option *ngFor="let quarter of quartersList" [value]="quarter.value">
+                                                {{quarter.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.period_selection_start">
+                                            {{formErrors.period_selection_start}}</div>
+                                    </div>
+
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="period_selection_end" class="form-col-form-label">End
+                                            Quarter:<em>*</em></label>
+                                        <select class="form-control" formControlName="period_selection_end"
+                                            [ngClass]="{'is-invalid' : formErrors.period_selection_end}">
+                                            <option value="" disabled>Select End Quarter</option>
+                                            <option *ngFor="let quarter of quartersList" [value]="quarter.value">
+                                                {{quarter.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback  d-block" *ngIf="formErrors.period_selection_end">
+                                            {{formErrors.period_selection_end}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Month selection  - Sugg:Not date picker just dropdown number -->
+                            <div class="row col-10" *ngSwitchCase="'Month'">
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="period_selection_start" class="form-col-form-label">Start
+                                            Month:<em>*</em></label>
+                                        <select class="form-control" formControlName="period_selection_start"
+                                            [ngClass]="{'is-invalid' : formErrors.period_selection_start}">
+                                            <option value="" disabled>Select Start Month</option>
+                                            <option *ngFor="let month of monthList" [value]="month.value">
+                                                {{month.name}}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.period_selection_start">
+                                            {{formErrors.period_selection_start}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="period_selection_end" class="form-col-form-label">End
+                                            Month:<em>*</em></label>
+                                        <select class="form-control" formControlName="period_selection_end"
+                                            [ngClass]="{'is-invalid' : formErrors.period_selection_end}">
+                                            <option value="" disabled>Select End Month</option>
+                                            <option *ngFor="let month of monthList" [value]="month.value">
+                                                {{month.name}}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.period_selection_end">
+                                            {{formErrors.period_selection_end}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Custom selection - Sugg: Date picker -->
+                            <div class="row col-10" *ngSwitchCase="'Custom'">
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="start_year" class="form-col-form-label">Start
+                                            Date:<em>*</em></label>
+                                        <div class="input-group">
+                                            <owl-date-time #period_selection_start [pickerType]="'calendar'"
+                                                (afterPickerClosed)="customDateChanged()"></owl-date-time>
+                                            <input class="form-control rounded-left" [min]="currentDate"
+                                                formControlName="period_selection_start" name="period_selection_start"
+                                                [owlDateTimeTrigger]="period_selection_start"
+                                                [owlDateTime]="period_selection_start" type="text"
+                                                [ngClass]="{'is-invalid' : formErrors.period_selection_start}"
+                                                placeholder="Select Start Date">
+                                            <div class="input-group-append"
+                                                [owlDateTimeTrigger]="period_selection_start"
+                                                [ngClass]="{'is-invalid' : formErrors.period_selection_start}">
+                                                <span class="input-group-text bg-white"><i
+                                                        class="fas fa-calendar-alt"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.period_selection_start">
+                                            {{formErrors.period_selection_start}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <label for="end_year" class="form-col-form-label">End Date:<em>*</em></label>
+                                        <div class="input-group">
+                                            <owl-date-time #period_selection_end
+                                                [pickerType]="'calendar'"></owl-date-time>
+                                            <input class="form-control rounded-left"
+                                                formControlName="period_selection_end" name="period_selection_end"
+                                                [owlDateTimeTrigger]="period_selection_end"
+                                                [owlDateTime]="period_selection_end" [min]="minCustomEndDate"
+                                                [max]="maxCustomEndDate" type="text"
+                                                [ngClass]="{'is-invalid' : formErrors.period_selection_end}"
+                                                placeholder="Select End Date">
+                                            <div class="input-group-append" [owlDateTimeTrigger]="period_selection_end"
+                                                [ngClass]="{'is-invalid' : formErrors.period_selection_end}">
+                                                <span class="input-group-text bg-white"><i
+                                                        class="fas fa-calendar-alt"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.period_selection_end">
+                                            {{formErrors.period_selection_end}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="form-group row" *ngIf="form.get('invoice')?.value">
+                        <div class="col-2 text-right pt-1">Invoice<em>* </em>:</div>
+                        <div class="col-10">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li *ngIf="isOptionEnabled('Year')">
+                                        <label class="pointer-link px-4"
+                                            [class.active]="form.get('invoice').value=='Year'">
+                                            <input type="radio" formControlName="invoice" [value]="'Year'">
+                                            <span class="font-sm">Year</span>
+                                        </label>
+                                    </li>
+                                    <li *ngIf="isOptionEnabled('Quarter')">
+                                        <label class="pointer-link px-4"
+                                            [class.active]="form.get('invoice').value=='Quarter'">
+                                            <input type="radio" formControlName="invoice" [value]="'Quarter'">
+                                            <span class="font-sm">Quarter</span>
+                                        </label>
+                                    </li>
+                                    <li *ngIf="isOptionEnabled('Month')">
+                                        <label class="pointer-link px-4"
+                                            [class.active]="form.get('invoice').value=='Month'">
+                                            <input type="radio" formControlName="invoice" [value]="'Month'">
+                                            <span class="font-sm">Month</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group" *ngIf="form.get('budget_amount')?.value">
+                        <div class="col-2 text-right pt-3">Budget Amount<em>* </em>:</div>
+                        <div class="col-10 dynamic-inputs">
+                            <ng-container [ngSwitch]="form.get('period')?.value">
+                                <ng-container *ngSwitchCase="'Year'">
+                                    <ng-container [ngSwitch]="form.get('invoice')?.value">
+                                        <ng-container *ngSwitchCase="'Year'">
+                                            <ng-container
+                                                *ngTemplateOutlet="singlecards;context: {form: form}"></ng-container>
+                                        </ng-container>
+                                        <ng-container *ngSwitchDefault>
+                                            <ng-container
+                                                *ngTemplateOutlet="tableLayout;context: {form: form}"></ng-container>
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'Quarter'">
+                                    <ng-container [ngSwitch]="form.get('invoice')?.value">
+                                        <ng-container *ngSwitchCase="'Month'">
+                                            <ng-container
+                                                *ngTemplateOutlet="tableLayout;context: {form: form}"></ng-container>
+                                        </ng-container>
+                                        <ng-container *ngSwitchDefault>
+                                            <ng-container
+                                                *ngTemplateOutlet="singlecards;context: {form: form}"></ng-container>
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'Month'">
+                                    <ng-container *ngTemplateOutlet="tableLayout;context: {form: form}"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'Custom'">
+                                    <ng-container *ngTemplateOutlet="singlecards;context: {form: form}"></ng-container>
+                                </ng-container>
+                            </ng-container>
+                            <div class="d-flex align-items-center pt-2">
+                                <div class="col-auto form-check pr-2 py-1">
+                                    <input class="form-check-input" type="checkbox" id="use_same_amount"
+                                        formControlName="same_for_all">
+                                    <label class="form-check-label" for="use_same_amount"> Use same amount for all
+                                    </label>
+                                </div>
+                                <input class="col-2 form-control" type="number" formControlName="same_for_all_amount"
+                                    (blur)="setBudgetForAll($event)" min="0" placeholder="$ Amount"
+                                    [class.is-invalid]="formErrors.same_for_all_amount">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-2 text-right pt-1">Status<em>* </em>:</div>
+                        <div class="col-3">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link" [class.active]="form.get('status').value == true">
+                                            <input type="radio" [value]="true" formControlName="status">
+                                            <span class="font-sm">Enable</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link" [class.active]="form.get('status').value == false">
+                                            <input type="radio" [value]="false" formControlName="status">
+                                            <span class="font-sm">Disable</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="dateError" class="row form-group offset-1">
+                        <div class="invalid-credentials font-weight-bold text-left">Note: {{dateError}}</div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-2">
+                <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success ml-3" type="button" (click)="onSubmit()" accessControl
+                    moduleName="Budget" accessType="Manage Budget" elementType="btn">{{actionMessage}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #singlecards let-form="form">
+    <ng-container [formGroup]="form">
+        <div class="row form-group" formGroupName="budget_amount">
+            <ng-container *ngFor="let key of getBudgets()">
+                <!-- For Year and Year ( for budget_amount = { 2024: '' } ) -->
+                <div class="col-2 py-2" *ngIf="!isNestedBudgetObj(key)">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text text-dark"
+                                style="background-color:  rgb(200, 206, 211, 1) !important;">{{ key }}</span>
+                        </div>
+                        <input class="form-control" [formControlName]="key" type="number" min="0" placeholder="$ Amount"
+                            [class.is-invalid]="formErrors.budget_amount[key]">
+                    </div>
+                    <!-- <div class="d-block invalid-feedback" *ngIf="formErrors.budget_amount[key]">{{formErrors.budget_amount[key]}}</div> -->
+                </div>
+                <!-- For Quarter and Month without showing Year ( for budget_amount = { 2024: {} } ) -->
+                <div *ngIf="isNestedBudgetObj(key)" class="col-12 p-0 d-flex" [formGroupName]="key">
+                    <div class="col-auto pt-3 text-center">{{ key }}</div>
+                    <div class="col p-0 d-flex flex-wrap">
+                        <div class="col-3 py-2" *ngFor="let subKey of getNestedBudgetObj(key)">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text text-dark"
+                                        style="background-color:  rgb(200, 206, 211, 1) !important;">{{ subKey }}</span>
+                                </div>
+                                <input class="form-control" [formControlName]="subKey" type="number" min="0"
+                                    placeholder="$ Amount" [class.is-invalid]="formErrors.budget_amount[key]?.subKey">
+                            </div>
+                            <!-- <div class="d-block invalid-feedback" *ngIf="formErrors.budget_amount[key][subKey]">{{formErrors.budget_amount[key][subKey]}}</div> -->
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+</ng-template>
+
+<!-- <ng-template #singlerowcards let-form="form">
+    <ng-container [formGroup]="form">
+        <div class="row form-group" formGroupName="budget_amount">
+            <ng-container *ngFor="let key of getBudgets()">
+                <div *ngIf="isNestedBudgetObj(key)" class="col-12 d-flex flex-wrap align-items-center"
+                    [formGroupName]="key">
+                    <div class="font-sm font-italic text-right">{{ key }}</div>
+                    <div class="col-2" *ngFor="let subKey of getNestedBudgetObj(key)">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text text-dark"
+                                    style="background-color:  rgb(200, 206, 211, 1) !important;">{{ subKey }}</span>
+                            </div>
+                            <input class="form-control" [formControlName]="subKey" type="number" min="0"
+                                placeholder="$ Amount" [class.is-invalid]="formErrors.key?.subKey">
+                        </div>
+                        <small class="text-danger" *ngIf="formErrors.key?.subKey">{{formErrors.key?.subKey}}</small>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+</ng-template> -->
+
+<ng-template #tableLayout let-form="form">
+    <ng-container [formGroup]="form">
+        <div class="row form-group m-0" formGroupName="budget_amount">
+            <table class="col-12 table table-sm table-gray-100 rounded">
+                <thead>
+                    <ng-container *ngFor="let key of getBudgets(); let i = index;">
+                        <tr *ngIf="i == 0">
+                            <th class="font-500 text-center font-sm-xs">Year</th>
+                            <ng-container *ngIf="isNestedBudgetObj(key)">
+                                <th *ngFor="let subKey of getNestedBudgetObj(key)"
+                                    class="font-500 text-center font-sm-xs">{{subKey}}</th>
+                            </ng-container>
+                            <th *ngIf="!isNestedBudgetObj(key)">{{key}}</th>
+                        </tr>
+                    </ng-container>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let key of getBudgets()">
+                        <tr [formGroupName]="key">
+                            <td class="font-500 text-center font-sm-xs">
+                                {{key}}
+                            </td>
+                            <ng-container *ngIf="isNestedBudgetObj(key)">
+                                <td *ngFor="let subKey of getNestedBudgetObj(key)">
+                                    <input class="form-control" type="number" min="0" placeholder="$ Amount"
+                                        [formControlName]="subKey"
+                                        [class.is-invalid]="formErrors.budget_amount[key][subKey]">
+                                    <!-- <div class="invalid-feedback" *ngIf="formErrors.budget_amount[key][subKey]">
+                                        {{formErrors.budget_amount[key][subKey]}} </div> -->
+                                </td>
+                            </ng-container>
+                            <td *ngIf="!isNestedBudgetObj(key)">
+                                <input class="form-control" type="number" min="0" placeholder="$ Amount"
+                                    [formControlName]="key" [class.is-invalid]="formErrors.budget_amount[key]">
+                                <!-- <div class="invalid-feedback" *ngIf="formErrors.budget_amount[key]">{{formErrors.budget_amount[key]}} </div> -->
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #confirmEdit>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Update
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="budgetEditModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Budget analysis report will be updated as per the new details you've provided. Are you sure you want to
+            update?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onUpdate()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="budgetEditModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

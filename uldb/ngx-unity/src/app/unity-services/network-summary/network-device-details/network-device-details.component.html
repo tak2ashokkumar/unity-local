@@ -1,0 +1,7 @@
+<div class="container-fluid mt-3">
+    <ng-container [ngSwitch]="device.deviceType">
+        <ng-container *ngSwitchCase="'Switch'"> <switches-zabbix></switches-zabbix></ng-container>
+        <ng-container *ngSwitchCase="'Firewall'"><firewalls-zabbix></firewalls-zabbix></ng-container>
+        <ng-container *ngSwitchCase="'Load Balancer'"><loadbalancers-zabbix></loadbalancers-zabbix></ng-container>
+    </ng-container>
+</div>

@@ -1,0 +1,159 @@
+<div class="card mb-0 minvh-50" *ngIf="!selectedView">
+    <app-spinner [name]="loaderName"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center py-1">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{count}}</span>
+            <span class="ml-1 font-lg">Protection Groups</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+    </div>
+    <div class="card-body px-2 py-0">
+        <table class="table table-sm text-left">
+            <thead class="">
+                <tr>
+                    <th>Name</th>
+                    <th>Snapshots</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of viewData; let i = index;" truncateText>
+                    <td class="tdw-50">
+                        <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                            [tooltip]="view.name" (click)="goToDetails(view)" accessControl moduleName="Monitoring"
+                            accessType="View Monitoring" elementType="div">{{view.name}}</button>
+                    </td>
+                    <td class="tdw-50">
+                        <div [tooltip]="view.space?.snapshots">{{view.space?.snapshots}}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No associated Protection Groups found.</div>
+    </div>
+</div>
+
+<div class="card" *ngIf="selectedView">
+    <app-spinner [name]="loaderName"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center py-1">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="font-lg">Protection Group</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                    class="fa fa-arrow-left"></i></button>
+            <!-- <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData()"></data-refresh-btn> -->
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="row">
+            <div class="col-6">
+                <div class="card rounded border-0 equalize-card">
+                    <div class="card-body d-flex flex-column font-sm">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-muted w-30 text-truncate">Protection Group Name :</span>
+                            <span class="font-sm-xs font-500 ml-2">{{selectedView?.name}}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2 mt-1">
+                            <span class="text-muted w-30 text-truncate">Snapshots :</span>
+                            <span class="font-sm-xs font-500 ml-2">{{selectedView?.space?.snapshots || '--'}}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2 mt-1">
+                            <span class="text-muted w-30 text-truncate" tooltip="Connected Snapshots"
+                                nodeTooltip>Connected Hosts :</span>
+                            <span class="font-sm-xs font-500 ml-2 d-flex flex-column">
+                                <span *ngFor="let h of selectedView?.connectedHosts">{{h}}</span>
+                                <span *ngIf="!selectedView?.connectedHosts?.length">--</span>
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2 mt-1">
+                            <span class="text-muted w-30 text-truncate" tooltip="Connected Snapshots"
+                                nodeTooltip>Connected Host Groups :</span>
+                            <span class="font-sm-xs font-500 ml-2 d-flex flex-column">
+                                <span *ngFor="let hg of selectedView?.connectedHostGroups">{{hg}}</span>
+                                <span *ngIf="!selectedView?.connectedHostGroups?.length">--</span>
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2 mt-1">
+                            <span class="text-muted w-30 text-truncate" tooltip="Connected Snapshots"
+                                nodeTooltip>Connected Volumes :</span>
+                            <span class="font-sm-xs font-500 ml-2 d-flex flex-column">
+                                <span *ngFor="let h of selectedView?.connectedVolumes">{{h}}</span>
+                                <span *ngIf="!selectedView?.connectedVolumes?.length">--</span>
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2 mt-1">
+                            <span class="text-muted w-30 text-truncate" tooltip="Connected Snapshots"
+                                nodeTooltip>Connected Snapshots :</span>
+                            <span class="font-sm-xs font-500 ml-2 d-flex flex-column">
+                                <span *ngFor="let s of selectedView?.connectedSnapshots">{{s}}</span>
+                                <span *ngIf="!selectedView?.connectedSnapshots?.length">--</span>
+                            </span>
+                        </div>
+                        <div class="card rounded mt-1 mb-0">
+                            <div class="card-header p-2">Snapshot Schedule</div>
+                            <div class="card-body p-2">
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted text-truncate">Enabled :</span>
+                                    <span class="font-sm-xs font-500 text-capitalize ml-2">{{selectedView?.snapshotSchedule?.enabled}}</span>
+                                </div>
+                                <div class="d-flex align-items-center mt-1">
+                                    <span class="text-muted text-truncate">Create a snapshot on source every</span>
+                                    <span class="font-sm-xs font-500 ml-1">{{selectedView?.snapshotSchedule?.frequency_hours}}
+                                        hours</span>
+                                </div>
+                                <div class="d-flex align-items-center mt-1">
+                                    <span class="text-muted text-truncate">Retain all snapshots on source for</span>
+                                    <span class="font-sm-xs font-500 ml-1">{{selectedView?.snapshotSchedule?.all_snapshots}}
+                                        day</span>
+                                </div>
+                                <div class="d-flex align-items-center my-1">
+                                    <span class="text-muted text-truncate">then retain</span>
+                                    <span
+                                        class="font-sm-xs font-500 mx-1">{{selectedView?.snapshotSchedule?.snapshots_per_day}}</span>
+                                    <span class="text-muted text-truncate">snapshots per day for</span>
+                                    <span class="font-sm-xs font-500 mx-1">{{selectedView?.snapshotSchedule?.more_days}}</span>
+                                    <span class="text-muted text-truncate">more days</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card rounded mt-2">
+                    <div class="card-header p-2">Replication Schedule</div>
+                    <div class="card-body p-2">
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted text-truncate">Enabled :</span>
+                            <span class="font-sm-xs font-500 text-capitalize ml-2">{{selectedView?.replicationSchedule?.enabled}}</span>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <span class="text-muted text-truncate">Replicate a snapshot to targets every</span>
+                            <span class="font-sm-xs font-500 ml-1">{{selectedView?.replicationSchedule?.frequency_hours}}
+                                hours</span>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <span class="text-muted text-truncate">Retain all snapshots on targets for</span>
+                            <span class="font-sm-xs font-500 ml-1">{{selectedView?.replicationSchedule?.all_snapshots}}
+                                day</span>
+                        </div>
+                        <div class="d-flex align-items-center my-1">
+                            <span class="text-muted text-truncate">then retain</span>
+                            <span
+                                class="font-sm-xs font-500 mx-1">{{selectedView?.replicationSchedule?.snapshots_per_day}}</span>
+                            <span class="text-muted text-truncate">snapshots per day for</span>
+                            <span class="font-sm-xs font-500 mx-1">{{selectedView?.replicationSchedule?.more_days}}</span>
+                            <span class="text-muted text-truncate">more days</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

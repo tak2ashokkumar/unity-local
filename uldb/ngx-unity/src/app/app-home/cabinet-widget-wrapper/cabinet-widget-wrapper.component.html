@@ -1,0 +1,37 @@
+<h5 *ngIf="datacenters.length">Data Center</h5>
+<div class="row">
+  <div [ngClass]="datacenter.cardData.length>1?'col-12':'col-6'" *ngFor="let datacenter of datacenters">
+    <div class="card">
+      <dc-spinner-util [spinnerName]="datacenter.datacenter_uuid" [parentSubject]="parentSubject"></dc-spinner-util>
+      <div class="card-header bg-transparent border-bottom-0 ml-0 card-title">
+        <div class="row">
+          <div class="col-12">
+            <a class="card-title font-lg text-decoration-none text-dark h4"
+              (click)="goTo(datacenter.datacenter_url)">{{datacenter.datacenter_name}}</a>
+            <span class="pull-right ml-4" *ngIf="greenITEnabled && datacenter.co2EmissionValue">
+              <i class="fas fa-leaf text-success"></i>&nbsp;
+              <span [innerHTML]="datacenter.co2EmissionValue"></span>
+            </span>
+            <span class="pull-right">
+              <i class="fa fa-bolt text-success"></i>&nbsp;{{datacenter.dcTotalPower}}kW
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="card-body py-0 px-0">
+        <div class="row align-items">
+          <div class="col-6" [ngClass]="datacenter.cardData.length>1?'col-6':'col-12'"
+            *ngFor="let cardData of datacenter.cardData">
+            <div class="px-2">
+              <div class="cabinet-row">
+                <div class="cabinet-col pb-2 text-center" *ngFor="let cabinet of cardData.cabinets">
+                  <cabinet-widget [cabinetData]="cabinet"></cabinet-widget>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

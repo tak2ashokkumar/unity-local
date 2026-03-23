@@ -1,0 +1,127 @@
+<pre>Instructions:
+  Click Organization to generate "Auth Keys"
+  Click REBUILD to regenerate ansible parts
+  Click CAPTURE to acquire Auth Key yourself</pre>
+
+<generic-panel heading="Proxy Server" panel-type="default">
+  <panel-body>
+    <table class="table">
+      <thead>
+      <tr>
+        <th>IP Address</th>
+        <th>Domain</th>
+        <th>Conn. Type</th>
+        <th>Pingable</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>{{ proxy_server.ip_address }}</td>
+        <td>{{ proxy_server.domain }}</td>
+        <td>{{ proxy_server.connection_type }}</td>
+        <td>{{ proxy_server.pingable }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </panel-body>
+  <panel-footer>
+    <button class="btn btn-danger" ng-click="refresh_subdomains()">Correct Subdomains</button>
+    <button class="btn btn-success" ng-click="add_proxy_modal()">Add Proxy</button>
+  </panel-footer>
+</generic-panel>
+
+<generic-panel heading="Proxies" panel-type="default">
+  <panel-body>
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Device</th>
+        <th>Proxy Type</th>
+        <th>Proxy Name</th>
+        <th>Cust</th>
+        <th>Rebuilt At</th>
+        <th>Rebuild</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="result in results">
+        <td><a href="{{result.reverse_proxy_url}}" target="_blank">{{ result.device }}</a></td>
+        <td>{{ result.proxy_type }}</td>
+        <td>{{ result.name }}</td>
+        <td>
+          <span ng-repeat="orgs in result.customers">
+            <p ng-repeat="(org_id, org_name) in orgs"><a href="#/org/{{ org_id }}/">{{ org_name }}</a></p>
+          </span>
+        </td>
+        <td> <i ng-if="result.loader" class="fa fa-spinner fa-spin"></i> <span ng-if="!result.loader">{{ result.rebuilt_at | date : "dd MMM yyyy HH:mm:ss" }}</span></td>
+        <td>
+          <button class="btn btn-warning" ng-click="proxy_rebuild(result)">Rebuild</btn>
+          <button class="btn btn-danger" ng-click="delete_proxy(result)">Delete</btn>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </panel-body>
+  <panel-footer></panel-footer>
+</generic-panel>
+
+<script type="text/ng-template" id="add_proxy_modal.html">
+    <form role="form" name="add_proxy_form" ng-submit="add_proxy_form.$valid && add_proxy(new_proxy)" novalidate>
+        <div class="modal-header">
+            <h3 class="modal-title">Add Reverse Proxy </h3>
+        </div>
+        <div class="modal-body">
+            <div class="col-xs-12 modal-form">
+                <div class="col-xs-8">
+                    <!--  <div class="form-group">
+                        <label for="customer"> Customer </label>
+                         <input class="form-control"
+                             ng-model="new_proxy.customer"
+                             uib-typeahead="rel.name for rel in search_customers($viewValue)"
+                             />
+                    </div> -->
+                    <div class="form-group">
+                        <label for="device_category"> Device Category </label>
+                        <select class="form-control" id="device_category" name="device_category" ng-model="new_proxy.device_category" ng-change="get_proxy_types(new_proxy)">
+                            <option value="" disabled> Select Device Category </option>
+                            <option value="firewall"> Firewall </option>
+                            <option value="switch"> Switch </option>
+                            <option value="load_balancer"> Load Balancer </option>
+                            <option value="server"> Hypervisor (ESXi) </option>
+                            <option value="private_cloud"> Private Cloud </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="proxy_type"> Proxy Type </label>
+                         <select class="form-control" id="proxy_type" name="proxy_type" ng-model="new_proxy.proxy_type" ng-options="item.type as item.name for item in proxy_types_by_category">
+                            <option value="" disabled> Select Proxy Type </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="device_category"> Devices List</label>
+                         <input class="form-control"
+                             ng-model="new_proxy.device"
+                             uib-typeahead="rel as rel.name for rel in get_devices_by_category($viewValue)"
+                             />
+                        <!--  <select class="form-control" id="device" name="device" ng-model="new_proxy.device" ng-options="item.id as item.name for item in devices_list">
+                            <option value="" disabled> Select {{ new_proxy.device_category }} Device</option>
+                        </select> -->
+                    </div>
+                    <div class="form-group">
+                        <label for="proxy_url"> Proxy Name for Subdomain</label>
+                         <input class="form-control" type="text" name="proxy_url" ng-model="new_proxy.proxy_url" size="10" /> .{{proxy_server.domain}}
+                    </div>
+                    <div class="form-group">
+                        <label for="backend_url"> Backend URL </label>
+                         <input class="form-control" type="text" name="backend_url" ng-model="new_proxy.backend_url" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-buttons">
+            <button type="button" class="btn btn-cancel" ng-click="cancel()"> Close </button>
+            <button type="submit" class="btn btn-default"> Add </button>
+        </div>
+    </form>
+</script>
+

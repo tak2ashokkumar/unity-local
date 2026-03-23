@@ -1,0 +1,158 @@
+<div class="card equalize-card" [widgetLazyLoader]="{ttw:500}" (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="alertCounts.loaderName"></app-spinner>
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title font-lg">
+    <div class="row">
+      <div class="col-12">
+        <a class="d-block text-truncate font-lg text-dark text-decoration-none h4" *ngIf="alertCounts"
+          (click)="goTo(alertCounts.drillDownLink)">
+          Alerts <small class="text-muted font-sm float-right">Total <span
+              class="badge badge-pill badge-secondary">{{alertCounts.totalCount}}</span></small>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="card-body pt-0">
+    <div class="row">
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.PDU)">
+              <i class="fa fa-plug pdus"></i>
+              <span> PDUs</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress">
+              <div class="progress-bar" [ngClass]="alertCounts.pduBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.pduAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.STORAGE_DEVICES)">
+              <i class="fas fa-hdd storage"></i>
+              <span> SANs</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress bg-secondary">
+              <div class="progress-bar" [ngClass]="alertCounts.sanBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.sanAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.BARE_METAL_SERVER)">
+              <i class="fa fa-laptop bms"></i>
+              <span> Bare Metals</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress">
+              <div class="progress-bar" [ngClass]="alertCounts.bmsBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.bmServerAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.VIRTUAL_MACHINE)">
+              <i class="fa fa-object-group vms"></i>
+              <span> VMs</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress">
+              <div class="progress-bar" [ngClass]="alertCounts.vmsBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.vmAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.FIREWALL)">
+              <i class="fa fa-fire firewalls"></i>
+              <span> Firewalls</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress">
+              <div class="progress-bar" [ngClass]="alertCounts.firewallBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.firewallAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.SWITCHES)">
+              <i class="fa fa-sitemap switches"></i>
+              <span> Switches</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress bg-secondary">
+              <div class="progress-bar" [ngClass]="alertCounts.switchBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.switchAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-4 text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.LOAD_BALANCER)">
+              <i class="fa fa-balance-scale lbs"></i>
+              <span> Load Balancers</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress bg-secondary">
+              <div class="progress-bar" [ngClass]="alertCounts.lbBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.loadBalancerAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4 text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(AppDeviceMapping.MAC_MINI)">
+              <i class="fab fa-apple fa-lg"></i>
+              <span> Mac Minis</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <div class="progress bg-secondary">
+              <div class="progress-bar" [ngClass]="alertCounts.macMiniBarColor" role="progressbar" style="width: 100%"
+                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{alertCounts.macMiniAlertCount}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+{% include 'include_frame.html' %}
+
+<div class="divpad" ng-app="uldb" ng-controller="VLANInterfaceController">
+
+<div>
+  <form class="form-inline ticketing">
+    <div class="form-group leftpan">
+      <label for="orgName">Filter by Customer</label>
+      <input type="text" id="orgName" class="form-control ticketing"
+             ng-model="org"
+             placeholder="Type org to filter..."
+	     typeahead-on-select="getVlanByOrg($item)"
+             typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="">
+      
+    </div>
+    <div class="form-group rightpan">
+	<button class="btn btn-success" type="button" ng-click="open('lg')">Add</button>
+    </div>
+  </form>
+</div>
+
+  <div style="height: 10px"></div>   
+
+	
+  <div class="table-responsive">
+  <table class="table table-striped" border="1" style="padding:1%;">
+    <thead class="resulttable-head">
+    {% verbatim %}
+	
+    <tr>
+      <th>Interface Name</th>      
+      <th>Switch</th>
+      <th>Customer</th>
+      <th><center>Delete</center></th>
+    </tr>
+    </thead>
+   
+    <tbody ng-repeat="vlan in vlans"  border="1" class="monitoringtable">
+	
+    <tr>
+     <td class="vlanintname">{{ vlan.interface_name }} <div class="editvlan" ng-click="openEdit(vlan.id,'lg')" value="{{ vlan.interface_name }}" title="VLAN Edit"/></div></td>
+     <td>{{ vlan.switch_details.name }}</td>
+     <td>{{ vlan.organization_details.organization_name }}</td>
+      
+      <td>
+	<center><div class="deletecheck" ng-click="removeCheck()" title="Delete check" confirm> </center>
+      </td>
+      
+    {% endverbatim %}
+    </tbody>
+
+  </table>
+</div>
+
+ 
+</div>

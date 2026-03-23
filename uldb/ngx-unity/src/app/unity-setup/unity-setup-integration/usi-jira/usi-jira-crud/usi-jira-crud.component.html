@@ -1,0 +1,190 @@
+<ng-container *ngIf="isAddOrEdit">
+    <div class="row py-3">
+        <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+            <div class="d-flex flex-column align-items-center step">
+                <span class="badge icon-wrap"
+                    [ngClass]="{'active':activeForm == 'integrationForm','success':activeForm != 'integrationForm'}"
+                    (click)="manageSteps('integrationForm')">
+                    <span class="fas fa-link font-xl"></span>
+                </span>
+                <label class="mt-1 font-md">Integration</label>
+            </div>
+            <div class="d-flex flex-column align-items-center step">
+                <span class="badge icon-wrap" [ngClass]="{'active':activeForm == 'projectSelection'}"
+                    (click)="manageSteps('projectSelection')">
+                    <span class="fas fa-cog font-xl"></span>
+                </span>
+                <label class="mt-1 font-md">Project Selection</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4 offset-4 divider-wrap">
+            <hr class="divider-line active w-85">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ng-container [ngSwitch]="activeForm">
+                <ng-container *ngSwitchCase="'integrationForm'">
+                    <ng-container *ngTemplateOutlet="integrationFormRef"></ng-container>
+                </ng-container>
+                <ng-container *ngSwitchCase="'projectSelection'">
+                    <ng-container *ngTemplateOutlet="projectSelectionRef"></ng-container>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #integrationFormRef>
+    <div class="card mx-2">
+        <div class="card-title mb-2 px-2 py-2 border-bottom d-flex justify-content-between font-weight-bold">
+            <span class="font-lg font-500">Integration</span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form [formGroup]="integrationForm" *ngIf="integrationForm">
+                        <div class="row">
+                            <div class="form-group col-12">
+                                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label for="name">Name<em>*</em></label>
+                                <input class="form-control" id="name" formControlName="name" type="text"
+                                    placeholder="Instance Name" [ngClass]="{'is-invalid' : integrationFormErrors.name}">
+                                <div class="invalid-feedback" *ngIf="integrationFormErrors.name">
+                                    {{integrationFormErrors.name}}
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label for="email">Email<em>*</em></label>
+                                <input class="form-control" id="email" formControlName="email" type="text"
+                                    placeholder="Email" [ngClass]="{'is-invalid' : integrationFormErrors.email}">
+                                <div class="invalid-feedback" *ngIf="integrationFormErrors.email">
+                                    {{integrationFormErrors.email}}
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label for="access_type">Access Type<em>*</em></label>
+                                <select id="access_type" class="form-control" formControlName="access_type"
+                                    [class.is-invalid]="integrationFormErrors.access_type">
+                                    <option value="" disabled>Access Type</option>
+                                    <option value="admin">Admin</option>
+                                    <!-- <option value="tenant">Tenant</option> -->
+                                </select>
+                                <div class="invalid-feedback" *ngIf="integrationFormErrors.access_type">
+                                    {{integrationFormErrors.access_type}}</div>
+                            </div>
+                            <div class="form-group col-12">
+                                <label for="jira_url">JIRA URL<em>*</em></label>
+                                <input class="form-control" id="jira_url" formControlName="jira_url" type="text"
+                                    placeholder="JIRA Instance URL"
+                                    [ngClass]="{'is-invalid' : integrationFormErrors.jira_url}">
+                                <div class="invalid-feedback" *ngIf="integrationFormErrors.jira_url">
+                                    {{integrationFormErrors.jira_url}}</div>
+                            </div>
+                            <div class="form-group col-12">
+                                <label for="api_token">API Token<em>*</em></label>
+                                <textarea id="api_token" rows="4" class="form-control" formControlName="api_token"
+                                    placeholder="API Token"
+                                    [ngClass]="{'is-invalid' : integrationFormErrors.api_token}"></textarea>
+                                <div class="invalid-feedback" *ngIf="integrationFormErrors.api_token">
+                                    {{integrationFormErrors.api_token}}</div>
+                            </div>
+                            <div class="form-group col-6">
+                                <label class="col-form-label">Default</label>
+                                <div class="col-form-label">
+                                    <div class="form-check form-check-inline mx-1 mt-0">
+                                        <input class="form-check-input" id="is_default" formControlName="is_default"
+                                            type="checkbox"
+                                            [ngClass]="{'is-invalid' : integrationFormErrors.is_default}">
+                                        <div class="invalid-feedback" *ngIf="integrationFormErrors.is_default">
+                                            {{integrationFormErrors.is_default}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onIntegrationFormSubmit()">Submit</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #projectSelectionRef>
+    <div class="card mx-2">
+        <div class="card-title mb-2 px-2 py-2 border-bottom d-flex justify-content-between font-weight-bold">
+            <span class="font-lg font-500">Integration</span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8 offset-2 projects-list"
+                    [ngClass]="{'d-flex justify-content-center align-items-center':!projects.length}">
+                    <ng-container *ngIf="projects.length">
+                        <div class="pb-1">Select Projects to be managed from Unity</div>
+                        <span *ngFor="let view of projects"
+                            class="badge badge-pill font-weight-bold m-1 font-xs-sm px-3 py-2 pointer-link"
+                            [ngClass]="view.isSelected ? 'badge-primary' : 'badge-secondary'"
+                            (click)="selectProject(view)">{{view.name}}</span>
+                    </ng-container>
+                    <div class="text-center text-muted" *ngIf="!projects.length">No Projects available.
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+                <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success ml-3" (click)="onSubmitProjects()" type="button">Submit</button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #instanceProjectList>
+    <div class="card mb-0">
+        <div class="card-header">
+            Select Projects to be managed from Unity
+        </div>
+        <div class="card-body" style="min-height: 200px;"
+            [ngClass]="{'d-flex justify-content-center align-items-center':!projects.length}">
+            <span *ngFor="let view of projects"
+                class="badge badge-pill font-weight-bold m-1 font-xs-sm px-3 py-2 pointer-link"
+                [ngClass]="view.isSelected ? 'badge-primary' : 'badge-secondary'"
+                (click)="selectProject(view)">{{view.name}}</span>
+            <div class="text-center text-muted" *ngIf="!projects.length">No Projects available.
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" (click)="onSubmitProjects()"
+                type="button">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Disconnect
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to disconnect?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

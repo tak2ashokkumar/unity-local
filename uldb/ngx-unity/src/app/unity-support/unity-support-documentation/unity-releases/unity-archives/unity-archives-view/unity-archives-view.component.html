@@ -1,0 +1,14 @@
+<div class="row">
+  <div class="col-12">
+    <div class="tab-content border-0">
+      <div class="tab-pane active p-2">
+        <ul class="nav">
+          <li class="nav-item ml-auto text-warning">
+            <a class="nav-link py-0 " (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>Back</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<unity-pdf-viewer [pdfUrl]="url" *ngIf="url"></unity-pdf-viewer>

@@ -1,0 +1,93 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 main-content-wrapper" style="padding:0px;">
+    <div class="navbar-header" id="notificationArea">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span></button> 
+    </div>
+
+
+    <!--Content Start-->
+
+    <!--Tabs Level 1 Start-->
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 tabs-level1" ng-if="selectedSubMenuItem.submenu">
+        <div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+            <loading></loading>
+            <div class="ui-selectee">
+                <nav class="column">
+                    <uib-tabset active="secondLevelActiveIndex" class="actonecls" ng-init="getSecondLevelActiveIndex(selectedSubMenuItem.submenu)">
+                        <uib-tab ng-show="!item.disabled" ng-repeat="item in selectedSubMenuItem.submenu" index="$index" ng-click="getSecondlevelMenuItemUrl(item,$index)"
+                        deselect="removeClassforTabs('.actonecls ul',$index)">
+                            <uib-tab-heading class="tab-heading">
+                                <span ng-show="!(item.fa || item.svg)">{{item.name}}</span>
+                                <span ng-show="item.fa">
+                                    <i class="fa {{item.fa}}"></i> {{item.name}}
+                                </span>
+                                <span ng-show="item.svg">
+                                    <img class="svg leftnavsubhead2icon" src="static/fonts/SVGicons/{{ item.svg }}"> {{item.name}}
+                                </span>
+                            </uib-tab-heading>
+                        </uib-tab>
+
+                        <span ng-if="angular.isDefined(view_mode)" class="pull-right" style="padding : 10px;">
+                            <!-- <span ng-if="view_mode" style="padding : 10px;"> in view mode  </span> 
+                            <span ng-if="!view_mode" style="padding : 10px;"> in edit mode  </span>  -->
+                            <a ng-if="view_mode" class="pull-right" ng-click="toggle_mode()" style="color:#1cc09F; font-size:22px; margin-top:-5px;cursor:pointer"> 
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a ng-if="!view_mode" class="pull-right" ng-click="toggle_mode()" style="color:#1cc09F; font-size:22px; margin-top:-5px;cursor:pointer"> 
+                                <i class="fa fa-eye"></i>
+                            </a>
+                        </span>
+                    </uib-tabset>
+                </nav>
+                <div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="row db-info shadow-btm"> </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="tabstyles tabs-level2">
+                                <div id="tabs-ui-171882" class="mytabsclass">
+                                    <uib-tabset active="thirdLevelActiveIndex" class="acttwocls" ng-if="selectedSecondlevelMenuItem.submenu" ng-init="getThirdLevelActiveIndex(selectedSecondlevelMenuItem.submenu)" ng-show="(selectedSubMenuItem.state !== 'public_cloud') || (displaythirdleveltabs)">
+                                        <uib-tab ng-repeat="item in selectedSecondlevelMenuItem.submenu" index="$index"
+                                        ng-click="getThirdlevelMenuItemUrl(item,$index);" deselect="removeClassforTabs('.acttwocls ul',$index)">
+                                            <uib-tab-heading class="tab-heading">
+                                                <span ng-show="!(item.fa || item.svg)">{{item.name}}</span>
+                                                <span ng-show="item.fa">
+                                                    <i class="fa {{item.fa}}"></i> {{item.name}}
+                                                </span>
+                                                <span ng-show="item.svg">
+                                                    <img class="svg leftnavsubhead3icon" src="static/fonts/SVGicons/{{ item.svg }}"> {{item.name}}
+                                                </span>
+                                            </uib-tab-heading>
+                                        </uib-tab>
+                                    </uib-tabset>
+                                    <div id="tabsui-1" class="pull-left width100">
+                                        <p ng-if="selectedThirdlevelMenuItem.submenu"></p>
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 Tabs3-wrapper">
+                                            <ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header" ng-class="{'Tabs3 tabs-level3' : (selectedThirdlevelMenuItem.submenu)}">
+                                                <uib-tabset ng-if="selectedThirdlevelMenuItem.submenu" active="activeTabIndex">
+                                                    <uib-tab ng-repeat="item in selectedThirdlevelMenuItem.submenu" index="$index" ng-click="getFourthlevelMenuItemUrl(item,$index);">
+                                                        <uib-tab-heading class="tab-heading">
+                                                            <span ng-show="!(item.fa || item.svg)">{{item.name}}</span>
+                                                            <span ng-show="item.fa">
+                                                                <i class="fa {{item.fa}}"></i> {{item.name}}
+                                                            </span>
+                                                            <span ng-show="item.svg">
+                                                                <img class="svg leftnavsubhead3icon" src="static/fonts/SVGicons/{{ item.svg }}"> {{item.name}}
+                                                            </span>
+                                                        </uib-tab-heading>
+                                                    </uib-tab>
+                                                </uib-tabset>
+                                                <div ui-view></div>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

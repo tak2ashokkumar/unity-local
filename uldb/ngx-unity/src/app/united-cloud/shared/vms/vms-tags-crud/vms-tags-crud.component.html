@@ -1,0 +1,31 @@
+<ng-template #tagsFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Update Tags
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="tagsFormModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="tagsForm" [formGroup]="tagsForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col">
+                        <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+                            <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+                            </tag-input-dropdown>
+                        </tag-input>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitTags()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="tagsFormModelRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,226 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <!-- <div class="row mb-2">
+            <div class="col-3 pr-1">
+                <div class="card bg-transparent border-0 mb-0 equalize-card">
+                    <div class="card-body p-0">
+                        <div class="card mb-2 round-edge">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="font-lg">Total Number Of Resources</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="font-lg font-500 text-primary">876</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-2 round-edge">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="font-lg">Most Used Resource Category</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="font-lg font-500 text-primary">Network</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-0 round-edge">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="font-lg">Documents Uploaded Last 30 days</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="font-lg font-500 text-primary">15</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col px-1">
+                <div class="card round-edge equalize-card">
+                    <div class="card-header bg-white font-lg font-500 py-2">
+                        Trend By Resource
+                    </div>
+                    <div class="card-body p-0">
+                        <div echarts [options]="chartData.options" [extentions]="chartData.extensions"
+                            class="echart-container flex-grow-1"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col pl-1">
+                <div class="card round-edge equalize-card">
+                    <div class="card-header bg-white font-lg font-500 py-2">
+                        Resource Types
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <div class="card round-edge">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{count}}</span>
+                    <span class="ml-1 font-lg">Resources</span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center w-40">
+                    <div class="w-45 mr-2">
+                        <search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></search-box>
+                    </div>
+                    <button class="btn btn-pill btn-sm btn-warning" type="button"
+                        (click)="addResource()">Upload</button>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <div class="d-flex">
+                    <div class="w-20">
+                        <div class="w-100 border round-edge">
+                            <div class="d-flex align-items-center round-border-top justify-content-between py-1 px-2 category"
+                                [ngClass]="selectedCategory?.name ? 'border-bottom' : 'selected-category'"
+                                (click)="selectAll()">
+                                <div>All</div>
+                                <button class="action-icons small-action-icon mb-0 font-sm" (click)="addCategory()"
+                                    tooltip="Add" container="body">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <ng-container *ngFor="let category of categories; let last = last">
+                                <div class="d-flex align-items-center border-bottom justify-content-between py-1 px-2 category"
+                                    (click)="selectCategory(category)" (mouseenter)="category.onHover = true"
+                                    (mouseleave)="category.onHover = false"
+                                    [ngClass]="getCategoryClasses(category, last)">
+                                    <div class="text-truncate" [ngClass]="category.onHover ? 'w-70' : 'w-100'">{{
+                                        category.name }}({{category.total_documents }})</div>
+                                    <ng-container *ngIf="category.onHover">
+                                        <div class="w-30 d-flex align-items-center justify-content-end">
+                                            <button
+                                                class="action-icons small-action-icon mb-0 fas fa-pencil-alt font-sm"
+                                                (click)="editCategory(category); $event.stopPropagation()"
+                                                tooltip="Edit" container="body"></button>
+                                            <ng-container *ngIf="!category.total_documents">
+                                                <button
+                                                    class="action-icons small-action-icon mb-0 fas fa-trash-alt font-sm ml-1"
+                                                    (click)="onDelete('Category', null, category.id); $event.stopPropagation()"
+                                                    tooltip="Delete" container="body"></button>
+                                            </ng-container>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div class="w-80 ml-2">
+                        <table class="table table-sm text-left">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Resource Name</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Created At</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let data of resources" truncateText>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="data.name">{{data.name}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="data.category">{{data.category}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="data.type">{{data.type}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="data.createdAt">{{data.createdAt}}</div>
+                                    </td>
+                                    <td class="action-icons-column text-center">
+                                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                            (click)="onDelete('Resource', data.id)"></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries *ngIf="resources.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count">
+                        </table-entries>
+                        <table-pager *ngIf="resources.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!resources.length">No resources were found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #category>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{actionMessage}} Category
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="categoryForm" [formGroup]="categoryForm">
+                <ng-container *ngIf="nonFieldErr">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                </ng-container>
+                <div class="rowform-group ">
+                    <div class="col-12">
+                        <label class="form-col-form-label">Category Name<em>* </em></label>
+                        <input id="name" class="form-control" type="text" formControlName="name"
+                            [class.is-invalid]="categoryFormErrors.name">
+                        <div class="invalid-feedback" *ngIf="categoryFormErrors.name">
+                            {{categoryFormErrors.name}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onCategorySubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button" (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete this {{deleteMessage}}?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onConfirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

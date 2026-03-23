@@ -1,0 +1,6 @@
+<h5 *ngIf="kubernetesControllers.length">Container Cloud</h5>
+<div class="row">
+  <div class="col-6 col-card-height" *ngFor="let controller of kubernetesControllers">
+    <dashboard-kubernetes-controllers-widget [controllerDetails]="controller"></dashboard-kubernetes-controllers-widget>
+  </div>
+</div>

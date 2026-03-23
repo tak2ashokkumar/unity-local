@@ -1,0 +1,23 @@
+<a href="#/ipv4_private/assignments/"><small>back to assignments</small></a>
+
+<h2>information about {{ ipBlock }}</h2>
+
+<h3>customer: {{ block.related.customer.organization_name }}</h3>
+
+<h3>ips</h3>
+<table class="table">
+  <thead>
+  <tr>
+    <th>ip addr</th>
+    <!--<th>device type</th>-->
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="address in block.addresses | orderBy: 'address_int'">
+    <td>{{ address.address }}</td>
+    <!--<td>{{ address.device.name }}</td>-->
+  </tr>
+  </tbody>
+</table>
+

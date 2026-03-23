@@ -1,0 +1,51 @@
+<div class="row mt--3">
+    <div class="col-12 p-0">
+        <div class="card">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">Execute Workflow - {{workflowName}}</span>
+                <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body py-2">
+                <form *ngIf="itsmTriggerForm" [formGroup]="itsmTriggerForm">
+                    <div class="form-group row">
+                        <label for="record_uuid" class="col-2 text-right col-form-label">Ticket Record<em>*</em>
+                            :</label>
+                        <div class="col-3">
+                            <select class="text-dark form-control mb-2" formControlName="record_uuid"
+                                [class.is-invalid]="itsmTriggerFormErrors.record_uuid">
+                                <option value="" disabled>Select Record</option>
+                                <option *ngFor="let itsm of itsmData" [ngValue]="itsm.uuid">{{ itsm.ticket_id }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback d-block" *ngIf="itsmTriggerFormErrors.record_uuid">
+                                {{ itsmTriggerFormErrors.record_uuid }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="activity_id" class="col-2 text-right col-form-label">Event<em>*</em> :</label>
+                        <div class="col-3">
+                            <select class="text-dark form-control mb-2" formControlName="activity_id"
+                                [class.is-invalid]="itsmTriggerFormErrors.activity_id">
+                                <option value="" disabled>Select Event</option>
+                                <option *ngFor="let comm of commentData" [ngValue]="comm.id">{{ comm.username }} -
+                                    {{ formatActivityType(comm.activity_type) }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback d-block" *ngIf="itsmTriggerFormErrors.activity_id">
+                                {{ itsmTriggerFormErrors.activity_id }}
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-md btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                    <button class="btn btn-md btn-success ml-2" type="button" (click)="onSubmit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

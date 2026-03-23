@@ -1,0 +1,23 @@
+<generic-panel heading="Details">
+  <panel-body>
+    <detailtable cols="cols" result="result"></detailtable>
+  </panel-body>
+  <panel-footer></panel-footer>
+</generic-panel>
+<generic-panel heading="Interfaces">
+  <panel-body>
+    <table class="table table-condensed">
+      <thead>
+      <tr>
+        <td ng-repeat="f in interface_fields">{{ f }}</td>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="i in interfaces">
+        <td ng-repeat="f in interface_fields">{{ i[f] }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </panel-body>
+  <panel-footer></panel-footer>
+</generic-panel>

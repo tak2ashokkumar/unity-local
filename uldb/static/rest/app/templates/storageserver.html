@@ -1,0 +1,72 @@
+<!-- System view -->
+
+<div class="row">
+  <div class="col-sm-8">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+  <div class="col-sm-4">
+    <form class="form-horizontal">      
+	<div class="col-xs-2" style="float:right;">
+	  <button type="button" class="btn btn-danger delete_rows" title="Delete" ng-click="DeleteServer('md')" style="font-size: 13px;">Delete</button>
+	</div>    
+    </form>
+  </div>
+</div>
+
+<div class="alert alert-info" role="alert" ng-if="message" ng-click="closeAlert()">{{alertMsg}}</div>
+
+<table class="display" cellspacing="0" width="100%"> 
+<tr> 
+<td>
+    <span ng-if="!results">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+    </span>
+    <span ng-if="results.length != 0">
+    <table class="table table-striped tableheader tabborder">
+      <thead>
+      <tr width="100%">
+        <th width="1%"><span><input type="checkbox" ng-click="selectAllRows($event)" ng-model="allSystems" /></span></th>
+
+        <th class="col-md-2">Storage Name</th>
+        <th class="col-md-2">Type</th>
+        <th class="col-md-2">OS</th>
+        <th class="col-md-2">Customer</th>
+      </tr>
+      </thead>
+
+      <tbody>
+        <tr ng-repeat="server in results" width="100%">
+        <td><input type="checkbox" class="action-select" ng-model="sys.checked" ng-click="selectCurrentRow($event)" checked="{{syschk}}" value="{{server.url}}" data="{{ server.name }}" width="1%"/></td>
+
+        <!-- <td class="col-md-2 serveredit bolder"><a href="" class="serversysname" ng-click="ShowServerDetails(server.id);">{{ server.instance.name }}</a>
+        <div class="edit_server" ng-click="EditInstance(server)" value="{{server.instance.id}}" title="Server Edit"></div>
+        <div class="delete_server" ng-if="server.instance" ng-click="DeleteInstance(server.instance.url,server.instance.name ,'md')" title="Server Delete"></div>
+        </td> -->
+        <td class="col-md-2 serveredit bolder">{{ server.instance.name }}
+        <div class="edit_server" ng-click="EditInstance(server)" value="{{server.instance.id}}" title="Server Edit"></div>
+        <div class="delete_server" ng-if="server.instance" ng-click="DeleteInstance(server.instance.url,server.instance.name ,'md')" title="Server Delete"></div>
+        </td>
+
+        <td class="col-md-2">
+        <div ng-if="server.instance.instance_type != null">{{ server.instance.instance_type }}</div>
+        <div ng-if="server.instance.instance_type == null">PHYSICAL</div>
+        </td>
+        <td class="col-md-2">{{ server.instance.os.name }} {{ server.instance.os.version }}</td>
+        <td class="col-md-2"><a ng-click="ShowCustomerDetails(server.customer.id)" class="server_customer">{{ server.customer.name }}</a></td>
+        </tr>
+      </tbody>
+    </table>
+    </span>
+    <span ng-if="results.length==0">
+        <h3 class="align-center">No records to display</h3>
+    </span>
+</td>
+</tr>
+</table>
+
+<pagination total-items="model.count" ng-model="model.currentPage" max-size="5" rotate="false" ng-change="pageChanged()"></pagination>
+

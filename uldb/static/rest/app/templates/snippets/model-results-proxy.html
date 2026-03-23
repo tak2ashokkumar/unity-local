@@ -1,0 +1,83 @@
+<div>
+  <span ng-if="model.results === undefined">
+      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </span>
+  <div ng-if="model.results !== undefined">
+    <table class="table table-condensed" ng-if="model.results.length > 0">
+      <thead>
+      <tr>
+        <th ng-repeat="f in fields" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''">
+          <div ng-if="f.hide === undefined">{{ f.description }}</div>
+        </th>
+        <th>Manage Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr ng-repeat="result in model.results | filter: searchKeyword as filtered"
+          ng-click="selection.selected = result; selection.index = $index; selectActions(result)"
+          ng-class="classSelectors(result)">
+        <td ng-repeat="f in fields" ng-if="!(f.hide)" ng-switch="f.opaque">
+          <div ng-switch-when="link">
+            <a href="{{ linkify(result, f).url }}">{{ linkify(result, f).text }}</a>
+          </div>
+          <div ng-switch-when="stringTransform">{{ desub(result, f) }}</div>
+          <div ng-switch-when="choices">{{ result[f.name] }}</div>
+          <div ng-switch-when="arbitraryLink">{{ f.func(result) }}</div>
+          <div ng-switch-when="multiple">
+            <div ng-repeat="r in result[f.name]">
+            <p><a href="{{ f.uriPrefix }}{{r[f.idField]}}">{{ r.name }}</a></p>
+            </div>
+          </div>
+          <div ng-switch-when="newType"><uldb-field result="result" field="f"></uldb-field></div>
+          <div ng-switch-default>{{ result[f.name] }}</div>
+        </td>
+        <td>
+          <span ng-if="result.cisco_firewall.length === 0 && result.juniper_firewall.length === 0 || result.cisco_switch.length === 0 && result.juniper_switch.length === 0 || result.f5lb_proxy.length === 0 && result.netscaler_proxy.length === 0">Not Configured</span>
+          
+          <span ng-if="result.cisco_firewall.length || result.juniper_firewall.length || result.cisco_switch.length || result.juniper_switch.length || result.f5lb_proxy.length || result.netscaler_proxy.length">Manageable</span>
+          
+        </td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu action-button">
+              <li><a href ng-click="ctrl.edit(result, $index)">Edit</a></li>
+              <li><a href ng-click="ctrl.remove(result, $index)" confirm>Delete</a></li>
+
+              <li ng-repeat="p in result.cisco_firewall" ng-if="result.cisco_firewall.length !== 0"><a href="{{ p.proxy_fqdn }}" target="_blank">Manage Cisco</a></li>
+              <li ng-if="result.cisco_firewall.length === 0"><a href="/admin#/cisco-firewall">Configure 
+              Cisco</a></li>
+
+              <li ng-repeat="p in result.juniper_firewall" ng-if="result.juniper_firewall.length !== 0"><a href="{{ p.proxy_fqdn }}" target="_blank">Manage Juniper</a></li>
+              <li ng-if="result.juniper_firewall.length === 0"><a href="/admin#/juniper-firewall">Configure Juniper</a></li>
+
+              <li ng-repeat="p in result.cisco_switch" ng-if="result.cisco_switch.length !== 0"><a href="{{ p.proxy_fqdn }}" target="_blank">Manage Cisco</a></li>
+              <li ng-if="result.cisco_switch.length === 0"><a href="/admin#/cisco-switch">Configure 
+              Cisco</a></li>
+
+              <li ng-repeat="p in result.juniper_switch" ng-if="result.juniper_switch.length !== 0"><a href="{{ p.proxy_fqdn }}" target="_blank">Manage Juniper</a></li>
+              <li ng-if="result.juniper_switch.length === 0"><a href="/admin#/juniper-switch">Configure Juniper</a></li>
+
+              <li ng-repeat="p in result.f5lb_proxy" ng-if="result.f5lb_proxy.length !== 0"><a href="{{ p.proxy_fqdn }}" target="_blank">Manage F5 LB</a></li>
+              <li ng-if="result.f5lb_proxy.length === 0"><a href="/admin#/f5-lb-proxy">Configure F5 LB</a></li>
+
+              <li ng-repeat="p in result.netscaler_proxy" ng-if="result.netscaler_proxy.length !== 0"><a href="{{ p.proxy_fqdn }}" target="_blank">Manage Netscaler</a></li>
+              <li ng-if="result.netscaler_proxy.length === 0"><a href="/admin#/citrix-vpx-device">Configure Netscaler</a></li>
+
+
+              <li ng-repeat="act in additional_actions"><a href ng-click="act['func'](result, $index)">{{ act.name }}</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <span ng-if="model.results.length === 0">
+      <h3 class="align-center">No records to display</h3>
+    </span>
+  </div>
+</div>

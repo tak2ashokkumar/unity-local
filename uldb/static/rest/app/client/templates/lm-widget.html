@@ -1,0 +1,26 @@
+<!-- <page-title title="System Monitoring"></page-title> -->
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+  <!-- <span ng-if="!widget_list">
+    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </span> -->
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper" style="padding-top: 0px !important">
+        <div class="row" style="padding-top: 0px !important;">
+            <div ng-if="widget_list.length === 0">
+              <no-records-found message="No widgets available to display."></no-records-found>
+            </div>
+            <div ng-show="lm_iframe_show" ng-repeat="widget in widget_list track by $index" class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                <div class="row paddingtop" style="padding-right: 30px;">
+                    <iframe ng-src="{{widget.widget_url}}"  id="iframe{{$index}}" style="width: 100%; height: 300px;" frameBorder="0"></iframe>
+                </div>
+            </div>
+            <!-- <div class=""></div> -->
+        </div>
+    </div>
+  </div>
+  
+  <loading object={{widget_list}}></loading>
+
+</div>

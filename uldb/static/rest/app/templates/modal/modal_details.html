@@ -1,0 +1,24 @@
+<div class="modal-content">
+    <div class="modal-header" style="text-align: center;">
+        <h2 class="modal-title" style="font-size:20px;">{{modal_heading}} Details</h2>
+    </div>
+    <div class="modal-body" style="padding:20px 40px;">
+      <div class="modal-form">
+        <table class="table table-condensed">
+          <tbody>
+            <tr ng-repeat="(key, value) in details">
+              <td style="font-weight: bold;">{{key}}</td>
+              <td>{{value}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <div class="modal-footer modal-buttons">
+            <button type="button" class="btn btn-default" ng-click="cancel()">
+              Ok
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1001 @@
+<!-- <div class="card text-center border-0 mb-0" *ngIf="!showDiscoveredDevices">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center px-0 py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+            <span class="ml-1 font-lg">Networks</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <button class="btn btn-pill btn-sm btn-warning mx-2 px-3 font-500" type="button" (click)="addDiscovery()">
+                <span class="font-sm">Add Discovery</span>
+            </button>
+            <button class="btn btn-warning btn-sm btn-pill pull-right px-3 font-500" (click)="addPolicy()">Add
+                Policy</button>
+            <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+        </div>
+    </div>
+    <div class="card-body px-0 pt-0">
+        <div class="table-responsive" tableStickyScroll>
+            <table class="table table-sm text-left discoveries">
+                <thead class="bg-light">
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Target Type</th>
+                        <th>Target</th>
+                        <th>Collector</th>
+                        <th>Last Run</th>
+                        <th>Duration</th>
+                        <th>Schedule</th>
+                        <th>Created By</th>
+                        <th>Updated By</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of viewData">
+                        <td class="bg-white" (click)="$event.stopPropagation();selectDiscovery(view)"
+                            style="width: 15px;">
+                            <i [ngClass]="view.selected? 'fas fa-check-circle text-success':'far fa-circle'"></i>
+                        </td>
+                        <td>{{view.name}}</td>
+                        <td>{{view.targetType}}</td>
+                        <td>{{view.targetValue}}</td>
+                        <td>{{view.collector}}</td>
+                        <td>{{view.lastRun}}</td>
+                        <td>{{view.duration}}</td>
+                        <td class="text-capitalize">{{view.schedule}}</td>
+                        <td>{{view.createdBy}}</td>
+                        <td>{{view.updatedBy}}</td>
+                        <td class="{{view.statusClass}}">
+                            {{view.status}}
+                            <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+                        </td>
+                        <td class="action-icons-column">
+                            <button class="action-icons mb-0 fas fa-play font-sm ml-1" container="body"
+                                tooltip="Execute" (click)="executeDiscovery(view)" *ngIf="!view.isInProgress"></button>
+                            <button class="action-icons mb-0 fas fa-times font-sm ml-1" container="body"
+                                tooltip="Cancel" (click)="cancelDiscovery(view)" *ngIf="view.isInProgress"></button>
+                            <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
+                                tooltip="Schedule History" (click)="getScheduleHistory(view)"></button>
+                            <button class="action-icons mb-0 fas fa-project-diagram font-sm ml-1" container="body"
+                                tooltip="Network Topology" (click)="getNetworkTopology(view)"></button>
+                            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" container="body"
+                                tooltip="Edit" (click)="editDiscovery(view)"></button>
+                            <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body"
+                                tooltip="Delete" (click)="deleteDiscovery(view)"></button>
+                            <button class="action-icons mb-0 fas font-sm ml-1" [tooltip]="view.toggleTootipMsg"
+                                [ngClass]="{'action-icons-disabled':!view.toggleBtnEnabled}" container="body"
+                                (click)="toggle(view)" [class]="[view.toggleIcon]"></button> -->
+<!-- <button class="action-icons mb-0 fa fa-info-circle font-sm ml-1" container="body"
+                            tooltip="Show Devices" (click)="getDiscoveredDevices(view, discoveredDevicesRef)"></button> -->
+<!-- </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p *ngIf="viewData.length==0" class="text-center py-4">No networks to display</p>
+        <advanced-discovery-next-prev></advanced-discovery-next-prev>
+    </div>
+</div>
+
+<ng-template #confirmToggleTemplate>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm {{selectedView.toggleTootipMsg}}
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmToggleModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to {{selectedView.toggleTootipMsg}}?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmToggle()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmToggleModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<div class="row" *ngIf="showDiscoveredDevices">
+    <div class="col-12">
+        <div class="tab-content">
+            <div class="tab-pane active p-2">
+                <a class="nav-link py-0 " (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>Discovery
+                    List</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mt-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <table class="table text-left">
+                    <thead>
+                        <tr>
+                            <th>System Name</th>
+                            <th>System Type</th>
+                            <th>System Domain</th>
+                            <th>System IP</th>
+                            <th>System Description</th>
+                            <th>System Manufacturer</th>
+                            <th>System Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of discoveredDevices">
+                            <td>{{view.systemName}}</td>
+                            <td>{{view.systemType}}</td>
+                            <td>{{view.systemDomain}}</td>
+                            <td>{{view.systemIp}}</td>
+                            <td>{{view.systemDescription}}</td>
+                            <td>{{view.systemManufacturer}}</td>
+                            <td>{{view.systemStatus}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p *ngIf="discoveredDevices.length==0" class="text-center py-3">No divices to display</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #discoveryCRUD>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Discovery
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeAddModal()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="discoveryForm" [formGroup]="discoveryForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="name">Name<em>*</em></label>
+                    <input id="name" type="text" class="form-control" formControlName="name"
+                        [ngClass]="{'is-invalid' : formErrors.name}">
+                    <small class="text-danger" *ngIf="formErrors.name">{{formErrors.name}}</small>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.type">
+                    <label class="form-col-form-label" for="type">Type<em>*</em></label>
+                    <select id="type" class="form-control rounded-left" formControlName="type"
+                        [class.is-invalid]="formErrors.type">
+                        <option [value]="''" disabled>Select Type</option>
+                        <option [value]="'subnet'">Subnet</option>
+                        <option [value]="'active directory'">Active Directory</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.type">{{formErrors.type}}</div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.subnet">
+                    <label for="subnet">Subnet<em *ngIf="discovery_type == 'subnet'">*</em> </label>
+                    <input id="subnet" type="text" class="form-control" formControlName="subnet"
+                        [ngClass]="{'is-invalid' : formErrors.subnet}">
+                    <small class="text-danger" *ngIf="formErrors.subnet">{{formErrors.subnet}}</small>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.credentials">
+                    <label for="credentials">Credentials<em>*</em></label>
+                    <multiselect-dropdown [options]="filteredCredentialList" [settings]="credentialSettings"
+                        class="form-control p-0" style="height:auto;" formControlName="credentials"
+                        [ngClass]="{'is-invalid' : formErrors.credentials}"></multiselect-dropdown>
+                    <small class="text-danger" *ngIf="formErrors.credentials">{{formErrors.credentials}}</small>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.collector">
+                    <label class="form-col-form-label" for="collector">Collector<em>*</em></label>
+                    <select id="collector" class="form-control rounded-left" formControlName="collector"
+                        [class.is-invalid]="formErrors.collector">
+                        <option [ngValue]="''" disabled>Select collector</option>
+                        <option [ngValue]="collector" *ngFor="let collector of collectorList">{{collector.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.collector">{{formErrors.collector}}</div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.run_now">
+                    <div class="form-check checkbox">
+                        <input class="form-check-input" id="run_now" type="checkbox" formControlName="run_now">
+                        <label class="form-check-label" for="run_now">Run Now</label>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule_scan">
+                    <div class="form-check checkbox">
+                        <input class="form-check-input" id="schedule_scan" type="checkbox"
+                            formControlName="schedule_scan">
+                        <label class="form-check-label" for="schedule_scan">Schedule Scan</label>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule">
+                    <label class="form-col-form-label" for="schedule">Schedule<em>*</em></label>
+                    <select id="schedule" class="form-control rounded-left" formControlName="schedule"
+                        [class.is-invalid]="formErrors.schedule">
+                        <option [value]="''" disabled>Select Schedule</option>
+                        <option [value]="'once'">Once</option>
+                        <option [value]="'daily'">Daily</option>
+                        <option [value]="'weekly'">Weekly</option>
+                        <option [value]="'monthly'">Monthly</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.schedule">{{formErrors.schedule}}</div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule.value == 'once'">
+                    <label for="schedule_time" class="form-col-form-label">Schedule Date and Time<em>*</em></label>
+                    <div class="input-group">
+                        <owl-date-time #schedule_time [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" name="schedule_time" formControlName="schedule_time"
+                            [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text"
+                            [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                        <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                        {{formErrors.schedule_time}}</div>
+                </div>
+                <div class="row" *ngIf="discoveryForm.controls.schedule.value == 'monthly'">
+                    <div class="col-6 form-group">
+                        <label for="scheduled_date" class="form-col-form-label">Schedule Date<em>*</em></label>
+                        <select class="form-control" id="scheduled_date" formControlName="scheduled_date"
+                            [ngClass]="{'is-invalid' : formErrors.scheduled_date}">
+                            <option [ngValue]="date" *ngFor="let date of dates;">{{date}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.scheduled_date">
+                            {{formErrors.scheduled_date}}</div>
+                    </div>
+                    <div class="col-6 form-group">
+                        <label for="schedule_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #schedule_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                            <input class="form-control rounded-left" name="schedule_time"
+                                formControlName="schedule_time" [owlDateTimeTrigger]="schedule_time"
+                                [owlDateTime]="schedule_time" type="text"
+                                [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                            <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                            {{formErrors.schedule_time}}</div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="discoveryForm.controls.schedule.value == 'weekly'">
+                    <div class="col-6 form-group">
+                        <label for="scheduled_day" class="form-col-form-label">Schedule Day<em>*</em></label>
+                        <select class="form-control" id="scheduled_day" formControlName="scheduled_day"
+                            [ngClass]="{'is-invalid' : formErrors.scheduled_day}">
+                            <option [value]="'Sunday'" selected>Sunday</option>
+                            <option [value]="'Monday'">Monday</option>
+                            <option [value]="'Tuesday'">Tuesday</option>
+                            <option [value]="'Wednesday'">Wednesday</option>
+                            <option [value]="'Thursday'">Thursday</option>
+                            <option [value]="'Friday'">Friday</option>
+                            <option [value]="'Saturday'">Saturday</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.scheduled_day">
+                            {{formErrors.scheduled_day}}</div>
+                    </div>
+                    <div class="col-6 form-group">
+                        <label for="schedule_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #schedule_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                            <input class="form-control rounded-left" name="schedule_time"
+                                formControlName="schedule_time" [owlDateTimeTrigger]="schedule_time"
+                                [owlDateTime]="schedule_time" type="text"
+                                [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                            <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                            {{formErrors.schedule_time}}</div>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule.value == 'daily'">
+                    <label for="schedule_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                    <div class="input-group">
+                        <owl-date-time #schedule_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" name="schedule_time" formControlName="schedule_time"
+                            [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text"
+                            [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                        <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                        {{formErrors.schedule_time}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer" *ngIf="discoveryForm">
+            <button class="btn btn-sm btn-warning pull-right ml-1" type="button" (click)="submit()"
+                *ngIf="!discoveryForm.controls.run_now.value && !discoveryForm.controls.schedule_scan.value">Save</button>
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submit()"
+                *ngIf="discoveryForm.controls.run_now.value || discoveryForm.controls.schedule_scan.value">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Discovery Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #discoveredDevicesRef>
+    <div class="card text-center mb-0">
+        <div class="card-header">
+            Discovered Devices
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeAddModal()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table text-left">
+                <thead>
+                    <tr>
+                        <th>System Name</th>
+                        <th>System Type</th>
+                        <th>System Domain</th>
+                        <th>System IP</th>
+                        <th>System Description</th>
+                        <th>System Manufacturer</th>
+                        <th>System Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of discoveredDevices">
+                        <td>{{view.systemName}}</td>
+                        <td>{{view.systemType}}</td>
+                        <td>{{view.systemDomain}}</td>
+                        <td>{{view.systemIp}}</td>
+                        <td>{{view.systemDescription}}</td>
+                        <td>{{view.systemManufacturer}}</td>
+                        <td>{{view.systemStatus}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p *ngIf="discoveredDevices.length==0" class="text-center py-3">No divices to display</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleHistoryRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Schedule History
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table text-left">
+                <thead>
+                    <tr>
+                        <th>Last Run</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Executed By </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of scheduleHistory">
+                        <td>{{view.lastRun}}</td>
+                        <td>{{view.duration}}</td>
+                        <td class="{{view.statusClass}}">
+                            {{view.status}}
+                            <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+                        </td>
+                        <td>{{view.updatedBy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p *ngIf="scheduleHistory.length==0" class="text-center py-3">No history to display</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+        </div>
+    </div>
+</ng-template> -->
+
+<div class="card text-center border-0 mb-0" *ngIf="!showDiscoveredDevices">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center px-0 py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+            <span class="ml-1 font-lg">Networks</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <!-- <button class="btn btn-pill btn-sm btn-warning mx-2 px-3 font-500" type="button" (click)="addDiscovery()">
+                <span class="font-sm">Add Discovery</span>
+            </button> -->
+            <button class="btn btn-warning btn-sm btn-pill pull-right px-3 font-500" (click)="addPolicy()" accessControl
+                moduleName="Onboarding" accessType="Manage Onboarding" elementType="btn">Add
+                Policy</button>
+            <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+        </div>
+    </div>
+    <div class="card-body pt-1 p-0">
+        <div class="row mt-1 mb-2">
+            <div class="col-3">
+                <table-search-box (searched)="onSearched($event)"></table-search-box>
+            </div>
+            <div class="col-9">
+                <div class="row justify-content-end mr-1">
+                    <div class="col-2">
+                        <multiselect-dropdown class="form-control discovery-type" style="height:auto;" [options]="discoveryType"
+                            [settings]="discoveryTypeSettings" [texts]="discoveryTypeTexts"
+                            [(ngModel)]="currentCriteria.multiValueParam.discover_methods"
+                            (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                    </div>
+                    <div class="col-2">
+                        <select class="form-control" type="text" [(ngModel)]="currentCriteria.params[0].network_type"
+                            (ngModelChange)="onFilterChange()">
+                            <option [value]="''">Select Network Type</option>
+                            <option [value]="'ip_range'">IP Range</option>
+                            <option [value]="'subnet'">Subnet</option>
+                            <option [value]="'ip'">IP</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <select class="form-control" type="text"
+                            [(ngModel)]="currentCriteria.params[0].execution_status" (ngModelChange)="onFilterChange()">
+                            <option [value]="''">Select Execution Status</option>
+                            <option [value]="'PENDING'">Pending</option>
+                            <option [value]="'STARTED'">Started</option>
+                            <option [value]="'SUCCESS'">Success</option>
+                            <option [value]="'FAILURE'">Failure</option>
+                            <option [value]="'REVOKED'">Revoke</option>
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <select class="form-control" type="text" [(ngModel)]="currentCriteria.params[0].schedule_status"
+                            (ngModelChange)="onFilterChange()">
+                            <option [value]="''">Select status</option>
+                            <option [value]="'True'">Enabled</option>
+                            <option [value]="'False'">Disabled</option>
+                        </select>
+                    </div>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-body px-0 pt-0">
+            <div class="table-responsive" tableStickyScroll>
+                <table class="table table-sm text-left discoveries">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Discovery Type</th>
+                            <th>Network Type</th>
+                            <th>IP</th>
+                            <th>Last Execution</th>
+                            <th>Device Count</th>
+                            <th>Last Execution Status</th>
+                            <th>Schedule Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData">
+                            <td class="pointer-link text-primary" (click)="goToScan(view)">{{view.name}}</td>
+                            <td class="tdw-25">
+                                <span>{{view.discover}}</span>
+                                <span *ngIf="view.usersBadgeCount"
+                                    class="badge bg-secondary users-count rounded-3 w-auto ml-1" [popover]="popTemplate"
+                                    container="body" (click)="showUsers(view)"
+                                    [outsideClick]="true">+{{view.usersBadgeCount}}</span>
+                            </td>
+                            <td>{{view.networkType}}</td>
+                            <td class="tdw-25">
+                                <span>{{view.discoverIps}}</span>
+                                <span *ngIf="view.usersBadgeCountIp"
+                                    class="badge bg-secondary users-count rounded-3 w-auto ml-1"
+                                    [popover]="popTemplateIp" container="body" (click)="showUsersDiscoveryIp(view)"
+                                    [outsideClick]="true">+{{view.usersBadgeCountIp}}</span>
+                            </td>
+                            <td>{{view.lastRun}}</td>
+                            <td class="text-center">{{view.deviceCount}}</td>
+                            <td>
+                                <div class="row">
+                                    <i class="fa status-icon mt-1 ml-2" [ngClass]="view.statusIcon" container="body">
+                                    </i>
+                                    <div class="ml-2">{{view.statusTooltip}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="action-icons mb-0 fas font-sm ml-1 mt-1" [tooltip]="view.toggleTootipMsg"
+                                    [ngClass]="{'action-icons-disabled':!view.toggleBtnEnabled}" container="body"
+                                    (click)="toggle(view)" [class]="[view.toggleIcon]" accessControl
+                                    moduleName="Onboarding" accessType="Manage Onboarding"
+                                    elementType="actionbtn"></button>
+                            </td>
+
+                            <td class="action-icons-column">
+                                <button class="action-icons mb-0 fas fa-play font-sm ml-1" container="body"
+                                    tooltip="Execute" (click)="executeDiscovery(view)" *ngIf="!view.isInProgress"
+                                    accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                    elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-times font-sm ml-1" container="body"
+                                    tooltip="Cancel" (click)="cancelDiscovery(view)" *ngIf="view.isInProgress"
+                                    accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                    elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
+                                    tooltip="Schedule History" (click)="getScheduleHistory(view)"></button>
+                                <button class="action-icons mb-0 fas fa-project-diagram font-sm ml-1" container="body"
+                                    tooltip="Network Topology" (click)="getNetworkTopology(view)" accessControl
+                                    moduleName="Network Topology" accessType="View Network Topology"
+                                    elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" container="body"
+                                    tooltip="Edit" (click)="editDiscovery(view)" accessControl moduleName="Onboarding"
+                                    accessType="Manage Onboarding" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body"
+                                    tooltip="Delete" (click)="deleteDiscovery(view)" accessControl
+                                    moduleName="Onboarding" accessType="Manage Onboarding"
+                                    elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-copy font-sm ml-1" container="body"
+                                    tooltip="Clone" (click)="cloneTemplate(view.uuid)" accessControl
+                                    moduleName="Onboarding" accessType="Manage Onboarding"
+                                    elementType="actionbtn"></button>
+                                <!-- <button class="action-icons mb-0 fa fa-info-circle font-sm ml-1" container="body"
+                            tooltip="Show Devices" (click)="getDiscoveredDevices(view, discoveredDevicesRef)"></button> -->
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!viewData.length">No networks to display</div>
+            </div>
+            <!-- <p *ngIf="viewData.length==0" class="text-center py-4">No networks to display</p> -->
+            <!-- <advanced-discovery-next-prev></advanced-discovery-next-prev> -->
+        </div>
+    </div>
+</div>
+
+<ng-template #popTemplate>
+    <div *ngFor="let name of popOverList">{{name}}</div>
+</ng-template>
+
+<ng-template #popTemplateIp>
+    <div *ngFor="let name of popOverListIp">{{name}}</div>
+</ng-template>
+
+<ng-template #confirmToggleTemplate>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm {{selectedView.toggleTootipMsg}}
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmToggleModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to {{selectedView.toggleTootipMsg}}?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmToggle()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmToggleModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<div class="row" *ngIf="showDiscoveredDevices">
+    <div class="col-12">
+        <div class="tab-content">
+            <div class="tab-pane active p-2">
+                <a class="nav-link py-0 " (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>Discovery
+                    List</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mt-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <table class="table text-left">
+                    <thead>
+                        <tr>
+                            <th>System Name</th>
+                            <th>System Type</th>
+                            <th>System Domain</th>
+                            <th>System IP</th>
+                            <th>System Description</th>
+                            <th>System Manufacturer</th>
+                            <th>System Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of discoveredDevices">
+                            <td>{{view.systemName}}</td>
+                            <td>{{view.systemType}}</td>
+                            <td>{{view.systemDomain}}</td>
+                            <td>{{view.systemIp}}</td>
+                            <td>{{view.systemDescription}}</td>
+                            <td>{{view.systemManufacturer}}</td>
+                            <td>{{view.systemStatus}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p *ngIf="discoveredDevices.length==0" class="text-center py-3">No divices to display</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #discoveryCRUD>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Discovery
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeAddModal()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="discoveryForm" [formGroup]="discoveryForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="name">Name<em>*</em></label>
+                    <input id="name" type="text" class="form-control" formControlName="name"
+                        [ngClass]="{'is-invalid' : formErrors.name}">
+                    <small class="text-danger" *ngIf="formErrors.name">{{formErrors.name}}</small>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.type">
+                    <label class="form-col-form-label" for="type">Type<em>*</em></label>
+                    <select id="type" class="form-control rounded-left" formControlName="type"
+                        [class.is-invalid]="formErrors.type">
+                        <option [value]="''" disabled>Select Type</option>
+                        <option [value]="'subnet'">Subnet</option>
+                        <option [value]="'active directory'">Active Directory</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.type">{{formErrors.type}}</div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.subnet">
+                    <label for="subnet">Subnet<em *ngIf="discovery_type == 'subnet'">*</em> </label>
+                    <input id="subnet" type="text" class="form-control" formControlName="subnet"
+                        [ngClass]="{'is-invalid' : formErrors.subnet}">
+                    <small class="text-danger" *ngIf="formErrors.subnet">{{formErrors.subnet}}</small>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.credentials">
+                    <label for="credentials">Credentials<em>*</em></label>
+                    <multiselect-dropdown [options]="filteredCredentialList" [settings]="credentialSettings"
+                        class="form-control p-0" style="height:auto;" formControlName="credentials"
+                        [ngClass]="{'is-invalid' : formErrors.credentials}"></multiselect-dropdown>
+                    <small class="text-danger" *ngIf="formErrors.credentials">{{formErrors.credentials}}</small>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.collector">
+                    <label class="form-col-form-label" for="collector">Collector<em>*</em></label>
+                    <select id="collector" class="form-control rounded-left" formControlName="collector"
+                        [class.is-invalid]="formErrors.collector">
+                        <option [ngValue]="''" disabled>Select collector</option>
+                        <option [ngValue]="collector" *ngFor="let collector of collectorList">{{collector.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.collector">{{formErrors.collector}}</div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.run_now">
+                    <div class="form-check checkbox">
+                        <input class="form-check-input" id="run_now" type="checkbox" formControlName="run_now">
+                        <label class="form-check-label" for="run_now">Run Now</label>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule_scan">
+                    <div class="form-check checkbox">
+                        <input class="form-check-input" id="schedule_scan" type="checkbox"
+                            formControlName="schedule_scan">
+                        <label class="form-check-label" for="schedule_scan">Schedule Scan</label>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule">
+                    <label class="form-col-form-label" for="schedule">Schedule<em>*</em></label>
+                    <select id="schedule" class="form-control rounded-left" formControlName="schedule"
+                        [class.is-invalid]="formErrors.schedule">
+                        <option [value]="''" disabled>Select Schedule</option>
+                        <option [value]="'once'">Once</option>
+                        <option [value]="'daily'">Daily</option>
+                        <option [value]="'weekly'">Weekly</option>
+                        <option [value]="'monthly'">Monthly</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.schedule">{{formErrors.schedule}}</div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule.value == 'once'">
+                    <label for="schedule_time" class="form-col-form-label">Schedule Date and Time<em>*</em></label>
+                    <div class="input-group">
+                        <owl-date-time #schedule_time [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" name="schedule_time" formControlName="schedule_time"
+                            [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text"
+                            [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                        <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                        {{formErrors.schedule_time}}</div>
+                </div>
+                <div class="row" *ngIf="discoveryForm.controls.schedule.value == 'monthly'">
+                    <div class="col-6 form-group">
+                        <label for="scheduled_date" class="form-col-form-label">Schedule Date<em>*</em></label>
+                        <select class="form-control" id="scheduled_date" formControlName="scheduled_date"
+                            [ngClass]="{'is-invalid' : formErrors.scheduled_date}">
+                            <option [ngValue]="date" *ngFor="let date of dates;">{{date}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.scheduled_date">
+                            {{formErrors.scheduled_date}}</div>
+                    </div>
+                    <div class="col-6 form-group">
+                        <label for="schedule_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #schedule_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                            <input class="form-control rounded-left" name="schedule_time"
+                                formControlName="schedule_time" [owlDateTimeTrigger]="schedule_time"
+                                [owlDateTime]="schedule_time" type="text"
+                                [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                            <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                            {{formErrors.schedule_time}}</div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="discoveryForm.controls.schedule.value == 'weekly'">
+                    <div class="col-6 form-group">
+                        <label for="scheduled_day" class="form-col-form-label">Schedule Day<em>*</em></label>
+                        <select class="form-control" id="scheduled_day" formControlName="scheduled_day"
+                            [ngClass]="{'is-invalid' : formErrors.scheduled_day}">
+                            <option [value]="'Sunday'" selected>Sunday</option>
+                            <option [value]="'Monday'">Monday</option>
+                            <option [value]="'Tuesday'">Tuesday</option>
+                            <option [value]="'Wednesday'">Wednesday</option>
+                            <option [value]="'Thursday'">Thursday</option>
+                            <option [value]="'Friday'">Friday</option>
+                            <option [value]="'Saturday'">Saturday</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.scheduled_day">
+                            {{formErrors.scheduled_day}}</div>
+                    </div>
+                    <div class="col-6 form-group">
+                        <label for="schedule_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #schedule_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                            <input class="form-control rounded-left" name="schedule_time"
+                                formControlName="schedule_time" [owlDateTimeTrigger]="schedule_time"
+                                [owlDateTime]="schedule_time" type="text"
+                                [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                            <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                            {{formErrors.schedule_time}}</div>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="discoveryForm.controls.schedule.value == 'daily'">
+                    <label for="schedule_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                    <div class="input-group">
+                        <owl-date-time #schedule_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" name="schedule_time" formControlName="schedule_time"
+                            [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text"
+                            [ngClass]="{'is-invalid' : formErrors.schedule_time}">
+                        <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback d-block" *ngIf="formErrors.schedule_time">
+                        {{formErrors.schedule_time}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer" *ngIf="discoveryForm">
+            <button class="btn btn-sm btn-warning pull-right ml-1" type="button" (click)="submit()"
+                *ngIf="!discoveryForm.controls.run_now.value && !discoveryForm.controls.schedule_scan.value">Save</button>
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submit()"
+                *ngIf="discoveryForm.controls.run_now.value || discoveryForm.controls.schedule_scan.value">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Discovery Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #discoveredDevicesRef>
+    <div class="card text-center mb-0">
+        <div class="card-header">
+            Discovered Devices
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeAddModal()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table text-left">
+                <thead>
+                    <tr>
+                        <th>System Name</th>
+                        <th>System Type</th>
+                        <th>System Domain</th>
+                        <th>System IP</th>
+                        <th>System Description</th>
+                        <th>System Manufacturer</th>
+                        <th>System Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of discoveredDevices">
+                        <td>{{view.systemName}}</td>
+                        <td>{{view.systemType}}</td>
+                        <td>{{view.systemDomain}}</td>
+                        <td>{{view.systemIp}}</td>
+                        <td>{{view.systemDescription}}</td>
+                        <td>{{view.systemManufacturer}}</td>
+                        <td>{{view.systemStatus}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p *ngIf="discoveredDevices.length==0" class="text-center py-3">No divices to display</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleHistoryRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Schedule History
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mt-1 mb-2">
+                <div class="col-3">
+                    <table-search-box (searched)="onSearchedSchedule($event)"></table-search-box>
+                </div>
+                <div class="col-9">
+                    <div class="row justify-content-end mr-1">
+                        <table-page-size [currentPageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                            [totalCount]="scheduleHistoryCount"
+                            (pageSizeChange)="pageSizeChangeSchedule($event)"></table-page-size>
+                    </div>
+                </div>
+            </div>
+            <table class="table text-left">
+                <thead>
+                    <tr>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Executed By </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of scheduleHistory">
+                        <td>{{view.startedAt}}</td>
+                        <td>{{view.lastRun}}</td>
+                        <td>{{view.duration}}</td>
+                        <td class="{{view.statusClass}}">
+                            {{view.status}}
+                            <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+                        </td>
+                        <td>{{view.updatedBy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table-entries [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                [totalCount]="scheduleHistoryCount"></table-entries>
+            <table-pager *ngIf="scheduleHistory.length" [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"
+                (pageChange)="pageChangeSchedule($event)"></table-pager>
+            <p *ngIf="scheduleHistory.length==0" class="text-center py-3">No history to display</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #clone>
+    <div class="card mb-0">
+        <div class="card-header">
+            Clone Network
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="cloneModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form class="form" [formGroup]="cloneForm">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="name" class="form-control" formControlName="name" placeholder="Enter Name"
+                        [ngClass]="{'is-invalid' : cloneFormErrors.name}">
+                    <div class="invalid-feedback" *ngIf="cloneFormErrors.name">
+                        {{cloneFormErrors.name}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-sm btn-primary pull-right ml-2 w-15"
+                (click)="onSubmit()">Create</button>
+            <button type="button" class="btn btn-sm btn-outline-danger pull-right w-15"
+                (click)="cloneModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

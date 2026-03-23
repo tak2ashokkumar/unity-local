@@ -1,0 +1,72 @@
+<div class="row">
+  <div class="col-sm-8">
+    <h3>CABINETS</h3>
+  </div>
+  <div class="col-sm-4">
+    <form class="form-horizontal">
+      <div class="form-group">
+       	<div class="col-xs-6">
+          <listviewsearch ng-model="searchKeyword"></listviewsearch>	  
+        </div>
+	<div class="col-xs-2">
+          <button type="button" class="btn btn-success" title="Delete" ng-click="AddCabinet()" style="font-size: 13px;">Add</button>	
+        </div>
+	<div class="col-xs-2">
+	  <button type="button" class="btn btn-danger delete_rows" ng-click="Deletecabinet('md')" title="Delete" style="font-size: 13px;"> 			Delete</button>
+	</div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="alert alert-info" role="alert" ng-if="message" ng-click="closeAlert()">{{alertMsg}}</div>
+
+<table class="display" cellspacing="0" width="100%"> 
+	<tr> 
+	   <td>
+		
+<table class="table table-striped tableheader tabborder">
+  <thead>
+  <tr width="100%" align="center">
+    <th width="1%"><span><input type="checkbox" ng-click="selectAllRows($event)" ng-model="allCabinets" /></span></th>
+    <th width="16%">Name</th>
+    <th width="16%">Model</th>
+    <th width="17%">Type</th>
+    <th width="17%">Datacenter</th>
+    <th width="17%">Cage</th>
+    <th width="17%">Customer</th>
+  </tr>
+  </thead>
+</table>
+
+<table class="table table-striped tabborder" id="resulttable">
+  <tbody>
+  <tr ng-repeat="cabinet in model.results | filter: searchKeyword" width="100%">
+    <td><input type="checkbox" class="action-select" ng-model="cabinet.checked" ng-click="selectCurrentRow($event)" 				checked="{{cabchk}}" value="{{cabinet.url}}" data="{{ cabinet.name }}" width="1%"/></td>
+
+    <td width="16%" class="cabedit"><div width="100%">{{ cabinet.name }}</div>
+	<div class="edit_cabinet" value="{{cabinet.url}}" ng-click="EditCabinet(cabinet)" title="Cabinet Edit"/></div>
+    </td>
+    <td width="16%"><div width="100%">{{cabinet.related.cabientmodel.model}}</div>
+    </td>
+    <td width="17%"><div width="100%">{{cabinet.related.cabienttype.cabinet_type}}</div></td>
+    <td width="17%"><div width="100%">{{ cabinet.related.datacenter.datacenter_name }}</div></td>
+    <td width="17%">
+	<div ng-if="cabinet.related.cage.name != ''" width="100%">{{ cabinet.related.cage.name }}</div>
+	<div ng-if="cabinet.related.cage.name == ''" width="100%">None</div>
+    </td>
+    <td width="17%">
+	<div ng-if="cabinet.related.customer.organization_name != ''" ng-click="ShowCustomerDetails(cabinet.related.customer.id)" width="100%" class="cabinet_customer">{{ cabinet.related.customer.organization_name }}</div>
+	<div ng-if="cabinet.related.customer.organization_name == ''" ng-click="ShowCustomerDetails(cabinet.related.customer.id)" width="100%" class="cabinet_customer">None</div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</td>
+
+</tr>
+</table>
+
+<pagination total-items="model.count" ng-model="model.currentPage" ng-change="pageChanged()"></pagination>
+
+

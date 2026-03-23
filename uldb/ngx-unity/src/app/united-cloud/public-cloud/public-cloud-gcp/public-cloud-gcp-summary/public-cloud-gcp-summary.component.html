@@ -1,0 +1,360 @@
+<div class="row">
+    <div class="col-6">
+        <div class="row">
+            <div class="col-6">
+                <div class="card mb-2">
+                    <div class="card-body d-flex justify-content-between">
+                        <img [src]="imageUrl" class="w-40"
+                            style="height: 30px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                        <div class="text-primary text-value">{{accountListViewData?.totalGcpAccounts}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-2">
+                    <div class="card-body d-flex justify-content-between">
+                        <div class="text-value">Cost</div>
+                        <div class="text-primary text-value">${{accountListViewData?.totalCost}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body d-flex justify-content-between ">
+                        <div class="text-value">Resources</div>
+                        <div class="text-primary text-value pointer-link" (click)="redirectToResourceDetails()">
+                            {{accountListViewData?.totalResources}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body d-flex justify-content-between ">
+                        <div class="text-value">Alerts</div>
+                        <div class="text-primary d-flex align-items-baseline text-value">
+                            <div class="ml-2">
+                                <span class="text-primary pointer-link mr-3 text-value"
+                                    (click)="gotToAIMLPage()">{{accountListViewData?.totalEvent}}</span>
+                                <span class="fas fa-exclamation-triangle text-danger font-xs-sm"></span>
+                                <span
+                                    class="text-primary font-xs-sm ml-1">{{accountListViewData?.totalCriticalAlerts}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-exclamation-circle text-warning font-xs-sm"></span>
+                                <span
+                                    class="text-primary font-xs-sm ml-1">{{accountListViewData?.totalWarningAlerts}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-info-circle text-primary font-xs-sm"></span>
+                                <span
+                                    class="text-primary font-xs-sm ml-1">{{accountListViewData?.totalInformationAlerts}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card mb-2" *ngFor="let view of accountListViewData?.accountDetails">
+                    <div class="card-body py-2">
+                        <div class="row">
+                            <div class="col-6 d-flex flex-column">
+                                <div class="text-primary mb-2 text-value pointer-link" (click)="edit(view)"
+                                    accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                    elementType="div">
+                                    {{view?.accountName}}</div>
+                                <div class="text-primary text-value pointer-link" (click)="goToCostAnalysis(view)"
+                                    accessControl moduleName="Cost Analysis" accessType="View Cost Analysis"
+                                    elementType="div">
+                                    ${{view?.currentMonthCost.amount}}</div>
+                            </div>
+                            <div class="col-6 d-flex flex-column text-right">
+                                <div class="mb-2">
+                                    <span class="text-primary pr-1 text-value pointer-link"
+                                        (click)="showServices(view)">{{view?.totalServicesCount}}</span>
+                                    <span class="text-muted text-sm pr-1">Services</span>
+                                    <span class="border border-secondary mb-5"></span>
+                                    <span class="text-primary px-1 text-value pointer-link"
+                                        (click)="redirectToResourceDetailsFromAccount(view)">{{view?.totalResourceCount}}</span>
+                                    <span class="text-muted text-sm pr-1">Resources</span>
+                                    <span class="border border-secondary mb-5"></span>
+                                    <span class="text-primary pl-1 text-value">{{view?.totalAlertEventCount}}</span>
+                                    <span class="text-muted text-sm pl-1">Alerts</span>
+                                </div>
+                                <div>
+                                    <button class="action-icons mb-0 fas fa-sync font-sm ml-1"
+                                        [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
+                                        [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}"
+                                        (click)="syncNow(view)" accessControl moduleName="Public Cloud"
+                                        accessType="Manage Public Cloud" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-history font-sm ml-1"
+                                        tooltip="Schedule History" (click)="getScheduleHistory(view)">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1"
+                                        (click)="goToStats(view)" [tooltip]="view.statsTooltipMessage" accessControl
+                                        moduleName="Monitoring" accessType="View Monitoring" elementType="actionbtn">
+                                    </button>
+                                    <!-- <button class="action-icons mb-0 fas fa-money-check-alt font-sm ml-1"
+                                        [tooltip]="view.billingTooltip"
+                                        [ngClass]="{'action-icons-disabled':!view.isBillingExists}"
+                                        (click)="addBillngDetails(view)" accessControl moduleName="Public Cloud"
+                                        accessType="Manage Public Cloud" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-leaf font-sm ml-1"
+                                        [tooltip]="view.sustainabilityTooltip"
+                                        [ngClass]="{'action-icons-disabled':!view.co2EmissionEnabled}"
+                                        (click)="addSustanabilityDetails(view)" accessControl moduleName="Public Cloud"
+                                        accessType="Manage Public Cloud" elementType="actionbtn">
+                                    </button> -->
+                                    <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                        tooltip="Manage by creating support ticket" (click)="createTicket(view)">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1"
+                                        tooltip="Delete Account" (click)="deleteGcpAccount(view)" accessControl
+                                        moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                        elementType="actionbtn">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center p-1">
+                <div>
+                    <span
+                        class="badge bg-secondary font-weight-bold ml-1 mt-1 rounded-circle p-2">{{serviceAndResourceViewData.totalResourceTypeCount}}</span>
+                    <span class="font-weight-bold ml-2">Services</span>
+                </div>
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                    <div class="col-8 form-group mb-0 mr-3">
+                        <multiselect-dropdown class="form-control w-100 p-0" style="height:auto;"
+                            [options]="gcpAccountData" [settings]="accountDetailsSettings" [texts]="accountDetailsTexts"
+                            [(ngModel)]="currentCriteria.multiValueParam.uuid"
+                            (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body  p-0">
+                <table class="table text-left font-xs-sm font-500 w-100 mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Service Name</th>
+                            <th>Resources</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let view of serviceAndResourceViewData?.resourceList">
+                        <tr>
+                            <td>
+                                <div>
+                                    <img [src]="view.iconPath" width="17" height="17" *ngIf="view.iconPath">
+                                    <span class="ml-2">{{view.name}}</span>
+                                </div>
+                            </td>
+                            <td class="tdw-10 text-primary">
+                                <div class="text-primary pointer-link" (click)="redirectToResourceDetails(view)">
+                                    {{view.resourceCount}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center text-muted p-4" *ngIf="!serviceAndResourceViewData.resourceList.length">No
+                    associated Services for this Account was found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteGcpModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">This GCP account will be deleted. Are you sure you want to delete?</div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteGcpAccount()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteGcpModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleHistoryRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Schedule History
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="historymodalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body pt-0 pb-0">
+            <div class="row align-items-center justify-content-between py-1">
+                <div class="col-3">
+                    <table-search-box (searched)="onSearched($event)"></table-search-box>
+                </div>
+                <div class="col-3">
+                    <table-page-size [currentPageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                        [totalCount]="scheduleHistoryCount" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <table class="table table-sm text-left">
+                <thead>
+                    <tr>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Executed By </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of scheduleHistory">
+                        <td>{{view.startedAt}}</td>
+                        <td>{{view.lastRun}}</td>
+                        <td>{{view.duration}}</td>
+                        <td class="{{view.statusClass}}">
+                            {{view.status}}
+                            <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+                        </td>
+                        <td>{{view.updatedBy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table-entries [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                [totalCount]="scheduleHistoryCount"></table-entries>
+            <table-pager *ngIf="scheduleHistory.length" [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"
+                (pageChange)="pageChange($event)"></table-pager>
+            <p *ngIf="scheduleHistory.length==0" class="text-center py-3">No history to display</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="historymodalRef.hide()"
+                type="button">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- <ng-template #billing>
+    <div class="card mb-0">
+        <div class="card-header">
+            Account Billing Details
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="billingFormModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="billingForm" [formGroup]="billingForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="billingFormErrors.error">{{billingFormErrors.error}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="name">Account Name<em>*</em></label>
+                    <input class="form-control" id="name" type="text" formControlName="name"
+                        [ngClass]="{'is-invalid' : billingFormErrors.name}">
+                    <div class="invalid-feedback" *ngIf="billingFormErrors.name">{{billingFormErrors.name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="billing_account">Billing Account<em>*</em></label>
+                    <select class="form-control" id="billing_account" name="billing_account"
+                        formControlName="billing_account"
+                        [ngClass]="{'is-invalid' : billingFormErrors.billing_account}">
+                        <option [value]="''" disabled>Select Billing account</option>
+                        <option [value]="account" *ngFor="let account of billingAccounts">{{account}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="billingFormErrors.billing_account">
+                        {{billingFormErrors.billing_account}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="dataset">Dataset<em>*</em></label>
+                    <select class="form-control" id="dataset" name="dataset" formControlName="dataset"
+                        [ngClass]="{'is-invalid' : billingFormErrors.dataset}">
+                        <option [value]="''" disabled>Select Dataset</option>
+                        <option [value]="dataset" *ngFor="let dataset of billingDataSets">{{dataset}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="billingFormErrors.dataset">{{billingFormErrors.dataset}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onSubmitBillingForm()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="billingFormModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #sustainability>
+    <div class="card mb-0">
+        <div class="card-header">
+            Account Sustainability Details
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="sustainabilityFormModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="sustainabilityForm" [formGroup]="sustainabilityForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="sustainabilityFormErrors.error">
+                        {{sustainabilityFormErrors.error}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="name">Account Name<em>*</em></label>
+                    <input class="form-control" id="name" type="text" formControlName="name"
+                        [ngClass]="{'is-invalid' : sustainabilityFormErrors.name}">
+                    <div class="invalid-feedback" *ngIf="sustainabilityFormErrors.name">{{billing.name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="billing_account">Billing Account<em>*</em></label>
+                    <select class="form-control" id="billing_account" name="billing_account"
+                        formControlName="billing_account"
+                        [ngClass]="{'is-invalid' : sustainabilityFormErrors.billing_account}">
+                        <option [value]="''" disabled>Select Billing account</option>
+                        <option [value]="account" *ngFor="let account of billingAccounts">{{account}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="sustainabilityFormErrors.billing_account">
+                        {{sustainabilityFormErrors.billing_account}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="dataset">Dataset<em>*</em></label>
+                    <select class="form-control" id="dataset" name="dataset" formControlName="dataset"
+                        [ngClass]="{'is-invalid' : sustainabilityFormErrors.dataset}">
+                        <option [value]="''" disabled>Select Dataset</option>
+                        <option [value]="dataset" *ngFor="let dataset of billingDataSets">{{dataset}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="sustainabilityFormErrors.dataset">
+                        {{sustainabilityFormErrors.dataset}}
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onSubmitSustainabilityForm()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="sustainabilityFormModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template> -->

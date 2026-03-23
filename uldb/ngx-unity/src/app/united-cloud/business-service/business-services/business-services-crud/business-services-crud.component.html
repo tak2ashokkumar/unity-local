@@ -1,0 +1,299 @@
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between bg-white align-items-center py-2">
+                    <div class="font-500">{{ actionMessage }} Service Business</div>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                            class="fa fa-arrow-left"></i></button>
+                </div>
+                <div class="card-body text-muted">
+                    <form *ngIf="form" [formGroup]="form">
+                        <!-- Error message -->
+                        <div *ngIf="nonFieldErr" class="row form-group offset-1">
+                            <div class="invalid-credentials text-left">{{ nonFieldErr }}</div>
+                        </div>
+
+                        <!-- Business Service Name -->
+                        <div class="row form-group ml-2">
+                            <div class="col-2 text-right align-self-center">Business Unit<em>*</em>:</div>
+                            <div class="col-3">
+                                <!-- <select id="businessServiceName" class="form-control"
+                                    (click)="onBusinessServiceChange($event)" formControlName="business_service_name"
+                                    [class.is-invalid]="formErrors.business_service_name">
+                                    <option [value]="''" disabled>Select Business Service Name</option>
+                                    <option value="addNew" class="add-new-option border-top border-top-2">+ Add New</option>
+                                    <option *ngFor="let bs of businessServiceList" [value]="bs.id">{{ bs.name }}</option>
+                                </select> -->
+                                <!-- <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.business_service"
+                                    [items]="dropDownOptions?.business_unit" formControlName="business_service"
+                                    placeholder="Select Business Unit" [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                                    [addTag]="addTag('business_unit')"></ng-select>
+                                <small class="invalid-feedback" *ngIf="formErrors.business_service">
+                                    {{ formErrors.business_service }}
+                                </small> -->
+                                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.business_service"
+                                    [items]="businessDropDownOptions?.business_unit" [multiple]="false"
+                                    [closeOnSelect]="true" placeholder="Select Business Unit" bindLabel="name"
+                                    bindValue="name" [hideSelected]="false" formControlName="business_service"
+                                    [addTag]="addTag('business_unit')">
+                                </ng-select>
+                                <small class="invalid-feedback" *ngIf="formErrors.business_service">
+                                    {{ formErrors.business_service }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="row form-group ml-2">
+                            <div class="col-2 text-right mt-1">Description:</div>
+                            <div class="col-6">
+                                <textarea class="form-control text-dark" placeholder="Enter Description"
+                                    formControlName="description"
+                                    [class.is-invalid]="formErrors.description"></textarea>
+                                <small class="invalid-feedback" *ngIf="formErrors.description">
+                                    {{ formErrors.description }}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Group -->
+
+                        <!-- License Cost Center -->
+                        <div class="row ml-2 mt-3">
+                            <div formArrayName="license_cost_centers" class="d-flex flex-column">
+                                <div *ngFor="let lcc of form.get('license_cost_centers')['controls']; let lccIndex = index;let lccLast=last; let lccFirst=first;"
+                                    [formGroupName]="lccIndex" class="row ml-2 mt-3">
+                                    <div class="col-11 border round-edge p-4 position-relative mx-0">
+                                        <div class="pb-2 mb-3 bg-white position-absolute section-name">License Cost
+                                            Center
+                                            {{ lccIndex + 1 }}</div>
+
+                                        <!-- License Centre -->
+                                        <div class="row form-group">
+                                            <div class="col-2 text-right align-self-center">License Centre<em>*</em>:
+                                            </div>
+                                            <div class="col-3">
+                                                <ng-select class="custom-ng-select"
+                                                    [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex]?.license_centre"
+                                                    [items]="indexedLicenseOptions[lccIndex]"
+                                                    formControlName="license_centre" bindLabel="name" bindValue="name"
+                                                    placeholder="Select License Centre" [multiple]="false"
+                                                    [closeOnSelect]="true" [hideSelected]="false"
+                                                    [addTag]="addLicenseTag('license_cost_center', lccIndex)"></ng-select>
+                                                <small class="invalid-feedback"
+                                                    *ngIf="formErrors.license_cost_centers?.[lccIndex]?.license_centre">
+                                                    {{ formErrors.license_cost_centers?.[lccIndex]?.license_centre }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-2 text-right align-self-center">Building Block<em>*</em>:
+                                            </div>
+                                            <div class="col-3">
+                                                <select class="form-control" formControlName="building_block_code"
+                                                    [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex]?.building_block_code">
+                                                    <option [value]="''" disabled>Select Building Blocks</option>
+                                                    <option *ngFor="let bc of buildingBlock" [value]="bc.id">{{
+                                                        bc.building_block_code
+                                                        }}</option>
+                                                </select>
+                                                <small class="invalid-feedback"
+                                                    *ngIf="formErrors.license_cost_centers?.[lccIndex]?.building_block_code">
+                                                    {{ formErrors.license_cost_centers?.[lccIndex]?.building_block_code
+                                                    }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div formArrayName="application">
+                                            <div class="d-flex form-group"
+                                                *ngFor="let app of lcc.get('application')['controls']; let appIndex = index;let appLast=last; let appFirst=first;"
+                                                [formGroupName]="appIndex">
+                                                <!-- Application Array border -->
+                                                <div class="border round-edge p-4 position-relative mx-0 ">
+                                                    <div class="pb-2 mb-3 bg-white position-absolute section-name">
+                                                        <span>Application {{ appIndex + 1 }}</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="row col-12">
+                                                            <div class=" form-group col-2">
+                                                                <div class=" ">Application Name<em>*</em>:</div>
+                                                                <div>
+                                                                    <select class="form-control"
+                                                                        formControlName="app_name_id"
+                                                                        [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].app_name_id">
+                                                                        <option [value]="''" disabled>Select Application
+                                                                        </option>
+                                                                        <option *ngFor="let appItem of appList"
+                                                                            [value]="appItem.id">{{ appItem.name }}
+                                                                        </option>
+                                                                    </select>
+                                                                    <small class="invalid-feedback"
+                                                                        *ngIf="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].app_name_id">
+                                                                        {{
+                                                                        formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].app_name_id}}
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class=" form-group col-2">
+                                                                <div class=" ">Business Criticality<em>*</em>:</div>
+                                                                <div>
+                                                                    <select class="form-control"
+                                                                        formControlName="business_criticality"
+                                                                        [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].business_criticality">
+                                                                        <option [value]="''" disabled>Select Business
+                                                                            Criticality
+                                                                        </option>
+                                                                        <option *ngFor="let bc of businessCriticality"
+                                                                            [value]="bc.value">{{ bc.name }}</option>
+                                                                    </select>
+                                                                    <small class="invalid-feedback"
+                                                                        *ngIf="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].business_criticality">
+                                                                        {{
+                                                                        formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].business_criticality}}
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                            <div class=" form-group col-2">
+                                                                <div class=" ">Type of App<em>*</em>:</div>
+                                                                <div>
+                                                                    <select class="form-control"
+                                                                        formControlName="type_of_app"
+                                                                        [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].type_of_app">
+                                                                        <option [value]="''" disabled>Select Type of App
+                                                                        </option>
+                                                                        <option *ngFor="let ac of appTypeChoice"
+                                                                            [value]="ac.value">
+                                                                            {{ ac.name }}</option>
+                                                                    </select>
+                                                                    <small class="invalid-feedback"
+                                                                        *ngIf="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].type_of_app">
+                                                                        {{
+                                                                        formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].type_of_app}}
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-2">
+                                                                <div class=" ">Environment<em>*</em>:</div>
+                                                                <div>
+                                                                    <select class="form-control" formControlName="env"
+                                                                        [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].env">
+                                                                        <option [value]="''" disabled>Select Environment
+                                                                        </option>
+                                                                        <option *ngFor="let app of appEnv"
+                                                                            [value]="app.value">
+                                                                            {{ app.name }}</option>
+                                                                    </select>
+                                                                    <small class="invalid-feedback"
+                                                                        *ngIf="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].env">
+                                                                        {{
+                                                                        formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].env}}
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-2">
+                                                                <div class=" ">Deployment Model<em>*</em>:</div>
+                                                                <div>
+                                                                    <select class="form-control"
+                                                                        formControlName="deployment_model"
+                                                                        [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].deployment_model">
+                                                                        <option [value]="''" disabled>Select Deployment
+                                                                            Model
+                                                                        </option>
+                                                                        <option *ngFor="let dm of deploymentModel"
+                                                                            [value]="dm.value">
+                                                                            {{ dm.name }}</option>
+                                                                    </select>
+                                                                    <small class="invalid-feedback"
+                                                                        *ngIf="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].deployment_model">
+                                                                        {{
+                                                                        formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].deployment_model}}</small>
+                                                                </div>
+                                                            </div>
+                                                            <div class=" form-group col-2">
+                                                                <div class=" ">Cloud Type<em>*</em>:</div>
+                                                                <div>
+                                                                    <select class="form-control"
+                                                                        formControlName="cloud_types"
+                                                                        [class.is-invalid]="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].cloud_types">
+                                                                        <option [value]="''" disabled>Select Cloud Type
+                                                                        </option>
+                                                                        <option *ngFor="let ct of cloudTypes"
+                                                                            [value]="ct.value">
+                                                                            {{ ct.name }}</option>
+                                                                    </select>
+                                                                    <small class="invalid-feedback"
+                                                                        *ngIf="formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].cloud_types">
+                                                                        {{
+                                                                        formErrors.license_cost_centers?.[lccIndex].application?.[appIndex].cloud_types}}</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-2 mt-1">
+                                                    <span class="form-control border-0 p-0">
+                                                        <button tooltip="Remove Application"
+                                                            class="action-icons fas fa-minus font-sm mb-1"
+                                                            *ngIf="licenseCostCentersField.at(lccIndex).get('application').length > 1"
+                                                            (click)="removeApplication(lccIndex,appIndex)"></button>
+                                                        <button tooltip="Add Application"
+                                                            (click)="addApplication(lccIndex, appIndex)" *ngIf="appLast"
+                                                            class="action-icons fas fa-plus font-sm mt-1"></button>
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- Add/Remove LCC -->
+                                    <div class="d-flex mt-1">
+                                        <span class="form-control border-0 p-0">
+                                            <button tooltip="Remove Parameter"
+                                                class="action-icons fas fa-minus font-sm ml-1"
+                                                (click)="removeLicenseCostCenter(lccIndex)"
+                                                *ngIf="licenseCostCentersField.length>1"></button>
+                                            <button tooltip="Add License" (click)="addLicenseCostCenter(lccIndex)"
+                                                *ngIf="lccLast" class="action-icons fas fa-plus font-sm ml-1"></button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Visibility -->
+                        <div class="row form-group ml-2 mt-3">
+                            <div class="col-2 text-right align-self-center">
+                                Visibility<em>*</em>:
+                            </div>
+                            <div class="col-6 d-flex align-items-center">
+
+                                <div class="custom-control custom-radio">
+                                    <input id="Private" type="radio" class="custom-control-input" value="Private"
+                                        name="visibility" formControlName="visibility">
+                                    <label class="custom-control-label" for="Private">Private</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input id="Organization" type="radio" class="custom-control-input"
+                                        value="Organization" name="visibility" formControlName="visibility">
+                                    <label class="custom-control-label" for="Organization">Organization</label>
+                                </div>
+                            </div>
+                            <small class="invalid-feedback" *ngIf="formErrors.visibility">
+                                {{ formErrors.visibility }}
+                            </small>
+                        </div>
+
+
+                    </form>
+                </div>
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-2">
+                    <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                    <button class="btn btn-success ml-3" type="button" (click)="onSubmit()">{{actionMessage}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

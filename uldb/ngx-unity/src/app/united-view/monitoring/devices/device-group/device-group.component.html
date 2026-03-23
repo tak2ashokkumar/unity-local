@@ -1,0 +1,131 @@
+<div class="row example-container" [ngClass]="{'border border-secondary shadow-sm mb-3':editModeOn}">
+  <div class="col-sm mb-2">
+    <div class="card-header bg-transparent border-0">
+      <!-- <small>with captions</small> -->
+      <span class="text-warning h6">{{group.name}}</span>
+      <button class="action-icons editmode-action-icons font-sm fas fa-pencil-alt ml-2 bg-gray text-white"
+        *ngIf="editModeOn" (click)="editGroup(group)"></button>
+      <button class="action-icons editmode-action-icons font-sm fas fa-times ml-2 bg-gray text-white" *ngIf="editModeOn"
+        (click)="deleteGroup(group)"></button>
+    </div>
+
+    <div class="row example-list" cdkDropList cdkDropListOrientation="horizontal" [id]="group.id+''"
+      [cdkDropListData]="devices" [cdkDropListConnectedTo]="groupIds" (cdkDropListDropped)="dropStatus($event)"
+      [cdkDropListDisabled]="!editModeOn">
+      <div class="col-2 example-box" *ngFor="let device of devices;" cdkDrag [cdkDragData]="device">
+        <div class="card mb-2">
+          <div class="card-header d-flex align-items-center font-weight-bold px-1 py-0">
+            <i class="fa" [ngClass]="getDeviceIcon(device)"></i>
+            <div class="w-90 text-truncate" [ngClass]="editModeOn ? 'w-20' : 'w-90'">
+              <span class="small font-weight-bolder"> {{device.device_name}}</span>
+            </div>
+            <a *ngIf="editModeOn" class="card-header-action btn-close" (click)="deleteDevice(device.uuid)">
+              <i class="icon-close font-weight-bolder"></i>
+            </a>
+          </div>
+          <div class="card-body p-0">
+            <div class="row text-center mx-0">
+              <div class="col px-0 shadow-sm" [ngClass]="device.widgetwidthClass">
+                <div class="p-0" [ngClass]="device.statusBackGround" [tooltip]="device.statusTooltipMessage"
+                  container="body">
+                  <!-- <small *ngIf="device.status !== 'N/A' && device.status !== 'None'"><i class="fa" [ngClass]="device.statusIcon"></i></small>
+                  <small class="text-sm" *ngIf="device.status == 'N/A' || device.status == 'None'">N/A</small><br /> -->
+                  <small><i class="fa" [ngClass]="device.statusIcon"></i></small>
+                  <small class="mt-n2 w-100 d-inline-block text-truncate text-sm">Status</small>
+                </div>
+              </div>
+
+              <div class="col-3 px-0 shadow-sm" *ngIf="device.cpuText">
+                <div class="p-0" [ngClass]="device.cpuBackGround" [tooltip]="device.cpuTooltipMessage" container="body">
+                  <small class="text-sm">{{device.cpuText}}</small><br />
+                  <small class="mt-n2 w-100 d-inline-block text-truncate text-sm">CPU</small>
+                </div>
+              </div>
+
+              <div class="col-3 px-0 shadow-sm" *ngIf="device.memoryText">
+                <div class="p-0" [ngClass]="device.memoryBackGround" [tooltip]="device.memoryTooltipMessage"
+                  container="body">
+                  <small class="text-sm">{{device.memoryText}}</small><br />
+                  <small class="mt-n2 w-100 d-inline-block text-truncate text-sm">RAM</small>
+                </div>
+              </div>
+
+              <div class="col-4 px-0 shadow-sm" *ngIf="device.usageText">
+                <div class="p-0" [ngClass]="device.usageBackGround" [tooltip]="device.usageTooltipMessage"
+                  container="body">
+                  <small class="text-sm">{{device.usageText}}</small><br />
+                  <small class="mt-n2 w-100 d-inline-block text-truncate text-sm">Used(%)</small>
+                </div>
+              </div>
+
+              <div class="col px-0 shadow-sm" [ngClass]="device.widgetwidthClass" *ngIf="device.errorText"
+                (click)="showAlerts(device)">
+                <div class="p-0" [ngClass]="device.errorBackGround" [tooltip]="device.errorTooltipMessage"
+                  container="body">
+                  <small class="text-sm">{{device.failed_alerts}}</small><br />
+                  <small class="mt-n2 w-100 d-inline-block text-truncate text-sm">Errors</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-2 example-box" *ngIf="(editModeOn && !loading) || (!devices.length && !loading)">
+        <div class="brand-card mb-2">
+          <div class=" pl-1  text-center">
+            <small class="font-weight-bolder">Add New Device</small>
+          </div>
+          <div class="brand-card-body py-0">
+            <div class="py-1 bg-success btn rounded-0 border-0" (click)="addDevice()">
+              <div class="mt-n2">&nbsp;</div>
+              <i class="fa fa-plus position-absolute align-middle"></i><br />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="loading">
+      <div class="col text-center">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #deviceAlertsRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Alerts
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="deviceAlertsModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table text-left" *ngIf="alerts.length">
+        <thead>
+          <tr>
+            <th>Device Name</th>
+            <th>Alert</th>
+            <th>Severity</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of alerts; let i = index">
+            <td>{{view.deviceName}}</td>
+            <td>{{view.alertDesc}}</td>
+            <td [ngClass]="[view.colorClass, 'text-white','text-capitalize']">{{view.severity}}</td>
+            <!-- <td>
+              <div class="badge badge-pill p-2 text-capitalize" [class]="view.colorClass">
+                {{view.severity}} </div>
+            </td> -->
+            <td>{{view.alertTime}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center text-muted" *ngIf="!alerts.length">No Alerts were found.</div>
+    </div>
+  </div>
+</ng-template>

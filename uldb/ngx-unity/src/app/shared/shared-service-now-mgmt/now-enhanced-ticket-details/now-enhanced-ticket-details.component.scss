@@ -1,0 +1,110 @@
+.timeline .timeline-item .card {
+  max-height: 300px;
+}
+
+.timeline .timeline-item {
+  display: flex;
+  position: relative;
+}
+
+.timeline .timeline-item:not(:last-child)::before {
+  content: "";
+  height: 100%;
+  left: 19px;
+  position: absolute;
+  top: 20px;
+  // border-left: 3px dotted #dadee4;
+}
+
+.timeline .timeline-item .timeline-icon .badge {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.timeline .timeline-item .timeline-content {
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  padding: 0 0 0 1rem;
+}
+
+.badge {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 500px;
+  vertical-align: middle;
+  color: #fff;
+  font-size: 0.875rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.badge .custom-badge-btn {
+  background-color: #0fc5777d;
+  border: 1px solid #2d8f56;
+}
+
+.badge:hover,
+.badge:focus {
+  color: #fff;
+  text-decoration: none;
+  outline: none;
+  z-index: 1;
+}
+
+.timeline-content .card::before {
+  content: " ";
+  height: 0;
+  position: absolute;
+  width: 0;
+  z-index: 1;
+  top: 4px;
+  left: -10px;
+  border: medium solid #e4e7ea;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent #e4e7ea transparent transparent;
+}
+
+.no-resize {
+  resize: none;
+}
+
+.sop-step-card {
+  border-color: #e4e7ea
+}
+
+.similar-tickets-card-body {
+  height: 65.7vh;
+}
+
+.section-name-one {
+  position: absolute;
+  top: -1rem;
+  right: 3.5rem;
+  z-index: 1;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.section-name-two {
+  position: absolute;
+  top: -1rem;
+  right: 1rem;
+  z-index: 1;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.scrollable-steps {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+a.kb-link {
+  text-decoration: underline;
+}

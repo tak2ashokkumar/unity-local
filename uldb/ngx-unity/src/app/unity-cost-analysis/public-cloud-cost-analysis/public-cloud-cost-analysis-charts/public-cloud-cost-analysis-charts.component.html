@@ -1,0 +1,40 @@
+<div class="card mb-0 border-0 data-card">
+  <app-spinner [name]="spinnerName"></app-spinner>
+  <div class="card-header bg-transparent border-0 px-0" *ngIf="data.dataLables.length">
+    <h3 class="text-muted d-inline-block mb-0 text-uppercase align-middle">{{target}} BREAKDOWN</h3>
+    <form class="d-inline-block mx-4">
+      <select class="custom-select mr-sm-2 py-0 view-type-dropdown" [ngModel]="chartInterval" (ngModelChange)="getChartData($event)"
+        name="chartIntervalType">
+        <option [value]="chartIntervelOptions.MONTH">{{chartIntervelOptions.MONTH}}</option>
+        <option [value]="chartIntervelOptions.QUARTER">{{chartIntervelOptions.QUARTER}}</option>
+      </select>
+    </form>
+    <div class="btn-group pull-right" role="group">
+      <button class="btn btn-outline-secondary" [class.active]="viewType == dataViewTypes.CHART" type="button" (click)="changeView('chart')">
+        <span class="fas fa-chart-line"></span>
+      </button>
+      <button class="btn btn-outline-secondary" [class.active]="viewType == dataViewTypes.LIST" type="button" (click)="changeView('list')">
+        <span class="fas fa-list"></span>
+      </button>
+    </div>
+  </div>
+  <div class="card-body px-0" *ngIf="data.dataLables.length" [ngSwitch]="viewType">
+    <canvas baseChart [chartType]="chartType" [labels]="chartLabels" [datasets]="chartData" [options]="chartOptions"
+      [plugins]="chartPlugins" [legend]="chartLegend" height="100" *ngSwitchCase="dataViewTypes.CHART"></canvas>
+    <table class="table text-left table-hover table-condensed mb-0" *ngSwitchCase="dataViewTypes.LIST">
+      <thead class="thead-light">
+        <tr>
+          <th class="text-capitalize">{{target}}</th>
+          <th *ngFor="let label of chartLabels">{{label}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of chartData">
+          <td [ngClass]="{'font-weight-bold bg-secondary': !view.label}">{{view.label ? view.label : 'Total Amount'}}</td>
+          <td [ngClass]="{'font-weight-bold bg-secondary': !view.label}" *ngFor="let price of view.data">${{price |
+            number : '1.0-0'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

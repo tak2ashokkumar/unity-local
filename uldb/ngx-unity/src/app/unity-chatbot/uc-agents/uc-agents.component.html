@@ -1,0 +1,162 @@
+<ng-container *ngIf="chatHistoryData.length">
+    <div class="row mt-2 mx-0 pb-2">
+        <div class="col-3 d-flex flex-column align-items-center px-1" *ngFor="let module of modules">
+            <div class="d-flex align-items-center justify-content-center rounded-circle expolre-icon"
+                [ngClass]="{'active': module.isActive || module.inUrl}" (click)="onIconHover(module)">
+                <i [ngClass]="module.icon + ' fa-lg'"></i>
+            </div>
+            <div class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
+                [ngClass]="{'font-500': module.isActive}">{{ module.name }}</div>
+        </div>
+    </div>
+    <div id="queries" class="queries-container" [ngClass]="{'mt-1 mb-2': queries.length}">
+        <div *ngFor="let query of queries" class="mb-1">
+            <div class="mx-3 text-primary font-sm default-query-explore" (click)="sumbitQuery(query)"
+                [ngClass]="{'text-muted': isTyping}" style="cursor: pointer;">{{query}}</div>
+        </div>
+        <ng-conatiner *ngIf="comingSoon">
+            <div class="d-flex align-items-center justify-content-center pb-2">
+                <span>Coming Soon...</span>
+            </div>
+        </ng-conatiner>
+    </div>
+</ng-container>
+<div class="custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top">
+    <div #messagesContainer class="messages-container d-flex flex-column justify-content-between">
+        <ng-container *ngIf="!chatHistoryData.length">
+            <div class="d-flex flex-column mb-2">
+                <ng-conatiner *ngIf="moduleSpinner">
+                    <div class="d-flex align-items-center justify-content-center p-5">
+                        <span class="fas fa-spinner fa-spin fa-lg"></span>
+                        <span class="ml-2 ">Loading</span>
+                    </div>
+                </ng-conatiner>
+                <ng-conatiner *ngIf="!modules.length && !moduleSpinner">
+                    <div class="d-flex align-items-center justify-content-center p-5">
+                        <span>No agents available.</span>
+                    </div>
+                </ng-conatiner>
+                <div *ngIf="modules.length" class="d-flex flex-column">
+                    <h6 class="font-lg ml-1">Explore</h6>
+                    <div class="row mt-2 mx--1">
+                        <div class="col-3 d-flex flex-column align-items-center px-1" *ngFor="let module of modules">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle expolre-icon"
+                                [ngClass]="{'active': module.isActive}" (click)="manageActiveModule(module)">
+                                <i [ngClass]="module.icon + ' fa-lg'"></i>
+                            </div>
+                            <div class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
+                                [ngClass]="{'font-500': module.isActive}">{{ module.name }}</div>
+                        </div>
+                    </div>
+                </div>
+                <ng-conatiner *ngIf="comingSoon">
+                    <div class="d-flex align-items-center justify-content-center p-5">
+                        <span>Coming Soon...</span>
+                    </div>
+                </ng-conatiner>
+                <div id="defaultQueries" class="d-flex flex-column mt-2 queries-container">
+                    <div *ngFor="let query of queries" class="card round-edge mb-2">
+                        <div class="card-body p-2 default-query" style="cursor: pointer" (click)="sumbitQuery(query)">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-muted font-sm ml-2 hover-text">{{query}}</div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center rounded-circle angle-icon"
+                                    [ngClass]="{'disable': isTyping}">
+                                    <i class="fas fa-angle-right font-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <div class="d-flex flex-column w-100" style="max-width: 100%;">
+            <div *ngFor="let chat of chatHistoryData;let i = index" class="d-flex flex-column w-100"
+                style="max-width: 100%;">
+                <div *ngIf="chat.user == 'bot'" class="d-flex flex-column justify-content-start mb-1 w-100"
+                    style="max-width: 100%;">
+                    <ng-container *ngIf="chat.type == 'text'">
+                        <div class="message-box bot-message">
+                            <markdown [data]="chat.message"></markdown>
+                        </div>
+                    </ng-container>
+                    <!-- <ng-container *ngIf="chat.botResponseId">
+                        <div class="d-flex align-items-center ml-1 mb-2">
+                            <span class="fas fa-thumbs-up cursor-pointer"
+                                [ngClass]="chat.liked ? 'text-success' : 'text-muted'" (click)="onLike(i)"
+                                tooltip="Like"></span>
+                            <span class="fas fa-thumbs-down mx-3 cursor-pointer"
+                                [ngClass]="chat.disliked ? 'text-danger' : 'text-muted'" (click)="onDislike(i)"
+                                tooltip="Dislike"></span>
+                            <span class="fas fa-comment cursor-pointer"
+                                [ngClass]="{'text-success': chat.feedbackSubmitted,'text-primary': !chat.feedbackSubmitted && chat.comment,'text-muted': !chat.feedbackSubmitted && !chat.comment}"
+                                (click)="onComment(i)" [tooltip]="chat.feedbackIconTooltip"></span>
+                        </div>
+                        <ng-container *ngIf="chat.comment && !chat.feedbackSubmitted">
+                            <form *ngIf="feedbackForm" [formGroup]="feedbackForm" class="mb-3">
+                                <div class="card round-edge mt-2 mb-0">
+                                    <div class="card-body p-1">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <textarea name="feedback" id="feedback" formControlName="feedback"
+                                                    rows="2" class="form-control no-resize no-border"
+                                                    placeholder="Add your comment..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end mt-1">
+                                            <button class="btn btn-pill btn-primary btn-sm mr-2" type="button"
+                                                (click)="submitFeedBackForm(chat.botResponseId, i)"
+                                                [disabled]="!feedbackForm.get('feedback')?.value?.trim()"
+                                                [tooltip]="'Submit'" container="body">
+                                                <i class="fa fa-arrow-up"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </ng-container>
+                    </ng-container> -->
+                </div>
+                <div *ngIf="chat.user == 'user'" class="d-flex justify-content-end mb-1" style="max-width: 100%;">
+                    <div class="message-box user-message">
+                        {{ chat.message }}
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
+                <div class="message-box bot-message">
+                    <div class="pulse-loader m-1">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+            <ng-container *ngIf="resetThread">
+                <div class="d-flex align-items-center justify-content-center mt-2 position-relative">
+                    <div class="dashed-line flex-grow-1 mx-0 position-relative"></div>
+                    <i class="fas fa-info-circle text-muted info-icon"
+                        tooltip="The conversation has been reset. You can start a fresh one." container="body"></i>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <form *ngIf="form && modules.length && !comingSoon" [formGroup]="form" class="w-100 mt-auto p-2 chat-input">
+        <div class="row">
+            <div class="col">
+                <div class="input-group">
+                    <input class="form-control border-left-radius" type="text" formControlName="chat"
+                        placeholder="Ask me anything..." (keyup.enter)="onSubmit()" style="height: 2.7rem;">
+                    <div class="input-group-append">
+                        <span class="input-group-text bg-white border-right-radius" (click)="onSubmit()"
+                            style="cursor: pointer;">
+                            <i class="fas fa-paper-plane font-lg mr-1"
+                                [ngClass]="{'text-success': !isTyping, 'text-muted': isTyping}"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

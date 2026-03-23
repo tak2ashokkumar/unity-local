@@ -1,0 +1,70 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+  <loading></loading>
+    <span ng-if="loader">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+    </span>
+    <div class="row">
+      <div class="col-md-6" >
+        <form name="dateForm" class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-6">
+              <label for="orgName" class="control-label">Organization : </label>
+              <input id="orgName" class="form-control ticketing"
+                     ng-model="org"
+                     placeholder="Type org to search..."
+                     uib-typeahead="org as org.name for org in getOrgs($viewValue)"
+                     force-null="col.nullify"
+                     typeahead-on-select="get_customer_device_count()">
+            </div>
+            <div class="col-md-6">
+              <label for="activity_date_range" class="control-label">Select Date Range: </label>
+              <input options="options" date-range-picker class="form-control date-picker" name= 'activity_date_range' type="text" ng-model="datePicker.date"/>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <div class="col-md-2" >
+          <a href="{{downloadUrl}}"><button class="btn btn-success" ng-disabled="!downloadUrl">Export</button></a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-10"></div>
+        <div ng-if="model.results !== undefined">
+          <table class="table table-condensed" ng-if="model.results.length > 0">
+            <thead>
+              <tr>
+                <th>Firewall Count</th>
+                <th>Switch Count</th>
+                <th>Hypervisor Count</th>
+                <th>Virtual Machine Count</th>
+                <th>Load Balancer Count</th>
+                <th>Other Device Count</th>
+                <th>BareMetal Server Count</th>
+                <th>Cabinet Count</th>
+                <th>Total Count</th>
+              </tr>
+            </thead>
+  
+            <tbody>
+              <tr ng-repeat="result in model.results" ng-class="classSelectors(result)">
+                  <td>{{ result.firewall_count }}</td>
+                  <td>{{ result.switch_count }}</td>
+                  <td>{{ result.hypervisor_count }}</td>
+                  <td>{{ result.virtual_machine_count }}</td>
+                  <td>{{ result.load_balancer_count }}</td>
+                  <td>{{ result.custom_device_count }}</td>
+                  <td>{{ result.baremetal_server_count }}</td>
+                  <td>{{ result.cabinet_count }}</td>
+                  <td>{{ result.total_count }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <span ng-if="model.results.length === 0 && !loader">
+            <h3 class="align-center">No records to display.</h3>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,46 @@
+<div class="modal-header">
+  <h3 class="modal-title">
+    <span ng-if="method === 'Add'">Add</span>
+    <span ng-if="method === 'Edit'">Edit All</span>
+  </h3>
+</div>
+
+<div class="modal-body">
+  <form class="form-horizontal" ng-submit="method === 'Edit' && update(obj) || create(obj, list)">
+    <div class="form-group" ng-repeat="col in activeCols" ng-if="(col.required == undefined || col.required !== false ) && !(method === 'Edit' && col.hide_on_edit !== undefined)  ">
+      <label class="col-sm-2 control-label">
+        {{ col.description }} <span ng-if="col.required">*</span>
+      </label>
+      <div class="col-sm-10">
+      <label class="errormsg" ng-if="obj[col.err_msg]">{{ obj[col.err_msg] }}</label>
+        <input ng-if="col.inputMethod == null" class="form-control" ng-model="obj[col.name]" force-null="col.nullify">
+        <input ng-if="col.inputMethod.type === 'number'" type="number" min="0" class="form-control" ng-model="obj[col.name]" force-null="col.nullify">
+        <input ng-if="col.inputMethod.type === 'password'" type="password" class="form-control" ng-model="obj[col.name]" force-null="col.nullify">
+        <datetimepicker ng-if="col.inputMethod.type == 'datetime'" data-ng-model="obj[col.name]"></datetimepicker>
+        <input ng-if="col.inputMethod.type == 'typeahead'" class="form-control"
+               ng-model="obj[col.name]"
+               uib-typeahead="rel as rel[col.inputMethod.accessor] for rel in col.inputMethod.invoker($viewValue)"
+               force-null="col.nullify" >
+        <select ng-init="obj[col.name] = col.inputMethod.choices[0]"
+                ng-if="col.inputMethod.type == 'choices'"
+                class="form-control"
+                ng-model="obj[col.name]"
+                force-null="col.nullify"
+                ng-options="choice for choice in col.inputMethod.choices"></select>
+      </div>
+    </div>
+    <input type="submit" style="visibility: hidden">
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-danger" type="button" ng-click="cancel()">
+    Cancel
+  </button>
+  <button ng-if="method === 'Edit'" class="btn btn-primary" type="button" ng-click="update(obj)">
+    Save changes!
+  </button>
+  <button ng-if="method === 'Add'" class="btn btn-primary" type="button" ng-click="create(obj, list)">
+    Save
+  </button>
+</div>

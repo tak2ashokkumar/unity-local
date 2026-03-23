@@ -1,0 +1,10 @@
+<h5 *ngIf="meshServices.length">Mesh Services</h5>
+<div class="row">
+  <div class="col-6 col-card-height" *ngFor="let service of meshServices">
+    <div [ngSwitch]="service.serviceType">
+      <traffic-director-widget [meshServiceData]="service" *ngSwitchCase="MESH_SERVICE_TYPE_MAPPING.ANTHOS"></traffic-director-widget>
+      <app-mesh-widget [meshServiceData]="service" *ngSwitchCase="MESH_SERVICE_TYPE_MAPPING.AWS"></app-mesh-widget>
+      <istio-widget [meshServiceData]="service" *ngSwitchCase="MESH_SERVICE_TYPE_MAPPING.ISTIO"></istio-widget>
+    </div>
+  </div>
+</div>

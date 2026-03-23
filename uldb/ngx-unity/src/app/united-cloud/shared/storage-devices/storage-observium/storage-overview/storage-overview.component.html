@@ -1,0 +1,67 @@
+<div class="row">
+  <div class="col-6">
+    <div class="row">
+      <div class="col">
+        <storage-overview-details [deviceId]="deviceId"></storage-overview-details>
+      </div>
+    </div>
+  </div>
+  <div class="col-6" *ngIf="deviceStorageDetails">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header bg-transparent border-bottom-0 ml-0 card-title ">
+            <h4 class="card-title font-lg">Storage</h4>
+          </div>
+          <div class="card-body pt-0">
+            <div class="row align-items">
+              <div class="col">
+                <table class="table text-left table-responsive-sm">
+                  <tbody>
+                    <tr *ngFor="let storage of deviceStorageDetails | keyvalue">
+                      <td>
+                        <div class="row mt-4">
+                          {{storage.key}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="row">
+                          <div class="col ml-auto mb-1">
+                            <small class="text-muted utilization-font-size">capacity: {{storage.value.capacity}}</small>
+                          </div>
+                          <div class="col-12">
+                            <div class="progress">
+                              <div class="progress-bar" role="progressbar" [style.width.%]="storage.value.used_perc"
+                                aria-valuenow="percentData.active" aria-valuemin="0" aria-valuemax="100"
+                                [ngClass]="getProgressClass(storage.value.used_perc)"></div>
+
+                              <div class="progress-bar bg-secondary" role="progressbar"
+                                [style.width.%]="100 - storage.value.used_perc" aria-valuenow="percentData.unknown"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                          <div class="col">
+                            <small class="text-muted utilization-font-size">used: {{storage.value.used}}</small>
+                          </div>
+                          <div class="col ml-auto text-right">
+                            <small class="text-muted utilization-font-size">free:
+                              {{100 - storage.value.used_perc}}%</small>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="row" *ngFor="let sensor of sensors">
+      <div class="col">
+        <device-sensor [input]="sensor"></device-sensor>
+      </div>
+    </div> -->
+  </div>
+</div>

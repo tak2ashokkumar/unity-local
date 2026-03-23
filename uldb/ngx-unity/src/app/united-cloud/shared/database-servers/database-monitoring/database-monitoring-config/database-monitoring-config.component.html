@@ -1,0 +1,178 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-0">
+            <div class="card-body">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <ng-container *ngIf="dbForm" [formGroup]="dbForm">
+                        <!-- <form *ngIf="dbForm" [formGroup]="dbForm"> -->
+                        <div class="form-group col-4">
+                            <label class="font-col-form-label" for="connection_type">Connection
+                                Type<em>*</em></label>
+                            <select id="connection_type" class="form-control" formControlName="connection_type"
+                                [class.is-invalid]="dbFormErrors.connection_type">
+                                <option value="" disabled>Select Connection Type</option>
+                                <option [value]="'Agent'">Agent</option>
+                                <option [value]="'ODBC'">ODBC</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="dbFormErrors.connection_type">
+                                {{dbFormErrors.connection_type}}</div>
+                        </div>
+                        <!-- </form> -->
+                    </ng-container>
+                    <ng-container *ngIf="odbcForm" [formGroup]="odbcForm">
+                        <div class="form-group col-4" *ngIf="odbcForm.controls.data_source_name">
+                            <label class="form-col-form-label" for="data_source_name">Data Source
+                                Name(DSN)<em>*</em></label>
+                            <input id="data_source_name" class="form-control" type="text"
+                                formControlName="data_source_name" [class.is-invalid]="odbcFormErrors.data_source_name">
+                            <div class="invalid-feedback" *ngIf="odbcFormErrors.data_source_name">
+                                {{odbcFormErrors.data_source_name}}</div>
+                        </div>
+                        <div class="form-group col-4" *ngIf="odbcForm.controls.driver">
+                            <label class="form-col-form-label" for="driver">Driver Name<em>*</em></label>
+                            <input id="driver" class="form-control" type="text" formControlName="driver"
+                                [class.is-invalid]="odbcFormErrors.driver">
+                            <div class="invalid-feedback" *ngIf="odbcFormErrors.driver">{{odbcFormErrors.driver}}</div>
+                        </div>
+                        <div class="form-group col-4" *ngIf="odbcForm.controls.username">
+                            <label class="form-col-form-label" for="username">SQL Login<em>*</em></label>
+                            <input id="username" class="form-control" type="text" formControlName="username"
+                                [class.is-invalid]="odbcFormErrors.username">
+                            <div class="invalid-feedback" *ngIf="odbcFormErrors.username">{{odbcFormErrors.username}}
+                            </div>
+                        </div>
+                        <div class="form-group col-4" *ngIf="odbcForm.controls.password">
+                            <label class="form-col-form-label" for="password">SQL Password<em>*</em></label>
+                            <input id="password" class="form-control" type="password" formControlName="password"
+                                [class.is-invalid]="odbcFormErrors.password">
+                            <div class="invalid-feedback" *ngIf="odbcFormErrors.password">{{odbcFormErrors.password}}
+                            </div>
+                        </div>
+                        <div class="form-group col-4" *ngIf="odbcForm.controls.service_name">
+                            <label class="form-col-form-label" *ngIf="dbType == 'Oracle'">Oracle Service
+                                Name<em>*</em></label>
+                            <ng-container *ngIf="dbType != 'Oracle'">
+                                <label class="form-col-form-label" *ngIf="dbType != 'MSSQL Server'">Database
+                                    Name<em>*</em></label>
+                                <label class="form-col-form-label" *ngIf="dbType == 'MSSQL Server'">Instance
+                                    Name<em>*</em></label>
+                            </ng-container>
+                            <input id="service_name" class="form-control" type="text" formControlName="service_name"
+                                [class.is-invalid]="odbcFormErrors.service_name">
+                            <div class="invalid-feedback" *ngIf="odbcFormErrors.service_name">
+                                {{odbcFormErrors.service_name}}</div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="agentForm" [formGroup]="agentForm">
+                        <ng-container *ngIf="dbType == 'Oracle'">
+                            <div class="form-group col-4" *ngIf="agentForm.controls.connection_string">
+                                <label class="form-col-form-label" for="connection_string">Connection
+                                    String<em>*</em></label>
+                                <input id="connection_string" class="form-control" type="text"
+                                    formControlName="connection_string"
+                                    [class.is-invalid]="agentFormErrors.connection_string">
+                                <div class="invalid-feedback" *ngIf="agentFormErrors.connection_string">
+                                    {{agentFormErrors.connection_string}}
+                                </div>
+                            </div>
+                            <div class="form-group col-4" *ngIf="agentForm.controls.service_name">
+                                <label class="form-col-form-label" for="service_name">Oracle Service
+                                    Name<em>*</em></label>
+                                <input id="service_name" class="form-control" type="text" formControlName="service_name"
+                                    [class.is-invalid]="agentFormErrors.service_name">
+                                <div class="invalid-feedback" *ngIf="agentFormErrors.service_name">
+                                    {{agentFormErrors.service_name}}</div>
+                            </div>
+                            <div class="form-group col-4" *ngIf="agentForm.controls.username">
+                                <label class="form-col-form-label" for="username">Oracle User<em>*</em></label>
+                                <input id="username" class="form-control" type="username" formControlName="username"
+                                    [class.is-invalid]="agentFormErrors.username">
+                                <div class="invalid-feedback" *ngIf="agentFormErrors.username">
+                                    {{agentFormErrors.username}}</div>
+                            </div>
+                            <div class="form-group col-4" *ngIf="agentForm.controls.password">
+                                <label class="form-col-form-label">Oracle Password<em>*</em></label>
+                                <input id="password" class="form-control" type="text" formControlName="password"
+                                    [class.is-invalid]="agentFormErrors.password">
+                                <div class="invalid-feedback" *ngIf="agentFormErrors.password">
+                                    {{agentFormErrors.password}}</div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="dbType == 'MySQL'">
+                            <div class="form-group col-4" *ngIf="agentForm.controls.username">
+                                <label for="username" class="form-col-form-label">Username<em>*</em></label>
+                                <input id="username" class="form-control" type="username" formControlName="username"
+                                    [class.is-invalid]="agentFormErrors.username">
+                                <div class="invalid-feedback" *ngIf="agentFormErrors.username">
+                                    {{agentFormErrors.username}}</div>
+                            </div>
+                            <div class="form-group col-4" *ngIf="agentForm.controls.password">
+                                <label for="password" class="form-col-form-label">Password<em>*</em></label>
+                                <custom-password-field formControlName="password"
+                                    [options]="{errors:agentFormErrors.password, placeholder:''}"></custom-password-field>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmMonitoringConfig()"
+                    [disabled]="((dbForm && dbForm.pristine) && (agentForm && agentForm.pristine))
+                    ||
+                     ((dbForm && dbForm.pristine) && (odbcForm && odbcForm.pristine))" accessControl
+                    moduleName="Monitoring" accessType="Manage Monitoring" elementType="btn">Activate
+                    Monitoring</button>
+
+                <button class="btn btn-sm btn-warning pull-right ml-1" type="button" *ngIf="monitoringDetails"
+                    [disabled]="((dbForm && dbForm.pristine) && (agentForm && agentForm.pristine))
+                    ||
+                    ((dbForm && dbForm.pristine) && (odbcForm && odbcForm.pristine))"
+                    (click)="buildAddEditForm()">Reset</button>
+
+                <button class="btn btn-sm btn-danger pull-right ml-1" type="button" (click)="deleteMonitoringConfig()"
+                    *ngIf="monitoringDetails" accessControl moduleName="Monitoring" accessType="Manage Monitoring"
+                    elementType="btn">Delete</button>
+
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="toggleMonitoring()"
+                    *ngIf="monitoring && monitoring.configured && !monitoring.enabled" accessControl
+                    moduleName="Monitoring" accessType="Manage Monitoring" elementType="btn">Enable</button>
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="toggleMonitoring()"
+                    *ngIf="monitoring && monitoring.configured && monitoring.enabled" accessControl
+                    moduleName="Monitoring" accessType="Manage Monitoring" elementType="btn">Disable</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This monitoring configuration will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteConfig()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #ODBC_FORM>
+
+</ng-template>
+
+<ng-template #AGENT_FORM>
+
+</ng-template>

@@ -1,0 +1,6 @@
+<div class="card" *ngIf="isMapAvailable">
+    <app-spinner [name]="'dashboard_map_widget'"></app-spinner>
+  <div class="card-body p-2">
+    <div #map class="map-container"></div>
+  </div>
+</div>

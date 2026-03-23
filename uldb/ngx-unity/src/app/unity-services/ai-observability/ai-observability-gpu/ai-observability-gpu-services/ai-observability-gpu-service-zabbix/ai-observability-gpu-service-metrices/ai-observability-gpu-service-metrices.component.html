@@ -1,0 +1,54 @@
+<div class="card rounded-0 border-top-0">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{count}}</span>
+            <span class="ml-1 font-lg">Metrices</span>
+        </div>
+    </div>
+    <div class="card-body py-2">
+        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+            <div class="w-25">
+                <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+            </div>
+            <div>
+                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+            </div>
+        </div>
+        <table class="table table-sm text-left">
+            <thead class="bg-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                    <th>GPU Name</th>
+                    <th>Timestamp</th>
+                    <th>Deployment Environment</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of viewData" truncateText>
+                    <td class="tdw-20">
+                        <div>{{view.name}}</div>
+                    </td>
+                    <td class="tdw-15">
+                        <div>{{view.value}}</div>
+                    </td>
+                    <td class="tdw-25">
+                        <div>{{view.gpuName}}</div>
+                    </td>
+                    <td class="tdw-20">
+                        <div>{{view.timestamp}}</div>
+                    </td>
+                    <td class="tdw-20">
+                        <div>{{view.deploymentEnvironment}}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count">
+        </table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No associated Metrices were found!!</div>
+    </div>
+</div>

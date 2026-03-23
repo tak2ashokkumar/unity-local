@@ -1,0 +1,216 @@
+<div class="card rounded-0 border-0 mb-0" style="margin-top: -2.25rem !important;">
+  <app-spinner [name]="'viewplaybooks'"></app-spinner>
+  <div class="card-header bg-transparent d-flex justify-content-end align-items-center p-0">
+    <button class="action-icons fas fa-upload font-sm pull-right mb-1 mr-4" tooltip="Upload Playbook" container="body"
+      (click)="addPlaybook()" accessControl moduleName="DevOps Automation" accessType="Manage Scripts"
+      elementType="btn"></button>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm text-left mb-0">
+      <thead class="bg-light">
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of viewData" setTableColumnWidth>
+          <td>{{view.playbookName}}</td>
+          <td>{{view.playbookType}}</td>
+          <td>{{view.playbookDescription}}</td>
+          <td class="action-icons-column text-center">
+            <button class="action-icons mb-0 fa fa-eye font-sm ml-1" tooltip="View"
+              (click)="viewDetails(view)"></button>
+            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1"
+              [ngClass]="{'action-icons-disabled': view.isPlaybookDefault}" [tooltip]="view.editPlaybooktoolTipMessage"
+              (click)="editPlaybook(view)" [disabled]="view.isPlaybookDefault" accessControl
+              moduleName="DevOps Automation" accessType="Manage Scripts" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+              [ngClass]="{'action-icons-disabled': view.isPlaybookDefault}"
+              [tooltip]="view.deletePlaybooktoolTipMessage" (click)="deletePlaybook(view.uuid)"
+              [disabled]="view.isPlaybookDefault" accessControl moduleName="DevOps Automation"
+              accessType="Manage Scripts" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-history font-sm ml-1" tooltip="History"
+              (click)="viewHistory(view)"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="!viewData.length" class="d-flex py-5 justify-content-center align-items-center">
+      No playbooks available.
+    </div>
+  </div>
+</div>
+<!-- <div>
+  <button class="action-icons fas fa-upload font-sm pull-right mb-1 mr-4" tooltip="Upload Playbook" container="body"
+    (click)="addPlaybook()" accessControl moduleName="DevOps Automation" accessType="Manage DevOps Automation"
+    elementType="btn"></button>
+</div> -->
+
+<ng-template #create>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Playbook
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="playbookModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="playbookForm" [formGroup]="playbookForm">
+        <div class="form-group">
+          <div class="invalid-script" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label">Name<em>* </em></label>
+          <input id="name" class="form-control" type="text" formControlName="name"
+            [class.is-invalid]="playbookFormErrors.name">
+          <div class="invalid-feedback" *ngIf="playbookFormErrors.name">
+            {{playbookFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label">Type<em>* </em></label>
+          <input id="type" class="form-control" type="text" formControlName="type"
+            [class.is-invalid]="playbookFormErrors.type" readonly>
+          <div class="invalid-feedback" *ngIf="playbookFormErrors.type">
+            {{playbookFormErrors.type}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label">Description<em>* </em></label>
+          <input id="description" class="form-control" type="text" formControlName="description"
+            [class.is-invalid]="playbookFormErrors.description">
+          <div class="invalid-feedback" *ngIf="playbookFormErrors.description">
+            {{playbookFormErrors.description}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="playbook">Upload Playbook<em>*</em></label>
+          <span class="mx-1" *ngIf="playbook && playbook.playbookFileName"> - </span>
+          <a *ngIf="playbook && playbook.playbookFileName" href="{{playbook.playbookFile}}"
+            target="_blank">{{playbook.playbookFileName}}</a>
+          <input id="file" class="form-control" type="file" (change)="playbookFile($event.target.files)"
+            formControlName="playbook" name="playbook" [class.is-invalid]="playbookFormErrors.playbook">
+          <div class="invalid-feedback" *ngIf="playbookFormErrors.playbook">
+            {{playbookFormErrors.playbook}}
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmPlaybookCreate()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" type="button" (click)="playbookModalRef.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="playbookDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This Playbook will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmPlaybookDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="playbookDeleteModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #viewPlaybook>
+  <div class="card mb-0">
+    <div class="card-header">
+      Playbook Details
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="playbookViewModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="detailsForm" [formGroup]="detailsForm">
+        <div class="row">
+          <div class="form-group col">
+            <label for="name" class="col-3 col-form-label">Name</label>
+            <input id="name" class="form-control" type="text" formControlName="name" readonly>
+          </div>
+          <div class="form-group col">
+            <label for="type" class="col-3 col-form-label">Type</label>
+            <input id="type" class="form-control" type="text" formControlName="type" readonly>
+          </div>
+          <div class="form-group col">
+            <label for="description" class="col-5 col-form-label">Description</label>
+            <input id="description" class="form-control" type="text" formControlName="description" readonly>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col">
+            <label for="content">Playbook</label>
+            <textarea id="content" class="form-control" type="text" rows="20" formControlName="content"
+              readonly></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="playbookViewModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #history>
+  <div class="card mb-0">
+    <div class="card-header">
+      Execution History
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="taskModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-sm text-left">
+        <thead>
+          <tr>
+            <th>Task Name</th>
+            <th>Host Name</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Duration</th>
+            <th class="text-center">Status</th>
+            <th>Executed By</th>
+            <!-- <th class="text-center">Action</th> -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of viewHistoryData">
+            <td class="text-truncate">{{view.taskName}}</td>
+            <td class="text-truncate">{{view.hostName}}</td>
+            <td class="text-truncate">{{view.executionStartTime}}</td>
+            <td class="text-truncate">{{view.executionEndTime}}</td>
+            <td class="text-truncate">{{view.executionDuration}}</td>
+            <td class="text-center">
+              <div class=" fa" [tooltip]="view.executionStatus" [ngClass]="view.statusIcon"></div>
+            </td>
+            <td class="text-truncate">{{view.executionUser}}</td>
+            <!-- <td class="action-icons-column text-center">
+              <button class="action-icons fas fa-folder-open" tooltip="Logs"
+                [ngClass]="{'action-icons-disabled':'true'}"></button>
+            </td> -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-template>

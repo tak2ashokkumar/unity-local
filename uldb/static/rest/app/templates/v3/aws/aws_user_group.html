@@ -1,0 +1,28 @@
+<alerts></alerts>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-sm-12">
+            <h3 ng-if="user_name_group"><p>{{user_name_group}} - Group Details</p></h3>
+            <span>
+                <small ng-repeat="crumb in bread.crumbs">
+                    <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                </small>
+            </span>
+        </div>
+    </div>
+    <alerts></alerts>
+    <br>
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="USER GROUP"
+                headers="aws_usergroup_list_headers"
+                tabledata="aws_usergroup_list_content.data"
+                modeldata="aws_dashboard"
+                rows="aws_dashboard_rows"
+                addclick="aws_dashboard_add(data)"
+                actions="">
+            </awsgenerictable>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+
+<form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength">
+    <div class="form-group ng-scope">
+        <label class="col-sm-3 control-label ng-binding" for="blockName">Auto Scaling Group *</label>
+        <div class="col-sm-9 ng-scope">
+            <select ng-if="rows4.autoscaling_group == ''" ng-options="row.auto_scaling_group as row.auto_scaling_group for row in rows4.autoscaling_group" class="form-control" ng-model="obj.group" disabled>
+                <option selected="selected" value="">-- no auto scaling group present --</option>
+            </select>
+            <select ng-if="rows4.autoscaling_group != ''" ng-options="row.auto_scaling_group as row.auto_scaling_group for row in rows4.autoscaling_group" class="form-control" ng-model="obj.group">
+                <option selected="selected" value="">-- choose an auto scaling group --</option>
+            </select>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['grouperr']">{{ obj['groupMsg'] }}</label>
+        </div>
+    </div>
+    <p>Are you sure you want to attach {{obj.instance_id}} ?</p>
+</form>
+    

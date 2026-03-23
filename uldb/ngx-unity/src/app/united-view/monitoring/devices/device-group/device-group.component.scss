@@ -1,0 +1,16 @@
+@import "variables";
+
+.editmode-action-icons {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.link {
+  cursor: pointer;
+  &:hover {
+    color: $primary;
+  }
+}
+.card-header-action {
+  float: right;
+}

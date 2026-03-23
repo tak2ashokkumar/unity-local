@@ -1,0 +1,100 @@
+//stepper styles
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10px;
+  background: #fff;
+  font-family: Arial, sans-serif;
+}
+
+.step {
+  position: relative;
+  text-align: center;
+  flex: 1;
+  color: #8c9aa5;
+}
+
+.step:not(:last-child) .icon::after {
+  content: '';
+  position: absolute;
+  right: -50%;
+  width: calc(100% - 20px);
+  height: 2px;
+  background: #d3d8dd;
+  z-index: 0;
+}
+
+.step .icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font-size: 18px;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.step.active .icon {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.step .label {
+  margin-top: 8px;
+  font-size: 13px;
+  color: inherit;
+}
+
+.step.active .label {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.step.valid .icon {
+  border-color: #0cbb70;
+  color: #0cbb70;
+}
+
+.step.valid .label {
+  font-weight: bold;
+  color: #0cbb70;
+}
+
+//For ng-select
+.ng-select .ng-select-container {
+  font-weight: 400;
+  color: #5c6873;
+  background-color: #ffffff;
+  background-clip: padding-box;
+  border: 1px solid #c8ced3 !important;
+  min-height: 30px !important;
+  height: calc(1.5em + 0.5rem + 2px) !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.765625rem !important;
+  line-height: 1.5 !important;
+  border-radius: 0.2rem !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.ng-select .ng-select-container .ng-value-container {
+  padding: 0 !important;
+}
+
+.ng-select .ng-arrow-wrapper {
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.ng-select.is-invalid .ng-select-container {
+  border: 1px solid #cc0000 !important;
+}
+
+.ng-select.is-invalid ~ .invalid-feedback{
+  display: block !important;
+}

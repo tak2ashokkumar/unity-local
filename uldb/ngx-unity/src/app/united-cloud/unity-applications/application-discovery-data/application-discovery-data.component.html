@@ -1,0 +1,15 @@
+<app-main-tab [tabItems]="tabItems">
+  <ng-template>
+    <div class="d-flex justify-content-end align-items-center mr-2">
+      <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <data-refresh-btn></data-refresh-btn>
+    </div>
+  </ng-template>
+</app-main-tab>
+<div class="container-fluid px-2 mt--3">
+  <div class="animated fadeIn">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -1,0 +1,600 @@
+<div class="card-header d-flex justify-content-between align-items-center bg-white border-bottm-0 py-2">
+    <div class="d-flex align-items-center justify-content-center">
+        <ul class="nav nav-tabs tabs-level1 custom-nav-container">
+            <li class="nav-item rounded-top tabs-level1-item">
+                <a class="nav-link tabs-level1-link border-0 text-success py-0">IOT devices Summary</a>
+            </li>
+        </ul>
+    </div>
+    <div class="d-flex align-items-center justify-content-end w-16">
+        <div class="form-group mb-0 w-100">
+            <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                [(ngModel)]="currentCriteria.multiValueParam.datacenter" [options]="datacenterList"
+                [settings]="datacenterListSettings" [texts]="datacenterSelectionTexts"
+                (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+        </div>
+        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
+            [tooltip]="'Go Back'" container="body">
+            <i class="fa fa-arrow-left"></i>
+        </button>
+        <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+    </div>
+</div>
+
+<div *ngIf="summaryData?.totalDevices?.total > 0; else elseBlock">
+    <ng-container *ngTemplateOutlet="summaryRef"></ng-container>
+    <div class="row mx-0">
+        <div class="col-3 pr-0">
+            <ng-container *ngTemplateOutlet="statusByGroupWidgetRef"></ng-container>
+        </div>
+        <div class="col pl-2">
+            <ng-container *ngTemplateOutlet="smartPDUsWidgetRef"></ng-container>
+        </div>
+    </div>
+    <div class="row mx-0 my-2">
+        <div class="col">
+            <ng-container *ngTemplateOutlet="temperatureWidgetRef"></ng-container>
+        </div>
+    </div>
+    <div class="row mx-0 my-2">
+        <div class="col pr-1">
+            <ng-container *ngTemplateOutlet="humidityWidgetRef"></ng-container>
+        </div>
+        <div class="col pl-1">
+            <ng-container *ngTemplateOutlet="airflowWidgetRef"></ng-container>
+        </div>
+    </div>
+
+    <div class="row mx-0 my-2">
+        <div class="col">
+            <div class="card round-edge equalize-card">
+                <app-spinner [name]="'RecentModifiedRFIDTagsLoader'"></app-spinner>
+                <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+                    <span class="font-lg font-500">Recently Modified RFID Tags</span>
+                </div>
+                <div class="card-body p-0"
+                    style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <table *ngIf="recentModifiedRFIDTagsViewData.length" class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Device Name</th>
+                                <th>RFID Tag (Hex UID)</th>
+                                <th>Last Seen Location</th>
+                                <th>Last Seen Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of recentModifiedRFIDTagsViewData" truncateText>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.rfidTag">{{view.rfidTag}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.lastSeenLocation">{{view.lastSeenLocation}}</div>
+                                </td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.lastSeenTime">{{view.lastSeenTime}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!recentModifiedRFIDTagsViewData.length"
+                        class="d-flex h-100 justify-content-center align-items-center">
+                        No recent modified RFID tags available.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mx-0 my-2">
+        <div class="col">
+            <div class="card round-edge equalize-card">
+                <app-spinner [name]="'RecentEventsLoader'"></app-spinner>
+                <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+                    <span class="font-lg font-500">Recent Events</span>
+                </div>
+                <div class="card-body p-0"
+                    style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <table *ngIf="recentEventsViewData.length" class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Time</th>
+                                <th>Datacenter</th>
+                                <th>Rack-Cabinet</th>
+                                <th>Device</th>
+                                <th>Description</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of recentEventsViewData" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="view.eventTime">{{view.eventTime}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="view.datacenter">{{view.datacenter}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="view.cabinet">{{view.cabinet}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="view.description">{{view.description}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="view.severity">{{view.severity}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="view.status">{{view.status}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!recentEventsViewData.length"
+                        class="d-flex h-100 justify-content-center align-items-center">
+                        No Events available.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #elseBlock>
+    <div class="row mx-0 my-2">
+        <div class="col">
+            <div class="card vh-75">
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    No IOT devices available.
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #summaryRef>
+    <div class="row mx-0 my-2">
+        <div class="col pr-0">
+            <div class="card round-edge equalize-card mb-0">
+                <div class="card-body d-flex flex-column p-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="font-lg font-500">Total Resources</span>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryData?.totalDevices?.total}}</span>
+                    </div>
+                    <div class="d-flex justify-content-start ml-1">
+                        <span class="fas fa-long-arrow-alt-up text-success align-self-center"></span>
+                        <span
+                            class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryData?.totalDevices?.up}}</span>
+                        <span class="fas fa-long-arrow-alt-down text-danger align-self-center"></span>
+                        <span
+                            class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryData?.totalDevices?.down}}</span>
+                        <span class="fas fa-exclamation-circle text-muted align-self-center"></span>
+                        <span
+                            class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryData?.totalDevices?.unknown}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card round-edge equalize-card mb-0">
+                <div class="card-body d-flex flex-column p-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="font-lg font-500">Avg Temperature</span>
+                        <span
+                            class="font-lg-xl text-primary font-500 mx-1">{{summaryData?.avgTemperature?.current}}</span>
+                    </div>
+                    <div class="d-flex justify-content-start ml-1 mt-1">
+                        <span class="mx-1" [ngClass]="summaryData?.avgTemperature?.lastOneHrTextClass">
+                            <span class="fas" [ngClass]="summaryData?.avgTemperature?.lastOneHrIconClass"></span>
+                            <span class="ml-1">{{summaryData?.avgTemperature?.lastOneHr}}</span>
+                        </span>
+                        <span>since last hr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card round-edge equalize-card mb-0">
+                <div class="card-body d-flex flex-column p-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="font-lg font-500">Avg Humidity</span>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryData?.avgHumidity?.current}}</span>
+                    </div>
+                    <div class="d-flex justify-content-start ml-1 mt-1">
+                        <span class="mx-1" [ngClass]="summaryData?.avgHumidity?.lastOneHrTextClass">
+                            <span class="fas" [ngClass]="summaryData?.avgHumidity?.lastOneHrIconClass"></span>
+                            <span class="ml-1">{{summaryData?.avgHumidity?.lastOneHr}}</span>
+                        </span>
+                        <span>since last hr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card round-edge equalize-card mb-0">
+                <div class="card-body d-flex flex-column p-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="font-lg font-500">Avg Airflow</span>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryData?.avgAirflow?.current}}</span>
+                    </div>
+                    <div class="d-flex justify-content-start ml-1 mt-1">
+                        <span class="mx-1" [ngClass]="summaryData?.avgAirflow?.lastOneHrTextClass">
+                            <span class="fas" [ngClass]="summaryData?.avgAirflow?.lastOneHrIconClass"></span>
+                            <span class="ml-1">{{summaryData?.avgAirflow?.lastOneHr}}</span>
+                        </span>
+                        <span>since last hr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card round-edge equalize-card mb-0">
+                <div class="card-body d-flex flex-column p-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="font-lg font-500">Avg Power Consumption</span>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryData?.avgPower?.current}}</span>
+                    </div>
+                    <div class="d-flex justify-content-start ml-1 mt-1">
+                        <span class="mx-1" [ngClass]="summaryData?.avgPower?.lastOneHrTextClass">
+                            <span class="fas" [ngClass]="summaryData?.avgPower?.lastOneHrIconClass"></span>
+                            <span class="ml-1">{{summaryData?.avgPower?.lastOneHr}}</span>
+                        </span>
+                        <span>since last hr</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #statusByGroupWidgetRef>
+    <div class="card round-edge equalize-card" *ngIf="statusByGroupViewData">
+        <app-spinner [name]="statusByGroupViewData?.loader"></app-spinner>
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+            <span class="font-lg font-500">Status by Group</span>
+            <div class="d-flex align-items-center justify-content-end">
+                <div class="form-group mb-0">
+                    <select class="form-control form-control-sm w-100"
+                        [(ngModel)]="statusByGroupViewData.selectedViewType" (change)="onSelectByGroupTypeChange()">
+                        <option *ngFor="let type of statusByGroupViewData?.viewTypes" [value]="type">{{type}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0 pt-2" style="min-height:200px;max-height:250px;overflow-y: auto;overflow-x: hidden;">
+            <ng-container *ngIf="statusByGroupViewData?.displayViewData.length">
+                <ng-container
+                    *ngTemplateOutlet="statusByGroupRef; context: { $implicit: statusByGroupViewData.displayViewData, pIndex: null }"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="!statusByGroupViewData?.displayViewData.length">
+                <div class="d-flex justify-content-center align-items-center py-5">
+                    No devices available.
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+<ng-template #statusByGroupRef let-groupViewData let-parentIndex="pIndex">
+    <ng-container *ngFor="let data of groupViewData; let i = index">
+        <div class="col-12">
+            <div class="d-flex align-items-center ml-2" [ngClass]="getClass(data)">
+                <shared-device-status [status]="data.status" [hideTooltip]="true" class="mt-1"></shared-device-status>
+                <button class="btn btn-link text-decoration-none p-0 text-muted ml-2"
+                    (click)="selectbyGroup(data, parentIndex)">{{data.name}}</button>
+            </div>
+        </div>
+        <ng-container *ngIf="data.selected && data.nodes.length">
+            <ng-container
+                *ngTemplateOutlet="statusByGroupRef; context: { $implicit: data.nodes, pIndex: i}"></ng-container></ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #smartPDUsWidgetRef>
+    <div class="card round-edge equalize-card">
+        <app-spinner [name]="'SmartPDUsLoader'"></app-spinner>
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+            <span class="font-lg font-500">PDUs</span>
+        </div>
+        <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+            <table class="table table-sm font-sm text-left mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Current Phase Load (A)</th>
+                        <th>Voltage (V)</th>
+                        <th>Power (W)</th>
+                        <!-- <th>Outlet Status</th> -->
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of smartPDUsViewData" truncateText>
+                        <td class="text-primary tdw-30">
+                            <button class="btn btn-link text-decoration-none p-0 table-column-btn font-500"
+                                type="button" [tooltip]="view.name"
+                                (click)="goToDeviceDetails(view)">{{view.name}}</button>
+                        </td>
+                        <td class="tdw-20">
+                            <div [tooltip]="view.current">{{view.current}}</div>
+                        </td>
+                        <td class="tdw-20">
+                            <div [tooltip]="view.voltage">{{view.voltage}}</div>
+                        </td>
+                        <td class="tdw-20">
+                            <div [tooltip]="view.power">{{view.power}}</div>
+                        </td>
+                        <!-- <td class="tdw-20">
+                            <shared-device-status [status]="view.outletStatus" [hideTooltip]="true"
+                                class="mt-1"></shared-device-status>
+                        </td> -->
+                        <td class="tdw-10">
+                            <shared-device-status [status]="view.status" [hideTooltip]="true"
+                                class="mt-1"></shared-device-status>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ng-container *ngIf="!smartPDUsViewData.length">
+                <div class="d-flex justify-content-center align-items-center py-5">
+                    No PDS's available.
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #temperatureWidgetRef>
+    <div class="card round-edge equalize-card">
+        <app-spinner [name]="temperatureWidgetViewData.loader"></app-spinner>
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+            <span class="font-lg font-500">Temperature</span>
+            <custom-date-dropdown [options]="temperatureWidgetViewData.dropdownOptions" [enableCustomDateRange]="true"
+                [customClass]="'form-control-sm'" [default]="temperatureWidgetViewData.defaultSelected"
+                (onSubmit)="onSelectTemperatureWidgetDateRange($event)">
+            </custom-date-dropdown>
+        </div>
+        <div class="card-body d-flex flex-column p-2">
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="d-flex flex-column pr-3">
+                    <span class="text-muted">Total Devices</span>
+                    <span class="font-lg-xl text-primary">{{temperatureWidgetViewData?.summary?.total || 0}}</span>
+                </div>
+                <div class="d-flex flex-column border-left px-3">
+                    <span class="text-muted">Active Devices</span>
+                    <span class="font-lg text-primary">{{temperatureWidgetViewData?.summary?.active || 0}}</span>
+                </div>
+                <div class="d-flex flex-column border-left px-3">
+                    <span class="text-muted">Inactive Devices</span>
+                    <span class="font-lg text-primary">{{temperatureWidgetViewData?.summary?.inactive || 0}}</span>
+                </div>
+                <div class="d-flex flex-column border-left px-3">
+                    <span class="text-muted">Average Temperature</span>
+                    <span class="font-lg-xl font-500">{{temperatureWidgetViewData?.summary?.average_temperature ||
+                        0}}°C</span>
+                </div>
+                <div class="d-flex flex-column border-left px-3">
+                    <span class="text-muted">Max. Temperature</span>
+                    <span class="font-lg-xl font-500">{{temperatureWidgetViewData?.summary?.maximum_temperature ||
+                        0}}°C</span>
+                </div>
+                <div class="d-flex flex-column border-left px-3">
+                    <span class="text-muted">Min. Temperature</span>
+                    <span class="font-lg-xl font-500">{{temperatureWidgetViewData?.summary?.minimum_temperature ||
+                        0}}°C</span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-3 charts-min-height">
+                <div class="w-50 d-flex flex-column h-100 position-relative">
+                    <app-spinner [name]="temperatureWidgetViewData.trendChartDataLoader"></app-spinner>
+                    <ng-container *ngIf="temperatureWidgetViewData?.trendChartDeviceSelectionForm">
+                        <form class="row form" [formGroup]="temperatureWidgetViewData.trendChartDeviceSelectionForm">
+                            <div class="col-4 font-lg">Trend</div>
+                            <div class="form-group mb-0 col-4">
+                                <label class="font-sm-xs mb-0" for="cabinet">Cabinet/Rack</label>
+                                <select id="cabinet" class="form-control form-control-sm" formControlName="cabinet">
+                                    <option value="" disabled>Select Cabinet</option>
+                                    <option *ngFor="let c of cabinetList" [ngValue]="c.id">
+                                        {{c.name}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-0 col-4">
+                                <label class="font-sm-xs mb-0" for="device">Device</label>
+                                <select id="device" class="form-control form-control-sm" formControlName="device">
+                                    <option value="" disabled>Select Device</option>
+                                    <option *ngFor="let d of temperatureWidgetViewData?.devicesList" [value]="d.uuid">
+                                        {{d.name}}</option>
+                                </select>
+                            </div>
+                        </form>
+                    </ng-container>
+                    <div class="mt-2" echarts [options]="temperatureWidgetViewData.trendChartData.options"
+                        [extentions]="temperatureWidgetViewData.trendChartData.extensions" [defaultHeight]="300"
+                        *ngIf="temperatureWidgetViewData?.trendChartData">
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center flex-grow-1"
+                        *ngIf="!temperatureWidgetViewData?.trendChartData">No data
+                        available.</div>
+                </div>
+                <div class="w-40" *ngIf="temperatureWidgetViewData?.top5DevicesChartData">
+                    <div echarts [options]="temperatureWidgetViewData.top5DevicesChartData.options"
+                        [extentions]="temperatureWidgetViewData.top5DevicesChartData.extensions" [defaultHeight]="350">
+                    </div>
+                </div>
+                <div class="w-40 d-flex align-items-center justify-content-center flex-grow-1 pt-5"
+                    *ngIf="!temperatureWidgetViewData?.top5DevicesChartData">No data
+                    available.</div>
+            </div>
+
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #humidityWidgetRef>
+    <div class="card round-edge equalize-card">
+        <app-spinner [name]="humidityWidgetViewData.loader"></app-spinner>
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+            <span class="font-lg font-500">Humidity</span>
+            <custom-date-dropdown [options]="humidityWidgetViewData.dropdownOptions" [enableCustomDateRange]="true"
+                [customClass]="'form-control-sm'" [default]="humidityWidgetViewData.defaultSelected"
+                (onSubmit)="onSelectHumiditySummaryWidgetDateRange($event)">
+            </custom-date-dropdown>
+        </div>
+        <div class="card-body d-flex flex-column p-2">
+            <div class="d-flex justify-content-around align-items-center">
+                <div class="d-flex flex-column w-30">
+                    <span class="text-muted">Total Devices</span>
+                    <span class="font-lg-xl text-primary">{{humidityWidgetViewData?.summary?.total || 0}}</span>
+                </div>
+                <div class="d-flex flex-column w-30 border-left pl-3">
+                    <span class="text-muted">Active Devices</span>
+                    <span class="font-lg text-primary">{{humidityWidgetViewData?.summary?.active || 0}}</span>
+                </div>
+                <div class="d-flex flex-column w-30 border-left pl-3">
+                    <span class="text-muted">Inactive Devices</span>
+                    <span class="font-lg text-primary">{{humidityWidgetViewData?.summary?.inactive || 0}}</span>
+                </div>
+                <!-- <div class="d-flex flex-column w-25 border-left pl-3">
+                        <span class="text-muted">Device Uptime</span>
+                        <span class="font-lg-xl font-500">{{humidityWidgetViewData?.summary?.inactive}}%</span>
+                    </div> -->
+            </div>
+            <div class="d-flex justify-content-center align-items-center mt-2">
+                <div class="d-flex flex-column w-25">
+                    <span class="text-muted">Average Humidity</span>
+                    <span class="font-lg-xl font-500">{{humidityWidgetViewData?.summary?.average_humidity || 0}}%
+                    </span>
+                </div>
+                <div class="d-flex flex-column w-25 border-left pl-3">
+                    <span class="text-muted">Max. Humidity</span>
+                    <span class="font-lg-xl font-500">{{humidityWidgetViewData?.summary?.maximum_humidity || 0}}%
+                    </span>
+                </div>
+                <div class="d-flex flex-column w-25 border-left pl-3">
+                    <span class="text-muted">Min. Humidity</span>
+                    <span class="font-lg-xl font-500">{{humidityWidgetViewData?.summary?.minimum_humidity || 0}}%
+                    </span>
+                </div>
+            </div>
+            <div class="d-flex flex-column h-100 position-relative charts-min-height mt-3">
+                <app-spinner [name]="humidityWidgetViewData.trendChartDataLoader"></app-spinner>
+                <ng-container *ngIf="humidityWidgetViewData?.trendChartDeviceSelectionForm">
+                    <form class="row form" [formGroup]="humidityWidgetViewData.trendChartDeviceSelectionForm">
+                        <div class="col-4 font-lg">Trend</div>
+                        <!-- <div class="form-group mb-0 col-4">
+                            <label class="font-sm-xs mb-0" for="cabinet">Cabinet/Rack</label>
+                            <select id="cabinet" class="form-control form-control-sm" formControlName="cabinet">
+                                <option value="" disabled>Select Cabinet</option>
+                                <option *ngFor="let c of cabinetList" [value]="c.id">
+                                    {{c.name}}</option>
+                            </select>
+                        </div> -->
+                        <div class="form-group mb-0 col-4 offset-4">
+                            <label class="font-sm-xs mb-0" for="device">Device</label>
+                            <select id="device" class="form-control form-control-sm" formControlName="device">
+                                <option value="" disabled>Select Device</option>
+                                <option *ngFor="let d of humidityWidgetViewData?.devicesList" [value]="d.uuid">
+                                    {{d.name}}</option>
+                            </select>
+                        </div>
+                    </form>
+                </ng-container>
+                <div class="w-100" *ngIf="humidityWidgetViewData?.trendChartData">
+                    <div echarts [options]="humidityWidgetViewData.trendChartData.options"
+                        [extentions]="humidityWidgetViewData.trendChartData.extensions" [defaultHeight]="300">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center flex-grow-1"
+                    *ngIf="!humidityWidgetViewData?.trendChartData">No data
+                    available.</div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #airflowWidgetRef>
+    <div class="card round-edge equalize-card">
+        <app-spinner [name]="airflowWidgetViewData.loader"></app-spinner>
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+            <span class="font-lg font-500">Airflow</span>
+            <custom-date-dropdown [options]="airflowWidgetViewData.dropdownOptions" [enableCustomDateRange]="true"
+                [customClass]="'form-control-sm'" [default]="airflowWidgetViewData.defaultSelected"
+                (onSubmit)="onSelectAirflowWidgetDateRange($event)">
+            </custom-date-dropdown>
+        </div>
+        <div class="card-body d-flex flex-column p-2">
+            <div class="d-flex justify-content-around align-items-center">
+                <div class="d-flex flex-column w-30">
+                    <span class="text-muted">Total Devices</span>
+                    <span class="font-lg-xl text-primary">{{airflowWidgetViewData?.summary?.total || 0}}</span>
+                </div>
+                <div class="d-flex flex-column w-30 border-left pl-3">
+                    <span class="text-muted">Active Devices</span>
+                    <span class="font-lg text-primary">{{airflowWidgetViewData?.summary?.active || 0}}</span>
+                </div>
+                <div class="d-flex flex-column w-30 border-left pl-3">
+                    <span class="text-muted">Inactive Devices</span>
+                    <span class="font-lg text-primary">{{airflowWidgetViewData?.summary?.inactive || 0}}</span>
+                </div>
+                <!-- <div class="d-flex flex-column w-25 border-left pl-3">
+                        <span class="text-muted">Device Uptime</span>
+                        <span class="font-lg-xl font-500">{{humiditySummary?.summary?.inactive}}%</span>
+                    </div> -->
+            </div>
+            <div class="d-flex justify-content-center align-items-center mt-2">
+                <div class="d-flex flex-column w-25">
+                    <span class="text-muted">Average Airflow</span>
+                    <span class="font-lg-xl font-500">{{airflowWidgetViewData?.summary?.average_airflow || 0}}
+                        CFM</span>
+                </div>
+                <div class="d-flex flex-column w-25 border-left pl-3">
+                    <span class="text-muted">Max. Airflow</span>
+                    <span class="font-lg-xl font-500">{{airflowWidgetViewData?.summary?.maximum_airflow || 0}}
+                        CFM</span>
+                </div>
+                <div class="d-flex flex-column w-25 border-left pl-3">
+                    <span class="text-muted">Min. Airflow</span>
+                    <span class="font-lg-xl font-500">{{airflowWidgetViewData?.summary?.minimum_airflow || 0}}
+                        CFM</span>
+                </div>
+            </div>
+            <div class="d-flex flex-column h-100 position-relative charts-min-height mt-3">
+                <app-spinner [name]="airflowWidgetViewData.trendChartDataLoader"></app-spinner>
+                <ng-container *ngIf="airflowWidgetViewData.trendChartDeviceSelectionForm">
+                    <form class="row form" [formGroup]="airflowWidgetViewData.trendChartDeviceSelectionForm">
+                        <div class="col-4 font-lg">Trend</div>
+                        <!-- <div class="form-group mb-0 col-4">
+                            <label class="font-sm-xs mb-0" for="cabinet">Cabinet/Rack</label>
+                            <select id="cabinet" class="form-control form-control-sm" formControlName="cabinet">
+                                <option value="" disabled>Select Cabinet</option>
+                                <option *ngFor="let c of cabinetList" [value]="c.id">
+                                    {{c.name}}</option>
+                            </select>
+                        </div> -->
+                        <div class="form-group mb-0 col-4 offset-4">
+                            <label class="font-sm-xs mb-0" for="device">Device</label>
+                            <select id="device" class="form-control form-control-sm" formControlName="device">
+                                <option value="" disabled>Select Device</option>
+                                <option *ngFor="let d of airflowWidgetViewData?.devicesList" [value]="d.uuid">
+                                    {{d.name}}</option>
+                            </select>
+                        </div>
+                    </form>
+                </ng-container>
+                <div class="w-100" *ngIf="airflowWidgetViewData?.trendChartData">
+                    <div echarts [options]="airflowWidgetViewData.trendChartData.options"
+                        [extentions]="airflowWidgetViewData.trendChartData.extensions" [defaultHeight]="300">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center flex-grow-1"
+                    *ngIf="!airflowWidgetViewData?.trendChartData">No data
+                    available.</div>
+            </div>
+        </div>
+    </div>
+</ng-template>

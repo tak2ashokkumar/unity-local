@@ -1,0 +1,112 @@
+<div class="row">
+  <div class="col-12">
+    <div *ngIf="onbDetails">
+      <div class="card-group rounded mb-4 border border-secondary">
+        <div class="card border-0 pl-3">
+          <div class="card-body px-0">
+            <div class="row align-items-center justify-content-center">
+              <div class="col-12">
+                <connect-to-unity [onbDetails]="onbDetails" (reloadStatusDetails)="getOnboardDetails()"></connect-to-unity>
+                <small class="text-muted text-uppercase font-weight-bold d-flex justify-content-center">Connect to
+                  Unity</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card border-0">
+          <div class="card-body px-0">
+            <div class="row align-items-center justify-content-center">
+              <div class="col-12">
+                <div class="row align-items-center justify-content-center">
+                  <div class="col-12">
+                    <on-board-assets [onbDetails]="onbDetails" (reloadStatusDetails)="getOnboardDetails()"></on-board-assets>
+                    <small class="text-muted text-uppercase font-weight-bold d-flex justify-content-center">Onboard
+                      Assets
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card border-0">
+          <div class="card-body px-0">
+            <div class="row align-items-center justify-content-center">
+              <div class="col-12">
+                <div class="row align-items-center justify-content-center">
+                  <div class="col-12">
+                    <div class="onb-wrap mb-2">
+                      <unity-setup-monitoring [onbDetails]="onbDetails" (reloadStatusDetails)="getOnboardDetails()"></unity-setup-monitoring>
+                    </div>
+                    <small class="text-muted text-uppercase font-weight-bold d-flex justify-content-center">Monitoring</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card border-0 pr-3">
+          <div class="card-body px-0">
+            <div class="row align-items-center justify-content-center">
+              <div class="col-12">
+                <div class="row align-items-center justify-content-center">
+                  <div class="col-12">
+                    <div class="onb-wrap mb-2">
+                      <unity-setup-management [onbDetails]="onbDetails" (reloadStatusDetails)="getOnboardDetails()"></unity-setup-management>
+                    </div>
+                    <small class="text-muted text-uppercase font-weight-bold d-flex justify-content-center">Management</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card bg-transparent border-0">
+      <div class="card-body py-0">
+        <div class="row">
+          <div class="col-3">
+            <div class="card equalize-card">
+              <div class="card-body font-sm">
+                <p>UNITYOne.AI supports two types of configuration to connect UNITYOne.AI to your
+                  infrastructure i.e with & without Collector. In the default Configuration, Connectivity needs to
+                  be established via IPSec VPN tunnel. And for the Collector Configuration, a VM to be installed at
+                  customer subnet to deploy the UNITY Collector packages and we will need a 1:1 NAT mapping to give
+                  the collector VM a public IP for Unity SaaS to talk directly.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card equalize-card">
+              <div class="card-body font-sm">
+                <p>In this phase, you can perform auto discovery of devices in your network. Also download, fill
+                  and upload the Onboarding Template with all the details updated.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card equalize-card">
+              <div class="card-body font-sm">
+                <p>In this section you can enable monitoring of all your onboarded devices provided SNMP is
+                  configured. Please contact support@unityonecloud.com for further assistance with SNMP
+                  configuration. Also download, update & upload the VM lists from respective clouds to enable
+                  Monitoring of VMs.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="card equalize-card">
+              <div class="card-body font-sm">
+                <p>Activate Management via web console for Private Cloud, Hypervisors & network Devices.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

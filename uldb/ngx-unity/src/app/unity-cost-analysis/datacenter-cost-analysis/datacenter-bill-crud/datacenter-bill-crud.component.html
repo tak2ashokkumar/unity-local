@@ -1,0 +1,98 @@
+<ng-template #billFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Bill
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="billModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="billForm" [formGroup]="billForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Datacenters<em>*</em></label>
+            <multiselect-dropdown [options]="datacenters" [settings]="dcSettings" class="form-control p-0" style="height:auto;"
+              formControlName="datacenters" [ngClass]="{'is-invalid' : billFormErrors.datacenters}" [isDisabled]="billId"></multiselect-dropdown>
+            <div class="invalid-feedback" *ngIf="billFormErrors.datacenters">{{billFormErrors.datacenters}}</div>
+          </div>
+          <div class="form-group col-6 mb-1">
+            <label class="form-col-form-label" for="contract_date">Contract Date<em>*</em></label>
+            <div class="input-group-append " [owlDateTimeTrigger]="contractDate">
+            </div>
+            <owl-date-time #contractDate [pickerType]="'calendar'"></owl-date-time>
+            <input class="form-control" [owlDateTimeTrigger]="contractDate" [owlDateTime]="contractDate" type="text"
+              formControlName="contract_date" [ngClass]="{'is-invalid' : billFormErrors.contract_date}" [required]="true">
+            <div class="invalid-feedback" *ngIf="billFormErrors.contract_date">{{billFormErrors.contract_date}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="font-col-form-label" for="cabinet_rental_model">Cabinet Rental Model<em>*</em></label>
+            <select id="cabinet_rental_model" class="form-control" formControlName="cabinet_rental_model"
+              [class.is-invalid]="billFormErrors.cabinet_rental_model">
+              <option [value]="cabinetRentalModels.FULL_CABINET">Full Cabinet</option>
+              <option [value]="cabinetRentalModels.RU">RU</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="billFormErrors.cabinet_rental_model">{{billFormErrors.cabinet_rental_model}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Cabinet Unit Cost<em>*</em></label>
+            <input id="cabinet_unit_cost" class="form-control" type="number" min="1" formControlName="cabinet_unit_cost"
+              [class.is-invalid]="billFormErrors.cabinet_unit_cost">
+            <div class="invalid-feedback" *ngIf="billFormErrors.cabinet_unit_cost">{{billFormErrors.cabinet_unit_cost}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="power_circuit">
+            <label class="font-col-form-label" for="power_circuitid">Power Circuit<em>*</em></label>
+            <select id="power_circuitid" class="form-control" formControlName="id" [class.is-invalid]="billFormErrors.power_circuit.id">
+              <option value="" disabled>Select Power Circuit</option>
+              <option *ngFor="let powerCircuit of powerCircuits" [value]="powerCircuit.id">{{powerCircuit.full_name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="billFormErrors.power_circuit.id">{{billFormErrors.power_circuit.id}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Power Circuit Cost<em>*</em></label>
+            <input id="power_circuit_cost_id" class="form-control" type="number" min="1" formControlName="power_circuit_cost"
+              [class.is-invalid]="billFormErrors.power_circuit_cost">
+            <div class="invalid-feedback" *ngIf="billFormErrors.power_circuit_cost">{{billFormErrors.power_circuit_cost}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="font-col-form-label" for="redundant_power">Redundant Power<em>*</em></label>
+            <select id="redundant_power" class="form-control" formControlName="redundant_power" [class.is-invalid]="billFormErrors.redundant_power">
+              <option [value]="''" disabled>Select</option>
+              <option [value]="true">Yes</option>
+              <option [value]="false">No</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="billFormErrors.redundant_power">{{billFormErrors.redundant_power}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmBillCreate()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="billModelRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmBillDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Bill for the datacenter will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmBillDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmBillDeleteModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

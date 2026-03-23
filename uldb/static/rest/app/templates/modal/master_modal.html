@@ -1,0 +1,185 @@
+<div class="modal-content">
+    <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)"
+        enctype="multipart/form-data">
+        <div class="modal-header">
+            <h4 class="modal-title" ng-bind="method"></h4>
+        </div>
+        <div class="modal-body" style="padding:20px 40px; padding-bottom: 0px;">
+
+            <div class="modal-form">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="paddingR"
+                        ng-class="{'col-xs-6 col-sm-6 col-md-6 col-lg-6':(col.inputMethod.parent_item != 'maintenace_schedule'),
+                         'col-xs-12 col-sm-12 col-md-12 col-lg-12' : (col.inputMethod.parent_item == 'maintenace_schedule') }"
+                        ng-repeat="col in fields">
+                        <div class="form-group"
+                            ng-if="(col.required == undefined || col.required !== false ) &&!(method === 'Edit' && col.hide_on_edit !== undefined) "
+                            ng-class="{'has-error':(modalform.$submitted && modalform[col.description].$invalid)}">
+
+                            <label for="col.description">
+                                {{col.description}} <span ng-if="col.required"> *</span>
+                                <span class="errormsg"
+                                    ng-if="!obj[col.err_msg] && (modalform.$submitted && modalform[col.description].$invalid)">
+                                    &nbsp; ( This Field is Required )</span>
+                                <span class="errormsg" ng-if="obj[col.err_msg] && (modalform.$submitted)">
+                                    &nbsp; ( {{ obj[col.err_msg] }} )</span>
+                            </label>
+
+                            <input ng-if="col.inputMethod === undefined" type="text" class="form-control"
+                                ng-model="obj[col.name]" dynamic-name="col.description" ng-required="col.required"
+                                force-null="col.nullify">
+
+                            <input ng-if="col.inputMethod.type === 'number'" type="number" min="0" class="form-control"
+                                ng-model="obj[col.name]" dynamic-name="col.description" ng-required="col.required"
+                                force-null="col.nullify">
+
+                            <input ng-if="col.inputMethod.type === 'password'" type="password" class="form-control"
+                                ng-model="obj[col.name]" dynamic-name="col.description" ng-required="col.required"
+                                force-null="col.nullify">
+
+                            <select ng-if="col.inputMethod.type === 'choices'" class="form-control"
+                                ng-model="obj[col.name]"
+                                ng-init="obj[col.name] ? '' : obj[col.name] = col.inputMethod.default"
+                                force-null="col.nullify" name="col.description" ng-required="col.required"
+                                ng-disabled="col.disabled"
+                                ng-options="choice for choice in col.inputMethod.choices"></select>
+
+                            <select ng-if="col.inputMethod.type === 'obj_choices'" class="form-control"
+                                ng-model="obj[col.name]" force-null="col.nullify" name="col.description"
+                                ng-required="col.required" ng-disabled="col.disabled"
+                                ng-options="choice[col.inputMethod.valueAccessor] as choice[col.inputMethod.displayAccessor] for choice in col.inputMethod.choices"></select>
+
+                            <multiselect ng-if="col.inputMethod.type === 'multiple'" ng-model="obj[col.name]"
+                                id-prop="{{ col.inputMethod.idProp }}" display-prop="{{ col.inputMethod.displayProp}}"
+                                options="col.inputMethod.choices" show-search="true" class="form-control"
+                                style="padding: 0px; border:none;"></multiselect>
+
+                            <input ng-if="col.inputMethod.type === 'typeahead'" class="form-control"
+                                ng-model="obj[col.name]"
+                                uib-typeahead="rel as rel[col.inputMethod.accessor] for rel in col.inputMethod.invoker($viewValue)"
+                                typeahead-on-select="col.output($item, $model, $label, $event)"
+                                dynamic-name="col.description" ng-required="col.required" force-null="col.nullify">
+
+                            <datetimepicker id="small_datepicker"
+                                ng-if="col.inputMethod.type == 'datetime' && (col.description !== 'Start Date')  && (col.description !== 'End Date') && (col.name !== 'end_of_life') && (col.name !== 'end_of_service')"
+                                data-ng-model="obj[col.name]" ng-required="col.required"
+                                data-datetimepicker-config="{ minView: 'day' }" dynamic-name="col.description"
+                                style="width:90%;">
+                            </datetimepicker>
+
+                            <div ng-if="(col.inputMethod.type == 'datetime') && (col.name === 'end_of_life')">
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle" id="eoldropdown" role="button" data-toggle="dropdown"
+                                        data-target="#">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" data-ng-model="obj[col.name]"
+                                                data-date-time-input="MMMM D, YYYY">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <datetimepicker data-ng-model="obj[col.name]" ng-required="col.required"
+                                            dynamic-name="col.description" data-datetimepicker-config="{ dropdownSelector: '#eoldropdown', startView: 'day', minView: 'day',
+                                            modelType: 'YYYY-MM-DDTHH:mm:ss.sssZ' }" />
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div ng-if="(col.inputMethod.type == 'datetime') && (col.name === 'end_of_service')">
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle" id="eosdropdown" role="button" data-toggle="dropdown"
+                                        data-target="#">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" data-ng-model="obj[col.name]"
+                                                data-date-time-input="MMMM D, YYYY">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <datetimepicker data-ng-model="obj[col.name]" ng-required="col.required"
+                                            dynamic-name="col.description" data-datetimepicker-config="{ dropdownSelector: '#eosdropdown', startView: 'day', minView: 'day',
+                                            modelType: 'YYYY-MM-DDTHH:mm:ss.sssZ' }" />
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div ng-if="(col.inputMethod.type == 'datetime') && (col.description === 'Start Date')">
+                                <div class="dropdown form-group dropdown-start-parent Maintenancecal">
+                                    <a class="dropdown-toggle" id="dropdownStart" role="button" data-toggle="dropdown"
+                                        data-target="#">
+                                        <div class="input-group date">
+                                            <input type="text" class="form-control"
+                                                data-date-time-input="D MMM, YYYY h:mm A" data-ng-model="obj[col.name]">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <datetimepicker data-ng-model="obj[col.name]" ng-required="col.required"
+                                            dynamic-name="col.description"
+                                            data-datetimepicker-config="{ dropdownSelector: '#dropdownStart', renderOn: 'end-date-changed'}"
+                                            data-before-render="startDateBeforeRender()"
+                                            data-on-set-time="startDateOnSetTime()"></datetimepicker>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div ng-if="(col.inputMethod.type == 'datetime') && (col.description === 'End Date')">
+                                <div class="dropdown form-group dropdown-start-parent Maintenancecal">
+                                    <a class="dropdown-toggle" id="dropdownEnd" role="button" data-toggle="dropdown"
+                                        data-target="#">
+                                        <div class="input-group date">
+                                            <input type="text" class="form-control"
+                                                data-date-time-input="D MMM, YYYY h:mm A" data-ng-model="obj[col.name]">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                                        <datetimepicker data-ng-model="obj[col.name]" ng-required="col.required"
+                                            dynamic-name="col.description"
+                                            data-datetimepicker-config="{ dropdownSelector: '#dropdownEnd', renderOn: 'start-date-changed'}"
+                                            data-before-render="endDateBeforeRender()"
+                                            data-on-set-time="endDateOnSetTime()"></datetimepicker>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div ng-if="col.inputMethod.type === 'logo'" class="form-group">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn" style="pointer-events:none;">Select File </button>
+                                    <button type="button" class="btn btn-primary" ngf-select ng-model="obj.logo"
+                                        ngf-model-invalid="errorFile" name="logo" ngf-max-size="700KB">
+                                        <i class="fa fa-upload"></i>
+                                    </button>
+                                    <span ng-if="modalform.logo.$valid"> &nbsp; &nbsp; {{obj.logo.name}} </span>
+                                    <span ng-if="modalform.logo.$error.maxSize">
+                                        &nbsp; &nbsp; File too large [Uploaded {{errorFile.size / 1000000 | number :
+                                        1}}MB : Max allowed 700KB]
+                                    </span>
+
+                                </div>
+                                <div>( * Image ratio needs to be 1:4 and max allowed size is 700KB)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                    Cancel
+                </button>
+                <button ng-if="method === 'Edit'" type="submit" class="btn btn-default">
+                    Save
+                </button>
+                <button ng-if="method === 'Add'" type="submit" class="btn btn-default">
+                    Save
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

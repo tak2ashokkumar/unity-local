@@ -1,0 +1,37 @@
+<div class="modal-header">
+  <h3 class="modal-title">{{ method }} {{ title.singular }}</h3>
+</div>
+
+<div class="modal-body" style="height: 400px;">
+  <form class="form-horizontal">
+
+    <div class="form-group" ng-repeat="row in rows" ng-if="row.required">
+      <label for="blockName" class="col-sm-2 control-label">
+        {{ row.description }}
+      </label>
+
+      <div class="col-sm-10" ng-if="row.opaque === undefined">
+        <input type="text" class="form-control" ng-model="obj[row.name]">
+      </div>
+
+      <div class="col-sm-10" ng-if="row.opaque !== undefined">
+        <input type="text" class="form-control" ng-model="obj[row.name]"
+               placeholder=""
+               uib-typeahead="obj as obj[row.subfield] for obj in row.render($viewValue)">
+      </div>
+    </div>
+  </form>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" type="button" ng-click="cancel()">
+    No, not right now.
+  </button>
+  <button ng-if="method === 'Add'" class="btn btn-primary" type="button" ng-click="add(obj)">
+    Create!
+  </button>
+  <button ng-if="method === 'Edit'" class="btn btn-primary" type="button" ng-click="edit(obj, selection.index)">
+    Save changes!
+  </button>
+</div>

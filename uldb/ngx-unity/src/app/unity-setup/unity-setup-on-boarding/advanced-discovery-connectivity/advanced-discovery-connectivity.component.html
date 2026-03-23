@@ -1,0 +1,138 @@
+<div class="card text-center" *ngIf="!viewData.length">
+  <div class="card-body">
+    <div class="row py-5">
+      <div class="col-12 text-center">
+        <h4 class="mb-3">Welcome to Onboarding</h4>
+      </div>
+      <div class="col-12 text-center">
+        <p class="text-muted">First step toward onboarding using advanced device discovery is <span
+            class="text-dark font-500">Connectivity</span></p>
+      </div>
+      <div class="col-12">
+        <div class="d-flex justify-content-center">
+          <div class="btn-group pull-right" dropdown accessControl moduleName="UnityCollector"
+            accessType="Manage UnityCollector" elementType="div">
+            <!-- <button id="button-basic" dropdownToggle type="button" aria-controls="collector-download"
+              class="btn btn-warning btn-sm btn-pill dropdown-toggle"> Download Image <span class="caret"></span>
+            </button> -->
+            <ul id="collector-download" *dropdownMenu class="dropdown-menu text-center" role="menu">
+              <li role="menuitem">
+                <a *ngIf="vmWareCollectorUrl" class="dropdown-item p-2 font-sm" href="{{vmWareCollectorUrl}}">VMware</a>
+              </li>
+              <li role="menuitem">
+                <a *ngIf="hyperVCollectorUrl" class="dropdown-item p-2 font-sm"
+                  href="{{hyperVCollectorUrl}}">Hyper-V</a>
+              </li>
+            </ul>
+          </div>
+          <button class="btn btn-warning btn-sm btn-pill ml-2" (click)="addAgent()" accessControl
+            moduleName="UnityCollector" accessType="Register UnityCollector" elementType="btn">Add Collector</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="card text-center" *ngIf="viewData.length">
+  <div class="card-header bg-transparent border-bottom-0 py-2">
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-warning btn-sm btn-pill pull-right ml-1" (click)="addAgent()"
+          [disabled]="!userInfo.isZabbixMonitoring" accessControl moduleName="UnityCollector"
+          accessType="Register UnityCollector" elementType="btn">Add Collector</button>
+        <div class="btn-group pull-right" dropdown accessControl moduleName="UnityCollector"
+          accessType="Manage UnityCollector" elementType="div">
+          <!-- <button id="button-basic" dropdownToggle type="button" aria-controls="collector-download"
+            class="btn btn-warning btn-sm btn-pill dropdown-toggle"> Download Collector <span class="caret"></span>
+          </button> -->
+          <ul id="collector-download" *dropdownMenu class="dropdown-menu text-center" role="menu">
+            <li role="menuitem">
+              <a *ngIf="vmWareCollectorUrl" class="dropdown-item p-2 font-sm" href="{{vmWareCollectorUrl}}">VMware</a>
+            </li>
+            <li role="menuitem">
+              <a *ngIf="hyperVCollectorUrl" class="dropdown-item p-2 font-sm" href="{{hyperVCollectorUrl}}">Hyper-V</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body pt-0">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th>Collector Name</th>
+          <th>IP Address</th>
+          <th>SSH User</th>
+          <th>SSH Port</th>
+          <th>Deployment Status</th>
+          <th>Created On</th>
+          <th>Test Result</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr *ngIf="scanForm" [formGroup]="scanForm">
+        <td>
+          <input class="form-control" formControlName="inet" [ngClass]="{'is-invalid' : formErrors.inet}" type="text">
+        </td>
+        <td colspan="2" class="align-middle">
+          <small class="text-danger" *ngIf="formErrors.inet">{{formErrors.inet}}</div>
+        </td>
+        <td class="align-middle">
+          <button class="btn btn-success btn-sm btn-pill" (click)="submitNewScan()">Initiate Scanning</button>
+          <button class="ml-2 btn btn-danger btn-sm btn-pill" (click)="cancelNewScan()">Cancel</button>
+        </td>
+      </tr> -->
+        <tr *ngFor="let view of viewData">
+          <td class="align-middle">{{view.agentName}}</td>
+          <td class="align-middle">{{view.ipAddress}}</td>
+          <td class="align-middle">{{view.sshUser}}</td>
+          <td class="align-middle">{{view.sshPort}}</td>
+          <td class="align-middle">{{view.deplymentState}}</td>
+          <td class="align-middle">{{view.createdOn}}</td>
+          <td class="align-middle">
+            <table>
+              <tr>
+                <td class="p-0 border-0"><button class="test-result-action-icons mb-0 fas fa-link font-sm ml-1"
+                    container="body" [tooltip]="view.testResult?.ping?.msg"
+                    [ngClass]="{'test-success': view.testResult?.ping?.result, 'test-fail': !view.testResult?.ping?.result, 'test-result-action-icons-disabled': view.testing}"></button>
+                </td>
+                <td class="p-0 border-0"><button class="test-result-action-icons mb-0 fas fa-lock font-sm ml-1"
+                    container="body" [tooltip]="view.testResult?.ssh?.msg"
+                    [ngClass]="{'test-success': view.testResult?.ssh?.result, 'test-fail': !view.testResult?.ssh?.result, 'test-result-action-icons-disabled': view.testing}"></button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" class="text-center small p-0 border-0">{{view.testResult?.date}}</td>
+              </tr>
+            </table>
+          </td>
+          <td colspan="2" class="align-middle">
+            <button class="action-icons mb-0 font-sm ml-1" [class]="view.testConnectionIcon" container="body"
+              [tooltip]="view.testConnectionTooltipMsg" (click)="testConnection(view)" accessControl
+              moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1" [tooltip]="view.newTabToolipMessage"
+              [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" (click)="consoleNewTab(view)" accessControl
+              moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" container="body" tooltip="Edit"
+              (click)="editAgent(view)" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+              (click)="createTicket(view)"></button>
+            <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body" tooltip="Delete"
+              (click)="deleteConfig(view)" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
+              elementType="actionbtn"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="viewData.length==0" class="text-center py-3">No configurations to display</p>
+    <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="goTo('onboarding')" accessControl
+      moduleName="Onboarding" accessType="View Onboarding" elementType="btn">Import
+      Inventory</button>
+    <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="goTo('advanced-discovery')"
+      accessControl moduleName="Onboarding" accessType="View Onboarding" elementType="btn">Discovery</button>
+  </div>
+</div>

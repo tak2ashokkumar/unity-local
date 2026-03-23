@@ -1,0 +1,99 @@
+
+     
+<div class="panel panel-default">
+<!-- Header -->
+	<div class="panel-heading">
+		<h4>Edit Cabinet</h4>
+	</div>
+<!-- END Header -->
+<!-- Content -->
+	<div class="panel-body scrollsize">
+		<form role="form"id="postform" action="" method="post">
+    			<input type='hidden' name='csrfmiddlewaretoken' id="csrf_token" value={{csrf_token}} />
+ 		</form>
+		<form enctype='application/json' action="" method="post" id="cabinet_add" role="form">
+
+			<div class="form-group">
+				
+				<label for="id_salesforce" title="The Salesforce ID is contained within the URL of the asset on salesforce.com. For instance, SF10-CAB-7.01 would be located at https://na4.salesforce.com/a0R60000003NREJ, therefore the Salesforce ID is a0R60000003NREJ. Some URLs may have a question mark (?) in the URL path; when a question mark (?) is present, the Salesforce ID is everything in the path before the question mark." class="optional">Salesforce ID </label>					
+				
+				<input class="form-control" id="id_salesforce" maxlength="128" name="salesforce_id" type="text" 				ng-model="cabinet.salesforce_id" ng-value="salesforce_id" data4="alphanumeric" ng-keypress="ClearValidation()">
+			</div>
+			
+			<div class="form-group">
+				
+				<label for="id_name" class="required">Name *</label>					
+				
+				<input class="form-control" id="id_name" maxlength="128" name="name" ng-model="cabinet.name"
+				type="text" data4="alphanumeric" ng-value="name" ng-keypress="ClearValidation()">
+				<label class="errormsg" ng-if="nameerr">{{ cabnameMsg }}</label>
+			</div>
+			
+			<div class="form-group">
+				
+				<label for="id_datacenter" class="required">Datacenter *</label>
+						
+				
+				<div class="form-inline">
+					<select id="id_datacenter" class="form-control" ng-model="cabinet.datacenter" 							ng-options="dc.url as dc.datacenter_name for dc in datacenter" style="width:100%;">
+						<option style="display:none" value="">Select Here</option>
+					</select>
+					<label class="errormsg" ng-if="dcerr">{{ cabdcMsg }}</label>	
+				</div>
+			</div>
+			<div class="form-group">
+                           <label for="orgName" class="required">Customer *</label>
+                            <div class="form-group form-inline">
+                             <input type="text" id="orgName" class="form-control"
+			     ng-model="cabinet.customer" ng-value="cabinet_customer"
+			     placeholder="Type customer to filter..."
+			     typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="" ng-keypress="ClearValidation();ClearURL;">
+				<label class="errormsg" ng-if="cabcustomererr">{{ cabcustomerMsg }}</label>
+                            </a>
+                           </div>
+                        </div>
+			<div class="form-group">
+				
+				<label for="id_cage" class="optional">Cage </label>
+						
+				<div class="form-inline">
+					<select id="id_cage" class="form-control" ng-model="cabinet.cage" 							ng-options="cage.url as cage.name for cage in cage" style="width:100%;">
+						<option style="display:none" value="">Select Here</option>
+					</select>
+					<label class="errormsg" ng-if="cageerr">{{ cabcageMsg }}</label>
+				</div>
+			</div>
+                        <div class="form-group">
+				
+				<label for="id_cabinet_model" class="required">Cabinet Model *</label>
+						
+                                
+                                <div class="form-inline">
+                                        <select id="id_cabinet_model" class="form-control" ng-model="cabinet.cabinet_model" 							ng-options="cm.url as cm.model for cm in cabinet_model" style="width:100%;">
+						<option style="display:none" value="">Select Here</option>
+					</select>
+					<label class="errormsg" ng-if="cabmodelerr">{{ cabmodelMsg }}</label>
+                                </div>
+                        </div>
+			<div class="form-group">
+				
+				<label for="id_cabinet_type" class="required">Cabinet Type *</label>		
+				
+				<div class="form-inline">
+					<select id="id_cabinet_type" class="form-control" ng-model="cabinet.cabinet_type" 							ng-options="type.url as type.cabinet_type for type in cabinet_type" style="width:100%;">
+						<option style="display:none" value="">Select Here</option>
+					</select>
+					<label class="errormsg" ng-if="cabtypeerr">{{ cabtypeMsg }}</label>
+				</div>
+				
+			</div>
+                        
+			<button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="cancelCabEdit()">Cancel</button>
+			<button type="button" class="btn btn-success" id="finishbutton" ng-click="saveCabEdit()">Save</button>
+		</form>
+	</div>
+</div>
+<!-- END Content -->
+
+	
+

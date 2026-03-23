@@ -1,0 +1,316 @@
+<div class="row">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between font-weight-bold bg-transparent px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span>Details</span>
+                    </div>
+                    <div class="">
+                        <button class="action-icons fas fa-angle-down font-sm pull-right mr-2"
+                            [tooltip]="isDetailsOpen ? 'Minimize' : 'Expand'" (click)="toggleAccordion()"
+                            [attr.aria-expanded]="isDetailsOpen"></button>
+                    </div>
+                </div>
+                <div class="card-body" [collapse]="!isDetailsOpen">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="name" class="col-3 col-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="detailFormErrors.name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                        {{detailFormErrors.name}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="region_host" class="col-3 col-form-label">Region Host</label>
+                                <div class="col-9">
+                                    <input id="region_host" class="form-control" type="text"
+                                        formControlName="region_host" [class.is-invalid]="detailFormErrors.region_host"
+                                        readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.region_host">
+                                        {{detailFormErrors.region_host}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="licensing_model" class="col-3 col-form-label">Licensing Model</label>
+                                <div class="col-9">
+                                    <input id="licensing_model" class="form-control" type="text"
+                                        formControlName="licensing_model" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.licensing_model">
+                                        {{detailFormErrors.licensing_model}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="network_count" class="col-3 col-form-label">Network Count</label>
+                                <div class="col-9">
+                                    <input id="network_count" class="form-control" type="text"
+                                        formControlName="network_count" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.network_count">
+                                        {{detailFormErrors.network_count}}</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="organization_id" class="col-3 col-form-label">Organization Id</label>
+                                <div class="col-9">
+                                    <input id="organization_id" class="form-control" type="text"
+                                        formControlName="organization_id"
+                                        [class.is-invalid]="detailFormErrors.organization_id" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.organization_id">
+                                        {{detailFormErrors.organization_id}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="region_name" class="col-3 col-form-label">Region Name</label>
+                                <div class="col-9">
+                                    <input id="region_name" class="form-control" type="text"
+                                        formControlName="region_name" [class.is-invalid]="detailFormErrors.region_name"
+                                        readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.region_name">
+                                        {{detailFormErrors.region_name}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="licenses" class="col-3 col-form-label">Licenses</label>
+                                <div class="col-9">
+                                    <input id="licenses" class="form-control" type="text" formControlName="licenses"
+                                        [class.is-invalid]="detailFormErrors.licenses" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.licenses">
+                                        {{detailFormErrors.licenses}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="devices_count" class="col-3 col-form-label">Devices Count</label>
+                                <div class="col-9">
+                                    <input id="devices_count" class="form-control" type="text"
+                                        formControlName="devices_count" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.devices_count">
+                                        {{detailFormErrors.devices_count}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form *ngIf="licenseDataForm" [formGroup]="licenseDataForm">
+
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between font-weight-bold bg-transparent px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span>License</span>
+                    </div>
+                    <div class="">
+                        <button class="action-icons fas fa-angle-down font-sm pull-right mr-2"
+                            [tooltip]="isLicenseOpen ? 'Minimize' : 'Expand'" (click)="toggleLicenseAccordian()"
+                            [attr.aria-expanded]="isLicenseOpen"></button>
+                    </div>
+                </div>
+                <div class="card-body" [collapse]="!isLicenseOpen">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="expiry_date" class="col-3 col-form-label">Expiry Date</label>
+                                <div class="col-9">
+                                    <input id="expiry_date" class="form-control" type="text"
+                                        formControlName="expiry_date" [class.is-invalid]="detailFormErrors.expiry_date">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.expiry_date">
+                                        {{detailFormErrors.expiry_date}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="status" class="col-3 col-form-label">Status</label>
+                                <div class="col-9">
+                                    <input id="status" class="form-control" type="text" formControlName="status"
+                                        [class.is-invalid]="detailFormErrors.status">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.status">
+                                        {{detailFormErrors.status}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="licensed_device_count" class="col-3 col-form-label">Licensed Device
+                                    Count</label>
+                                <div class="col-9">
+                                    <input id="licensed_device_count" class="form-control" type="text"
+                                        formControlName="licensed_device_count"
+                                        [class.is-invalid]="detailFormErrors.licensed_device_count">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="detailFormErrors.licensed_device_count">
+                                        {{detailFormErrors.licensed_device_count}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form *ngIf="licenseStateForm" [formGroup]="licenseStateForm">
+
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between font-weight-bold bg-transparent px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span>License State</span>
+                    </div>
+                    <div class="">
+                        <button class="action-icons fas fa-angle-down font-sm pull-right mr-2"
+                            [tooltip]="isLicenseDataOpen ? 'Minimize' : 'Expand'" (click)="toggleLicenseDataAccordian()"
+                            [attr.aria-expanded]="isLicenseDataOpen"></button>
+                    </div>
+                </div>
+                <div class="card-body" [collapse]="!isLicenseDataOpen">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="active" class="col-3 col-form-label">Active</label>
+                                <div class="col-9">
+                                    <input id="active" class="form-control" type="text" formControlName="active"
+                                        [class.is-invalid]="detailFormErrors.active">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.active">
+                                        {{detailFormErrors.active}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="expiring" class="col-3 col-form-label">Expiring</label>
+                                <div class="col-9">
+                                    <input id="expiring" class="form-control" type="text"
+                                        formControlName="expiring"
+                                        [class.is-invalid]="detailFormErrors.expiring">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.expiring">
+                                        {{detailFormErrors.expiring}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="unused" class="col-3 col-form-label">Unused</label>
+                                <div class="col-9">
+                                    <input id="unused" class="form-control" type="text"
+                                        formControlName="unused"
+                                        [class.is-invalid]="detailFormErrors.unused">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.unused">
+                                        {{detailFormErrors.unused}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="expired" class="col-3 col-form-label">Expired</label>
+                                <div class="col-9">
+                                    <input id="expired" class="form-control" type="text"
+                                        formControlName="expired"
+                                        [class.is-invalid]="detailFormErrors.expired">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.expired">
+                                        {{detailFormErrors.expired}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="recently_queued" class="col-3 col-form-label">Recently Queued</label>
+                                <div class="col-9">
+                                    <input id="recently_queued" class="form-control" type="text"
+                                        formControlName="recently_queued"
+                                        [class.is-invalid]="detailFormErrors.recently_queued">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="detailFormErrors.recently_queued">
+                                        {{detailFormErrors.recently_queued}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="unused_active" class="col-3 col-form-label">Unused Active</label>
+                                <div class="col-9">
+                                    <input id="unused_active" class="form-control" type="text"
+                                        formControlName="unused_active"
+                                        [class.is-invalid]="detailFormErrors.unused_active">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="detailFormErrors.unused_active">
+                                        {{detailFormErrors.unused_active}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <form *ngIf="systemManagerForm" [formGroup]="systemManagerForm">
+
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between font-weight-bold bg-transparent px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span>System Manager</span>
+                    </div>
+                    <div class="">
+                        <button class="action-icons fas fa-angle-down font-sm pull-right mr-2"
+                            [tooltip]="isSystemManagerOpen ? 'Minimize' : 'Expand'" (click)="toggleSystemManagerAccordian()"
+                            [attr.aria-expanded]="isSystemManagerOpen"></button>
+                    </div>
+                </div>
+                <div class="card-body" [collapse]="!isSystemManagerOpen">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="total_seats" class="col-3 col-form-label">Total Seats </label>
+                                <div class="col-9">
+                                    <input id="total_seats" class="form-control" type="text" formControlName="total_seats"
+                                        [class.is-invalid]="detailFormErrors.total_seats">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.total_seats">
+                                        {{detailFormErrors.total_seats}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="unassigned_seats" class="col-3 col-form-label">Unassigned Seats</label>
+                                <div class="col-9">
+                                    <input id="unassigned_seats" class="form-control" type="text"
+                                        formControlName="unassigned_seats"
+                                        [class.is-invalid]="detailFormErrors.unassigned_seats">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.unassigned_seats">
+                                        {{detailFormErrors.unassigned_seats}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="active_seats" class="col-3 col-form-label">Active Seats</label>
+                                <div class="col-9">
+                                    <input id="active_seats" class="form-control" type="text"
+                                        formControlName="active_seats"
+                                        [class.is-invalid]="detailFormErrors.active_seats">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.active_seats">
+                                        {{detailFormErrors.active_seats}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="org_wise_enrolled_devices" class="col-3 col-form-label">Org Wide Enrolled Devices</label>
+                                <div class="col-9">
+                                    <input id="org_wise_enrolled_devices" class="form-control" type="text"
+                                        formControlName="org_wise_enrolled_devices"
+                                        [class.is-invalid]="detailFormErrors.org_wise_enrolled_devices">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="detailFormErrors.org_wise_enrolled_devices">
+                                        {{detailFormErrors.org_wise_enrolled_devices}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-12 mb-4" *ngIf="deviceId && device.deviceType && view">
+        <device-details-components [deviceType]="device.deviceType" [deviceId]="deviceId"></device-details-components>
+    </div>
+</div>

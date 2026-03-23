@@ -1,0 +1,165 @@
+<ng-container>
+    <ng-template #eventTypeKeywordRef>
+        <form *ngIf="selectedEventType" [formGroup]="eventKeywordForm">
+            <div class="form-group">
+                <input class="form-control" type="text" formControlName="keyword"
+                    [ngClass]="{'is-invalid' : eventKeywordFormErrors.keyword}">
+            </div>
+            <div class="invalid-feedback" *ngIf="eventKeywordFormErrors.keyword">
+                {{eventKeywordFormErrors.keyword}}
+            </div>
+            <div class="form-group">
+                <button class="btn btn-sm btn-primary" type="button" (click)="onSubmitEventTypeKeyword()">Add</button>
+            </div>
+        </form>
+    </ng-template>
+
+    <ng-template #eventCategoryListRef>
+        <div class="col-12 py-2">
+            <table-search-box (searched)="onSearchedEvent($event)"></table-search-box>
+        </div>
+        <div class="form-check checkbox" *ngFor="let s of eventCategories; let a=index">
+            <label *ngIf="!selectedEventType.name.includes(s.name)">
+                <input class="form-check-input" type="checkbox" [value]="s.name"
+                    (change)="onEventCategoryChecked($event, s.name)">{{
+                s.name }}
+            </label>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-sm btn-primary" type="button" (click)="onSubmitEventCategory()">Add</button>
+        </div>
+
+    </ng-template>
+
+
+    <div class="container-fluid mt-3">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card rounded-0 border-top-0">
+                                <div
+                                    class="card-header bg-transparent border-bottom-0 d-flex justify-content-between py-2">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <span class="text-muted font-sm mt-1 ml-2">
+                                            <span class="badge badge-secondary rounded-3">{{eventTypes.length}}</span>
+                                            <span class="ml-1">Manage Event Types</span>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button"
+                                            (click)="addEventType()">Add Event Type</button>
+                                    </div>
+                                </div>
+                                <div class="card-body pt-0">
+                                    <table class="table mb-0">
+                                        <thead>
+                                            <th>Event Type</th>
+                                            <th>Keyword</th>
+                                            <th>Action</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let view of eventTypes; let i = index" setTableColumnWidth>
+                                                <td>
+                                                    <div class="row" *ngIf="view.onForm">
+                                                        <div class="col-10">
+                                                            <form *ngIf="view.eventForm" [formGroup]="view.eventForm">
+                                                                <div class="form-group mb-0">
+                                                                    <input id="name" type="text" formControlName="name"
+                                                                        placeholder="Enter Event Name"
+                                                                        class="form-control p-0 event-form-control">
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="col-2 px-0 pt-2 text-center">
+                                                            <a class="fas fa-check text-muted"
+                                                                (click)="onSubmitEvent(view)"></a>
+                                                            <a class="card-header-action btn-close text-muted ml-3"
+                                                                (click)="resetEventName(view)">
+                                                                <i class="fas fa-times"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="!view.onForm" (click)="onEditEvent(i)">{{view.name}}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="keywords-container">
+                                                        <div *ngFor="let keyword of view.keywords; let j = index"
+                                                            class="btn btn-pill btn-light btn-sm ml-2 w-auto text-muted">
+                                                            {{ keyword }}
+                                                            <a class="card-header-action btn-close text-muted"
+                                                                (click)="deleteKeyword(i,j)">
+                                                                <i class="fas fa-times ml-1"></i>
+                                                            </a>
+                                                        </div>
+                                                        <span
+                                                            class="fas fa-plus-circle text-primary fa-lg pointer-link ml-1"
+                                                            (click)="addEventTypeKeyword(i); $event.stopPropagation();$event.preventDefault();"
+                                                            [popover]="eventTypeKeywordRef" container="body"
+                                                            [outsideClick]="true" [isOpen]="view.isAddkeywordsPopover"
+                                                            tooltip="Add Keyword"></span>
+                                                    </div>
+                                                </td>
+                                                <!-- <td>
+                                                    <div class="keywords-container">
+                                                        <div *ngFor="let category of view.categories; let j = index"
+                                                            class="btn btn-pill btn-light btn-sm ml-2 w-auto text-muted">
+                                                            {{ category }}
+                                                            <a class="card-header-action btn-close text-muted"
+                                                                (click)="deleteEventCategoryKeyword(i,j)">
+                                                                <i class="fas fa-times ml-1"></i>
+                                                            </a>
+                                                        </div>
+                                                        <span
+                                                            class="fas fa-plus-circle text-primary fa-lg pointer-link ml-1"
+                                                            (click)="bindEventCategoryToEventType(i);$event.stopPropagation();$event.preventDefault();"
+                                                            [popover]="eventCategoryListRef" container="body"
+                                                            [outsideClick]="true" [isOpen]="view.isAddEventTypePopover"
+                                                            tooltip="Add Event-Category"></span>
+                                                    </div>
+                                                </td> -->
+                                                <td class="action-icons-column">
+                                                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1"
+                                                        tooltip="Delete" (click)="eventDelete(view.uuid, i)"></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div *ngIf="!eventTypes.length"
+                                        class="d-flex py-5 justify-content-center align-items-center">
+                                        No Event Types available.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #confirmdelete>
+        <div class="card mb-0">
+            <div class="card-header">
+                Confirm Delete
+                <div class="card-header-actions">
+                    <a class="card-header-action btn-close" (click)="confirmEventDeleteModalRef.hide()">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                This event will be deleted. Are you sure you want to delete?
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                    (click)="confirmEventDelete()">Yes</button>
+                <button class="btn btn-sm btn-danger pull-right" (click)="confirmEventDeleteModalRef.hide()"
+                    type="button">No</button>
+            </div>
+        </div>
+    </ng-template>
+
+</ng-container>

@@ -1,0 +1,29 @@
+<tab heading="maintaince_schedules">
+	<div class="col-sm-12 panelbodyborder box-container" ng-controller="UladminController">
+		<div class="row">
+			<div class="col-sm-5 pull-left">
+				<h4>Customers</h4>
+			</div>
+			<div class="col-sm-5 pull-right no-sides-padding">
+				<input type="text" id="orgName" class="form-control" ng-model="server.customer" placeholder="Search...">
+			</div>
+		</div>
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th ng-repeat="row in customers.customers.headers">
+						<div ng-if="row.hide === undefined">{{ row | uppercase }}</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="row in customers.customers.info">
+					<td><div>{{ row.name }}</div></td>
+					<td><div>{{ row.aws_ai }}</div></td>
+					<td><div>{{ row.region }}</div></td>
+					<td><div>{{ row.created_at }}</div></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</tab>

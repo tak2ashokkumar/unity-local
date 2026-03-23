@@ -1,0 +1,168 @@
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4>Edit Virtual Datacenter</h4>
+	</div>
+	<div class="panel-body">
+		<!--<form role="form" method="post" id="postform">-->
+		<form role="form"id="postform" action="" method="post">
+    			<input type='hidden' name='csrfmiddlewaretoken' id="csrf_token" value={{csrf_token}} />
+ 		</form>
+ 		<form role="form" id="virtualdatacenter_add" action="" method="post" enctype='application/json'>
+			
+			<div class="form-group">
+				
+				<label for="id_cloud_customer" class="required">Customer *</label>
+				<div class="form-group">				
+			      	 	<input type="text" id="orgName" class="form-control"
+					     ng-model="vdc.customer"
+					     ng-value="vdc_customer"
+					     placeholder="Type customer to filter..."
+				             typeahead-on-select="FillVDCDet($item)"
+					     typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="" 						     		 							 ng-keypress="ClearValidation()" ng-disabled="DisableCustomer">
+
+				 	<label class="errormsg" ng-if="customererr">{{ customerMsg }}</label>				
+				</div>
+			</div>
+			<div class="form-group">				
+				<label for="id_cloud_name" class="required">Virtual Datacenter Name * </label>				
+				<input type="text" id="id_cloud_name" name="name" placeholder="Name" class="form-control" ng-model="vdc.name"  					data4="alphanumeric" ng-keypress="ClearValidation()">
+				<label class="errormsg" ng-if="nameerr">{{ nameMsg }}</label>
+			</div>
+			<div class="form-group">
+				<label for="id_cloud_type" class="required">Cloud Type * </label>					
+				<select id="id_cloud_type" class="form-control" name="cloud_type" ng-model="vdc.cloud_type" 								 					ng-change="ShowVCenter(vdc.cloud_type)" ng-disabled="DisableCloudType">
+					<option value="" style="display:none" selected="selected">Please select</option>
+					<option value="VMware">VMware</option>
+					<option value="OpenStack">OpenStack</option>
+					<option value="Custom">Custom</option>
+ 				 </select>
+				<label class="errormsg" ng-if="cloudtypeerr">{{ cloudtypeMsg }}</label>
+			</div>
+
+			<div class="form-group" ng-if="VisibleVCenter">
+				
+				<label for="id_vcenter" class="opional">vCenter </label>
+						
+				<select id="id_admin_id" class="form-control" ng-model="vdc.vcenter" 				 									 					ng-options="vc as vc.name for vc in virtualcenter track by vc.url" ng-disabled="DisableVCenter" style="width:100%;">
+						<option  value="">Please select</option>
+				</select>
+			</div>
+			<!-- editable -->
+			<div id="serverdiv" class="panel panel-success">
+				<div class="panel-heading">
+					<h3 class="panel-title">Server </h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-sm-5">
+				
+					  <label for="id_cloud_server_alloc" class="optional">Available </label>
+					  <select class="form-control" ng-model="vdc.servers" 				 		  						  						  ng-options="cusser as cusser.instance_name for cusser in cust_servers track by cusser.url" multiple> 						  </select>	
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-danger" ng-click="RemoveServer(vdc.servers,cust_servers)" 							style="margin-left:40px; margin-top:30px;"> > </button><br/>
+						<button type="button" class="btn btn-success" ng-click="AddServer(vdc.inv_servers,inv_servers)" 						style="margin-left:40px;"> < </button>
+					</div>
+					<div class="col-sm-5">
+				
+					  <label for="id_cloud_server_inv" class="optional">From Inventory</label>
+					  <select  class="form-control" ng-model="vdc.inv_servers" 				 			  			  						 							ng-options="invser as invser.instance_name for invser in inv_servers track by invser.url" multiple> </select>		
+				
+					</div>
+				</div>
+			 </div>			 
+			 
+			 <div id="storageserverdiv" class="panel panel-success">
+				<div class="panel-heading">
+					<h3 class="panel-title">Storage Server </h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-sm-5">
+				
+					   <label for="id_cloud_storageserver_alloc" class="optional">Available </label>
+					  
+					   <select class="form-control" ng-model="vdc.storage_Servers" 				 		   				   					 							ng-options="cs as cs.instance_name for cs in cust_san track by cs.url" multiple> </select>			
+			
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-danger" ng-click="RemoveSANS(vdc.storage_Servers,cust_san)" 							style="margin-left:40px; margin-top:30px;"> > </button><br/>
+						<button type="button" class="btn btn-success" ng-click="AddSANS(vdc.inv_storage_Servers,inv_san)" 							style="margin-left:40px;"> < </button>
+					</div>
+					<div class="col-sm-5">
+					   <label for="id_cloud_storageserver_inv" class="optional">From Inventory</label>
+					   <select class="form-control" ng-model="vdc.inv_storage_Servers" 														 							ng-options="is as is.instance_name for is in inv_san track by is.url" multiple> </select>
+					</div>
+				</div>
+			 </div>
+			 <div id="firewalldiv" class="panel panel-success">
+				<div class="panel-heading">
+					<h3 class="panel-title">Firewall</h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-sm-5">
+					   <label for="id_cloud_firewall_alloc" class="optional">Available </label>
+					   
+					   <select class="form-control" ng-model="vdc.firewalls" 																 							ng-options="cf as cf.name for cf in cust_firewall track by cf.url" multiple> </select>
+				
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-danger" ng-click="RemoveFirewall(vdc.firewalls,cust_firewall)" 						style="margin-left:40px;margin-top:30px;"> > </button><br/>
+						<button type="button" class="btn btn-success" 																		 							ng-click="AddFirewall(vdc.inv_firewalls,inv_firewall)" style="margin-left:40px;"> < </button>
+					</div>
+					<div class="col-sm-5">
+					   <label for="id_cloud_firewall_inv" class="optional">From Inventory</label>
+					   <select class="form-control" ng-model="vdc.inv_firewalls" 															 							ng-options="inf as inf.name for inf in inv_firewall track by inf.url" multiple></select>
+					</div>
+				</div>
+			 </div>
+			 <div id="loadbalancerdiv" class="panel panel-success">
+				<div class="panel-heading">
+					<h3 class="panel-title">Load Balancer</h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-sm-5">
+					   <label for="id_cloud_loadbalancer_alloc" class="optional">Available </label>
+					  
+					   <select class="form-control" ng-model="vdc.loadbalancers" 															 							ng-options="cl as cl.name for cl in cust_loadbalancer track by cl.url" multiple> </select>							
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-danger" ng-click="RemoveLoadbalancer(vdc.loadbalancers,cust_loadbalancer)" 						style="margin-left:40px; margin-top:30px;"> > </button><br/>
+						<button type="button" class="btn btn-success" 																		 							ng-click="AddLoadbalancer(vdc.inv_loadbalancers,inv_loadbalancer)" style="margin-left:40px;"> < </button>
+					</div>
+					<div class="col-sm-5">
+					   <label for="id_cloud_loadbalancer_inv" class="optional">From Inventory</label>
+					   <select class="form-control" ng-model="vdc.inv_loadbalancers"  														 							ng-options="inl as inl.name for inl in inv_loadbalancer track by inl.url" multiple> </select>
+					  
+					</div>
+				</div>
+			 </div>
+	
+			 <div id="switchdiv" class="panel panel-success">
+				<div class="panel-heading">
+					<h3 class="panel-title">Switch</h3>
+				</div>
+				<div class="panel-body">
+					<div class="col-sm-5">
+					   <label for="id_cloud_switch_alloc" class="optional">Available </label>
+					  
+					   <select class="form-control" ng-model="vdc.switches"  																 							ng-options="csw as csw.name for csw in cust_switch track by csw.url" multiple>  </select>	
+			
+					</div>
+					<div class="col-sm-2">
+						<button type="button" class="btn btn-danger" ng-click="RemoveSwitch(vdc.switches,cust_switch)" 							style="margin-left:40px; margin-top:30px;">	> </button><br/>
+						<button type="button" class="btn btn-success" ng-click="AddSwitch(vdc.inv_switches,inv_switch)" 						style="margin-left:40px;"> < </button>
+					</div>
+					<div class="col-sm-5">
+					   <label for="id_cloud_switch_inv" class="optional">From Inventory</label>
+					   <select class="form-control" ng-model="vdc.inv_switches" 															 							ng-options="insw as insw.name for insw in inv_switch track by insw.url" multiple> </select>
+					   
+					</div>
+				</div>
+			 </div>
+			<!-- ended -->
+			<button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelVDCEdit()">Cancel</button>
+			<button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveVDCEdit()">Save</button>
+		</form>
+	</div>
+</div>
+

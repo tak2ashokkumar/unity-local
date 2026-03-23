@@ -1,0 +1,2264 @@
+<style type="text/css">
+    input.ng-invalid  { border: 1px solid red; }
+    .poweredOnCss {
+        background-color: #378ad8 !important;
+        color: #FFFFFF !important;
+        border: 1px solid #378ad8;
+    }
+    .small-text{
+        font-size: 20px;
+    }
+    .gray-border-right{
+        border-right: 2px solid #dddddd;
+    }
+    .table-td-padding {
+        padding : 11px 15px !important;
+    }
+    .table>thead>tr>th {
+      padding : 8px 8px;
+    }
+    .table>tbody>tr>td {
+      padding-top: 8px 8px;
+    }
+    .actions_div {
+        min-width: 150px !important;
+    }
+    .uptime_status i{
+      font-size: 15px;
+    }
+
+    .summary .cardbox-inner{
+        padding: 8px;
+        color: #848484;
+        font-size: 15px;
+    }
+
+    .summary .cardbox-inner .device_type{
+      font-size: 11px;
+      color : gray
+    }
+
+    .summary .cardbox-inner .device_category{
+      font-size: 13px;
+    }
+
+    @media only screen  and (min-device-width: 1024px)  and (max-device-width: 1300px)  and (min-resolution: 190dpi){
+      .tabs-level2 .nav>li>a {
+        padding: 8px 6px; 
+      }
+
+      .tabs-level2 .nav-tabs>li.active>a{
+        padding: 8px 6px;
+      }
+    }
+
+    @media (min-resolution: 90dpi ) and (max-resolution: 99dpi ) and (max-width: 1380px){
+      .tabs-level2 .nav>li>a {
+        padding: 8px 6px; 
+      }
+
+      .tabs-level2 .nav-tabs>li.active>a{
+        padding: 8px 6px;
+      }
+    }
+</style>
+
+<div ng-if = "(tabname === 'summary')" class="page_wrapper summary content-wrapper" style="float:left">
+ <loading loader="{{loader}}"></loading>
+ <!--  <div class="content-wrapper"> -->
+  <div class="row">
+      <section id="no-more-tables">
+          <table class="Summary-box table table-condensed">
+            <thead class="summarytd">
+                <tr>
+                  <th>Name</th>
+                  <th>Virtualization Platform</th>
+                  <th>Hypervisors</th>
+                  <th>Virtual Machines</th>
+                  <!-- <th>Network Devices</th> -->
+                  <th>Manage</th>
+                </tr>
+            </thead>
+            <tbody class="summarytd">
+                <tr>
+                  <td>
+                    <!--<a ng-click="cloudRedirect(cloud.uuid, cloud.platform_type, cloud.name)" ng-if="data_availabe">{{ cloud.name }}</a>-->
+                    <a href="#/pc_clouds/{{ cloud.uuid }}/virtual_machines" ng-click="cloudRedirect(cloud.uuid, cloud.platform_type, cloud.name)"   ng-if="data_availabe">{{ cloud.name }}</a>
+                    <span ng-if="!data_availabe">{{ cloud.name }}</span>
+                  </td>
+                  <td>{{ cloud.platform_type }}</td>
+                  <td class="numeric"> 
+                    <i class="fa-server fa fa-fw fa-lg red"></i>{{ cloud.hypervisors.length || 0 }}
+                  </td>
+                  <td>
+                    <i class="fa-object-group fa fa-fw fa-lg blue"></i>{{ vm_summary_count || 0 }}
+                  </td>
+                  <!-- <td>
+                    <i class="fa fa-compress fa-fw fa-lg yellow"> </i>{{ cloud.switches.length || 0 + cloud.load_balancers.length || 0  + cloud.firewalls.length }}
+                  </td> -->
+                  <td>
+                    <div class="action-icons">
+                        <a ng-if="proxy_platform_link" tooltip-class="customClass" uib-tooltip="Manage in Same Tab"
+                           class="fa fa-external-link-square blue-text" ng-href="{{ proxy_platform_link }}"></a>
+                        <a ng-if="proxy_link_cloud" tooltip-class="customClass" uib-tooltip="Manage in New Tab"
+                           ng-click="update_activity_log_entry(cloud)" href="{{ proxy_link_cloud }}" target="_blank"
+                           class="fa fa-external-link blue-text"></a>
+                        <a tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                           ng-click="manage_request_cloud(cloud)" class="fa fa-ticket blue-text"></a>
+                    </div>
+                  </td>
+                </tr>
+            </tbody>
+          </table>
+      </section>
+  </div>
+
+  <!--Summary Strat-->
+  <!--Component Summary for vmware, OpenStack, Hyper-v -->
+  <div class="row paddingtop">
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-right: 10px!important">
+        <div class="cardbox">
+              <div class="row cardbox-header">Component Summary </div>
+              <div class="row">
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 Dashborder-right">
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-server yellowbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <p class="yellow small-text">{{cloud.hypervisors.length}}</p>
+                                    <h2 class="device_category">Hypervisors</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-object-group bluebg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <p class="blue small-text">{{vm_summary_count || 0}}</p>
+                                    <h2 class="device_category">Virtual Machines</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-laptop neonredbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <p class="neonred small-text">{{cloud.bm_server.length}}</p>
+                                    <h2 class="device_category">Bare Metal Servers</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-sliders neonyellowbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                  <p class="neonyellow small-text">{{customDevicesCount || 0}}</p>
+                                  <h2 class="device_category">Other Devices</h2>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-3 text-align-center"  style="margin-top:5px;">
+                              <i class="fa fa-fire redbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-10 col-sm-10 col-md-10 col-lg-9 text-align-center">
+                              <!-- <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"> -->
+                                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                    <p class="red small-text">{{cloud.firewall.length - shared_firewalls.length}}</p>
+                                    <h2 class="device_type">Dedicated</h2>
+                                </div>
+                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                    <p class="red small-text">{{shared_firewalls.length}}</p>
+                                    <h2 class="device_type">Shared</h2>
+                                </div>
+                              <!-- </div> -->
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <h2 class="device_category">Firewalls</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-3 text-align-center" style="margin-top:5px;">
+                              <i class="fa fa-balance-scale brownbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-10 col-sm-10 col-md-10 col-lg-9 text-align-center">
+                              <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                  <p class="brown small-text">{{cloud.load_balancer.length - shared_load_balancers.length}}</p>
+                                  <h2 class="device_type">Dedicated</h2>
+                              </div>
+                              <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                  <p class="brown small-text">{{shared_load_balancers.length}}</p>
+                                  <h2 class="device_type">Shared</h2>
+                              </div>
+                              <!-- </div> -->
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <h2 class="device_category">Load Balancers</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-3 text-align-center"  style="margin-top:5px;">
+                              <i class="fa fa-sitemap greenbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-10 col-sm-10 col-md-10 col-lg-9 text-align-center">
+                              <!-- <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"> -->
+                                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                    <p class="green small-text">{{cloud.switch.length - shared_switches.length}}</p>
+                                    <h2 class="device_type">Dedicated</h2>
+                                </div>
+                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                    <p class="green small-text">{{shared_switches.length}}</p>
+                                    <h2 class="device_type">Shared</h2>
+                                </div>
+                              <!-- </div> -->
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <h2 class="device_category">Switches</h2>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+    </div>
+
+        <!-- CardBox for vmware, OpenStack -->
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+      <div  ng-show="data_availabe" class="row" ng-if="(platform_type == 'OpenStack' || platform_type == 'VMware' || platform_type == 'vCloud Director')">
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingleft paddingright">
+              <div class="cardbox" style="height: 165px;">
+                  <div class="row cardbox-header">vCPU</div>
+                  <div class="row">
+                      <div class="row cardbox-inner">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <!--<h3 class="pcw-bg-title" style="font-weight : 600;">VCPUs</h3>-->
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="margin-top : 5px;font-weight:bolder;">Available: {{vcpus_available || 0}} vCPU</div>
+                      </div>
+                      <div class="row cardbox-inner" style="padding-top: 0px; padding-bottom: 0px;">
+                          <div class="progress">
+                              <uib-progressbar max="100" value="vcpus_percent" animate="true" type="{{vcpu_bar}}">
+                              </uib-progressbar>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner" >
+                          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 lightcolor pcw-bg-lables" style="font-weight:bolder;">Configured: {{vcpus_used || 0}} vCPU</div>
+                          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="font-weight:bolder;">Allocated: {{vcpus_total || 0}} vCPU</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingleft">
+              <div class="cardbox" style="height: 165px;">
+                  <div class="row cardbox-header">RAM </div>
+                  <div class="row">
+                      <div class="row cardbox-inner">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <!--<h3 class="pcw-bg-title" style="font-weight : 600;">RAM</h3>-->
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="margin-top : 5px;font-weight:bolder;">Available: {{memory_available | content_unit_check: 'GB'}}</div>
+                      </div>
+                      <div class="row cardbox-inner" style="padding-top: 0px; padding-bottom: 0px;">
+                          <div class="progress_bar_section">
+                              <uib-progressbar max="100" value="memory_percent" animate="true" type="{{memory_bar}}">
+                              </uib-progressbar>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 lightcolor pcw-bg-lables" style="font-weight:bolder;">Configured: {{memory_used | content_unit_check: 'GB'}}</div>
+                          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="font-weight:bolder;">Allocated: {{memory_total | content_unit_check: 'GB'}}</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingleft">
+              <div class="cardbox" style="height: 165px;">
+                  <div class="row cardbox-header">Storage Disk</div>
+                  <div class="row">
+                      <div class="row cardbox-inner">
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <!--<h3 class="pcw-bg-title" style="font-weight : 600;">Storage</h3>-->
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="margin-top : 5px;font-weight:bolder;">Available: {{storage_available | content_unit_check: 'GB'}}</div>
+                      </div>
+                      <div class="row cardbox-inner" style="padding-top: 0px; padding-bottom: 0px;">
+                          <div class="progress_bar_section">
+                              <uib-progressbar max="100" value="storage_percent" animate="true" type="{{storage_bar}}">
+                              </uib-progressbar>
+                          </div>
+
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 lightcolor pcw-bg-lables" style="font-weight:bolder;">Configured: {{storage_used | content_unit_check: 'GB'}}</div>
+                          <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="font-weight:bolder;">Allocated: {{storage_total | content_unit_check: 'GB'}}</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+    </div>
+
+      <!-- table for vmware, OpenStack, Hyper-v -->
+
+      <!--<div class="row" style="padding-top : 10px;">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddingleft" ng-class="{'padding_top8px' : (data_availabe)}">
+            <div class="cardbox">
+              <div class="row cardbox-header">Cloud Information</div>
+              <div class="row">
+                <table class="example table  table-condensed cf" style="height: 223px;">
+                  <tbody>
+                    <tr>
+                      <td>Name</td>
+                      <td>{{ cloud.name }}</td>
+                    </tr>
+                    <tr>
+                      <td>Datacenter</td>
+                      <td>{{ cloud.datacenter.name }}</td>
+                    </tr>
+                    <tr>
+                      <td>Platform</td>
+                      <td>{{ cloud.platform_type }}</td>
+                    </tr>
+                    <tr>
+                      <td>Created</td>
+                      <td>{{ cloud.created_at | unityDate : $root.users_timezone}}</td>
+                    </tr>
+                    <tr>
+                      <td>Updated</td>
+                      <td>{{ cloud.updated_at | unityDate : $root.users_timezone}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+      </div>-->
+
+    </div>
+  </div>
+</div>
+
+<div ng-if = "(tabname === 'switches')" class="page_wrapper" style="float:left">
+  <loading object="{{switchesData}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((switchesData | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Switches</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="switchesData.length !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="switches">
+              <thead>
+                  <tr>
+                      <th> Name </th>
+                      <th> Device Status </th>
+                      <th> Model </th>
+                      <th> Type </th>
+                      <th> Action</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr ng-repeat="row in switchesData | filter: searchKeyword1">
+                      <!-- <td>{{ row.name}}</td> -->
+                      <td>
+                        <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                              popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                              ng-init="get_observium_details('switch', row)" ng-click="show_observium_details(row)">
+                                {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                        <span ng-if="angular.isObject(row.observium_details) && !angular.isDefined(row.observium_details.device_data)">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </span>
+                        <span ng-if="!angular.isObject(row.observium_details)">
+                          <device-not-configured></device-not-configured>
+                        </span>
+                        <span ng-if="angular.isObject(row.observium_details) && angular.isDefined(row.observium_details.device_data)">
+                            <span ng-if="row.observium_details.device_data.status == 1"> 
+                                <device-up></device-up>
+                            </span>
+                            <span ng-if="row.observium_details.device_data.status == 0"> 
+                                <device-down></device-down>
+                            </span>
+                        </span>
+                      </td>
+                      <td ng-if= "row.model != ''" >{{row.model}}</td>
+                      <td ng-if= "row.model == ''" > N/A</td>
+                      <td ng-if= "row.cisco_switch.length != 0 && row.juniper_switch.length == 0" >Cisco</td>
+                      <td ng-if= "row.cisco_switch.length == 0 && row.juniper_switch.length != 0" >Juniper</td>
+                      <td ng-if= "row.cisco_switch.length == 0 && row.juniper_switch.length == 0" > N/A</td>
+                      <!-- <td class="numeric "> {{item.proxyServerName}}</td> -->
+
+                      <td ng-if="row.cisco_switch || row.juniper_switch">
+                <div class="action-icons">
+                    <span ng-if="row.cisco_switch.length !== 0">
+                      <span ng-repeat="p in row.cisco_switch">
+                        <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (Cisco)'}}">
+                          <a class="fa fa-external-link"  ng-class="{'fa-disabled': row.is_shared}" ng-click="updateActivityLog($index, row.uuid, 'switches')" href="{{p.proxy_fqdn}}" target="_blank"></a>
+                        </span>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                        <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        </a>
+                        <a ng-if="row.observium_details === null">
+                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                        </a>
+                      </span>
+                      <span>
+                          <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                             href="" ng-click="ctrl.manage_request(row.name, 'Switch', row.model, 'Cisco')"></a>
+                      </span>
+                    </span>
+
+                    <span ng-if="row.juniper_switch.length !== 0">
+                      <span ng-repeat="p in row.juniper_switch">
+                        <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in Same Tab (Juniper)'}}">
+                          <a class="fa fa-external-link-square" ng-class="{'fa-disabled': row.is_shared}" ng-click="updateActivityLog($index, row.uuid, 'switches')" href="#/juniper-switch/{{ p.uuid }}/"></a>
+                        </span>
+                      </span>
+                      <span ng-repeat="p in row.juniper_switch">
+                        <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (Juniper)'}}">
+                          <a class="fa fa-external-link" tooltip-class="customClass" href="{{p.proxy_fqdn}}" ng-click="updateActivityLog($index, row.uuid, 'switches')" target="_blank" ng-class="{'fa-disabled': row.is_shared}">
+                          </a>
+                        </span>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                        <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        </a>
+                        <a ng-if="row.observium_details === null">
+                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                        </a>
+                      </span>
+                      <span>
+                          <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                             href="" ng-click="ctrl.manage_request(row.name, 'Switch', row.model, 'Juniper')"></a>
+                      </span>
+                    </span>
+
+                    <span ng-if="row.juniper_switch.length === 0 && row.cisco_switch.length === 0">
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link-square fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                      </span>
+                      <span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" href="" ng-click="ctrl.manage_request(row.name, 'Switch', row.model, '')"></a>
+                      </span>
+               </div>
+            </td>
+                  </tr>
+              </tbody>
+            </table>
+      </section>
+      <div ng-if="switches_loaded && switchesData.length===0 || (((switchesData | filter: searchKeyword1).length) == 0)" class="content-wrapper">
+        <no-records-found message="No associated Switches were found !!"></no-records-found>
+      </div>
+
+  </div>
+</div>
+
+<div ng-if = "(tabname === 'firewalls')" class="page_wrapper" style="float:left">
+  <loading object="{{ firewalls }}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((firewallsData | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Firewalls</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="firewallsData.length !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="firewalls">
+              <thead>
+                  <tr>
+                      <th> Name </th>
+                      <th> Device Status </th>
+                      <th> Model</th>
+                      <th> Type </th>
+                      <th> Action </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in firewallsData | filter: searchKeyword1">
+                      <!-- <td>{{ row.name}}</td> -->
+                      <td>
+                          <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                              popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                              ng-init="get_observium_details('firewall', row)" ng-click="show_observium_details(row)">
+                                {{row.name}}
+                          </a>
+                      </td>
+                      <td>
+                        <span ng-if="angular.isObject(row.observium_details) && !angular.isDefined(row.observium_details.device_data)">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </span>
+                        <span ng-if="!angular.isObject(row.observium_details)">
+                          <device-not-configured></device-not-configured>
+                        </span>
+                        <span ng-if="angular.isObject(row.observium_details) && angular.isDefined(row.observium_details.device_data)">
+                            <span ng-if="row.observium_details.device_data.status == 1"> 
+                                <device-up></device-up>
+                            </span>
+                            <span ng-if="row.observium_details.device_data.status == 0"> 
+                                <device-down></device-down>
+                            </span>
+                        </span>
+                      </td>
+                      <td ng-if= "row.model != ''" >{{row.model}}</td>
+                      <td ng-if= "row.model == ''" > N/A</td>
+                      <td ng-if= "row.cisco_firewall.length != 0 && row.juniper_firewall.length == 0" >Cisco</td>
+                      <td ng-if= "row.cisco_firewall.length == 0 && row.juniper_firewall.length != 0" >Juniper</td>
+                      <td ng-if= "row.cisco_firewall.length == 0 && row.juniper_firewall.length == 0" > N/A</td>
+
+              <td ng-if="row.cisco_firewall || row.juniper_firewall">
+                <div class="action-icons">
+
+                  <span ng-if="row.cisco_firewall.length !== 0">
+                    <span ng-repeat="p in row.cisco_firewall"  >
+                      <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in Same Tab (Cisco)'}}">
+                        <a class="fa fa-external-link-square" ng-class="{'fa-disabled': row.is_shared}" ng-click="updateActivityLog($index, row.uuid, 'firewalls')" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                    </span>
+                    <span ng-repeat="p in row.cisco_firewall" ng-if="row.cisco_firewall.length !== 0">
+                      <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (Cisco)'}}">
+                        <a class="fa fa-external-link" ng-class="{'fa-disabled': row.is_shared}" href="{{ p.proxy_fqdn }}" ng-click="updateActivityLog($index, row.uuid, 'firewalls')" target="_blank"></a>
+                      </span>
+                    </span>
+                    <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                        <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        </a>
+                        <a ng-if="row.observium_details === null">
+                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    <span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                           href="" ng-click="ctrl.manage_request(row.name, 'Firewall', row.model, 'Cisco')"></a>
+                    </span>
+                  </span>
+
+                  <span ng-if="row.juniper_firewall.length !== 0">
+                    <span ng-repeat="p in row.juniper_firewall" >
+                      <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (Juniper)'}}">
+                        <a class="fa fa-external-link" ng-class="{'fa-disabled': row.is_shared}" href="{{p.proxy_fqdn}}" ng-click="updateActivityLog($index, row.uuid, 'firewalls')" target="_blank"></a>
+                      </span>
+                    </span>
+                    <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                        <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                        </a>
+                        <a ng-if="row.observium_details === null">
+                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    <span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                           href="" ng-click="ctrl.manage_request(row.name, 'Firewall', row.model, 'Juniper')"></a>
+                    </span>
+                  </span>
+
+                  <span ng-if="row.juniper_firewall.length === 0 && row.cisco_firewall.length === 0">
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link-square fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                      </span>
+                      <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" href="" ng-click="ctrl.manage_request(row.name, 'Firewall', row.model, '')"></a>
+                  </span>
+               </div>
+            </td>
+          </tr>
+              </tbody>
+          </table>
+      </section>
+      <div ng-if="firewalls_loaded && firewallsData.length===0 || (((firewallsData | filter: searchKeyword1).length) == 0)" class="content-wrapper">
+        <no-records-found message="No associated Firewalls were found !!"></no-records-found>
+      </div>
+
+  </div>
+</div>
+
+<div ng-if = "(tabname === 'load_balancers')" class="page_wrapper" style="float:left">
+  <loading object="{{loadBalancersData}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((loadBalancersData | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Load Balancers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="loadBalancersData.length !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="load_balancers">
+              <thead>
+                  <tr>
+                      <th> Name </th>
+                      <th> Device Status </th>
+                      <th> Model</th>
+                      <th> Type </th>
+                      <th> Action </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in loadBalancersData | filter: searchKeyword1">
+                      <td><a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                              popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                              ng-init="get_observium_details('load_balancer', row)" ng-click="show_observium_details(row)">
+                                {{row.name}}
+                          </a>
+                      </td>
+                      <td>
+                        <span ng-if="angular.isObject(row.observium_details) && !angular.isDefined(row.observium_details.device_data)">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </span>
+
+                        <span ng-if="!angular.isObject(row.observium_details)">
+                          <device-not-configured></device-not-configured>
+                        </span>
+                        <span ng-if="angular.isObject(row.observium_details) && angular.isDefined(row.observium_details.device_data)">
+                            <span ng-if="row.observium_details.device_data.status == 1"> 
+                                <device-up></device-up>
+                            </span>
+                            <span ng-if="row.observium_details.device_data.status == 0"> 
+                                <device-down></device-down>
+                            </span>
+                        </span>
+                      </td>
+                      <td ng-if= "row.model != ''" >{{row.model}}</td>
+                      <td ng-if= "row.model == ''" > N/A</td>
+                      <td ng-if= "row.netscaler_proxy.length != 0 && row.f5lb_proxy.length == 0" >Netscaler</td>
+                      <td ng-if= "row.netscaler_proxy.length == 0 && row.f5lb_proxy.length != 0" >F5 LoadBalancer</td>
+                      <td ng-if= "row.netscaler_proxy.length == 0 && row.f5lb_proxy.length == 0" > N/A</td>
+
+                      <td ng-if="row.f5lb_proxy || row.netscaler_proxy">
+                <div class="action-icons">
+                    <span ng-repeat="p in row.f5lb_proxy" ng-if="row.f5lb_proxy.length !== 0">
+                      <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (F5 LB)'}}">
+                        <a class="fa fa-external-link" href="{{ p.proxy_fqdn }}" ng-click="updateActivityLog($index, row.uuid, 'load_balancers')" target="_blank" ng-class="{'fa-disabled': row.is_shared}"></a>
+                      </span>
+                    </span>
+                    <span ng-if="row.f5lb_proxy.length !== 0">
+                        <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                        </span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                           href="" ng-click="ctrl.manage_request(row.name, 'LoadBalancer', row.model, 'F5 LoadBalancer')"></a>
+                    </span>
+                    <span ng-repeat="p in row.netscaler_proxy" ng-if="row.netscaler_proxy.length !== 0">
+                      <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (Citrix)'}}">
+                        <a class="fa fa-external-link" href="{{p.proxy_fqdn}}" ng-click="updateActivityLog($index, row.uuid, 'load_balancers')" target="_blank" ng-class="{'fa-disabled': row.is_shared}"></a>
+                      </span>
+                    </span>
+                    <span ng-if="row.netscaler_proxy.length !== 0">
+                        <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                        </span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" href=""
+                           ng-click="ctrl.manage_request(row.name, 'LoadBalancer', row.model, 'Netscaler')"></a>
+                    </span>
+                    <span ng-if="row.netscaler_proxy.length === 0 && row.f5lb_proxy.length === 0">
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link-square fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                      </span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" href=""
+                           ng-click="ctrl.manage_request(row.name, 'LoadBalancer', row.model, '')"></a>
+                    </span>
+               </div>
+            </td>
+                  </tr>
+              </tbody>
+            </table>
+      </section>
+      <div ng-if="load_balancers_loaded && loadBalancersData.length===0 || (((loadBalancersData | filter: searchKeyword1).length) == 0)" class="content-wrapper">
+        <no-records-found message="No associated Load Balancers were found !!"></no-records-found>
+      </div>
+
+  </div>
+</div>
+
+<div ng-if = "(tabname === 'hypervisors')" class="page_wrapper" style="float:left">
+  <loading object="{{esxiData}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((esxiData | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Hypervisors</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="esxiData.length !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="hypervisors">
+              <thead ng-if="hypervisors_loaded">
+                  <tr>
+                      <th> Server Name </th>
+                      <th> Device Status </th>
+                      <th> Virtualization Type </th>
+                      <th> Manage </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+
+                  <tr ng-repeat="row in esxiData | filter: searchKeyword1">
+                      <!-- <td>{{ row.name}} </td> -->
+                      <td>
+                          <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                              popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                              ng-init="get_observium_details('hypervisor',row)" ng-click="show_observium_details(row)">
+                                {{row.name}}
+                          </a>
+                      </td>
+                      <td>
+                        <span ng-if="angular.isObject(row.observium_details) && !angular.isDefined(row.observium_details.device_data)">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </span>
+                        <span ng-if="!angular.isObject(row.observium_details)">
+                          <device-not-configured></device-not-configured>
+                        </span>
+                        <span ng-if="angular.isObject(row.observium_details) && angular.isDefined(row.observium_details.device_data)">
+                            <span ng-if="row.observium_details.device_data.status == 1"> 
+                                <device-up></device-up>
+                            </span>
+                            <span ng-if="row.observium_details.device_data.status == 0"> 
+                                <device-down></device-down>
+                            </span>
+                        </span>
+                      </td>
+                      <td>{{ row.instance.virtualization_type }}</td>
+                      <td>
+                          <div class="action-icons">
+                              <span tooltip-class="customClass" uib-tooltip="{{ (row.esxi.length == 0) ? 'Device Not Configured' : 'Manage in Same Tab (ESXi)'}}">
+                                  <a href="#/vmware-esxi/{{ row.esxi[0].uuid }}/" ng-click="updateActivityLog($index, row.uuid, 'servers')" ng-class="{'fa-disabled': (row.esxi.length == 0)}">
+                                      <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (row.esxi.length == 0)}"></i>
+                                  </a>
+                              </span>
+                              <span tooltip-class="customClass" uib-tooltip="{{ (row.esxi.length == 0) ? 'Device Not Configured' : 'Manage in New Tab (ESXi)'}}">
+                                  <a href="{{row.esxi[0].proxy_fqdn}}" ng-click="updateActivityLog($index, row.uuid, 'servers')" ng-class="{'fa-disabled': (row.esxi.length == 0)}" target="_blank">
+                                      <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (row.esxi.length == 0)}"></i>
+                                  </a>
+                              </span>
+
+                              <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                                  <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                                      <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                  </a>
+                                  <a ng-if="row.observium_details === null">
+                                      <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                  </a>
+                              </span>
+
+                              <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                                  <a href="" ng-click="manage_request_hypervisor(row.name, 'Hypervisor', row)">
+                                      <i class="fa fa-ticket" aria-hidden="true"></i>
+                                  </a>
+                              </span>
+                          </div>
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="hypervisors_loaded && esxiData.length===0 || (((esxiData | filter: searchKeyword1).length) == 0)" class="content-wrapper">
+        <no-records-found message="No associated Hypervisors were found !!"></no-records-found>
+      </div>
+
+  </div>
+</div>
+
+<div ng-if = "(tabname === 'baremetals')" class="page_wrapper" style="float:left">
+  <loading object="{{baremetal_servers}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((baremetal_servers | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Bare Metal Servers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="baremetal_servers.length !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="baremetalservers">
+              <thead ng-if="baremetals_loaded">
+                  <tr>
+                      <th> Server Name </th>
+                      <th> Power Status </th>
+                      <th> OS </th>
+                      <th> Management IP </th>
+                      <th> Manage </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+
+                  <tr ng-repeat="bm_server in baremetal_servers | filter: searchKeyword1">
+                      <!-- <td>{{ row.name}} </td> -->
+                      <td>
+                          <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                              popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                              ng-init="get_observium_details('bm_server', bm_server.server); get_bm_server_controller_power_stats(bm_server);" ng-click="show_observium_details(bm_server.server)">
+                                {{bm_server.server.name}}
+                          </a>
+                      </td>
+
+                      <!-- Power status column start-->
+                      <td>
+                        <span ng-if="(action_support) && (bm_server.power_on)">
+                          <device-up></device-up>
+                        </span>
+
+                        <span ng-if="(action_support) && (!bm_server.power_on)">
+                          <device-down></device-down>
+                        </span>
+
+                        <span ng-if="!(action_support)">
+                          <span ng-if="angular.isObject(bm_server.server.observium_details) && !angular.isDefined(bm_server.server.observium_details.device_data)">
+                              <i class="fa fa-spinner fa-spin"></i>
+                          </span>
+                          <span ng-if="!angular.isObject(bm_server.server.observium_details)">
+                            <device-not-configured></device-not-configured>
+                          </span>
+                          <span ng-if="angular.isObject(bm_server.server.observium_details) && angular.isDefined(bm_server.server.observium_details.device_data)">
+                              <span ng-if="bm_server.server.observium_details.device_data.status == 1"> 
+                                  <device-up></device-up>
+                              </span>
+                              <span ng-if="bm_server.server.observium_details.device_data.status == 0">
+                                  <device-down></device-down>
+                              </span>
+                          </span>
+                        </span>
+                      </td>
+                      <!-- Power status column end -->
+
+                      <td>{{ bm_server.os.full_name }}</td>
+                      <td>{{ bm_server.management_ip }}</td>
+                      <td>
+                          <div class="action-icons">
+                              <span tooltip-class="customClass" uib-tooltip="{{bm_server.action_message}}">
+                                <a class="fa fa-power-off" ng-click="manage_bmserver_actions(bm_server)"
+                                ng-class="{'poweredOnCss white_text': bm_server.power_on, 'fa-disabled' : (bm_server.action_support === null)}"></a>
+                              </span>
+
+                              <span>
+                                <a class="fa fa-info-circle"  tooltip-class="customClass" uib-tooltip="Server Info"
+                                   href="" ng-click="show_full_details(bm_server)"></a>
+                              </span>
+
+                              <span ng-if="bm_server.os.platform_type === 'Linux'" tooltip-class="customClass" uib-tooltip="Open in same tab">
+                                <a ng-click="xtermConsoleSameTab($index, bm_server.uuid, cloud_type)">
+                                    <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                                </a>
+                              </span>
+
+                              <span ng-if="bm_server.os.platform_type === 'Windows'" tooltip-class="customClass" uib-tooltip="Open in same tab option is not available for windows machines">
+                                <a ng-class="{'fa-disabled': true}">
+                                    <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (bm_server.os.platform_type != 'Linux')}"></i>
+                                </a>
+                              </span>
+
+                              <span ng-if="(bm_server.os.platform_type !== 'Windows') && (bm_server.os.platform_type !== 'Linux')" tooltip-class="customClass" uib-tooltip="Open in same tab option is not available">
+                                <a class="disabled">
+                                    <i class="fa fa-external-link-square fa-disabled" aria-hidden="true"></i>
+                                </a>
+                              </span>
+
+                              <span ng-if="bm_server.os.platform_type === 'Linux'" tooltip-class="customClass" uib-tooltip="Open in new tab">
+                                <a href="/vm-console-client#/baremetal/webconsole/{{ bm_server.uuid }}/" target="_blank" ng-class="{'fa-disabled': (bm_server.os.platform_type != 'Linux')}">
+                                    <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (bm_server.os.platform_type != 'Linux') }"></i>
+                                </a>
+                              </span>
+                              <span ng-if="bm_server.os.platform_type === 'Windows'" tooltip-class="customClass" uib-tooltip="Open in new tab">
+                                <a href="/rdp?ip={{ bm_server.management_ip }}&domain=unitedlayer.com" target="_blank">
+                                    <i class="fa fa-external-link" aria-hidden="true"></i>
+                                </a>
+                              </span>
+
+                              <span ng-if="(bm_server.os.platform_type !== 'Windows') && (bm_server.os.platform_type !== 'Linux')" tooltip-class="customClass" uib-tooltip="Open in new tab option is not available">
+                                <a class="disabled">
+                                    <i class="fa fa-external-link fa-disabled" aria-hidden="true"></i>
+                                </a>
+                              </span>
+
+                              <span tooltip-class="customClass" uib-tooltip="{{bm_server.server.message}}">
+                                  <a ng-click="show_server_statistics(bm_server.server.uuid)" ng-if="bm_server.server.observium_details !== null">
+                                      <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                  </a>
+                                  <a ng-if="bm_server.server.observium_details === null">
+                                      <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                  </a>
+                              </span>
+
+                              <span tooltip-class="customClass" uib-tooltip="{{bm_server.controller_message}}">
+                                  <a ng-click="show_controller_statistics(bm_server.uuid, bm_server.bmc_type)"
+                                   ng-if="(bm_server.action_support !== null) && (bm_server.action_support !== 'power_on')">
+                                      <i class="fa fa-bolt" aria-hidden="true"></i>
+                                  </a>
+                                  <a ng-if="(bm_server.action_support === null) ||  (bm_server.action_support === 'power_on')">
+                                      <i class="fa fa-bolt fa-disabled" aria-hidden="true"></i>
+                                  </a>
+                              </span>
+
+                              <span>
+                                <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                                   href="" ng-click="manage_request(bm_server.server.name, bm_server)"></a>
+                              </span>
+                          </div>
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="baremetals_loaded && baremetal_servers.length===0 || (((baremetal_servers | filter: searchKeyword1).length) == 0)" class="content-wrapper">
+        <no-records-found message="No associated baremetals were found !!"></no-records-found>
+      </div>
+
+  </div>
+</div>
+
+<deviceslist></deviceslist>
+
+<div ng-if = "(tabname === 'other_devices')" class="page_wrapper" style="float:left">
+  <loading loader="{{loader}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((customDevicesData | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Other Devices</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="customDevicesData.length !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="Summary-box table table-condensed" ng-if="custom_devices">
+              <thead>
+                  <tr>
+                      <th> Name </th>
+                      <th> Status</th>
+                      <th> Friendly Name </th>
+                      <th> Description</th>
+                      <th> Type </th>
+                      <th> Actions</th>
+                  </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="device in customDevicesData | filter: searchKeyword1">
+                  <td>
+                    <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="customdevicedetailspopoverobj.templateUrl"
+                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                    ng-click="show_uptime_details(device)">
+                    {{device.name}}
+                    </a>
+                  </td>
+                  <td class="uptime_status">
+                    <span ng-if="angular.isUndefined(device.details)">
+                      <i class="fa fa-spinner fa-spin"></i>
+                    </span>
+                    <span ng-if="device.details.status === 'up'">
+                      <device-up></device-up>
+                    </span>
+                    <span ng-if="device.details.status === 'down'">
+                      <device-down></device-down>
+                    </span>
+                    <span ng-if="device.details.status === 'paused'">
+                      <i class="fa fa-pause-circle-o yellow"></i> Paused
+                    </span>
+                    <span ng-if="device.details.status === 'not checked yet'">
+                      <i class="fa fa-exclamation-circle-o yellow"></i> Not checked yet
+                    </span>
+                    <span ng-if="device.details.status === 'seems down'">
+                      <i class="fa fa-exclamation-circle-o yellow"></i> Seems down
+                    </span>
+                  </td>
+                  <td>
+                    <span ng-if="angular.isUndefined(device.details)">
+                      <i class="fa fa-spinner fa-spin"></i>
+                    </span>
+                    <span ng-if="!angular.isUndefined(device.details)">
+                      {{device.details.friendly_name}}    
+                    </span>
+                  </td>
+                  <td>{{device.description}}</td>
+                  <td>{{device.type}}</td>
+                  <td>
+                    <div class="action-icons">
+                      <span>
+                        <a class="fa fa-info-circle"  tooltip-class="customClass" uib-tooltip="Other Device Info"
+                         ng-click="show_customdevice_details(device)"></a>
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      </section>
+      <div ng-if="custom_devices_loaded && customDevicesData.length===0 || (((loadBalancersData | filter: searchKeyword1).length) == 0)" class="content-wrapper">
+        <no-records-found message="No associated Other Devices were found !!"></no-records-found>
+      </div>
+
+  </div>
+</div>
+
+<div ng-if = "(tabname === 'virtual_machines' && !$root.showConsole)" class="page_wrapper" style="float:left">
+  <loading object="{{openstack_result || vmware_result || hyperV_result || custom_cloud_result }}"></loading>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="row content-wrapper bg-color">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+        <form class="navbar-form">
+          <div class="form-group width100">
+            <input class="form-control" type="text" ng-model="searchKeyword" ng-model-options="{debounce: 1000}" ng-change="getSearchResults(searchKeyword)" id="searchKeyword" placeholder="Enter keyword">
+            <button class="btn btn-search" type="submit" style="top: 4px;">
+            <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+        <div class="action-bar pull-right">
+          <span class="count">{{model_count}}</span>
+          <span class="count-text"> Virtual Machines</span>
+        </div>
+      </div>
+    </div>
+
+    <section id="no-more-tables" class="margintop20 middle-wrapper" ng-if="openstack_result.length > 0">
+      <table class="table" infinite-scroll='loadPageData()' infinite-scroll-disabled="!openstack_loaded">
+        <thead class="cf">
+          <tr>
+            <th ng-repeat="row in openstack_rows track by $index" custom-sort order="{{ row.name }}" sortdisabled= "{{row.is_sort_disabled}}" sort="sort">{{ row.description }}</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="result in openstack_result | filter: searchKeyword as filtered">
+            <!-- <td>{{result.name}}</td> -->
+            <td>
+                <a tabindex="0" popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                    ng-init="get_observium_details('openstack', result)" ng-click="show_observium_details(result)">
+                    {{result.name}}
+                </a>
+            </td>
+            <!-- Power status column start-->
+            <td>
+              <span ng-if="result.last_known_state == 'ACTIVE'">
+                <device-up></device-up>
+              </span>
+
+              <span ng-if="result.last_known_state == 'SHUTOFF'">
+                <device-down></device-down>
+              </span>
+
+              <span ng-if="(result.last_known_state != 'SHUTOFF') && (result.last_known_state != 'ACTIVE')">
+                <span ng-if="angular.isObject(result.observium_details) && !angular.isDefined(result.observium_details.device_data)">
+                  <i class="fa fa-spinner fa-spin"></i>
+                </span>
+
+                <span ng-if="!angular.isObject(result.observium_details)">
+                  <device-not-configured></device-not-configured>
+                </span>
+                <span ng-if="angular.isObject(result.observium_details) && angular.isDefined(result.observium_details.device_data)">
+                    <span ng-if="result.observium_details.device_data.status == 1"> 
+                        <device-up></device-up>
+                    </span>
+                    <span ng-if="result.observium_details.device_data.status == 0"> 
+                        <device-down></device-down>
+                    </span>
+                </span>
+              </span>
+            </td>
+            <!-- power status column end -->
+
+            <td>{{result.operating_system || 'NA'}}</td>
+            <td>{{result.management_ip || 'NA'}}</td>
+            <td>
+              <div class="action-icons">
+                  <span tooltip-class="customClass" uib-tooltip="{{ result.power ? 'Power Off' : 'Power On'}}">
+                    <a ng-class="{'disabled': !result.power}" ng-click="powerStatusToggle($index, result.instance_id, result.power, cloud_type)">
+                      <i class="fa fa-power-off blue-text" ng-class="{'poweredOnCss': result.power}" aria-hidden="true"></i>
+                    </a>
+                  </span>
+
+                  <span>
+                    <a class="fa fa-info-circle"  tooltip-class="customClass" uib-tooltip="VM Info"
+                           href="" ng-click="show_vm_details(result)"></a>
+                  </span>
+
+                  <span ng-if="(result.power)">
+                    <span tooltip-class="customClass" uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in same tab'}}">
+                        <a ng-click="vmConsoleSameTab($index, result.instance_id, cloud_type)" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip)}"></i>
+                        </a>
+                    </span>
+                    <span tooltip-class="customClass"  uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in new tab'}}">
+                        <a href="/vm-console-client#/openstack-vm/webconsole/{{ result.instance_id }}/" target="_blank" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip) }"></i>
+                        </a>
+                    </span>
+                  </span>
+
+                  <span ng-if="(!result.power)">
+                    <span tooltip-class="customClass" uib-tooltip="VM is Powered Off">
+                        <a ng-click="" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}"></i>
+                        </a>
+                    </span>
+                    <span tooltip-class="customClass" uib-tooltip="VM is Powered Off">
+                        <a href="" target="_blank" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip) }"></i>
+                        </a>
+                    </span>
+                  </span>
+                  
+                  <span tooltip-class="customClass" uib-tooltip="{{result.message}}">
+                    <a ng-click="show_device_statistics(result.uuid, 'openstack')" ng-if="result.observium_details !== null">
+                      <i class="fa fa-line-chart" aria-hidden="true"></i>
+                      {{row}}
+                    </a>
+                    <a ng-if="result.observium_details === null">
+                      <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                    </a>
+                  </span>
+                  
+                  <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                    <a ng-click="manage_request_vm(result.name, 'Virtual Machine', result)">
+                      <i class="fa fa-ticket" aria-hidden="true"></i>
+                    </a>
+                  </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <div ng-if="openstack_loaded && (openstack_result.length === 0)" class="content-wrapper">
+      <no-records-found message="There are no vms associated with this account."></no-records-found>
+    </div>
+
+    <section id="no-more-tables" class="margintop20 middle-wrapper" ng-if="vmware_result.length > 0">
+      <table class="table" infinite-scroll='loadPageData()' infinite-scroll-disabled="!vmware_loaded">
+        <thead>
+          <tr>
+            <th ng-repeat="row in vmware_rows track by $index" custom-sort order="{{ row.name }}" sortdisabled= "{{row.is_sort_disabled}}" sort="sort">{{row.description}}</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="result in vmware_result | filter: searchKeyword as filtered">
+            <td class="normal">
+                <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                    ng-init="get_observium_details('vmware', result)" ng-click="show_observium_details(result)">
+                      {{result.name}}
+                </a>
+            </td>
+            <!-- Power status column start-->
+            <td>
+              <span ng-if="result.state == 'poweredOn'">
+                <device-up></device-up>
+              </span>
+
+              <span ng-if="result.state == 'poweredOff'">
+                <device-down></device-down>
+              </span>
+
+              <span ng-if="(result.state != 'poweredOn') && (result.state != 'poweredOff')">
+                <span ng-if="angular.isObject(result.observium_details) && !angular.isDefined(result.observium_details.device_data)">
+                  <i class="fa fa-spinner fa-spin"></i>
+                </span>
+
+                <span ng-if="!angular.isObject(result.observium_details)">
+                  <device-not-configured></device-not-configured>
+                </span>
+                <span ng-if="angular.isObject(result.observium_details) && angular.isDefined(result.observium_details.device_data)">
+                    <span ng-if="result.observium_details.device_data.status == 1"> 
+                        <device-up></device-up>
+                    </span>
+                    <span ng-if="result.observium_details.device_data.status == 0"> 
+                        <device-down></device-down>
+                    </span>
+                </span>
+              </span>
+            </td>
+            <!-- Power status column end -->
+
+            <td class="normal" >{{result.os_name}}</td>
+            <td>{{result.management_ip || 'NA'}}</td>
+            <td>
+              <div class="action-icons">
+                <span ng-if="!result.powerStateLoading" tooltip-class="customClass" uib-tooltip="{{ result.power ? 'Power Off' : 'Power On'}}">
+                  <a ng-click="powerStatusToggle($index, result.instance_id, result.power, cloud_type)">
+                    <i class="fa fa-power-off blue-text" ng-class="{'poweredOnCss': result.power}" aria-hidden="true"></i>
+                  </a>
+                </span>
+                <span ng-if="result.powerStateLoading">
+                  <i class="fa fa-spinner fa-spin"></i>
+                </span>
+
+                <span>
+                  <a class="fa fa-info-circle"  tooltip-class="customClass" uib-tooltip="VM Info"
+                           href="" ng-click="show_vm_details(result)"></a>
+                </span>
+
+                <span ng-if="(result.power)">
+                    <span tooltip-class="customClass" ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0" uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in same tab'}}">
+                        <a ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0" ng-click="vmConsoleSameTab($index, result.uuid, cloud_type)" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}"></i>
+                        </a>
+                    </span>
+
+                    <span tooltip-class="customClass" ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0" uib-tooltip="Open in Same tab option is not available for windows based machines.">
+                        <a ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0" ng-click="vmConsoleSameTab($index, result.uuid, cloud_type)" ng-class="{'fa-disabled': true}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': true}"></i>
+                        </a>
+                    </span>
+
+                    <span tooltip-class="customClass" uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in new tab'}}">
+
+                        <a href="/rdp?ip={{result.management_ip}}&domain=unitedlayer.com" target="_blank" ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0" >
+                          <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}"></i>
+                        </a>
+
+                        <a ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0" href="/vm-console-client#/vmware-vm/webconsole/{{ result.uuid }}/" target="_blank" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}"></i>
+                        </a>
+                    </span>
+                    <span tooltip-class="customClass" uib-tooltip="{{result.message}}">
+                      <a ng-click="show_device_statistics(result.uuid, 'vmware')" ng-if="result.observium_details !== null">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                      </a>
+                      <a ng-if="result.observium_details === null">
+                        <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                      </a>
+                    </span>
+
+                </span>
+
+                <span ng-if="(!result.power)">
+                    <span tooltip-class="customClass" uib-tooltip="VM is Powered Off" ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0">
+                        <a ng-click="" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}"></i>
+                        </a>
+                    </span>
+                    <span tooltip-class="customClass" uib-tooltip="Open in Same tab option is not available for windows based machines." ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0">
+                        <a ng-click="" ng-class="{'fa-disabled': true}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': true}"></i>
+                        </a>
+                    </span>
+
+                    <span tooltip-class="customClass" uib-tooltip="VM is Powered Off">
+                        <a href="" target="_blank" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}">
+                          <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip || !result.power)}"></i>
+                        </a>
+                    </span>
+
+                    <span tooltip-class="customClass" uib-tooltip="{{result.message}}">
+                      <a ng-click="show_device_statistics(result.uuid)" ng-if="result.observium_details !== null">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                      </a>
+                      <a ng-if="result.observium_details === null">
+                        <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                      </a>
+                    </span>
+
+                </span>
+
+                <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                <a ng-click="manage_request_vm(result.name, 'Virtual Machine', result)" href="">
+                  <i class="fa fa-ticket" aria-hidden="true"></i>
+                </a>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <div ng-if="vmware_loaded && (vmware_result.length === 0)" class="content-wrapper">
+      <no-records-found message="There are no vms associated with this account."></no-records-found>
+    </div>
+
+    <section id="no-more-tables" class="margintop20 middle-wrapper" ng-if="custom_cloud_result.length > 0">
+      <table class="table table-striped table-condensed table-hover" infinite-scroll='loadPageData()' infinite-scroll-disabled="!custom_cloud_loaded">
+        <thead>
+          <tr>
+            <th> Name </th>
+            <th> Management IP</th>
+            <th> Operating System</th>
+            <th style="padding-left:20px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="result in custom_cloud_result | filter: searchKeyword as filtered">
+            <!-- <td> {{ result.name }}</td> -->
+            <td>
+                <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                ng-init="get_observium_details('custom_vm',result)" ng-click="show_observium_details(result)">
+                  {{result.name}}
+                </a>
+            </td>
+            <td> {{ result.management_ip }}</td>
+            <td> {{ result.os.name }}</td>
+            <td>
+              <div class="action-icons actions_div">
+
+                <span ng-show="result.os.platform_type=='Windows'">
+                  <span tooltip-class="customClass" uib-tooltip="Open in Same tab option is not available for windows based machines.">
+                    <i class="fa fa-external-link-square fa-disabled" aria-hidden="true"></i>
+                  </span>
+                  <span tooltip-class="customClass" uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in new tab'}}">
+                    <a href="/rdp?ip={{result.management_ip}}&domain=unitedlayer.com" target="_blank" >
+                      <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip)}"></i>
+                    </a>
+                  </span>
+                </span>
+
+                <span ng-show="result.os.platform_type=='Linux'">
+                  <span tooltip-class="customClass" uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in same tab'}}">
+                    <a ng-click="vmConsoleSameTab($index, result.uuid, cloud_type)" ng-class="{'fa-disabled': (!result.management_ip)}">
+                      <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip)}"></i>
+                    </a>
+                  </span>
+                  <span tooltip-class="customClass"  uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in new tab'}}">
+                      <a href="/vm-console-client#/custom-vm/webconsole/{{ result.uuid }}/" target="_blank" ng-class="{'fa-disabled': (!result.management_ip)}">
+                        <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip) }"></i>
+                      </a>
+                  </span>
+                </span>
+
+                <span tooltip-class="customClass" uib-tooltip="{{result.message}}">
+                    <a ng-click="show_device_statistics(result.uuid, 'custom_vm')" ng-if="result.observium_details !== null">
+                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                    </a>
+                    <a ng-if="result.observium_details === null">
+                        <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                    </a>
+                </span>
+
+                <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                  <a ng-click="manage_request_custom_vm(result.name, 'Virtual Machine', result)" href="">
+                    <i class="fa fa-ticket" aria-hidden="true"></i>
+                  </a>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <div ng-if="custom_cloud_loaded && (custom_cloud_result.length === 0)" class="content-wrapper">
+      <no-records-found message="There are no vms associated with this account."></no-records-found>
+    </div>
+
+    <div ng-if="(cloud_type != ('VMware' || 'OpenStack' || 'Custom')) && hyperV_result.length===0" class="content-wrapper">
+      <no-records-found message="No records found."></no-records-found>
+    </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'virtual_machines' && $root.showConsole)" class="page_wrapper" style="float:left">
+  <span id="vm_error"  style="color:red"></span>
+  
+  <div id="terminal-container" style="position:absolute;width:100%;height:100%;top:0;left:0"><span class="fa fa-times-circle pull-right boxclose" ng-click="closeVM()"></span></div>
+  <!-- <div id="terminal-container" ng-if="iframe" class="xterm-container"></div> -->
+</div>
+
+<div ng-if="is_observium_enabled">
+  <div class="ui-view" style="margin-top: 20px;"></div>
+</div>
+
+
+<observium-stats-popup></observium-stats-popup>
+
+
+<script type="text/ng-template" id="customerCloudManage.html">
+  <div class="row">
+    <div class="col-xs-4">
+      <h4>Click on an object to manage on the right.</h4>
+      <h4>Switches</h4>
+      <table-array arr="cloud.switches" elems="['name']"></table-array>
+
+      <h4>Firewalls</h4>
+      <table-array arr="cloud.firewalls" elems="['name']"></table-array>
+
+      <h4>Load Balancers</h4>
+      <table-array arr="cloud.load_balancers" elems="['name']"></table-array>
+
+      <h4>Servers</h4>
+      <table-array arr="cloud.servers" elems="['name']"></table-array>
+
+      <h4>VMs</h4>
+      <table-array arr="cloud.vms" elems="['name']"></table-array>
+    </div>
+    <div class="col-xs-8">
+      Right side
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="customerVMBackup.html">
+    <div ng-if="backup_instance_show">
+      <!--<div class="dataTable_wrapper content_settings">-->
+      <span ng-if="vm_snapshots.length == 0">
+        <h3 class="align-center">No records to display</h3>
+      </span>
+      <span ng-if="vm_snapshots.length != 0">
+          <table
+              class="table table-hover"
+              id="dataTables-example"
+              float-thead="{top: 20, position: 'absolute', scrollContainer: true};"
+              ng-model="vm_snapshots">
+              <thead>
+              <tr>
+                  <th ng-repeat="row in vm_backup_headers" class="fixed_th">{{ row.title }}</th>
+              </tr>
+              </thead>
+              <tbody>
+                  <tr ng-repeat="row in vm_snapshots">
+                      <td ng-repeat="row_data in vm_backup_headers">
+                          <span ng-if="row_data.key == 'updated_at' || row_data.key == 'backup_date'">
+                            {{row[row_data.key]| date:'medium'}}
+                          </span>
+                          <span ng-if="row_data.key == 'size'">
+                              {{(row[row_data.key]/(1024*1024))|number: 1}}
+                          </span>
+                          <span ng-if="row_data.key != 'updated_at' && row_data.key != 'backup_date' && row_data.key != 'openstack_actions' && row_data.key != 'size' && row_data.key != 'vmware_actions'">
+                            {{row[row_data.key]}}
+                          </span>
+                          <span ng-if="row_data.key == 'openstack_actions'">
+                              <div class="btn-group">
+                                <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu action-button">
+                                    <li><a href ng-click="backupOpenStackVm(row.id, 'AWS', $index)"  >AWS S3 Backup</a></li>
+                                    <li><a href ng-click="backupOpenStackVm(row.id, 'Azure', $index)"  >Azure Backup</a></li>
+                                    <li><a href ng-click="backupHistory(row.id, 'OpenStack', $index)"  >Backup History</a></li>
+                                </ul>
+                              </div>
+                          </span>
+                          <span ng-if="row_data.key == 'vmware_actions'">
+                              <div class="btn-group">
+                                <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu action-button">
+                                    <li><a href ng-click="backupVMWareVm(row.instance_id, 'AWS', $index)"  >AWS S3 Backup</a></li>
+                                    <li><a href ng-click="backupVMWareVm(row.instance_id, 'Azure', $index)"  >Azure Backup</a></li>
+                                    <li><a href ng-click="backupHistory(row.id, 'VMware', $index)"  >Backup History</a></li>
+                                </ul>
+                              </div>
+                          </span>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </span>
+    </div>
+    <div ng-if="!backup_instance_show" style="font-size: 24px; margin-top:20px;">
+        <span >
+          {{backup_instance_unsupported}}
+        </span>
+    </div>
+</script>
+
+<script type="text/ng-template" id="customerCloudVmMigration.html">
+    <div ng-if="vm_migrate_show">
+      <span ng-if="virtual_machines.length == 0">
+        <h3 class="align-center">No records to display</h3>
+      </span>
+      <span ng-if="virtual_machines.length != 0">
+          <table
+              class="table table-hover"
+              float-thead="{top: 20, position: 'absolute', scrollContainer: true};"
+              ng-model="virtual_machines">
+              <thead>
+              <tr>
+                  <th ng-repeat="row in vm_headers" class="fixed_th">{{ row.title }}</th>
+              </tr>
+              </thead>
+              <tbody>
+                  <tr ng-repeat="row in virtual_machines">
+                      <td ng-repeat="row_data in vm_headers">
+                          <span ng-if="row_data.key == 'migration_date'">
+                            {{row[row_data.key]| date:'medium'}}
+                          </span>
+                          <span ng-if="row_data.key == 'size'">
+                              {{(row[row_data.key]/(1024*1024))|number: 1}}
+                          </span>
+                          <span ng-if="row_data.key != 'updated_at' && row_data.key != 'migration_date' && row_data.key != 'openstack_actions' && row_data.key != 'vmware_actions'">
+                            {{row[row_data.key]}}
+                          </span>
+                          <span ng-if="row_data.key == 'openstack_actions'">
+                              <div class="btn-group">
+                                <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu action-button">
+                                    <li><a href ng-click="migrateOpenStackVm(row.instance_id, 'AWS', $index)"  >Migrate (AWS EC2)</a></li>
+                                    <!-- <li><a href ng-click="migrateOpenStackVm(row.instance_id, 'Azure', $index)"  >Azure Backup</a></li> -->
+                                    <!-- <li><a href ng-click="backupHistory(row.instance_id, 'OpenStack', $index)"  >Backup History</a></li> -->
+                                </ul>
+                              </div>
+                          </span>
+                          <span ng-if="row_data.key == 'vmware_actions'">
+                              <div class="btn-group">
+                                <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu action-button">
+                                    <li><a href ng-click="migrateVMWareVm(row.instance_id, 'AWS', $index)"  >Migrate (AWS EC2)</a></li>
+                                    <!-- <li><a href ng-click="migrateVMWareVm(row.instance_id, 'Azure', $index)"  >Azure Backup</a></li> -->
+                                    <!-- <li><a href ng-click="backupHistory(row.instance_id, 'VMware', $index)"  >Backup History</a></li> -->
+                                </ul>
+                              </div>
+                          </span>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+      </span>
+    </div>
+    <div ng-if="!vm_migrate_show" style="font-size: 24px; margin-top:20px;">
+        <span >
+          {{migrate_instance_unsupported}}
+        </span>
+    </div>
+</script>
+
+<script type="text/ng-template" id="backupHistory.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Backup History</h3>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <table class="table">
+        <thead>
+        <tr>
+          <th>File Name</th>
+          <th>Backup Date</th>
+          <th>Target Type</th>
+          <th>Target Account Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="d in backup_history">
+          <td>{{ d.file_name }}</td>
+          <td>{{ d.backup_date | unityDate : $root.users_timezone }}</td>
+          <td>{{ d.target_type }}</td>
+          <td><span ng-if="d.target_type == 'Azure'">{{ d.azure_account__account_name }}</span>
+            <span ng-if="d.target_type == 'AWS'">{{ d.aws_account_id }}</span></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Ok
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="customerCloudDBInstances.html">
+  <div ng-if="db_instance_show">
+    <div class="row">
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Virtual Machine Name</th>
+          <th>RAM Size (MB)</th>
+          <th>CPUs</th>
+          <th>Hostname</th>
+          <th>Internal IP</th>
+          <th>Private IP</th>
+          <th>Database</th>
+          <th>Creation Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="d in db_instnaces">
+          <td>{{ d.vm_name }}</td>
+          <td>{{ d.ram_size }}</td>
+          <td>{{ d.cpus }}</td>
+          <td>{{ d.hostname }}</td>
+          <td>{{ d.internal_ip }}</td>
+          <td>{{ d.routable_ip }}</td>
+          <td>{{ d.database }}</td>
+          <td><span ng-if="d.created_at">{{ d.created_at | unityDate : $root.users_timezone }}</span><span ng-if="!d.created_at">{{ d.status }}</span></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <button class="btn btn-primary" ng-click="createDbInstance()">Add</button>
+    </div>
+  </div>
+  <div ng-if="!db_instance_show" style="font-size: 24px; margin-top:20px;">
+    <span >
+      {{db_instance_unsupported}}
+    </span>
+  </div>
+</script>
+
+<script type="text/ng-template" id="createDbInstance.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Create DB Instance</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="request.vm_name" class="col-sm-2 control-label">
+          Database Type
+        </label>
+
+        <div class="col-sm-10">
+         <select class="form-control" ng-model="request.database">
+           <option value="MYSQL">MYSQL</option>
+         </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.vm_name" class="col-sm-2 control-label">
+          VM Name
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text"
+                 class="form-control"
+                 ng-model="request.vm_name"
+                 placeholder="Virtual Machine Name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.vm_name" class="col-sm-2 control-label">
+          Host Name
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text"
+                 class="form-control"
+                 ng-model="request.hostname"
+                 placeholder="Host Name"
+                 ng-pattern="/^[a-zA-Z0-9]*$/">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          RAM Size
+        </label>
+
+        <div class="col-sm-10">
+          <input type="number"
+                 min=0
+                 class="form-control"
+                 ng-model="request.ram_size"
+                 placeholder="RAM Size in GB">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.cpus" class="col-sm-2 control-label">
+          CPUs
+        </label>
+
+        <div class="col-sm-10">
+          <input type="number"
+                 min=0
+                 class="form-control"
+                 ng-model="request.cpus"
+                 placeholder="No. of CPU Cores">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.vm_name" class="col-sm-2 control-label">
+          Internal IP
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text"
+                 class="form-control"
+                 ng-model="request.internal_ip"
+                 placeholder="Ex : 192.168.254.60"
+                 ng-pattern='/^([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})$/'>
+        </div>
+      </div>
+
+
+      <div class="form-group">
+        <label for="request.vm_name" class="col-sm-2 control-label">
+          Private IP
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text"
+                 class="form-control"
+                 ng-model="request.routable_ip"
+                 placeholder="Ex : 209.237.238.90"
+                 ng-pattern='/^([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})$/'>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success pull-right" type="button" ng-click="create(request)">
+      Create
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="awsAccountSelection.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Select AWS Bucket</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="request.account_name" class="col-sm-2 control-label">
+          AWS Account
+        </label>
+        <div class="col-sm-10">
+          <select ng-change="loadAwsRegionList(request.aws_account_list)" ng-options="option.long for option in aws_account_list track by option.short" class="form-control"
+                  ng-model="request.aws_account_list" required >
+                  <option value="">-- Select aws account --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Region
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="loadAwsBucketList(request.aws_region_list)" ng-options="option.long for option in aws_region_list track by option.short" class="form-control"
+                  ng-model="request.aws_region_list" required>
+                  <option value="">-- Select Region --</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Bucket
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="" ng-options="option.long for option in aws_bucket_list track by option.short" class="form-control"
+                  ng-model="request.aws_bucket_list" required>
+                  <option value="">-- Select bucket --</option>
+          </select>
+        </div>
+      </div>
+
+
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success pull-right" type="button" ng-click="create(request)">
+      Create
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="azureAccountSelection.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Select Azure Bucket</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="request.account_name" class="col-sm-2 control-label">
+          Azure Account
+        </label>
+        <div class="col-sm-10">
+              <select  ng-change="loadAzureResourceList(request.azure_account_list)"  ng-options="option.long for option in azure_account_list track by option.short" class="form-control" ng-model="request.azure_account_list" required>
+                  <option value="">-- Select azure account --</option>
+              </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Resource group
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="loadAzureStorageList(request.azure_resource_list)" ng-options="option.long for option in azure_resource_list track by option.short" class="form-control"
+                  ng-model="request.azure_resource_list" required>
+                  <option value="">-- Select resource group --</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Storage Account
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="loadAzureContainerList(request.azure_storage_list)" ng-options="option.long for option in azure_storage_list track by option.short" class="form-control"
+                  ng-model="request.azure_storage_list" required>
+                  <option value="">-- Select storage account --</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Container
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-options="option.long for option in azure_container_list track by option.short" class="form-control"
+                  ng-model="request.azure_container_list" required>
+                  <option value="">-- Select container account --</option>
+          </select>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success pull-right" type="button" ng-click="create(request)">
+      Create
+    </button>
+  </div>
+</script>
+
+
+<style type="text/css">
+    #authentication_loader .cg-busy {
+        top : 0px !important;
+        left : 0px !important;
+    }
+</style>
+
+<script type="text/ng-template" id="vmAuthentcicate.html">
+  <div class="modal-content">
+    <form role="form" name="modalform">
+      <div class="modal-header">
+          <h4 class="modal-title">Virtual Machine Authenticate</h4>
+      </div>
+      <div class="modal-body" id="authentication_loader" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}" style="padding:20px 40px;">
+         <div class="modal-form">
+                <div class="form-group" ng-if="errorMsg">
+                  <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+                </div>
+                <div class="form-group" ng-if="disableAccess != undefined">
+                  <label style="color:red" class="col-sm-10">Management IP Address not Assigned.</label>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="disableAccess == undefined">
+                    <div class="paddingR"
+                        ng-class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                          <label for="request.hostname" class="col-sm-2 control-label">
+                            IP Address
+                          </label>
+
+                          <div>
+                             <input type="text"
+                                   class="form-control"
+                                   ng-model="request.hostname"
+                                   placeholder="Hostname" disabled>
+                                   <!-- {#management_ip#} -->
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.port" class="col-sm-2 control-label">
+                            Port Number
+                          </label>
+
+                          <div>
+                            <input type="number"
+                                   min=0
+                                   class="form-control"
+                                   ng-model="request.port"
+                                   placeholder="Port Number">
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.username">
+                            Username*
+                          </label>
+                          <span class="errormsg" ng-if="loginUsernameErrMsg">{{loginUsernameErrMsg}}</span>
+
+                          <div>
+                            <input type="text"
+                                   class="form-control"
+                                   ng-model="request.username"
+                                   placeholder="Username"
+                                   autofocus
+                                   ng-class="{'has-error_inputbox': loginUsernameErr }" />
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.password">
+                            Password*
+                          </label>
+                          <span class="errormsg" ng-if="loginPasswordErrMsg">{{loginPasswordErrMsg}}</span>
+
+                          <div>
+                            <input type="password"
+                                   class="form-control"
+                                   ng-model="request.password"
+                                   placeholder="Password"
+                                   ng-class="{'has-error_inputbox': loginPasswordErr}" />
+                          </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+      </div>
+      <div class="modal-footer modal-buttons">
+          <div class="modal-footer modal-buttons" ng-if="disableAccess == undefined">
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                Close
+              </button>
+              <button type="submit" class="btn btn-default" ng-click="create(request)">
+                Login
+              </button>
+          </div>
+      </div>
+    </form>
+  </div>
+</script>
+<script type="text/ng-template" id="customdevicedetailstemplate.html">
+    <div class="row">
+        <table class="table" ng-show="device_details">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div ng-if="device_details.up_since">Uptime</div>
+                        <div ng-if="device_details.down_since">Downtime</div>
+                    </th>
+                    <td class="col-md-8 pull-left table_no_top_border">
+                        <div ng-if="device_details.up_since">{{device_details.up_since | unityObserviumTime}}</div>
+                        <div ng-if="device_details.down_since">{{device_details.down_since | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+           </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="angular.isDefined(device_details) && (device_details === null)" style="padding : 20px">
+            <p>Device not Configured in Uptime Robot</p>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="xtermAuthenticate.html">
+  <div class="modal-content">
+    <form role="form" name="modalform">
+      <div class="modal-header">
+          <h4 class="modal-title">Bare Metal Server Authenticate</h4>
+
+      </div>
+      <div class="modal-body" id="authentication_loader" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}" style="padding:20px 40px;">
+          <div class="modal-form" >
+                <div class="form-group" ng-if="errorMsg">
+                  <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+                </div>
+                <div class="form-group" ng-if="disableAccess != undefined">
+                  <label style="color:red" class="col-sm-10">Management IP Address not Assigned.</label>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="disableAccess == undefined">
+                    <div class="paddingR"
+                        ng-class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                          <label for="request.hostname" class="col-sm-2 control-label">
+                            IP Address
+                          </label>
+
+                          <div>
+                             <input type="text"
+                                   class="form-control"
+                                   ng-model="request.hostname"
+                                   placeholder="Hostname" disabled>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.port" class="col-sm-2 control-label">
+                            Port Number
+                          </label>
+
+                          <div>
+                            <input type="number"
+                                   min=0
+                                   class="form-control"
+                                   ng-model="request.port"
+                                   placeholder="Port Number">
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.username">
+                            Username*
+                          </label>
+                          <span class="errormsg" ng-if="loginUsernameErrMsg">{{loginUsernameErrMsg}}</span>
+
+                          <div>
+                            <input type="text"
+                                   class="form-control"
+                                   ng-model="request.username"
+                                   placeholder="Username"
+                                   autofocus
+                                   ng-class="{'has-error_inputbox': loginUsernameErr }" />
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.password">
+                            Password*
+                          </label>
+                          <span class="errormsg" ng-if="loginPasswordErrMsg">{{loginPasswordErrMsg}}</span>
+
+                          <div>
+                            <input type="password"
+                                   class="form-control"
+                                   ng-model="request.password"
+                                   placeholder="Password"
+                                   ng-class="{'has-error_inputbox': loginPasswordErr}" />
+                          </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+      </div>
+      <div class="modal-footer modal-buttons">
+          <div class="modal-footer modal-buttons" ng-if="disableAccess == undefined">
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                Close
+              </button>
+              <button type="submit" class="btn btn-default" ng-click="create(request)">
+                Login
+              </button>
+          </div>
+      </div>
+    </form>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="baremetal_full_details.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Server details</h3>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="col-md-4 table_no_top_border">
+                                <div>Server</div>
+                            </th>
+                            <td class="table_no_top_border">
+                              <div>{{bm_details.server.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Manufacturer</div>
+                            </th>
+                            <td>
+                              <div>{{bm_details.server.manufacturer || 'NA'}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>CPUs</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.num_cpus || 'NA' }}</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Cores</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.num_cores || 'NA' }}</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Memory (GB)</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.memory_mb || 'NA' }}</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Capacity (GB)</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.capacity_gb || 'NA' }}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+  <div class="modal-footer modal-buttons">
+        <button type="button" class="btn btn-cancel" ng-click="cancel()">
+          Close
+        </button>
+  </div>
+</script>

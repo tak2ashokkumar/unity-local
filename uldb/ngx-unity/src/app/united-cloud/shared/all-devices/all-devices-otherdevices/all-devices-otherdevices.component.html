@@ -1,0 +1,140 @@
+<div class="card border-top-0">
+  <app-spinner [name]="'allod'"></app-spinner>
+  <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+    <div class="d-flex justify-content-center align-items-center font-500">
+      <span class="badge badge-secondary font-sm">{{count}}</span>
+      <span class="ml-1 font-lg">Other Devices</span>
+    </div>
+    <div class="d-flex justify-content-end align-items-center w-30">
+      <table-search-box class="w-100" (searched)="onSearched($event)"></table-search-box>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm text-left mb-0" sortableTable>
+      <thead>
+        <tr>
+          <th>Device Name</th>
+          <th>Status</th>
+          <th>Friendly Name</th>
+          <th>Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of viewData">
+          <td class="w-20"><button class="btn btn-link text-decoration-none p-0" type="button"
+              (click)="popData=view.popOverDetails" [popover]="popTemplate" [outsideClick]="true">{{view.name}}</button>
+          </td>
+          <td class="w-20">
+            <span *ngIf="!view.deviceStatus"><i class="fa fa-spinner fa-spin"></i></span>
+            <span *ngIf="view.deviceStatus" class="text-capitalize">
+              <i *ngIf="view.deviceStatus=='up' || view.deviceStatus=='down'" class="fa fa-circle status-icon"
+                [tooltip]="view.deviceStatus"
+                [ngClass]="view.deviceStatus==='up'?'text-success':'text-danger'">&nbsp;</i>
+              <i *ngIf="view.deviceStatus == 'paused'" class="fa fa-pause-circle status-icon text-warning"
+                [tooltip]="view.deviceStatus"></i>
+              <i *ngIf="view.deviceStatus=='not checked yet' || view.deviceStatus=='seems down'"
+                class="fa fa-exclamation-circle status-icon text-warning" [tooltip]="view.deviceStatus"></i>
+              <i *ngIf="view.deviceStatus=='Not Configured'" class="fa fa-exclamation-circle status-icon text-warning"
+                [tooltip]="view.deviceStatus"></i>
+            </span>
+          </td>
+          <td class="w-20"><span *ngIf="!view.deviceStatus"><i
+                class="fa fa-spinner fa-spin">&nbsp;</i></span>{{view.friendlyName}}
+          </td>
+          <td class="w-20">{{view.type}}</td>
+          <td class="w-20">
+            <button class="action-icons mb-0 fa fa-info-circle font-sm ml-1" tooltip="Other device info"
+              (click)="showInfo(view)"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-center text-muted py-4" *ngIf="!viewData.length">No associated Other Devices were found.</div>
+  </div>
+</div>
+<ng-template #popTemplate>
+  <div class="p-2" *ngIf="!popData.uptime">
+    <div class="row">
+      <div class="col">
+        <i class="fa fa-spinner fa-spin"></i>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="popData.uptime && popData.uptime!=='0'">
+    <table>
+      <tr>
+        <td class="border-0">
+          <h6>Uptime</h6>
+        </td>
+        <td class="border-0">
+          {{popData.uptime | SecToDays}}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h6>Down</h6>
+        </td>
+        <td>
+          {{popData.downtime | SecToDays}}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="p-2" *ngIf="popData.uptime && popData.uptime=='0'">
+    <div class="row">
+      <div class="col">
+        Monitoring not enabled
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deviceinfo>
+  <div class="card mb-0">
+    <div class="card-header">
+      Other device details
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table text-left">
+        <tr>
+          <td><strong>Name</strong></td>
+          <td>{{info?.name}}</td>
+        </tr>
+        <tr>
+          <td><strong>Friendly Name</strong></td>
+          <td>{{info?.friendlyName}}</td>
+        </tr>
+        <tr>
+          <td><strong>Up Since</strong></td>
+          <td>{{info?.upSince | SecToDays}}</td>
+        </tr>
+        <tr>
+          <td><strong>Down Since</strong></td>
+          <td>{{info?.downSince | SecToDays}}</td>
+        </tr>
+        <tr>
+          <td><strong>Paused Since</strong></td>
+          <td>{{info?.pausedSince | SecToDays}}</td>
+        </tr>
+        <tr>
+          <td><strong>Average Response Time</strong></td>
+          <td>{{info?.avgResponseTime}}</td>
+        </tr>
+        <tr>
+          <td><strong>Custom Uptime Ratio</strong></td>
+          <td>{{info?.customUptimeRatio}}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,57 @@
+<div class="container-fluid pt-2">
+    <div class="row">
+        <ng-container *ngIf="dashboardList.length">
+            <div class="col-12 d-flex justify-content-end align-items-center">
+                <div class="w-15 mr-2">
+                    <select class="form-control form-control-sm" [(ngModel)]="selectedDashboard"
+                        (ngModelChange)="onDashboardChange($event)">
+                        <option disabled [value]="null">Select Dashboard</option>
+                        <ng-container *ngFor="let dashboard of dashboardList">
+                            <option [ngValue]="dashboard">{{dashboard.name}}</option>
+                        </ng-container>
+                    </select>
+                </div>
+                <div>
+                    <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                    <button class="btn btn-pill btn-warning btn-sm ml-1" [tooltip]="'Manage'" container="body"
+                        (click)="goToList()" accessControl moduleName="Dashboard"
+                                accessType="Manage Dashboard" elementType="btn">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+            <app-dashboard-view [activeBoard]="selectedDashboard" class="w-100"></app-dashboard-view>
+        </ng-container>
+        <ng-container *ngIf="!dashboardList.length">
+            <div class="col-12">
+                <div class="card content-wrap">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h1 class="title-section mb-3">No Dashboards Created / Published Yet!</h1>
+                        <span class="text-section font-lg-xl mb-3">Looks like your enabled dashboard collection is
+                            Empty!.</span>
+                        <span class="text-section font-lg mb-3">Add one with data you intend
+                            to view or pubnlish which you already created. Once you do, this page will be populated with
+                            the widgets you have
+                            added.</span>
+                        <span class="text-section font-lg mb-3" accessControl moduleName="Dashboard"
+                                accessType="Manage Dashboard" elementType="div-hide">Click on the button below to create your personilized
+                            dashboard or view the existing dashboards and publish.
+                        </span>
+                        <div class="d-flex">
+                            <button class="btn btn-warning" accessControl moduleName="Dashboard"
+                                accessType="Manage Dashboard" elementType="btn" (click)="addDashboard()">
+                                <i class="fas fa-plus"></i>
+                                <span class="mx-2 font-500">Create New</span>
+                            </button>
+                            <button class="btn btn-warning ml-3" (click)="goToList()" accessControl moduleName="Dashboard"
+                                accessType="Manage Dashboard" elementType="btn">
+                                <i class="fas fa-eye"></i>
+                                <span class="mx-2 font-500">View Existing Dashboards</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

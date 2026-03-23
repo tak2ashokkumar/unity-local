@@ -1,0 +1,76 @@
+<div class="card text-center">
+  <div class="card-header bg-white border-0 pb-0 mt-3">
+    <div class="row">
+      <div class="col-3">
+        <!-- <div class="input-prepend input-group custom-input-group">
+          <div class="input-group-prepend"><span class="input-group-text bg-transparent border-right-0">
+              <i class="fa fa-search"></i></span>
+          </div>
+          <input placeholder="Enter keyword" class="form-control  form-control-sm border-left-0 custom-search-input" id="prependedInput"
+            size="16" type="text" tableSeachBox (searched)="onSearched($event)">
+        </div> -->
+      </div>
+      <div class="col ">
+        <span class="text-muted ml-2 font-sm float-right align-middle"><span
+            class="badge badge-pill badge-secondary">{{count}}</span>&nbsp;
+          Datacenters</span>
+        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+        <div class="btn-group pull-right" dropdown>
+          <button class="btn btn-warning btn-sm" type="button" (click)="addDatacenter()" accessControl
+            moduleName="Datacenter" accessType="Manage Datacenter" elementType="btn">Add</button>
+          <!-- <button id="button-basic" dropdownToggle type="button" class="btn btn-warning btn-sm dropdown-toggle dropdown-toggle-split"
+            aria-controls="dropdown-basic">
+            <span class="caret"></span>
+            <span class="sr-only">Split button!</span>
+          </button>
+          <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+            <li role="menuitem"><a class="dropdown-item">Upload</a></li>
+            <li role="menuitem"><a class="dropdown-item">Download</a></li>
+          </ul> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of viewData; let i = index" setTableColumnWidth>
+          <td>
+            <div [tooltip]="view.name">{{view.name}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.location">{{view.location}}</div>
+          </td>
+          <td class="action-icons-column">
+            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit Cabinet"
+              (click)="editDatacenter(view.dcId)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+              elementType="actionbtn">
+            </button>
+            <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete Cabinet"
+              (click)="deleteDatacenter(view.dcId)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+              elementType="actionbtn">
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center text-muted" *ngIf="!viewData.length">No datacenter found.</div>
+        <br>
+      </div>
+      <div class="col">
+        <next-prev></next-prev>
+      </div>
+    </div>
+  </div>
+</div>
+<dc-crud (onCrud)="onCrud($event)"></dc-crud>

@@ -1,0 +1,44 @@
+<h5 class="font-weight-bold">{{cloud.displayName}}</h5>
+
+<div class="card mb-2">
+  <app-spinner [name]="'azure-instance-prices'"></app-spinner>
+  <form class="azureInstanceFiltersForm px-2" *ngIf="azureInstanceFiltersForm" [formGroup]="azureInstanceFiltersForm">
+    <div class="row">
+      <div class="form-group col-6 pr-1 mb-1">
+        <label class="font-weight-bold mb-0" for="region">Region:</label>
+        <select id="region" class="form-control form-control-sm" formControlName="region">
+          <option *ngFor="let regionData of regionList" [value]="regionData.code"> {{regionData.name}}</option>
+        </select>
+      </div>
+      <div class="form-group col-6 pl-1 mb-1">
+        <label class="font-weight-bold mb-0" for="tier">Tier:</label>
+        <select id="tier" class="form-control form-control-sm" formControlName="tier">
+          <option *ngFor="let tier of tierValues" [value]="tier"> {{tier}}</option>
+        </select>
+      </div>
+      <div class="form-group col-6 pr-1 mb-2">
+        <label class="font-weight-bold mb-0" for="storage_type">Storage Type:</label>
+        <select id="storage_type" class="form-control form-control-sm" formControlName="storage_type">
+          <option [value]='' disabled> Select Storage Type</option>
+          <option *ngFor="let storageType of storageTypes" [value]="storageType.code"> {{storageType.name}}</option>
+        </select>
+      </div>
+    </div>
+  </form>
+  <ul class="list-group instances">
+    <li class="list-group-item d-flex list-group-item-action justify-content-between align-items-center px-2 py-1"
+      *ngFor="let instance of instances; let i = index" (click)="selectInstance(i)" [ngClass]="instance.bgClass"
+      [tooltip]="instance.description">
+      <span class="col-5"> {{instance.name}}</span>
+      <span class="badge badge-pill" [ngClass]="instance.badgeClass">{{instance.cpu | number}}vCPU</span>
+      <span class="badge badge-pill" [ngClass]="instance.badgeClass">{{instance.ram | number: '1.0-2'}}GB RAM</span>
+      <span class="badge badge-pill" [ngClass]="instance.badgeClass">
+        &#36;{{instance.instanceRate | number: '1.0-2'}}</span>
+    </li>
+    <li *ngIf="!instances.length">
+      <p class="text-center text-muted pt-5">
+        No instances for Criteria
+      </p>
+    </li>
+  </ul>
+</div>

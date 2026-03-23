@@ -1,0 +1,84 @@
+<div class="page_wrapper" style="float:left">
+  <section ng-if="model.results !== undefined" id="no-more-tables" class="margintop20">
+    <table infinite-scroll='loadPageData()' ng-if="model.results.length > 0" id="example" class="example table  table-condensed cf">
+      <thead class="cf">
+        <tr>
+          <th ng-repeat="f in fields" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''" custom-sort order="{{ f.name }}"
+            sortdisabled="{{f.is_sort_disabled}}" sort="sort">
+            <span ng-if="f.hide === undefined" class="{{f.name}}">{{ f.description }}</span>
+          </th>
+          <th class="numeric" ng-if="!disable_actions">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr ng-repeat="result in model.results">
+          <td ng-repeat="f in fields" ng-if="!(f.hide)" ng-switch="f.opaque">
+            <div ng-switch-when="link">
+              <a href="{{ linkify(result, f).url }}">{{ linkify(result, f).text }}</a>
+            </div>
+            <div ng-switch-when="stringTransform" ng-if="!result.is_customer_admin">{{ desub(result, f) }}</div>
+            <div ng-switch-when="stringTransform" ng-if="result.is_customer_admin">{{ desub(result, f) }} <i class="fa fa-check-circle"></i></div>
+            <div ng-switch-when="choices">{{ result[f.name] }}</div>
+            <div ng-switch-when="obj_choices">
+              <a href="{{ linkify(result, f).url }}">{{ linkify(result, f).text }}</a>
+            </div>
+            <div ng-switch-when="arbitraryLink">{{ f.func(result) }}</div>
+            <div ng-switch-when="multiple">
+              <div ng-repeat="r in result[f.name]">
+                <p><a ng-if='f.uriPrefix' href="{{ f.uriPrefix }}{{r[f.idField]}}">{{ r.name }}</a><span ng-if='!f.uriPrefix'>{{
+                    r.name }}</span></p>
+              </div>
+            </div>
+            <div ng-switch-when="newType">
+              <uldb-field result="result" field="f"></uldb-field>
+            </div>
+            <div ng-switch-default ng-if="f.name!='is_active'">
+
+              <span ng-if="f.name!='logo'">{{ result[f.name] | returnNaWhenEmpty }}</span>
+              <span ng-if="result.logo && f.name=='logo'">
+                <img class="companylogo" ng-click="show_logo(result.logo)" ng-src="data:image/png;base64,{{ result.logo }}">
+              </span>
+
+            </div>
+            <div ng-switch-default ng-if="!result.is_active && f.name=='is_active'">
+              <i class="fa fa-close" style="color:red"></i>
+            </div>
+            <div ng-switch-default ng-if="result.is_active && f.name=='is_active'">
+              <i class="fa fa-check-circle" style="color:green"></i>
+            </div>
+          </td>
+          <td ng-if="!disable_actions">
+            <div class="action-icons">
+              <a ng-if="!disable_edit" class="fa fa-pencil blue-text" tooltip-class="customClass" uib-tooltip="Edit"
+                ng-click="selection.selected = result; selection.index = $index;ctrl.edit(result, $index)"></a>
+              <a ng-class="result.is_active ? 'fa fa-toggle-on blue-text': 'fa fa-toggle-off' " ng-if="activate_deactivate_user"
+                tooltip-class="customClass" uib-tooltip="{{result.is_active ? 'Deactivate' : 'Activate'}}" href
+                ng-click="changeUserStateConfirmation(result, $index)">
+              </a>
+              <span uib-tooltip="{{!result.is_active ? 'Account Deactivated' : (!result.password_reset_link_pending ? 'Reset Password' : 'Password reset link sent to users email address.')}}"
+                ng-if="reset_password_option">
+                <a class="fa fa-undo" ng-class="((!result.password_reset_link_pending) && (result.is_active)) ? 'link_active': 'link_not_active'"
+                  tooltip-class="customClass" href ng-click="changeUserPasswordConfirmation(result)">
+                </a>
+              </span>
+              <a ng-if="can_delete!==false" class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete"
+                ng-click="selection.selected = result; selection.index = $index;ctrl.dailog_box(result, $index)"></a>
+              <span ng-repeat="act in additional_actions">
+                <a class="fa fa-lock blue-text" ng-if="act.name === 'Change Password' || act.name === 'Change Api Keys'"
+                  tooltip-class="customClass" uib-tooltip="{{ act.name }}" href ng-click="act['func'](result, $index)"></a>
+                <a class="fa fa-external-link-square" ng-if="act.name !== 'Change Password' && act.name !== 'Manage in New Tab' && act.name !== 'Change Api Keys' && act.name !== 'Manage User'"
+                  tooltip-class="customClass" uib-tooltip="{{ act.name }}" href ng-click="act['func'](result, $index)"></a>
+                <a class="fa fa-external-link" ng-if="act.name === 'Manage in New Tab'" tooltip-class="customClass"
+                  uib-tooltip="{{ act.name }}" href ng-click="act['func'](result, $index)"></a>
+              </span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div ng-if="model.results.length === 0" class="content-wrapper">
+      <no-records-found message="No {{title}} to display"></no-records-found>
+    </div>
+  </section>
+</div>

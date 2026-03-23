@@ -1,0 +1,39 @@
+.card-bottom-border-radius {
+    border-bottom-right-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+tbody {
+    display: block;
+    max-height: 315px;
+    overflow: auto;
+}
+
+thead,
+tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table thead th {
+    border-top: 2px solid #c8ced3;
+    // border-radius: 0.5rem !important;
+}
+
+// .table thead th:first-child {
+//     border-top-left-radius: 0.5rem;
+// }
+
+// .table thead th:last-child {
+//     border-top-right-radius: 0.5rem;
+// }
+
+.table tbody td {
+    border-top: 1px solid #c8ced3;
+}

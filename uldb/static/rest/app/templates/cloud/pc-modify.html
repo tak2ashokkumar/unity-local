@@ -1,0 +1,145 @@
+<div class="row">
+  <div class="col-xs-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Firewalls
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="fw in cloud.firewalls">
+            <td>{{ fw.id }}</td>
+            <td><a href="#/firewall/{{ fw.id }}">{{ fw.name }}</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-success" ng-click="link('firewalls')">Link Firewall</button>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Load Balancers
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="lb in cloud.load_balancers">
+            <td>{{ lb.id }}</td>
+            <td><a href="#/load_balancer/{{ lb.id }}">{{ lb.name }}</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-success" ng-click="link('load_balancers')">Link Load Balancer</button>
+      </div>
+    </div>
+
+    <div class="panel  panel-default">
+      <div class="panel-heading">
+        Switches
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="switch in cloud.switches">
+            <td>{{ switch.id }}</td>
+            <td><a href="#/switch/{{ switch.id }}">{{ switch.name }}</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-success" ng-click="link('switches')">Link Switch</button>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        Servers
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <!--<th>Id</th>-->
+            <th>Name</th>
+            <th>Cloud Hyp.</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="server in cloud.servers">
+            <!--<td>{{ server.uuid }}</td>-->
+            <td><a href ng-click="focusServer(server)">{{ server.name }}</a></td>
+            <td>{{ server.esxi || 'None' }}</td>
+            <td>
+              <div class="btn-group">
+                <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu action-button">
+                  <li><a href ng-click="linkHost(server, $index, cloud)">Link</a></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-success" ng-click="link('servers')">Link Server</button>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        VMs
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Id</th>
+            <th>Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="vm in cloud.vms">
+            <td>{{ vm.id }}</td>
+            <td><a href="#/vm/{{ vm.id }}">{{ vm.name }}</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-success" ng-click="link('vms')">Link VM</button>
+      </div>
+    </div>
+
+
+  </div>
+  <div class="col-xs-6"></div>
+</div>

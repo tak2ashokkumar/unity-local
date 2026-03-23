@@ -1,0 +1,261 @@
+<div class="row mx-0 mt-2">
+    <div class="col-12 p-0">
+        <div class="card rounded">
+            <div class="card-body d-flex flex-column justify-content-center workflow-body">
+                <div class="d-flex justify-content-around align-items-center w-100 py-4" id="task_wrapper_flex_div"
+                    *ngFor="let tasks of viewData?.multiLevelTasks; let i = index;">
+                    <div class="" *ngFor="let task of tasks; let k = index;">
+                        <ng-container [ngSwitch]="task.type">
+                            <ng-container *ngSwitchCase="taskTypes.START">
+                                <ng-container *ngTemplateOutlet="startTask; context: { $implicit: task}"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.INTEGRATION">
+                                <ng-container
+                                    *ngTemplateOutlet="integrationTask; context: { $implicit: task, index:i }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.CONDITION">
+                                <ng-container
+                                    *ngTemplateOutlet="conditionTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.ANSIBLE">
+                                <ng-container
+                                    *ngTemplateOutlet="ansibleTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.TERRAFORM">
+                                <ng-container
+                                    *ngTemplateOutlet="ansibleTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.BASH">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.POWERSHELL">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.PYTHON">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.REST_API">
+                                <ng-container
+                                    *ngTemplateOutlet="bashTask; context: { $implicit: task, i:i, k:k }"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="taskTypes.END">
+                                <ng-container *ngTemplateOutlet="endTask; context: { $implicit: task}"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Task details Side Panel -->
+<div class="row">
+    <div class="col-12 p-0">
+        <div id="task-details-card" class="card task-details-card mb-0 rounded" *ngIf="showTaskDetails">
+            <div class="card-header d-flex justify-content-between align-items-center px-3 py-2">
+                <div>
+                    <span class="font-sm" [ngClass]="selectedTask.taskTypeIcon"></span>
+                    <span class="ml-1 font-sm">{{selectedTask.name}}</span>
+                </div>
+                <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeTaskDetails()"></a>
+            </div>
+            <div class="card-body p-0 d-flex flex-column font-sm">
+                <div *ngIf="selectedTask.taskImage" class="d-flex justify-content-center align-items-center p-1">
+                    <img [src]="selectedTask.taskImage" [alt]="altText" loading="eager"
+                        style="height: 30px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    <span class="ml-2 font-sm">{{selectedTask.type}}</span>
+                </div>
+                <div class="card mb-0 border-0">
+                    <div class="card-header py-2 border-0">Details</div>
+                    <div class="card-body d-flex flex-column font-sm py-1">
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted w-40 text-truncate">Category :</span>
+                            <span class="font-sm-xs font-500 mr-2">{{selectedTask.category || 'NA'}}</span>
+                        </div>
+                        <div class="d-flex align-items-center mt-1">
+                            <span class="text-muted w-40 text-truncate">Target Type :</span>
+                            <span class="font-sm-xs font-500 mr-2">{{selectedTask.target_type|| 'NA'}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-0 border-0">
+                    <div class="card-header py-2 border-0">Input Parameters</div>
+                    <div class="card-body pt-2 pb-0">
+                        <div *ngIf="selectedTask.inputForm?.get('inputs')">
+                            <form [formGroup]="selectedTask.inputForm">
+                                <div class="row mx-0" formArrayName="inputs">
+                                    <div class="col-12 p-0"
+                                        *ngFor="let control of selectedTask.inputForm.get('inputs').controls; let i = index; let last=last;">
+                                        <div [formGroupName]="i" class="row">
+                                            <div
+                                                class="col-12 p-0 form-group mb-2 d-flex justify-content-between align-items-center">
+                                                <span
+                                                    class="form-col-form-label text-left w-40 text-right font-xs-sm">${{selectedTask.inputForm.get('inputs').controls[i].get('name').value}}</span>
+                                                <input class="form-control form-control-sm ml-2" type="text"
+                                                    formControlName="value" placeholder="value">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div *ngIf="selectedTask.inputForm?.get('name')">
+                            <form [formGroup]="selectedTask.inputForm">
+                                <div
+                                    class="col-12 px-0 form-group mb-2 d-flex justify-content-between align-items-center">
+                                    <span
+                                        class="form-col-form-label text-left w-40 text-right font-xs-sm">${{selectedTask.inputForm.get('name').value}}</span>
+                                    <input class="form-control form-control-sm ml-2" type="text" formControlName="value"
+                                        placeholder="value">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center py-4"
+                            *ngIf="!selectedTask.inputForm">
+                            No inputs available.
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-0 border-0">
+                    <div class="card-header py-2 border-0">Outputs Parameters</div>
+                    <div class="card-body pt-2 pb-0">
+                        <div *ngIf="selectedTask.outputForm?.get('name')">
+                            <form [formGroup]="selectedTask.outputForm">
+                                <div
+                                    class="col-12 px-0 form-group mb-2 d-flex justify-content-between align-items-center">
+                                    <span
+                                        class="form-col-form-label text-left w-40 text-right font-xs-sm">${{selectedTask.outputForm.get('name').value}}</span>
+                                    <input class="form-control form-control-sm ml-2" type="text" formControlName="value"
+                                        placeholder="value">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center py-4"
+                            *ngIf="!selectedTask.outputForm">
+                            No outputs available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #startTask let-view>
+    <div id="task_wrapper_div" class="mt--4">
+        <div [id]="view.name_id" class="dot workflow-start main_task">{{view.name}}</div>
+    </div>
+</ng-template>
+<ng-template #integrationTask let-view let-index="index">
+    <div id="task_wrapper_div" class="">
+        <div [id]="view.name_id" class="card widget-card main_task">
+            <div class="card-header font-sm d-flex justify-content-between font-500 px-2 py-1">
+                <div class="d-flex justify-content-around align-items-center">
+                    <span class="fa-sm" [ngClass]="view.taskTypeIcon"></span>
+                    <span class="ml-1">{{view.name}}</span>
+                </div>
+                <div class="ml-2">
+                    <span class="fa fa-ellipsis-v"></span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group">
+                    <span *ngIf="view.taskImage" class="list-group-item px-2 py-1">
+                        <img [src]="view.taskImage" class="w-100" [alt]="altText" loading="eager"
+                            style="height: 22px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </span>
+                    <span *ngIf="view.inputs?.length"
+                        class="list-group-item list-group-item-secondary text-dark font-xs-sm px-2 py-1">Input
+                        Parameters</span>
+                    <span *ngFor="let p of view.inputs"
+                        class="list-group-item text-muted font-xs-sm px-2 py-1">${{p.name}}</span>
+                    <span *ngIf="view.outputs?.length"
+                        class="list-group-item list-group-item-secondary text-dark font-xs-sm px-2 py-1">Output
+                        Parameters</span>
+                    <span *ngFor="let p of view.outputs"
+                        class="list-group-item text-muted font-xs-sm px-2 py-1">${{p.name}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #bashTask let-view let-i="i" let-k="k">
+    <div id="task_wrapper_div" class="mt-0 pointer-link" (click)="viewTaskDetails(i, k)">
+        <div [id]="view.name_id" class="card widget-card main_task" [ngClass]="view.execution_status">
+            <div class="card-header font-sm d-flex justify-content-between font-500 px-2 py-1">
+                <div class="d-flex justify-content-around align-items-center">
+                    <span class="fa-sm" [ngClass]="view.taskTypeIcon"></span>
+                    <span class="ml-1">{{view.name}}</span>
+                </div>
+                <div class="ml-2">
+                    <span *ngIf="view.execution_status == 'Success'" class="text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
+                    <span *ngIf="view.execution_status == 'InProgress'" class="text-white">
+                        <i class="fa fa-spinner fa-spin">&nbsp;</i>
+                    </span>
+                    <span *ngIf="view.execution_status == 'Failed'" class="text-danger">
+                        <i class="fas fa-times-circle"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group">
+                    <span *ngIf="view.taskImage" class="list-group-item px-2 py-1">
+                        <img [src]="view.taskImage" class="w-100" [alt]="altText" loading="eager"
+                            style="height: 22px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #ansibleTask let-view let-i="i" let-k="k">
+    <div id="task_wrapper_div" class="mt-0 pointer-link" (click)="viewTaskDetails(i, k)">
+        <div [id]="view.name_id" class="card widget-card main_task" [ngClass]="view.execution_status">
+            <div class="card-header font-sm d-flex justify-content-between font-500 px-2 py-1">
+                <div class="d-flex justify-content-around align-items-center">
+                    <span class="fa-sm" [ngClass]="view.taskTypeIcon"></span>
+                    <span class="ml-1">{{view.name}}</span>
+                </div>
+                <div class="ml-2">
+                    <span *ngIf="view.execution_status == 'Success'" class="text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
+                    <span *ngIf="view.execution_status == 'InProgress'" class="text-white">
+                        <i class="fa fa-spinner fa-spin">&nbsp;</i>
+                    </span>
+                    <span *ngIf="view.execution_status == 'Failed'" class="text-danger">
+                        <i class="fas fa-times-circle"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group">
+                    <span *ngIf="view.taskImage" class="list-group-item px-2 py-1">
+                        <img [src]="view.taskImage" class="w-100" [alt]="altText" loading="eager"
+                            style="height: 22px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #conditionTask let-view let-i="i" let-k="k">
+    <div id="task_wrapper_div" class="mt--4">
+        <div [id]="view.name_id" class="d-flex justify-content-center align-items-center condition main_task"
+            [ngClass]="view.execution_status">
+            <span class="text-truncate font-sm" style="transform: rotateZ(317deg);"></span>
+        </div>
+    </div>
+</ng-template>
+<ng-template #endTask let-view>
+    <div id="task_wrapper_div" class="mt--4">
+        <span [id]="view.name_id" class="dot workflow-end main_task">{{view.name}}</span>
+    </div>
+</ng-template>

@@ -1,0 +1,265 @@
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <a href="tab.url"></a>
+  </uib-tab>
+</uib-tabset>
+
+<alerts></alerts>
+
+<div class="panel panel-responsive panel-primary">
+  <div class="panel-heading">
+    ARIN Allocations
+  </div>
+  <div class="panel-body">
+    <div class="row" ng-repeat="result in model.results">
+      <div class="col-sm-3">
+        <div class="row">
+          <div class="col-sm-12">
+            <p><strong>{{ result.name }}</strong></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-offset-1 col-sm-11">
+            <p>Address: <code>{{ result.prefix }}/{{ result.prefixlen }}</code></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-offset-1 col-sm-11">
+            <p>
+              <button class="btn btn-primary" ng-click="createLocation(result)">Add Location</button>
+            </p>
+            <p>
+              <button class="btn btn-danger" ng-click="ctrl.remove(result, $index)" confirm>Delete Block</button>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-9">
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="col-sm-3">Block Name</th>
+            <th class="col-sm-3">Prefix</th>
+            <th class="col-sm-3">Prefix Length</th>
+            <th class="col-sm-3"></th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="loc in result.locations"
+              ng-click="selectLocation(loc, $index)"
+              ng-class="{'active': loc === selectedLocation.location}">
+            <td>{{ loc.name }}</td>
+            <td>{{ loc.prefix }}</td>
+            <td>{{ loc.prefixlen }}</td>
+            <td>
+              <button class="btn btn-default" ng-if="loc === selectedLocation.location"
+                      ng-click="deleteLocation(result, loc, $index)" confirm>
+                <i class="fa fa-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    <button class="btn btn-primary" ng-click="ctrl.add()">Add ARIN Allocation</button>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="ipv6locationmodal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Create Location</h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="location_name" class="col-sm-4 control-label">
+          Location Name
+        </label>
+        <div class="col-sm-8">
+          <input id="location_name" class="form-control" type="text" ng-model="newLoc.name">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="addLocation(newLoc)">
+      Create!
+    </button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="genericModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">{{ method }} {{ title.singular }}</h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+
+      <div class="form-group" ng-repeat="row in rows" ng-if="row.required">
+
+        <label for="blockName" class="col-sm-2 control-label" ng-if="DescriptionChange == false">
+          {{ row.description }}
+        </label>
+
+        <label for="blockName" class="col-sm-2 control-label"
+               ng-if="DescriptionChange && row.alterdescription === undefined">
+          {{ row.description }}
+        </label>
+
+        <label for="blockName" class="col-sm-2 control-label"
+               ng-if="DescriptionChange && row.alterdescription !== undefined">
+          {{ row.alterdescription }}
+        </label>
+
+        <div class="col-sm-10"
+             ng-if="row.opaque === undefined && row.opaquelist === undefined && row.opaquedate === undefined && row.opaqueselect === undefined && row.ischeck === undefined && row.passwordfield === undefined && row.changepasswordfield === undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]">
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaque === undefined && row.opaquelist === undefined && row.opaquedate === undefined && row.opaqueselect === undefined && row.ischeck === undefined && row.passwordfield === undefined && row.changepasswordfield !== undefined && DescriptionChange == false">
+
+          <input class="form-control" type="password" ng-model="obj[row.name]"></input>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaque === undefined && row.opaquelist === undefined && row.opaquedate === undefined && row.opaqueselect === undefined && row.ischeck === undefined && row.passwordfield !== undefined && row.changepasswordfield === undefined && DescriptionChange == false">
+
+          <input ng-show="showpassword" ng-disabled="!resetpassword" class="form-control" type="text"
+                 ng-model="obj[row.name]"></input>
+          <input ng-hide="showpassword" ng-disabled="!resetpassword" class="form-control" type="password"
+                 ng-model="obj[row.name]">      </input>
+          <input type="checkbox" ng-model="showpassword" ng-checked="false"><label>Show Password </label></input>
+          <input type="checkbox" ng-model="resetpassword" ng-checked="false"> <label>Reset Password </label></input>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaque === undefined && row.opaquelist === undefined && row.opaquedate === undefined && row.opaqueselect === undefined && row.ischeck === undefined && (row.passwordfield !== undefined || row.changepasswordfield !== undefined) && DescriptionChange">
+
+          <input type="checkbox" ng-model="resetpasswordEdit"
+                 ng-change="obj[row.name] = resetpasswordEdit == false ? undefined : obj[row.name]"> <label>Reset
+          Password </label></input>
+          <input ng-hide="!resetpasswordEdit" class="form-control" type="password" ng-model="obj[row.name]"></input>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaque === undefined && row.opaquelist === undefined && row.opaquedate === undefined && row.opaqueselect === undefined && row.ischeck !== undefined && row.passwordfield === undefined && row.changepasswordfield === undefined">
+          <label><input class="ckeckbox cbox_view" ng-model="obj[row.name]" name="obj[row.name]"
+                        type="checkbox"> {{ row.checkvalue }}</label>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaque !== undefined && row.opaquelist === undefined && row.opaquedate === undefined && row.opaqueselect === undefined && row.rendermethod === undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]"
+                 placeholder=""
+                 uib-typeahead="obj as obj[row.subfield] for obj in row.render($viewValue)">
+        </div>
+        <div class="col-sm-10"
+             ng-if="row.opaque !== undefined && row.opaquelist === undefined && row.opaquedate === undefined && row.opaqueselect === undefined && row.rendermethod !== undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]"
+                 placeholder="" typeahead-on-select="getGroupssByOrg($item)"
+                 uib-typeahead="obj as obj[row.subfield] for obj in row.render($viewValue)">
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist === undefined && row.opaque === undefined && row.opaquedate === undefined && row.trackby === undefined && row.shownamefield === undefined && row.shownamesubfield === undefined && row.opaqueselect !== undefined">
+          <select class="form-control" ng-model="obj[row.name]"
+                  ng-options="obj as obj[row.subfield] for obj in row.list track by obj[row.subfield]">
+            <option value="">Please select</option>
+          </select>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist === undefined && row.opaque === undefined && row.opaquedate === undefined && row.trackby === undefined && row.opaqueselect !== undefined && row.shownamefield !== undefined && row.shownamesubfield !== undefined">
+          <select class="form-control" ng-model="obj[row.name]"
+                  ng-options="obj as obj[row.shownamefield] + '/' + obj[row.shownamesubfield] for obj in row.list track by obj[row.subfield]">
+            <option value="">Please select</option>
+          </select>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist !== undefined && row.opaque === undefined && row.opaquedate === undefined && row.trackby === undefined && row.opaqueselect === undefined && row.fillbyobj === undefined">
+          <select class="form-control" ng-model="obj[row.name]"
+                  ng-options="obj as obj[row.subfield] for obj in row.list track by obj[row.subfield]"
+                  multiple></select>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist !== undefined && row.opaque === undefined && row.opaquedate === undefined && row.trackby !== undefined && row.opaqueselect === undefined && row.fillbyobj === undefined">
+          <select class="form-control" ng-model="obj[row.name]"
+                  ng-options="obj as obj[row.subfield] for obj in row.list track by obj[row.trackby]"
+                  multiple></select>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist !== undefined && row.opaque === undefined && row.opaquedate === undefined && row.trackby !== undefined && row.opaqueselect === undefined && row.fillbyobj === 'groups'">
+          <select class="form-control" ng-model="obj[row.name]"
+                  ng-options="obj as obj[row.subfield] for obj in grouplist track by obj[row.trackby]"
+                  multiple></select>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist !== undefined && row.opaque === undefined && row.opaquedate === undefined && row.trackby === undefined && row.opaqueselect === undefined && row.fillbyobj === 'roles'">
+          <select class="form-control" ng-model="obj[row.name]"
+                  ng-options="obj as obj[row.subfield] for obj in rolelist track by obj[row.subfield]"
+                  multiple></select>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist !== undefined && row.opaque === undefined && row.opaquedate === undefined && row.trackby === undefined && row.opaqueselect === undefined && row.fillbyobj === 'access'">
+          <select class="form-control" ng-model="obj[row.name]"
+                  ng-options="obj as obj[row.subfield] for obj in accesslist track by obj[row.subfield]"
+                  multiple></select>
+        </div>
+
+        <div class="col-sm-10"
+             ng-if="row.opaquelist === undefined && row.opaque === undefined && row.opaquedate !== undefined && row.opaqueselect === undefined">
+          <div class="dropdown">
+            <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="">
+              <div class="input-group">
+                <input type="text" class="form-control" data-ng-model="obj[row.name]"
+                       data-date-time-input="DD/MM/YYYY hh:mm">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+              </div>
+            </a>
+            <ul class="dropdown-menu action-button" role="menu" aria-labelledby="dLabel">
+              <datetimepicker data-ng-model="obj[row.name]"
+                              data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }">
+              </datetimepicker>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button ng-if="method === 'Add'" class="btn btn-primary" type="button" ng-click="add(obj)">
+      Create!
+    </button>
+    <button ng-if="method === 'Edit'" class="btn btn-primary" type="button" ng-click="edit(obj, selection.index)">
+      Save changes!
+    </button>
+  </div>
+</script>

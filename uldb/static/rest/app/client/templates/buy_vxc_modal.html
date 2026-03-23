@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BUY VXC</title>
+  </head>
+  <style type="text/css">
+    .modal_heading{
+    text-align:center;
+    font-family:sans-serif;
+    color:#222222;
+    font-size: 20px;
+    }
+  </style>
+  <body>
+    <div>
+      
+      <div class="tabs-level1">
+        <uib-tabset>
+          <uib-tab ng-repeat="item in tabs" index="$index" heading="{{item.name}}" ng-click="show_tab_table(item.short_name,$index)"></uib-tab>
+        </uib-tabset>
+      </div>
+      <div>
+        <div>
+          <span ng-if="show_loader==true">
+            <div>
+              <!-- <img src="/static/img/v3/loading_icon.gif" class="ajax-loader" style="z-index: 1000;"> -->
+              <loading></loading>
+            </div>
+          </span>
+        </div>
+        <!-- PRIVATE VXC html -->
+        <div  class="modal-content">
+          <form ng-if="show_table=='privatevxc'" role="form" name="modalform" novalidate ng-submit="modalform.$valid && buy_vxc(private_obj, 'Private')">
+            <div class="modal-body" style="padding:20px 40px;">
+              <div class="modal-form">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <div class="paddingR"
+                    ng-class="{'col-xs-6 col-sm-6 col-md-6 col-lg-6':(col.inputMethod.type != 'datetime'), 'col-xs-12 col-sm-12 col-md-12 col-lg-12' : (col.inputMethod.type == 'datetime') }"
+                    ng-repeat="col in private_vxc_rows">
+                    <div class="form-group" ng-if="(col.required == undefined || col.required !== false ) &&!(method === 'Edit' && col.hide_on_edit !== undefined) " ng-class="{'has-error':(modalform.$submitted && modalform[col.description].$invalid)}">
+                      <label for="col.description">
+                      {{col.description}} <span ng-if="col.required"> * </span>
+                      <span class="errormsg" 
+                        ng-if="!private_obj[col.err_msg] && (modalform.$submitted && modalform[col.description].$invalid)" >
+                      &nbsp; ( This Field is Required )</span>
+                      <span class="errormsg" 
+                        ng-if="private_obj[col.err_msg] && (modalform.$submitted)" >
+                      &nbsp; ( {{ obj[col.err_msg] }} )</span>
+                      </label>
+                      <input ng-if="col.type!='select'" type="{{ col.type }}" class="form-control {{ col.class }}" maxlength=128" force-null="col.nullify" dynamic-name="col.description" ng-model="private_obj[col.name]" value="{{col.value}}" ng-required="col.required">
+                      <textarea ng-if="col.type == 'textarea'" dynamic-name="col.description" type="{{ col.type }}" class="{{ col.class }}" class="form-control ng-model="private_obj[col.name]" value="{{col.value}}" private_vxc_rows="4" maxlength="128" cols="40" required></textarea>
+                      <div ng-if="(col.type == 'select' && col.name == 'parent_port' )">
+                        <select ng-if=" col.type == 'select' " ng-options="option.long for option in col.options track by option.short" class="{{ col.class }}" ng-change="load_target_port(private_obj[col.name])" ng-model="private_obj[col.name]" required>
+                          <option value="">-- Select {{ col.description | lowercase }} --</option>
+                        </select>
+                      </div>
+                      <div ng-if="(col.type == 'select' && col.name != 'parent_port' )">
+                        <select ng-options="option.long for option in col.options track by option.short" class="{{ col.class }}" ng-model="private_obj[col.name]" required>
+                          <option value="">-- Select {{ col.description | lowercase }} --</option>
+                        </select>
+                      </div>
+                      <label class="errormsg" ng-if="private_obj[col.err_id]">{{ private_obj[col.err_msg] }}</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer modal-buttons">
+              <label ng-if="private_buy_vxc_error" style="color:red">{{private_buy_vxc_error}}</label><br>
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+              Cancel
+              </button>
+              <button type="submit" ng-disabled="disableButton" class="btn btn-default">
+              Buy
+              </button>
+            </div>
+        </div>
+        </form>
+      </div>
+      <!-- VXC to AWS html -->
+      <div ng-if="show_table=='awsvxc'" class="modal-content">
+        <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && buy_vxc(aws_obj, 'AWS')">
+          <div class="modal-body" style="padding:20px 40px;">
+            <div class="modal-form">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="paddingR"
+                  ng-class="{'col-xs-6 col-sm-6 col-md-6 col-lg-6':(col.inputMethod.type != 'datetime'), 'col-xs-12 col-sm-12 col-md-12 col-lg-12' : (col.inputMethod.type == 'datetime') }"
+                  ng-repeat="col in aws_vxc_rows">
+                  <div class="form-group" ng-if="(col.required == undefined || col.required !== false ) &&!(method === 'Edit' && col.hide_on_edit !== undefined) " ng-class="{'has-error':(modalform.$submitted && modalform[col.description].$invalid)}">
+                    <label for="col.description">
+                    {{col.description}} <span ng-if="col.required"> *</span>
+                    <span class="errormsg" 
+                      ng-if="!obj[col.err_msg] && (modalform.$submitted && modalform[col.description].$invalid)" >
+                    &nbsp; ( This Field is Required )</span>
+                    <span class="errormsg" 
+                      ng-if="obj[col.err_msg] && (modalform.$submitted)" >
+                    &nbsp; ( {{ obj[col.err_msg] }} )</span>
+                    </label>
+                    <input ng-if="col.type!='select'" type="{{ col.type }}" class="form-control {{ col.class }}" maxlength="128" ng-model="aws_obj[col.name]" value="{{col.value}}" dynamic-name="col.description" required>
+                    <textarea ng-if="col.type == 'textarea'" type="{{ col.type }}" class="{{ col.class }}" dynamic-name="col.description" ng-model="aws_obj[col.name]" value="{{col.value}}" private_vxc_rows="4" maxlength="128" cols="40" required></textarea>
+                    <div ng-if="(col.type == 'select' && col.name == 'parent_port' )">
+                      <select ng-if=" col.type == 'select' " ng-options="option.long for option in col.options track by option.short" class="{{ col.class }}" ng-change="load_target_port(private_obj[col.name])" ng-model="aws_obj[col.name]" required>
+                        <option value="">-- Select {{ col.description | lowercase }} --</option>
+                      </select>
+                    </div>
+                    <div ng-if="(col.type == 'select' && col.name != 'parent_port' )">
+                      <select ng-options="option.long for option in col.options track by option.short" class="{{ col.class }}" ng-model="aws_obj[col.name]" required>
+                        <option value="">-- Select {{ col.description | lowercase }} --</option>
+                      </select>
+                    </div>
+                    <label class="errormsg" ng-if="aws_obj[col.err_id]">{{ aws_obj[col.err_msg] }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-if="show_table=='awsvxc'" class="modal-footer modal-buttons">
+            <label ng-if="aws_buy_vxc_error" style="color:red">{{aws_buy_vxc_error}}</label><br>
+            <button type="button" class="btn btn-cancel" ng-click="cancel()">
+            Cancel
+            </button>
+            <button type="submit" ng-disabled="disableButton" class="btn btn-default">
+            Buy
+            </button>
+          </div>
+      </div>
+      </form>
+    </div>
+    <!-- VXC to AZURE html -->
+    <div ng-if="show_table=='azurevxc'" class="modal-content">
+      <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && buy_vxc(azure_obj, 'Azure')">
+        <div class="modal-body" style="padding:20px 40px;">
+          <div class="modal-form">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="paddingR"
+                ng-class="{'col-xs-6 col-sm-6 col-md-6 col-lg-6':(col.inputMethod.type != 'datetime'), 'col-xs-12 col-sm-12 col-md-12 col-lg-12' : (col.inputMethod.type == 'datetime') }"
+                ng-repeat="col in azure_vxc_rows">
+                <div class="form-group" ng-if="(col.required == undefined || col.required !== false ) &&!(method === 'Edit' && col.hide_on_edit !== undefined) " ng-class="{'has-error':(modalform.$submitted && modalform[col.description].$invalid)}">
+                  <label for="col.description">
+                  {{col.description}} <span ng-if="col.required"> *</span>
+                  <span class="errormsg" 
+                    ng-if="!obj[col.err_msg] && (modalform.$submitted && modalform[col.description].$invalid)" >
+                  &nbsp; ( This Field is Required )</span>
+                  <span class="errormsg" 
+                    ng-if="obj[col.err_msg] && (modalform.$submitted)" >
+                  &nbsp; ( {{ obj[col.err_msg] }} )</span>
+                  </label>
+                  <input ng-if="(col.type == 'text' && col.name!='service_key') || (col.type == 'checkbox') || (col.type == 'number') || (col.type == 'file')" dynamic-name="col.description" type="{{ col.type }}" class="{{ col.class }}" maxlength="128" ng-model="azure_obj[col.name]" value="{{col.value}}" required>
+                  <input ng-if="(col.type == 'text' && col.name =='service_key')" dynamic-name="col.description" type="{{ col.type }}" class="{{ col.class }}" maxlength="128" ng-model="azure_obj[col.name]" ng-blur="azure_target_port(azure_obj[col.name])" value="{{col.value}}" required>
+                  <textarea ng-if="col.type == 'textarea'" type="{{ col.type }}" class="{{ col.class }}" dynamic-name="col.description" ng-model="azure_obj[col.name]" value="{{col.value}}" azure_vxc_rows="4" maxlength="128" cols="40" required></textarea>
+                  <select ng-if="(col.type == 'select')" ng-disabled="col.name=='target_cloud' && loading_target_port" ng-options="option.long for option in col.options track by option.short" class="{{ col.class }}" ng-model="azure_obj[col.name]" required>
+                    <option value="">-- Select {{ col.description | lowercase }} --</option>
+                  </select>
+                  <label class="errormsg" ng-if="azure_obj[col.err_id]">{{ azure_obj[col.err_msg] }}</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div ng-if="show_table=='azurevxc'" class="modal-footer modal-buttons">
+          <label ng-if="azure_api_error" style="color:red">{{azure_api_error}}</label><br>
+          <label ng-if="azure_buy_vxc_error" style="color:red">{{azure_buy_vxc_error}}</label><br>
+          <button type="button" class="btn btn-cancel" ng-click="cancel()">
+          Cancel
+          </button>
+          <button type="submit" ng-disabled="disableButton" class="btn btn-default">
+          Buy
+          </button>
+        </div>
+    </div>
+    </form>
+    </div>
+  </body>
+</html>

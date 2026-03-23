@@ -1,0 +1,416 @@
+<div ng-if="(tabname === 'firewalls')"class="page_wrapper" style="float:left">
+  <loading object="{{firewalls_alert}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((firewalls_alert | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Firewalls</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="firewalls_alert.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="firewalls_alert">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in firewalls_alert | filter: searchKeyword1">
+                      <td>
+                        <a ng-click="deviceAlertsModal(row.name, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && firewalls_alert.length===0 || (((firewalls_alert | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No monitoring enabled for Firewalls !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'switches')"class="page_wrapper" style="float:left">
+  <loading object="{{switches_alert}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((switches_alert | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Switches</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="switches_alert.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="switches_alert">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in switches_alert | filter: searchKeyword1">
+                      <td>
+                        <a ng-click="deviceAlertsModal(row.name, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && switches_alert.length===0 || (((switches_alert | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No monitoring enabled for Switches !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'loadbalancers')"class="page_wrapper" style="float:left">
+  <loading object="{{load_balancers_alert}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((load_balancers_alert | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Load Balancers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="load_balancers_alert.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="load_balancers_alert">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in load_balancers_alert | filter: searchKeyword1">
+                      <td>
+                        <a ng-click="deviceAlertsModal(row.name, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && load_balancers_alert.length===0 || (((load_balancers_alert | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No monitoring enabled for Loadbalancers !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'bm_servers')"class="page_wrapper" style="float:left">
+  <loading object="{{bm_servers_alert}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((bm_servers_alert | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> BM Servers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="bm_servers_alert.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="bm_servers_alert">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in bm_servers_alert | filter: searchKeyword1">
+                      <td>
+                        <a ng-click="deviceAlertsModal(row.name, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && bm_servers_alert.length===0 || (((bm_servers_alert | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No monitoring enabled for BM Servers !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'hypervisors')"class="page_wrapper" style="float:left">
+  <loading object="{{hypervisors_alert}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((hypervisors_alert | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Hypervisors</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="hypervisors_alert.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="hypervisors_alert">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in hypervisors_alert | filter: searchKeyword1">
+                      <td>
+                        <a ng-click="deviceAlertsModal(row.name, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && hypervisors_alert.length===0 || (((hypervisors_alert | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No monitoring enabled for Hypervisors !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'pdus')"class="page_wrapper" style="float:left">
+  <loading object="{{pdus_alert}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((pdus_alert | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> PDUs</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="pdus_alert.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="pdus_alert">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in pdus_alert | filter: searchKeyword1">
+                      <td>
+                        <a ng-click="deviceAlertsModal(row.name, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && pdus_alert.length===0 || (((pdus_alert | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No monitoring enabled for PDUs !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'vms')"class="page_wrapper" style="float:left">
+  <loading object="{{vms_alert}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((vms_alert | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Virtual Machines</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="vms_alert.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="vms_alert">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Cloud Name </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in vms_alert | filter: searchKeyword1">
+                      <td>
+                        <a ng-click="deviceAlertsModal(row.name, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+                      <td>
+                          {{ row.cloud_name }}
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && vms_alert.length===0 || (((vms_alert | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No monitoring enabled for Virtual Machines !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-if="(tabname === 'all_alerts')" class="page_wrapper" style="float:left">
+  <loading loader="{{!alerts_loaded}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((all_alerts | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Alerts</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="all_alerts.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="all_alerts">
+              <thead ng-if="!alerts_loading">
+                  <tr>
+                    <th ng-repeat="row in all_alerts_rows track by $index" custom-sort order="{{ row.name }}" sort="sort">{{ row.desc }}</th>
+                    <th>Alert Name</th>
+                    <th>Changed</th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in all_alerts | orderBy:sort.sortingColumn:sort.reverse | filter: searchKeyword1">
+                      <td>
+                          {{row.device_name}}
+                      </td>
+                      <td>
+                          {{ row.device_type }}
+                      </td>
+                      <td>
+                          {{ row.alert_name }}
+                      </td>
+                      <td>
+                          <span ng-bind-html="row.changed"></span>
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="(alerts_loaded) && ((all_alerts.length===0) || (((all_alerts | filter: searchKeyword1).length) == 0 ))" class="content-wrapper">
+        <no-records-found message="No failed alerts for any of the devices !!"></no-records-found>
+      </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h3>{{ sysname }}</h3>
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<div class="alert alert-info" role="alert" ng-if="showmessage" ng-click="closeAlert()">{{alertMsg}}</div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="Virtual Server Details">
+      <table class="table table-striped" ng-if="VMAvailable">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Operating System</th>         
+		  <th>User</th> 
+		  <th>Ordered Date</td>
+          <th>Customer</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="vd in vserverdet">
+          <td class="systemedit">
+			<a href="#/virtualservers/{{vd.virtualsystem.id}}">{{ vd.instance_name }}</a>
+			<div class="edit_system" ng-click="EditVirtualServer(vd.virtualsystem)"title="Virtual Server Edit"/></div>
+		  </td>
+          <td>{{ vd.os.name }} {{ vd.os.version }}</td>
+		  <td>{{vd.os_rootuser}}</td>
+		  <td>{{vd.ordered_date | date:'dd/MM/yyyy hh:mm'}}</td>
+          <td><a href="#/org/{{vd.customer.id}}">{{ vd.customer.organization_name }}</a></td>
+        </tr>
+        </tbody>
+      </table>
+	  <div ng-if="VMAvailable == false">No associated virtual instances </div>
+    </panelhalf>
+  </div>
+</div>

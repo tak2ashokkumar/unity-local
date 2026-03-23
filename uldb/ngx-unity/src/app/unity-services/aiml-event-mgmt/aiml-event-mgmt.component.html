@@ -1,0 +1,79 @@
+<div class="container-fluid mt-2">
+    <div class="animated fadeIn">
+        <div class="row ml-1">
+            <div class="col-7">
+                <div class="row mb-2">
+                    <div class="col-12 p-0">
+                        <div class="card h-100 mb-0">
+                            <div class="card-body d-flex flex-column px-2 py-0">
+                                <div class="d-flex justify-content-between pointer-link">
+                                    <div class="entity-card w-15 py-1 pointer-link"
+                                        [class.active]="currentPath == 'summary'" (click)="goTo('summary')">
+                                        <div class="text-truncate font-500">Event Reduction</div>
+                                        <div class="d-flex align-items-baseline">
+                                            <span
+                                                class="font-xl value text-truncate">{{viewData.eventReductionPercentage}}%</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-0 my-2 border border-secondary"></div>
+                                    <div class="d-flex justify-content-around align-items-center entity-card w-15 py-1 pointer-link"
+                                        [class.active]="currentPath == 'events'" (click)="goTo('events')">
+                                        <div class="font-lg font-500 text-truncate">Events</div>
+                                        <div class="font-xl value text-truncate">{{viewData.events}}</div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                                    </div>
+                                    <div class="d-flex flex-column justify-content-center entity-card w-16 py-1 pointer-link"
+                                        [class.active]="currentPath == 'alerts'" (click)="goTo('alerts')">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-500 text-truncate">Alerts</span>
+                                            <span class="font-xl value">{{viewData.alerts}}</span>
+                                        </div>
+                                        <div class="d-flex">
+                                            <span class="font-xss sub-entity font-500 text-truncate">Noise Reduction :
+                                            </span>
+                                            <span
+                                                class="font-xss value font-500 ml-1">{{viewData.noiseReductionPercentage}}%</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                                    </div>
+                                    <div class="d-flex flex-column justify-content-center entity-card w-16 py-1 pointer-link"
+                                        [class.active]="currentPath == 'conditions'" (click)="goTo('conditions')">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-500 text-truncate">Conditions</span>
+                                            <span class="font-xl value">{{viewData.conditions}}</span>
+                                        </div>
+                                        <div class="d-flex">
+                                            <span class="font-xss sub-entity font-500 text-truncate">Correlation % :
+                                            </span>
+                                            <span
+                                                class="font-xss value font-500 ml-1">{{viewData.correlationPercentage}}%</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-0 my-2 border border-secondary"></div>
+                                    <div class="d-flex align-items-center entity-card w-12 py-1 pointer-link"
+                                        [class.active]="currentPath == 'analytics'" (click)="goTo('analytics')">
+                                        <div class="font-lg font-500 value text-truncate">Analytics</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 offset-1 mt-3">
+                <data-refresh-btn></data-refresh-btn>
+                <button class="btn btn-pill btn-warning pull-right btn-sm" [tooltip]="'Rules'" container="body"
+                    (click)="goTo('rules')" accessControl moduleName="AIML Event Management"
+                    accessType="Manage AIML Event Management" elementType="btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+        <router-outlet></router-outlet>
+    </div>
+</div>

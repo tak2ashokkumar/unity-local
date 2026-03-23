@@ -1,0 +1,401 @@
+<ng-template #deployOvaRef>
+    <div class="card mb-0 set-min-height">
+        <div class="card-header">
+            Deploy OVA
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deployOvaModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body" id="add-vm-card">
+            <div class="row">
+                <div class="col-12" id="step-col">
+                    <div class="card text-center mb-0">
+                        <div class="card-body">
+                            <ol class="step-indicator" [perfectScrollbar]>
+                                <li *ngFor="let step of steps; let i = index;" [class.active]="isActive(i)"
+                                    [ngClass]="{'complete' : step.visited}">
+                                    <div class="step">
+                                        <i class="step-icon" [ngClass]="step.icon"></i>
+                                    </div>
+                                    <div class="caption hidden-xs hidden-sm pb-0">
+                                        <span>{{step.stepName}}</span>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <span class="p-2 text-danger font-sm" *ngIf="deplymentInProgress">If you Cancel/Close the pop-up,
+                        the deployment process will be
+                        terminated</span>
+                </div>
+
+                <div class="col-12" id="container-col">
+                    <div class="card border-0 mb-0" style="height: 100%;">
+                        <div class="card-body">
+                            <ng-container [ngSwitch]="steps[currentActiveIndex].stepName">
+                                <ng-container *ngSwitchCase="DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES">
+                                    <ng-container *ngTemplateOutlet="UPLOAD_FILES"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER">
+                                    <ng-container *ngTemplateOutlet="NAME_AND_FOLDER"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="DEPLOY_OVA_TEMPLATE_STEPS.COMPUTE_RESOURCE">
+                                    <ng-container *ngTemplateOutlet="COMPUTE_RESOURCE"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="DEPLOY_OVA_TEMPLATE_STEPS.STORAGE">
+                                    <ng-container *ngTemplateOutlet="STORAGE"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="DEPLOY_OVA_TEMPLATE_STEPS.NETWORK">
+                                    <ng-container *ngTemplateOutlet="NETWORK"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="DEPLOY_OVA_TEMPLATE_STEPS.SUMMARY">
+                                    <ng-container *ngTemplateOutlet="SUMMARY"></ng-container>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="next()"
+                *ngIf="currentActiveIndex != (steps.length - 1)">Next</button>
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="saveFileInChunks()"
+                *ngIf="currentActiveIndex == (steps.length - 1)">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right ml-1" type="button" *ngIf="currentActiveIndex"
+                (click)="back()">Back</button>
+            <button class="btn btn-sm btn-outline-danger pull-right" (click)="deployOvaModelRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #UPLOAD_FILES>
+    <h6 class="mb-3">Upload OVA</h6>
+    <div class="row">
+        <div class="col-12">
+            <div class="dnd-container" fileDnd [maxFiles]="1" [type]="[ 'ova']" (fileDropped)="onFileDropped($event)"
+                *ngIf="!fileToUpload">
+                <input type="file" #fileDropRef id="fileDropRef" accept=".ova"
+                    (change)="detectFiles($event.target.files)" multiple />
+                <h3>Drag a file here to upload</h3>
+                <h3>or</h3>
+                <button type="button" class="btn btn-outline-dark">Browse</button>
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="mainData[DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES].ovaFileError">
+                {{mainData[DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES].ovaFileError}}</div>
+        </div>
+        <div class="w-100" *ngFor="let file of mainData[DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES].files | keyvalue">
+            <div class="d-flex">
+                <div class="text-truncate">
+                    {{file.key}}
+                </div>
+                <div class="text-truncate w-15 pl-2">
+                    <em class="font-sm">({{file.value.size}})</em>
+                </div>
+                <div class="">
+                    <a style="
+                    text-decoration: none;
+                    box-shadow: none;
+                    outline: none;" (click)="removeFile(file.key)" *ngIf="!file.value.uploaded">
+                        <span class="far fa-times-circle pl-2 text-danger"></span>
+                    </a>
+                    <a style="
+                    text-decoration: none;
+                    box-shadow: none;
+                    outline: none;" *ngIf="file.value.uploaded">
+                        <span class="far fa-check-circle pl-2 text-success"></span>
+                    </a>
+                </div>
+                <div class="text-truncate text-danger font-xs-sm pl-2" *ngIf="file.value.uploadError">
+                    {{file.value.uploadError}}
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #recursiveListTmpl let-list="list" let-action="action">
+    <ul id="myUL">
+        <li *ngFor="let node of list">
+            <span style="display: block;" class="pl-2 pointer-link" (click)="action(node)"
+                [ngClass]="{'highlight-node':node.isSelected}">
+                <span [ngClass]="node.getIcon()" style="cursor:pointer;"></span>
+                <span (click)="node.toggle()">{{ node.name }}</span>
+            </span>
+            <ul *ngIf="node.children && node.children.length > 0" [ngClass]="{'d-none':!node.isOpened}">
+                <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: node.children, action:action }">
+                </ng-container>
+            </ul>
+        </li>
+    </ul>
+</ng-template>
+
+<ng-template #NAME_AND_FOLDER>
+    <div class="row">
+        <div class="form-group col-12">
+            <label class="form-col-form-label" for="name">VM Name<em>*</em></label>
+            <input id="name" class="form-control" type="text"
+                [(ngModel)]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].name"
+                (ngModelChange)="deploySvc.validateName(mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER])"
+                [class.is-invalid]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].nameError">
+            <div class="invalid-feedback" *ngIf="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].nameError">
+                {{mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].nameError}}</div>
+        </div>
+        <div class="form-group col-12">
+            <label class="form-col-form-label">Select location for the VM<em>*</em></label>
+            <div style="height: 150px; overflow: auto;" class="border rounded"
+                [class.is-invalid]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].destinationError">
+                <ng-container *ngTemplateOutlet="recursiveListTmpl; context:nameAndFolderCtx">
+                </ng-container>
+            </div>
+            <div class="invalid-feedback d-block"
+                *ngIf="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].destinationError">
+                {{mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].destinationError}}</div>
+        </div>
+    </div>
+    <!-- <div class="invalid-feedback" *ngIf="loadBalancerErrors.name">{{loadBalancerErrors.name}}</div> -->
+</ng-template>
+
+<ng-template #COMPUTE_RESOURCE>
+    <div class="row">
+        <div class="form-group col-12">
+            <label class="form-col-form-label">Select the destination compute resource for this
+                operation<em>*</em></label>
+            <div style="min-height: 150px;max-height: 100%; overflow: auto;" class="border rounded"
+                [class.is-invalid]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.COMPUTE_RESOURCE].computeResourceError">
+                <ng-container *ngTemplateOutlet="recursiveListTmpl; context:computeResourceCtx">
+                </ng-container>
+            </div>
+            <div class="invalid-feedback d-block"
+                *ngIf="mainData[DEPLOY_OVA_TEMPLATE_STEPS.COMPUTE_RESOURCE].computeResourceError">
+                {{mainData[DEPLOY_OVA_TEMPLATE_STEPS.COMPUTE_RESOURCE].computeResourceError}}</div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #STORAGE>
+    <div class="row">
+        <div class="form-group col-12">
+            <div class="row mb-2">
+                <div class="col-8">
+                    <label class="form-col-form-label">Select the storage for configuration and hard disk
+                        files<em>*</em></label>
+                </div>
+                <div class="col-4">
+                    <select class="form-control form-control-sm float-left w-100 select-md"
+                        [(ngModel)]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.STORAGE].diskProvision">
+                        <option [value]="'Thick Provision Lazy Zerored'">Thick Provision Lazy
+                            Zerored
+                        </option>
+                        <option [value]="'Thin Provision'">Thin Provision</option>
+                        <option [value]="'Thick Provision Eager Zeroed'">Thick Provision Eager
+                            Zeroed
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <table class="table text-left border border-top-0 mb-0">
+                <thead>
+                    <tr>
+                        <th>
+                        </th>
+                        <th>Name</th>
+                        <th>Capacity</th>
+                        <th>Provisioned</th>
+                        <th>Free</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let stg of storage;let i = index" (click)="$event.stopPropagation();selectStorage(stg)"
+                        class="pointer-link">
+                        <td class="bg-white" style="width: 15px;">
+                            <i class="far" [ngClass]="stg.isSelected ? 'fa-check-circle':'fa-circle'">
+                            </i>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.name}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary.capacity}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary.provisioned}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary.freespace}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary.type}}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="invalid-feedback d-block" *ngIf="mainData[DEPLOY_OVA_TEMPLATE_STEPS.STORAGE].storageError">
+                {{mainData[DEPLOY_OVA_TEMPLATE_STEPS.STORAGE].storageError}}</div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #NETWORK>
+    <div class="row">
+        <div class="col">
+            <label class="d-block h6">Configure the virtual machine network </label>
+        </div>
+    </div>
+    <div class="network-wrapper">
+        <div class="row">
+            <div class="col-12">
+                <div class="float-left w-100 row-item border">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">New Network<em>*</em></label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm float-left select-md"
+                                    [(ngModel)]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NETWORK].network"
+                                    (ngModelChange)="deploySvc.validateNetwork(mainData)"
+                                    [class.is-invalid]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NETWORK].networkError">
+                                    <option [value]="''" disabled>Please Select</option>
+                                    <!-- <option
+                                        [value]="mainData[DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES].uploadedResponse.ovf_data.vm_network">
+                                        {{mainData[DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES].uploadedResponse.ovf_data.vm_network}}
+                                    </option> -->
+                                    <option [value]="n" *ngFor="let n of network">{{n}}</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block"
+                                    *ngIf="mainData[DEPLOY_OVA_TEMPLATE_STEPS.NETWORK].networkError">
+                                    {{mainData[DEPLOY_OVA_TEMPLATE_STEPS.NETWORK].networkError}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <label class="d-block h6">IP Allocation Setting</label>
+        </div>
+
+        <div class="form-group col-6">
+            <label class="form-col-form-label" for="name">IP Allocation<em>*</em></label>
+            <input class="form-control" type="text" value="Static - manual" readonly>
+        </div>
+
+        <div class="form-group col-6">
+            <label class="form-col-form-label" for="name">IP Protocol<em>*</em></label>
+            <input class="form-control" type="text" value="IPv4" readonly>
+        </div>
+    </div>
+
+</ng-template>
+
+<ng-template #SUMMARY>
+    <label class="d-block">Click submit to start creation</label>
+    <div class="network-wrapper">
+        <table class="summary-table w-100 table table-bordered">
+            <tbody>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Virtual machine name</td>
+                    <td>{{mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].name}}</td>
+                </tr>
+                <ng-container
+                    *ngFor="let file of mainData[DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES].files | keyvalue;let first=first">
+                    <tr *ngIf="file.key.endsWith('ova')">
+                        <td class="w-35 bg-gray-200 h6">
+                            OVA File
+                        </td>
+                        <td>{{file.key}}<span *ngIf="file.value.uploading"><i
+                                    class="fas fa-spinner fa-spin text-primary ml-2 fa-lg"></i></span>
+                            <div class="text-truncate text-danger font-xs-sm pl-2" *ngIf="file.value.uploadError">
+                                {{file.value.uploadError}}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!-- <tr>
+                    <td class="w-35 bg-gray-200 h6">Review Details</td>
+                    <td></td>
+                </tr>
+
+                <ng-container
+                    *ngFor="let file of mainData[DEPLOY_OVA_TEMPLATE_STEPS.UPLOAD_FILES].files | keyvalue;let first=first">
+                    <tr *ngIf="file.key.endsWith('vmdk')">
+                        <td class="w-35 bg-gray-200 h6">
+                            VMDK File
+                        </td>
+                        <td>{{file.key}}<span *ngIf="file.value.uploading"><i
+                                    class="fas fa-spinner fa-spin text-primary ml-2 fa-lg"></i></span>
+                            <div class="text-truncate text-danger font-xs-sm pl-2" *ngIf="file.value.uploadError">
+                                {{file.value.uploadError}}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="w-35 pl-5 bg-gray-200 h6">Downloaded Size</td>
+                        <td>{{file.value.size || 'NA'}}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-35 pl-5 bg-gray-200 h6" rowspan="2">Size on Disks</td>
+                        <td>{{file.value.populated_size|| 'NA'}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{file.value.capacity|| 'NA'}}</td>
+                    </tr>
+                </ng-container> -->
+
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Folder</td>
+                    <td>{{mainData[DEPLOY_OVA_TEMPLATE_STEPS.NAME_AND_FOLDER].destination}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Resource pool</td>
+                    <td>{{mainData[DEPLOY_OVA_TEMPLATE_STEPS.COMPUTE_RESOURCE].computeResource}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Storage</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="w-35 pl-5 bg-gray-200 h6">Name</td>
+                    <td>{{mainData[DEPLOY_OVA_TEMPLATE_STEPS.STORAGE].storage[0].name}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Network</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="w-35 pl-5 bg-gray-200 h6">VM Network</td>
+                    <td>{{mainData[DEPLOY_OVA_TEMPLATE_STEPS.NETWORK].network}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 pl-5 bg-gray-200 h6">IP Protocol</td>
+                    <td>IPv4</td>
+                </tr>
+                <tr>
+                    <td class="w-35 pl-5 bg-gray-200 h6">IP Protocol</td>
+                    <td>Static - Manual</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>

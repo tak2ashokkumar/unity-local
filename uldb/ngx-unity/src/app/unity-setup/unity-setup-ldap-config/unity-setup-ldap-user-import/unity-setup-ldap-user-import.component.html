@@ -1,0 +1,120 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated-fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center pl-0 py-2">
+                        <div class="d-flex justify-content-between ml-3">
+                            <div class="d-flex align-items-center justify-content-center font-500">
+                                <span class="badge badge-secondary font-sm">{{count}}</span>
+                                <span class="ml-2 font-lg">LDAP Users</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-end">
+                            <button class="btn btn-pill btn-sm btn-warning font-500" type="button"
+                                (click)="importLDAPUserByForm()" accessControl moduleName="User Management"
+                                accessType="Manage Users" elementType="btn">
+                                <span class="fas fa-user-plus"></span>
+                                <span class="font-xs-sm mx-1">Import User</span>
+                            </button>
+                            <button class="btn btn-pill btn-warning btn-sm ml-2" type="button" container="body"
+                                (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                            </button>
+                            <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <table class="table text-left">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th *ngIf="viewData.length" scope="col" style="font-size:1rem;"
+                                        (click)="$event.stopPropagation();selectAll()" accessControl
+                                        moduleName="User Management" accessType="Manage Users" elementType="div-hide">
+                                        <span class="ml-2 text-primary">
+                                            <i class="far" [ngClass]="selectedAll? 'fa-check-square':'fa-square'"></i>
+                                        </span>
+                                    </th>
+                                    <th>Email ID</th>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData; let i = index" truncateText>
+                                    <td class="w-3" (click)="$event.stopPropagation();select(view);"
+                                        style="font-size:1rem;" accessControl moduleName="User Management"
+                                        accessType="Manage Users" elementType="div-hide">
+                                        <span class="ml-2 bg-white text-primary">
+                                            <i class="far"
+                                                [ngClass]="view.isSelected? 'fa-check-square':'fa-square'"></i>
+                                        </span>
+                                    </td>
+                                    <td class="tdw-35">
+                                        <div [tooltip]="view.email">{{view.email}}</div>
+                                    </td>
+                                    <td class="tdw-35">
+                                        <div [tooltip]="view.firstName">{{view.firstName}}</div>
+                                    </td>
+                                    <td class="tdw-22">
+                                        <div [tooltip]="view.lastName">{{view.lastName}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="!viewData.length" class="py-5 d-flex justify-content-center align-items-center">
+                            No LDAP users available.
+                        </div>
+                    </div>
+                    <div *ngIf="selectedUsers.length"
+                        class="card-footer bg-white border-top-0 d-flex justify-content-center pt-0 mb-3">
+                        <button class="btn btn-primary" type="button" (click)="confirmImportLDAPUsers()">Submit</button>
+                    </div>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="count">
+                    </table-entries>
+                    <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageChange)="pageChange($event)"></table-pager>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #importuser>
+    <div class="card mb-0">
+        <div class="card-header">
+            Import LDAP User
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="importModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="importForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="cn">Common Name<em>*</em></label>
+                    <input class="form-control" id="cn" formControlName="cn" type="text" placeholder="Common Name"
+                        [ngClass]="{'is-invalid' : importFormErrors.cn}">
+                    <div class="invalid-feedback" *ngIf="importFormErrors.cn">{{importFormErrors.cn}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="ou">Group Name</label>
+                    <input class="form-control" id="ou" type="text" placeholder="Group Name"
+                        [ngClass]="{'is-invalid' : importFormErrors.ou}" formControlName="ou">
+                    <div class="invalid-feedback" *ngIf="importFormErrors.ou">{{importFormErrors.ou}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" (click)="confirmImportLDAPUserByForm()"
+                type="button">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="importModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

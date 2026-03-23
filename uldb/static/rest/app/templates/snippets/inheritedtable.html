@@ -1,0 +1,16 @@
+<table class="table table-striped">
+  
+  <tbody>
+  <tr ng-repeat="col in cols">
+    <td class="col-md-4">
+      <div>{{ col.description }}</div>
+    </td>
+    <td>
+      <div ng-if="col.opaque === undefined"><strong>{{ model[col.name] }}</strong></div>
+      <div ng-if="col.opaque !== undefined">
+        {{ col.read(server) }}
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>

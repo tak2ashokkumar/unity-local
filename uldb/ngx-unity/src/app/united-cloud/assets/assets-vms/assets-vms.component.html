@@ -1,0 +1,15 @@
+<scrollable-tab [selector]="'active'">
+  <div class="nav-item border-right border-light" #scrollLeft>
+    <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-left"></i></a>
+  </div>
+  <ul class="nav nav-tabs nav-tabs custom-nav-container border-bottom-0" #tabContent role="tablist">
+    <li class="nav-item bg-secondary rounded-top" *ngFor="let tab of tabData">
+      <a class="nav-link" [ngClass]="isActive(tab)" (click)="goTo(tab)">
+        {{tab.name}}</a>
+    </li>
+  </ul>
+  <div class="nav-item border-left border-light" #scrollRight>
+    <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-right"></i></a>
+  </div>
+</scrollable-tab>
+<router-outlet></router-outlet>

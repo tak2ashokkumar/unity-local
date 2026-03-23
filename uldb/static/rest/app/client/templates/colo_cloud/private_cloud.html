@@ -1,0 +1,258 @@
+<style type="text/css">
+    .maintabs .nav-tabs {
+        border: none;
+        padding: 2px 20px 0px
+    }
+    .maintabs .nav-tabs>li.active>a:hover, .maintabs .nav-tabs>li.active>a:focus, .maintabs .nav-tabs>li.active>a, .maintabs.nav-tabs>li.active>a:hover, .maintabs .nav-tabs>li.active>a:focus {
+        background-color: transparent;
+        color: #0bbb71;
+        cursor: pointer;
+        font-size: 13px !important;
+        border: 1px solid #f48e1f;
+        border-width: 0 0 0px;
+        line-height: 23px!important;
+        padding: 3px 5px;
+    }
+    .maintabs .nav-tabs>li>a {
+        margin-right: 0px;
+        border-radius: 4px 4px 0 0;
+        background-color: transparent;
+        font-size: 13px;
+    }
+    .maintabs .nav-tabs>li>a:hover,{
+        border-color: #fbfbfb;
+        color: #0bbb71;
+        background-color: transparent;
+        font-size: 13px;
+    }
+    .maintabs .nav>li>a:focus, .maintabs .nav>li>a:focus, .maintabs .nav>li>a:active {
+        background-color: #fbfbfb;
+        text-decoration: none;
+    }
+    .maintabs .nav-tabs>li.active>a:hover {
+        /*border-color: #fbfbfb;*/
+        color: #0bbb71;
+        background-color: transparent;
+    }
+
+    .maintabs .nav-tabs>li>a:hover {
+        border-color: #fbfbfb;
+        background-color: transparent;
+        color: #5589d0;
+        text-decoration: none;
+    }
+
+    .maintabs .nav-tabs {
+        padding-left: 5px;
+    }
+
+    .subtabs .nav-tabs {
+        border: none;
+        padding: 2px 20px 0px
+    }
+    .subtabs .nav-tabs>li.active>a:hover, .subtabs .nav-tabs>li.active>a:focus, .subtabs .nav-tabs>li.active>a, .subtabs.nav-tabs>li.active>a:hover, .subtabs .nav-tabs>li.active>a:focus {
+        background-color: transparent;
+        color: #0bbb71;
+        cursor: pointer;
+        font-size: 12px !important;
+        border: 1px solid #f48e1f;
+        border-width: 0 0 0px;
+        line-height: 30px!important;
+        padding: 0px 5px;
+    }
+    .subtabs .nav-tabs>li>a {
+        margin-right: 0px;
+        border-radius: 4px 4px 0 0;
+        background-color: transparent;
+        line-height: 30px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        font-size: 12px !important;
+    }
+    .subtabs .nav-tabs>li>a:hover,{
+        border-color: #fbfbfb;
+        color: #0bbb71;
+        background-color: transparent;
+        font-size: 12px !important;
+    }
+    .subtabs .nav>li>a:focus, .subtabs .nav>li>a:focus, .subtabs .nav>li>a:active {
+        background-color: #fbfbfb;
+        text-decoration: none;
+    }
+    .subtabs .nav-tabs>li.active>a:hover {
+        color: #0bbb71;
+        background-color: transparent;
+    }
+    .subtabs .nav-tabs>li>a:hover {
+        color: #5589d0;
+        background-color: transparent;
+    }
+    .subtabs .nav-tabs {
+        padding-left: 5px;
+    }
+
+    .fullheight {
+        height: 100%;
+    }
+
+
+    li.nav-item.disabled {
+        opacity : 0.5;
+        pointer-events : none;
+    }
+    .pdu_graphs {
+       width: 98%;
+    }
+    .subtitleclass {
+       padding-left: 20px !important;
+    }
+    tr:focus {
+        outline: none;
+        border: 0;
+    }
+
+    .poweredOnCss {
+        background-color: #378ad8 !important;
+        color: #FFFFFF !important;
+        border: 1px solid #378ad8;
+    }
+    .small-text{
+        font-size: 20px;
+    }
+    .gray-border-right{
+        border-right: 2px solid #dddddd;
+    }
+    .table-td-padding {
+        padding : 11px 15px !important;
+    }
+    .table>thead>tr>th {
+      padding : 8px 8px;
+    }
+    .table>tbody>tr>td {
+      padding-top: 8px 8px;
+    }
+    .actions_div {
+        min-width: 150px !important;
+    }
+
+   /* tr:hover  img {
+        background-color: red;
+    }*/
+
+    @media only screen  and (min-device-width: 1024px)  and (max-device-width: 1300px)  and (min-resolution: 190dpi){
+        .tabs-level2 .subtabs .nav>li>a {
+            padding: 0px 9px; 
+        }
+
+        .tabs-level2 .subtabs .nav-tabs>li.active>a{
+            padding: 0px 9px;
+        }
+    }
+
+    @media (min-resolution: 90dpi ) and (max-resolution: 99dpi ) and (max-width: 1380px){
+        .tabs-level2 .subtabs .nav>li>a {
+            padding: 0px 9px; 
+        }
+
+        .tabs-level2 .subtabs .nav-tabs>li.active>a{
+            padding: 0px 9px;
+        }
+    }
+
+</style>
+
+<div class="page_wrapper" style="float:left" ng-if="private_clouds !== undefined">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 no-record-warning">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <div ng-if="private_clouds.length === 0" class="content-wrapper">
+                <span class="no-record-text">No Private Cloud to display.
+                    <a ng-click="add_pc(0)" style="color:#5589d0; cursor:pointer;"> Click here </a>to create.
+                </span>
+            </div>
+        </section>
+    </div>    
+</div>
+<div ng-if="(private_clouds !== undefined) && (private_clouds.length > 0)">
+    <loading loader="{{loader}}"></loading>
+
+    <div class="row tabs-level1 margin_top10px" style="height: 35px;background-color: #fff;">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 fullheight pull-left">
+            <div class="ui-selectee fullheight">
+                <nav class="column maintabs fullheight">
+                    <uib-tabset active="active_pc_index" style="background : none;">
+                        <uib-tab ng-repeat="private_cloud in private_clouds" index="$index" ng-click="switch_active_pc(private_cloud)">
+                            <uib-tab-heading class="tab-heading">
+                                <span ng-show="!(private_cloud.fa || private_cloud.svg)">{{private_cloud.name}}</span>
+                                <span ng-show="private_cloud.fa">
+                                    <i class="fa {{private_cloud.fa}}"></i> {{private_cloud.name}}
+                                </span>
+                                <span ng-show="private_cloud.svg">
+                                    <img class="svg leftnavsubhead3icon" ng-src="static/fonts/SVGicons/{{ private_cloud.svg }}"> {{private_cloud.name}}
+                                </span>
+                            </uib-tab-heading>
+                        </uib-tab>
+                    </uib-tabset>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top : 10px;">
+        <div class="row tabs-level1" style="margin-top: 10px;height: 35px;">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-left: 5px !important;">
+                <div class="ui-selectee">
+                    <nav class="column subtabs">
+                        <uib-tabset active="active_pc_elem_index.index">
+                            <uib-tab ng-repeat="item in pc_elems" index="$index"
+                            ng-click="get_pc_elements(active_pc, item, $index);">
+                                <uib-tab-heading class="tab-heading">
+                                    <span ng-show="!(item.fa || item.svg)">{{item.display_name}}</span>
+                                    <span ng-show="item.fa">
+                                        <i class="fa {{item.fa}}"></i> {{item.display_name}}
+                                    </span>
+                                    <span ng-show="item.svg">
+                                        <img class="svg leftnavsubhead3icon" ng-src="static/fonts/SVGicons/{{ item.svg }}"> {{item.display_name}}
+                                    </span>
+                                </uib-tab-heading>
+                            </uib-tab>
+                        </uib-tabset>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top : 10px;" ui-view></div>
+</div>
+
+<observium-stats-popup></observium-stats-popup>
+
+
+
+
+<!-- <div class="page_wrapper" style="float:left">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="private_clouds !== undefined">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table class="table table-condensed table-hover margin0">
+                <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Platform Type</th>
+                      <th>Datacenter</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="private_cloud in private_clouds">
+                        <td>{{private_cloud.name}}</td>
+                        <td>{{private_cloud.platform_type}}</td>
+                        <td>{{private_cloud.datacenter}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="private_clouds.length === 0" class="content-wrapper">
+                <no-records-found message="No Private Clouds to display"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div> -->

@@ -1,0 +1,148 @@
+<style type="text/css">
+    .pagemargin .page_wrapper {
+        background-color: #FFFFFF;
+        width: 100%;
+        -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        padding: 20px;
+        padding-bottom: 60px;
+        padding-top: 0px;
+    }
+
+    .dataTables_filter input[type="search"] {
+        border: 2px solid #E4E4E4;
+        border-radius: 2px;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .dataTables_length select {
+        border: 1px solid #E4E4E4;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .table th {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        /*height: 50px !important;*/
+    }
+
+    .table td {
+        padding: 8px 13px !important;
+    }
+</style>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object={{agent_details}}></loading>
+    <div class="pagemargin">
+        <div class="col-xs-12 content-wrapper bg-color top_shadow" ng-if="agent_details" style="padding-left:0px;">
+            <div class="col-xs-4 pull-right">
+                <div class="action-bar pull-right table-button">
+                    <button class="btn btn-primary" type="button" ng-click="add()" style="margin-left:20px;"> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="page_wrapper" style="float:left">
+            <section ng-if="agent_details" id="no-more-tables" class="margintop20">
+                <table class="example table  table-condensed cf" ng-if="agent_details.length">
+                    <thead class="cf">
+                        <tr>
+                            <th>OS Distribution</th>
+                            <th>OS Version</th>
+                            <th>Zabbix Server Version</th>
+                            <th>Hardware</th>
+                            <th>Path</th>
+                            <th class="numeric">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="agent in agent_details">
+                            <td>{{agent.os_distribution}}</td>
+                            <td>{{agent.os_version}}</td>
+                            <td>{{agent.zabbix_version}}</td>
+                            <td>{{agent.hardware}}</td>
+                            <td>{{agent.file_path}}</td>
+                            <td>
+                                <div class="action-icons">
+                                    <a class="fa fa-pencil blue-text" tooltip-class="customClass" uib-tooltip="Edit"
+                                        ng-click="edit(agent)"></a>
+                                    <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete"
+                                        ng-click="delete(agent)"></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="!agent_details.length" class="content-wrapper text-center" style="padding-top:30px">
+                    <span class="no-record-text">No agents available to display</span>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="agentDetails.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> {{method}} Agent Details</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+            <div class="col-xs-12">
+                <label style="color:red" ng-if="err">{{ error }}</label><br>
+                <div class="form-group col-xs-6">
+                    <label for="os_distribution">OS Distribution*</label>
+                    <select class="form-control" id="os_distribution" ng-model="obj.os_distribution" ng-change="get_os_version()" required>
+                        <option ng-repeat="osd in os_distributions" value="{{osd}}">{{osd}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="os_version">Version*</label>
+                    <select class="form-control" id="os_version" ng-model="obj.os_version" required>
+                        <option ng-repeat="version in os_versions" value="{{version}}">{{version}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="zabbix_version">Zabbix Server Version</label>
+                    <input class="form-control" id="zabbix_version" type="text" ng-model="obj.zabbix_version"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="hardware">Hardware*</label>
+                    <select class="form-control" id="hardware" ng-model="obj.hardware" required>
+                        <option ng-repeat="hw in hardwares" value="{{hw}}">{{hw}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-xs-12">
+                    <label for="file_path">Zabbix Agent Path</label>
+                    <input class="form-control" id="file_path" type="text" ng-model="obj.file_path"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-danger" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-success" ng-click="onSubmit()" type="submit"> Submit</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="deleteAgentDetails.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> Confirm Delete</span>
+    </div>
+    <div class="modal-content">
+        <div class="modal-body" style="text-align: center;">
+            Are you sure you want to delete this agent ?
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons"  style="text-align: center;">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+                <button type="button" class="btn btn-default" ng-click="confirmDelete()"> Confirm </button>
+            </div>
+        </div>
+    </div>
+</script>

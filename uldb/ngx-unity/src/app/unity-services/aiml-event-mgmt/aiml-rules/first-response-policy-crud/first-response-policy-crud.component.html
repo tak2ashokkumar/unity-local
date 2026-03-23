@@ -1,0 +1,159 @@
+<div class="card">
+    <div class="card-header bg-white rounded-3 py-2">
+        <div class="row">
+            <div class="col-6">
+                <div class="mt-1">
+                    <span class="font-lg font-weight-bold">{{!policyId ? 'Create ' : 'Update '}}Policy</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back"><i
+                        class="fa fa-arrow-left" (click)="goBack()"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body font-sm">
+        <form *ngIf="form" [formGroup]="form">
+            <div class="form-group">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="border position-relative py-2 rounded">
+                <div class="bg-white font-md font-500 border-title">Basic</div>
+                <div class="col-10 form-group d-flex align-items-center my-2">
+                    <label class="col-2 form-col-form-label align-items-center m-0 text-center">Name<em>*</em></label>
+                    <input id="name" type="text" class="col-6 form-control" formControlName="name"
+                        placeholder="Enter Name" [class.is-invalid]="formErrors.name">
+                    <div class="invalid-feedback col" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center py-2 my-4">
+                <div class="font-sm px-2">Filters :</div>
+                <div class="col-10 d-inline-block">
+                    <div class="btn-group rounded-pill border" style="border-radius: 50px;">
+                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                            (click)="enableFilter()" [class.active]="form.controls.filter_enabled.value">Enable</button>
+                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                            (click)="disableFilter()"
+                            [class.active]="!form.controls.filter_enabled.value">Disable</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border position-relative py-2 my-4 rounded" *ngIf="form.controls.filter_enabled.value && queryBuilderConfig">
+                <div class="bg-white font-md font-500 border-title">Filters</div>
+                <div class="col-10 form-group mt-2">
+                    <query-builder #queryBuilder formControlName='filter_rule_meta'
+                        [classNames]='queryBuilderClassNames' [config]='queryBuilderConfig'
+                        [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
+                        [persistValueOnFieldChange]='persistValueOnFieldChange'>
+                        <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+                            <textarea class="text-input text-area" [(ngModel)]="rule.value"
+                                [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                placeholder="Custom Textarea"></textarea>
+                        </ng-container>
+                        <ng-container *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
+                            <div class="col-auto">
+                                <tag-input [clearOnBlur]="true" [(ngModel)]="rule.value"
+                                    [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                    [modelAsStrings]="true" [secondaryPlaceholder]="'Enter tag'">
+                                    <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+                                    </tag-input-dropdown>
+                                </tag-input>
+                            </div>
+                        </ng-container>
+                    </query-builder>
+                </div>
+            </div>
+            <div class="border position-relative py-2 mt-5 rounded">
+                <div class="bg-white font-md font-500 border-title">Supression Time</div>
+                <div class="col-10 form-group mt-2 pl-4">
+                    <div class="py-2">
+                        <div class="custom-control custom-radio">
+                            <input id="suppress_always" type="radio" class="custom-control-input" value="always"
+                                name="suppress_time_type" formControlName="suppress_time_type">
+                            <label class="custom-control-label" for="suppress_always">Suppress Always</label>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center pt-3">
+                        <div class="custom-control custom-radio">
+                            <input id="suppress_next" type="radio" class="custom-control-input" value="next"
+                                name="suppress_time_type" formControlName="suppress_time_type">
+                            <label class="custom-control-label" for="suppress_next">Next</label>
+                        </div>
+                        <div class="d-flex input-group pl-2">
+                            <div>
+                                <input class="form-control" type="number" formControlName="next_hr" min="0" max="23"
+                                    placeholder="Hr" [class.is-invalid]="formErrors.next_hr">
+                                <div class="invalid-feedback" *ngIf="formErrors.next_hr">
+                                    {{formErrors.next_hr}}</div>
+                            </div>
+                            <div class="ml-2">
+                                <input class="form-control" formControlName="next_min" type="number" min="0" max="59"
+                                    placeholder="Min" [class.is-invalid]="formErrors.next_min">
+                                <div class="invalid-feedback" *ngIf="formErrors.next_min">
+                                    {{formErrors.next_min}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center pt-2">
+                        <div class="custom-control custom-radio">
+                            <input id="suppress_custom" type="radio" class="custom-control-input" value="custom"
+                                name="suppress_time_type" formControlName="suppress_time_type">
+                            <label class="custom-control-label" for="suppress_custom">Custom</label>
+                        </div>
+                        <div class="ml-4 form-group">
+                            <label class="form-col-form-label font-sm-xs mb-0">Start Date<em>*</em></label>
+                            <div class="input-group">
+                                <owl-date-time #startdate [hour12Timer]="true"></owl-date-time>
+                                <input class="form-control rounded-left" [owlDateTimeTrigger]="startdate"
+                                    [owlDateTime]="startdate" type="text" placeholder="Date"
+                                    formControlName="start_datetime" [class.is-invalid]="formErrors.start_datetime">
+                                <div class="input-group-append" [owlDateTimeTrigger]="startdate">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                                <div class="invalid-feedback" *ngIf="formErrors.start_datetime">
+                                    {{formErrors.start_datetime}}</div>
+                            </div>
+                        </div>
+                        <div class="ml-4 form-group">
+                            <label class="form-col-form-label font-sm-xs mb-0">End Date</label>
+                            <div class="d-flex align-items-center">
+                                <div class="custom-control custom-radio">
+                                    <input id="end_date_off" type="radio" class="custom-control-input" value="never"
+                                        name="end_date_status" formControlName="end_date_status">
+                                    <label class="custom-control-label" for="end_date_off">Never</label>
+                                </div>
+                                <div class="custom-control custom-radio ml-3">
+                                    <input id="end_date_on" type="radio" class="custom-control-input" value="on"
+                                        name="end_date_status" formControlName="end_date_status">
+                                    <label class="custom-control-label" for="end_date_on">On</label>
+                                </div>
+                                <div class="input-group ml-3">
+                                    <owl-date-time #enddate [hour12Timer]="true"></owl-date-time>
+                                    <input class="form-control rounded-left" [owlDateTimeTrigger]="enddate"
+                                        [owlDateTime]="enddate" type="text" placeholder="Date"
+                                        formControlName="end_datetime" [class.is-invalid]="formErrors.end_datetime">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="enddate">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <div class="invalid-feedback" *ngIf="formErrors.end_datetime">
+                                        {{formErrors.end_datetime}}</div>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fromAfterTo">
+                                        {{formErrors.fromAfterTo}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer d-flex justify-content-center bg-white border-top-0 mt-4 pb-5 mb-5">
+        <button class="btn btn-sm btn-primary mr-2" type="button" (click)="onSubmit()">{{policyId ? 'Update' :
+            'Create'}}</button>
+        <button class="btn btn-sm btn-outline-danger" type="button" (click)="reset()">Reset</button>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<form *ngIf="form" [formGroup]="form">
+    <div class="border position-relative rounded mt-4 p-3">
+        <div class="bg-white font-md font-500 section-name-one">Datacenter Details</div>
+        <div class="row">
+            <div class="form-group col-4">
+                <label class="form-col-form-label">Datacenter<em>*</em></label>
+                <multiselect-dropdown [options]="datacenters" [settings]="dcSettings" class="form-control p-0"
+                    (dropdownClosed)="dcChange()" formControlName="datacenters"
+                    [ngClass]="{'is-invalid' : formErrors.datacenters}"></multiselect-dropdown>
+                <div class="invalid-feedback" *ngIf="formErrors.datacenters">{{formErrors.datacenters}}</div>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-col-form-label">Cabinets</label>
+                <multiselect-dropdown [options]="datacenterCabinets" [settings]="cabinetSettings"
+                    class="form-control p-0" formControlName="cabinets"
+                    [isDisabled]="!selectedDCIds.length"></multiselect-dropdown>
+                <div class="invalid-feedback" *ngIf="formErrors.cabinets">
+                    {{formErrors.cabinets}}</div>
+            </div>
+            <div class="form-group col-4">
+                <label class="form-col-form-label">Report Type</label>
+                <select class="form-control" formControlName="reportType"
+                    [ngClass]="{'is-invalid' : formErrors.reportType}">
+                    <option [value]="'cabinet'">Cabinet</option>
+                    <option [value]="'device'">Devices</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.reportType">
+                    {{formErrors.reportType}}</div>
+            </div>
+        </div>
+    </div>
+</form>

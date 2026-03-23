@@ -1,0 +1,372 @@
+<div ng-controller="TicketManagementController">
+
+  <style type="text/css">
+    .tabstyles {
+        padding : 0px !important;
+    }
+    .tickets_pages {
+      min-height: 100vh;
+    }
+
+    .date-wrapper {
+      width: unset;
+      box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.14);
+    } 
+
+    .date-wrapper .fa {
+      padding: 7px 0px 7px 7px;
+    }
+
+    .daterange {
+      border-right: none;
+      min-height: auto;
+      padding: 9px 7px 5px 7px;
+    }
+
+    .aws div {
+      color : orange;
+    }
+
+    .azure div {
+      color : blue;
+    }
+
+    .private_cloud div {
+      color : green;
+    }
+
+    .form-inline .form-group {
+      transform: scale(0.9);
+    }
+
+    .form-inline .form-control {
+      width: 63%;
+    }
+
+    .select-arrow {
+      top: 17px;
+      position: absolute;
+      margin-left: -20px;
+    }
+
+    .lightcolor {
+      font-size: 10px;
+    }
+
+    .graph_lables {
+      padding-top: 25px;
+    }
+    .graph_heading {
+      font-size: 16px !important;
+    }
+
+    @media (min-width: 1260px) and (max-width: 1396px){
+      .form-inline .form-group {
+        transform: scale(0.8);
+      }
+      .date-wrapp  span.daterange {
+        width: 80% !important;
+      }
+      .graph_heading {
+        font-size: 12px !important;
+      }
+    }
+
+    @media (min-width: 1396px) and (max-width: 1419px){
+      .graph_lables {
+        padding-top: 15px;
+      }
+      .form-inline .form-group {
+        transform: scale(0.8);
+      }
+      .date-wrapp  span.daterange {
+        width: 225px !important;
+      }
+      .graph_heading {
+        font-size: 15px !important;
+      }
+    }
+
+  </style>
+  <loading loader="{{loader}}"></loading>
+  <div class="row content-wrapper tickets_pages" style="padding-top:10px !important;" ng-if="org_linked_to_zendesk">
+    <div class="col-xs-12 paddingright">
+        <div class="row middle-wrapper">
+            <div class="col-xs-3  paddingleft">
+              <div class="Dashwrap col-xs-12" style="min-height: 160px;">
+                  <div class="col-xs-11 col-xs-offset-1">
+                      <h4 class="graph_heading">Open/Pending Tickets by Priority </h4>
+                  </div>
+                  <div class="col-xs-12 paddingtop10px" ng-show="open_tickets_count">
+                      <div class="col-xs-8" id="priority-ticket-container" ng-show="open_tickets_count.length != 0">
+                          <div class="row padding_top8px">
+                              <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+
+                              <div class="col-xs-8 col-sm-8 col-md-10 col-lg-8">
+                                <canvas id="priority-ticket-donut"></canvas>
+                              </div>
+                              <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+                          </div>
+                      </div>
+                      <div class="col-xs-4 graph_lables" ng-show="open_tickets_count.length != 0">
+                          <div class="col-xs-12 paddingleft">
+                              <span class="legendred"></span>
+                              <span class="lightcolor paddingright">Urgent</span>
+                          </div>
+                          <div class="col-xs-12 paddingleft paddingtop10px">
+                              <span class="legendyellow"></span>
+                              <span class="lightcolor paddingright">High</span>
+                          </div>
+                          <div class="col-xs-12 paddingleft paddingtop10px">
+                              <span class="legendgreen"></span>
+                              <span class="lightcolor paddingright">Normal</span>
+                          </div>
+                          <div class="col-xs-12 paddingleft paddingtop10px">
+                              <span class="legendlight"></span>
+                              <span class="lightcolor paddingright">Low</span>
+                          </div>
+                      </div>
+                      <div class="col-xs-10" id="priority-graph-no-tickets-container"></div>
+                  </div>
+                  <div class="col-xs-11 col-xs-offset-1" ng-show="!open_tickets_count" style="text-align: center;padding: 60px;">
+                      <i class="fa fa-spinner fa-spin" style="font-size:40px;"></i>
+                  </div>
+              </div>
+            </div>
+
+            <div class="col-xs-3  paddingleft col-xs-offset-1" style="margin-left:12%;">
+                <div class="Dashwrap col-xs-12" style="min-height: 160px;">
+                    <div class="col-xs-10 col-xs-offset-2">
+                        <h4 class="graph_heading">Tickets by Status </h4>
+                    </div>
+                    <div class="col-xs-12 paddingtop10px" ng-show="tickets_count_by_status">
+                        <div class="col-xs-8" id="status-tickets-container" ng-show="tickets_count_by_status.length != 0">
+                            <div class="row padding_top8px">
+                                <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+
+                                <div class="col-xs-8 col-sm-8 col-md-10 col-lg-8">
+                                  <canvas id="status-tickets-donut"></canvas>
+                                </div>
+                                <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 graph_lables" ng-show="tickets_count_by_status.length != 0">
+                            <div class="col-xs-12">
+                                <span class="legendred"></span>
+                                <span class="lightcolor paddingright">Open</span>
+                            </div>
+                            <div class="col-xs-12 paddingtop10px">
+                                <span class="legendyellow"></span>
+                                <span class="lightcolor paddingright">Pending</span>
+                            </div>
+                            <div class="col-xs-12 paddingtop10px">
+                                <span class="legendgreen"></span>
+                                <span class="lightcolor paddingright">Solved</span>
+                            </div>
+                            <div class="col-xs-12 paddingtop10px">
+                                <span class="legendlight"></span>
+                                <span class="lightcolor paddingright">Closed</span>
+                            </div>
+                        </div>
+                        <div class="col-xs-10" id="status-graph-no-tickets-container"></div>
+                    </div>
+                    <div class="col-xs-8 col-xs-offset-4" ng-show="!tickets_count_by_status" style="padding: 60px;">
+                        <i class="fa fa-spinner fa-spin" style="font-size:40px;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-3  paddingleft" style="float:right;">
+                <div class="Dashwrap col-xs-12" style="min-height: 160px;">
+                    <div class="col-xs-11 col-xs-offset-1">
+                        <h4 class="graph_heading">Solved by Response Time </h4>
+                    </div>
+                    <div class="col-xs-12 paddingtop10px" ng-show="tickets_count_by_solved_time">
+                        <div class="col-xs-8" id="tickets-responsetime-container" ng-show="tickets_count_by_solved_time.length != 0">
+                            <div class="row padding_top8px">
+                                <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+
+                                <div class="col-xs-8 col-sm-8 col-md-10 col-lg-8">
+                                  <canvas id="tickets-responsetime-donut"></canvas>
+                                </div>
+                                <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 graph_lables" ng-show="tickets_count_by_solved_time.length != 0">
+                            <div class="col-xs-12">
+                                <span class="legenddarkgreen"></span>
+                                <span class="lightcolor paddingright">1 Day</span>
+                            </div>
+                            <div class="col-xs-12 paddingtop10px">
+                                <span class="legendgreen"></span>
+                                <span class="lightcolor paddingright">1 Week</span>
+                            </div>
+                            <div class="col-xs-12 paddingtop10px">
+                                <span class="legendyellow"></span>
+                                <span class="lightcolor paddingright">1 Month</span>
+                            </div>
+                            <div class="col-xs-12 paddingtop10px">
+                                <span class="legendred"></span>
+                                <span class="lightcolor paddingright"> >1 Month</span>
+                            </div>
+                        </div>
+                        <div class="col-xs-10" id="responsetime-graph-no-tickets-container"></div>
+                    </div>
+                    <div class="col-xs-11 col-xs-offset-1" ng-if="!tickets_count_by_solved_time" style="text-align: center;padding: 60px;">
+                        <i class="fa fa-spinner fa-spin" style="font-size:40px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 paddingright paddingtop10px">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color" style="padding-top: 10px !important; padding-bottom: 10px !important;">
+        <div class="col-xs-9" style="border-right: 1px solid #dddddd;">
+            <form role="from" name="tickets_filter_form" novalidate class="form-inline" ng-submit="filter_tickets()">
+                <div class="row">
+                    <div class="col-xs-3 form-group">
+                        <label for="searchKeyword"> Search : </label>
+                        <input type="text" class="form-control" ng-model="tickets_filter.searchkey" id="searchKeyword" placeholder="Enter Keyword">
+                    </div>
+                    <div class="col-xs-6 search-widget form-group">
+                      <div class="row">
+                          <div class="date-wrapp" style="float:left;width: 100%">
+                              <label class="daterange" style="padding: 0px;">Date Created : &nbsp;</label>
+                              <span class="date-wrapper" style="border: 1px solid #ddd;box-shadow: none;width: 69%">
+                                <span>
+                                  <i class="fa fa-calendar" style="padding-left: 10px"></i>&nbsp;
+                                </span>
+                                <span class="daterange" style="width: 85%;"><input id="demo" date-range-picker name="daterange5" class="date-picker" type="text" ng-model="tickets_filter.tickets_date_range" options="options" required/>
+                                </span>
+                              </span>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-xs-3 form-group">
+                        <label for="status"> Status : &nbsp;</label>
+                        <select class="form-control" id="status" ng-model="tickets_filter.status">
+                          <option name="open" value="open"> Open/New </option>
+                          <option name="pending" value="pending"> Pending </option>
+                          <option name="solved" value="solved"> Solved </option>
+                          <option name="colsed" value="closed"> Closed </option>
+                          <option name="all" value="all"> All </option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <div class="col-xs-3 form-group">
+                        <label for="priority"> Priority : </label>
+                        <select class="form-control" id="priority" ng-model="tickets_filter.priority">
+                          <option name="all" value="" selected> All </option>
+                          <option name="urgent" value="urgent"> Urgent </option>
+                          <option name="high" value="high"> High </option>
+                          <option name="normal" value="normal"> Normal </option>
+                          <option name="low" value="low"> Low </option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+
+                    <div class="col-xs-6 form-group" style="padding-left: 10px;">
+                      <label for="display_for"> Display / Show:</label>
+                        <select class="form-control"  id="display_for" ng-model="tickets_filter.display_for" style="width: 69%;">
+                          <option name="all_tickets" value="all_tickets" selected> All Tickets </option>
+                          <option name="my_tickets" value="my_tickets"> My Tickets </option>
+                          <option name="assigned_to_me" value="assigned_to_me"> Tickets Assigned to me </option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+
+                    <div class="col-xs-3 form-group" style="margin-top: 5px;">
+                        <button type="submit" class="btn btn-default pull-right" style="margin-right: 10px;"> Filter Tickets</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-xs-3" style="float:right;padding-top: 50px;">
+          <div class="action-bar table-button">
+            <span class="count">{{ tickets_data.count }}</span>
+            <span class="count-text"> Tickets</span>
+            <span uib-tooltip="{{userZendeskCheckMsg}}" ng-if="ticket_type">
+              <button class="btn btn-default" type="button" ng-click="promptRequest()" ng-class="{'fa-disabled': (userZendeskCheckMsg !== undefined) }">Create Ticket</button>
+            </span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="bg-color">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <section id="no-more-tables" class="margintop20 middle-wrapper">
+          <table cellspacing="0" width="100%" class="display bg-color table table-condensed cf" infinite-scroll="loadMoreResults()">
+            <thead class="cf">
+              <tr>
+                <th ng-repeat="tickets_header in tickets_headers" style="white-space: nowrap;"
+                custom-sort order="{{tickets_header.key}}" sort="sort" sortdisabled="{{tickets_header.is_sort_disabled}}">{{ tickets_header.title }} </th>
+                <th ng-if="actions != undefined">Actions</th>
+              </tr>
+            </thead>
+            <tbody ng-if="(tickets_data.results.length != 0)">
+              <tr ng-repeat="ticket in tickets_data.results | filter: searchKeyword | orderBy : sortkey" class="odd gradeX {{ticket.cloud_type}}">
+                  <td>
+                      <div>
+                      <a href="/main#/zendesk/ticket/{{ ticket.id}}">
+                      {{ ticket.id}}
+                      </a>
+                      </div>
+                  </td>
+                  <td>
+                      <div ng-if="ticket.subject.length <= 45 ">
+                          {{ ticket.subject }}
+                      </div>
+                      <div ng-if="ticket.subject.length > 45 " tooltip-class="customClass"  uib-tooltip="{{ticket.subject}}">
+                          {{ ticket.subject | limitTo:45 }}&nbsp;....
+                      </div>
+                  </td>
+                  <!-- <td>
+                      <div class="{{ticket.cloud_type}}">{{ ticket.cloud_name }}</div>
+                  </td> -->
+                  <td>
+                      <div>{{ ticket.status || 'N/A'}}</div>
+                  </td>
+                  <td>
+                      <div>{{ ticket.priority || 'N/A'}}</div>
+                  </td>
+                  <td class="ticket_date_width">
+                      <div> {{ ticket.created_at | unityDate : $root.users_timezone}}</div>
+                  </td>
+                  <td class="ticket_date_width">
+                      <div ng-if="ticket.has_metrics"> {{ ticket.assigned_on | unityDate : $root.users_timezone}}</div>
+                      <div ng-if="!ticket.has_metrics">
+                          <i class="fa fa-spinner fa-spin"></i>
+                      </div>
+                  </td>
+                  <td class="ticket_date_width">
+                      <div ng-if="ticket.has_metrics"> {{ ticket.resolved_on | unityDate : $root.users_timezone}}</div>
+                      <div ng-if="!ticket.has_metrics">
+                          <i class="fa fa-spinner fa-spin"></i>
+                      </div>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="(tickets_data.results.length === 0) && (!zendeskError)" class="bg-color content-wrapper">
+              <div ng-if="(tickets_filter_copy.display_for == 'all_tickets') || ((tickets_filter_copy.display_for != 'all_tickets') && userZendeskCheck)">
+                  <no-records-found message="No tickets to display"></no-records-found>
+              </div>
+              <div ng-if="(tickets_filter_copy.display_for != 'all_tickets') && !userZendeskCheck">
+                <no-records-found message="{{userZendeskCheckMsg}}"></no-records-found>
+              </div>
+          </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="padding20px margin_top85px" ng-if="!org_linked_to_zendesk">
+        <no-records-found message=" Organization not linked with zendesk. Please contact support@unityonecloud.com "></no-records-found>
+  </div>
+
+
+</div>

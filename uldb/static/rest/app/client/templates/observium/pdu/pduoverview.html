@@ -1,0 +1,86 @@
+<div class="row">
+	 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-right : 10px !important;">
+	 	<div class="middle-wrapper Dashwrap" ng-if="!pdu_details_error && pdu_details">
+	 		<div class="row table-responsive">
+ 		        <h1>PDU Details</h1>
+ 		        <table class="table" style="margin-top:10px;">
+ 		        	<tbody>
+ 		        		<tr>
+ 		        			<td>Hardware</td>
+ 		        			<td>{{pdu_details.device_data.hardware}}</td>
+ 		        		</tr>
+ 		        		<tr>
+ 		        			<td>Operating system</td>
+ 		        			<td>{{pdu_details.device_data.os}}</td>
+ 		        		</tr>
+ 		        		<tr>
+ 		        			<td>System name</td>
+ 		        			<td>{{pdu_details.device_data.sysName}}</td>
+ 		        		</tr>
+ 		        		<tr>
+ 		        			<td>Contact</td>
+ 		        			<td>{{pdu_details.device_data.sysContact}}</td>
+ 		        		</tr>
+ 		        		<tr>
+ 		        			<td>Location</td>
+ 		        			<td>{{pdu_details.device_data.location}}</td>
+ 		        		</tr>
+ 		        		<tr>
+ 		        			<td>Serial</td>
+ 		        			<td ng-show="pdu_details.device_data.serial != 'MISSING-0xNNNNNNNNL'">{{pdu_details.device_data.serial}}</td>
+ 		        			<td ng-show="pdu_details.device_data.serial == 'MISSING-0xNNNNNNNNL'"><i>MISSING</i></td>
+ 		        		</tr>
+ 		        		<tr>
+ 		        			<td>Uptime</td>
+ 		        			<td ng-if="pdu_details.device_data.status == 1">{{pdu_details.device_data.uptime | unityObserviumTime}}</td>
+ 		        			<td ng-if="pdu_details.device_data.status == 0" style="color:red">Down  {{pdu_details.device_data.uptime | unityObserviumTime}}</td>
+ 		        		</tr>
+ 		        		<tr>
+ 		        			<td>Last reboot</td>
+ 		        			<td>{{pdu_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone}}</td>
+ 		        		</tr>
+ 		        	</tbody>
+ 		        </table>
+	 		 </div>
+	 	</div>
+	 </div>
+
+	 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+
+	 	<div class="middle-wrapper Dashwrap" ng-if="!pdu_details_error && pdu_status_data" style="padding-top:10px !important;padding-bottom: 5px;">
+	 		<h1>Status Indicators</h1>
+	 		<table class="table" style="margin-top:10px;">
+	 			<tbody>
+	 				<tr ng-repeat="(key,value) in pdu_status_data">
+	 					<td style="width: 30%;">{{key}}</td>
+	 					<td>
+	 						<img ng-src="data:image/png;base64,{{ pdu_status_data[key].graph }}">
+	 					</td>
+	 					<td>{{pdu_status_data[key].status_name}}</td>
+	 				</tr>
+	 			</tbody>
+	 		</table>
+	 	</div>
+
+	 	<div class="middle-wrapper Dashwrap" ng-if="!pdu_details_error && pdu_sensor_data"  ng-repeat="(sensor_data_key,sensor_data_obj) in pdu_sensor_data" style="margin-top: 10px;padding-top:10px !important;padding-bottom: 5px;">
+	 		<div class="row table-responsive" >
+	 			<h1>{{sensor_data_key | unityHeading}}</h1>
+		        <table class="table" style="margin-top:10px;">
+		 			<tbody>
+		 				<tr ng-repeat="(key,value) in sensor_data_obj">
+		 					<td ng-init="key1 = get_sensor_subkeys(value)" style="width: 30%;">{{key1}}</td>
+		 					<td>
+		 						<img ng-src="data:image/png;base64,{{ value[key1].graph }}">
+		 					</td>
+		 					<td>{{value[key1].sensor_value}}{{value[key1].sensor_unit}}</td>
+		 				</tr>
+		 			</tbody>
+	 			</table>
+		    </div>
+	 	</div>
+	 </div>
+</div>
+
+<div style="float:left; width:100%;" ng-if="pdu_details_error">
+    <no-records-found message="{{pdu_details_error.data}}"></no-records-found>
+</div>

@@ -1,0 +1,34 @@
+<div class="panel panel-primary">
+    <div class="panel-heading vcloud-head">
+        <div class="col-md-8 vcloudtitle"><i class="fa fa-cloud  fa-fw"></i> COLOCATIONS</div>
+        <div class="col-md-4 pinnewcus">
+            <input class="form-control custom_search_field" type="text" ng-model="searchKeywordColo"
+                   placeholder="Search by name.." ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+        </div>
+    </div>
+
+    <div class="panel-body limt-scroll-cloud-widget" >
+        <span ng-if="!colocations">
+          <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+        </span>
+        <div class="privateClouds-wrapper">
+            <div class="dataTable_wrapper auto-height">
+                <span ng-if="colocations.data.info.length != 0">
+                <table class="table" id="dataTables-example">
+                    <div ng-repeat="(index, page) in colocations.data.info | filter: searchKeywordColo"
+                        class="cus-widget-item widget-item-wrapper col-lg-6 col-md-6">
+                        <colocation-widget colo="page">
+                          <!--<div class="col-md-9">
+                                      <canvas id="bar" class="chart chart-bar" data="page.availability.status" labels="medal_ticks" colours="medals_colours"></canvas>
+                                    </div>-->
+                        </colocation-widget>
+                    </div>
+                </table>
+                </span>
+                <span ng-if="colocations.data.info.length == 0">
+                    <h3 class="align-center">No records to display</h3>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

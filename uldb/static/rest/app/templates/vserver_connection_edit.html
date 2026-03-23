@@ -1,0 +1,89 @@
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+	<h4>Edit Virtual Server Connection</h4>
+  </div>
+
+  <div class="panel-body">
+	<form role="form"id="postform" action="" method="post">
+		 <input type='hidden' id="csrf_token" name='csrfmiddlewaretoken' value={{csrf_token}} />		
+	</form>
+	<form role="form" id="wizard" action="server.html" method="post" enctype='application/json'>
+		
+		<div>
+			<table class="table tabborder" cellspacing="0" width="100%">
+			    <thead>
+				 <tr>
+
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>Ethernet</center></div>
+						<div class="clear"></div>
+					</th>
+		
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>MAC Address</center></div>
+						<div class="clear"></div>
+					</th>
+
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>IP Address</center></div>
+						<div class="clear"></div>
+					</th>
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>Default Gateway</center></div>
+						<div class="clear"></div>
+					</th>
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>VLAN</center></div>
+						<div class="clear"></div>
+					</th>
+	    			</tr>
+				</thead>
+				<tbody> 
+					<tr ng-repeat="connection in eth_det">
+						<td><input type="text" value="{{connection.interface_name}}" class="form-control" 								 							ng-model="connection.interface_name" disabled></input></td>
+						<td><input type="text" value="{{connection.nic_macaddress}}" class="form-control" 									 							ng-model="connection.nic_macaddress" ng-blur="validateMAC($event)" id="{{connection.mac_id}}"></input></td>
+						<td><input type="text" value="{{connection.nic_ipaddress}}" class="form-control" 									 							ng-model="connection.nic_ipaddress" ng-blur="ValidateIP($event)" id="{{connection.ip_id}}"></input></td>
+						<td><input type="text" value="{{connection.default_gateway}}" class="form-control" 								 							ng-model="connection.default_gateway" ng-blur="ValidateDefGwy($event)"></input></td>
+						<td><input type="text" value="{{connection.vlan_tag}}" class="form-control" 									 							ng-model="connection.vlan_tag" ng-blur="validatevlan($event)" id="{{connection.vlan_id}}"></input></td>
+					</tr>
+				</tbody>
+				<tfoot>
+				 <tr>
+
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>Ethernet</center></div>
+						<div class="clear"></div>
+					</th>
+		
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>MAC Address</center></div>
+						<div class="clear"></div>
+					</th>
+
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>IP Address</center></div>
+						<div class="clear"></div>
+					</th>
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>Default Gateway</center></div>
+						<div class="clear"></div>
+					</th>
+					<th scope="col" class="no-sorting">
+						<div class="text"><center>VLAN</center></div>
+						<div class="clear"></div>
+					</th>
+	    			</tr>
+				</tfoot>
+			</table>
+		</div>
+		
+	      <button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelVConnectionEdit()">Cancel</button>
+   	      <button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveVConnectionEdit()">Save</button>
+		<!--<div><br>
+		<pre>{{eth_det | json}}</pre>
+		</div>-->
+	</form>
+  </div>
+</div>
+	

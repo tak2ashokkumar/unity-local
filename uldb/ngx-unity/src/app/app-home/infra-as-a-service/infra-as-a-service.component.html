@@ -1,0 +1,7 @@
+<private-cloud *ngIf="showPrivateCloudWidgets()"></private-cloud>
+<public-cloud *ngIf="showPublicCloudWidgets()"></public-cloud>
+<ng-container *ngIf="showServicesWidgets()">
+    <dashboard-kubernetes-controllers></dashboard-kubernetes-controllers>
+    <dashboard-dockers-controller></dashboard-dockers-controller>
+    <mesh-services></mesh-services>
+</ng-container>

@@ -1,0 +1,28 @@
+@import "variables";
+
+.card.active::before,
+.card.active::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+
+.card.active::before {
+  font-family: FontAwesome;
+  content: "\f00c";
+  margin-top: -3px;
+  z-index: 200;
+  color: $white;
+  font-size: 11px;
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.card.active::after {
+  border-width: 0.8rem;
+  border-right-color: $success;
+  border-top-color: $success;
+}

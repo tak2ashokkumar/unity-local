@@ -1,0 +1,151 @@
+<style type="text/css">
+    .maintabs .nav-tabs {
+        border: none;
+        padding: 2px 20px 0px
+    }
+    .maintabs .nav-tabs>li.active>a:hover, .maintabs .nav-tabs>li.active>a:focus, .maintabs .nav-tabs>li.active>a, .maintabs.nav-tabs>li.active>a:hover, .maintabs .nav-tabs>li.active>a:focus {
+        background-color: transparent;
+        color: #0bbb71;
+        cursor: pointer;
+        font-size: 13px !important;
+        border: 1px solid #f48e1f;
+        border-width: 0 0 0px;
+        line-height: 23px!important;
+        padding: 3px 5px;
+    }
+    .maintabs .nav-tabs>li>a {
+        margin-right: 0px;
+        border-radius: 4px 4px 0 0;
+        background-color: transparent;
+        font-size: 13px;
+    }
+    .maintabs .nav-tabs>li>a:hover,{
+        border-color: #fbfbfb;
+        color: #0bbb71;
+        background-color: transparent;
+        font-size: 13px;
+    }
+    .maintabs .nav>li>a:focus, .maintabs .nav>li>a:focus, .maintabs .nav>li>a:active {
+        background-color: #fbfbfb;
+        text-decoration: none;
+    }
+    .maintabs .nav-tabs>li.active>a:hover {
+        /*border-color: #fbfbfb;*/
+        color: #0bbb71;
+        background-color: transparent;
+    }
+
+    .maintabs .nav-tabs>li>a:hover {
+        border-color: #fbfbfb;
+        background-color: transparent;
+        color: #5589d0;
+        text-decoration: none;
+    }
+
+    .maintabs .nav-tabs {
+        padding-left: 5px;
+    }
+
+    .subtabs .nav-tabs {
+        border: none;
+        padding: 2px 20px 0px
+    }
+    .subtabs .nav-tabs>li.active>a:hover, .subtabs .nav-tabs>li.active>a:focus, .subtabs .nav-tabs>li.active>a, .subtabs.nav-tabs>li.active>a:hover, .subtabs .nav-tabs>li.active>a:focus {
+        background-color: transparent;
+        color: #0bbb71;
+        cursor: pointer;
+        font-size: 12px !important;
+        border: 1px solid #f48e1f;
+        border-width: 0 0 0px;
+        line-height: 30px!important;
+        padding: 0px 5px;
+    }
+    .subtabs .nav-tabs>li>a {
+        margin-right: 20px;
+        border-radius: 4px 4px 0 0;
+        background-color: transparent;
+        line-height: 30px;
+        padding-top: 0px;
+        padding-bottom: 0px;
+        font-size: 12px !important;
+    }
+    .subtabs .nav-tabs>li>a:hover,{
+        border-color: #fbfbfb;
+        color: #0bbb71;
+        background-color: transparent;
+        font-size: 12px !important;
+    }
+    .subtabs .nav>li>a:focus, .subtabs .nav>li>a:focus, .subtabs .nav>li>a:active {
+        background-color: #fbfbfb;
+        text-decoration: none;
+    }
+    .subtabs .nav-tabs>li.active>a:hover {
+        color: #0bbb71;
+        background-color: transparent;
+    }
+    .subtabs .nav-tabs>li>a:hover {
+        color: #5589d0;
+        background-color: transparent;
+    }
+    .subtabs .nav-tabs {
+        padding-left: 5px;
+    }
+
+    .fullheight {
+        height: 100%;
+    }
+
+
+    li.nav-item.disabled {
+        opacity : 0.5;
+        pointer-events : none;
+    }
+    .aws_graphs {
+       width: 98%;
+    }
+    .subtitleclass {
+       padding-left: 20px !important;
+    }
+    tr:focus {
+        outline: none;
+        border: 0;
+    }
+
+   /* tr:hover  img {
+        background-color: red;
+    }*/
+
+</style>
+
+<loading loader="{{loader}}"></loading>
+
+<div class="row tabs-level1" style="margin-top: -10px;height: 35px;background-color: #fff;">
+
+    <p style="display:inline;padding-top: 8px;padding-left : 10px;" class="pull-left">
+        <a href="" style="width: 100%;">
+            <span style="font-size:14px;color:#0bbb71"> {{aws_details.device_data.sysName | strLimit: 20}}
+                <span style="color : #c3c3c3;"> | </span>
+            </span>
+        </a> 
+    </p>
+    
+    <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 fullheight pull-left">
+        <div class="ui-selectee fullheight">
+            <nav class="column maintabs fullheight">
+                <uib-tabset active="activeTab" style="background : none;">
+                    <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{tab.tabname}}"
+                    select="getTabData(tab)" disable="tab.disabled"></uib-tab>
+                </uib-tabset>
+            </nav> 
+        </div>
+    </div>
+
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 company-name pull-right" style="padding-right: 15px !important;">
+        <a href="" ng-click="goToPreviousPage()" style="padding-top:0px;width: 100%;" class="menubackoption">
+          <i  style="font-size: 14px; padding-top: 7px;padding-right: 5px;" class="fa fa-arrow-left" aria-hidden="true"></i>
+          <span style="font-size:15px;">VM List</span>
+        </a>
+    </div>
+</div>
+
+<div style="margin-top : 10px;" ui-view></div>

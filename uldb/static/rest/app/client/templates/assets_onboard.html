@@ -1,0 +1,69 @@
+<!--Content Start-->
+<!--Tabs Level 1 Start-->
+<style type="text/css">
+    .btn-group .btn:hover, .btn:focus{
+        background-color: #2e6da4 !important;
+    }
+</style>
+
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 tabs-level1">
+    <div class="ui-selectee">
+        <nav class="column">
+            <ul class="nav nav-tabs">
+                <span class="ulheading">Customer Devices Onboard</span>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!--Tabs Level 1 End-->
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="row db-info shadow-btm"> </div>
+</div>
+
+<!--Tabs Level 1 End - Content Start-->
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingright">
+            <div class="row middle-wrapper">
+                <div class="row cardbox-header">Download Mock Sheet</div>
+                <div class="row Dashwrap">
+                    <button class="btn btn-default" type="button" ng-click="download_mock()">Download Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+            <div class="row middle-wrapper">
+                <div class="row cardbox-header">Upload Sheet</div>
+                <div class="row Dashwrap">
+                    <form role="form" name="inventory_onboard_form">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="form-group">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn" 
+                                    style="pointer-events:none;">Select File </button>
+                                    <button type="button" class="btn btn-primary"
+                                    ngf-select ng-model="file" ngf-model-invalid="errorFile"
+                                    name="file" required ngf-max-size="1MB" ngf-accept="'application/vnd.ms-excel'">
+                                        <i class="fa fa-upload"></i>
+                                    </button>
+                                    <span ng-if="inventory_onboard_form.file.$valid"> &nbsp; &nbsp; {{file.name}} </span>
+                                    <span ng-if="inventory_onboard_form.file.$error.maxSize">
+                                        &nbsp; &nbsp; File too large [Uploaded {{errorFile.size / 1000000 | number : 1}}MB : Max allowed 1MB]
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <button class="btn btn-default" ng-click="createOnboardRequest(request)" type="submit"> Upload </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

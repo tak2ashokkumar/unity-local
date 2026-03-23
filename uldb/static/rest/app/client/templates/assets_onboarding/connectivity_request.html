@@ -1,0 +1,353 @@
+<style type="text/css">
+    /*.btn-group .btn:hover, .btn:focus{
+    background-color: #2e6da4 !important;
+    }*/
+    li.list_item {
+      padding: 5px;
+      padding-left: 10px;
+      display : list-item !important; 
+      width:100%;
+      list-style: inside !important;
+      font-size: 16px;
+      color : #9f9f9f;
+    }
+
+    .agent_table {
+      width: 100%;
+    }
+
+    .agent_table thead,.agent_table tbody,
+    .agent_table tr,.agent_table  th,.agent_table td {
+      display: block;
+    }
+
+    .agent_table thead tr th {
+      height: 36px;
+      width: 25%;
+      float: left;
+      padding: 8px 15px;
+    }
+
+    .agent_table thead tr th .action-icons div {
+      display: inline-block;
+    }
+
+    .agent_table thead tr th .action-icons div.buttons{
+      margin-top: -8px;
+      margin-right: -15px;
+      width: 50%;
+    }
+
+    .agent_table thead tr th .action-icons div.buttons .btn{
+      width: 100%;
+    }
+
+    .agent_table tbody{
+      height:400px;
+      overflow-y:auto;
+      width: 100%;
+    }
+    .agent_table tbody tr td{
+      height: 40px;
+      width: 25%;
+      float: left;
+      padding: 9px 15px;
+    }
+
+    .agent_table tbody tr td.full-width {
+      width: 100%;
+    }
+
+    .agent_table tbody tr td input, 
+    .agent_table tbody tr td .btn {
+      margin-top: -6px;
+    }
+
+    .agent_table tbody tr td.full-width .input {
+      display: inline-block;
+      width: 74%;
+    }
+
+    .agent_table tbody tr td.full-width .input input{
+      display: inline-block;
+      width: 60%;
+    }
+
+    .agent_table>tbody>tr>td .action-icons {
+      margin-top: -7px;
+    }
+
+    .action-icons .fa.btn-default{
+      padding: 7px 0px;
+    }
+
+  </style>
+
+<div class="modal-header">
+  <h3 class="modal-title">VPN / Agent Setup</h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <uib-tabset active="activeJustified" justified="true">
+            <uib-tab index="0" classes="uibtab-header">
+                <uib-tab-heading>
+                  <h2  style="font-size:18px"><b>Request to create connectivity</b></h2>
+                </uib-tab-heading>
+                <form role="form" name="connectivity_request_form" ng-submit="create_connectivity_request(conn_req)">
+                    <div class="modal-body">
+                        <div class="row">
+                            <table class="table table-condensed table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width : 15%;"></th>
+                                        <th> Customer </th>
+                                        <th> UnitedLayer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="condense">
+                                        <td> Contact Info </td>
+                                        <td>
+                                            <div class="form-group col-xs-6">
+                                                <label for="cust_email"> Email <em>*</em> </label>
+                                                <span class="errormsg" ng-if="email_errmsg">({{ email_errmsg }})</span>
+                                                <input type="text" class="form-control" name="cust_email" ng-model="conn_req.cust_email"/>
+                                            </div>
+                                            <div class="form-group col-xs-6 paddingleft10">
+                                                <label for="cust_contact_number"> Contact Number <em>*</em> </label>
+                                                <span class="errormsg" ng-if="contact_number_errmsg">({{ contact_number_errmsg }})</span>
+                                                <input type="text" class="form-control" name="cust_contact_number" 
+                                                ng-model="conn_req.cust_contact_number"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group col-xs-6">
+                                                <label for="email"> Email <em>*</em> </label>
+                                                <input type="email" class="form-control" name="email" 
+                                                value="{{unity_constants.ul_details.emial}}" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-6 paddingleft10">
+                                                <label for="contact_number"> Contact Number </label>
+                                                <input type="text" class="form-control" name="contact_number" 
+                                                value="{{unity_constants.ul_details.contact_number}}" disabled/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="condense">
+                                        <td> Firewall Info </td>
+                                        <td>
+                                            <div class="form-group col-xs-4">
+                                                <label for="manufacturer"> Manufacturer </label>
+                                                <input type="text" class="form-control" name="manufacturer" ng-model="conn_req.manufacturer"/>
+                                            </div>
+                                            <div class="form-group col-xs-4 paddingleft10">
+                                                <label for="model"> Model </label>
+                                                <input type="text" class="form-control" name="model" ng-model="conn_req.model"/>
+                                            </div>
+                                            <div class="form-group col-xs-4 paddingleft10">
+                                                <label for="version"> Version </label>
+                                                <input type="text" class="form-control" name="version" ng-model="conn_req.version"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group col-xs-4">
+                                                <label for="manufacturer"> Manufacturer </label>
+                                                <input type="text" class="form-control" name="manufacturer" 
+                                                value="{{unity_constants.ul_details.firewall_manufacturer}}" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-4 paddingleft10">
+                                                <label for="model"> Model </label>
+                                                <input type="text" class="form-control" name="model" 
+                                                value="{{unity_constants.ul_details.firewall_model}}" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-4 paddingleft10">
+                                                <label for="version"> Version </label>
+                                                <input type="text" class="form-control" name="version" 
+                                                value="{{unity_constants.ul_details.firewall_version}}" disabled/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="condense">
+                                        <td>
+                                            IP addressing
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label for="peer_ip_addresses"> Peer IP Addresses</label>
+                                                <input type="text" class="form-control" name="peer_ip_addresses" 
+                                                ng-model="conn_req.peer_ip_addresses"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label for="peer_ip_addresses"> Peer IP Addresses</label>
+                                                <input type="text" class="form-control" name="peer_ip_addresses" disabled
+                                                value="{{unity_constants.ul_details.ip_address}}"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="condense">
+                                        <td>
+                                            Inside Hosts or Subnets
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label for="subnets"> Hosts or Subnets</label>
+                                                <textarea ng-model="conn_req.subnets" class="form-control" rows="2"></textarea>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <label for="subnets"> Hosts or Subnets</label>
+                                                <textarea class="form-control" rows="2" disabled>{{unity_constants.ul_details.hosts}} </textarea>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td> Settings </td>
+                                        <td colspan="2"> 
+                                            <div class="form-group col-xs-4 paddingright10">
+                                                <label for="authentication_method"> Authentication Method </label>
+                                                <input type="text" class="form-control" name="authentication_method" 
+                                                ng-model="conn_req.auth_method" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-5">
+                                                <label for="pre_shared_secret"> Pre-Shared Secret </label>
+                                                <input type="text" class="form-control" name="pre_shared_secret" disabled
+                                                ng-model="conn_req.pre_shared_secret"/>
+                                            </div>
+                                            <div class="form-group col-xs-3 paddingleft10">
+                                                <label for="dh_group_identifier"> DH Group Identifier </label>
+                                                <select class="form-control" name="dh_group_identifier" 
+                                                ng-model="conn_req.dh_group_identifier">
+                                                    <option value="2 (1024bit)"> 2 (1024bit) </option>
+                                                    <option value="No PFS"> No PFS </option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-xs-4 paddingright10">
+                                                <label for="ike_encryption_algorithm"> IKE Encryption Algorithm </label>
+                                                <input type="text" class="form-control" name="ike_encryption_algorithm" 
+                                                ng-model="conn_req.ike_encryption_algorithm" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-5">
+                                                <label for="ike_security_lifetime"> IKE Security Lifetime </label>
+                                                <input type="text" class="form-control" name="ike_security_lifetime" 
+                                                ng-model="conn_req.ike_security_lifetime" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-3 paddingleft10">
+                                                <label for="ike_hash_algorithm"> IKE Hash ALgorithm </label>
+                                                <input type="text" class="form-control" name="ike_hash_algorithm" 
+                                                ng-model="conn_req.ike_hash_algorithm" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-4 paddingright10">
+                                                <label for="ipsec_encryption_algorithm"> IPSEC Encryption Algorithm</label>
+                                                <input type="text" class="form-control" name="ipsec_encryption_algorithm" 
+                                                ng-model="conn_req.ipsec_encryption_algorithm" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-5">
+                                                <label for="ipsec_security_lifetime"> IPSEC Security Lifetime </label>
+                                                <span> ( range - 460 secs to 28,800 secs)</span>
+                                                <input type="text" class="form-control" name="ipsec_security_lifetime" 
+                                                ng-model="conn_req.ipsec_security_lifetime"/> 
+                                            </div>
+                                            <div class="form-group col-xs-3 paddingleft10">
+                                                <label for="ipsec_hash_algorithm"> IPSEC Hash Algorithm</label>
+                                                <input type="text" class="form-control" name="ipsec_hash_algorithm" 
+                                                ng-model="conn_req.ipsec_hash_algorithm" disabled/>
+                                            </div>
+                                            <div class="form-group col-xs-4 paddingright10">
+                                                <label for="ipsec_security_protocol"> IPSEC Security Protocol</label>
+                                                <input type="text" class="form-control" name="ipsec_security_protocol" 
+                                                ng-model="conn_req.ipsec_security_protocol" disabled/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer modal-buttons">
+                        <button type="button" class="btn btn-cancel" ng-click="close_modal()"> Close </button>
+                        <button type="submit" class="btn btn-default"> Send </button>
+                    </div>
+                </form>
+            </uib-tab>
+            <uib-tab index="1" classes="uibtab-header">
+                <uib-tab-heading>
+                    <h2 style="font-size:18px"><b>Agent Configuration</b></h2>
+                </uib-tab-heading>
+
+                <div class="modal-body" style="min-height: 300px;">
+                    <div ng-init="getOrgScans()">
+                        <div class="col-xs-12" style="padding-top: 20px;">
+                            <table class="table table-condensed table-hover">
+                                <thead>
+                                    <tr>
+                                        <th> Agent Name </th>
+                                        <th> IP Address </th>
+                                        <th> SSH User </th>
+                                        <th> SSH Port </th>
+                                        <th> Created On </th>
+                                        <th> Deployment Status </th>
+                                        <th class="actions">
+                                            <div class="action-icons">
+                                                <div class="" >Action</div>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <span class="btn btn-default" ng-click="addAgentForm()">
+                                                Add Agent
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in agentConfigData track by $index">
+                                      <td> {{ row.name }}</td>
+                                      <td>{{ row.ip_address }}</td>
+                                      <td>{{ row.ssh_username }}</td>
+                                      <td>{{ row.ssh_port }}</td>
+                                      <td>{{ row.created_at | unityDate : $root.users_timezone }}</td>
+                                      <td>{{ row.status }}
+                                        <span ng-if="row.deployment_status==0">
+                                        <i class="fa fa-spinner fa-spin"></i>
+                                        </span>
+
+                                       </td>
+                                      <td>
+                                        <div class="action-icons">
+                                         <!--  <span uib-tooltip="{{(row.deployment_status === 'In Progress') ? 'Agent Installation in progress' : 'Edit'}}" tooltip-class="customClass">
+                                            <a ng-class="{'fa-disabled': row.deployment_status === 'In Progress'}" ng-click="editAgent(row.ip_address, row.uuid)" >
+                                              <i class="fa fa-edit" aria-hidden="true"></i>  
+                                            </a>
+                                          </span> -->
+                                          <span uib-tooltip="Delete" tooltip-class="customClass">
+                                            <a ng-click="deleteAgent($index, row)" >
+                                              <i class="fa fa-trash-o" aria-hidden="true"></i>  
+                                            </a>
+                                          </span>
+                                        </div>
+                                      </td>
+                                      <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div ng-if="agentConfigData.length===0" class="content-wrapper">
+                                <no-records-found message="No records were found !!"></no-records-found>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer modal-buttons">
+                    <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+                        Close
+                    </button>
+                </div>
+            </uib-tab>
+        </uib-tabset>
+    </div>
+</div>
+<div class="modal-footer modal-buttons">
+</div>

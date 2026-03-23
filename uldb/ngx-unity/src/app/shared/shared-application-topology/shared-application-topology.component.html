@@ -1,0 +1,25 @@
+<div class="card mb-0 h-100">
+    <app-spinner [name]="'topologyLoader'"></app-spinner>
+    <div class="card-header bg-transparent font-lg font-500 py-2">Topology</div>
+    <div class="card-body p-2">
+        <div id="node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo"></div>
+        <div class="application-network-container" id="application-network-container" #visGraph>
+        </div>
+    </div>
+</div>
+
+<ng-template #nodeDetails>
+    <div class="card border-0 mb-0" *ngIf="hoveredNode">
+        <div class="card-body p-0 pt-1">
+            <p class="card-text mb-1">Name: <span class="text-muted">{{hoveredNode.name}}</span></p>
+            <p class="card-text mb-1">Type: <span class="text-muted">{{ hoveredNode.type}}</span></p>
+            <p class="card-text mb-1" *ngIf="hoveredNode.subtype">Subtype: <span
+                    class="text-muted">{{hoveredNode.subtype}}</span></p>
+            <ng-container *ngFor="let item of hoveredNode.metadata | keyvalue">
+                <p class="card-text mb-1" *ngIf="item.value">
+                    {{ item.key }}: <span class="text-muted">{{ item.value }}</span>
+                </p>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>

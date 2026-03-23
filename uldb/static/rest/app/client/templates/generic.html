@@ -1,0 +1,37 @@
+<div class="page_wrapper" style="float:left">
+    <loading object="{{model.results}}"></loading>
+    <table-search-widget ng-show="model.results !== undefined"></table-search-widget>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="model.results !== undefined">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table infinite-scroll='loadPageData()' class="table table-condensed table-hover margin0">
+                <thead>
+                    <tr>
+                      <th class="{{ row.col_class }}" ng-repeat="row in rows" custom-sort order="{{ row.name }}" sort="sort" sortdisabled="{{row.is_sort_disabled}}">{{ row.description }}</th>
+                      <th ng-if="angular.isDefined(disable_action) && !disable_action">Actions</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    <tr ng-repeat="result in model.results">
+                        <td ng-repeat="row in rows">
+                            <span ng-if="row.opaque === undefined">{{ result[row.name] }}</span>
+                            <span ng-if="row.opaque === 'stringTransform'">{{ row.read(result) }}</span>
+                            <a ng-if="row.opaque === 'link'" href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+                            <span ng-if="row.opaque === 'string'">{{ row.read(result).innerText }}</span>
+                        </td>
+                        <td ng-if="angular.isDefined(disable_action) && !disable_action">
+                            <div class="action-icons">
+                                <a class="fa fa-external-link" href="/main#/vmware-esxi/{{ p.uuid }}"></a>
+                                <a class="fa fa-external-link-square" href="{{ p.proxy_fqdn }}" target="_blank"></a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="model.results.length === 0" class="content-wrapper">
+                <no-records-found message="No records to display"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>

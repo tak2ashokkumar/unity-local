@@ -1,0 +1,68 @@
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Delete Google Cloud Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #accountAddEdit>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{actionMessage}} Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="accountAddEditModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="accountAddEditForm" [formGroup]="accountAddEditForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="accountAddEditFormErrors.error">
+                        {{accountAddEditFormErrors.error}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="name">Account Name<em>*</em></label>
+                    <input class="form-control" id="name" type="text" formControlName="name"
+                        [ngClass]="{'is-invalid' : accountAddEditFormErrors.name}">
+                    <div class="invalid-feedback" *ngIf="accountAddEditFormErrors.name">
+                        {{accountAddEditFormErrors.name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="email">Email<em>*</em></label>
+                    <input class="form-control" id="email" type="text" formControlName="email"
+                        [ngClass]="{'is-invalid' : accountAddEditFormErrors.email}">
+                    <div class="invalid-feedback" *ngIf="accountAddEditFormErrors.email">
+                        {{accountAddEditFormErrors.email}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="service_account_info">Service Account Info <em
+                            *ngIf="actionMessage == 'Add'">*</em></label>
+                    <textarea class="form-control" id="service_account_info" formControlName="service_account_info"
+                        [ngClass]="{'is-invalid' : accountAddEditFormErrors.service_account_info}"></textarea>
+                    <div class="invalid-feedback" *ngIf="accountAddEditFormErrors.service_account_info">
+                        {{accountAddEditFormErrors.service_account_info}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="accountAddEditModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

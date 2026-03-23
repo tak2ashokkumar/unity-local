@@ -1,0 +1,11 @@
+<div class="row">
+  <div class="col-sm-6">
+    <uib-alert template-url="/static/rest/app/templates/snippets/alert.html"
+               ng-repeat="alert in alertService.alerts" ng-if="alert.msg" type="{{ alert.severity }}"
+               close="alertService.closeAlert($index)"
+               dismiss-on-timeout="10000">
+      {{ alert.msg }}
+    </uib-alert>
+  </div>
+</div>
+

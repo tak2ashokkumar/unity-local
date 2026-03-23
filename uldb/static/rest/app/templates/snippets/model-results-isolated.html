@@ -1,0 +1,61 @@
+<span ng-if="handler.model.results === undefined">
+    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+</span>
+<table class="table table-condensed">
+  <thead>
+  <tr>
+    <th ng-repeat="f in config.filterFunc(handler.fields)" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''">
+      <div ng-if="f.hide === undefined">{{ f.description }}</div>
+    </th>
+    <th ng-if="handler.modifiable">Actions</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="result in handler.model.results | filter: searchKeyword as filtered"
+      ng-click="handler.selection.selected = result; handler.selection.index = $index; handler.selectActions(result)"
+      ng-class="handler.classSelectors(result)">
+    <td ng-repeat="f in config.filterFunc(handler.fields)" ng-if="!(f.hide)" ng-switch="f.opaque">
+      <div ng-switch-when="link">
+        <a href="{{ handler.linkify(result, f).url }}">{{ handler.linkify(result, f).text }}</a>
+      </div>
+      <div ng-switch-when="stringTransform">
+        {{ handler.desub(result, f) }}
+      </div>
+      <div ng-switch-when="choices">
+        {{ result[f.name] }}
+      </div>
+      <div ng-switch-when="arbitraryLink">
+        {{ f.func(result) }}
+      </div>
+      <div ng-switch-when="multiple">
+        <div ng-repeat="r in result[f.name]">
+        <p><a ng-if='f.uriPrefix' href="{{ f.uriPrefix }}{{r[f.idField]}}">{{ r.name }}</a><span ng-if='!f.uriPrefix'>{{ r.name }}</span></p>
+        </div>
+      </div>
+      <div ng-switch-default>{{ result[f.name] }}</div>
+    </td>
+    <td ng-if="handler.modifiable">
+      <div class="btn-group">
+        <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu action-button">
+          <li><a href ng-click="ctrl.edit(result, $index)">Edit</a></li>
+          <li><a href ng-click="ctrl.remove(result, $index)" confirm>Delete</a></li>
+          <li ng-repeat="act in handler.additional_actions"><a href ng-click="act['func'](result, $index)">{{ act.name }}</a></li>
+        </ul>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<span ng-if="handler.model.results.length === 0">
+  <h3 class="align-center">No records to display</h3>
+</span>
+<uib-pagination ng-if="config.paginate === true"
+                total-items="handler.model.count"
+                max-size="10"
+                rotate="false"
+                items-per-page="handler.pageSize"
+                ng-model="handler.model.currentPage" ng-click="handler.pageChanged()"></uib-pagination>

@@ -1,0 +1,28 @@
+<h2>Import XLSX</h2>
+<alerts></alerts>
+<!-- originally: https://jsfiddle.net/danialfarid/0mz6ff9o/135/ -->
+
+<div class="row">
+  <div class="col-xs-6">
+    <div class="panel panel-primary">
+      <div class="panel-body">
+        <button type="file" ngf-select="upload($file)"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="btn btn-primary">
+          Select File To Upload
+        </button>
+        <button class="btn btn-info pull-right" type="button" ng-click="attemptImport()">Update Unity &#8594;</button>
+      </div>
+      <div class="panel-footer">
+        <span>JSON representation : <b><strong>{{ customer }}</strong></b></span>
+        <pre contenteditable="true">{{ data | json }}</pre>
+      </div>
+
+    </div>
+  </div>
+  <div class="col-xs-6" ng-if="errors" >
+    <pre style="background-color:#dd514c">{{ errors | json }}</pre>
+  </div>
+  <div class="col-xs-6" ng-if="resp">
+    <pre>{{ resp | json }}</pre>
+  </div>
+</div>

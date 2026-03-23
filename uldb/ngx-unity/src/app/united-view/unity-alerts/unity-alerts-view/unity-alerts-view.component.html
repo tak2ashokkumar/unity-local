@@ -1,0 +1,528 @@
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col ">
+                <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)">
+                </data-refresh-btn>
+                <button *ngIf="!isSockectError" class="btn btn-pill btn-sm btn-success mb-0 pull-right mr-1"
+                    [tooltip]="'Auto Sync Active'"><i class="fas fa-link"></i></button>
+                <span *ngIf="isSockectError" dropdown placement="bottom right" container="body" class="pull-right">
+                    <button id="button-container" class="btn btn-pill btn-sm btn-danger mb-0 pull-right mr-1"
+                        data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle (click)="false"
+                        [tooltip]="'Auto Sync Disabled'" container="body"><i class="fas fa-link"></i></button>
+                    <div container="body" id="icons-dropdown-container"
+                        class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                        aria-labelledby="button-container">
+                        <a class="dropdown-item text-primary" (click)="connectToSocket()">Enable Manually</a>
+                    </div>
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3 pr-0">
+                <div class="card equalize-card border-0" *ngIf="summary">
+                    <div class="card-body px-0">
+                        <div class="row">
+                            <div class="col-6 text-center">
+                                <span class="badge badge-success w-100">
+                                    <div class="text-center py-4">
+                                        <div class="text-value">{{summary.total}}</div>
+                                        <div class="mt-2 text-truncate">Total Alerts</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="col-6 text-center">
+                                <span class="badge badge-danger w-100 text-white">
+                                    <div class="text-center py-4">
+                                        <div class="text-value">{{summary.critical}}</div>
+                                        <div class="mt-2 text-truncate">Critical</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="col-6 text-center mt-2">
+                                <span class="badge badge-warning w-100 text-white">
+                                    <div class="text-center py-4">
+                                        <div class="text-value">{{summary.warning}}</div>
+                                        <div class="mt-2 text-truncate">Warning</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="col-6 text-center mt-2">
+                                <span class="badge badge-primary w-100 text-white">
+                                    <div class="text-center py-4">
+                                        <div class="text-value">{{summary.information}}</div>
+                                        <div class="mt-2 text-truncate">Information</div>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card equalize-card border-0">
+                    <div class="card-body py-0 chart-block">
+                        <canvas *ngIf="alertChartData" baseChart [chartType]="alertChartData.type"
+                            [labels]="alertChartData.lables" [data]="alertChartData.piedata"
+                            [options]="alertChartData.options" [plugins]="alertChartData.plugins"
+                            [legend]="alertChartData.legend" [colors]="alertChartData.colors" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 pl-0">
+                <div class="card equalize-card border-0 mt-4">
+                    <div class="card-body pt-0 px-0">
+                        <div class="row">
+                            <div class="col text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fa fa-plug pdus"></i>
+                                            <span> PDUs</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.pduAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fas fa-hdd storage"></i>
+                                            <span> SANs</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress bg-secondary">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.sanAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fa fa-laptop bms"></i>
+                                            <span> Bare Metals</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.bmsAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fa fa-object-group vms"></i>
+                                            <span> VMs</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.vmsAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fa fa-fire firewalls"></i>
+                                            <span> Firewalls</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.fwAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fa fa-sitemap switches"></i>
+                                            <span> Switches</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress bg-secondary">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.switchAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-4 text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fa fa-balance-scale lbs"></i>
+                                            <span> Load Balancers</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress bg-secondary">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.lbsAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4 text-truncate">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a
+                                            class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+                                            <i class="fab fa-apple fa-lg"></i>
+                                            <span> Mac Minis</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="progress bg-secondary">
+                                            <div class="progress-bar" [class]="barColor" role="progressbar"
+                                                style="width: 100%" aria-valuenow="100" aria-valuemin="0"
+                                                aria-valuemax="100">{{summary.macAlertCount}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card border-0 mt-5">
+            <app-spinner [name]="'unity-alerts-view'"></app-spinner>
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-3">
+                        <table-search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)">
+                        </table-search-box>
+                    </div>
+                    <div class="col" *ngIf="viewData.length">
+                        <span class="badge badge-pill badge-secondary font-xs py-1 my-1 mx-1 float-left"
+                            *ngIf="filterDeviceType">
+                            {{filterDeviceType}}
+                            <span class="fas fa-times pointer-link pl-1" (click)="removeFilterDeviceType()"></span>
+                        </span>
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" [disabled]="!selectedIds.size"
+                            (click)="bulkAction()">Bulk Action</button>
+                        <span class="text-muted ml-2 pt-1 font-sm float-right align-middle"><span
+                                class="badge badge-pill badge-secondary">{{count}}</span>&nbsp;Alerts</span>
+                        <table-page-size *ngIf="showPagination()" [currentPageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" [isLargeSize]="true" (pageSizeChange)="pageSizeChange($event)">
+                        </table-page-size>
+                    </div>
+                    <div class="col-2">
+                        <form>
+                            <div class="form-row">
+                                <div class="col-auto w-100 my-0">
+                                    <select class="custom-select mr-sm-2 py-0 view-type-dropdown"
+                                        [ngModel]="selectedAlertsView" (ngModelChange)="manageAlertView($event)"
+                                        name="alertViewType">
+                                        <option [ngValue]="view" *ngFor="let view of alertGroupTypes">{{view.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="table-responsive" tableStickyScroll>
+                    <table class="table text-left mt-3" sortableTable (sorted)="onSorted($event)">
+                        <thead>
+                            <tr>
+                                <th sortable-column="device_name">Device Name</th>
+                                <th sortable-column="device_type">Device Type</th>
+                                <th>Management IP</th>
+                                <th sortable-column="severity">Severity</th>
+                                <th>Alert</th>
+                                <th sortable-column="alert_time">Alert Time</th>
+                                <th sortable-column="status">Status</th>
+                                <th>Acknowledged</th>
+                                <th sortable-column="recovery_time">Recovery Time</th>
+                                <th sortable-column="duration">Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of viewData; let i = index;" [class.sub-record]="view.isSubMember"
+                                truncateText>
+                                <td>
+                                    <span class="px-1" [class.pointer-link]="!view.isRecentlyResolved"
+                                        [ngClass]="view.isRecentlyResolved ? 'text-secondary':'text-primary'"
+                                        (click)="$event.stopPropagation();selectRecords(i, view)"
+                                        style="font-size:1rem">
+                                        <i class="far" [ngClass]="view.isSelected ? 'fa-check-square':'fa-square'"></i>
+                                    </span>
+                                    <span [class.pointer-link]="view.isGrouped" (click)="manageRecords(i, view)">
+                                        <span *ngIf="view.isGrouped" class="fas text-success"
+                                            [ngClass]="view.isGroupOpen ? 'fa-minus' : 'fa-plus'"></span>
+                                        <span class="ml-2">{{view.deviceName}}</span>
+                                    </span>
+                                </td>
+                                <td>{{view.deviceType}}</td>
+                                <td>{{view.managementIp}}</td>
+                                <!-- <td [ngClass]="[view.severityBg, 'text-white']">{{view.severity}}</td> -->
+                                <td [ngClass]="[view.severityClass, 'text-capitalize']">{{view.severity}}</td>
+                                <td class="tdw-25">
+                                    <div [tooltip]="view.alert"> {{view.alert}} </div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="view.alertTime"> {{view.alertTime}} </div>
+                                </td>
+                                <td [ngClass]="[view.statusTextColor, 'text-capitalize']"
+                                    [class.blinking]="view.isRecentAlert || view.isRecentlyResolved">{{view.status}}
+                                </td>
+                                <td class="text-center">{{view.acknowledged}}</td>
+                                <td>{{view.recoveryTime}}</td>
+                                <td>{{view.duration}}</td>
+                                <td class="action-icons-column">
+                                    <button class="action-icons mb-0 fas fa-comment-dots font-sm ml-1"
+                                        [tooltip]="view.acknowledgeTooltipMessage" container="body"
+                                        [ngClass]="{'action-icons-disabled':!view.isAcknowledgeEnabled}"
+                                        (click)="acknowledge(view)"></button>
+                                    <button class="action-icons mb-0 fas fa-edit font-sm ml-1"
+                                        [tooltip]="view.changeSeverityTooltipMessage" container="body"
+                                        [ngClass]="{'action-icons-disabled':!view.isChangeSeverityEnabled}"
+                                        (click)="changeSeverity(view)"></button>
+                                    <button class="action-icons mb-0 fa fa-times font-sm ml-1"
+                                        [tooltip]="view.closeProblemTooltipMessage" container="body"
+                                        [ngClass]="{'action-icons-disabled':!view.isCloseProblemEnabled}"
+                                        (click)="closeProblem(view)"></button>
+                                    <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
+                                        [tooltip]="view.newTabTootipMessage" container="body"
+                                        [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}"
+                                        (click)="consoleNewTab(view)"></button>
+                                    <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                        tooltip="Manage by creating support ticket" container="body"
+                                        [ngClass]="{'action-icons-disabled':!view.isCreateTicketEnabled}"
+                                        (click)="createTicket(view)"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries *ngIf="showPagination()" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="count">
+                    </table-entries>
+                    <table-pager *ngIf="showPagination()" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="count" (pageChange)="pageChange($event)">
+                    </table-pager>
+                    <div *ngIf="!viewData.length" class="text-center text-muted py-5">
+                        No alerts found !!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #acknowledgeRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Acknowledge
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="acknowledgeModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="acknowledgeForm" [formGroup]="acknowledgeForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Alert<em>*</em></label>
+                    <input id="alert" class="form-control" type="text" formControlName="alert">
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="message">Message<em>*</em></label>
+                    <textarea id="message" rows="5" class="form-control" formControlName="message"
+                        [class.is-invalid]="acknowledgeFormErrors.message"></textarea>
+                    <div class="invalid-feedback" *ngIf="acknowledgeFormErrors.message">
+                        {{acknowledgeFormErrors.message}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmAcknowledge()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="acknowledgeModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #changeSeverityRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change Alert Severity
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="changeSeverityModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="changeSeverityForm" [formGroup]="changeSeverityForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Alert<em>*</em></label>
+                    <input id="alert" class="form-control" type="text" formControlName="alert">
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="message">Message<em>*</em></label>
+                    <textarea id="message" rows="5" class="form-control" formControlName="message"
+                        [class.is-invalid]="changeSeverityFormErrors.message"></textarea>
+                    <div class="invalid-feedback" *ngIf="changeSeverityFormErrors.message">
+                        {{changeSeverityFormErrors.message}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="severity">Severity<em>*</em></label>
+                    <select id="severity" class="form-control" formControlName="severity"
+                        [class.is-invalid]="changeSeverityFormErrors.severity">
+                        <option value="Information">Information</option>
+                        <option value="Warning">Warning</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="changeSeverityFormErrors.severity">
+                        {{changeSeverityFormErrors.severity}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmChangeSeverity()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="changeSeverityModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #closeProblemRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Close Problem
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeProblemModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="closeProblemForm" [formGroup]="closeProblemForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Alert<em>*</em></label>
+                    <input id="alert" class="form-control" type="text" formControlName="alert">
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="message">Message<em>*</em></label>
+                    <textarea id="message" rows="5" class="form-control" formControlName="message"
+                        [class.is-invalid]="closeProblemFormErrors.message"></textarea>
+                    <div class="invalid-feedback" *ngIf="closeProblemFormErrors.message">
+                        {{closeProblemFormErrors.message}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmCloseProblem()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeProblemModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #bulkActionRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Bulk Action
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="bulkActionModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="bulkActionForm" [formGroup]="bulkActionForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <select id="action" class="form-control" formControlName="action"
+                        [class.is-invalid]="bulkActionFormErrors.action">
+                        <option value="acknowledge">Acknowledge</option>
+                        <option value="change_severity">Change Severity</option>
+                        <option value="close">Close</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="message">Message<em>*</em></label>
+                    <textarea id="message" rows="5" class="form-control" formControlName="message"
+                        [class.is-invalid]="bulkActionFormErrors.message"></textarea>
+                    <div class="invalid-feedback" *ngIf="bulkActionFormErrors.message">
+                        {{bulkActionFormErrors.message}}</div>
+                </div>
+                <div class="form-group" *ngIf="bulkActionForm.controls.severity">
+                    <label class="form-col-form-label" for="severity">Severity<em>*</em></label>
+                    <select id="severity" class="form-control" formControlName="severity"
+                        [class.is-invalid]="bulkActionFormErrors.severity">
+                        <option value="" disabled>Select Severity</option>
+                        <option value="Information">Information</option>
+                        <option value="Warning">Warning</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="bulkActionFormErrors.severity">
+                        {{bulkActionFormErrors.severity}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmBulkAction()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="bulkActionModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

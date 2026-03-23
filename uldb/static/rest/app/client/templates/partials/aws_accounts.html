@@ -1,0 +1,86 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="row db-info shadow-btm"> </div>
+</div>
+
+<div class="row page_wrapper">
+    <!--Tabs Level 1 End-->
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <h1>{{heading}}</h1>
+            </div>
+            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <div class="action-bar">
+                    <button class="btn btn-default" type="button" ng-click="openModal('Add')"> + Add Account</button>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                <form class="navbar-form">
+                    <div class="form-group">
+                        <input class="form-control" type="text" placeholder="Enter keyword">
+                        <button class="btn btn-search" type="submit" style="top: 3px;">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table id="example" class="example table table-condensed cf" ng-model="tabledata" ng-if="tabledata.length !== 0">
+                <thead class="cf">
+                    <tr>
+                        <th ng-repeat="row in headers">{{ row.title }}</th>
+                        <th ng-if="actions != undefined">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in tabledata">
+                        <td ng-repeat="row_data in headers">
+                            <span ng-if="row_data.key != 'region' && row_data.key != 'customer'">
+                                 <span ng-if="row[row_data.key]">{{row[row_data.key]}}</span>
+                                 <span ng-if="!row[row_data.key]">N/A</span>
+                            </span>
+                            <span ng-if="row_data.key === 'customer'">{{ row[row_data.key].name }}</span>
+                            <div ng-if="row_data.key == 'region'">
+                                <form role="form">
+                                    <div class="barpaddingtop">
+                                        <select name="speed" id="speed" ng-options="region as region for region in row[row_data.key]" ng-model="row.selected_region">
+                                            <option value="" disabled selected>Select a region</option>
+                                        </select>
+                                        <span class="select-arrow"></span>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+
+                        <td ng-show="actions != undefined">
+                            <div class="action-icons">
+                                <a class="fa fa-list-ul" tooltip-class="customClass" uib-tooltip="Show Inventory" ng-click="listall1(row)"></a>
+                                <a class="fa fa-object-group" tooltip-class="customClass" uib-tooltip="Virtual Machines" ng-click="listvms1(row)"></a>
+                                <a class="fa fa-map-marker" tooltip-class="customClass" uib-tooltip="Add Region" ng-click="openModal('addregion',row)"></a>
+                                <a class="fa fa-key" tooltip-class="customClass" uib-tooltip="Change API Keys" ng-click="openModal('change_password',row)"></a>
+                                <a class="fa fa-pencil" tooltip-class="customClass" uib-tooltip="Edit" ng-click="openModal('Edit',row)"></a>
+                                <a class="fa fa-ticket" tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" ng-click="openModal('manage_support',row)"></a>
+                                <a class="fa fa-trash" tooltip-class="customClass" uib-tooltip="Delete Account" ng-click="openModal('delete',row)"></a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+<div ng-if="tabledata.length === 0" class="bg-color content-wrapper">
+  <no-records-found message="No AWS account to display"></no-records-found>
+</div>
+<modal visible="showModal">
+    <ng-include src="modeldata.page"></ng-include>
+</modal>
+<modal1 visible="showModal1">
+    <ng-include src="modeldata1.page"></ng-include>
+</modal1>
+<modal2 visible="showModal2" >
+    <ng-include src="modeldata2.page"></ng-include>
+</modal2>
+<deletemodal visible="showDeleteConfirm"></deletemodal>

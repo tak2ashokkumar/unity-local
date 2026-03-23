@@ -1,0 +1,28 @@
+<div class="card" [class.border-danger]="dataError" appWidgetLazyLoader (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="controllerDetails.loaderName"></app-spinner>
+  <div class="card-body ">
+    <div class="row">
+      <div class="col-12">
+        <a class="d-inline-block font-lg text-dark text-decoration-none h4" (click)="goTo(controllerDetails.drillDownLink)">{{controllerDetails.name}}
+          - <small class="text-muted font-sm">{{controllerDetails.cloudName}} ({{controllerDetails.platformType}})</small></a>
+        <span class="pull-right fas fa-exclamation-triangle text-warning font-lg" [tooltip]="dataError" container="body"
+          *ngIf="dataError"></span>
+      </div>
+    </div>
+    <div class="row mt-2" [class.disabled-widget]="dataError">
+      <div class="col-sm-12">
+        <div style="display:flex; flex-direction:column">
+          <div style="flex-grow:1; height:120px; position:relative">
+            <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins" [options]="chartOptions"
+              [data]="chartData" [colors]="chartColors" [labels]="chartLabels"></canvas>
+          </div>
+        </div>
+        <div class="text-right w-75">
+          <small class="text-muted font-weight-bold text-uppercase">
+            <span> {{viewData.containerCount}}</span> Containers
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

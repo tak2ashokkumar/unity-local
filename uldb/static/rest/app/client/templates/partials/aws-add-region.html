@@ -1,0 +1,37 @@
+<form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength">
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Customer</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" ng-model="obj.customer.name" disabled>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['customererr']">{{ obj['customerMsg'] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Name</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" ng-model="obj.aws_user" disabled>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['customererr']">{{ obj['customerMsg'] }}</label>
+        </div>
+    </div>
+    <!-- <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Region *</label>
+        </span>
+        <div class="col-sm-9">
+            <select ng-options="option.long for option in rows1[1].options" class="form-control" ng-model="obj.region">
+                <option value="">-- select {{ row.description | lowercase }} --</option>
+            </select>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['regionerr']">{{ obj['regionMsg'] }}</label>
+        </div>
+    </div> -->
+</form>

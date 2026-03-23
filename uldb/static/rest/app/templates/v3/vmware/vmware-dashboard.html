@@ -1,0 +1,22 @@
+<alerts></alerts>
+<div class="row dashboard-admin">
+        <div class="col-md-12">
+            <generictable
+                    heading="vCenter Servers"
+                    headers="vcenter_headers"
+                    tabledata="vmware_vcenter.data.info"
+                    modeldata="vmware_vcenter_modeldata"
+                    rows="vmware_vcenter_rows"
+                    switches="vmware_vcenter_switches(args)"
+                    addclick="vmware_vcenter_add(data)"
+                    actions="vmware_vcenter_actions"
+                    modeldata7="update_vcenter_modeldata"
+                    rows7="update_venter_rows"
+                    addclick7="update_vcenter(data7)">
+            </generictable>
+        </div>
+</div>
+
+<div>
+  <pre>{{ missing_vms | json }}</pre>
+</div>

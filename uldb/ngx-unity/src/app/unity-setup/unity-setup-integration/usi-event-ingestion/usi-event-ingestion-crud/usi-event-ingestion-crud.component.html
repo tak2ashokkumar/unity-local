@@ -1,0 +1,281 @@
+<form *ngIf="eventIngestionCheck" [formGroup]="eventIngestionForm">
+  <div class="row border round-edge p-4 position-relative mx-0"
+    [ngClass]="!isMarginTopNotRequired ? (eventIngestionCheck ? 'mt-4' : 'mt-2'):''">
+    <div class="pb-2 mb-3 bg-white position-absolute section-name">Event Ingestion
+    </div>
+    <div class="col-12" formGroupName="event_inbound_webhook">
+      <div class="row form-group">
+        <div class="col-2 text-right">
+          <label for="name" class="form-col-form-label mb-0">Select Method<em>*</em> :</label>
+        </div>
+        <div class="col-4">
+          <div class="form-check form-check-inline mr-1">
+            <input type="radio" formControlName="method" [value]="'webhook'" class="form-check-input">
+            <label class="form-check-label">Webhook</label>
+          </div>
+          <div class="form-check form-check-inline mr-1 ml-2">
+            <input type="radio" formControlName="method" [value]="'api'" class="form-check-input">
+            <label class="form-check-label">API</label>
+          </div>
+        </div>
+      </div>
+      <div class="row form-group" *ngIf="!isWebhookUrlAndKeyNotRequired">
+        <div class="col-6">
+          <label class="form-col-form-label">Webhook URL<em>*</em></label>
+          <div class="input-group">
+            <input class="form-control" type="text" formControlName="webhook_url" readonly>
+            <div class="input-group-append">
+              <button class="input-group-text" [tooltip]="'Copy To Clipboard'"
+                (click)="copyToClipboard('webhook_url', 'URL')">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <label class="form-col-form-label">Key<em>*</em></label>
+          <div class="input-group">
+            <input class="form-control" type="text" formControlName="token" readonly>
+            <div class="input-group-append">
+              <button class="input-group-text" [tooltip]="'Copy To Clipboard'"
+                (click)="copyToClipboard('token', 'key')">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="mandatoryParamList && mandatoryParamList.length > 0" formArrayName="attribute_map">
+        <ng-container *ngFor="let attribute of attributes.controls; let i = index" [formGroupName]="i">
+          <div class="row form-group">
+            <div class="col-4">
+              <label *ngIf="i == 0" class="form-col-form-label">UnityOne Event
+                Attribute</label>
+              <input class="form-control" type="text" formControlName="display_name" readonly>
+            </div>
+            <div class="col-5">
+              <label *ngIf="i == 0" class="form-col-form-label">{{eventAttribute}} Event
+                Attribute</label>
+              <div class="row">
+                <div class="col-5 pr-0">
+                  <select class="form-control border-right-0" formControlName="expression_type"
+                    style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                    <option [value]="''" disabled>Select Type</option>
+                    <option [value]="'simple'">Simple Expression</option>
+                    <option [value]="'logical'">Logic Expression</option>
+                  </select>
+                </div>
+                <div class="col-7 pl-0">
+                  <input class="form-control" type="text" formControlName="mapped_attribute_expression"
+                    [placeholder]="attribute.get('expression_type').value == 'simple' ? '{{example}}' : '{{ex1}} AND {{ex2}} OR {{ex3}}'"
+                    [ngClass]="{'is-invalid' : eventIngestionFormErrors?.event_inbound_webhook.attribute_map[i]?.mapped_attribute_expression}"
+                    style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                  <!-- <div class="invalid-feedback"
+                                      *ngIf="eventIngestionFormErrors.event_inbound_webhook.attribute_map[i].mapped_attribute_expression">
+                                      {{eventIngestionFormErrors.event_inbound_webhook.attribute_map[i].mapped_attribute_expression}}
+                                  </div> -->
+                </div>
+              </div>
+            </div>
+            <div class="col-3 d-flex align-items-end">
+              <input class="form-control" type="text" formControlName="regular_expression"
+                placeholder="Regular Expression">
+              <!-- [ngClass]="{'custom-margin-bottom' : eventIngestionFormErrors.event_inbound_webhook.attribute_map[i].mapped_attribute_expression}" -->
+            </div>
+          </div>
+          <ng-container *ngIf="choiceMapControls(i).controls" formArrayName="choice_map">
+            <ng-container *ngFor="let choice of choiceMapControls(i).controls; let j = index" [formGroupName]="j">
+              <div class="row form-group">
+                <div class="col-1 pr-0 d-flex justify-content-end">
+                  <div class="custom-border-left w-70 mb-3" [ngClass]="j == 0 ? 'mt--3' : 'custom-margin-top'"></div>
+                </div>
+                <div class="col-3 pl-0">
+                  <input class="form-control" type="text" formControlName="display_value" readonly>
+                </div>
+                <div class="col-5">
+                  <input class="form-control" type="text" formControlName="mapped_value" placeholder="Enter"
+                    [ngClass]="{'is-invalid' : eventIngestionFormErrors?.event_inbound_webhook.attribute_map[i]?.choice_map[j]?.mapped_value}">
+                  <!-- <div class="invalid-feedback"
+                                      *ngIf="eventIngestionFormErrors.event_inbound_webhook.attribute_map[i].choice_map[j].mapped_value">
+                                      {{eventIngestionFormErrors.event_inbound_webhook.attribute_map[i].choice_map[j].mapped_value}}
+                                  </div> -->
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="selectedAttributes && selectedAttributes.value.length > 0"
+        formArrayName="additional_attribute_map">
+        <ng-container *ngFor="let attribute of selectedAttributes.controls; let i = index" [formGroupName]="i">
+          <div class="row form-group">
+            <ng-container *ngIf="selectedAttributes.at(i).get('custom_field')">
+              <div class="d-flex col-4">
+                <div class="w-50">
+                  <input class="form-control" type="text"
+                    style="border-top-right-radius: 0; border-bottom-right-radius: 0;" formControlName="display_name"
+                    readonly>
+                </div>
+                <div class="w-50">
+                  <input class="form-control" type="text"
+                    style="border-top-left-radius: 0; border-bottom-left-radius: 0;" formControlName="custom_field"
+                    readonly>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!selectedAttributes.at(i).get('custom_field')">
+              <div class="col-4">
+                <input class="form-control" type="text" formControlName="display_name" readonly>
+              </div>
+            </ng-container>
+            <div class="col-5">
+              <div class="row">
+                <div class="col-5 pr-0">
+                  <select class="form-control border-right-0" formControlName="expression_type"
+                    style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                    <option [value]="''" disabled>Select Type</option>
+                    <option [value]="'simple'">Simple Expression</option>
+                    <option [value]="'logical'">Logic Expression</option>
+                  </select>
+                </div>
+                <div class="col-7 pl-0">
+                  <input class="form-control" type="text" formControlName="mapped_attribute_expression"
+                    [placeholder]="attribute.get('expression_type').value == 'simple' ? '{{example}}' : '{{ex1}} AND {{ex2}} OR {{ex3}}'"
+                    [ngClass]="{'is-invalid' : eventIngestionFormErrors?.event_inbound_webhook?.additional_attribute_map[i]?.mapped_attribute_expression}"
+                    style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                  <!-- <div class="invalid-feedback"
+                                      *ngIf="eventIngestionFormErrors.event_inbound_webhook.additional_attribute_map[i].mapped_attribute_expression">
+                                      {{eventIngestionFormErrors.event_inbound_webhook.additional_attribute_map[i].mapped_attribute_expression}}
+                                  </div> -->
+                </div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="d-flex align-items-center">
+                <input class="form-control w-83 flex-shrink-1" type="text" formControlName="regular_expression"
+                  placeholder="Regular Expression"
+                  [ngClass]="{'custom-margin-bottom' : eventIngestionFormErrors?.event_inbound_webhook.additional_attribute_map[i]?.mapped_attribute_expression}">
+                <button tooltip="Remove" class="action-icons flex-shrink-0 fas fa-minus font-sm ml-2"
+                  (click)="removeAttribute(i)"></button>
+              </div>
+            </div>
+          </div>
+          <ng-container *ngIf="selectedChoiceMapControls(i).controls" formArrayName="choice_map">
+            <ng-container *ngFor="let choice of selectedChoiceMapControls(i).controls; let j = index"
+              [formGroupName]="j">
+              <div class="row form-group">
+                <div class="col-1 pr-0 d-flex justify-content-end">
+                  <div class="custom-border-left w-70 mb-3" [ngClass]="j == 0 ? 'mt--3' : 'custom-margin-top'"></div>
+                </div>
+                <div class="col-3 pl-0">
+                  <input class="form-control" type="text" formControlName="display_value" readonly>
+                </div>
+                <div class="col-5">
+                  <input class="form-control" type="text" formControlName="mapped_value" placeholder="Enter">
+                  <!-- [ngClass]="{'is-invalid' : eventIngestionFormErrors.event_inbound_webhook.additional_attribute_map[i].choice_map[j].mapped_value}" -->
+                  <!-- <div class="invalid-feedback"
+                                      *ngIf="eventIngestionFormErrors.event_inbound_webhook.additional_attribute_map[i].choice_map[j].mapped_value">
+                                      {{eventIngestionFormErrors.event_inbound_webhook.additional_attribute_map[i].choice_map[j].mapped_value}}
+                                  </div> -->
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="nonMandatoryParamList && nonMandatoryParamList.length > 0"
+        formGroupName="additional_attribute">
+        <div class="row form-group">
+          <ng-container *ngIf="additionalAttribute.get('custom_field')">
+            <div class="d-flex col-4">
+              <div class="w-50">
+                <select class="form-control" formControlName="unity_attribute"
+                  style="border-top-right-radius: 0; border-bottom-right-radius: 0;"
+                  [ngClass]="{'is-invalid' : eventIngestionFormErrors.event_inbound_webhook.additional_attribute.unity_attribute}">
+                  <option [value]="''" disabled>Select Attribute</option>
+                  <option *ngFor="let param of nonMandatoryParamList" [value]="param.name">
+                    {{param.display_name}}</option>
+                </select>
+              </div>
+              <div class="w-50">
+                <input class="form-control" type="text" formControlName="custom_field" placeholder="Enter"
+                  style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
+                  [ngClass]="{'is-invalid' : eventIngestionFormErrors.event_inbound_webhook.additional_attribute.custom_field}">
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!additionalAttribute.get('custom_field')">
+            <div class="col-4">
+              <select class="form-control" formControlName="unity_attribute"
+                [ngClass]="{'is-invalid' : eventIngestionFormErrors.event_inbound_webhook.additional_attribute.unity_attribute}">
+                <option [value]="''" disabled>Select Attribute</option>
+                <option *ngFor="let param of nonMandatoryParamList" [value]="param.name">
+                  {{param.display_name}}</option>
+              </select>
+            </div>
+          </ng-container>
+          <div class="col-5">
+            <div class="row">
+              <div class="col-5 pr-0">
+                <select class="form-control border-right-0" formControlName="expression_type"
+                  style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                  <option [value]="''" disabled>Select Type</option>
+                  <option [value]="'simple'">Simple Expression</option>
+                  <option [value]="'logical'">Logic Expression</option>
+                </select>
+              </div>
+              <div class="col-7 pl-0">
+                <input class="form-control" type="text" formControlName="mapped_attribute_expression"
+                  [placeholder]="additionalAttribute.get('expression_type').value == 'simple' ? '{{example}}' : '{{ex1}} AND {{ex2}} OR {{ex3}}'"
+                  [ngClass]="{'is-invalid' : eventIngestionFormErrors?.event_inbound_webhook?.additional_attribute?.mapped_attribute_expression}"
+                  style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                <!-- <div class="invalid-feedback"
+                                  *ngIf="eventIngestionFormErrors.event_inbound_webhook.additional_attribute.mapped_attribute_expression">
+                                  {{eventIngestionFormErrors.event_inbound_webhook.additional_attribute.mapped_attribute_expression}}
+                              </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="d-flex align-items-center">
+              <input class="form-control w-83 flex-shrink-1" type="text" formControlName="regular_expression"
+                placeholder="Regular Expression">
+              <button tooltip="Add" class="action-icons flex-shrink-0 fas fa-plus font-sm ml-2"
+                (click)="addAttribute()"></button>
+            </div>
+          </div>
+        </div>
+        <ng-container *ngIf="additionalAttributeChoices.controls" formArrayName="choice_map">
+          <ng-container *ngFor="let choice of additionalAttributeChoices.controls; let j = index" [formGroupName]="j">
+            <div class="row form-group">
+              <div class="col-1 pr-0 d-flex justify-content-end">
+                <div class="custom-border-left w-70 mb-3" [ngClass]="j == 0 ? 'mt--3' : 'custom-margin-top'"></div>
+              </div>
+              <div class="col-3 pl-0">
+                <input class="form-control" type="text" formControlName="display_value" readonly>
+              </div>
+              <div class="col-5">
+                <input class="form-control" type="text" formControlName="mapped_value" placeholder="Enter"
+                  [ngClass]="{'is-invalid' : eventIngestionFormErrors?.event_inbound_webhook?.additional_attribute?.choice_map[j]?.mapped_value}">
+                <!-- <div class="invalid-feedback"
+                                  *ngIf="eventIngestionFormErrors.event_inbound_webhook.additional_attribute.choice_map[j].mapped_value">
+                                  {{eventIngestionFormErrors.event_inbound_webhook.additional_attribute.choice_map[j].mapped_value}}
+                              </div> -->
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+    <div class="col-12">
+      <div class="row form-group">
+        <div class="col-6">
+          <label class="form-col-form-label">Ticket Subject Format</label>
+          <div class="input-group">
+            <input class="form-control" type="text" [placeholder]="'{{ example }}'" formControlName="ticket_subject_format">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

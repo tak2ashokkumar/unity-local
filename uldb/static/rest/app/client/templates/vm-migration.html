@@ -1,0 +1,186 @@
+<style type="text/css">
+.a_disabled {
+  cursor: not-allowed !important;
+    pointer-events: none;
+  color: grey;
+}
+</style>
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object="{{virtual_machines.results}}"></loading>
+    <page-title title="VM Migration"></page-title>
+    <div class="row">
+      <div class="date-wrapper">
+        <div class="col-xs-10 col-sm-8 col-md-8 col-lg-6">
+          <form role="form" class="form-horizontal">
+              <label class="col-sm-3" for="selectcloud"><span class="daterange">Select Cloud</span></label>
+              <div class="col-sm-7" style="padding-top : 20px;">
+                <select name="selectcloud" placeholder="Select Cloud" id="speed" ng-change="load_vm_list(cloud_list_migrate_select)" ng-options="option.long for option in cloud_list_migrate track by option.short.uuid" class="ng-touched date-picker" ng-model="cloud_list_migrate_select">
+                </select>
+                <span class="select-arrow"></span>
+              </div>
+              <label class="col-sm-1" for="selectcloud" style="margin-left: -8px !important;"><span class="daterange"></span></label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="margin_top20px page_wrapper" style="float:left">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper" ng-show="virtual_machines.results !== undefined">
+            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+                <form class="navbar-form">
+                    <div class="form-group">
+                        <input class="form-control" type="text" ng-model="searchkey" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}" ng-change="getSearchResults()">
+                        <button class="btn btn-search" type="submit" style="top: 4px;">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+              <div class="action-bar pull-right">
+                <span class="count">
+                {{virtual_machines.count}}</span>
+                <span class="count-text"> Virtual Machines</span>
+              </div>
+            </div>
+        </div>
+
+        <div class="bg-color">
+          <div  class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="virtual_machines.results !== undefined">
+              <section id="no-more-tables" class="margintop20">
+                <table infinite-scroll='loadMoreResults()' ng-if="virtual_machines.results.length > 0" id="example" class="example table  table-condensed cf">
+                  <thead class="cf">
+                  <tr>
+                    <th custom-sort order="{{f.key}}" sort="sort" ng-repeat="f in vm_headers" class="{{ f.class }}" ng-if="!f.hide && (f.title !== 'Actions')" ng-class="(f.cls)||''">
+                      <div ng-if="f.hide === undefined">{{ f.title }}</div>
+                    </th>
+                    <th class="numeric">Actions</th>
+                  </tr>
+                  </thead>
+
+                  <tbody>
+                  <tr ng-repeat="row in virtual_machines.results"
+                      ng-click="selection.selected = row; selection.index = $index; selectActions(row)">
+                    <td ng-repeat="row_data in vm_headers">
+                        <span ng-if="row_data.key == 'migration_date'">
+                          {{ (row[row_data.key] | unityDate : $root.users_timezone) || 'N/A' }}
+                        </span>
+                        <span ng-if="row_data.key == 'size'">
+                            {{(row[row_data.key]/(1024*1024))|number: 1}}
+                        </span>
+                        <span ng-if="row_data.key == 'state' || row_data.key == 'last_known_state'">
+                          <device-up ng-if="(row[row_data.key] | powerState) === 'On'"></device-up>
+                          <device-down ng-if="(row[row_data.key] | powerState) === 'Off'"></device-down>
+                          <span ng-if="((row[row_data.key] | powerState) !== 'Off') && ((row[row_data.key] | powerState) !== 'On')"> N/A </span>
+                        </span>
+                        <span
+                            ng-if="row_data.key != 'updated_at' && row_data.key != 'migration_date' && row_data.key != 'openstack_actions' && row_data.key != 'state' && row_data.key != 'last_known_state' && row_data.key != 'vmware_actions'">
+                          {{ row[row_data.key] || 'N/A' }}
+                        </span>
+                        <span ng-if="row_data.key == 'openstack_actions'">
+                            <div class="action-icons">
+                                <a class="fa fa-cloud-upload" tooltip-class="customClass" uib-tooltip="Migrate To AWS" href="" ng-class="{'fa-disabled': backup_status_check(row.migration_status)}" ng-click="migrate_vm_to_aws(row.instance_id, row.name, 'openstack', 'AWS', row.last_known_state, $index)"></a>
+                            </div>
+                        </span>
+                        <span ng-if="row_data.key == 'vmware_actions'">
+                            <div class="action-icons">
+                                <a class="fa fa-cloud-upload" tooltip-class="customClass" uib-tooltip="Migrate To AWS" href="" ng-class="{'fa-disabled': backup_status_check(row.migration_status)}" ng-click="migrate_vm_to_aws(row.instance_id, row.name, 'vmware', 'AWS', row.state, $index)"></a>
+                            </div>
+                        </span>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div  ng-if="virtual_machines.results.length === 0" class="content-wrapper">
+                    <no-records-found message="No records to display. {{migrate_instance_unsupported}}"></no-records-found>
+                </div>
+              </section>
+          </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="awsAccountSelection.html">
+ <div class="modal-content">
+     <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && create(request)">
+      <div class="modal-header">
+        <h4 class="modal-title"  >Select AWS Bucket</h4>
+      </div>
+      <div class="modal-body">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-show="aws_account_list.length!==0">
+                  <div class="paddingR">
+                      <div class="form-group">
+                            <label for="aws_account" >
+                                AWS Account <span> *</span>
+                                <span class="errormsg"  ng-if="!aws_region_list_errmsg && (modalform.$submitted && modalform.aws_account.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="aws_account_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ aws_account_list_errmsg }} )
+                                </span>
+                            </label>
+                            <select ng-change="loadAwsRegionList(request.aws_account_list)" ng-options="option.long for option in aws_account_list track by option.short" class="form-control"
+                                      ng-model="request.aws_account_list" required  name ="aws_account" >
+                                      <option value="">-- Select aws account --</option>
+                            </select>
+                      </div>
+                  </div>
+                  <div class="paddingR">
+                      <div class="form-group">
+                            <label for="aws_region" >
+                                Region <span  > *</span>
+                                <span class="errormsg"  ng-if="!aws_region_list_errmsg && (modalform.$submitted && modalform.aws_region.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="aws_region_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ aws_region_list_errmsg }} )
+                                </span>
+                            </label>
+                            <select ng-change="loadAwsBucketList(request.aws_region_list)" ng-options="option.long for option in aws_region_list track by option.short" class="form-control"
+                                     ng-model="request.aws_region_list" name ="aws_region" required>
+                                    <option value="">-- Select Region --</option>
+                            </select>
+                      </div>
+                  </div>
+                  <div class="paddingR">
+                      <div class="form-group">
+                            <label for="aws_bucket" >
+                                Bucket  <span > *</span>
+                                <span class="errormsg"  ng-if="!aws_region_list_errmsg && (modalform.$submitted && modalform.aws_bucket.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="aws_bucket_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ aws_bucket_list_errmsg }} )
+                                </span>
+                            </label>
+                            <select ng-change="" ng-options="option.long for option in aws_bucket_list track by option.short" class="form-control"
+                                      ng-model="request.aws_bucket_list" name ="aws_bucket"  required>
+                                      <option value="">-- Select bucket --</option>
+                            </select>
+                      </div>
+                  </div>
+              </div>
+              <div ng-if="aws_account_list==0" style="font-size: 17px; padding: 12px;">
+                  There is no AWS account associated.Please <a href="main#/public_cloud/aws-dashboard">click here</a> to add one.
+              </div>
+      </div>
+      
+    <div class="modal-footer modal-buttons">
+        <div class="modal-footer modal-buttons" ng-if="aws_account_list.length!=0">
+            <button type="button" class="btn btn-cancel" ng-click="cancel()">
+              Cancel
+            </button>
+            <button type="submit" ng-if="aws_account_list" class="btn btn-default">
+              Save
+            </button>
+        </div>
+        <div class="modal-footer modal-buttons" ng-if="aws_account_list.length==0">
+            <button type="button" class="btn btn-default" ng-click="cancel()">
+              Cancel
+            </button>
+        </div>
+    </div>
+
+     </form>
+ </div>
+</script>

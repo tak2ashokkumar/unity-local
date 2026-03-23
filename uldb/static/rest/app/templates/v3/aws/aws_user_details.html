@@ -1,0 +1,28 @@
+<alerts></alerts>
+<h3></h3>
+<div class="row">
+    <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                User Details
+            </div>
+            <div class="panel-body">
+                <span ng-if="!aws_userdetails_list_content">
+                    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+                </span>
+                <table class="table">
+                    <thead>
+                    <tr ng-repeat="col in aws_userdetails_headers">
+                        <td class="col-md-4">
+                            <div>{{ col.title }}</div>
+                        </td>
+                        <td class="col-md-8">
+                            <div><strong>{{ aws_userdetails_list_content[col.key] }}</strong></div>
+                        </td>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

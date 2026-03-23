@@ -1,0 +1,28 @@
+<alerts></alerts>
+<form role="form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group ng-scope">
+            <label for="blockName">Instance Id *</label>
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" ng-model="obj.instance_id" disabled>
+        </div>
+        <div class="form-group ng-scope">
+            <label for="blockName">Network Interface*</label>
+            <select ng-if="!angular.isDefined(rows5.network_interface_list) || (rows5.network_interface_list.length == 0)"
+             ng-options="row.network_interface_id as row.network_interface_id+'('+row.availability_zone+')' for row in rows5.network_interface_list" class="form-control" ng-model="obj.network_interface_id" disabled>
+                <option selected="selected" value="">-- no network interface present --</option>
+            </select>
+            <select ng-if="angular.isDefined(rows5.network_interface_list) && (rows5.network_interface_list.length > 0)"
+             ng-options="row.network_interface_id as row.network_interface_id+'('+row.availability_zone+')' for row in rows5.network_interface_list" class="form-control" ng-model="obj.network_interface_id">
+                <option selected="selected" value="">-- select network interface --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['network_interface_iderr']">{{ obj['network_interface_idMsg'] }}</label>
+        </div>
+        <div class="form-group ng-scope">
+            <label for="blockName">Device Index *</label>
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="number" min="1" required="" value="" ng-model="obj.device_index">
+            <label class="errormsg" ng-if="obj['device_indexerr']">{{ obj['device_indexMsg'] }}</label>
+        </div>
+    </div>
+</form>
+    

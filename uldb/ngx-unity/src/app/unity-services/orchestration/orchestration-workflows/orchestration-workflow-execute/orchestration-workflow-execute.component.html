@@ -1,0 +1,310 @@
+<div class="right-sidebar p-0">
+    <div class="resize-handle-right" (mousedown)="startResize($event)"></div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-dark">Execute</h6>
+        <button type="button" class="btn-close" aria-label="Close" (click)="onClose()">
+            <i class="fas fa-times text-muted"></i>
+        </button>
+    </div>
+
+
+    <div class="card-body p-3 text-muted">
+        <form *ngIf="manualForm" [formGroup]="manualForm">
+            <div class="row">
+                <div formArrayName="inputs" class="col">
+                    <ng-container *ngIf="manualInputs  && manualInputs .length > 0; else noInputs">
+                        <div class="form-group row mb-1"
+                            *ngFor="let inputControl of manualInputs .controls; let i = index">
+                            <div [formGroupName]="i" class="col-12">
+
+                                <div class="col-form-label">
+                                    {{ formatParamName(inputControl.get('param_name')?.value) }}<em>*</em> :
+                                </div>
+
+                                <!-- TEXT -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Text'">
+                                    <input class="form-control text-dark" type="text" formControlName="default_value"
+                                        placeholder="Enter default value"
+                                        [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                    <div class="invalid-feedback" *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                        {{ manualFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- NUMBER -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Number'">
+                                    <input class="form-control text-dark" type="number" formControlName="default_value"
+                                        placeholder="Enter default value"
+                                        [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                    <div class="invalid-feedback" *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                        {{ manualFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- SECRET -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Password'">
+                                    <custom-password-field formControlName="default_value"
+                                        [options]="{ placeholder: 'Enter default value' }"
+                                        [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                    </custom-password-field>
+                                    <div class="invalid-feedback" *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                        {{ manualFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- CLOUD ACCOUNT  -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Cloud Account'">
+                                    {{default_value}}
+                                    <select class="text-dark form-control" formControlName="default_value"
+                                        [compareWith]="compareAccounts"
+                                        [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                        <option value="">Select Cloud Account</option>
+                                        <option *ngFor="let account of cloudAccount" [ngValue]="account">{{
+                                            account.account_name }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                        {{ manualFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- CREDENTIAL -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Credential'">
+                                    <select class="text-dark form-control" formControlName="default_value"
+                                        [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">
+                                        <option value="">Select Credential</option>
+                                        <option *ngFor="let account of credentials" [value]="account.uuid">{{
+                                            account.name }}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="manualFormErrors.inputs[i]?.default_value">
+                                        {{ manualFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- TARGETS -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Target'">
+                                    <app-auto-complete-multi formControlName="default_value" [apiFn]="searchTargets"
+                                        placeholder="Search Targets" class="mb-3"></app-auto-complete-multi>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-template #noInputs>
+                        <div class="text-center p-3">
+                            There are no Inputs for Manual Trigger.
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </form>
+
+        <form *ngIf="scheduleForm" [formGroup]="scheduleForm">
+            <div class="row">
+                <div formArrayName="inputs" class="col">
+                    <ng-container *ngIf="scheduleInputs && scheduleInputs.length > 0; else noInputs">
+                        <div class="form-group row mb-1"
+                            *ngFor="let inputControl of scheduleInputs.controls; let i = index">
+                            <div [formGroupName]="i" class="col-12">
+
+                                <div class="col-form-label">
+                                    {{ formatParamName(inputControl.get('param_name')?.value) }}<em>*</em> :
+                                </div>
+
+                                <!-- TEXT -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Text'">
+                                    <input class="form-control text-dark" type="text" formControlName="default_value"
+                                        placeholder="Enter default value"
+                                        [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                        {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- NUMBER -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Number'">
+                                    <input class="form-control text-dark" type="number" formControlName="default_value"
+                                        placeholder="Enter default value"
+                                        [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                        {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- SECRET -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Password'">
+                                    <custom-password-field formControlName="default_value"
+                                        [options]="{ placeholder: 'Enter default value' }"
+                                        [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                    </custom-password-field>
+                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                        {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- CLOUD ACCOUNT  -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Cloud Account'">
+                                    <select class="text-dark form-control" formControlName="default_value"
+                                        [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                        <option value="">Select Cloud Account</option>
+                                        <option *ngFor="let account of cloudAccount" [value]="account.uuid">{{
+                                            account.account_name }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                        {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- CREDENTIAL -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Credential'"
+                                    [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                    <select class="text-dark form-control" formControlName="default_value">
+                                        <option value="">Select Credential</option>
+                                        <option *ngFor="let account of credentials" [value]="account.uuid">{{
+                                            account.name }}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.inputs[i]?.default_value">
+                                        {{ scheduleFormErrors.inputs[i]?.default_value }}
+                                    </div>
+                                </div>
+
+                                <!-- TARGETS -->
+                                <div class="col p-0" *ngIf="inputControl.get('param_type')?.value === 'Target'">
+                                    <app-auto-complete-multi formControlName="default_value" [apiFn]="searchTargets"
+                                        placeholder="Search Targets" class="mb-3"></app-auto-complete-multi>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-template #noInputs>
+                        <div class="text-center p-3">
+                            There are no Inputs for Schedule Trigger.
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </form>
+
+        <form *ngIf="webhookTriggerForm" [formGroup]="webhookTriggerForm">
+            <!-- <div class="form-group mb-1">
+                <label for="webhook_url" class="col-form-label">Webhook Url :</label>
+                <div class="col p-0">
+                    <input id="webhook_url" class="form-control text-dark" type="text" formControlName="webhook_url">
+                </div>
+            </div> -->
+            <div class="form-group mb-1">
+                <label for="payload" class="col-form-label">Payload<em>*</em> :</label>
+                <div class="col p-0">
+                    <textarea class="form-control text-dark" rows="8" formControlName="payload"
+                        placeholder="Enter Payload" [class.is-invalid]="webhookTriggerFormErrors.payload"></textarea>
+                    <div class="invalid-feedback d-block" *ngIf="webhookTriggerFormErrors.payload">
+                        {{ webhookTriggerFormErrors.payload }}
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <form *ngIf="itsmTriggerForm" [formGroup]="itsmTriggerForm">
+            <div class="form-group mb-1">
+                <label for="record_uuid" class="col-form-label">Ticket Record<em>*</em> :</label>
+                <div class="col p-0">
+                    <select class="text-dark form-control mb-2" [compareWith]="compareAccounts"
+                        formControlName="record_uuid" [class.is-invalid]="itsmTriggerFormErrors.record_uuid">
+                        <option value="">Select Record</option>
+                        <option *ngFor="let itsm of itsmData" [ngValue]="itsm.uuid">{{ itsm.ticket_id }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback d-block" *ngIf="itsmTriggerFormErrors.record_uuid">
+                        {{ itsmTriggerFormErrors.record_uuid }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mb-1">
+                <label for="activity_id" class="col-form-label">Event<em>*</em> :</label>
+                <div class="col p-0">
+                    <select class="text-dark form-control mb-2" [compareWith]="compareAccounts"
+                        formControlName="activity_id" [class.is-invalid]="itsmTriggerFormErrors.activity_id">
+                        <option value="">Select Event</option>
+                        <option *ngFor="let comm of commentData" [ngValue]="comm.id">{{ comm.username }} -
+                            {{ formatActivityType(comm.activity_type) }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback d-block" *ngIf="itsmTriggerFormErrors.activity_id">
+                        {{ itsmTriggerFormErrors.activity_id }}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div *ngIf="getChatTriggerNode()" class="mt-4">
+            <!-- Chat view -->
+            <ng-container>
+                <!-- scrollable messages area -->
+                <div #chatBody class="chat-body">
+                    <div class="chat-messages">
+                        <ng-container *ngFor="let msg of chatHistoryData">
+                            <div class="message-row"
+                                [ngClass]="{ 'user': msg.sender === 'user', 'bot': msg.sender === 'bot' }">
+                                <div class="message-box" [ngClass]="{ 'user-message': msg.sender === 'user' }">
+                                    <markdown *ngIf="msg.sender === 'bot'" [data]="msg.message"></markdown>
+                                    <div *ngIf="msg.sender === 'user'" class="user-text">{{ msg.message }}</div>
+
+                                    <!-- dots inside message box, only for Running bot messages -->
+                                    <span class="dots"
+                                        *ngIf="msg.sender === 'bot' && (!msg.message || msg.status === 'Running')"></span>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <div *ngIf="isTyping" class="d-flex mb-2 mx-3 typing-indicator">
+                            <div class="pulse-loader">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- docked input INSIDE the card (not viewport-fixed) -->
+                <div class="chat-input-bottom" aria-hidden="false">
+                    <div class="chat-input-container mt-3">
+                        <div class="chat-input-box pb-0">
+                            <textarea aria-label="type your message" class="chat-input"
+                                placeholder="Ask me something..." [(ngModel)]="newMessage"
+                                (keydown.enter)="onEnter($event)"></textarea>
+                            <button class="send-btn mb-2" (click)="send(newMessage)" aria-label="send"
+                                [ngClass]="{ 'active-send': newMessage?.trim().length > 0 }">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+
+        <form *ngIf="aimlTriggerForm" [formGroup]="aimlTriggerForm">
+            <div class="form-group mb-1">
+                <label for="record_uuid" class="col-form-label">Select Event<em>*</em> :</label>
+                <div class="col p-0">
+                    <select class="text-dark form-control mb-2" formControlName="id"
+                        [class.is-invalid]="aimlTriggerFormErrors.id">
+                        <option value="" disabled>Select Event</option>
+                        <option *ngFor="let i of aimlData" [ngValue]="i.id">{{i.id}} - {{ i.status}} - {{ i.description
+                            }}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback d-block" *ngIf="aimlTriggerFormErrors.id">
+                        {{ aimlTriggerFormErrors.id }}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div *ngIf="!getChatTriggerNode()">
+        <div class="d-flex justify-content-center mt-4">
+            <button class="btn btn-sm btn-outline-danger mr-2" type="button" (click)="onClose()">Cancel</button>
+            <button class="btn btn-sm btn-success" type="button" (click)="onSubmit()">Submit</button>
+        </div>
+    </div>
+</div>

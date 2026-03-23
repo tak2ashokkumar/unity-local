@@ -1,0 +1,241 @@
+<div class="row d-flex justify-content-between">
+    <div class="col-7 d-flex">
+        <div class="card h-100 mb-0 w-45">
+            <div class="card-body d-flex flex-column justify-content-center p-0">
+                <div class="d-flex justify-content-between">
+                    <div class="d-flex flex-column align-items-center w-25 pointer-link" (click)="goTo('events')">
+                        <div class="font-sm text-truncate">Events</div>
+                        <div class="d-flex align-items-baseline">
+                            <span class="text-primary font-xl">{{summaryData?.events || 0}}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center w-10">
+                        <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                    </div>
+                    <div class="d-flex flex-column align-items-center w-25 pointer-link" (click)="goTo('alerts')">
+                        <div class="font-sm text-truncate">Alerts</div>
+                        <div class="d-flex align-items-baseline">
+                            <span class="text-primary font-xl">{{summaryData?.alerts || 0}}</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center w-10">
+                        <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                    </div>
+                    <div class="d-flex flex-column align-items-center w-30 pointer-link" (click)="goTo('conditions')">
+                        <div class="font-sm font-500 text-truncate">Conditions</div>
+                        <div class="d-flex align-items-baseline">
+                            <span class="text-primary font-weight-bold font-xl">{{summaryData?.conditions || 0}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card h-100 mb-0 w-45 ml-3">
+            <div class="card-body d-flex flex-column justify-content-center p-0">
+                <div class="d-flex justify-content-between">
+                    <div class="entity-card w-60 p-2 pointer-link text-white active">
+                        <div class="font-sm font-500 text-truncate">Cumulative Reduction</div>
+                        <div class="d-flex align-items-baseline">
+                            <span
+                                class="text-white font-weight-bold font-xl">{{summaryData?.eventReductionPercentage || 0}}%</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center entity-card w-40 p-2 pointer-link"
+                        (click)="goTo('analytics')">
+                        <div class="font-sm font-500 text-truncate">Analytics</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex align-items-center">
+        <button class="btn btn-pill btn-warning pull-right btn-sm" [tooltip]="'Rules'" container="body"
+            (click)="goTo('rules')" accessControl moduleName="AIML Event Management"
+            accessType="Manage AIML Event Management" elementType="btn">
+            <i class="fas fa-cog"></i>
+        </button>
+        <data-refresh-btn (refresh)="refreshData()" class="pull-right"></data-refresh-btn>
+    </div>
+</div>
+<div class="row mt-4 mb-2">
+    <div class="col-5 pr-0">
+        <div class="card round-edge mb-0 equalize-card">
+            <div class="card-body px-2 pt-4">
+                <div class="funnel-wrapper font-sm-xs">
+                    <div class="d-flex w-100 entity-events pointer-link mb-1" (click)="goTo('events')">
+                        <div class="d-flex flex-column w-30 font-500 py-1">
+                            <span class="font-xs-sm">Raw Events</span>
+                            <span class="font-xl">{{summaryData?.events || 0}}</span>
+                        </div>
+                        <div class="funnel w-70 position-absolute text-white">
+                            <label class="position-absolute mb-0 font-sm font-500">Events </label>
+                        </div>
+                    </div>
+                    <div class="d-flex w-100 entity-alerts pointer-link mb-1" (click)="goTo('alerts')">
+                        <div class="d-flex flex-column w-30 font-500 py-1">
+                            <span class="font-xs-sm">Noise Reduction</span>
+                            <span class="font-xl">{{summaryData?.noiseReductionPercentage || 0}}%</span>
+                        </div>
+                        <div class="funnel w-70 position-absolute text-white">
+                            <label class="position-absolute mb-0 font-sm font-500">Alerts</label>
+                        </div>
+                    </div>
+                    <div class="d-flex w-100 entity-conditions pointer-link" (click)="goTo('conditions')">
+                        <div class="d-flex flex-column w-30 font-500 py-1">
+                            <span class="font-xs-sm">Correlation %</span>
+                            <span class="font-xl">{{summaryData?.correlationPercentage || 0}}%</span>
+                        </div>
+                        <div class="funnel w-70 position-absolute text-white">
+                            <label class="position-absolute mb-0 font-sm font-500">Conditions</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-2 pr-0">
+        <div class="card round-edge mb-2">
+            <div class="card-body d-flex flex-column px-2 py-1">
+                <div class="text-truncate font-xs-sm font-500">Compute</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary font-xl font-500">{{alertsData?.compute || 0}}</span>
+                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                </div>
+            </div>
+        </div>
+        <div class="card round-edge mb-2">
+            <div class="card-body d-flex flex-column px-2 py-1">
+                <div class="text-truncate font-xs-sm font-500">Network</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary font-xl font-500">{{alertsData?.network || 0}}</span>
+                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                </div>
+            </div>
+        </div>
+        <div class="card round-edge mb-2">
+            <div class="card-body d-flex flex-column px-2 py-1">
+                <div class="text-truncate font-xs-sm font-500">Storage</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary font-xl font-500">{{alertsData?.storage || 0}}</span>
+                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                </div>
+            </div>
+        </div>
+        <div class="card round-edge mb-0">
+            <div class="card-body d-flex flex-column px-2 py-1">
+                <div class="text-truncate font-xs-sm font-500">Others</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary font-xl font-500">{{alertsData?.others || 0}}</span>
+                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-5 pr-0">
+        <div class="card round-edge mb-0 equalize-card">
+            <div
+                class="card-header bg-transparent d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                <span> Events Trend - {{eventCountForm.value.target_type.name}}</span>
+                <div>
+                    <form [formGroup]="eventCountForm">
+                        <div class="row pr-2">
+                            <div class="form-group mb-0">
+                                <select class="form-control-sm border-secondary" formControlName="target_type">
+                                    <option *ngFor="let target of eventCountTargets" [ngValue]="target">{{target.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- <div class="form-group mb-0">
+                                <select class="form-control-sm" formControlName="target_type">
+                                    <option value="active">Active</option>
+                                    <option value="last_24_hrs">Last 24 Hr</option>
+                                    <option value="last_week">Last Week</option>
+                                    <option value="last_month">Last Month</option>
+                                    <option value="custom">Custom</option>
+                                </select>
+                            </div> -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <ng-container *ngIf="eventsCountEChartData">
+                    <div echarts [options]="eventsCountEChartData.options"
+                        [extentions]="eventsCountEChartData.extensions"
+                        [defaultHeight]="200"></div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-8 pr-0">
+        <div class="card round-edge mb-0 w-100 equalize-card">
+            <div class="card-header p-2 font-500">Noisy Events</div>
+            <div class="card-body p-0">
+                <table class="table text-left font-xs-sm font-500">
+                    <thead>
+                        <tr>
+                            <th>Device</th>
+                            <th>Device Type</th>
+                            <th>Count</th>
+                            <th>Description</th>
+                            <th>Source</th>
+                            <th>Last Reported</th>
+                            <th>Severity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of noisyEvents" truncateText>
+                            <td class="tdw-15 text-primary">
+                                <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.deviceDisplayType">{{view.deviceDisplayType}}</div>
+                            </td>
+                            <td class="tdw-8 text-primary">
+                                <div [tooltip]="view.count">{{view.count}}</div>
+                            </td>
+                            <td class="tdw-22">
+                                <div [tooltip]="view.description">{{view.description}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div [tooltip]="view.source">{{view.source}}</div>
+                            </td>
+                            <td class="tdw-20">
+                                <div [tooltip]="view.lastReported">{{view.lastReported}}</div>
+                            </td>
+                            <td class="tdw-5">
+                                <div [tooltip]="view.severity">
+                                    <span [class]="view.severityClass"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center text-muted py-5" *ngIf="!noisyEvents.length">No events found.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 pr-0">
+        <div class="card round-edge mb-0 w-100 equalize-card">
+            <div class="card-header p-2 font-500">Noisy Hosts</div>
+            <div class="card-body d-flex flex-column px-1 pb-2 py-1">
+                <div class="d-flex pt-2 align-items-center" *ngFor="let host of noisyHosts">
+                    <div class="px-2 w-30 font-xs-sm font-500 text-center text-truncate" [tooltip]="host.hostName">
+                        {{host.hostName}}
+                    </div>
+                    <div class="d-flex align-items-center w-70">
+                        <div class="progress" [style.width.%]="host.barwidth"
+                            style="height:25px; border-radius: 0 !important;">
+                            <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="100"
+                                aria-valuemin="0" aria-valuemax="100" [style.width.%]="100"></div>
+                        </div>
+                        <div class="px-2 w-20 font-xs-sm" style="top:-2px;">{{host.events}}</div>
+                    </div>
+                </div>
+                <div class="text-center text-muted py-5" *ngIf="!noisyHosts.length">No hosts found.</div>
+            </div>
+        </div>
+    </div>
+</div>

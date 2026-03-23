@@ -1,0 +1,58 @@
+.card.active {
+  border-width: 3px !important;
+}
+
+td > div {
+  width: max-0;
+}
+
+td .form-control {
+  // width: auto;
+}
+
+// tr > td,
+tr > th {
+  white-space: nowrap;
+}
+
+.table th:first-child,
+.table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background-color: #fff;
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  position: sticky;
+  left: 38px;
+  z-index: 2;
+  background-color: #fff;
+}
+
+.table th:nth-last-child(2),
+.table td:nth-last-child(2) {
+  position: sticky;
+  right: var(--last-col-width);
+  z-index: 2;
+  background-color: #fff;
+}
+
+.table th:last-child,
+.table td:last-child {
+  position: sticky;
+  right: 0;
+  background-color: #eff2f5;
+}
+
+.fa-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  cursor: default;
+  color: #fff !important;
+  outline: none;
+  text-align: center;
+}

@@ -1,0 +1,1081 @@
+<div class="row mb-2 mx-0" *ngIf="summaryViewData">
+    <div class="col pl-0">
+        <div class="card round-edge mb-0">
+            <div class="card-body d-flex flex-column p-2">
+                <div class="text-truncate">Total Conditions</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary text-value">{{summaryViewData.condition_count}}</span>
+                    <!-- <span
+                        class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.condition_count}}
+                        Since last week</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col pl-0">
+        <div class="card round-edge mb-0">
+            <div class="card-body d-flex flex-column p-2">
+                <div class="text-truncate">Total Alerts</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary text-value">{{summaryViewData.alert_count}}</span>
+                    <!-- <span
+                        class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.alert_count}}
+                        Since last week</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col pl-0">
+        <div class="card round-edge mb-0">
+            <div class="card-body d-flex flex-column p-2">
+                <div class="text-truncate">Critical</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary text-value">{{summaryViewData.critical}}</span>
+                    <!-- <span
+                        class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.critical}}
+                        Since last week</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col pl-0">
+        <div class="card round-edge mb-0">
+            <div class="card-body d-flex flex-column p-2">
+                <div class="text-truncate">Warning</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary text-value">{{summaryViewData.warning}}</span>
+                    <!-- <span class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.warning}}
+                        Since last week</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col pl-0">
+        <div class="card round-edge mb-0">
+            <div class="card-body d-flex flex-column p-2">
+                <div class="text-truncate">Information</div>
+                <div class="d-flex align-items-baseline">
+                    <span class="text-primary text-value">{{summaryViewData.information}}</span>
+                    <!-- <span
+                        class="font-xs text-muted font-500 ml-1 text-truncate">{{summaryViewData.last_7_days.information}}
+                        Since last week</span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card condition-card mb-2">
+            <div class="row mx-0 h-100" *ngIf="summaryViewData?.condition_count">
+                <div class="col-3 condition-brief border-right px-0 h-100">
+                    <div class="row h-100 mx-0">
+                        <div class="col-12 p-1">
+                            <table-search-box (searched)="onSearched($event)"
+                                [searchValue]="selectedConditionId"></table-search-box>
+                        </div>
+                        <div class="col-12 p-0 h-82" [perfectScrollbar]="{suppressScrollX: true}">
+                            <div class="border-bottom p-2 pointer-link"
+                                *ngFor="let view of conditionsViewData; let i = index" (click)="selectCondition(i)"
+                                [class.bg-light]="i==selectedConditionIndex">
+                                <div class="d-flex">
+                                    <div class="pl-0 pr-2 py-2">
+                                        <div class="rounded event-count d-flex justify-content-center align-items-center font-500"
+                                            [ngClass]="[view.severityBg, 'text-white']">{{view.alertCount}}
+                                        </div>
+                                    </div>
+                                    <div class="p-0 event-name mr-auto text-truncate">
+                                        <h6 class="mb-0 text-truncate">{{view.description}}</h6>
+                                        <div class="d-inline-flex">
+                                            <div class="p-0">
+                                                <span class="font-sm-xs text-muted">ID: </span>
+                                                <span class="font-sm-xs text-muted">{{view.id}}</span>
+                                            </div>
+                                            <div class="border-left ml-2 pl-2">
+                                                <span class="font-sm-xs font-500"
+                                                    [ngClass]="[view.statusTextColor, 'text-capitalize']">{{view.conditionStatus}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-0 event-duration">
+                                        <span class="font-xs-sm font-500 text-truncate">
+                                            <i class="fas fa-history mr-1"></i>{{view.conditionDuration}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="font-sm-xs text-muted">Hosts:&nbsp;</span>
+                                    <span class="font-sm-xs font-500 text-truncate w-65">{{view.hosts}}</span>
+                                    <div class="source-count d-inline-flex justify-content-center align-items-center font-xs font-500"
+                                        *ngIf="view.conditionHostsRemaining">+{{view.conditionHostsRemaining}}
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="font-sm-xs text-muted">Source Account:&nbsp;</span>
+                                    <span
+                                        class="font-sm-xs font-500 text-truncate w-65 text-capitalize">{{view.conditionSource}}</span>
+                                    <div class="source-count d-inline-flex justify-content-center align-items-center font-xs font-500"
+                                        *ngIf="view.conditionSourceRemaining">+{{view.conditionSourceRemaining}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 p-0">
+                            <!-- <table-entries *ngIf="!selectedConditionId" [pageNo]="currentCriteria.pageNo"
+                                [pageSize]="currentCriteria.pageSize" [totalCount]="conditionCount"></table-entries> -->
+                            <table-pager class="tablePager" *ngIf="conditionsViewData.length"
+                                [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="conditionCount" [minPager]="true"
+                                (pageChange)="pageChange($event)"></table-pager>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center text-muted my-5 py-5" *ngIf="!conditionsViewData.length">No
+                        conditions found.
+                    </div>
+                </div>
+                <div class="col-9 condition-detail pl-0 h-100" [perfectScrollbar] *ngIf="conditionsViewData.length">
+                    <div class="card border-0 mb-0 h-100">
+                        <div class="card-header border-bottom bg-white p-2 d-flex flex-column">
+                            <div class="d-flex align-items-center">
+                                <div id="event-severity"
+                                    class="d-flex align-items-center rounded event-severity small p-1 mr-2"
+                                    [ngClass]="[conditionsViewData[selectedConditionIndex].severityBg, 'text-white']">
+                                    {{conditionsViewData[selectedConditionIndex].conditionSeverity}}
+                                </div>
+                                <div class="d-flex align-items-center w-60 mr-auto">
+                                    <div class="font-lg font-500 event-name text-truncate">
+                                        {{conditionsViewData[selectedConditionIndex].description}}
+                                    </div>
+                                    <div class="w-20 ml-2 mt-1 font-xs text-muted">
+                                        {{conditionsViewData[selectedConditionIndex].conditionDatetime}}
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end w-35">
+                                    <button *ngIf="!conditionsViewData[selectedConditionIndex].isAcknowledged"
+                                        class="action-icons mb-0 fas fa-comment-dots font-sm ml-1"
+                                        (click)="onCloseAlertAcknowledge(); conditionAcknowledge(); $event.stopPropagation();$event.preventDefault();"
+                                        [popover]="conditionAcknowledgeFormRef" [tooltip]="'Acknowledge'"
+                                        container="body" [outsideClick]="true" placement="left" accessControl
+                                        moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                        elementType="actionbtn"></button>
+                                    <span *ngIf="conditionsViewData[selectedConditionIndex].isAcknowledged">
+                                        <span *ngIf="conditionsViewData[selectedConditionIndex].acknowledgedTime"
+                                            [tooltip]="conditionsViewData[selectedConditionIndex].acknowledgedTooltipMsg"
+                                            container="body" [style.marginTop.px]="2"
+                                            class="fas fa-check-circle fa-2x text-success ml-1"></span>
+                                        <span *ngIf="!conditionsViewData[selectedConditionIndex].acknowledgedTime"><i
+                                                class="fa fa-spinner fa-2x ml-1 fa-spin">&nbsp;</i></span>
+                                    </span>
+                                    <button class="action-icons mb-0 fa fa-times font-sm ml-1"
+                                        [tooltip]="conditionsViewData[selectedConditionIndex].resolveInProgress ? 'In Progress': conditionsViewData[selectedConditionIndex].resolveBtnTooltipMsg"
+                                        [ngClass]="{'fa-times':!conditionsViewData[selectedConditionIndex].resolveInProgress,'fa-spinner fa-spin': conditionsViewData[selectedConditionIndex].resolveInProgress,'action-icons-disabled':conditionsViewData[selectedConditionIndex].resolveInProgress || conditionsViewData[selectedConditionIndex].isStatusResolved}"
+                                        container="body" (click)="resolveCondtion()" accessControl
+                                        moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                        elementType="actionbtn"></button>
+                                    <button class="action-icons mb-0 fas fa-project-diagram font-sm ml-1"
+                                        [tooltip]="'Coming Soon'" container="body" accessControl
+                                        moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                        elementType="actionbtn"></button>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <span class="font-sm-xs text-muted">Ticket ID: </span>
+                                    <a class="font-sm-xs text-muted text-primary font-500 "
+                                        (click)="goToTicketDetails(conditionsViewData[selectedConditionIndex])"
+                                        accessControl moduleName="Ticket Management" accessType="View Tickets"
+                                        elementType="div">{{conditionsViewData[selectedConditionIndex].ticketId}}</a>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Status: </span>
+                                    <span class="font-sm-xs font-500"
+                                        [ngClass]="[conditionsViewData[selectedConditionIndex].statusTextColor, 'text-capitalize']">{{conditionsViewData[selectedConditionIndex].conditionStatus}}</span>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Source: </span>
+                                    <div class="font-sm d-inline">
+                                        <span
+                                            class="font-500 text-capitalize">{{conditionsViewData[selectedConditionIndex].conditionSource}}</span>
+                                    </div>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Hosts: </span>
+                                    <div class="font-sm d-inline"
+                                        *ngIf="conditionsViewData[selectedConditionIndex].hosts?.length">
+                                        <span
+                                            class="font-500">{{conditionsViewData[selectedConditionIndex].hosts[0]}}</span>
+                                        <div class="d-inline source-count font-xss pl-0 py-1 pr-1 ml-1"
+                                            *ngIf="conditionsViewData[selectedConditionIndex].hosts.length-1">
+                                            +{{conditionsViewData[selectedConditionIndex].hosts.length-1}}
+                                        </div>
+                                    </div>
+                                    <div class="font-sm d-inline"
+                                        *ngIf="!conditionsViewData[selectedConditionIndex].hosts?.length">NA</div>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Correlator: </span>
+                                    <span *ngIf="conditionsViewData[selectedConditionIndex].correlator?.length"
+                                        class="font-sm font-500">{{conditionsViewData[selectedConditionIndex].correlator}}</span>
+                                    <span *ngIf="!conditionsViewData[selectedConditionIndex].correlator?.length"
+                                        class="font-sm font-500">NA</span>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Time Window: </span>
+                                    <span
+                                        class="font-sm font-500">{{conditionsViewData[selectedConditionIndex].correlationWindow
+                                        || 'NA'}}</span>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Acknowledged: </span>
+                                    <span *ngIf="conditionsViewData[selectedConditionIndex].isAcknowledged">
+                                        <i class="font-sm fas fa-check-circle text-success"></i>
+                                        <span class="font-xs-sm ml-1">with comment</span>
+                                        <span
+                                            class="font-xs-sm font-500 ml-1">{{conditionsViewData[selectedConditionIndex].acknowledgedComment}}</span>
+                                    </span>
+                                    <span class="font-sm font-500"
+                                        *ngIf="!conditionsViewData[selectedConditionIndex].isAcknowledged">No</span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="d-flex align-items-center">
+                                    <div>
+                                        <span class="font-sm-xs text-muted">Events: </span>
+                                        <span
+                                            class="badge badge-pill badge-secondary font-xs-sm">{{conditionsViewData[selectedConditionIndex].eventCount}}</span>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Alert Start Time: </span>
+                                        <div class="font-sm d-inline">
+                                            <span
+                                                class="font-500 text-capitalize">{{conditionsViewData[selectedConditionIndex].firstAlertDateTime}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Latest Alert Time: </span>
+                                        <div class="font-sm d-inline">
+                                            <span
+                                                class="font-500">{{conditionsViewData[selectedConditionIndex].lastAlertDateTime}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="border-left ml-1 pl-1">
+                                        <span class="font-sm-xs text-muted">Duration: </span>
+                                        <span
+                                            class="font-sm font-500">{{conditionsViewData[selectedConditionIndex].conditionDuration
+                                            || 'NA'}}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center pr-2">
+                                    <span
+                                        class="badge badge-pill badge-secondary font-xs-sm">{{conditionsViewData[selectedConditionIndex].alertCount}}</span>
+                                    <span class="ml-1 font-sm float-right align-middle">Alerts</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="col-12 px-0">
+                                <scrollable-tab [selector]="'active'">
+                                    <div class="nav-item border-right border-light" #scrollLeft>
+                                        <a class="nav-link bg-secondary rounded-top border-bottom-0"><i
+                                                class="fa fa-angle-left"></i></a>
+                                    </div>
+                                    <ul class="nav nav-tabs nav-tabs custom-nav-container border-bottom-0" #tabContent
+                                        role="tablist">
+                                        <li class="nav-item bg-secondary rounded-top" *ngFor="let tab of tabItems">
+                                            <a class="nav-link" [ngClass]="isActive(tab)" (click)="goTo(tab)">
+                                                <i class="fa" [ngClass]="tab.icon"></i> {{tab.name}}</a>
+                                        </li>
+                                    </ul>
+                                    <div class="nav-item border-left border-light" #scrollRight>
+                                        <a class="nav-link bg-secondary rounded-top border-bottom-0"><i
+                                                class="fa fa-angle-right"></i></a>
+                                    </div>
+                                </scrollable-tab>
+                            </div>
+                            <ng-container [ngSwitch]="tabdetails">
+                                <ng-container *ngSwitchCase="'Activity'">
+                                    <ng-container *ngTemplateOutlet="activityList"></ng-container>
+                                </ng-container>
+
+                                <ng-container *ngSwitchCase="'Alerts'">
+                                    <ng-container *ngTemplateOutlet="alertsList"></ng-container>
+                                </ng-container>
+
+                                <ng-container *ngSwitchCase="'AI Analysis'">
+                                    <ng-container *ngTemplateOutlet="aiAnalysis"></ng-container>
+                                </ng-container>
+
+                                <ng-container *ngSwitchCase="'AI Remediation'">
+                                    <ng-container *ngTemplateOutlet="aiRemediation"></ng-container>
+                                </ng-container>
+
+                                <ng-container *ngSwitchCase="'Alert Stack'">
+                                    <ng-container *ngTemplateOutlet="alertStackList"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'Impact Analysis'">
+                                    <ng-container *ngTemplateOutlet="impactAnalysis"></ng-container>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ng-container *ngIf="!summaryViewData?.condition_count">
+                <div class="row h-100 d-flex justify-content-center align-items-center">
+                    <span>No conditions available.</span>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
+
+
+<!-- <aiml-condition-details></aiml-condition-details> -->
+<aiml-alert-details></aiml-alert-details>
+
+<ng-template #activityList>
+    <div class="wizard border-top">
+        <div class="activity-list ml-3 mt-3">
+            <div class="step" *ngFor="let view of activityVerticalWizardViewData;let last = last">
+                <div *ngIf="!last" class="line"></div>
+                <div class="d-flex">
+                    <div class="check-icon-container mr-2">
+                        <i class="action-icons text-success mb-0 font-sm nopointerevents fas fa-check"></i>
+                    </div>
+                    <div>
+                        <div>{{view.description}}</div>
+                        <div class="text-muted text-sm"><i class="far fa-clock mr-2"></i>{{view.createdDatetime}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mx-1">
+            <table-entries [pageNo]="activityCriteria.pageNo" [pageSize]="activityCriteria.pageSize"
+                [totalCount]="activitiesCount"></table-entries>
+            <table-pager *ngIf="alerts.length" [pageNo]="activityCriteria.pageNo" [pageSize]="activityCriteria.pageSize"
+                [totalCount]="activitiesCount" (pageChange)="activityPageChange($event)"></table-pager>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #alertsList>
+    <div *ngIf="matchedAlert" class="col-12 mx-0 border rounded p-2 mt-3 d-flex align-items-center">
+        <div>
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-exclamation-triangle blink-bg text-danger"
+                    [ngClass]="{'blink-background-item': isBlinking}"></i>
+                <h6 class="mb-0 ml-2">Root Cause Details</h6>
+            </div>
+            <div class="d-flex align-items-center">
+                <div>
+                    <span class="font-sm-xs text-muted">Alert :</span>
+                    <a href="#" class="ml-1 text-primary">{{ matchedAlert.id }}</a>
+                </div>
+                <div class="border-left ml-2 pl-1">
+                    <span class="font-sm-xs text-muted ml-1">Device :</span>
+                    <span class="ml-1 text-primary fas" [ngClass]="matchedAlert.deviceIcon"></span>
+                    <a href="#" class="ml-1 text-primary">{{ matchedAlert.deviceName }}</a>
+                </div>
+                <div class="border-left ml-2 pl-1">
+                    <span class="font-sm-xs text-muted ml-1">Severity :</span>
+                    <i class="ml-1 fa status-icon" [ngClass]="matchedAlert.severityIcon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive" *ngIf="conditionsViewData.length">
+        <table class="table table-sm font-xs-sm font-500">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Device Name</th>
+                    <th class="text-center">Count</th>
+                    <th>Event Metric</th>
+                    <th>Alert Time</th>
+                    <th class="text-center">Severity</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Source Account</th>
+                    <th>Acknowledged</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let alert of alerts;let i = index;"
+                    [ngClass]="{'blink-background': matchedAlert?.id === alert.id && isBlinking}" truncateText>
+                    <td class="tdw-7">
+                        <button class="btn btn-link text-decoration-none p-0 table-column-btn font-xs-sm font-500"
+                            type="button" [tooltip]="alert.id"
+                            (click)="viewAlertDetails(alert.uuid)">{{alert.id}}</button>
+                    </td>
+                    <td class="tdw-15 text-primary">
+                        <div [tooltip]="alert.deviceName">
+                            <span class="fas" [ngClass]="alert.deviceIcon"></span>
+                            <span class="ml-1">{{alert.deviceName}} </span>
+                        </div>
+                    </td>
+                    <td class="tdw-5">
+                        <div class="text-center" [tooltip]="alert.eventCount">
+                            {{alert.eventCount}}</div>
+                    </td>
+                    <td class="tdw-10">
+                        <div [tooltip]="alert.eventMetric">{{alert.eventMetric}}</div>
+                    </td>
+                    <td class="tdw-15">
+                        <div [tooltip]="alert.alertTime">{{alert.alertTime}}</div>
+                    </td>
+                    <td class="tdw-5">
+                        <div class="text-center" [tooltip]="alert.severity" container="body">
+                            <i class="fa status-icon" [ngClass]="alert.severityIcon"></i>
+                        </div>
+                    </td>
+                    <td class="tdw-15">
+                        <div [tooltip]="alert.description">{{alert.description}}</div>
+                    </td>
+                    <td class="tdw-8">
+                        <div [ngClass]="[alert.statusTextColor, 'text-capitalize']" [tooltip]="alert.status">
+                            {{alert.status}}</div>
+                    </td>
+                    <td class="tdw-10">
+                        <div class="text-capitalize" [tooltip]="alert.sourceAccount">{{alert.sourceAccount}}</div>
+                    </td>
+                    <td class="tdw-8 no-truncate">
+                        <div class="pl-3" *ngIf="alert.isAcknowledged">
+                            <span *ngIf="alert.acknowledgedTime" class="fas fa-check-circle fa-lg text-success"
+                                container="body" (mouseenter)="onMouseEnterTooltip(i, $event.target)"
+                                (mouseleave)="hoveredIndex = -1">
+                                <div #tooltipRef class="tooltip-box" *ngIf="hoveredIndex === i"
+                                    [ngClass]="tooltipDirection === 'bottom' ? 'tooltip-bottom' : 'tooltip-top'"
+                                    [innerHTML]="alert.acknowledgedTooltipMsg"></div>
+                            </span>
+                            <span *ngIf="!alert.acknowledgedTime"><i class="fa fa-spinner fa-spin">&nbsp;</i></span>
+                        </div>
+                        <div class="pl-2" *ngIf="!alert.isAcknowledged">
+                            <button class="action-icons mb-0 fas fa-comment-dots font-sm pe-none"
+                                (click)="onCloseAlertAcknowledge(); alertAcknowledge(i); $event.stopPropagation();$event.preventDefault();"
+                                [popover]="alertAcknowledgeFormRef" [tooltip]="'Acknowledge'" container="body"
+                                [outsideClick]="true" accessControl moduleName="AIML Event Management"
+                                accessType="Manage AIML Event Management" elementType="actionbtn"></button>
+                        </div>
+                    </td>
+                    <td class="action-icons-column">
+                        <span dropdown placement="bottom right" container="body">
+                            <button id="button-container" class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                                data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle
+                                (click)="false" [tooltip]="'More Actions'" container="body" accessControl
+                                moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                elementType="actionbtn"></button>
+                            <div container="body" id="icons-dropdown-container"
+                                class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                                aria-labelledby="button-container">
+                                <button class="action-icons mb-0 fa fa-times font-sm mt-1 mb-1"
+                                    [tooltip]="alert.resolveInProgress ? 'In Progress': alert.resolveBtnTooltipMsg"
+                                    [ngClass]="{'fa-times':!alert.resolveInProgress,'fa-spinner fa-spin': alert.resolveInProgress,'action-icons-disabled':alert.resolveInProgress || alert.isStatusResolved}"
+                                    container="body" (click)="resolveAlert(alert)"></button>
+                                <button class="action-icons mb-0 fas fa-comment-dots font-sm mt-2 mb-1"
+                                    [tooltip]="'Coming Soon'" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                                <button class="action-icons mb-0 fas fa-edit font-sm mt-1 mb-1"
+                                    [tooltip]="'Coming Soon'" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                                <button class="action-icons mb-0 fas fa-external-link-alt font-sm mt-1 mb-1"
+                                    [tooltip]="'Coming Soon'" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                                <button class="action-icons mb-0 fas fa-ticket-alt font-sm mt-1 mb-2"
+                                    tooltip="Manage by creating support ticket" container="body"
+                                    [ngClass]="{'action-icons-disabled':true}"></button>
+                            </div>
+                        </span>
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mx-1">
+            <table-entries [pageNo]="alertsCriteria.pageNo" [pageSize]="alertsCriteria.pageSize"
+                [totalCount]="alertsCount"></table-entries>
+            <table-pager *ngIf="alerts.length" [pageNo]="alertsCriteria.pageNo" [pageSize]="alertsCriteria.pageSize"
+                [totalCount]="alertsCount" (pageChange)="alertsPageChange($event)"></table-pager>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #aiAnalysis>
+    <div class="border-top">
+        <div class="card m-2 p-2" *ngIf="!aiAnalysisViewData">
+            <!-- <app-spinner [name]="'aiAnalysisLoader'"></app-spinner> -->
+            <span>UnityAI here 👋</span>
+            <span class="mt-3">Click below to generate your AI-powered Root Cause Analysis.</span>
+            <button class="btn btn-warning mt-2 col-2" (click)="getConditionRcaAnalysis()">Generate RCA</button>
+        </div>
+        <div>
+            <div class="col-12" *ngIf="aiAnalysisViewData?.success">
+                <div class="col mt-2 row pr-0">
+                    <img [src]="analysisLogos.UnityOne.imageURL" [alt]="'UnityOne.ai'"
+                        style="height: 20px; max-width: 20px; " />
+                    <div class="text-success ml-2">Summary by UnityOne.AI</div>
+                    <a class=" btn btn-pill btn-primary  btn-sm ml-auto" tooltip="Download" href="{{downloadUrl}}">
+                        <i class="fas fa-download font-sm"></i></a>
+                </div>
+                <div class="col">
+                    <div>
+                        <span class="font-sm-xs text-muted">Title: </span>
+                        <span class="font-sm-xs  text-dark font-500 ">{{aiAnalysisViewData.title}}</span>
+                    </div>
+                    <div>
+                        <span class="font-sm-xs text-muted">Description: </span>
+                        <span class="font-sm-xs  text-dark font-500 ">{{aiAnalysisViewData.description}}</span>
+                    </div>
+                    <div>
+                        <span class="font-sm-xs text-muted">Severity: </span>
+                        <span class="font-sm-xs  text-dark font-500 ">{{aiAnalysisViewData.severity}}</span>
+                    </div>
+                    <div>
+                        <span class="font-sm-xs text-muted">Affected Devices: </span>
+                        <span class="font-sm-xs  text-dark font-500 ">{{aiAnalysisViewData.afftectedDevices}}</span>
+                    </div>
+                    <div>
+                        <span class="font-sm-xs text-muted">Affected Interfaces: </span>
+                        <span class="font-sm-xs  text-dark font-500 ">{{aiAnalysisViewData.afftectedInterfaces}}</span>
+                    </div>
+                    <div>
+                        <span class="font-sm-xs text-muted">Source Account: </span>
+                        <span class="font-sm-xs  text-dark font-500 ">{{aiAnalysisViewData.sourceAccount}}</span>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row">
+                            <div class="col px-0">
+                                <img [src]="analysisLogos.rootCause.imageURL" [alt]="'Root Cause'" class="w-100"
+                                    style=" max-width: 35px; max-height: 30px;" />
+                                <span class="font-lg font-500 event-name text-truncate ml-2">Root Cause</span>
+                            </div>
+                            <div class="mr-2">
+                                <span class="font-500">Score :</span>
+                                <span class="ml-2">{{aiAnalysisViewData.resultAccuracyPercentage}}</span>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <span>{{aiAnalysisViewData.rootCause}}</span>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row">
+                            <img [src]="analysisLogos.factors.imageURL" [alt]="'Root Cause'" class="w-100 "
+                                style=" max-width: 35px; max-height: 30px;" />
+                            <span class="font-lg font-500 event-name text-truncate ml-2">Contributing Factors</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul *ngIf="aiAnalysisViewData.contributingFactors?.length">
+                            <li *ngFor="let factor of aiAnalysisViewData.contributingFactors">{{ factor }}</li>
+                        </ul>
+                        <div *ngIf="!aiAnalysisViewData.contributingFactors?.length">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row">
+                            <button class="action-icons mb-0 fas fa-mail-bulk font-sm ml-1"></button>
+                            <span class="font-lg font-500 event-name text-truncate ml-2">Suggested Remediation</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="wizard" *ngIf="aiAnalysisViewData?.remediationRecommendations?.length">
+                            <div class="activity-list ml-3 mt-3">
+                                <div class="step"
+                                    *ngFor="let rec of aiAnalysisViewData?.remediationRecommendations;let last = last">
+                                    <div *ngIf="!last" class="line"></div>
+                                    <div class="d-flex">
+                                        <div class="check-icon-container mr-2">
+                                            <i
+                                                class="action-icons text-success mb-0 font-sm nopointerevents fas fa-check"></i>
+                                        </div>
+                                        <div>
+                                            <div>{{rec}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row">
+                            <button class="action-icons mb-0 fas fa-calendar-alt font-sm ml-1"></button>
+                            <span class="font-lg font-500 event-name text-truncate  ml-2">Event Timeline</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" *ngIf="aiAnalysisViewData?.timelineOfEvents.length">
+                            <table class="table ">
+                                <thead class="font-500">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let event of aiAnalysisViewData?.timelineOfEvents">
+                                        <td class="">
+                                            <span>
+                                                {{ event.date }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span>
+                                                {{ event.time }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span> {{event.event}}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row align-items-center">
+                            <span class="font-lg font-500 ml-2">Logs</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive" *ngIf="aiAnalysisViewData?.logs?.length">
+
+                            <table class="table mb-0">
+                                <thead class="font-500">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th class="text-center">Status</th>
+                                        <th>Content</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr *ngFor="let log of aiAnalysisViewData.logs" truncateText>
+                                        <td class="tdw-13">
+                                            <div [tooltip]="log.date">{{ log.date }}</div>
+                                        </td>
+                                        <td class="tdw-9">
+                                            <div [tooltip]="log.time">{{log.time}}</div>
+                                        </td>
+                                        <td class="w-10 text-center">
+                                            <span [ngClass]="log.statusIcon" [tooltip]="log.status"></span>
+                                        </td>
+                                        <td>
+                                            <div>{{ log.description }}</div>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row align-items-center">
+                            <span class="font-lg font-500 ml-2">Traces</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive" *ngIf="aiAnalysisViewData?.traces?.length">
+
+                            <table class="table mb-0">
+                                <thead class="font-500">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th class="text-center">Status</th>
+                                        <th>Content</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr *ngFor="let trace of aiAnalysisViewData.traces" truncateText>
+                                        <td class="tdw-13">
+                                            <div [tooltip]="trace.date">{{ trace.date }}</div>
+                                        </td>
+                                        <td class="tdw-9">
+                                            <div [tooltip]="trace.date">{{trace.time}}</div>
+                                        </td>
+                                        <td class="tdw-10 text-center">
+                                            <shared-device-status [status]="trace.status"></shared-device-status>
+                                        </td>
+                                        <td>
+                                            <div>{{ trace.description }}</div>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class=" mt-4 text-center text-muted font-500">
+                    * AI Analysis can make mistakes. Please check important info.
+                </div>
+
+            </div>
+            <div style="min-height:100px" *ngIf="!aiAnalysisViewData?.success"
+                class=" mt-4 text-center text-muted h-100">
+                {{aiAnalysisViewData?.failureReason}}
+            </div>
+        </div>
+    </div>
+
+</ng-template>
+
+<ng-template #aiRemediation>
+    <div class="px-2 pb-2">
+        <div class="row mt-2">
+            <app-spinner [name]="'aiRemediation'"></app-spinner>
+            <div class="col-6">
+                <img class="pb-1" [src]="analysisLogos.UnityOne.imageURL" [alt]="'UnityOne.ai'"
+                    style="height: 20px; max-width: 20px; " />
+                <div class="text-success ml-2 d-inline-block">Summary by UnityOne.AI</div>
+            </div>
+        </div>
+        <div>
+            <span class="font-sm-xs text-muted">Title: </span>
+            <span class="font-sm-xs text-dark font-500">{{aiRemediationViewData?.title}}</span>
+        </div>
+        <div>
+            <span class="font-sm-xs text-muted">Description: </span>
+            <span class="font-sm-xs text-dark font-500">{{aiRemediationViewData?.description}}</span>
+        </div>
+        <div>
+            <span class="font-sm-xs text-muted">Severity: </span>
+            <span class="font-sm-xs text-dark font-500">{{aiRemediationViewData?.severity}}</span>
+        </div>
+        <div>
+            <span class="font-sm-xs text-muted">Affected Devices: </span>
+            <span class="font-sm-xs text-dark font-500">{{aiRemediationViewData?.afftectedDevices}}</span>
+        </div>
+        <div>
+            <span class="font-sm-xs text-muted">Affected Interfaces: </span>
+            <span class="font-sm-xs text-dark font-500">{{aiRemediationViewData?.afftectedInterfaces}}</span>
+        </div>
+        <div>
+            <span class="font-sm-xs text-muted">Source Account: </span>
+            <span class="font-sm-xs text-dark font-500">{{aiRemediationViewData?.sourceAccount}}</span>
+        </div>
+
+        <div class="card mb-3 mt-3">
+            <div class="card-header bg-transparent">
+                <button class="action-icons mb-0 fas fa-hand-pointer font-sm mr-2"></button>
+                <span class="text-dark font-500">Recommended Remediation Workflow From UnityAI</span>
+            </div>
+            <div class="card-body py-2">
+                <div *ngIf="aiRemediationViewData?.recommendedWorkflowFromUnityAI?.workflowName">
+                    <div>
+                        <span class="text-muted"> Workflow name: </span>
+                        <span
+                            class="text-dark font-500">{{aiRemediationViewData?.recommendedWorkflowFromUnityAI?.workflowName}}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">Description: </span>
+                        <span
+                            class="text-dark font-500">{{aiRemediationViewData?.recommendedWorkflowFromUnityAI?.description}}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">Confidence: </span>
+                        <span
+                            class="text-dark font-500">{{aiRemediationViewData?.recommendedWorkflowFromUnityAI?.confidence}}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">Trigger Type: </span>
+                        <span
+                            class="text-dark font-500">{{aiRemediationViewData?.recommendedWorkflowFromUnityAI?.triggerType}}</span>
+                    </div>
+                    <div>
+                        <span class="text-muted">Category: </span>
+                        <span
+                            class="text-dark font-500">{{aiRemediationViewData?.recommendedWorkflowFromUnityAI?.category}}</span>
+                    </div>
+
+
+                    <div class="mt-3">
+                        <div class="text-dark font-500">Expected Outcomes</div>
+                        <ul class="mt-1"
+                            *ngIf="aiRemediationViewData?.recommendedWorkflowFromUnityAI?.expectedOutcomes?.length">
+                            <li
+                                *ngFor="let expectedOutcome of aiRemediationViewData?.recommendedWorkflowFromUnityAI?.expectedOutcomes">
+                                {{expectedOutcome}}</li>
+                        </ul>
+                        <div class="d-flex justify-content-center align-items-center py-3"
+                            *ngIf="!aiRemediationViewData?.recommendedWorkflowFromUnityAI?.expectedOutcomes?.length">
+                            <p class="text-muted">No Expected Outcomes data found.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-dark font-500">Post-Execution Monitoring</div>
+                        <ul class="mt-1"
+                            *ngIf="aiRemediationViewData?.recommendedWorkflowFromUnityAI?.postExecutionMonitoring?.length">
+                            <li
+                                *ngFor="let postExecution of aiRemediationViewData?.recommendedWorkflowFromUnityAI?.postExecutionMonitoring">
+                                {{postExecution}}</li>
+                        </ul>
+                        <div class="d-flex justify-content-center align-items-center py-3"
+                            *ngIf="!aiRemediationViewData?.recommendedWorkflowFromUnityAI?.postExecutionMonitoring?.length">
+                            <p class="text-muted">No Post-Execution Monitoring data found.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center"
+                    *ngIf="!aiRemediationViewData?.recommendedWorkflowFromUnityAI?.workflowName">
+                    <p class="text-muted py-4">No matching workflow were found in UnityAI at this time. Please follow
+                        the
+                        recommended actions below to help resolve the issue.</p>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center mb-3"
+            *ngIf="aiRemediationViewData?.recommendedWorkflowFromUnityAI?.workflowName">
+            <button class="btn btn-pill btn-warning btn-sm ml-2"
+                (click)="goToExecuteWorkflow(aiRemediationViewData?.recommendedWorkflowFromUnityAI)"> Execute Workflow
+            </button>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-transparent">
+                <button class="action-icons mb-0 fas fa-hand-pointer font-sm mr-2"></button>
+                <span class="ext-dark font-500">Recommended Actions</span>
+            </div>
+            <div class="card-body py-2">
+                <div [ngClass]="{'border-bottom': !last, 'mt-2':!first}"
+                    *ngFor="let recommededAction of aiRemediationViewData?.recommendedActions; let i = index; let first = first; let last = last;">
+                    <p class="text-dark font-sm font-500 mb-1">{{recommededAction?.action}}</p>
+                    <p class="font-sm-xs">{{recommededAction?.description}}</p>
+                    <p class="text-dark font-500 mb-1">Why this action is recommended</p>
+                    <p class="font-sm-xs mb-2">{{recommededAction?.whyThisActionIsRecommended}}</p>
+                </div>
+                <div class="d-flex justify-content-center align-items-center py-4"
+                    *ngIf="!aiRemediationViewData?.recommendedActions?.length">
+                    <p class="text-muted">No Recommended Actions data found.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #alertStackList>
+    <div class="row">
+        <div [ngClass]="selectedEvent ? 'col-7' : 'col-12'">
+            <div class="font-xs-sm font-500">
+                <div class="d-flex w-100 justify-content-between align-items-center table-header">
+                    <div class="d-flex w-20 font-weight-bold table-header-item">Device Name</div>
+                    <div class="d-flex justify-content-between w-80">
+                        <div class="d-flex flex-column align-items-start table-header-item">
+                            <span class="font-weight-bold">Start Time</span>
+                            <span
+                                class="font-weight-bold">{{conditionsViewData[selectedConditionIndex].firstAlertDateTime}}</span>
+                        </div>
+                        <div class="d-flex flex-column align-items-start table-header-item">
+                            <span class="font-weight-bold">End Time</span>
+                            <span
+                                class="font-weight-bold">{{conditionsViewData[selectedConditionIndex].lastAlertDateTime}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex w-100 justify-content-between table-body"
+                    *ngFor="let host of conditionsViewData[selectedConditionIndex].hostBasedAlerts;let hostIndex = index;">
+                    <div class="d-flex w-20 font-xs-sm font-500 text-primary align-items-baseline table-body-item">
+                        <span class="fas" [ngClass]="host.deviceIcon"></span>
+                        <span class="ml-1 text-truncate">{{host.deviceName}} </span>
+                    </div>
+                    <div id="condition-events-timeline" class="d-flex flex-column w-80 table-body-item"
+                        style="margin-top: -6px;">
+                        <div *ngIf="showConditionEventTimeline" class="d-flex w-100">
+                            <div class="d-flex flex-column justify-content-start align-items-start"
+                                style="position: absolute;"
+                                *ngFor="let alert of conditionsViewData[selectedConditionIndex].hostBasedAlerts[hostIndex].alerts; let hostAlertIndex = index">
+                                <div class="badge rounded-pill font-xss" (click)="viewAlertDetails(alert.alertId)"
+                                    [ngClass]="alert.severityPointerBGClass" [tooltip]="alert.tooltipMessage"
+                                    [style.margin-left.px]="alert.inActiveTimelineLength - 5" style="z-index: 1;">
+                                    {{alert.alertNumber}}
+                                </div>
+                                <div class="vertical border border-right-0" [ngClass]="alert.severityPointerHookClass"
+                                    [style.margin-left.px]="alert.inActiveTimelineLength"></div>
+                                <div style="z-index: 1; border-width: 2px !important; margin-top: -3px; margin-right:16px; margin-left:-5px;"
+                                    [style.margin-left.px]="alert.inActiveTimelineLength"
+                                    [style.width.px]="alert.activeTimelineLength"
+                                    [ngClass]="conditionsViewData[selectedConditionIndex].hostBasedAlerts[hostIndex].alerts[hostAlertIndex].activeTimelineClass">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-5" *ngIf="selectedEvent">
+            <div class="card mb-0 rounded">
+                <div class="card-header d-flex justify-content-between align-items-center px-3 py-2">
+                    <div>
+                        <span class="fas" [ngClass]="selectedEvent.deviceIcon"></span>
+                        <span class="ml-2">{{selectedEvent.deviceName}} </span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="font-sm font-500 mr-2">
+                            <span class="text-muted">Status : </span>
+                            <span
+                                [ngClass]="[selectedEvent.statusTextColor, 'text-capitalize']">{{selectedEvent.status}}</span>
+                        </span>
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeEventDetails()"></a>
+                    </div>
+                </div>
+                <div class="card-body pt-2 px-4 pb-4 d-flex flex-column font-sm">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Event Time :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.eventDateTime}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Device Name :</span>
+                        <span class="text-primary font-sm-xs font-500 mr-2">{{selectedEvent.deviceName}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Device IP :</span>
+                        <span class="font-sm-xs font-500 mr-1">{{selectedEvent.managementIp}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Description :</span>
+                        <span class="font-sm-xs w-60 font-500 mr-2">{{selectedEvent.description}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Source :</span>
+                        <span
+                            class="font-sm-xs w-60 font-500 mr-2 text-capitalize text-truncate">{{selectedEvent.source}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Component :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.category}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Private Cloud :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.privateCloud}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Datacenter :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.datacenter}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Trigger Name :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.triggerName}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Tags :</span>
+                        <span class="font-sm-xs w-60 font-500 mr-2 text-truncate">{{selectedEvent.tags}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Cabinet :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.cabinet}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Service :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.service}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Domain :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.domain}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="text-muted w-30 text-truncate">Acknowledged :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.isAcknowledged}}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-1" *ngIf="selectedEvent.status == 'Resolved'">
+                        <span class="text-muted w-30 text-truncate">Resolved Time :</span>
+                        <span class="font-sm-xs font-500 mr-2">{{selectedEvent.recoveredDateTime}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #impactAnalysis>
+    <div class="col-12 border-top p-0 h-100">
+
+        <!-- HEADER ROW (LEFT: LOGO | RIGHT: TOGGLE) -->
+        <div class="d-flex justify-content-between align-items-center px-2 py-2">
+
+            <!-- LEFT: BRANDING -->
+            <div class="d-flex align-items-center">
+                <img [src]="analysisLogos.UnityOne.imageURL" [alt]="'UnityOne.ai'"
+                    style="height: 20px; max-width: 20px;" />
+                <div class="text-success ml-2">
+                    Impact Analysis by UnityOne.AI
+                </div>
+            </div>
+
+            <!-- RIGHT: TOGGLE -->
+            <div class="impact-toggle">
+                <div class="tabs-wrap d-inline-block">
+                    <ul class="mb-0 pl-0">
+                        <li>
+                            <span [class.active]="impactView === 'topology'" (click)="setImpactView('topology')">
+                                Topology
+                            </span>
+                        </li>
+                        <li>
+                            <span [class.active]="impactView === 'impact'" (click)="setImpactView('impact')">
+                                Impact Analysis
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CONTENT -->
+        <ng-container *ngIf="impactView === 'topology'">
+            <ng-container *ngIf="impactAnalysisData">
+                <shared-application-topology [data]="impactAnalysisData">
+                </shared-application-topology>
+            </ng-container>
+
+            <ng-container *ngIf="!impactAnalysisData">
+                <div class="card m-0 h-100">
+                    <div class="card-header bg-transparent py-2">Topology</div>
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-center align-items-center">
+                            No data available
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+
+        <ng-container *ngIf="impactView === 'impact' && conditionUuid">
+            <application-discovery-problems-impact-analysis [conditionId]="conditionUuid">
+            </application-discovery-problems-impact-analysis>
+        </ng-container>
+
+    </div>
+</ng-template>

@@ -1,0 +1,86 @@
+<app-main-tab [tabItems]="tabItems"></app-main-tab>
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card rounded-3">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center font-500">
+                            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+                            <span class="ml-1 font-lg">SolarWinds
+                                Instances</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button class="btn btn-pill btn-sm btn-warning px-3 font-500" type="button"
+                                (click)="addInstance()" accessControl moduleName="Integrations"
+                                accessType="Add Integrations" elementType="btn">
+                                <span class="font-sm">Add Instance</span>
+                            </button>
+                            <button class="btn btn-pill btn-warning pull-right btn-sm mx-2" [tooltip]="'Rules'"
+                                container="body" (click)="goToSettings()" accessControl
+                                moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                elementType="btn">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                            <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" container="body"
+                                (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                            </button>
+                            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <table class="table text-left">
+                            <thead>
+                                <tr>
+                                    <th>Instance Name</th>
+                                    <th>Instance URL</th>
+                                    <th>Ingestion Type</th>
+                                    <th>Last Ingestion</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData" setTableColumnWidth>
+                                    <td>{{view.name}}</td>
+                                    <td>{{view.url}}</td>
+                                    <td>{{view.type}}</td>
+                                    <td>{{view.lastIngestion}}</td>
+                                    <td class="action-icons-column text-center">
+                                        <!-- <a [href]="view.downloadURL"
+                                            class="action-icons mb-0 btn btn-primary btn-sm ml-1"
+                                            tooltip="Download Script" accessControl moduleName="Integrations"
+                                            accessType="Manage Integrations" elementType="actionbtn">
+                                            <i class="fa fa-download font-lg mt-1"></i>
+                                        </a> -->
+                                        <button class="action-icons mb-0 font-sm ml-1" [class]="view.statusIconClass"
+                                            [tooltip]="view.statusIconTooltip" (click)="switchStatus(view)"
+                                            accessControl moduleName="Integrations" accessType="Manage Integrations"
+                                            elementType="actionbtn"></button>
+                                        <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                            (click)="editInstance(view)" accessControl moduleName="Integrations"
+                                            accessType="Manage Integrations" elementType="actionbtn">
+                                        </button>
+                                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                            (click)="deleteInstance(view)" accessControl moduleName="Integrations"
+                                            accessType="Manage Integrations" elementType="actionbtn">
+                                        </button>
+                                        <button class="action-icons mb-0 fas fa-key font-sm ml-1"
+                                            [tooltip]="view.copyKeyTooltipMessage" (click)="copyKey(view)" accessControl
+                                            moduleName="Integrations" accessType="Manage Integrations"
+                                            elementType="actionbtn">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="!viewData.length" class="d-flex py-5 justify-content-center align-items-center">
+                            No Solarwinds Instances available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<usi-event-ingestion-solarwinds-crud (onCrud)="onCrud($event)"></usi-event-ingestion-solarwinds-crud>

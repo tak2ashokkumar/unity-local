@@ -1,0 +1,134 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+    <loading></loading>
+    <span ng-if="loader">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+    </span>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color top_shadow"
+            ng-show="model.results !== undefined" style="padding-left:0px;">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 pull-right"
+                ng-class="{'padding_top15px' : disable_action_btn}">
+                <div class="action-bar pull-right" ng-class="{'table-button' : !disable_action_btn}">
+                    <button class="btn btn-primary" type="button" ng-click="ctrl.add()" style="margin-left:20px;"> Add
+                        Catalogue</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12"></div>
+        <div ng-if="model.results !== undefined">
+            <table class="table table-condensed" ng-if="model.results.length > 0">
+                <thead>
+                    <tr>
+                        <th>Device Type</th>
+                        <th>Provider</th>
+                        <th>Catalogue Description</th>
+                        <th>Customers</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="result in model.results"
+                        ng-click="selection.selected = result; selection.index = $index"
+                        ng-class="{'selected': result === selection.selected}">
+                        <td>{{ result.device_type }}</td>
+                        <td>{{ result.provider }}</td>
+                        <td>{{ result.description }}</td>
+                        <td>
+                            <div ng-repeat="customer in result.customers">
+                                <p><span>{{ customer.name }}</span></p>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-icons">
+                                <a class="fa fa-pencil blue-text ng-scope" tooltip-class="customClass"
+                                    uib-tooltip="Edit" ng-click="ctrl.edit2(result, $index)"></a>
+                                <a class="fa fa-trash-o blue-text ng-scope" tooltip-class="customClass"
+                                    uib-tooltip="Delete" ng-click="ctrl.remove(result, $index)"></a>
+                                <a class="fa fa-money blue-text ng-scope" tooltip-class="customClass"
+                                    uib-tooltip="Manage Term" ng-click="getTermDetails($index, result)"></a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <span ng-if="model.results.length === 0 && !loader">
+                <h3 class="align-center">No records to display.</h3>
+            </span>
+        </div>
+    </div>
+</div>
+</div>
+
+<script type="text/ng-template" id="addTerm.html">
+    <div class="modal-header">
+        <h3 class="modal-title">{{ modal_obj.method }}  Terms</h3>
+    </div>
+
+    <div class="modal-form">
+        <form name="modalform" role="form">
+            <div class="col-xs-12">
+                <div class="paddingR col-xs-6">
+                    <div class="form-group">
+                        <label for="first_term" class="control-label">
+                        First Term*
+                        </label>
+                        <span class="errormsg" ng-if="modal_obj.first_term_errmsg">({{ modal_obj.first_term_errmsg }})</span>
+                        <input id="first_term" class="form-control" type="number" min="1" max="5" required="required" ng-model="modal_obj.first_term">
+                    </div>
+                </div>
+                <div class="paddingR col-xs-6">
+                    <div class="form-group">
+                        <label for="first_term_price" class="control-label">
+                        Price*
+                        </label>
+                        <input id="first_term_price" class="form-control" type="text" required="required" ng-model="modal_obj.first_term_price">
+                    </div>
+                </div>
+                <div class="paddingR col-xs-6">
+                    <div class="form-group">
+                        <label for="second_term" class="control-label">
+                        Second Term*
+                        </label>
+                        <span class="errormsg" ng-if="modal_obj.second_term_errmsg">({{ modal_obj.second_term_errmsg }})</span>
+                        <input id="second_term" class="form-control" type="number" required="required" ng-model="modal_obj.second_term">
+                    </div>
+                </div>
+                <div class="paddingR col-xs-6">
+                    <div class="form-group">
+                        <label for="second_term_price" class="control-label">
+                        Price*
+                        </label>
+                        <input id="second_term_price" class="form-control" type="text" required="required" ng-model="modal_obj.second_term_price">
+                    </div>
+                </div>
+                <div class="paddingR col-xs-6">
+                    <div class="form-group">
+                        <label for="third_term" class="control-label">
+                        Third Term*
+                        </label>
+                        <span class="errormsg" ng-if="modal_obj.third_term_errmsg">({{ modal_obj.third_term_errmsg }})</span>
+                        <input id="third_term" class="form-control" type="number" required="required" ng-model="modal_obj.third_term">
+                    </div>
+                </div>
+                <div class="paddingR col-xs-6">
+                    <div class="form-group">
+                        <label for="third_term_price" class="control-label">
+                        Price*
+                        </label>
+                        <input id="third_term_price" class="form-control" type="text" required="required" ng-model="modal_obj.third_term_price">
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-cancel" type="button" ng-click="cancel()">
+            Cancel
+        </button>
+        <button class="btn btn-default" type="button" ng-click="addTerm(obj)">
+            <span ng-bind="modal_obj.method"></span>
+        </button>
+    </div>
+</script>

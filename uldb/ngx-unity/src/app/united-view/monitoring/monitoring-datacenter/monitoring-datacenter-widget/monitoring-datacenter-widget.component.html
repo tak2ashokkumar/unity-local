@@ -1,0 +1,22 @@
+<div class="card equalize-card">
+  <app-spinner [name]="pdu.pduId"></app-spinner>
+  <div class="card-header bg-transparent py-2">
+    <div class="w-75 d-inline-block ">
+      <a class="card-title font-lg mb-0 font-weight-bolder text-decoration-none" [routerLink]="pdu.pduUrl">{{pdu.hostName}}
+      </a>
+    </div>
+    <div class="w-25 d-inline-block ">
+      <span class="text-right text-truncate w-100 d-inline-block">Cab : {{pdu.cabinetName}}</span>
+    </div>
+  </div>
+  <div class="card-body card-min-height">
+    <div class="row h-100">
+      <div class="col-6" *ngFor="let graph of pdu.graphs">
+        <div class="h5 m-0 text-warning">{{graph.displayName}}</div>
+        <img class="img-fluid graph-img" *ngIf="graph.graph" src="data:image/png;base64,{{graph.graph}}">
+        <span class="invalid-graph text-danger text-center" *ngIf="!loading && !graph.graph">Graph not available</span>
+        <i class="fa fa-spinner fa-spin align-middle" *ngIf="loading"></i>
+      </div>
+    </div>
+  </div>
+</div>

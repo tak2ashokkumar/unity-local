@@ -1,0 +1,297 @@
+<div class="page_wrapper" style="float:left" ng-show="!showProxy">
+  <loading object="{{ model.results }}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchkey" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}" ng-change="getSearchResults()">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ model.count }}</span>
+          <span class="count-text"> {{device_type}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="model.count !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="model.count > 0" infinite-scroll='loadMoreResults()'>
+              <thead>
+                  <tr>
+                      <th custom-sort order="name" sort="sort" ng-mouseover="order = 'name'"> Name </th>
+                      <th> Device Status </th>
+                      <th> Model</th>
+                      <th> Type </th>
+                      <th> Management IP </th>
+                      <th> Action </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in model.results">
+                      <!-- <td>{{ row.name}}</td> -->
+                      <td>
+                          <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                              popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                              ng-init="get_observium_details(device_url, row)" ng-click="show_observium_details(row)">
+                                {{row.name}}
+                          </a>
+                      </td>
+                      <td>
+                          <span ng-if="angular.isObject(row.observium_details) && !angular.isDefined(row.observium_details.device_data)">
+                              <i class="fa fa-spinner fa-spin"></i>
+                          </span>
+                          <span ng-if="!angular.isObject(row.observium_details)">
+                            <device-not-configured></device-not-configured>
+                          </span>
+
+                          <span ng-if="angular.isObject(row.observium_details) && angular.isDefined(row.observium_details.device_data)">
+                              <span ng-if="row.observium_details.device_data.status == 1">
+                                  <device-up></device-up>
+                              </span>
+                              <span ng-if="row.observium_details.device_data.status == 0"> 
+                                  <device-down></device-down>
+                              </span>
+                          </span>
+                      </td>
+
+                      <td>{{row.model || 'N/A'}}</td>
+
+                      <td>{{row.manufacturer || 'N/A' }}</td>
+
+                      <td>{{row.management_ip || 'N/A' }}</td>
+
+                      <td>
+                        <div class="action-icons">
+                          <span>
+                              <!-- Same Tab Starts -->
+                              <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in Same Tab' }}" >
+                                 <div class="btn-group" ng-init="disable_same_tab = row.is_shared || (!row.proxy.same_tab && !row.management_ip)">
+                                     <a class="dropdown-toggle" data-toggle="dropdown" ng-class="{'fa-disabled': disable_same_tab}">
+                                         <span class="fa fa-external-link-square" ng-class="{'fa-disabled': disable_same_tab}"></span>
+                                     </a>
+                                     <ul class="dropdown-menu padding12px" role="menu">
+                                         <li>
+                                             <span>
+                                                <span tooltip-class="customClass" tooltip-enable="{{ row.is_shared }}" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in Same Tab'}}">
+                                                    <a class="dropdown-item" ng-class="{'fa-disabled': !row.proxy.same_tab}" ng-click="proxySameTab($index, row.uuid, device_url, row.proxy.proxy_fqdn)" href="">Web Access</a>
+                                                </span>
+                                             </span>
+                                         </li>
+                                         <div class="dropdown-divider"></div>
+                                         <li>
+                                             <span tooltip-class="customClass" tooltip-enable="{{ row.is_shared}}" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : (row.management_ip ? 'Manage in Same Tab' : 'Device not Configured')}}">
+                                                 <a class="dropdown-item" ng-click="ConsoleSameTab($index, row.uuid)" ng-class="{'fa-disabled': !row.management_ip}" href="">Console Access</a>
+                                             </span>
+                                         </li>
+                                     </ul>
+                                 </div>
+                              </span>
+                              <!-- Same Tab Ends -->
+
+                              <!-- New Tab Starts -->
+                              <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab' }}" >
+                                 <div class="btn-group" ng-init="disable_new_tab = row.is_shared || (!row.proxy.proxy_fqdn && !row.management_ip)">
+                                     <a class="dropdown-toggle" data-toggle="dropdown" ng-class="{'fa-disabled': disable_new_tab}">
+                                         <span class="fa fa-external-link" ng-class="{'fa-disabled': disable_new_tab}"></span>
+                                     </a>
+                                     <ul class="dropdown-menu padding12px" role="menu">
+                                         <li>
+                                             <span>
+                                                 <span tooltip-class="customClass" tooltip-enable="{{ row.is_shared }}" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab'}}">
+                                                     <a class="dropdown-item" ng-class="{'fa-disabled': !row.proxy.proxy_fqdn}" href="{{ row.proxy.proxy_fqdn }}" ng-click="updateActivityLog($index, row.uuid, device_url)" target="_blank">Web Access</a>
+                                                 </span>
+                                             </span>
+                                         </li>
+                                         <div class="dropdown-divider"></div>
+                                         <li>
+                                             <span tooltip-class="customClass" tooltip-enable="{{ row.is_shared }}" uib-tooltip="{{ row.is_shared  ? 'Non Manageable shared Device' : (row.management_ip ? 'Manage in New Tab' : 'Device not Configured')}}">
+                                                 <a class="dropdown-item" ng-class="{'fa-disabled': ! row.management_ip}"
+                                                    href="/vm-console-client#/{{device_url}}/webconsole/{{ row.uuid }}/" target="_blank">Console Access</a>
+                                             </span>
+                                         </li>
+                                     </ul>
+                                 </div>
+                              </span>
+                              <!-- New Tab Ends -->
+
+                              <!-- Obbservium Stats Starts -->
+                              <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                                  <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                                      <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                  </a>
+                                  <a ng-if="row.observium_details === null">
+                                      <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                  </a>
+                              </span>
+                              <!-- Obbservium Stats Ends -->
+
+                              <!-- Manage by support -->
+                              <span>
+                                  <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                                     href="" ng-click="ctrl.manage_request(row.name, device_type, row.model, 'Cisco')"></a>
+                              </span>
+                              <!-- Manage by support Ends -->
+                          </span>
+                       </div>
+                      </td>
+          </tr>
+              </tbody>
+          </table>
+      </section>
+      <div ng-if="model.results.length === 0" class="content-wrapper">
+        <no-records-found message="No associated {{ device_type }} were found !!"></no-records-found>
+      </div>
+  </div>
+</div>
+
+<div ng-show="(showProxy)" class="page_wrapper" style="float:left">
+    <iframe src="{{trustSrc(proxy_url)}}" ng-if="proxy_url" frameborder="0" id="terminal-container" style="position:absolute;width:100%;height:100%;top:0;left:0">
+    </iframe>
+    <span class="fa fa-times-circle pull-right boxclose" ng-click="close_console()"></span>
+</div>
+
+<div ng-show="(showConsole)" class="page_wrapper" style="float:left">
+  <span id="vm_error"  style="color:red"></span>
+
+  <div id="terminal-container" style="position:absolute;width:100%;height:100%;top:0;left:0"><span class="fa fa-times-circle pull-right boxclose" ng-click="close_console()"></span></div>
+</div>
+
+<style type="text/css">
+    .popover{
+        width : 28%;
+        max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    }
+
+    #authentication_loader .cg-busy{
+        top : 0px !important;
+        left : 0px !important;
+    }
+</style>
+
+<script type="text/ng-template" id="vmAuthentcicate.html">
+  <div class="modal-content">
+    <form role="form" name="modalform">
+      <div class="modal-header">
+          <h4 class="modal-title">{{device_type}} Authenticate</h4>
+      </div>
+      <div class="modal-body" id="authentication_loader" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}" style="padding:20px 40px;">
+         <div class="modal-form">
+                <div class="form-group" ng-if="errorMsg">
+                  <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+                </div>
+                <div class="form-group" ng-if="disableAccess != undefined">
+                  <label style="color:red" class="col-sm-10">Management IP Address not Assigned.</label>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="disableAccess == undefined">
+                    <div class="paddingR">
+                        <div class="form-group">
+                          <label for="request.hostname" class="col-sm-2 control-label">
+                            IP Address
+                          </label>
+
+                          <div>
+                             <input type="text"
+                                   class="form-control"
+                                   ng-model="request.hostname"
+                                   placeholder="Hostname" disabled>
+                                   <!-- {#management_ip#} -->
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.port" class="col-sm-2 control-label">
+                            Port Number
+                          </label>
+
+                          <div>
+                            <input type="number"
+                                   min=0
+                                   class="form-control"
+                                   ng-model="request.port"
+                                   placeholder="Port Number">
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.username">
+                            Username*
+                          </label>
+                          <span class="errormsg" ng-if="loginUsernameErrMsg">{{loginUsernameErrMsg}}</span>
+
+                          <div>
+                            <input type="text"
+                                   class="form-control"
+                                   ng-model="request.username"
+                                   placeholder="Username"
+                                   autofocus
+                                   ng-class="{'has-error_inputbox': loginUsernameErr }" />
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.password">
+                            Password*
+                          </label>
+                          <span class="errormsg" ng-if="loginPasswordErrMsg">{{loginPasswordErrMsg}}</span>
+
+                          <div>
+                            <input type="password"
+                                   class="form-control"
+                                   ng-model="request.password"
+                                   placeholder="Password"
+                                   ng-class="{'has-error_inputbox': loginPasswordErr}" />
+                          </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+      </div>
+      <div class="modal-footer modal-buttons">  
+          <div class="modal-footer modal-buttons" ng-if="disableAccess == undefined">
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                Close
+              </button>
+              <button type="submit" class="btn btn-default" ng-click="create(request)">
+                Login
+              </button>
+          </div>
+      </div>
+    </form>
+  </div>
+</script>
+
+<script type="text/ng-template" id="devicedetailstemplate.html">
+    <div class="row">
+        <table class="table"  ng-show="device_details.device_data">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div>Uptime</div>
+                    </th>
+                    <td class="table_no_top_border">
+                        <div ng-if="device_details.device_data.status == 1">{{device_details.device_data.uptime | unityObserviumTime}}</div>
+                        <div ng-if="device_details.device_data.status == 0">Down {{device_details.device_data.uptime | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4">
+                        <div>Last reboot</div>
+                    </th>
+                    <td>
+                        <div>{{device_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="angular.isDefined(device_details) && (device_details === null)" style="padding : 20px">
+            <p>{{ $root.monitoring_not_enabled_msg }}</p>
+        </div>
+    </div>
+</script>

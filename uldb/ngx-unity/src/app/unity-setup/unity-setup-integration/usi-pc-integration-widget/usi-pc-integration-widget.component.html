@@ -1,0 +1,293 @@
+<div class="row">
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.esxi.imageURL" class="w-100" [alt]="'ESXI'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.esxi.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.esxi.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.esxi.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToEsxiViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addEsxiPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.vmwareCloud.imageURL" class="w-100" [alt]="'VMware Cloud'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.vmwareCloud.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.vmwareCloud.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.vmwareCloud.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToVcloudViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addVcloudPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.hyperV.imageURL" class="w-100" [alt]="'Hyper V'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.hyperV.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.hyperV.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.hyperV.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToHypervViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addHypervPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.openstack.imageURL" class="w-100" [alt]="'Openstack'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.openstack.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.openstack.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.openstack.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToOpenstackViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addOpenstackPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.proxmox.imageURL" class="w-100" [alt]="'Proxmox'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.proxmox.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.proxmox.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.proxmox.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToProxmoxViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addProxmoxPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.vmwareVcenter.imageURL" class="w-100" [alt]="'VMware vCenter'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.vmwareVcenter.length">
+                            <button
+                                class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.vmwareVcenter.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.vmwareVcenter.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToVcenterVmwareViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addVcenterVmwarePvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.upcKvm.imageURL" class="w-100" [alt]="'UPC KVM'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.upcKvm.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.upcKvm.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.upcKvm.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToUpckvmViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addUpckvmPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.upcVcenter.imageURL" class="w-100" [alt]="'UPC vCenter'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.upcVcenter.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.upcVcenter.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.upcVcenter.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToUpcvcenterViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addUpcvcenterPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="privateClouds.nutanix.imageURL" class="w-100" [alt]="'Nutanix'"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="privateClouds.nutanix.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{privateClouds.nutanix.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="privateClouds.nutanix.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToNutanixViewDetails()" accessControl
+                                moduleName="Private Cloud" accessType="View Private Cloud" elementType="actionbtn">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addNutanixPvtCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <pc-crud [isAddorEditEnabled]="false" (onCrud)="onCrud($event)"></pc-crud> -->

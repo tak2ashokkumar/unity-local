@@ -1,0 +1,109 @@
+<ng-template #searchRef>
+    <div class="card mb-0" *ngIf="searchForm">
+        <div class="card-header pb-1 bg-white border-0">
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeGlobalSearch()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body py-0">
+            <form [formGroup]="searchForm">
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="h5">Search</label>
+                        <label class="text-warning pull-right pointer-link" (click)="manageFormView('advanced-search')">Advanced
+                            Search</label>
+                        <input id="name" class="form-control" type="text" formControlName="keyword" placeholder="Enter device name, tags"
+                            [class.is-invalid]="searchFormErrors.keyword">
+                        <div class="invalid-feedback" *ngIf="searchFormErrors.keyword">{{searchFormErrors.keyword}}</div>
+                    </div>
+                    <div class="form-group col-12">
+                        <button class="btn btn-pill btn-sm btn-warning px-4" (click)="searchByKeyword()" type="button">Search</button>
+                        <span class="text-danger ml-2" *ngIf="isSearched && !searchResults.length">No associated
+                            inventory exists related to searched keyword.</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer pt-0 bg-white" *ngIf="searchResults.length">
+            <div class="row">
+                <div class="col-12">
+                    <ul class="list-group w-100" style="max-height:200px; overflow-y:auto">
+                        <li class="list-group-item pointer-link border-left-0 border-right-0" *ngFor="let res of searchResults"
+                            (click)="goToSelectedRecord(res)">
+                            <span>{{res.name}}</span>
+                            <span class="text-muted"> ({{res.deviceMapping}})</span>
+                            <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:res.tags}"></ng-container>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" *ngIf="filterForm">
+        <div class="card-header pb-1 bg-white border-0">
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeGlobalSearch()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body py-0">
+            <form [formGroup]="filterForm">
+                <div class="row">
+                    <div class="form-group col-12 mb-0">
+                        <label class="h5">Advanced Search</label>
+                        <label class="text-warning pull-right pointer-link" (click)="manageFormView('search')">Search</label>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="font-col-form-label" for="device_type">Device Type</label>
+                        <select id="device_type" class="form-control" formControlName="device_type">
+                            <option value="null">Select Device Type</option>
+                            <option *ngFor="let deviceType of deviceTypes" [value]="deviceType.name">
+                                {{deviceType.displayName}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label" for="name">Device Name</label>
+                        <input id="name" class="form-control" type="text" formControlName="name" placeholder="Enter device name">
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="font-col-form-label" for="os">OS</label>
+                        <select id="os" class="form-control" formControlName="os">
+                            <option value="null">Select Operating System</option>
+                            <option *ngFor="let operatingSystem of operatingSystems" [value]="operatingSystem.name">
+                                {{operatingSystem.full_name}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label" for="ip_address">IP Address</label>
+                        <input id="ip_address" class="form-control" type="text" formControlName="ip_address"
+                            placeholder="IP">
+                    </div>
+                    <div class="form-group col-4">
+                        <label class="form-col-form-label" for="tag">Tag</label>
+                        <input id="tag" class="form-control" type="text" formControlName="tag" placeholder="Tag name">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <button class="btn btn-pill btn-sm btn-warning px-4" (click)="advancedSearchView()" type="button">Advance
+                            Search</button>
+                        <button class="btn btn-pill btn-sm btn-warning bg-white text-warning ml-2 px-4" (click)="resetFilterForm()"
+                            type="button">Clear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tagsList let-tags="tags">
+    <span class="ml-2">
+        <span *ngFor="let tag of tags" class="badge badge-pill badge-primary">{{tag}}</span>
+    </span>
+</ng-template>

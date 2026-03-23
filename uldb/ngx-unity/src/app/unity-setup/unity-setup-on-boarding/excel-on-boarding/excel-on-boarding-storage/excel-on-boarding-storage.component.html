@@ -1,0 +1,202 @@
+<div class="card text-center border-0 mb-0">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center px-0 py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+            <span class="ml-1 font-lg">Storage Devices</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive" tableStickyScroll>
+            <table class="table table-sm text-left">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Name<em>*</em></th>
+                        <th>Management IP</th>
+                        <th>Manufacturer<em>*</em></th>
+                        <th>Model<em>*</em></th>
+                        <th>Datacenter<em>*</em></th>
+                        <th>Collector<em>*</em></th>
+                        <th>Cloud</th>
+                        <th>Cabinet</th>
+                        <th>Position<i class="fa fa-info-circle text-muted ml-2" container="body"
+                                containerClass="info-multi-line"
+                                [tooltip]="'Position of device in the cabinet\nEg.1,2,3,4...'"></i></th>
+                        <th>Size<em>*</em><i class="fa fa-info-circle text-muted ml-2" container="body"
+                                containerClass="info-multi-line" [tooltip]="'Size of the Device\nEg.1, 2, 3'"></i></th>
+                        <th>OS<em>*</em></th>
+                        <th>Asset Tag</th>
+                        <th>SNMP IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of viewData; let i = index">
+                        <ng-container [formGroup]="view.form" *ngIf="view.form">
+                            <td>
+                                <div>
+                                    <i class="fas fa-check" [ngClass]="view.onboardedClass"></i>
+                                    <input id="{{i}}-name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="view.formErrors.name"
+                                        style="max-width: calc(100% - 24px);float: right;" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.name">{{view.formErrors.name}}
+                                    </div>
+                                    <div class="invalid-credentials" *ngIf="view.nonFieldErr">{{view.nonFieldErr}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input id="{{i}}-management_ip" class="form-control" type="text"
+                                        formControlName="management_ip"
+                                        [class.is-invalid]="view.formErrors.management_ip" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.management_ip">
+                                        {{view.formErrors.management_ip}}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div formGroupName="manufacturer">
+                                    <select id="{{i}}-manufacturerid" class="form-control" formControlName="id"
+                                        [class.is-invalid]="view.formErrors.manufacturer.id" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                        <option value="" disabled>Select Manufacturer</option>
+                                        <option *ngFor="let manufacturer of manufacturers" [value]="manufacturer.id">
+                                            {{manufacturer.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.manufacturer.id">
+                                        {{view.formErrors.manufacturer.id}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div formGroupName="model">
+                                    <select id="{{i}}-modelid" class="form-control" formControlName="id"
+                                        [class.is-invalid]="view.formErrors.model.id" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                        <option value="" disabled>Select Model</option>
+                                        <option *ngFor="let model of view.models" [value]="model.id">
+                                            {{model.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.model.id">
+                                        {{view.formErrors.model.id}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div formGroupName="datacenter">
+                                    <select id="{{i}}-datacenterid" class="form-control" formControlName="uuid"
+                                        [class.is-invalid]="view.formErrors.datacenter.uuid" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                        <option value="" disabled>Select Datacenter</option>
+                                        <option *ngFor="let dc of datacenters" [value]="dc.uuid">{{dc.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.datacenter.uuid">
+                                        {{view.formErrors.datacenter.uuid}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div formGroupName="collector">
+                                    <select id="{{i}}-collectorid" class="form-control" formControlName="uuid"
+                                        [class.is-invalid]="view.formErrors.collector.uuid" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                        <option [value]="''" disabled>Select Collectors</option>
+                                        <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.collector.uuid">
+                                        {{view.formErrors.collector.uuid}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div formGroupName="private_cloud">
+                                    <select id="{{i}}-private_cloud_id" class="form-control" formControlName="id"
+                                        [class.is-invalid]="view.formErrors.private_cloud.id" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                        <option value="">Select Private Cloud</option>
+                                        <option *ngFor="let cloud of view.clouds" [value]="cloud.id">
+                                            {{cloud.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.private_cloud.id">
+                                        {{view.formErrors.private_cloud.id}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div formGroupName="cabinet">
+                                    <select id="{{i}}-cabinetid" class="form-control" formControlName="id"
+                                        [class.is-invalid]="view.formErrors.cabinet.id" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                        <option value="">Select Cabinet</option>
+                                        <option *ngFor="let cabinet of view.cabinets" [value]="cabinet.id">
+                                            {{cabinet.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.cabinet.id">
+                                        {{view.formErrors.cabinet.id}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input id="{{i}}-position" class="form-control" type="number" min="0"
+                                        formControlName="position" [class.is-invalid]="view.formErrors.position"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.position">
+                                        {{view.formErrors.position}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input id="{{i}}-size" class="form-control" type="number" min="1"
+                                        formControlName="size" [class.is-invalid]="view.formErrors.size" accessControl
+                                        moduleName="Onboarding" accessType="Manage Onboarding" elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.size">{{view.formErrors.size}}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div formGroupName="os">
+                                    <select id="{{i}}-osid" class="form-control" formControlName="id"
+                                        [class.is-invalid]="view.formErrors.os.id" accessControl moduleName="Onboarding"
+                                        accessType="Manage Onboarding" elementType="formelem">
+                                        <option value="" disabled>Select Operating System</option>
+                                        <option *ngFor="let os of operatingSystems" [value]="os.id">
+                                            {{os.full_name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.os.id">
+                                        {{view.formErrors.os.id}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input id="{{i}}-asset_tag" class="form-control" type="text"
+                                        formControlName="asset_tag" [class.is-invalid]="view.formErrors.asset_tag"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.asset_tag">
+                                        {{view.formErrors.asset_tag}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input id="{{i}}-snmp_ip" class="form-control" type="snmp_ip"
+                                        formControlName="snmp_ip" [class.is-invalid]="view.formErrors.snmp_ip"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.snmp_ip">
+                                        {{view.formErrors.snmp_ip}}</div>
+                                </div>
+                            </td>
+                        </ng-container>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center text-muted py-4" *ngIf="!viewData.length">No associated Storages available.
+                </div>
+                <br>
+            </div>
+            <div class="col">
+                <excel-on-boarding-next-prev></excel-on-boarding-next-prev>
+                <button class="btn btn-sm btn-success pull-right" type="button" (click)="submit()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

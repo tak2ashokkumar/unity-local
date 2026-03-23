@@ -1,0 +1,132 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card round-edge mb-2">
+            <app-spinner [name]="analysisViewData.loader"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+                <span class="font-lg font-500">Failure Analysis</span>
+                <custom-date-dropdown [options]="analysisViewData.dropdownOptions" [customClass]="'form-control-sm'"
+                    [default]="analysisViewData.defaultSelected" (onSubmit)="onAnalysisFilterChange($event)">
+                </custom-date-dropdown>
+            </div>
+            <div class="card-body" [style.minHeight]="'200px'">
+                <ng-container *ngIf="analysisViewData?.chartData">
+                    <div echarts [options]="analysisViewData.chartData.options"
+                        [extentions]="analysisViewData.chartData.extensions" [defaultHeight]="250">
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card mb-2">
+            <app-spinner [name]="'failureEventsLoader'"></app-spinner>
+            <div class="card-header bg-transparent py-2">
+                <span class="badge badge-secondary font-sm">{{eventsCount}}</span>
+                <span class="ml-1 font-lg">Failure Events</span>
+            </div>
+            <div class="card-body pt-2 pb-0">
+                <div class="row mx-0 d-flex justify-content-between align-items-center pb-2" *ngIf="eventsCount">
+                    <div class="w-25">
+                        <search-box [searchValue]="eventsCriteria.searchValue"
+                            (searched)="onEventsSearched($event)"></search-box>
+                    </div>
+                    <div>
+                        <table-page-size [currentPageSize]="eventsCriteria.pageSize" [totalCount]="eventsCount"
+                            (pageSizeChange)="eventsPageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Service</th>
+                            <!-- <th>Endpoint</th> -->
+                            <th>Reason</th>
+                            <th>Requests</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let event of eventsViewData" setTableColumnWidth truncateText>
+                            <td class="tdw-20">
+                                <div [tooltip]="event.service">{{event.service}}</div>
+                            </td>
+                            <!-- <td class="tdw-20">
+                                <div [tooltip]="event.endpoint">{{event.endpoint}}</div>
+                            </td> -->
+                            <td class="tdw-45">
+                                <div [tooltip]="event.reason">{{event.reason}}</div>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="event.requests">{{event.requests}}</div>
+                            </td>
+                            <td class="tdw-20">
+                                <div [tooltip]="event.timestamp">{{event.timestamp}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="eventsCriteria.pageNo" [pageSize]="eventsCriteria.pageSize"
+                    [totalCount]="eventsCount">
+                </table-entries>
+                <table-pager *ngIf="eventsViewData?.length" [pageNo]="eventsCriteria.pageNo"
+                    [pageSize]="eventsCriteria.pageSize" [totalCount]="eventsCount"
+                    (pageChange)="eventsPageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!eventsViewData?.length">No Failure Events available
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <app-spinner [name]="'failureLogsLoader'"></app-spinner>
+            <div class="card-header bg-transparent py-2">
+                <span class="badge badge-secondary font-sm">{{logsCount}}</span>
+                <span class="ml-1 font-lg">Failure Logs</span>
+            </div>
+            <div class="card-body pt-2 pb-0">
+                <div class="row mx-0 d-flex justify-content-between align-items-center pb-2" *ngIf="logsCount">
+                    <div class="w-25">
+                        <search-box [searchValue]="logsCriteria.searchValue"
+                            (searched)="onLogsSearched($event)"></search-box>
+                    </div>
+                    <div>
+                        <table-page-size [currentPageSize]="logsCriteria.pageSize" [totalCount]="logsCount"
+                            (pageSizeChange)="logsPageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                            <th>Content</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let log of logsViewData" setTableColumnWidth truncateText>
+                            <td class="tdw-30">
+                                <div [tooltip]="log.timestamp">{{log.timestamp}}</div>
+                            </td>
+                            <td class="tdw-20">
+                                <div>
+                                    <span [tooltip]="log.status" [class]="log.statusIcon"></span>
+                                </div>
+                            </td>
+                            <td class="tdw-50">
+                                <div [tooltip]="log.content">{{log.content}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="logsCriteria.pageNo" [pageSize]="logsCriteria.pageSize"
+                    [totalCount]="logsCount">
+                </table-entries>
+                <table-pager *ngIf="logsViewData?.length" [pageNo]="logsCriteria.pageNo"
+                    [pageSize]="logsCriteria.pageSize" [totalCount]="logsCount"
+                    (pageChange)="logsPageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!logsViewData?.length">No Failure Logs available
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,184 @@
+<style type="text/css">
+    /***************************** Dropzone Styling *****************************/
+
+    .box-yellow > h3 {
+        color: #8a6d3b;
+        background-color: #fcf8e3;
+        border-color: #faebcc;
+        background-image: -webkit-linear-gradient(top,#fcf8e3 0,#faf2cc 100%);
+        background-image: linear-gradient(to bottom,#fcf8e3 0,#faf2cc 100%);
+    }
+    .box > h3 {
+        color: #333;
+        border-color: #ddd;
+        border-bottom: 1px solid transparent;
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+        background-repeat: repeat-x;
+        display: block;
+        font-size: 16px;
+        padding: 10px 15px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .box-blue > h3 {
+        color: #31708f;
+        background-color: #d9edf7;
+        border-color: #bce8f1;
+        background-image: -webkit-linear-gradient(top,#d9edf7 0,#c4e3f3 100%);
+        background-image: linear-gradient(to bottom,#d9edf7 0,#c4e3f3 100%);
+    }
+    .box > h3 {
+        color: #333;
+        border-color: #ddd;
+        border-bottom: 1px solid transparent;
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+        background-repeat: repeat-x;
+        display: block;
+        font-size: 16px;
+        padding: 10px 15px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    /**
+     * The dnd-list should always have a min-height,
+     * otherwise you can't drop to it once it's empty
+     */
+    .advancedDemo .dropzone ul[dnd-list] {
+        min-height: 42px;
+        margin: 0px;
+        padding-left: 0px;
+    }
+
+    .advancedDemo .dropzone ul[dnd-list] {
+        background-color: #fff;
+    }
+
+    .advancedDemo .dropzone li {
+        display: block;
+        margin-top: 20px;
+    }
+
+    /**
+     * Reduce opacity of elements during the drag operation. This allows the user
+     * to see where he is dropping his element, even if the element is huge. The
+     * .dndDragging class is automatically set during the drag operation.
+     */
+    .advancedDemo .dropzone .dndDragging {
+        opacity: 0.7;
+    }
+
+    /**
+     * The dndDraggingSource class will be applied to the source element of a drag
+     * operation.
+     */
+    .advancedDemo .dropzone .dndDraggingSource {
+        opacity: 0.5;
+    }
+
+    /**
+     * An element with .dndPlaceholder class will be added as child of the dnd-list
+     * while the user is dragging over it.
+     */
+    .advancedDemo .dropzone .dndPlaceholder {
+        background-color: #ddd !important;
+        display: inline-block;
+        min-height: 42px;
+    }
+
+    /***************************** Element type specific styles *****************************/
+
+    .advancedDemo .dropzone .itemlist {
+        min-height: 120px !important;
+    }
+
+    .advancedDemo .dropzone .itemlist > li {
+        background-color: #337ab7;
+        border: none;
+        border-radius: .25em;
+        color: #fff;
+        float: left;
+        font-weight: 700;
+        margin: 10px;
+        padding: 10px;
+        text-align: center;
+        min-width: 80px;
+    }
+
+    .advancedDemo .dropzone .container-element {
+        margin: 10px;
+    }
+
+</style>
+<div class="row tabs-level1">
+    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+        <div class="ui-selectee">
+            <nav class="column">
+                <ul class="nav nav-tabs">
+                    <span class="ulheading">
+                        Dashboard in 
+                        <span ng-if="view_mode"> View Mode</span>
+                        <span ng-if="!view_mode"> Edit Mode</span>
+                        <a href="" ng-click="toggle_mode()" style="font-size:12px;"> &nbsp; (change to 
+                            <span ng-if="!view_mode"> view mode</span>
+                            <span ng-if="view_mode"> edit mode</span>)
+                        </a>
+                    </span>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 company-name" style="padding-right: 15px !important;">
+        <a href="" ng-if="showSettingsIcon"><i class="fa fa-cog" aria-hidden="true" ng-click="toggle_mode()"></i></a>
+        <label ng-show="showCheckBox"><input type="checkbox" ng-model="enable_welcome_page" ng-change="changeWelcomePage()"> Show Next Time</label> 
+    </div>
+</div>
+
+<div class="advancedDemo row">
+    <div class="col-md-12" ng-repeat="dashboard in  dashboards">
+        <div class="dropzone box box-yellow">
+            <ul dnd-list="groups"
+                dnd-allowed-types="['group']"
+                dnd-external-sources="true"
+                dnd-effect-allowed="move"
+                dnd-dragover="groupDragoverCallback(index, external, type)"
+                dnd-drop="groupDropCallback(index, item, external, type)">
+                <li ng-repeat="group in groups"
+                    dnd-draggable="group"
+                    dnd-type="'group'"
+                    dnd-effect-allowed="move"
+                    dnd-moved="groups.splice($index, 1)"
+                    dnd-callback='group.devices.length'
+                    dnd-dragend="logEvent('Drag operation ended. Drop effect: ' + dropEffect)">
+                    <div class="container-element box box-blue">
+                        <h3>{{group.name}}</h3>
+                        <ul dnd-list="group.devices"
+                            dnd-allowed-types="['device']"
+                            dnd-horizontal-list="true"
+                            dnd-external-sources="true"
+                            dnd-effect-allowed="move"
+                            dnd-disable-if="view_mode"
+                            dnd-dragover="dragoverCallback(index, external, type)"
+                            dnd-drop="dropCallback(index, item, external, type)"
+                            dnd-inserted="logListEvent('inserted at', index, external, type)"
+                            class="itemlist">
+                            <li ng-repeat="device in group.devices"
+                                dnd-draggable="device"
+                                dnd-type="'device'"
+                                dnd-effect-allowed="move"
+                                dnd-dragstart="logEvent('Started to drag an item')"
+                                dnd-moved="group.devices.splice($index, 1)"
+                                dnd-dragend="logEvent('Drag operation ended. Drop effect: ' + dropEffect)">
+                                {{device.server.name}}
+                            </li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

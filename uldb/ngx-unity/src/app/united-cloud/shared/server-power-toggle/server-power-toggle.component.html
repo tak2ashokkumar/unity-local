@@ -1,0 +1,58 @@
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{input?.confirmTitle}}
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cancelConfirm()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      {{input?.confirmMessage}}
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmToggle()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="cancelConfirm()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #authenticate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Please provide credentials to <strong>Power {{getAction()}}</strong> this {{input?.confirmTitle}}
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cancelAuth()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="authForm">
+
+        <div class="form-group">
+          <div class="invalid-credentials">Only authorized users are allowed to perform this action. Please provide
+            your credentials.</div>
+        </div>
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="formErrors.invalidCred">{{formErrors.invalidCred}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" type="text" formControlName="username" [ngClass]="{'is-invalid' : formErrors.username}">
+          <div class="invalid-feedback" *ngIf="formErrors.username">{{formErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="password">Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password" [ngClass]="{'is-invalid' : formErrors.password}">
+          <div class="invalid-feedback" *ngIf="formErrors.password">{{formErrors.password}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="cancelAuth()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

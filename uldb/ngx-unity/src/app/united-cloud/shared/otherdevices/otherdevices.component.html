@@ -1,0 +1,531 @@
+<div class="row">
+  <div class="col-12">
+    <div class="row mb-2" *ngIf="summaryData">
+      <div class="col">
+        <div class="card round-edge mb-0 pointer-link">
+          <app-spinner [name]="'total'"></app-spinner>
+          <div class="card-body d-flex flex-column px-3 py-2">
+            <div class="text-center">
+              <span class="font-sm">Total</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-baseline">
+              <span class="font-sm text-primary font-500">{{summaryData.total}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card round-edge mb-0 pointer-link">
+          <app-spinner [name]="'up'"></app-spinner>
+          <div class="card-body d-flex flex-column px-3 py-2">
+            <div class="text-center">
+              <span class="font-sm">Up</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-baseline">
+              <span class="fas fa-arrow-up text-success fa-sm"></span>
+              <span class="font-sm text-primary  font-500 ml-1">{{summaryData.up}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card round-edge mb-0 pointer-link">
+          <app-spinner [name]="'down'"></app-spinner>
+          <div class="card-body d-flex flex-column px-3 py-2">
+            <div class="text-center">
+              <span class="font-sm">Down</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-baseline">
+              <span class="fas fa-arrow-down text-danger fa-sm"></span>
+              <span class="font-sm text-primary font-500 ml-1">{{summaryData.down}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card round-edge mb-0 pointer-link">
+          <app-spinner [name]="'enabled'"></app-spinner>
+          <div class="card-body d-flex flex-column px-3 py-2">
+            <div class="text-center">
+              <span class="font-sm">Monitoring Enabled</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-baseline">
+              <span class="fas fa-check-circle text-success fa-sm"></span>
+              <span class="font-sm text-primary font-500 ml-1">{{summaryData.enabled}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card round-edge mb-0 pointer-link">
+          <app-spinner [name]="'activated'"></app-spinner>
+          <div class="card-body d-flex flex-column px-3 py-2">
+            <div class="text-center">
+              <span class="font-sm">Monitoring Not Activated</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-baseline">
+              <span class="fas fa-exclamation-circle text-danger fa-sm"></span>
+              <span class="font-sm text-primary font-500 ml-1">{{summaryData.notActivated}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card round-edge mb-0 pointer-link">
+          <app-spinner [name]="'alerts'"></app-spinner>
+          <div class="card-body d-flex flex-column px-3 py-2">
+            <div class="d-flex justify-content-center align-items-center">
+              <span class="font-sm">Alerts</span>
+              <span class="font-sm font-500 ml-1"> : {{summaryData.alertsCount}}</span>
+            </div>
+            <div class="d-flex justify-content-center align-items-baseline">
+              <div>
+                <span class="fas fa-exclamation-circle text-warning fa-sm"></span>
+                <span class="font-sm text-primary font-500 ml-1">{{summaryData.alertWarnings}}</span>
+              </div>
+              <div class="ml-2">
+                <span class="fas fa-exclamation-triangle text-danger fa-sm"></span>
+                <span class="font-sm text-primary font-500 ml-1">{{summaryData.alertErrors}}</span>
+              </div>
+              <div class="ml-2">
+                <span class="fas fa-exclamation-circle text-muted fa-sm"></span>
+                <span class="font-sm text-primary font-500 ml-1">{{summaryData.alertInfo}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card rounded-0">
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+          <span class="badge badge-secondary font-sm">{{count}}</span>
+          <span class="ml-1 font-lg">Other Devices</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+          <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="addDevice()"
+            *ngIf="selectedDeviceIds?.length == 0" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+            elementType="btn">
+            <span class="fas fa-plus"></span>
+            <span class="font-xs-sm mx-1">Device</span>
+          </button>
+          <ng-container *ngIf="selectedDeviceIds?.length">
+            <button class="btn btn-sm btn-pill btn-warning font-sm font-500" type="button"
+              (click)="bulkUpdate()">Update</button>
+            <button class="btn btn-sm btn-pill btn-danger font-sm font-500 mx-2" type="button"
+              (click)="bulkDelete()">Delete</button>
+          </ng-container>
+          <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+        </div>
+      </div>
+      <div class="card-body py-2">
+        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+          <div class="w-25">
+            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+          </div>
+          <div>
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+        </div>
+        <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+          <thead class="bg-light">
+            <tr>
+              <th scope="col">
+                <span class="bg-white text-primary" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+                  elementType="div-hide">
+                  <!-- <i class="fa-check-square" [ngClass]="selectedAll? 'fas':'far'" (click)="$event.stopPropagation();selectAll()"></i> -->
+                </span>
+              </th>
+              <th sortable-column="name">Name</th>
+              <th>Category</th>
+              <th>URL</th>
+              <th>Status</th>
+              <th>Last Check</th>
+              <th>Tag</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let view of viewData; let i = index">
+              <tr truncateText>
+                <td class="tdw-2">
+                  <span class="bg-white mr-1 text-primary" (click)="$event.stopPropagation();select(view);"
+                    accessControl moduleName="Datacenter" accessType="Manage Datacenter" elementType="div-hide">
+                    <i [ngClass]="view.isSelected? 'fas fa-check-square': 'far fa-square'"></i>
+                  </span>
+                </td>
+                <td class="text-primary tdw-15">
+                  <div class="pointer-link" [tooltip]="view.name" (click)="openRow(view)">{{view.name}}</div>
+                </td>
+                <td class="tdw-10">
+                  <div [tooltip]="view.type">{{view.type}}</div>
+                </td>
+                <td class="tdw-25">
+                  <div class="has-sub d-flex align-items-center">
+                    <div class="tdsw-85">
+                      <div [tooltip]="view.url">{{view.url}}</div>
+                    </div>
+                    <span *ngIf="view.popUrlCount" class="badge bg-secondary group-count rounded-3"
+                      [popover]="popTemplateURL" container="body" (click)="popUrlList=view.popUrlList"
+                      [outsideClick]="true">+{{view.popUrlCount}}</span>
+                  </div>
+                </td>
+                <td class="tdw-10">
+                  <shared-device-status [status]="view.deviceStatus"></shared-device-status>
+                </td>
+                <td class="tdw-20">
+                  <div [tooltip]="view.lastCheck">{{view.lastChecked}}</div>
+                </td>
+                <td class="tdw-15">
+                  <ng-container [ngTemplateOutlet]='tagsList'
+                    [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
+                </td>
+                <td class="action-icons-column text-right">
+                  <ng-container *ngIf="view.type == 'URL'">
+                    <!-- <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
+                      [tooltip]="'Stats'"></button> -->
+                    <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
+                      [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring"
+                      accessType="View Monitoring" elementType="actionbtn">
+                    </button>
+                    <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" (click)="editDevice(view)"
+                      [tooltip]="'Edit'" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+                      elementType="actionbtn"></button>
+                  </ng-container>
+                  <ng-container *ngIf="view.type != 'URL'">
+                    <button class="action-icons mb-0 fas fa-tag font-sm ml-1" (click)="updateTags(view)"
+                      tooltip="Update Tags" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+                      elementType="actionbtn"></button>
+                  </ng-container>
+                  <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" (click)="deleteDevice(view)"
+                    [tooltip]="'Delete'" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+                    elementType="actionbtn"></button>
+                  <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" (click)="createTicket(view)"
+                    [tooltip]="'Manage by creating support ticket'"></button>
+                </td>
+              </tr>
+              <tr *ngIf="view.isOpen" class="fold" [ngClass]="{'open' : view.isOpen}">
+                <td class="p-0" colspan="9">
+                  <ng-container [ngTemplateOutlet]='deviceDetails'
+                    [ngTemplateOutletContext]="{view:view}"></ng-container>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No associated Other Devices were found.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #popTemplateURL>
+  <div *ngFor="let urlObj of popUrlList">{{urlObj.url}}</div>
+</ng-template>
+
+<ng-template #tagsList let-tags="tags">
+  <div [popoverContext]="{ tags: tags }" [popover]="tagsTooltipTmpl" triggers="mouseenter:mouseleave" placement="top">
+    <span *ngFor="let tag of tags" class="badge badge-pill badge-primary">{{tag}}</span>
+  </div>
+  <div *ngIf="!tags.length">N/A</div>
+</ng-template>
+
+<ng-template #tagsTooltipTmpl let-tags="tags">
+  <div class="font-weight-bold">
+    <span *ngFor="let tag of tags" class="badge badge-pill badge-primary m-1 font-sm">{{tag}}</span>
+  </div>
+</ng-template>
+
+<ng-template #deleteModel>
+  <div class="card mb-0">
+    <div class="card-header">Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body text-center">
+      This device will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer text-right">
+      <button class="btn btn-sm btn-primary" type="button" (click)="confirmDelete()">Delete</button>
+      <button class="btn btn-outline-danger btn-sm ml-2" type="button" (click)="modalRef.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #bulkDeleteModel>
+  <div class="card mb-0">
+    <div class="card-header">Bulk Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body text-center">
+      All Selected devices will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer text-right">
+      <button class="btn btn-sm btn-primary" type="button" (click)="confirmMultipleDelete()">Delete</button>
+      <button class="btn btn-outline-danger btn-sm ml-2" type="button" (click)="modalRef.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #bulkUpdateFormModel>
+  <div class="card mb-0">
+    <div class="card-header">Bulk Update
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="bulkUpdateForm" [formGroup]="bulkUpdateForm">
+        <div class="row">
+          <div class="col-6 form-group">
+            <div class="pt-1 ml-2 mr-2 mb-1">URL Availability :</div>
+            <div class="d-inline-block">
+              <ul class="d-flex px-0 mb-0">
+                <li>
+                  <label class="pointer-link" [class.active]="bulkUpdateForm.controls.url_availability.value">
+                    <input type="radio" [value]="true" formControlName="url_availability">
+                    <span class="font-sm mr-2">Enable</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="pointer-link" [class.active]="!bulkUpdateForm.controls.url_availability.value">
+                    <input type="radio" [value]="false" formControlName="url_availability">
+                    <span class="font-sm mr-2">Disable</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-6 form-group">
+            <label class="mb-1">Interval</label>
+            <div class="row">
+              <div class="col-6">
+                <input class="form-control" id="polling_interval_min" type="number"
+                  formControlName="polling_interval_min" min="0" max="59" placeholder="minutes"
+                  [class.is-invalid]="bulkUpdateFormErrors.polling_interval_min">
+                <div class="invalid-feedback" *ngIf="bulkUpdateFormErrors.polling_interval_min">
+                  {{bulkUpdateFormErrors.polling_interval_min}}
+                </div>
+              </div>
+              <div class="col-6">
+                <input class="form-control ml-2" id="polling_interval_sec" type="number"
+                  formControlName="polling_interval_sec" min="0" max="59" placeholder="seconds"
+                  [class.is-invalid]="bulkUpdateFormErrors.polling_interval_sec">
+                <div class="invalid-feedback" *ngIf="bulkUpdateFormErrors.polling_interval_sec">
+                  {{bulkUpdateFormErrors.polling_interval_sec}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 form-group">
+            <div class="pt-1 ml-2 mr-2 mb-1">Monitoring Status :</div>
+            <div class="d-inline-block">
+              <ul class="d-flex px-0 mb-0">
+                <li>
+                  <label class="pointer-link" [class.active]="bulkUpdateForm.controls.activate_or_deactivate.value">
+                    <input type="radio" [value]="true" formControlName="activate_or_deactivate">
+                    <span class="font-sm mr-2">Activate</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="pointer-link" [class.active]="!bulkUpdateForm.controls.activate_or_deactivate.value">
+                    <input type="radio" [value]="false" formControlName="activate_or_deactivate">
+                    <span class="font-sm mr-2">Deactivate</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-6 form-group">
+            <div class="pt-1 ml-2 mr-2 mb-1">&nbsp;</div>
+            <div class="d-inline-block">
+              <ul class="d-flex px-0 mb-0">
+                <li>
+                  <label class="pointer-link" [class.active]="bulkUpdateForm.controls.monitoring_status.value">
+                    <input type="radio" [value]="true" formControlName="monitoring_status">
+                    <span class="font-sm mr-2">Enable</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="pointer-link" [class.active]="!bulkUpdateForm.controls.monitoring_status.value">
+                    <input type="radio" [value]="false" formControlName="monitoring_status">
+                    <span class="font-sm mr-2">Disable</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer text-right">
+      <button class="btn btn-sm btn-primary" type="button" (click)="onUpdate()">Update</button>
+      <button class="btn btn-outline-danger btn-sm ml-2" type="button" (click)="modalRef.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #tagsFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Update Tags
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="tagsFormModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="tagsForm" [formGroup]="tagsForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col">
+            <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+              <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+              </tag-input-dropdown>
+            </tag-input>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitTags()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="tagsFormModelRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deviceDetails let-view="view">
+  <ng-container *ngIf="view.type == 'URL'">
+    <ng-container [ngTemplateOutlet]='urlDeviceinfo' [ngTemplateOutletContext]="{view:view}"></ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="view.type != 'URL'">
+    <ng-container [ngTemplateOutlet]='deviceinfo' [ngTemplateOutletContext]="{view:view}"></ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #urlDeviceinfo let-view="view">
+  <div class="card border-0 mb-0">
+    <div class="card-body font-sm">
+      <div class="row">
+        <div class="col-5">
+          <table class="table table-borderless mb-0 text-left">
+            <tr>
+              <td class="text-muted font-500" style="white-space: nowrap;">Polling Interval</td>
+              <td>{{view?.pollingInterval}}</td>
+            </tr>
+            <tr>
+              <td class="text-muted font-500">Description</td>
+              <td>{{view?.description}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-5">
+          <table class="table table-borderless mb-0 text-left">
+            <tr>
+              <td class="text-muted font-500">Collector</td>
+              <td>{{view?.collector}}</td>
+            </tr>
+            <tr>
+              <td class="text-muted font-500">IP Address</td>
+              <td>{{view?.ipAddress}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <table class="table table-sm sub-table mt-2 mb-0">
+        <thead class="thead-light">
+          <th>Name</th>
+          <th>URL</th>
+          <th>URL Availability</th>
+          <th>Login Availability</th>
+          <th>Response Code Availability</th>
+          <th>String Pattern Availability</th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let url of view?.urls;">
+            <td>{{url.name}}</td>
+            <td>{{url.url}}</td>
+            <td>{{url.url_availabilty}}</td>
+            <td>{{url.login_availability}}</td>
+            <td>{{url.response_availability}}</td>
+            <td>{{url.string_availabilty}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center text-muted py-4" *ngIf="!view?.urls?.length">No URL's are configured</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deviceinfo let-view="view">
+  <div class="card border-0 mb-0">
+    <div class="card-body font-sm">
+      <div class="row">
+        <div class="col-4">
+          <table class="table table-borderless mb-0 text-left">
+            <tr>
+              <td class="text-muted font-500">Description</td>
+              <td>{{view?.description}}</td>
+            </tr>
+            <tr>
+              <td class="text-muted font-500">Collector</td>
+              <td>{{view?.collector}}</td>
+            </tr>
+            <tr>
+              <td class="text-muted font-500">IP Address</td>
+              <td>{{view?.ipAddress}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-4">
+          <table class="table table-borderless mb-0 text-left">
+            <tr>
+              <td class="text-muted font-500">Up Since</td>
+              <td>{{(view?.upSince | SecToDays) || 'NA'}}</td>
+            </tr>
+            <tr>
+              <td class="text-muted font-500">Down Since</td>
+              <td>{{(view?.downSince | SecToDays) || 'NA'}}</td>
+            </tr>
+            <tr>
+              <td class="text-muted font-500">Paused Since</td>
+              <td>{{(view?.pausedSince | SecToDays) || 'NA'}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-4">
+          <table class="table table-borderless mb-0 text-left">
+            <tr>
+              <td class="text-muted font-500">Average Response Time</td>
+              <td>{{view?.avgResponseTime || 'NA'}}</td>
+            </tr>
+            <tr>
+              <td class="text-muted font-500">Custom Uptime Ratio</td>
+              <td>{{view?.customUptimeRatio || 'NA'}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

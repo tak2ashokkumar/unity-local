@@ -1,0 +1,18 @@
+@import '../../orchestration-workflows/orchestration-workflow-poc/orchestration-workflow-poc.component.scss';
+@import '../../orchestration-workflows//orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.component.scss';
+
+.task-details-card {
+  position: fixed !important;
+  z-index: 2050;
+  top: 55px;
+  left: 78vw;
+  bottom: 50px;
+  height: calc(100% - 55px);
+  width: 0;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.right-card-body {
+  flex: 0 1 auto !important;
+}

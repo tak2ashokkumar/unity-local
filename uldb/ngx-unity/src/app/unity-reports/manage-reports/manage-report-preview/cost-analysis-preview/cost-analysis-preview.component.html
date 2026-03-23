@@ -1,0 +1,46 @@
+<div class="card-body" *ngIf="tableData.length">
+  <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+    <div class="w-25">
+      <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+    </div>
+    <div class="row w-40 d-flex justify-content-end align-items-center">
+      <div class="w-60"  *ngIf="tableData.length">
+          <form *ngIf="columnForm" class="col-12" [formGroup]="columnForm">
+              <div class="form-group mb-0">
+                  <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                      formControlName="columns" [options]="tableColumns"
+                      [settings]="columnSelectionSettings" [texts]="columnSelectionTexts"
+                      (dropdownClosed)="columnChange()"></multiselect-dropdown>
+              </div>
+          </form>
+      </div>
+      <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+    </div>
+  </div>
+  
+  <div class="div-scroll">
+    <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+      <thead>
+        <tr>
+          <th *ngFor="let col of columnsSelected">{{col.key}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of tableData">
+          <td *ngFor="let col of columnsSelected">
+            {{view[col.value]}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-center text-muted p-4 align-self-center" *ngIf="!columnsSelected.length">No Columns to Display.</div>
+
+  <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count">
+  </table-entries>
+  <table-pager *ngIf="tableData?.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+    [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+</div>
+<div class="text-center text-muted py-4" *ngIf="!tableData?.length">No associated preview was found!!</div>

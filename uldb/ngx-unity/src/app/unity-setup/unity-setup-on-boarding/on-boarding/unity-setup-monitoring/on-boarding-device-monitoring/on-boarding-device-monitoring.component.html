@@ -1,0 +1,48 @@
+<div class="pt-3 px-3">
+  <div class="row">
+    <div class="col-12">
+      <div [ngSwitch]="monitoringStatus">
+        <div *ngSwitchCase="'notstarted'">
+          <p class="text-center pt-3">Click on the button below to activate monitoring for onboarded devices.
+          </p>
+          <div class="text-center">
+            <button class="btn btn-warning btn-sm btn-pill" (click)="activateMonitoring()">Activate</button>
+          </div>
+        </div>
+        <div *ngSwitchCase="'inprogress'">
+          <p class="text-center mt-3"> Monitoring configuration is in progress. <br>
+            Please wait untill it gets completed. <br></p>
+        </div>
+        <div *ngSwitchCase="'error'">
+          <p>We encountered issues while activating monitoring for below specified devices. Please try again or
+            contact support.
+          </p>
+          <table class="table text-left table-bordered">
+            <thead>
+              <tr>
+                <td>Device Type</td>
+                <td>Devices</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of unmappedDevices | keyvalue">
+                <td>{{item.key}}</td>
+                <td>
+                  <div class="d-inline-block" *ngFor="let device of item.value; let isLast = last">{{device}}<span
+                      *ngIf="!isLast">,&nbsp;</span></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center">
+            <button class="btn btn-warning btn-sm btn-pill" (click)="activateMonitoring()">Activate</button>
+          </div>
+        </div>
+        <div *ngSwitchCase="'completed'">
+          <p class="text-center mt-3">Activated Monitoring for all the onboared devices.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

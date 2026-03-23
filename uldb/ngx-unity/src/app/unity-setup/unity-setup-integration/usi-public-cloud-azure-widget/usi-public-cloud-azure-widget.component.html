@@ -1,0 +1,6 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'Azure'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addAccount()"
+    (viewButtonClick)="viewAccounts()" [moduleName]="'Public Cloud'" [addAccessType]="'Manage Public Cloud'"
+    [viewAccessType]="'View Public Cloud'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+<public-cloud-azure-crud (onCrud)="onCrud($event)"></public-cloud-azure-crud>

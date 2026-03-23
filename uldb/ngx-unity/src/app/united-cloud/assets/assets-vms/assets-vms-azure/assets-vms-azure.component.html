@@ -1,0 +1,103 @@
+<azure-virtual-machines></azure-virtual-machines>
+
+<!-- <div class="card rounded-0 border-top-0">
+  <div class="card-header bg-transparent border-bottom-0 mt-3">
+    <div class="row">
+      <div class="col-3">
+        <div class="input-prepend input-group custom-input-group">
+          <div class="input-group-prepend"><span class="input-group-text bg-transparent border-right-0">
+              <i class="fa fa-search"></i></span>
+          </div>
+          <input placeholder="Enter keyword" class="form-control  form-control-sm border-left-0 custom-search-input"
+            id="prependedInput" size="16" type="text" tableSeachBox (searched)="onSearched($event)">
+        </div>
+      </div>
+      <div class="col ">
+        <span class="text-muted font-sm float-right align-middle"><span
+            class="badge badge-pill badge-secondary">{{filteredviewData.length}}</span>&nbsp;Virtual
+          Machines</span>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Type</th>
+          <th>Account Name</th>
+          <th>Location</th>
+          <th>Resource</th>
+          <th>Availability Set</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let view of filteredviewData | clientSideSearch: currentCriteria.searchValue: fieldsToFilterOn ;let i = index"
+          setTableColumnWidth>
+          <td>
+            <div [tooltip]="view.name">{{view.name}}</div>
+          </td>
+          <td>
+            <shared-device-status [status]="view.powerStatus"></shared-device-status>
+          </td>
+          <td>
+            <div [tooltip]="view.type">{{view.type}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.accountName">{{view.accountName}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.location">{{view.location}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.resource">{{view.resource}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.availabilitySet">{{view.availabilitySet}}</div>
+          </td>
+          <td class="action-icons-column">
+            <button class="action-icons mb-0 fa fa-power-off font-sm ml-1" [class]="view.powerStatusIcon"
+              [ngClass]="{'action-icons-on':view.powerStatusOn}" [tooltip]="view.powerTooltipMessage"
+              (click)="powerToggle(view, i)"></button>
+            <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" (click)="deleteVM(view)"
+              tooltip="Delete"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-center text-muted" *ngIf="!filteredviewData.length">No associated VMs were found.</div>
+  </div>
+</div>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{confirmInput?.confirmTitle}}
+    </div>
+    <div class="card-body">
+      {{confirmInput?.confirmMessage}}
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmToggle()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmDelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{confirmInput?.confirmTitle}}
+    </div>
+    <div class="card-body">
+      {{confirmInput?.confirmMessage}}
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmVMDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template> -->

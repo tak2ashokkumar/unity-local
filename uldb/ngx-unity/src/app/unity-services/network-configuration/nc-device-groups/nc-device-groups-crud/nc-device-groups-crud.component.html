@@ -1,0 +1,125 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <span class="font-lg font-500">{{actionMessage}}</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                        <div class="d-flex flex-column align-items-center step">
+                            <span class="badge icon-wrap pointer-link" [class.active]="activeForm == 'deviceGroupForm'"
+                                (click)="manageActiveForm('deviceGroupForm')">
+                                <span class="fas fa-regular fa-object-group font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Add Device Group</label>
+                        </div>
+                        <div class="d-flex flex-column align-items-center step">
+                            <span class="badge icon-wrap pointer-link" [class.active]="activeForm == 'scheduleForm'"
+                                (click)="manageActiveForm('scheduleForm')">
+                                <span class="fas fa-clock font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Scheduled Discovery</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 offset-4 divider-wrap">
+                        <hr class="divider-line w-85 ml-0">
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <ng-container [ngSwitch]="activeForm">
+                            <ng-container *ngSwitchCase="'deviceGroupForm'">
+                                <ng-container *ngTemplateOutlet="deviceGroupFormRef"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'scheduleForm'">
+                                <ng-container *ngTemplateOutlet="scheduleFormRef"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #deviceGroupFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="deviceGroupForm" [formGroup]="deviceGroupForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="name" class="form-col-form-label">Name<em>*</em></label>
+                                <input class="form-control form-control-sm" id="name" formControlName="name" type="text"
+                                    placeholder="Enter Name" [ngClass]="{'is-invalid' : deviceGroupFormErrors.name}">
+                                <div class="invalid-feedback" *ngIf="deviceGroupFormErrors.name">
+                                    {{deviceGroupFormErrors.name}}</div>
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="col-12 form-group">
+                                <label for="description" class="form-col-form-label">Description<em>*</em></label>
+                                <textarea id="description" rows="2"
+                                    class="form-control form-control-sm no-resize"
+                                    formControlName="description" placeholder="Enter Description"
+                                    [class.is-invalid]="deviceGroupFormErrors.description"></textarea>
+                                <div class="invalid-feedback" *ngIf="deviceGroupFormErrors.description">
+                                    {{deviceGroupFormErrors.description}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="device_types" class="form-col-form-label">Device Types<em>*</em></label>
+                                <multiselect-dropdown [options]="ncmDeviceTypes" [settings]="deviceTypesSettings"
+                                    class="form-control form-control-sm p-0" style="height:auto;"
+                                    formControlName="device_types"
+                                    [class.is-invalid]="deviceGroupFormErrors.device_types"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="deviceGroupFormErrors.device_types">
+                                    {{deviceGroupFormErrors.device_types}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="devices" class="form-col-form-label">Devices<em>*</em></label>
+                                <multiselect-dropdown [options]="ncmDevices" [settings]="devicesSettings"
+                                    class="form-control form-control-sm p-0" style="height:auto;"
+                                    formControlName="devices"
+                                    [class.is-invalid]="deviceGroupFormErrors.devices"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="deviceGroupFormErrors.devices">
+                                    {{deviceGroupFormErrors.devices}}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitDeviceGroupForm()">Next</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <unity-schedule></unity-schedule>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(false)">Save</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(true)">Save & Run</button>
+        </div>
+    </div>
+</ng-template>

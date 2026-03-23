@@ -1,0 +1,117 @@
+<div class="row">
+  <div class="col-sm-6">
+   <h3>{{ title.plural }}</h3>
+   <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+  <div class="col-sm-6">
+    <button class="btn btn-primary" ng-click="ctrl.add()" style="float:right;">Add Host</button>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th ng-repeat="row in rows">{{ row.description }}</th>
+        <th>State</th>
+        <th>Verify</th>
+        <th>Run Check Status</th>        
+        <th>Scan Services</th>
+ 	<th>Delete</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="result in model.results"
+        ng-click="select(result, $index)"
+        ng-class="{'success': result.state === 'OK', 'danger': result.state === 'CRITICAL'}">
+        <td ng-repeat="row in rows">
+            <div ng-if="row.opaque === undefined && row.hide === undefined">{{ result[row.name] }}</div>
+            <div ng-if="row.opaque !== undefined && row.hide === undefined">
+                {{ row.read(result) }}
+            </div>
+        </td>
+        <td>
+            {{ result.state }}
+        </td>
+ 	
+        <td>
+            <button class="btn btn-success"
+                    ng-if="result == selection.selected"
+                    ng-click="verify(result, $index)">Verify
+            </button>
+        </td>
+	<td>
+            <button class="btn btn-success"
+                    ng-if="result == selection.selected"
+                    ng-click="scan(result, $index)">Run check
+            </button>
+        </td>
+        <td>
+            <button class="btn btn-success"
+                    ng-if="result == selection.selected"
+                    ng-click="scanServices(result, $index)">Scan Services
+            </button>
+        </td>
+	<td>
+            <button ng-if="result === selection.selected"
+              class="btn btn-danger"
+              ng-click="removeCheck(result, $index)" confirm>
+		<i class="glyphicon glyphicon-erase" aria-hidden="true"></i> Delete
+	    </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<uib-pagination total-items="model.count" items-per-page="pageSize" max-size="5" rotate="false"
+                ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+</div>
+
+</div>
+
+<script type="text/ng-template" id="genericModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">{{ method }} {{ title.singular }}</h3>
+  </div>
+
+  <div class="modal-body" style="height: 400px;">
+    <form class="form-horizontal">
+
+      <div class="form-group" ng-repeat="row in rows" ng-if="row.required">
+        <label for="blockName" class="col-sm-2 control-label">
+          {{ row.description }}
+        </label>
+
+        <div class="col-sm-10" ng-if="row.opaque === undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]">
+        </div>
+
+        <div class="col-sm-10" ng-if="row.opaque !== undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]"
+                 placeholder=""
+                 uib-typeahead="obj as obj[row.subfield] for obj in row.render($viewValue)">
+        </div>
+      </div>
+    </form>
+
+
+  </div>
+
+  <div class="modal-footer">
+    <button ng-if="method === 'Add'" class="btn btn-success" type="button" ng-click="add(obj)">
+      Create!
+    </button>
+    <button ng-if="method === 'Edit'" class="btn btn-success" type="button" ng-click="edit(obj, selection.index)">
+      Save changes!
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+  </div>
+</script>

@@ -1,0 +1,44 @@
+<div class="row">
+  <div class="col-6">
+    <div class="row">
+      <div class="col">
+        <hypervisor-overview-details [deviceId]="deviceId"></hypervisor-overview-details>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <hypervisor-overview-ports [deviceId]="deviceId"></hypervisor-overview-ports>
+      </div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="row">
+      <div class="col">
+        <hypervisor-overview-processors [deviceId]="deviceId"></hypervisor-overview-processors>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <hypervisor-overview-memory [deviceId]="deviceId"></hypervisor-overview-memory>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" *ngIf="deviceStatus">
+        <device-status [input]="deviceStatus"></device-status>
+      </div>
+    </div>
+    <div class="row" *ngFor="let sensor of sensors">
+      <div class="col">
+        <device-sensor [input]="sensor"></device-sensor>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="card-columns">
+  <hypervisor-overview-details [deviceId]="deviceId"></hypervisor-overview-details>
+  <hypervisor-overview-ports [deviceId]="deviceId"></hypervisor-overview-ports>
+  <hypervisor-overview-processors [deviceId]="deviceId"></hypervisor-overview-processors>
+  <hypervisor-overview-memory [deviceId]="deviceId"></hypervisor-overview-memory>
+  <device-sensor *ngFor="let sensor of sensors" [input]="sensor"></device-sensor>
+  <device-status *ngIf="deviceStatus" [input]="deviceStatus"></device-status>
+</div> -->

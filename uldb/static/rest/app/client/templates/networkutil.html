@@ -1,0 +1,62 @@
+<div class="row">
+  <div class="col-sm-8">
+    <h3>{{ currentName }}</h3>
+    <nvd3 options="options" data="data"></nvd3>
+  </div>
+
+  <div class="col-sm-4">
+      <h4>Interfaces</h4>
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th ng-repeat="row in rows">{{ row.description }}</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr ng-repeat="result in model.results"
+            ng-click="select(result, $index)"
+            ng-class="{'active success': result === selection.selected}">
+          <td ng-repeat="row in rows">
+            <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+            <div ng-if="row.opaque !== undefined">
+              {{ row.read(result) }}
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <uib-pagination total-items="model.count" items-per-page="pageSize"
+                      ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+    <h4>Time Interval</h4>
+    <ul class="nav nav-pills nav-stacked">
+      <li role="presentation" ng-class="{'active': interval == 'day'}" ><a href="" ng-click="set_interval('day')">Day</a></li>
+      <li role="presentation" ng-class="{'active': interval == 'week'}" ><a href="" ng-click="set_interval('week')">Week</a></li>
+      <li role="presentation" ng-class="{'active': interval == 'month'}" ><a href="" ng-click="set_interval('month')">Month</a></li>
+      <li role="presentation" ng-class="{'active': interval == 'year'}" ><a href="" ng-click="set_interval('year')">Year</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <h3>Cumulative Bandwidth (95th percentile, bps)</h3>
+  <div class="col-sm-6">
+    <h4>Day</h4>
+    <nvd3 options="day_opts" data="stats.day"></nvd3>
+  </div>
+  <div class="col-sm-6">
+    <h4>Week</h4>
+    <nvd3 options="day_opts" data="stats.week"></nvd3>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-6">
+    <h4>Month</h4>
+    <nvd3 options="day_opts" data="stats.month"></nvd3>
+  </div>
+  <div class="col-sm-6">
+    <h4>Year</h4>
+    <nvd3 options="day_opts" data="stats.year"></nvd3>
+  </div>
+</div>

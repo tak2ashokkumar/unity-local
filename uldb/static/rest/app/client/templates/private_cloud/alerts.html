@@ -1,0 +1,56 @@
+<div class="page_wrapper" style="float:left">
+  <loading object="{{device_alerts}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((device_alerts | filter: searchKeyword1).length) || 0 }} of {{ ((device_alerts | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Devices</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="device_alerts.length > 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="device_alerts">
+              <thead ng-if="alerts_loaded">
+                  <tr>
+                      <th> Device Name </th>
+                      <th> Device Type </th>
+                      <th> Alerts Count </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in device_alerts | filter: searchKeyword1">
+                      <td ng-init="getDeviceAlerts(row.type, row.uuid, row)">
+                        <a ng-click="deviceAlertsModal(row.type, row)" href="">
+                          {{row.name}}
+                        </a>
+                      </td>
+
+                      <td>
+                          {{ row.type }}
+                      </td>
+                      <td>
+                          {{ row.alert_count }}
+                      </td>
+                    </tr>
+                </tbody>
+            </table>
+      </section>
+      <div ng-if="alerts_loaded && (device_alerts.length === 0) || (((device_alerts | filter: searchKeyword1).length) == 0 )" class="content-wrapper">
+        <no-records-found message="No Alerts were found for this cloud !!"></no-records-found>
+      </div>
+
+  </div>
+</div>

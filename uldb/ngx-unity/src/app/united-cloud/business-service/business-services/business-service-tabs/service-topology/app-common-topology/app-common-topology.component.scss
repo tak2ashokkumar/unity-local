@@ -1,0 +1,123 @@
+@import "variables";
+
+.action-icons {
+    // position: absolute;
+    bottom: 0;
+}
+
+.graph-container {
+    width: 100%;
+    height: 84vh;
+    // max-height: 64vh;
+    margin: 16px 0;
+    position: relative; 
+}
+
+// .hover-container {
+//     position: relative;
+//     display: inline-block;
+//     /* so tooltip stays attached */
+// }
+
+.node-tooltip {
+    position: absolute;
+    pointer-events: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .15);
+    font-size: 12px;
+    max-width: 300px;
+    max-height: 300px;
+    z-index: 999;
+    overflow: auto;
+}
+
+.node-tooltip .tooltip-arrow {
+  position: absolute;
+  z-index:999;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid white;
+}
+
+// :host ::ng-deep .vis-navigation {
+//     left: 20px !important;
+//     right: auto !important; /* Resetting the 'right' property is crucial */
+//     bottom: 20px !important;
+
+//     /* Add the other styling for the box */
+//     display: flex !important;
+//     flex-direction: column !important;
+//     gap: 8px !important;
+//     padding: 10px;
+//     background-color: #f8f9fa;
+//     border: 1px solid #dee2e6;
+//     border-radius: 8px;
+//     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+// }
+
+// :host ::ng-deep .vis-navigation .vis-button {
+//     position: static !important;
+//     margin: 0 !important;
+// }
+div.vis-network div.vis-navigation div.vis-button {
+    left: 2% !important;
+}
+
+div.vis-network div.vis-navigation div.vis-button.vis-zoomIn {
+    bottom: 89px !important;
+}
+
+// div.vis-network div.vis-navigation div.vis-button{
+//     left: 100px !important;
+// }
+// div.vis-network div.vis-navigation div.vis-button.vis-vis-zoomIn{
+//     left: 100px !important;
+// }
+
+.graph-legend {
+    position: absolute;
+    bottom: 10px; /* sticks to bottom of graph */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px; /* space between items */
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .legend-circle {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  
+  /* Specific states */
+  .legend-circle.healthy {
+    border: 2px solid #29945b;
+    background-color: #83dfae;
+  }
+  
+  .legend-circle.down {
+    background-color: #ffa1a1;
+    border: 2px solid #b72525;
+  }
+  
+  .legend-circle.unknown {
+    background-color: #ff9900; /* light orange */
+    border: 2px solid #ff8800;
+  }

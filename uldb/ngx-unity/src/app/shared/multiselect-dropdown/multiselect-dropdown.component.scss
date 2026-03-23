@@ -1,0 +1,47 @@
+a {
+  outline: none !important;
+}
+
+button.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+span.truncate {
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block !important;
+  width: 100%;
+}
+
+.dropdown-toggle .caret {
+  margin-left: 4px;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.btn.disabled,
+.btn:disabled {
+  cursor: no-drop;
+  background-color: #e4e7ea;
+  opacity: 1;
+}
+
+//Adding this to override the default z-index inside model popup.
+.dropdown-menu {
+  z-index: 2178 !important;
+}
+
+.custom-grey-text {
+  color: #5c6873;
+}
+
+.onItemHover:hover,
+.onItemHover:hover * {
+  background-color: #378ad8;
+  color: white !important;
+}

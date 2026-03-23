@@ -1,0 +1,154 @@
+@import "variables";
+
+// For Heatmap Legends
+.progress {
+  height: 20px;
+  background-image: linear-gradient(to right, $cv-frozen, $cv-less, $cv-normal, $cv-warning, $cv-high, $cv-danger);
+}
+
+.progress .progress-bar {
+  background-color: initial !important;
+  color: $gray-800;
+  font-size: 10px !important;
+  font-weight: 800;
+  text-shadow: 6px 6px 20px $white;
+}
+
+
+//For Vertical PDU's
+.label_slot {
+  height: 16px;
+  margin-bottom: 5px;
+
+  .slot_name {
+    font-size: 18px;
+    color: $blue;
+  }
+}
+
+.pdu_meter {
+  font-family: "Orbitron", sans-serif;
+  color: $red;
+  font-weight: 700;
+  height: 20px;
+
+  .pdu_meter_reading {
+    height: 20px;
+    background-color: $black;
+    font-size: 12px;
+    vertical-align: text-top;
+  }
+}
+
+// for Cabinet Devices
+.heat_map_indicator {
+  position: absolute;
+  width: 97%;
+  margin-left: -95%;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.pdus.heat_map_indicator {
+  left: calc(100% - (100% - 9px)) !important;
+  // opacity: 0.3;
+}
+
+.heat_map_indicator.frozen {
+  background-color: $cv-frozen;
+}
+.heat_map_indicator.less {
+  background-color: $cv-less;
+}
+.heat_map_indicator.normal {
+  background-color: $cv-normal;
+}
+.heat_map_indicator.warning {
+  background-color: $cv-warning;
+}
+.heat_map_indicator.high {
+  background-color: $cv-high;
+}
+.heat_map_indicator.danger {
+  background-color: $cv-danger;
+}
+
+.heat_map_indicator.unit_1 {
+  height: 13px;
+}
+.heat_map_indicator.unit_2 {
+  height: 26px;
+  margin-top: -13px;
+}
+.heat_map_indicator.unit_3 {
+  height: 39px;
+  margin-top: -26px;
+}
+.heat_map_indicator.unit_4 {
+  height: 52px;
+  margin-top: -39px;
+}
+.heat_map_indicator.unit_5 {
+  height: 65px;
+  margin-top: -52px;
+}
+.heat_map_indicator.unit_6 {
+  height: 78px;
+  margin-top: -65px;
+}
+.heat_map_indicator.unit_7 {
+  height: 91px;
+  margin-top: -78px;
+}
+.heat_map_indicator.unit_8 {
+  height: 104px;
+  margin-top: -91px;
+}
+.heat_map_indicator.unit_9 {
+  height: 117px;
+  margin-top: -104px;
+}
+.heat_map_indicator.unit_10 {
+  height: 130px;
+  margin-top: -117px;
+}
+.heat_map_indicator.unit_11 {
+  height: 143px;
+  margin-top: -130px;
+}
+.heat_map_indicator.unit_12 {
+  height: 156px;
+  margin-top: -143px;
+}
+.heat_map_indicator.unit_13 {
+  height: 169px;
+  margin-top: -156px;
+}
+.heat_map_indicator.unit_14 {
+  height: 182px;
+  margin-top: -169px;
+}
+.heat_map_indicator.unit_15 {
+  height: 195px;
+  margin-top: -182px;
+}
+.heat_map_indicator.unit_16 {
+  height: 208px;
+  margin-top: -195px;
+}
+.heat_map_indicator.unit_17 {
+  height: 221px;
+  margin-top: -208px;
+}
+.heat_map_indicator.unit_18 {
+  height: 234px;
+  margin-top: -221px;
+}
+.heat_map_indicator.unit_19 {
+  height: 247px;
+  margin-top: -234px;
+}
+.heat_map_indicator.unit_20 {
+  height: 260px;
+  margin-top: -247px;
+}

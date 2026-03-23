@@ -1,0 +1,284 @@
+<div class="row mt--2">
+    <div class="col px-2">
+        <div class="row mb-2">
+            <div class="col-4 pr-1">
+                <div class="card equalize-card">
+                    <app-spinner [name]="'viewServerHealthData'"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Server Health</span>
+                    </div>
+                    <div class="card-body p-2">
+                        <div *ngFor="let view of viewServerHealthData;"
+                            class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="text-primary" style="cursor:pointer" (click)="goToDetails(view)">{{ view.name }}
+                            </div>
+                            <div class="d-flex gap-3">
+                                <span class="text-muted mr-3">
+                                    {{ view.warning }}
+                                    <i class="text-warning fas fa-exclamation-circle ms-1" tooltip="Warning"></i>
+                                </span>
+                                <span class="text-muted mr-3">
+                                    {{ view.critical }}
+                                    <i class="text-danger fas fa-exclamation-triangle ms-1" tooltip="Critical"></i>
+                                </span>
+                                <span class="text-muted">
+                                    {{ view.ok }}
+                                    <i class="text-info fas fa-info-circle ms-1" tooltip="OK"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="text-center text-muted py-5" *ngIf="!viewServerHealthData">No data for
+                            Server Health.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4 p-0">
+                <div class="card equalize-card">
+                    <app-spinner [name]="'viewServerInfoData'"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Server Information</span>
+                    </div>
+                    <div class="card-body p-2">
+                        <ng-container *ngIf="viewServerInfoData && viewServerInfoData.length > 0; else noData">
+                            <div *ngFor="let view of viewServerInfoData">
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Name</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.name }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Status</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.status }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">State</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.state }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Manufacturer</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.manufacturer }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Model</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.model }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">BIOS Version</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.biosVersion }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Asset Tag</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.assetTag }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Part Number</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.partNumber }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">SKU</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.sku }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Power State</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.powerState }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">Serial Number</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.serialNumber }}</div>
+                                </div>
+                                <div class="row mb-2 text-muted">
+                                    <div class="col-4">System Type</div>
+                                    <span>:</span>
+                                    <div class="col-6">{{ view.systemType }}</div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-template #noData>
+                            <div class="text-center text-muted py-5">No data for Server Information.</div>
+                        </ng-template>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-4 pl-1">
+                <div class="card equalize-card">
+                    <app-spinner [name]="fansWidget.loader"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Fan Stats</span>
+                    </div>
+                    <div class="col p-0" *ngIf="fansWidget?.count">
+                        <ng-container *ngIf="fansWidget?.fanTypeChartData">
+                            <div class="mt-4" echarts [options]="fansWidget?.fanTypeChartData.options"
+                                [extentions]="fansWidget?.fanTypeChartData.extensions" [defaultHeight]="250">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!fansWidget?.count">
+                        No Fans data available.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-5 pr-0" style="min-height:250px">
+                <div class="card equalize-card">
+                    <app-spinner [name]="powerStatsWidget.loader"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Hardware Power Stats</span>
+                    </div>
+                    <div class="col p-0" *ngIf="powerStatsWidget?.count">
+                        <ng-container *ngIf="powerStatsWidget?.fanTypeChartData">
+                            <div class="mt-4" echarts [options]="powerStatsWidget?.fanTypeChartData.options"
+                                [extentions]="powerStatsWidget?.fanTypeChartData.extensions" [defaultHeight]="250">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center align-items-center"
+                        *ngIf="!powerStatsWidget?.count">
+                        No Power data available.</div>
+                </div>
+            </div>
+
+            <div class="col-7 pl-1">
+                <div class="card equalize-card">
+                    <app-spinner [name]="cpuStatsWidget.loader"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">CPU Overview</span>
+                    </div>
+                    <div class="col p-2" *ngIf="cpuStatsWidget?.count">
+                        <ng-container *ngIf="cpuStatsWidget?.fanTypeChartData">
+                            <div class="mt-4" echarts [options]="cpuStatsWidget?.fanTypeChartData.options"
+                                [extentions]="cpuStatsWidget?.fanTypeChartData.extensions" [defaultHeight]="300">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!cpuStatsWidget?.count">
+                        No CPU data available.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-5 pr-0" style="min-height:250px">
+                <div class="card equalize-card">
+                    <app-spinner [name]="memoryStatsWidget.loader"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Memory Attribute</span>
+                    </div>
+                    <div class="col p-0" *ngIf="memoryStatsWidget?.count">
+                        <ng-container *ngIf="memoryStatsWidget?.fanTypeChartData">
+                            <div class="mt-4" echarts [options]="memoryStatsWidget?.fanTypeChartData.options"
+                                [extentions]="memoryStatsWidget?.fanTypeChartData.extensions" [defaultHeight]="250">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center align-items-center"
+                        *ngIf="!memoryStatsWidget?.count">
+                        No Memory Attribute data available.</div>
+                </div>
+            </div>
+            <div class="col-7 pl-1">
+                <div class="card equalize-card">
+                    <app-spinner [name]="tempStatsWidget.loader"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Temperature</span>
+                    </div>
+                    <div class="col p-0" *ngIf="tempStatsWidget?.count">
+                        <ng-container *ngIf="tempStatsWidget?.fanTypeChartData">
+                            <div class="mt-1" echarts [options]="tempStatsWidget?.fanTypeChartData.options"
+                                [extentions]="tempStatsWidget?.fanTypeChartData.extensions" [defaultHeight]="350">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center align-items-center"
+                        *ngIf="!tempStatsWidget?.count">
+                        No Temperature data available.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-2">
+            <div class="col-5 pr-0" style="min-height:250px">
+                <div class="card equalize-card">
+                    <app-spinner [name]="physicalDiskStatsWidget.loader"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Physical Disk Overview</span>
+                    </div>
+                    <div class="col p-0" *ngIf="physicalDiskStatsWidget?.count">
+                        <ng-container *ngIf="physicalDiskStatsWidget?.fanTypeChartData">
+                            <div echarts [options]="physicalDiskStatsWidget?.fanTypeChartData.options"
+                                [extentions]="physicalDiskStatsWidget?.fanTypeChartData.extensions"
+                                [defaultHeight]="300">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-12 d-flex justify-content-center align-items-center"
+                        *ngIf="!physicalDiskStatsWidget?.count">
+                        No Physical Disk data available.</div>
+                </div>
+            </div>
+            <div class="col-7 pl-1">
+                <div class="card equalize-card">
+                    <app-spinner [name]="'viewVirtualDiskData'"></app-spinner>
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                        <span class="font-lg font-500">Virtual Disk</span>
+                    </div>
+                    <div class="card-body py-1 px-1">
+                        <table class="table table-sm text-left" sortableTable>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">State</th>
+                                    <th class="text-center">Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewVirtualDiskData" truncateText>
+                                    <td class="tdw-30">
+                                        <div class="text-truncate" [tooltip]="view.name">
+                                            {{view.name}}
+                                        </div>
+                                    </td>
+                                    <td class="w-20">
+                                        <div class="text-center pl-2" [tooltip]="view.statusTooltip">
+                                            <i [ngClass]="[view.statusIcon?.icon, view.statusIcon?.color]"></i>
+                                        </div>
+                                    </td>
+                                    <td class="w-20">
+                                        <div class="text-center pl-2" [tooltip]="view.stateTooltip">
+                                            <i [ngClass]="[view.stateIcon?.icon, view.stateIcon?.color]"></i>
+                                        </div>
+                                    </td>
+                                    <td class="tdw-30">
+                                        <div class="text-truncate text-center pl-4" [tooltip]="view.diskType">
+                                            {{view.diskType}}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="!viewVirtualDiskData.length"
+                            class="d-flex py-5 justify-content-center align-items-center">
+                            No Virtual Disk data available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

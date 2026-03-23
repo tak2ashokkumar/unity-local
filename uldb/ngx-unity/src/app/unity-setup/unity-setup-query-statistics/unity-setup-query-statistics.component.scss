@@ -1,0 +1,28 @@
+.query-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 98vh;
+    width: 35%;
+    background-color: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+  
+  .query-drawer.open {
+    transform: translateX(0);
+    margin: 0.5rem;
+  }
+  
+  .query-drawer.closed {
+    transform: translateX(-100%);
+    pointer-events: none; /* prevent interaction while hidden */
+  }
+
+  .query-drawer-content{
+    overflow-y: auto;
+  }
+  

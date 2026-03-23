@@ -1,0 +1,322 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header text-center">
+        <form *ngIf="filterForm" [formGroup]="filterForm">
+          <div class="row">
+            <div class="col-2">
+              <div class="form-group row">
+                <label for="search"
+                  class="col-sm-4 col-form-label col-form-label-sm text-right px-0">Search:&nbsp;</label>
+                <div class="col-8 px-0">
+                  <input type="text" class="form-control form-control-sm" formControlName="search" id="search"
+                    placeholder="Enter Keyword">
+                </div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group mb-0 row">
+                <label for="script_type" class="col-sm-4 col-form-label col-form-label-sm text-right px-0">Script
+                  Type:&nbsp;</label>
+                <div class="col-8 px-0">
+                  <select class="form-control form-control-sm" id="script_type" formControlName="script_type">
+                    <option [value]="''">All</option>
+                    <option value="Python">Python</option>
+                    <option value="Shell">Shell</option>
+                    <option value="Powershell">Powershell</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group mb-0 row">
+                <label for="category"
+                  class="col-sm-4 col-form-label col-form-label-sm text-right px-0">Category:&nbsp;</label>
+                <div class="col-8 px-0">
+                  <select class="form-control form-control-sm" id="category" formControlName="category">
+                    <option [value]="''">All</option>
+                    <option [value]="'Availability'">Availability</option>
+                    <option [value]="'Disk'">Disk</option>
+                    <option [value]="'CPU'">CPU</option>
+                    <option [value]="'Memory'">Memory</option>
+                    <option [value]="'Other'">Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group mb-0 row">
+                <label for="datecreated" class="col-3 col-form-label col-form-label-sm text-right px-0">Date
+                  Created:&nbsp;</label>
+                <div class="col-9 px-0">
+                  <div class="input-group-append" [owlDateTimeTrigger]="datecreated"></div>
+                  <owl-date-time #datecreated [hour12Timer]="true" [pickerType]="'calendar'"></owl-date-time>
+                  <input class="form-control rounded-left text-center" [owlDateTimeTrigger]="datecreated"
+                    [owlDateTime]="datecreated" type="text" formControlName="dateRange" [max]="maxDate"
+                    [selectMode]="'range'" (dateTimeInput)="onDateChanged()">
+                </div>
+              </div>
+            </div>
+            <div class="col-2 text-right">
+              <div class="form-group mb-0">
+                <button class="btn btn-sm btn-pill btn-warning px-4" type="button"
+                  (click)="filterScripts()">Filter</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-0">
+      <div
+        class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom-0 py-2 mt-3">
+        <div class="d-flex justify-content-center align-items-center font-500">
+          <span class="badge badge-pill badge-secondary font-sm">{{viewData.length}}</span>
+          <span class="ml-1 font-lg">&nbsp;Scripts</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+          <button class="btn btn-pill btn-sm btn-warning mx-2 px-3 font-500" type="button" (click)="addFile()">
+            <span class="font-sm">Add
+              Script</span>
+          </button>
+          <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" container="body"
+            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table *ngIf="viewData.length" class="table text-left">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Applicable</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Created Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let file of viewData; let i = index" setTableColumnWidth>
+                <td>
+                  <div>
+                    {{file.name}}
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    {{file.category}}
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    {{file.deviceCategory}}
+                  </div>
+                </td>
+                <td>
+                  <div [tooltip]="file.description">
+                    {{file.description}}
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    {{file.scriptType}}
+                  </div>
+                </td>
+                <td>
+                  <div [tooltip]="file.createdAt">
+                    {{file.createdAt}}
+                  </div>
+                </td>
+                <td class="action-icons-column">
+                  <button class="action-icons mb-0 fa fa-eye font-sm ml-1" tooltip="View"
+                    (click)="viewFile(i)"></button>
+                  <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                    (click)="editFile(i)"></button>
+                  <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                    (click)="deleteFile(i)"></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center text-muted" *ngIf="!viewData.length">No Scripts were found!!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #scriptCRUD>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Script
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeAddModal()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="scriptForm" [formGroup]="scriptForm">
+        <div class="form-group">
+          <div class="invalid-script" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label">Name<em>*</em></label>
+          <input id="name" class="form-control" type="text" formControlName="name"
+            [class.is-invalid]="scriptFormErrors.name">
+          <div class="invalid-feedback" *ngIf="scriptFormErrors.name">{{scriptFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="font-col-form-label" for="category">Category<em>*</em></label>
+          <select id="category" class="form-control" formControlName="category"
+            [class.is-invalid]="scriptFormErrors.category">
+            <option [value]="''" disabled>Select Type</option>
+            <option [value]="'Availability'">Availability</option>
+            <option [value]="'Disk'">Disk</option>
+            <option [value]="'CPU'">CPU</option>
+            <option [value]="'Memory'">Memory</option>
+            <option [value]="'Other'">Other</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="scriptFormErrors.category">
+            {{scriptFormErrors.category}}</div>
+        </div>
+        <div class="form-group">
+          <label class="font-col-form-label" for="device_category">Applicable To</label>
+          <select id="device_category" class="form-control" formControlName="device_category">
+            <option [value]="''" disabled>Select Device</option>
+            <option [value]="'All Devices'">All Devices</option>
+            <option [value]="'Bare Metal Servers'">Bare Metal Servers</option>
+            <option [value]="'Firewalls'">Firewall</option>
+            <option [value]="'Hypervisors'">Hypervisors</option>
+            <option [value]="'Load Balancers'">Load Balancers</option>
+            <option [value]="'Storage'">Storage</option>
+            <option [value]="'Switch'">Switches</option>
+            <option [value]="'Virtual Machines'">Virtual Machines</option>
+          </select>
+        </div>
+        <div class="form-group" *ngIf="scriptForm.controls.os">
+          <label for="os">Operating System<em>*</em></label>
+          <select id="os" class="form-control" formControlName="os" [ngClass]="{'is-invalid' : scriptFormErrors.os}">
+            <option [value]="''" disabled>Select Operating System</option>
+            <option [value]="'ESXi'">ESXi</option>
+            <option [value]="'Hypervisor'">Hypervisor</option>
+            <option [value]="'Linux'">Linux</option>
+            <option [value]="'MacOS'">MacOS</option>
+            <option [value]="'Nimble'">Nimble</option>
+            <option [value]="'Windows'">Windows</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="scriptFormErrors.os">{{scriptFormErrors.os}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label">Description<em>*</em></label>
+          <input id="description" class="form-control" type="text" formControlName="description"
+            [class.is-invalid]="scriptFormErrors.description">
+          <div class="invalid-feedback" *ngIf="scriptFormErrors.description">{{scriptFormErrors.description}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="upload_script">Upload Script<em>*</em></label>
+          <span class="mx-1" *ngIf="selectedview && selectedview.scriptFileName"> - </span>
+          <a *ngIf="selectedview && selectedview.scriptFileName" href="{{selectedview.uploadScript}}"
+            target="_blank">{{selectedview.scriptFileName}}</a>
+          <input id="file" class="form-control" type="file" (change)="scriptFile($event.target.files)"
+            formControlName="upload_script" name="upload_script" [class.is-invalid]="scriptFormErrors.upload_script">
+          <div class="invalid-feedback" *ngIf="scriptFormErrors.upload_script">
+            {{scriptFormErrors.upload_script}}</div>
+        </div>
+        <div class="form-group">
+          <label class="font-col-form-label" for="script_type">Type<em>*</em></label>
+          <select id="script_type" class="form-control" formControlName="script_type"
+            [class.is-invalid]="scriptFormErrors.script_type">
+            <option [value]="''" disabled>Select Type</option>
+            <option [value]="'Python'">Python</option>
+            <option [value]="'Shell'">Shell</option>
+            <option [value]="'Powershell'">Powershell</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="scriptFormErrors.script_type">
+            {{scriptFormErrors.script_type}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onScriptSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #scriptView>
+  <div class="card mb-0" style="width: 1000px;">
+    <div class="card-header">
+      Script Details
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeAddModal()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="scriptForm">
+        <div *ngIf="selectedScript">
+          <div class="row">
+            <div class="form-group col-6">
+              <label class="form-col-form-label">Name</label>
+              <div id="name" type="text" class="form-control" readonly>{{selectedScript.name}}</div>
+            </div>
+            <div class="col-6">
+              <label for="category">Category</label>
+              <div id="category" type="text" class="form-control" readonly>{{selectedScript.category}}</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-6">
+              <label class="form-col-form-label">Type</label>
+              <div id="script_type" type="text" class="form-control" readonly>{{selectedScript.scriptType}}</div>
+            </div>
+            <div class="col-6">
+              <label for="description">Description</label>
+              <textarea id="description" type="text" class="form-control"
+                readonly>{{selectedScript.description}}</textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="content">Code</label>
+            <textarea id="content" class="form-control" type="text" [value]="selectedScript?.content" rows="12"
+              readonly>{{selectedScript.content}}</textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmScriptDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This Script will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmScriptDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmScriptDeleteModalRef.hide()"
+        type="button">No</button>
+    </div>
+  </div>
+</ng-template>

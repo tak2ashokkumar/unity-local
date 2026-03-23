@@ -1,0 +1,67 @@
+<div class="card text-center border-0 mb-0">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center px-0 py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+            <span class="ml-1 font-lg">Datacenters</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive" tableStickyScroll>
+            <table class="table table-sm text-left">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Name<em>*</em></th>
+                        <th>Location<em>*</em></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of viewData; let i = index">
+                        <ng-container [formGroup]="view.form" *ngIf="view.form">
+                            <td>
+                                <div>
+                                    <i class="fas fa-check" [ngClass]="view.onboardedClass"></i>
+                                    <input id="{{i}}-name" class="form-control d-inline ml-1" type="text"
+                                        formControlName="name" [class.is-invalid]="view.formErrors.name" accessControl
+                                        moduleName="Datacenter" accessType="Manage Datacenter" elementType="formelem">
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.name">{{view.formErrors.name}}
+                                    </div>
+                                    <div class="invalid-credentials" *ngIf="view.nonFieldErr">{{view.nonFieldErr}}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <input class="form-control" id="{{i}}-searchlocation" type="text"
+                                        placeholder="Location" *ngIf="!view.onboarded"
+                                        [ngClass]="{'is-invalid' : view.formErrors.searchlocation || view.formErrors.location || view.formErrors.lat }"
+                                        formControlName="searchlocation" accessControl moduleName="Datacenter"
+                                        accessType="Manage Datacenter" elementType="formelem">
+                                    <input *ngIf="view.onboarded" class="form-control" id="{{i}}-searchlocation"
+                                        type="text" [value]="view.data.location" disabled>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.searchlocation">
+                                        {{view.formErrors.searchlocation}}</div>
+                                    <div class="invalid-feedback"
+                                        *ngIf="!view.formErrors.searchlocation && view.formErrors.location">
+                                        {{view.formErrors.location}}</div>
+                                    <div class="invalid-feedback" *ngIf="view.formErrors.lat">{{view.formErrors.lat}}
+                                    </div>
+                                </div>
+                            </td>
+                        </ng-container>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center text-muted py-4" *ngIf="!viewData.length">No associated Datacenters available.
+                </div>
+                <br>
+            </div>
+            <div class="col">
+                <excel-on-boarding-next-prev></excel-on-boarding-next-prev>
+                <button class="btn btn-sm btn-success pull-right" type="button" (click)="submit()" accessControl
+                    moduleName="Onboarding" accessType="Manage Onboarding" elementType="btn">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

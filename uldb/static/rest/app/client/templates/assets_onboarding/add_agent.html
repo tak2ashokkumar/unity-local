@@ -1,0 +1,82 @@
+<div class="modal-header">
+  <h3 class="modal-title">Add Agent</h3>
+</div>
+<div class="modal-body">
+<div class="modal-form">
+  <div class="form-group" ng-if="errorMsg">
+      <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-show="disableAccess == undefined">
+      <div class="paddingR">
+          <div class="form-group">
+              <label for="request.name" class="col-sm-6 control-label">
+                  Name* <span style="color: red;">{{name_error}}</span>
+              </label>
+
+              <div>
+                  <input type="text" class="form-control" ng-model="request.name" placeholder="Name" required>
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label for="request.ip_address" class="col-sm-6 control-label">
+                  IP Address* <span style="color: red;">{{ip_address_error}}</span>
+              </label>
+
+              <div>
+                  <input type="text" class="form-control" ng-model="request.ip_address" placeholder="IP Address" required>
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label for="request.ssh_port" class="col-sm-6 control-label">
+                  SSH Port
+              </label>
+
+              <div>
+                  <input type="text" class="form-control" ng-model="request.ssh_port" placeholder="Default SSH Port : 22" required>
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label for="request.ssh_username" class="col-sm-6 control-label">
+                  SSH Username* <span style="color: red;">{{ssh_username_error}}</span>
+              </label>
+
+              <div>
+                  <input type="text" class="form-control" ng-model="request.ssh_username" placeholder="SSH Username" required>
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label for="request.ssh_password" class="col-sm-6 control-label">
+                  SSH Password* <span style="color: red;">{{ssh_password_error}}</span>
+              </label>
+
+              <div>
+                  <input type="password" class="form-control" ng-model="request.ssh_password" placeholder="SSH Password" required>
+              </div>
+          </div>
+
+          <div class="form-group">
+              <label for="request.snmp_community" class="col-sm-6 control-label">
+                  SNMP Community 
+              </label>
+
+              <div>
+                  <input type="password" class="form-control" ng-model="request.snmp_community" placeholder="Default SNMP Community : public" required>
+              </div>
+          </div>
+
+      </div>
+  </div>
+</div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-cancel" ng-click="close()">
+    Close
+  </button>
+  <button type="submit" class="btn btn-default" ng-click="addAgent(request)">
+    Add
+  </button>
+</div>

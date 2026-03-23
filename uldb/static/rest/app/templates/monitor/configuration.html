@@ -1,0 +1,112 @@
+<style type="text/css">
+  .pagemargin .page_wrapper {
+    background-color: #FFFFFF;
+    width: 100%;
+    -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+    -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+    padding: 20px;
+    padding-bottom: 60px;
+    padding-top: 0px;
+  }
+
+  .dataTables_filter input[type="search"] {
+    border: 2px solid #E4E4E4;
+    border-radius: 2px;
+    height: 30px;
+    margin-left: 3px;
+  }
+
+  .dataTables_length select {
+    border: 1px solid #E4E4E4;
+    height: 30px;
+    margin-left: 3px;
+  }
+
+  .table th {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    /*height: 50px !important;*/
+  }
+
+  .table td {
+    padding: 8px 13px !important;
+  }
+</style>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+  <loading object={{model.results}}></loading>
+  <!-- <page-title title="Users"></page-title> -->
+  <div class="pagemargin">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color top_shadow" ng-show="model.results !== undefined"
+      style="padding-left:0px;">
+      <!-- <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget" style="padding-left:0px;">
+              <form class="navbar-form" style="padding-left:0px;">
+                  <div class="form-group width100" style="width:100%">
+                      <input class="form-control" type="text" ng-model="searchKeyword" ng-model-options="{debounce: 1000}" id="searchKeyword" placeholder="Enter keyword" ng-change="getSearchResults()" style="width : 85%">
+                      <button class="btn btn-search" type="submit" style="top: 4px;">
+                         <i class="fa fa-search"></i>
+                      </button>
+                  </div>
+              </form>
+          </div> -->
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 pull-right" ng-class="{'padding_top15px' : disable_action_btn}">
+        <div class="action-bar pull-right" ng-class="{'table-button' : !disable_action_btn}">
+          <!-- <span class="count">{{ model.results.length + " of " + model.count}}</span>
+                  <span class="count-text" ng-if="model.count === 1 || model.count === 0"> {{title.singular}}</span>
+                  <span class="count-text" ng-if="model.count > 1"> {{title.plural}}</span> -->
+          <button class="btn btn-primary" type="button" ng-click="ctrl.add()" style="margin-left:20px;"> Add
+            Configuration</button>
+        </div>
+      </div>
+    </div>
+    <!-- <model-results-admin></model-results-admin> -->
+    <div class="page_wrapper" style="float:left">
+      <section ng-if="model.results" id="no-more-tables" class="margintop20">
+        <table class="example table  table-condensed cf"  ng-if="model.results.length > 0">
+          <thead class="cf">
+            <tr>
+              <th>Organization</th>
+              <th>Switch</th>
+              <th>Firewall</th>
+              <th>Load Balancer</th>
+              <th>Hypervisor</th>
+              <th>Bare Metal</th>
+              <th>MAC Devices</th>
+              <th>Virtual Machines</th>
+              <th>Storage</th>
+              <th>Databases</th>
+              <th>PDU</th>
+              <th class="numeric">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="result in model.results">
+              <td>{{result.org.name}}</td>
+              <td>{{result.switch | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.firewall | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.load_balancer | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.hypervisor | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.baremetal | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.mac_device | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.vm | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.storage | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.database | orgMonitoringConfigToolNameFilter}}</td>
+              <td>{{result.pdu | orgMonitoringConfigToolNameFilter}}</td>
+              <td>
+                <div class="action-icons">
+                  <a class="fa fa-pencil blue-text" tooltip-class="customClass" uib-tooltip="Edit" ng-click="selection.selected = result; selection.index = $index;ctrl.edit(result, $index)"></a>
+                  <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete" ng-click="selection.selected = result; selection.index = $index;ctrl.dailog_box(result, $index)"></a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div ng-if="model.results.length === 0" class="content-wrapper">
+          <no-records-found message="No {{title}} to display"></no-records-found>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="row mb-4">
+    <label class="col-1 form-col-label text-muted text-right">Category :</label>
+    <div class="col d-flex">
+        <div class="mr-2" *ngFor="let category of categories" style="cursor: pointer;" (click)="manageCategory(category)">
+            <span>
+                <i *ngIf="!category.isSelected" class="far fa-square pt-1 fa-lg text-muted"></i>
+                <i *ngIf="category.isSelected" class="fas fa-check-square pt-1 fa-lg text-primary"></i>
+            </span>
+            <span class="ml-1 text-muted">{{category.name}}</span>
+        </div>
+    </div>
+</div>
+
+<ng-container [ngSwitch]="activeForm">
+    <usff-compute *ngSwitchCase="'Compute'"></usff-compute>
+    <usff-os-config *ngSwitchCase="'OS Config'"></usff-os-config>
+    <usff-storage *ngSwitchCase="'Storage'"></usff-storage>
+</ng-container>

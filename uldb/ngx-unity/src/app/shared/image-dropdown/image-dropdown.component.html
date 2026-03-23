@@ -1,0 +1,40 @@
+<div class="dropdown" *ngIf="imageWithText">
+  <button class="dropbtn form-control" (click)="toggleDrop($event)">
+      <ng-container *ngIf="selectedValue?.text;else staticVal">
+          <img src="{{selectedValue?.image}}" width="20" height="15">
+          <span>{{selectedValue?.text}}</span>
+      </ng-container>
+      <ng-template #staticVal>
+          Select {{defaultLabel}}
+      </ng-template>
+      <i class="fas fa-chevron-down fa-xs arrow-down-icon"></i>
+  </button>
+  <div [ngClass]="clickFlag ? 'dropdownClick' : 'dropdown-content'">
+      <span class="img-container" *ngFor="let val of values | keyvalue">
+          <div (click)="selectedDropValue(val.value)">
+              <img src="{{val.value.image}}" width="20" height="15">
+              <span>{{val.value.type}}</span>
+          </div>
+      </span>
+  </div>
+</div>
+
+<div class="dropdown" *ngIf="onlyImage">
+    <button class="dropbtn form-control" (click)="toggleDrop($event)">
+        <ng-container *ngIf="selectedValue?.text;else staticVal">
+            <img src="{{selectedValue?.image}}" width="100" height="25">
+        </ng-container>
+        <ng-template #staticVal>
+            Select {{defaultLabel}}
+        </ng-template>
+        <i class="fas fa-chevron-down fa-xs arrow-down-icon"></i>
+    </button>
+    <div [ngClass]="clickFlag ? 'dropdownClickonlyimg' : 'dropdown-content'">
+        <span class="img-container-onlyimg" *ngFor="let val of values">
+            <div (click)="selectedDropValue(val)">
+                <img src="{{val.image}}" width="100" height="25">
+            </div>
+            
+        </span>
+    </div>
+  </div>

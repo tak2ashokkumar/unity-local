@@ -1,0 +1,133 @@
+<form role="form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	    <div class="form-group">
+            <label for="blockName">Image Id *</label>
+            <select ng-if="rows.image_id == ''" ng-options="row.id as row.name for row in rows.image_id" class="form-control" ng-model="obj.image_id" disabled>
+            <option selected="selected" value="">-- no images present --</option>
+            </select>
+            <select ng-if="rows.image_id != ''" ng-options="row.id as row.name for row in rows.image_id" class="form-control" ng-model="obj.image_id">
+                <option selected="selected" value="">-- choose an image --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['image_iderr']">{{ obj['image_idMsg'] }}</label>
+        </div>
+
+        <div class="form-group">
+            <label for="blockName">Instance Type *</label>
+            <select ng-options="row for row in rows.instance_type" class="form-control" ng-model="obj.instance_type">
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['instance_typeerr']">{{ obj['instance_typeMsg'] }}</label>
+        </div>
+        <div class="form-group ng-scope">
+            <label for="blockName">Number of Instances *</label>
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="number" min="1" required="" value="" ng-model="obj.max_count">
+            <label class="errormsg" ng-if="obj['max_counterr']">{{ obj['max_countMsg'] }}</label>
+        </div>
+
+        <div class="form-group ng-scope">
+            <label for="blockName">Availability Zone *</label>
+            <select ng-options="row.Name as row.Name for row in rows.data.data" class="form-control" ng-model="obj.availability_zone">
+                <option selected="selected" value="">-- select availability zone --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['availability_zoneerr']">{{ obj['availability_zoneMsg'] }}</label>
+        </div>
+
+        <div class="form-group" ng-show="obj.availability_zone && row.Name == obj.availability_zone"
+         ng-repeat="row in rows.data.data">
+            <label for="blockName">Subnet Id *</label>
+            <select ng-options="option.SubnetId as option.SubnetId for option in row.Subnet" class="form-control" ng-model="obj.subnet_id">
+                <option selected="selected" value="">-- select subnet id --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['subnet_iderr']">{{ obj['subnet_idMsg'] }}</label>
+        </div>
+
+        <div class="form-group ng-scope">
+            <label for="blockName">Shutdown Behavior *</label>
+            <select class="form-control" ng-model="obj.shutdown_behavior">
+                <option selected="selected" value="">-- select shutdown behavior --</option>
+                <option label="Stop" value="stop">Stop</option>
+                <option label="Terminate" value="terminate">Terminate</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['shutdown_behaviorerr']">{{ obj['shutdown_behaviorMsg'] }}</label>
+        </div>
+
+        <div class="form-group ng-scope">
+            <label for="blockName">Key Pair behaviour *</label>
+            <select ng-change="load_keypair(obj.keypair_behavior)" class="form-control" ng-model="obj.keypair_behavior">
+                <option selected="selected" value="">-- select keypair behaviour --</option>
+                <option selected="selected" value="a">Proceed without a key pair (Use credentials from above Selected Ami image)</option>
+                <option  value="b">Choose an existing key pair</option>
+                <!--<option  value="c">Create a new key pair</option>-->
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['keypair_behaviorMsg']">{{ obj['keypair_behaviorMsg'] }}</label>
+        </div>
+
+        <div class="form-group ng-scope"  ng-show="keypair_list_show">
+            <label for="blockName">Select Key Pair</label>
+            <select ng-options="option.KeyName for option in keypairlist" class="form-control" ng-model="obj.keypairname">
+                <option selected="selected" value="">-- Select key pair --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['keypairnameMsg']">{{ obj['keypairnameMsg'] }}</label>
+        </div>
+
+        <div class="form-group ng-scope">
+            <label for="blockName">Storage size (should be more than 3, in GiB) *</label>
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="number" min="4" required="" value="" ng-model="obj.storage_size">
+            <label class="errormsg" ng-if="obj['storage_sizeerr']">{{ obj['storage_sizeMsg'] }}</label>
+        </div>
+
+        <div class="form-group">
+            <label for="blockName">Storage Type *</label>
+            <select ng-options="row.name as row.description for row in rows.storage_type" class="form-control" ng-model="obj.storage_type">
+                <option selected="selected" value="">-- select storage type --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['storage_typeerr']">{{ obj['storage_typeMsg'] }}</label>
+        </div>
+
+        <div class="form-group">
+            <label for="blockName">Delete on termination</label>
+            <input type="checkbox" ng-model="obj.dot"><br>
+            </input>
+        </div>
+
+        <div class="form-group">
+            <label for="blockName">Security group* </label>
+            <select ng-options="row.group_id as row.group_name for row in rows.security_group" class="form-control" ng-model="obj.security_group">
+                <option selected="selected" value="">-- select security group --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['security_grouperr']">{{ obj['security_groupMsg'] }}</label>
+        </div>
+
+        <div class="form-group">
+            <label for="blockName">Tags key</label>
+            <input type="text" class="form-control" ng-model="obj.tags_key">
+            </input>
+            <label class="errormsg" ng-if="obj['tags_keyerr']">{{ obj['tags_keyMsg'] }}</label>
+        </div>
+
+        <div class="form-group">
+            <label for="blockName">Tags value</label>
+            <input type="text" class="form-control" ng-model="obj.tags_value">
+            </input>
+            <label class="errormsg" ng-if="obj['tags_valueerr']">{{ obj['tags_valueMsg'] }}</label>
+        </div>
+
+        <div class="form-group">
+            <label for="blockName">Tags applicable to?</label>
+            <select ng-options="row for row in rows.tags_applicability" class="form-control" ng-model="obj.tags_applicability">
+                <option selected="selected" value="">-- select tag applicability --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['tags_applicabilityerr']">{{ obj['tags_applicabilityMsg'] }}</label>
+        </div>
+
+    </div>
+</form>

@@ -1,0 +1,306 @@
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-10">
+            <p>For urgent support requests, please contact us via :</p>
+          </div>
+          <div class="col-2">
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+            <a class="d-table text-warning pull-right ml-2" (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>Go
+              Back</a>
+          </div>
+          <div class="col-4">
+            <i class="far fa-envelope fa-lg text-success">&nbsp;</i>Email&nbsp;:&nbsp;<a
+              href="mailto:support@unityonecloud.com" class="text-decoration-none">support@unityonecloud.com</a>
+          </div>
+          <div class="col-8">
+            <i class="fa fa-phone fa-lg text-success">&nbsp;</i>Phone&nbsp;:&nbsp;<span
+              class="pr-2 border-right">1-415-349-2102</span>
+            <span class="pl-2">Toll-free&nbsp;:&nbsp;1-888-853-7733</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header bg-transparent ml-0 card-title font-lg">
+        <div class="row">
+          <div class="col-12 font-sm mb-1">
+            <span *ngIf="details.ticketType">
+              <span class="text-primary fa-sm"> <i class="fas fa-angle-double-left"></i> </span>
+              <span class="mx-2 text-muted font-weight-bold">{{details.ticketType}}</span>
+              <span class="text-primary fa-sm"> <i class="fas fa-angle-double-right"></i> </span>
+            </span>
+            <span *ngIf="details.ticketNumber" class="ml-4" tooltip="Ticket Number">
+              <span class="text-primary"> <i class="fas fa-ticket-alt"></i> </span>
+              <span class="ml-2 text-muted">{{details.ticketNumber}}</span>
+            </span>
+            <!-- <span *ngIf="details.assignedTo" class="ml-4" tooltip="Assigned to">
+              <span class="text-primary"> <i class="far fa-user"></i> </span>
+              <span class="ml-2 text-muted">{{details.assignedTo}}</span>
+            </span> -->
+            <span *ngIf="details.assignedTo" class="ml-4">
+              <span class="text-primary font-500 font-sm">Assigned to <i class="far fa-user"></i> : </span>
+              <span class="ml-1 text-muted font-500 font-sm">{{details.assignedTo}}</span>
+            </span>
+            <span *ngIf="details.assignedTo" class="ml-4">
+              <span class="text-primary font-500 font-sm">Created By <i class="far fa-user"></i> : </span>
+              <span class="ml-1 text-muted font-500 font-sm">{{details.createdBy}}</span>
+            </span>
+            <span *ngIf="details.reportedBy" class="ml-4">
+              <span class="text-primary font-500 font-sm">Reported By <i class="far fa-user"></i> : </span>
+              <span class="ml-1 text-muted font-500 font-sm">{{details.reportedBy}}</span>
+            </span>
+            <span class="float-right text-muted">{{details.openedAt}}</span>
+          </div>
+          <div class="col-12">
+            <h4 class="card-title d-inline font-lg mb-0"> {{details.title}}
+            </h4>
+          </div>
+        </div>
+        <div class="d-flex mt-4 justify-content-between align-items-center">
+          <div>
+            <span class="text-primary font-500 font-sm">Status :</span>
+            <span class="ml-2 text-muted font-500 font-sm">{{details.status}}</span>
+          </div>
+          <div>
+            <span class="text-primary font-500 font-sm">Status Reason :</span>
+            <span class="ml-1 text-muted font-500 font-sm">{{details.statusReason}}</span>
+          </div>
+          <div>
+            <span class="text-primary font-500 font-sm">Priority :</span>
+            <span class="ml-2 text-muted font-500 font-sm">{{details.priority}}</span>
+          </div>
+          <div *ngIf="transitions.length">
+            <div class="col-3">
+              <form class="form-inline">
+                <div class="form-group row">
+                  <label class="text-primary font-500 font-sm mr-2" for="priority">Transitions :</label>
+                  <select class="form-control form-control-sm" id="priority" name="priority"
+                    [(ngModel)]="details.transitionId" (change)="changeTransition($event.target.value)"
+                    [disabled]="!isAuthorised" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+                    elementType="formelem">
+                    <option [value]="null">Select Transition</option>
+                    <option [value]="transition.id" *ngFor="let transition of transitions">{{transition.name}}</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- <div class="col-3">
+              <button class="btn btn-sm btn-success float-right ml-1" type="button" (click)="resolve()" *ngIf="details.status=='Active'">Resolve</button>
+              <button class="btn btn-sm btn-danger float-right" type="button" (click)="cancel()" *ngIf="details.status=='Active'">Cancel</button>
+              <button class="btn btn-sm btn-warning float-right" type="button" (click)="reactivate()" *ngIf="details.status!='Active'">Reactivate</button>
+            </div> -->
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" [innerHTML]="details.description" style="min-height:20vh;" accessControl
+            moduleName="AIML Event Management" accessType="Manage AIML Event Management" elementType="div"></div>
+          <div class="col-12 mt-2">
+            <a *ngFor="let attachment of details.attachments" [href]="attachment.downloadLink" target="_blank"
+              class="btn btn-primary mb-1 mr-1 btn-sm" accessControl moduleName="Ticket Management"
+              accessType="Manage Tickets" elementType="btn">{{attachment.fileName}}&nbsp;<i
+                class="fa fa-download"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-transparent">
+        <strong>Comments <span *ngIf="details.comments.length">- ({{details.comments.length}})</span></strong>
+        <button type="button" class="btn btn-sm btn-outline-primary float-right border" (click)="reply()" accessControl
+          moduleName="Ticket Management" accessType="Manage Tickets" elementType="btn">
+          <i class="fas fa-reply mr-1"></i> Reply
+        </button>
+      </div>
+      <div class="card-body py-2">
+        <div class="row border-bottom" *ngIf="commentForm">
+          <div class="col-12 mb-2">
+            <form [formGroup]="commentForm">
+              <div class="form-group">
+                <label for="comments">Post New Comment<em>*</em></label>
+                <textarea class="form-control" id="comments" name="comments" rows="5" formControlName="comments"
+                  [ngClass]="{'is-invalid' : formErrors.comments}" placeholder="Add your comment here"></textarea>
+                <div class="invalid-feedback" *ngIf="formErrors.comments">{{formErrors.comments}}</div>
+              </div>
+              <div class="form-group form-actions">
+                <button class="btn btn-sm btn-success float-right ml-1" type="button" (click)="onSubmit()">Post</button>
+                <button class="btn btn-sm btn-danger float-right" type="button"
+                  (click)="cancelComment()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="row" *ngFor="let comment of details.comments; let last = last"
+              [ngClass]="{'border-bottom':!last}">
+              <div class="col-12">
+                <strong class="card-title mb-0">{{comment.createdBy}} - </strong><small
+                  class="text-muted">{{comment.createdOn}}</small>
+              </div>
+              <div class="col-12 mb-2" [innerHTML]="comment.description"></div>
+            </div>
+            <div class="text-center text-muted py-5" *ngIf="details && !details.comments.length">No comments for this
+              ticket.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Change Priority
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cancelConfirm()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure to change the Ticket priority from <b>{{currentPriority}}</b> to <b>{{details.priority}}</b> ?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmChange()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="cancelConfirm()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmReactivate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Reactivate
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure to reactivate ticket?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmReactivateSubmit()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #resolveRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Resolve Ticket
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="resolveForm" [formGroup]="resolveForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-12">
+            <label class="form-col-form-label">Resolution Type<em>*</em></label>
+            <select id="resolution_type" class="form-control" formControlName="resolution_type"
+              [class.is-invalid]="resolveFormErrors.resolution_type">
+              <option value="" disabled>Select Type</option>
+              <option [value]="'Problem Solved'">Problem Solved</option>
+              <option [value]="'Information Provided'">Information Provided</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="resolveFormErrors.resolution_type">
+              {{resolveFormErrors.resolution_type}}</div>
+          </div>
+
+          <div class="form-group col-12">
+            <label class="form-col-form-label">Resolution<em>*</em></label>
+            <textarea id="resolution" class="form-control" type="text" formControlName="resolution"
+              [class.is-invalid]="resolveFormErrors.resolution"></textarea>
+            <div class="invalid-feedback" *ngIf="resolveFormErrors.resolution">{{resolveFormErrors.resolution}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onResolveSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #cancelRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Cancel Ticket
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="cancelForm" [formGroup]="cancelForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-12">
+            <label class="form-col-form-label">Status<em>*</em></label>
+            <select id="cancel_status" class="form-control" formControlName="cancel_status"
+              [class.is-invalid]="cancelFormErrors.cancel_status">
+              <option value="" disabled>Select Status</option>
+              <option [value]="'Canceled'">Canceled</option>
+              <option [value]="'Merged'">Merged</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="cancelFormErrors.cancel_status">
+              {{cancelFormErrors.cancel_status}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onCancelSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #transitionConfirmRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Change Transition
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cancelTransition()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure to change the Ticket transition ?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmTransition()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="cancelTransition()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

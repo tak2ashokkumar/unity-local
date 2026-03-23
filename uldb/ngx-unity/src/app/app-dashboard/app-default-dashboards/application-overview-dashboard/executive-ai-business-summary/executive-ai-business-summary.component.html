@@ -1,0 +1,101 @@
+<div class="card border-0 mb-0">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 border-bottom-0">
+        <div class="d-flex align-items-center justify-content-center">
+            <ul class="nav nav-tabs tabs-level1 custom-nav-container">
+                <li class="nav-item rounded-top tabs-level1-item">
+                    <a class="nav-link tabs-level1-link border-0 text-success py-0">Executive AI Business Summary</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center justify-content-end w-16">
+            <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
+                [tooltip]="'Go Back'" container="body">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+    </div>
+</div>
+
+
+<ng-container
+    *ngIf="executiveAIBusinessSummaryViewData && (executiveAIBusinessSummaryViewData?.extendedInsights?.length || executiveAIBusinessSummaryViewData?.topKeyInsights?.length); else elseBlock">
+    <ng-container *ngTemplateOutlet="topKeyInsights"></ng-container>
+    <ng-container *ngTemplateOutlet="extendedInsights"></ng-container>
+</ng-container>
+
+
+<ng-template #topKeyInsights>
+    <div class="row mt-2 mx-0">
+        <ng-container *ngIf="executiveAIBusinessSummaryViewData?.topKeyInsights?.length">
+            <div class="col-3"
+                *ngFor="let topInsight of executiveAIBusinessSummaryViewData?.topKeyInsights; let last= last;"
+                [ngClass]="{'pr-0':!last}">
+                <div class="card equalize-card round-edge">
+                    <div class="card-body py-2">
+                        <span class="font-lg font-500 text-primary d-inline-block mb-1">{{topInsight.title}}</span>
+                        <p class="font-sm-xs text-muted mb-1">{{topInsight.summary}}</p>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="!executiveAIBusinessSummaryViewData?.topKeyInsights?.length">
+            <div class="col-12">
+                <div class="card round-edge equalize-card round-edge">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <p class="text-muted py-4">No Top Key Insights found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+    </div>
+</ng-template>
+
+<ng-template #extendedInsights>
+    <div class="row my-2 mx-0">
+        <ng-container *ngIf="executiveAIBusinessSummaryViewData?.extendedInsights?.length">
+            <div class="col-6 mt-2"
+                *ngFor="let extendedInsight of executiveAIBusinessSummaryViewData?.extendedInsights; let i = index; let isEven=even; let last= last;"
+                [ngClass]="{'pr-0':isEven}">
+                <div class="card equalize-card round-edge">
+                    <div class="card-header bg-transparent py-2 pl-3 d-flex justify-content-between align-items-center">
+                        <span class="font-lg font-500">{{extendedInsight.title}}</span>
+                        <span class="badge badge-pill p-2 text-capitalize" [ngClass]="extendedInsight.statusClass">
+                            {{extendedInsight.status}}
+                        </span>
+                    </div>
+                    <div class="card-body pt-2">
+                        <p class="text-muted mb-1 font-500">AI Summary</p>
+                        <p>{{extendedInsight.aiSummary}}</p>
+                        <p class="text-muted mb-1 font-500">Executive Watchpoint</p>
+                        <markdown [data]="extendedInsight.executiveWatchpoint"></markdown>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="col-12 mt-2" *ngIf="!executiveAIBusinessSummaryViewData?.extendedInsights?.length">
+            <div class="card equalize-card round-edge">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <p class="text-muted py-4">No Extended Insights found.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #elseBlock>
+    <div class="row mx-0 my-2">
+        <div class="col">
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 240px;">
+                No Executive AI Business Summary available.
+            </div>
+        </div>
+    </div>
+</ng-template>

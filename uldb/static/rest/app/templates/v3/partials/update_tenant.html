@@ -1,0 +1,41 @@
+<form class="form-horizontal">
+    <div class="form-group" ng-repeat="row in rows2">
+        <div ng-if="row.required">
+            <span ng-if= "row.type != 'hidden'">
+                <label for="blockName" class="col-sm-3 control-label">
+                    {{ row.description }}
+                    <span ng-if="row.required">*</span>
+                </label>
+            </span>
+            <span ng-if= "row.type == 'checkbox'">
+                <input type="{{ row.type }}" ng-model="obj[row.name]" value="" id="tenant_enabled" checked style="margin: 4px 0 0 15px;" ng-checked="{{obj.enabled}}">
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </span>
+            <div class="col-sm-9" ng-if= "row.type == 'text'">
+                <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+        </div>
+        <div ng-if="!row.required">
+
+            <div ng-if="row.depends == undefined">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">
+                        {{ row.description }}
+                        <span ng-if="row.required">*</span>
+                    </label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'textarea')">
+                    <textarea type="{{ row.type }}" class="form-control" maxlength="256" ng-model="obj[row.name]" rows="4" value="{{row.value}}" required></textarea>
+                </div>
+                <div class="col-sm-9" ng-if="(row.type == 'checkbox') ">
+                    <input type="{{ row.type }}" ng-model="obj[row.name]" value="{{row.value}}" required ng-checked="{{obj.enabled}}">
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

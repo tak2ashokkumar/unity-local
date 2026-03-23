@@ -1,0 +1,11 @@
+td > div {
+  width: max-content;
+}
+
+.table th:last-child,
+.table td:last-child {
+  width: 50px;
+  position: sticky;
+  right: 0;
+  background-color: #e4e8eb;
+}

@@ -1,0 +1,136 @@
+<div class="row">
+
+  <div class="col-xs-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Component Summary
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-xs-4">
+            <div id="mynetwork" style="height:600px;"></div>
+          </div>
+          <div class="col-xs-8">
+            <svg style="height: 600px">
+              <text x="20" y="60" font-family="Roboto" font-size="18px" fill="#555">Switches</text>
+              <text x="20" y="184" font-family="Roboto,Open Sans,Arial,sans-serif;" font-size="18px" fill="#555">Firewalls</text>
+              <text x="20" y="308" font-family="Roboto,Open Sans,Arial,sans-serif;" font-size="18px" fill="#555">Load Balancers</text>
+              <text x="20" y="432" font-family="Roboto,Open Sans,Arial,sans-serif;" font-size="18px" fill="#555">Servers/Hypervisors
+              </text>
+              <text x="20" y="556" font-family="Roboto,Open Sans,Arial,sans-serif;" font-size="18px" fill="#555">VMs</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Management
+      </div>
+      <div class="panel-body">
+        <table class="table table-condensed" ng-if="proxy_link(cloud)">
+          <thead>
+          <tr>
+            <td class="col-xs-4">Link</td>
+            <td class="col-xs-7"><a href="{{ proxy_link(cloud).proxy_url }}">{{ proxy_link(cloud).proxy_url }}</a></td>
+            <td>
+              <div class="btn-group">
+                <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu action-button">
+                  <li><a href ng-click="ctrl.edit(result, $index)">Disassociate Management Interface</a></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Cloud Information
+      </div>
+      <div class="panel-body">
+        <table class="table table-condensed">
+          <thead>
+          <tr>
+            <td>Name</td>
+            <td>{{ cloud.name }}</td>
+          </tr>
+          <tr>
+            <td>Datacenter</td>
+            <td>{{ cloud.datacenter.name }}</td>
+          </tr>
+          <tr>
+            <td>Customer</td>
+            <td>{{ cloud.customer.name }}</td>
+          </tr>
+          <tr>
+            <td>Platform</td>
+            <td>{{ cloud.platform_type }}</td>
+          </tr>
+          <tr>
+            <td>UUID</td>
+            <td>{{ cloud.uuid }}</td>
+          </tr>
+          <tr>
+            <td>Created</td>
+            <td>{{ cloud.created_at | date:'medium' }}</td>
+          </tr>
+          <tr>
+            <td>Updated</td>
+            <td>{{ cloud.updated_at | date:'medium' }}</td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="col-xs-8">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        System Health
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-xs-6">
+            <h4>Hosts</h4>
+            <donut data="host_data"></donut>
+          </div>
+          <div class="col-xs-6">
+            <h4>Services</h4>
+            <donut data="service_data"></donut>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Network Utilization
+      </div>
+      <div class="panel-body">
+        <div ng-repeat="port in cloud.upstream_providers">
+          <h3>{{ port.switch }} {{ port.interface_name }}</h3>
+          <div class="row">
+            <div class="col-xs-9">
+              <observium-graph port="port" val="intervals[port.$$hashKey]" chart-type="'lineChart'" ticks="3"></observium-graph>
+            </div>
+            <div class="col-xs-3">
+              <observium-interval-picker interval="intervals[port.$$hashKey]"></observium-interval-picker>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>

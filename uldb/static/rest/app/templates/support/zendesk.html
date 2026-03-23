@@ -1,0 +1,182 @@
+<alerts></alerts>
+
+<style type="text/css">
+  md-card {
+    box-shadow: 0 1px 10px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
+  }
+  md-card md-card-title {
+    padding : 16px;
+  }
+</style>
+
+<div layout="column">
+  <md-card>
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline">Zendesk Linked Organizations</span>
+      </md-card-title-text>
+    </md-card-title>
+    <md-card-content>
+      <div>
+        <img ng-if="!zendeskOrganizations" src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+
+
+        <table ng-if="zendeskOrganizations.length != 0" class="table">
+          <thead>
+          <tr>
+            <th>Organization</th>
+            <!--<th>Link UUID</th>-->
+            <th>Zendesk ID</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="zendeskOrg in zendeskOrganizations">
+            <td><a href="#/org/{{ zendeskOrg.organization.id }}/">{{ zendeskOrg.organization.name }}</a></td>
+            <!--<td>{{ zendeskOrg.uuid }}</td>-->
+            <td>{{ zendeskOrg.remote_id }}</td>
+            <td>
+              <i class="fa fa-pencil" ng-click=edit_linking(zendeskOrg)></i>
+              <i class="fa fa-trash" ng-click=show_delete_confirmation(zendeskOrg)></i>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <h3 ng-if="zendeskOrganizations && zendeskOrganizations.length == 0" class="align-center">No records to display</h3>
+      </div>
+
+      <button class="btn btn-info" ng-click="linkOrg()">Link an Organization to Zendesk</button>
+    </md-card-content>
+  </md-card>
+</div>
+
+
+<div ng-if="selected.selection !== null">
+  <span ng-if="selected.selection.users.length != 0">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>user</th>
+        <th>email</th>
+        <th>remote ID (or None)</th>
+        <th>link/unlink</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="user in selected.selection.users">
+        <td>{{ user.first_name }} {{ user.last_name }}</td>
+        <td>{{ user.id }}</td>
+        <td>{{ user.ticket_user !== null? user.ticket_user.remote_id: 'None'}}</td>
+        <td>
+          <div ng-if="user.ticket_user == null"><button class="btn btn-info" ng-click="linkUser(user)">Link User</button></div>
+          <div ng-if="user.ticket_user !== null">
+            <button class="btn btn-danger" ng-click="unlinkUser(user)" confirm>Unlink User</button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </span>
+  <span ng-if="selected.selection.users.length == 0">
+    <h3 class="align-center">No records to display</h3>
+  </span>
+
+</div>
+
+
+<script type="text/ng-template" id="ticketModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Link an Organization to a Zendesk account</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="org" class="col-sm-2 control-label">
+          Organization
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control"
+                 ng-model="org"
+                 placeholder="Type the name of an Organization to search..."
+                 uib-typeahead="org as org.name for org in getOrgs($viewValue)">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="zendesk_id" class="col-sm-2 control-label">
+          Zendesk ID
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control"
+                 ng-model="zendesk_id"
+                 placeholder="Enter the Zendesk ID (the number in unitedlayer.zendesk.com/agent/organizations/785833158/tickets)">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="save(org, zendesk_id)">
+      Save
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Cancel.
+    </button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="linkUserModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Link {{ selectedUser.user.id }} to Zendesk</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="org" class="col-sm-2 control-label">
+          Zendesk User ID
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text"
+                 class="form-control"
+                 ng-model="zendeskUserId"
+                 placeholder="Leave blank to create...">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="linkZendeskUser(zendeskUserId)">
+      Link {{ selectedUser.user.id }} to {{ zendeskUserId }}
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Never mind, I made a mistake.
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="delete_confirmation_modal.html">
+  <div class="modal-content">
+      <div class="modal-header" style="text-align: center;">
+          <h4 class="modal-title">Confirm Delete</h4>
+      </div>
+    <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+      <div class="modal-body" style="text-align: center;">
+          {{delete_confirmation_msg}}
+      </div>
+      <div class="modal-footer modal-buttons">
+          <div class="modal-footer modal-buttons"  style="text-align: center;">
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                Cancel
+              </button>
+              <button type="button" class="btn btn-default" ng-click="delete_organization()">
+                Confirm
+              </button>
+          </div>
+      </div>
+    </form>
+  </div>
+</script>

@@ -1,0 +1,61 @@
+<ng-template #targetDeviceRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add Target Device
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="targetDeviceModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <form *ngIf="targetDeviceForm" [formGroup]="targetDeviceForm">
+                <div class="form-group row">
+                    <div class="invalid-credentials text-center" *ngIf="nonFieldErr">
+                        {{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-12 form-group">
+                        <label for="device_type" class="form-col-form-label">Device Type<em>*</em></label>
+                        <select id="device_type" class="form-control form-control-sm" formControlName="device_type"
+                            [ngClass]="{'is-invalid' : targetDeviceFormErrors.device_type}">
+                            <option [value]="''">Select Device Type</option>
+                            <option *ngFor="let deviceType of deviceTypes" [value]="deviceType.value">
+                                {{deviceType.label}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="targetDeviceFormErrors.device_type">
+                            {{targetDeviceFormErrors.device_type}}
+                        </div>
+                    </div>
+                    <div class="col-12 form-group">
+                        <label for="remote_device" class="form-col-form-label">Remote Device<em>*</em></label>
+                        <select id="remote_device" class="form-control form-control-sm" formControlName="remote_device"
+                            [ngClass]="{'is-invalid' : targetDeviceFormErrors.remote_device}">
+                            <option [ngValue]="''">Select Remote Device</option>
+                            <option *ngFor="let device of devices" [ngValue]="device">{{device.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="targetDeviceFormErrors.remote_device">
+                            {{targetDeviceFormErrors.remote_device}}
+                        </div>
+                    </div>
+                    <div class="col-12 form-group">
+                        <label for="remote_interface" class="form-col-form-label">Remote Interface<em>*</em></label>
+                        <select id="remote_interface" class="form-control form-control-sm"
+                            formControlName="remote_interface"
+                            [ngClass]="{'is-invalid' : targetDeviceFormErrors.remote_interface}">
+                            <option [ngValue]="''">Select Remote Interface</option>
+                            <option *ngFor="let inf of interfaceDetails" [ngValue]="inf">{{inf.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="targetDeviceFormErrors.remote_interface">
+                            {{targetDeviceFormErrors.remote_interface}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="targetDeviceModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

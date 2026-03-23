@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-6">
+    <div class="row">
+      <div class="col">
+        <vms-overview-details [deviceId]="deviceId" [deviceType]="deviceType"></vms-overview-details>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <vms-overview-ports [deviceId]="deviceId" [deviceType]="deviceType"></vms-overview-ports>
+      </div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="row">
+      <div class="col">
+        <vms-overview-processors [deviceId]="deviceId" [deviceType]="deviceType"></vms-overview-processors>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <vms-overview-memory [deviceId]="deviceId" [deviceType]="deviceType"></vms-overview-memory>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" *ngIf="deviceStatus">
+        <device-status [input]="deviceStatus"></device-status>
+      </div>
+    </div>
+    <div class="row" *ngFor="let sensor of sensors">
+      <div class="col">
+        <device-sensor [input]="sensor"></device-sensor>
+      </div>
+    </div>
+  </div>
+</div>

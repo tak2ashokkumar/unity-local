@@ -1,0 +1,70 @@
+<div class="container-fluid mt-4">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+            <span class="font-lg font-500">Custom Integration</span>
+          </div>
+          <div class="card-body">
+            <!-- <div class="row">
+              <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                <div class="d-flex flex-column align-items-center step">
+                  <span class="badge icon-wrap pointer-link" [class.active]="true"
+                    (click)="manageActiveForm()">
+                    <span class="fas fa-cog font-xl"></span>
+                  </span>
+                  <label class="mt-1 font-md">Add Credentials</label>
+                </div>
+              </div>
+            </div> -->
+            <div class="row mt-4">
+              <div class="col-10 offset-1">
+                <ng-container *ngTemplateOutlet="credentialFormRef"></ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #credentialFormRef>
+    <div class="card border-0">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <form *ngIf="credentialForm" [formGroup]="credentialForm">
+              <div class="form-group" *ngIf="nonFieldErr">
+                <div class="invalid-credentials">{{nonFieldErr}}</div>
+              </div>
+              <div class="row">
+                <div class="col-6 form-group">
+                  <label for="name" class="form-col-form-label">Account Name<em>*</em></label>
+                  <input id="name" class="form-control" type="text" formControlName="name"
+                    placeholder="Enter Account Name" [class.is-invalid]="credentialFormErrors.name">
+                  <div class="invalid-feedback" *ngIf="credentialFormErrors.name">
+                    {{credentialFormErrors.name}}</div>
+                </div>
+              </div>
+              <div class="row form-group">
+                <div class="col d-flex align-items-center justify-content-start">
+                  <div class="w-20">
+                    <input id="ingest_event" class="ut-checkbox" type="checkbox" formControlName="ingest_event">
+                    <label for="ingest_event" class="primary mb-0">Event Ingestion</label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <usi-event-ingestion-crud [paramList]="paramList" [instance]="instance"
+          [eventIngestionCheck]="credentialForm.get('ingest_event').value" [eventAttribute]="'Custom'"
+          (formUpdate)="onFormUpdate($event)"></usi-event-ingestion-crud>
+      </div>
+      <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+        <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+        <button class="btn btn-success ml-3" type="button" (click)="onSubmit()">Submit</button>
+      </div>
+    </div>
+  </ng-template>

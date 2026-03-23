@@ -1,0 +1,28 @@
+<script type="text/ng-template" id="devicedetailstemplate.html">
+    <div class="row">
+        <table class="table"  ng-show="device_details.device_data">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div>Uptime</div>
+                    </th>
+                    <td class="col-md-8 table_no_top_border">
+                        <div ng-if="device_details.device_data.status == 1">{{device_details.device_data.uptime | unityObserviumTime}}</div>
+                        <div ng-if="device_details.device_data.status == 0">Down {{device_details.device_data.uptime | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4">
+                        <div>Last reboot</div>
+                    </th>
+                    <td class="col-md-8">
+                        <div>{{device_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="angular.isDefined(device_details) && (device_details === null)" style="padding : 20px">
+            <p>{{ $root.monitoring_not_enabled_msg }}</p>
+        </div>
+    </div>
+</script>

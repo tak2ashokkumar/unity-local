@@ -1,0 +1,11 @@
+@import "variables";
+
+.nav-item {
+  border-bottom: 1px solid $secondary !important;
+  &.active {
+    border-bottom: 1px solid $white !important;
+    border-top: 1px solid $secondary !important;
+    border-right: 1px solid $secondary !important;
+    border-left: 1px solid $secondary !important;
+  }
+}

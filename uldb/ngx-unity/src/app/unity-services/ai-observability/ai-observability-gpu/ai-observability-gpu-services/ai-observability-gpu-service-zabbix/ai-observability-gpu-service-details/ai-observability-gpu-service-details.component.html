@@ -1,0 +1,149 @@
+<div class="row">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card rounded-0">
+                <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span> Details</span>
+                    </div>
+                    <div class="w-25">
+                        <!-- <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1"
+                            (click)="manageDetailsForm()" [tooltip]="'Edit'" container="body" accessControl
+                            moduleName="Monitoring" accessType="Manage Monitoring" elementType="actionbtn"></button> -->
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row text-right">
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="name" class="col-3 h-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="detailFormErrors.name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                        {{detailFormErrors.name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="service-type" class="col-3 h-form-label">Service Type</label>
+                                <div class="col-9">
+                                    <input id="service-type" class="form-control" type="text"
+                                        formControlName="service_type"
+                                        [class.is-invalid]="detailFormErrors.service_type">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.service_type">
+                                        {{detailFormErrors.service_type}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="gpu-uuid" class="col-3 h-form-label">GPU UUID</label>
+                                <div class="col-9">
+                                    <input id="gpu-uuid" class="form-control" type="text" formControlName="gpu_uuid"
+                                        [class.is-invalid]="detailFormErrors.gpu_uuid">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.gpu_uuid">
+                                        {{detailFormErrors.gpu_uuid}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="gpu-name" class="col-3 h-form-label">GPU Name</label>
+                                <div class="col-9">
+                                    <input id="gpu-name" class="form-control" type="text" formControlName="gpu_name"
+                                        [class.is-invalid]="detailFormErrors.gpu_name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.gpu_name">
+                                        {{detailFormErrors.gpu_name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="gpu-utilization" class="col-3 h-form-label">GPU Utilization</label>
+                                <div class="col-9">
+                                    <input id="gpu-utilization" class="form-control" type="text" formControlName="gpu_utilization"
+                                        [class.is-invalid]="detailFormErrors.gpu_utilization">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.gpu_utilization">
+                                        {{detailFormErrors.gpu_utilization}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="memory-usage" class="col-3 h-form-label">Memory Used</label>
+                                <div class="col-9">
+                                    <input id="memory-usage" class="form-control" type="text" formControlName="memory_usage"
+                                        [class.is-invalid]="detailFormErrors.memory_usage">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.memory_usage">
+                                        {{detailFormErrors.memory_usage}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="temperature" class="col-3 h-form-label">Temperature</label>
+                                <div class="col-9">
+                                    <input id="temperature" class="form-control" type="text" formControlName="temperature"
+                                        [class.is-invalid]="detailFormErrors.temperature">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.temperature">
+                                        {{detailFormErrors.temperature}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="power-draw" class="col-3 h-form-label">Power Draw</label>
+                                <div class="col-9">
+                                    <input id="power-draw" class="form-control" type="text" formControlName="power_draw"
+                                        [class.is-invalid]="detailFormErrors.power_draw">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.power_draw">
+                                        {{detailFormErrors.power_draw}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="power-limit" class="col-3 h-form-label">Power Limit</label>
+                                <div class="col-9">
+                                    <input id="power-limit" class="form-control" type="text" formControlName="power_limit"
+                                        [class.is-invalid]="detailFormErrors.power_limit">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.power_limit">
+                                        {{detailFormErrors.power_limit}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="created-at" class="col-3 h-form-label">Created At</label>
+                                <div class="col-9">
+                                    <input id="created-at" class="form-control" type="text" formControlName="created_at"
+                                        [class.is-invalid]="detailFormErrors.created_at" formControlNameDateFormatter>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.created_at">
+                                        {{detailFormErrors.created_at}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="updated-at" class="col-3 h-form-label">Updated At</label>
+                                <div class="col-9">
+                                    <input id="updated-at" class="form-control" type="text"
+                                        formControlName="updated_at"
+                                        [class.is-invalid]="detailFormErrors.updated_at" formControlNameDateFormatter>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.updated_at">
+                                        {{detailFormErrors.updated_at}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12 text-center">
+                            <button type="button" class="btn btn-primary" (click)="submitDetailForm()">Update</button>
+                            <button type="button" class="btn btn-danger ml-2" (click)="buildDetailForm()">Reset</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

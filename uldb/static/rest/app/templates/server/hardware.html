@@ -1,0 +1,148 @@
+<div class="row">
+  <div class="col-sm-6 col-md-6 col-lg-6">
+    <panelhalf heading="Motherboard Details">
+      <detailtable cols="mbcols" result="mbdet"></detailtable>
+    </panelhalf>
+
+  </div>
+
+  <div class="col-sm-6 col-md-6 col-lg-6">
+        <panelhalf heading="CPU Details">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Model</th>
+          <th>Serial number</th>
+          <th>Status</th>
+          <th>Is Allocated</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="cpu in cpudet">
+          <td>{{ cpu.cpu_type }}</td>
+          <td>{{ cpu.serialnumber }}</td>
+          <td>{{ cpu.status }}</td>
+          <td>{{ cpu.is_allocated }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+
+    <panelhalf heading="Memory Details">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Type</th>
+          <th>Serial number</th>
+          <th>Capacity</th>
+          <th>Measure Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="mem in memorydet">
+          <td>{{ mem.memory_type }}</td>
+          <td>{{ mem.serialnumber }}</td>
+          <td>{{ mem.mem_capacity }}</td>
+          <td>{{ mem.measuretype }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+
+     <div class="panel panel-primary">
+      <div class="panel-heading">Disk Details</div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Type</th>
+            <th>Serial number</th>
+            <th>Spare Disk</th>
+            <th>Is Allocated</th>
+            <th>Raid Config</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="disk in diskdet">
+            <td>{{ disk.disk_type }}</td>
+            <td>{{ disk.serialnumber }}</td>
+            <td>{{ disk.spare_disk }}</td>
+            <td>{{ disk.is_allocated }}</td>
+            <td>{{ disk.raid_config.id }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="configRaid()">Configure Raid</button>
+      </div>
+    </div>
+
+     <div class="panel panel-primary">
+      <div class="panel-heading">Raid</div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Type</th>
+            <th>V. Size</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="raid in sysresult.raid_config">
+            <td>{{ raid.type }}</td>
+            <td>{{ raid.virtual_size }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="configRaid.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Edit Raid Config
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Disks
+        </label>
+        <div class="col-sm-10">
+          <select multiple class="form-control"
+                  ng-model="raid.disks"
+                  ng-options="d as d.url for d in obj.disks track by d.id">
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          RAID Level
+        </label>
+        <div class="col-sm-10">
+          <select class="form-control" ng-model="raid.type">
+            <option value="RAID-5">RAID-5</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="createRaid(raid)">
+      Create Raid
+    </button>
+  </div>
+
+</script>

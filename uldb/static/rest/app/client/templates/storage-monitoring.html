@@ -1,0 +1,142 @@
+
+<style type="text/css">
+    .storage-monitoring .panel{
+        margin-bottom: 0px;
+    }
+    .panel-primary > .panel-heading {
+        background-color: #1F618d;
+    }
+</style>
+<loading loader="{{loader}}"></loading>
+
+<div class="content-wrapper" ng-if="!baremetal_details.results.length && !private_clouds.length && !loader">
+        <no-records-found message="No Storage is configured for this Organization"></no-records-found>
+</div>
+
+<div class="row page_wrapper storage-monitoring margin_right_minus_15px" ng-if="baremetal_details.results.length || private_clouds.length">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <span class="panel-title"> Overall Storage Allocation</span>
+                <span class="pull-right" style="font-weight:600; font-size : 18px;"> {{overall_storage_allocation | tb_unit_check}}</span>
+            </div>
+            <div class="panel-body">
+                <div class="col-xs-9" >
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Allocation details
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-xs-3 card" style="display:inline-block" ng-repeat="cloud in private_clouds">
+                                <div class="card-body">
+                                    <blockquote class="blockquote mb-0">
+                                        <p style="font-size:17px;">
+                                            <span>{{cloud.name}}</span>
+                                        </p>
+                                        <footer class="blockquote-footer"><span>Allocated <cite title="Source Title">{{cloud.storage | tb_unit_check}}</cite></span></footer>
+                                    </blockquote>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-3 card" style="display:inline-block" ng-if="baremetal_details.results.length">
+                                <div class="card-body">
+                                    <blockquote class="blockquote mb-0">
+                                        <p style="font-size:17px;">
+                                            <span>Bare Metals</span>
+                                        </p>
+                                        <footer class="blockquote-footer"><span>Allocated <cite title="Source Title">{{ baremetal_details.storage_allocated | tb_unit_check}}</cite></span>
+                                        </footer>
+                                    </blockquote>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3 card">
+                    <div class="col-xs-10 col-xs-offset-1" ng-class="{'col-xs-11 margin_top20px' : private_clouds.length > 3}">
+                        <div class="row">
+                            <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+
+                            <div class="col-xs-8 col-sm-8 col-md-10 col-lg-8">
+                                <canvas id="storage-monitor-donut"></canvas>
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-1 col-lg-2"></div>
+                        </div>
+                        <div class="row" style="padding-left:10%">
+                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                <span class="legendgreen"></span>
+                                <span class="lightcolor paddingright">utilized (TB)</span>
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                <span class="legendlight"></span>
+                                <span class="lightcolor paddingright">remaining (TB)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+</div>
+
+<div class="row page_wrapper storage-monitoring margin_right_minus_15px margin_top20px" ng-if="baremetal_details.results.length || private_clouds.length">
+    <div class="col-xs-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <span class="panel-title">Overall Storage Utilization </span>
+                <span class="pull-right" ng-if="!loader" style="font-weight:600; font-size : 18px;"> {{(private_storage_utilization + baremetal_details.storage_utilized ) | tb_unit_check}} <span ng-if="overall_storage_allocation"> of {{overall_storage_allocation | tb_unit_check}}</span></span>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <span>Private Cloud Utilization</span>
+                        <span class="pull-right" ng-if="!loader" style="font-weight:600; font-size : 15px;"> 
+                                {{private_storage_utilization | tb_unit_check}} 
+                        </span>
+                    </div>
+                    <div class="panel-body" style="padding-bottom : 0px;">
+                        <div class="col-xs-4 card" style="display:inline-block" ng-repeat="cloud in private_clouds">
+                            <div class="card-body">
+                                <blockquote class="blockquote mb-0">
+                                    <p style="font-size:17px;">
+                                        <span>{{ cloud.name }} </span>
+                                    </p>
+                                    <footer class="blockquote-footer"><span>Platform type <cite title="Source Title">{{cloud.platform_type}}</cite></span></footer>
+                                    <footer class="blockquote-footer"><span ng-init="get_cloud_bm_servers(cloud)">Utilized <cite title="Source Title">{{cloud.utilization | tb_unit_check}}</cite></span>
+                                    </footer>
+                                    <footer class="blockquote-footer" ng-if="cloud.bm_servers.length !== 0">
+                                        <h5>Bare Metal Servers </h5>
+                                    </footer>
+                                    <footer class="blockquote-footer margin-left-5percent" ng-repeat="bm in cloud.bm_servers"><span>{{bm.server.name}} <cite title="Source Title">{{bm.server.capacity_gb | gb_unit_check}}
+                                        </cite></span></footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default" style="margin-top : 20px;" ng-if="baremetal_details.results.length">
+                    <div class="panel-heading">
+                        <span>Bare Metal Utilization</span>
+                        <span class="pull-right" style="font-weight:600; font-size : 15px;"> 
+                        {{ baremetal_details.storage_utilized | tb_unit_check }}</span>
+                    </div>
+                    <div class="panel-body" style="padding-bottom : 0px;">
+                        <div class="col-xs-4 card" style="display:inline-block" ng-repeat="baremetal in baremetal_details.results track by $index">
+                            <div class="card-body">
+                                <blockquote class="blockquote mb-0">
+                                    <p style="font-size:17px;">
+                                        <span>{{baremetal.server.name}}</span>
+                                    </p>
+                                    <footer class="blockquote-footer"><span>Utilized 
+                                        <cite title="Source Title">{{baremetal.server.capacity_gb | tb_unit_check}}</cite>
+                                        </span>
+                                    </footer>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

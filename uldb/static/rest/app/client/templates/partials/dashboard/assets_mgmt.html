@@ -1,0 +1,264 @@
+<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5" style="padding-right : 10px !important; padding-bottom : 20px;">
+    <style type="text/css">
+        .iconbox .inner_spinner.fa {
+            font-size: 9px;
+            line-height: 12px;
+            width: 10px;
+            height: 10px;
+        }
+    </style>
+    <div class="middle-wrapper Dashwrap" style="height:290px" cg-busy="{promise:assets_count, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
+                <a href="#/devices/firewalls">
+                    <h4 class="widget-title">Devices under Management</h4>
+                    <h4 class="widget-title">({{asset_counts.total_count}})</h4>
+                </a>
+            </div>
+            <div class="hidden-xs hidden-sm col-md-5 col-lg-5 asset-indicators-section">
+                <span class="legendgreen minitextdash"></span>
+                <span class="lightcolor minitextdash">Up</span>
+                <span class="legendred minitextdash"></span>
+                <span class="lightcolor minitextdash">Down</span>
+                <span class="legendgray minitextdash"></span>
+                <span class="lightcolor minitextdash">Not Configured</span>
+            </div>
+        </div>
+        <div class="row paddingtop assets-section">
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-server yellow aum-icons"></i>
+                <a class="dashboard_widget_link" href="#/devices/servers">
+                    <span class="assets-bar-count" >{{asset_counts.server.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.server.count == 1">Server</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.server.count != 1)">Servers</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.server.count">
+                    <uib-bar value="asset_counts.server.count" type="success" ng-if="angular.isUndefined(asset_counts.server.active_count)">
+                        <span>{{asset_counts.server.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.server.active_count" type="success" ng-if="angular.isDefined(asset_counts.server.active_count)">
+                        <span>{{asset_counts.server.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.server.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.server.inactive_count)">
+                        <span>{{asset_counts.server.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.server.unknown" type="warning" ng-if="angular.isDefined(asset_counts.server.unknown)">
+                        <span>{{asset_counts.server.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-database grey aum-icons"></i>
+                <a class="dashboard_widget_link no_pointer_events">
+                    <span class="assets-bar-count" >{{asset_counts.SAN.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.SAN.count == 1">SAN</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.SAN.count != 1)">SANs</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.SAN.count">
+                    <uib-bar value="asset_counts.SAN.count" type="success" ng-if="angular.isUndefined(asset_counts.SAN.active_count)">
+                        <span>{{asset_counts.SAN.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.SAN.active_count" type="success" ng-if="angular.isDefined(asset_counts.SAN.active_count)">
+                        <span>{{asset_counts.SAN.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.SAN.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.SAN.inactive_count)">
+                        <span>{{asset_counts.SAN.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.SAN.unknown" type="warning" ng-if="angular.isDefined(asset_counts.SAN.unknown)">
+                        <span>{{asset_counts.SAN.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-object-group blue aum-icons"></i>
+                <a class="dashboard_widget_link" href="#/devices/vms/allvms">
+                    <span class="assets-bar-count" >{{asset_counts.VM.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.VM.count == 1">VM</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.VM.count != 1)">VMs</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.VM.count">
+                    <uib-bar value="asset_counts.VM.count" type="success" ng-if="angular.isUndefined(asset_counts.VM.active_count)">
+                        <span>{{asset_counts.VM.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.VM.active_count" type="success" ng-if="angular.isDefined(asset_counts.VM.active_count)">
+                        <span>{{asset_counts.VM.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.VM.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.VM.inactive_count)">
+                        <span>{{asset_counts.VM.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.VM.unknown" type="warning" ng-if="angular.isDefined(asset_counts.VM.unknown)">
+                        <span>{{asset_counts.VM.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-fire red aum-icons"></i>
+                <a class="dashboard_widget_link" href="#/devices/firewalls">
+                    <span class="assets-bar-count" >{{asset_counts.firewall.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.firewall.count == 1">Firewall</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.firewall.count != 1)">Firewalls</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.firewall.count">
+                    <uib-bar value="asset_counts.firewall.count" type="success" ng-if="angular.isUndefined(asset_counts.firewall.active_count)">
+                        <span>{{asset_counts.firewall.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.firewall.active_count" type="success" ng-if="angular.isDefined(asset_counts.firewall.active_count)">
+                        <span>{{asset_counts.firewall.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.firewall.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.firewall.inactive_count)">
+                        <span>{{asset_counts.firewall.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.firewall.unknown" type="warning" ng-if="angular.isDefined(asset_counts.firewall.unknown)">
+                        <span>{{asset_counts.firewall.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-sitemap green aum-icons"></i>
+                <a class="dashboard_widget_link" href="#/devices/switches">
+                    <span class="assets-bar-count" >{{asset_counts.switch.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.switch.count == 1">Switch</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.switch.count != 1)">Switches</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.switch.count">
+                    <uib-bar value="asset_counts.switch.count" type="success" ng-if="angular.isUndefined(asset_counts.switch.active_count)">
+                        <span>{{asset_counts.switch.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.switch.active_count" type="success" ng-if="angular.isDefined(asset_counts.switch.active_count)">
+                        <span>{{asset_counts.switch.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.switch.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.switch.inactive_count)">
+                        <span>{{asset_counts.switch.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.switch.unknown" type="warning" ng-if="angular.isDefined(asset_counts.switch.unknown)">
+                        <span>{{asset_counts.switch.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-balance-scale brown asset_lb aum-icons"></i>
+                <a class="dashboard_widget_link" href="#/devices/load_balancers">
+                    <span class="assets-bar-count" >{{asset_counts.load_balancer.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.load_balancer.count == 1">Load Balancer</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.load_balancer.count != 1)">Load Balancers</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.load_balancer.count">
+                    <uib-bar value="asset_counts.load_balancer.count" type="success" ng-if="angular.isUndefined(asset_counts.load_balancer.active_count)">
+                        <span>{{asset_counts.load_balancer.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.load_balancer.active_count" type="success" ng-if="angular.isDefined(asset_counts.load_balancer.active_count)">
+                        <span>{{asset_counts.load_balancer.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.load_balancer.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.load_balancer.inactive_count)">
+                        <span>{{asset_counts.load_balancer.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.load_balancer.unknown" type="warning" ng-if="angular.isDefined(asset_counts.load_balancer.unknown)">
+                        <span>{{asset_counts.load_balancer.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-cube navy aum-icons"></i>
+                <a class="dashboard_widget_link no_pointer_events">
+                    <span class="assets-bar-count" >{{asset_counts.cabinet.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.cabinet.count == 1">Cabinet</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.cabinet.count != 1)">Cabinets</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.cabinet.count">
+                    <uib-bar value="asset_counts.cabinet.count" type="success" ng-if="angular.isUndefined(asset_counts.cabinet.active_count)">
+                        <span>{{asset_counts.cabinet.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.cabinet.active_count" type="success" ng-if="angular.isDefined(asset_counts.cabinet.active_count)">
+                        <span>{{asset_counts.cabinet.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.cabinet.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.cabinet.inactive_count)">
+                        <span>{{asset_counts.cabinet.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.cabinet.unknown" type="warning" ng-if="angular.isDefined(asset_counts.cabinet.unknown)">
+                        <span>{{asset_counts.cabinet.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-laptop yellow aum-icons"></i>
+                <a class="dashboard_widget_link" href="#/devices/bm_servers">
+                    <span class="assets-bar-count" >{{asset_counts.bm_server.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.bm_server.count == 1">Bare Metal</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.bm_server.count != 1)">Bare Metals</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.bm_server.count">
+                    <uib-bar value="asset_counts.bm_server.count" type="success" ng-if="angular.isUndefined(asset_counts.bm_server.active_count)">
+                        <span>{{asset_counts.bm_server.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.bm_server.active_count" type="success" ng-if="angular.isDefined(asset_counts.bm_server.active_count)">
+                        <span>{{asset_counts.bm_server.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.bm_server.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.bm_server.inactive_count)">
+                        <span>{{asset_counts.bm_server.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.bm_server.unknown" type="warning" ng-if="angular.isDefined(asset_counts.bm_server.unknown)">
+                        <span>{{asset_counts.bm_server.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+
+            <div class=" col-xs-4 col-sm-4 col-md-4 col-lg-4 iconbox asset_bars_padding">
+                <i class="fa fa-plug teal aum-icons"></i>
+                <a class="dashboard_widget_link no_pointer_events">
+                    <span class="assets-bar-count" >{{asset_counts.PDU.count}} </span>
+                    <span class="assets-bar-label" ng-if="asset_counts.PDU.count == 1">PDU</span>
+                    <span class="assets-bar-label" ng-show="(asset_counts.PDU.count != 1)">PDUs</span>
+                </a>
+
+                <uib-progress class="assets-bar col-xs-10" max="asset_counts.PDU.count">
+                    <uib-bar value="asset_counts.PDU.count" type="success" ng-if="angular.isUndefined(asset_counts.PDU.active_count)">
+                        <span>{{asset_counts.PDU.count}}
+                            <span class="inner_spinner fa fa-spinner fa-spin"></span>
+                        </span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.PDU.active_count" type="success" ng-if="angular.isDefined(asset_counts.PDU.active_count)">
+                        <span>{{asset_counts.PDU.active_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.PDU.inactive_count" type="danger" ng-if="angular.isDefined(asset_counts.PDU.inactive_count)">
+                        <span>{{asset_counts.PDU.inactive_count}}</span>
+                    </uib-bar>
+                    <uib-bar value="asset_counts.PDU.unknown" type="warning" ng-if="angular.isDefined(asset_counts.PDU.unknown)">
+                        <span>{{asset_counts.PDU.unknown}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+<!-- <md-card md-theme="'default'">
+  <md-card-title class="green-card">
+    <md-card-title-text>
+      <span class="md-headline">Maintenance Events</span>
+      <span class="md-subhead">Latest 10 shown</span>
+    </md-card-title-text>
+  </md-card-title>
+  <md-card-content>
+    <div class="dataTable_wrapper content_settings">
+      <table
+          class="table table-hover"
+          id="dataTables-example"
+          float-thead="{top: 20, position: 'absolute', scrollContainer: true};"
+          ng-model="tabledata"
+          ng-if="tabledata.length != 0">
+        <thead>
+        <tr>
+          <th ng-repeat="row in headers" class="fixed_th">{{ row.title }}</th>
+          <th ng-if="actions != undefined" class="fixed_th">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="row in tabledata | filter: searchKeyword">
+          <td ng-repeat="row_data in headers">
+            <div ng-if="row_data.decorator == undefined">
+                                            <span ng-if="row_data.key == 'impacted_customer'">
+                                               <div ng-repeat="customer in row[row_data.key]">{{ customer.name }}</div>
+                                            </span>
+              <span ng-if="row_data.key == 'datacenter'">
+                                               <div>{{ row[row_data.key].name }}</div>
+                                            </span>
+              <span ng-if="row_data.key != 'impacted_customer' && row_data.key != 'datacenter'">
+                                              {{ row[row_data.key]| date:'medium'}}
+                                            </span>
+            </div>
+            <div ng-if="row_data.decorator">
+              {{ decorate(row_data.decorator,row[row_data.key])}}
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </md-card-content>
+</md-card>
+ -->
+ <div layout="row">
+  <div layout="column" flex="100">
+    <md-card>
+      <md-card-title class="green-card">
+        <md-card-title-text>
+          <span class="md-headline">Maintenance Events</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <nested-model-results handler="maintenance_model" ctrl="maintenance_ctrl" config="maintenance_config"></nested-model-results>
+      </md-card-content>
+    </md-card>
+    <div flex></div>
+  </div>
+</div>

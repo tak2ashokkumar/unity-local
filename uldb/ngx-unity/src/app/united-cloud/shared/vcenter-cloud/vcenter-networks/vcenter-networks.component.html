@@ -1,0 +1,216 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-transparent d-flex justify-content-between">
+                <div class="row w-40 font-xs-sm networks-tabs">
+                    <div class="col pr-0">
+                        <div class="card text-muted font-500 pointer-link mb-0"
+                            [class.active]="selectedView == 'networks'" (click)="getSelectedView('networks')">
+                            <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                <span class="text-truncate">Standard Network</span>
+                                <span
+                                    class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.networks}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col pr-0">
+                        <div class="card text-muted font-500 pointer-link mb-0"
+                            [class.active]="selectedView == 'distributedSwitches'"
+                            (click)="getSelectedView('distributedSwitches')">
+                            <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                <span class="text-truncate">Distributed Switches</span>
+                                <span
+                                    class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.distributedSwitches}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col pr-0">
+                        <div class="card text-muted font-500 pointer-link mb-0"
+                            [class.active]="selectedView == 'distributedPortGroups'"
+                            (click)="getSelectedView('distributedPortGroups')">
+                            <div class="card-body p-1 d-flex justify-content-between align-items-center">
+                                <span class="text-truncate">Distributed Port Groups</span>
+                                <span
+                                    class="ml-2 font-lg font-weight-bold value">{{networksSummaryViewData.distributedPortGroups}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1 d-flex justify-content-end pr-0">
+                    <data-refresh-btn [page]="currentCriteria.pageNo"
+                        (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </div>
+            <div class="card-body pt-2">
+                <ng-container [ngSwitch]="selectedView">
+                    <ng-container *ngSwitchCase="'networks'">
+                        <ng-container *ngTemplateOutlet="networksRef"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'distributedSwitches'">
+                        <ng-container *ngTemplateOutlet="distributedSwitchesRef"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'distributedPortGroups'">
+                        <ng-container *ngTemplateOutlet="distributedPortGroupsRef"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #networksRef>
+    <div class="row pb-2 d-flex justify-content-between">
+        <div class="col-2">
+            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+        </div>
+        <div class="col-3 d-flex justify-content-end">
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="networksCount"
+                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+        </div>
+    </div>
+    <table class="table table-sm text-left">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Hosts</th>
+                <th>Virtuals Machines</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let network of networksViewData" truncateText>
+                <td class="tdw-25">
+                    <div [tooltip]="network.name">{{network.name}}</div>
+                </td>
+                <td class="tdw-10">
+                    <shared-device-status [status]="network.status"></shared-device-status>
+                </td>
+                <td class="tdw-20">
+                    <div [tooltip]="network.type">{{network.type}}</div>
+                </td>
+                <td class="tdw-20">
+                    <div [tooltip]="network.hosts">{{network.hosts}}</div>
+                </td>
+                <td class="tdw-25">
+                    <div [tooltip]="network.vms">{{network.vms}}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="networksCount">
+    </table-entries>
+    <table-pager *ngIf="networksViewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+        [totalCount]="networksCount" (pageChange)="pageChange($event)"></table-pager>
+    <p *ngIf="!networksViewData.length" class="text-center text-muted py-4">No Standard Networks to display.</p>
+</ng-template>
+
+<ng-template #distributedSwitchesRef>
+    <div class="row pb-2 d-flex justify-content-between">
+        <div class="col-2">
+            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+        </div>
+        <div class="col-3 d-flex justify-content-end">
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="distributedSwitchesCount"
+                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+        </div>
+    </div>
+    <table class="table table-sm text-left">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Version</th>
+                <th>Noic Version</th>
+                <th>Lacp Version</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let distributedSwitch of distributedSwitchesViewData" truncateText>
+                <td class="tdw-25">
+                    <div [tooltip]="distributedSwitch.name">{{distributedSwitch.name}}</div>
+                </td>
+                <td class="tdw-10">
+                    <shared-device-status [status]="distributedSwitch.status"></shared-device-status>
+                </td>
+                <td class="tdw-20">
+                    <div [tooltip]="distributedSwitch.version">{{distributedSwitch.version}}</div>
+                </td>
+                <td class="tdw-25">
+                    <div [tooltip]="distributedSwitch.noicVersion">{{distributedSwitch.noicVersion}}</div>
+                </td>
+                <td class="tdw-20">
+                    <div [tooltip]="distributedSwitch.lacpVersion">{{distributedSwitch.lacpVersion}}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+        [totalCount]="distributedSwitchesCount">
+    </table-entries>
+    <table-pager *ngIf="distributedSwitchesViewData.length" [pageNo]="currentCriteria.pageNo"
+        [pageSize]="currentCriteria.pageSize" [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+    <p *ngIf="!distributedSwitchesViewData.length" class="text-center text-muted py-4">No Distributed Switches to
+        display.
+    </p>
+</ng-template>
+
+<ng-template #distributedPortGroupsRef>
+    <div class="row pb-2 d-flex justify-content-between">
+        <div class="col-2">
+            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+        </div>
+        <div class="col-3 d-flex justify-content-end">
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="distributedPortGroupsCount"
+                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+        </div>
+    </div>
+    <table class="table table-sm text-left">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Distributed Switch</th>
+                <th>VLAN ID</th>
+                <th>Ports</th>
+                <th>Virtual Machines</th>
+                <th>Port Binding</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let distributedPortGroup of distributedPortGroupsViewData" truncateText>
+                <td class="tdw-20">
+                    <div [tooltip]="distributedPortGroup.name">{{distributedPortGroup.name}}</div>
+                </td>
+                <td class="tdw-10">
+                    <shared-device-status [status]="distributedPortGroup.status"></shared-device-status>
+                </td>
+                <td class="tdw-20">
+                    <div [tooltip]="distributedPortGroup.distributedSwitch">{{distributedPortGroup.distributedSwitch}}
+                    </div>
+                </td>
+                <td class="tdw-10">
+                    <div [tooltip]="distributedPortGroup.vlanId">{{distributedPortGroup.vlanId}}</div>
+                </td>
+                <td class="tdw-10">
+                    <div [tooltip]="distributedPortGroup.ports">{{distributedPortGroup.ports}}</div>
+                </td>
+                <td class="tdw-10">
+                    <div [tooltip]="distributedPortGroup.vms">{{distributedPortGroup.vms}}</div>
+                </td>
+                <td class="tdw-20">
+                    <div [tooltip]="distributedPortGroup.portBinding">{{distributedPortGroup.portBinding}}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+        [totalCount]="distributedPortGroupsCount">
+    </table-entries>
+    <table-pager *ngIf="distributedPortGroupsViewData.length" [pageNo]="currentCriteria.pageNo"
+        [pageSize]="currentCriteria.pageSize" [totalCount]="distributedPortGroupsCount"
+        (pageChange)="pageChange($event)"></table-pager>
+    <p *ngIf="!distributedPortGroupsViewData.length" class="text-center text-muted py-4">No Distributed Port Groups to
+        display.
+    </p>
+</ng-template>

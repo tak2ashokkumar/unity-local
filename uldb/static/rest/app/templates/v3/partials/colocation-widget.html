@@ -1,0 +1,65 @@
+<div class="panel panel-default">
+  <!--<div ng-repeat="(index, colo) in datacenternames.data.info"
+       class="panel panel-success panel-default col-lg-6 col-md-12">-->
+  <div class="panel-heading">
+    <!-- <a href="#datacenter/{{ colo.id }}/"> -->
+      <!--class="dash-item-wrapper"-->
+      <span style="display: inline-block">{{ colo.name }} , {{ colo.datacenter.name }}</span>
+      <!-- </a> -->
+    <!--    class="wid-head widget-title"-->
+
+    <!--<div ng-if="colo.status== 0" class="status-buttons">
+      <span class="btn-status-top status-none"></span>
+      <span class="btn-status-top status-bad"></span>
+    </div>
+    <div ng-if="colo.status== 1" class="status-buttons">
+      <span class="btn-status-top status-good"></span>
+      <span class="btn-status-top status-none"></span>
+    </div>-->
+  </div>
+  <div class="panel-body">
+    <div class="col-lg-12 pad-small">
+      <div class="progress-item">
+        <div class="col-md-5 device-text progress-text">Hosts</div>
+        <div class="progress col-md-7 ">
+          <div class="progress-bar progress-bar-success" role="progressbar"
+               style="width:{{ host_widths['normal'] }}%">{{ colo.host_stats.normal }}</div>
+          <div class="progress-bar progress-bar-warning" role="progressbar"
+               style="width:{{ host_widths['warning'] }}%">{{ colo.host_stats.warning }}</div>
+          <div class="progress-bar progress-bar-danger" role="progressbar"
+               style="width:{{ host_widths['critical']  }}%">{{ colo.host_stats.critical }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 pad-small">
+
+      <div class="progress-item">
+        <div class="col-md-5 device-text progress-text">
+          Services
+        </div>
+        <div class="progress col-md-7 ">
+
+          <div class="progress-bar progress-bar-success" role="progressbar"
+               style="width:{{ serv_widths['normal'] }}%">{{ colo.service_stats.normal }}</div>
+          <div class="progress-bar progress-bar-warning" role="progressbar"
+               style="width:{{ serv_widths['warning'] }}%">{{ colo.service_stats.warning }}</div>
+          <div class="progress-bar progress-bar-danger" role="progressbar"
+               style="width:{{ serv_widths['critical'] }}%">{{ colo.service_stats.critical }}</div>
+        </div>
+      </div>
+
+      <div class="progress-item">
+        <div class="col-md-5 device-text progress-text">
+          Throughput
+        </div>
+        <div class="col-md-7 ">
+          <span>{{ round_throughput(colo.throughput) }}</span>
+          <!--<div class="progress-bar progress-bar-info" role="progressbar"
+               style="width:100%"></div>-->
+        </div>
+      </div>
+    </div>
+
+    <ng-transclude></ng-transclude>
+  </div>
+</div>

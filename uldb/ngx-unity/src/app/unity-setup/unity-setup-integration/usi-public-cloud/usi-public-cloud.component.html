@@ -1,0 +1,135 @@
+<h5>Public Clouds</h5>
+<div class="row mb-4">
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="publicClouds.azure.imageURL" class="w-100" [alt]="'Azure'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="publicClouds.azure.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{publicClouds.azure.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="publicClouds.azure.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewAzureAccounts()" accessControl
+                                [moduleName]="'Public Cloud'" [accessType]="'View Public Cloud'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addAzureAccount()" accessControl [moduleName]="'Public Cloud'"
+                            [accessType]="'Manage Public Cloud'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="publicClouds.aws.imageURL" class="w-100" [alt]="'AWS'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="publicClouds.aws.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{publicClouds.aws.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="publicClouds.aws.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewAWSAccounts()" accessControl
+                                [moduleName]="'Public Cloud'" [accessType]="'View Public Cloud'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addAWSAccount()" accessControl [moduleName]="'Public Cloud'"
+                            [accessType]="'Manage Public Cloud'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="publicClouds.gcp.imageURL" class="w-100" [alt]="'GCP'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="publicClouds.gcp.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{publicClouds.gcp.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="publicClouds.gcp.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewGCPAccount()" accessControl
+                                [moduleName]="'Public Cloud'" [accessType]="'View Public Cloud'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addGCPAccount()" accessControl [moduleName]="'Public Cloud'"
+                            [accessType]="'Manage Public Cloud'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="publicClouds.oracle.imageURL" class="w-100" [alt]="'Oracle'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="publicClouds.oracle.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{publicClouds.oracle.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="publicClouds.oracle.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewOracleAccount()" accessControl
+                                [moduleName]="'Public Cloud'" [accessType]="'View Public Cloud'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addOracleAccount()" accessControl [moduleName]="'Public Cloud'"
+                            [accessType]="'Manage Public Cloud'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

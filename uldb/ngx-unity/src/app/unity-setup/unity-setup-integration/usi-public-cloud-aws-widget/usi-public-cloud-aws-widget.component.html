@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'AWS'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addAccount()"
+    (viewButtonClick)="viewAccounts()" [moduleName]="'Public Cloud'" [addAccessType]="'Manage Public Cloud'"
+    [viewAccessType]="'View Public Cloud'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<public-cloud-aws-crud (onCrud)="onCrud($event)"></public-cloud-aws-crud>

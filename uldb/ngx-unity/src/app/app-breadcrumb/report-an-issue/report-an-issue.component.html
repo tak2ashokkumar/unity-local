@@ -1,0 +1,63 @@
+<ng-template #template>
+  <div class="card mb-0">
+    <div class="card-header">
+      Report Issue
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="issueForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="subject">Subject<em>*</em></label>
+          <input class="form-control" id="subject" type="text" placeholder="What is your issue about?"
+            formControlName="subject" [ngClass]="{'is-invalid' : formErrors.subject}">
+          <div class="invalid-feedback" *ngIf="formErrors.subject">{{formErrors.subject}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="collaborators">CC</label>
+          <input class="form-control" id="collaborators" placeholder="example@unityonecloud.com" type="text"
+            formControlName="collaborators" [ngClass]="{'is-invalid' : formErrors.collaborators}">
+          <div class="invalid-feedback" *ngIf="formErrors.collaborators">{{formErrors.collaborators}}</div>
+        </div>
+        <div class="form-group">
+          <label for="priority">Priority<em>*</em></label>
+          <select class="form-control text-capitalize" id="priority" name="priority" formControlName="priority"
+            [ngClass]="{'is-invalid' : formErrors.priority}">
+            <option [value]="''" disabled>Select Priority</option>
+            <option [value]="priority.value" *ngFor="let priority of ticketPriorityList">
+              {{priority.display_name}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="formErrors.priority">{{formErrors.priority}}</div>
+        </div>
+        <div class="form-group">
+          <label for="description">Description<em>*</em></label>
+          <textarea class="form-control" id="description" name="description" rows="5" formControlName="description"
+            [ngClass]="{'is-invalid' : formErrors.description}" placeholder="Describe your issue here"></textarea>
+          <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}</div>
+        </div>
+        <div class="form-group" *ngIf="!user.selfBrandedOrgName" >
+          <label for="metadata">Metadata (Uneditable)</label>
+          <textarea class="form-control" id="metadata" name="metadata" formControlName="metadata" readonly></textarea>
+        </div>
+      </form>
+      <form [formGroup]="attachmentForm">
+        <div class="form-group row"><label class="col-3 col-form-label" for="file-multiple-input">Attachments : </label>
+          <div class="col-9"><input id="file-multiple-input" multiple name="file-multiple-input" type="file"
+              (change)="detectFiles($event.target.files)"></div>
+        </div>
+        <span *ngFor="let attachment of attachments">
+          <span class="btn btn-primary mb-1 mr-1 btn-sm">{{attachment}}&nbsp;<i class="fas fa-times"
+              (click)="removeFiles(attachment)"></i></span>
+        </span>
+      </form>
+    </div>
+    <div class="card-footer">
+      <a [href]="emailLink">Click here to report via e-mail</a>
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Send</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

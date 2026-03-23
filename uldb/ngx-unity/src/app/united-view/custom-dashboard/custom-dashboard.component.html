@@ -1,0 +1,51 @@
+<div class="container-fluid">
+    <div class="align-items-center d-flex justify-content-end custom-manage-btn-box p-2">
+        <form [formGroup]="refreshForm">
+            <div class="row form-group d-flex align-items-center mb-0 mr-2">
+                <div class="col-auto text-right align-self-center">Auto Refresh</div>
+                <div class="col-auto">
+                    <div class="d-inline-block">
+                        <ul class="d-flex px-0 mb-0">
+                            <li class="d-inline-block">
+                                <label class="pointer-link" [class.active]="refreshForm.get('autoRefresh').value">
+                                    <input type="radio" formControlName="autoRefresh" [value]="true">
+                                    <span class="font-sm mr-2">On</span>
+                                </label>
+                            </li>
+                            <li class="d-inline-block">
+                                <label class="pointer-link" [class.active]="!refreshForm.get('autoRefresh').value">
+                                    <input type="radio" formControlName="autoRefresh" [value]="false">
+                                    <span class="font-sm mr-2">Off</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="ml-1 w-20" *ngIf="refreshForm.get('autoRefresh').value">
+                    <input class="form-control" type="number" formControlName="refreshInterval" min="1" max="60"
+                        placeholder="Min">
+                </div>
+                <div *ngIf="refreshForm.get('autoRefresh').value" class="col-auto text-right align-self-center">Min(s)
+                </div>
+            </div>
+        </form>
+        <button class="btn btn-warning btn-pill btn-sm" (click)="manageWidget()" accessControl moduleName="Dashboard"
+            accessType="Manage Dashboard" elementType="btn">Manage Widget</button>
+        <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+    <div class="align-items-top d-flex flex-wrap" *ngIf="viewData.length">
+        <ng-container *ngFor="let view of viewData">
+            <div class="flex-grow-1 p-2 mb-1" [ngClass]="getColWidth(view)">
+                <shared-graph [data]="view"></shared-graph>
+            </div>
+        </ng-container>
+    </div>
+    <p class="text-center text-muted pt-5" *ngIf="!viewData.length">
+        <span>No widgets created yet.</span>
+        <span>
+            <a href="javascript:void(0);" class="pointer-link" (click)="addWidget()" accessControl
+                moduleName="Dashboard" accessType="Manage Dashboard" elementType="div">click here</a>
+            <span class="ml-2">to create now</span>
+        </span>
+    </p>
+</div>

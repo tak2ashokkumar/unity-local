@@ -1,0 +1,72 @@
+<div class="card" [class.border-danger]="dataError">
+    <!-- <app-spinner [name]=""></app-spinner> -->
+    <div class="card-body ">
+        <div class="row mx-0 d-flex justify-content-between">
+            <img [src]="widgetData?.imageURL" [alt]="widgetData?.cloudType" class="w-80" style="height: 25px;
+                    max-width: 100px;
+                    max-height: -webkit-fill-available;" />
+            <div class="col-6 d-flex justify-content-end">
+                <a class="h4 mb-0 text-primary font-lg"
+                    (click)="goToSubscriptions(widgetData)">{{widgetData?.subscriptions}}
+                    <span class="text-muted small">Subscriptions</span></a>
+                <span class="fas fa-exclamation-triangle text-warning mx-1 font-lg" [tooltip]="dataError"
+                    container="body" *ngIf="dataError"></span>
+            </div>
+        </div>
+        <div class="row mt-2" [class.disabled-widget]="dataError">
+            <div class="col-sm-5 border-right">
+                <div style="display:flex; flex-direction:column">
+                    <div style="flex-grow:1; height:100px; position:relative">
+                        <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                            [options]="widgetChartOptions" [data]="widgetChartData" [colors]="widgetChartColor"
+                            [labels]="widgetChartLabels"></canvas>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <small class="text-muted font-weight-bold">{{widgetData?.vms}} VM Instances</small>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="row">
+                    <div class="col-6 text-center pr-0">
+                        <span class="text-value text-primary pointer-link"
+                            (click)="goToCost(widgetData)">${{widgetData?.cost}}</span>
+                        <span class="text-muted small d-block">Cost</span>
+                    </div>
+                    <div class="col-6 text-center pl-0">
+                        <div class="text-value text-primary pointer-link" (click)="goToServices(widgetData)">
+                            {{widgetData?.services}}</div>
+                        <div class="text-muted small">Services</div>
+                    </div>
+                    <div class="col-6  mt-3 text-center pr-0">
+                        <div class="text-value text-primary pointer-link" (click)="goToResources(widgetData)">
+                            {{widgetData?.resources}}</div>
+                        <div class="text-muted small">Resources</div>
+                    </div>
+                    <div class="col-6 mt-3 text-center pl-0">
+                        <div class="d-flex align-items-center justify-content-center" (click)="goToAlerts(widgetData)"
+                            accessControl moduleName="AIML Event Management" accessType="View AIML Event Management"
+                            elementType="div">
+                            <span class="text-value text-primary pointer-link">{{widgetData?.alerts}}</span>
+                            <div class="d-flex align-items-end text-primary pointer-link ml-2">
+                                <span class="mt-1">
+                                    <span class="fas fa-exclamation-triangle font-xs text-danger"></span>
+                                    <span class="font-sm-xs font-500 pl-1">{{widgetData?.criticalAlerts}}</span>
+                                </span>
+                                <span class="mt-1 mx-1">
+                                    <span class="fas fa-exclamation-circle font-xs text-warning"></span>
+                                    <span class="font-sm-xs font-500 pl-1">{{widgetData?.warningAlerts}}</span>
+                                </span>
+                                <span class="mt-1">
+                                    <span class="fas fa-info-circle font-xs text-primary"></span>
+                                    <span class="font-sm-xs font-500 pl-1">{{widgetData?.informationAlerts}}</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-muted small">Alerts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,211 @@
+<h3>Account Completeness</h3>
+
+<alerts></alerts>
+
+<div>
+  <strong>Organization Name</strong>
+  <input type="text" class="form-control"
+         ng-model="org"
+         placeholder=""
+         uib-typeahead="org as org.organization_name for org in getOrgs($viewValue)"
+         typeahead-wait-ms="200">
+  <button class="btn btn-success" ng-click="completeness(org)">Validate</button>
+</div>
+
+<table ng-if="orgCountTable.length > 0" class="table">
+  <thead>
+  <tr>
+    <th>Object Type</th>
+    <th>ULDB Count</th>
+    <th>Salesforce Count</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="result in orgCountTable"
+      ng-click="select(result, $index)"
+      ng-class="{'active success': result === selection.result}">
+    <td>{{ result.name }}</td>
+    <td>{{ result.uldb_count }}</td>
+    <td>{{ result.sf_count }}</td>
+    <td ng-if="result === selection.result">
+      <button class="btn btn-info" ng-click="inventoryDiff(result, org)">Get differences</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div ng-if="diffed">
+  <h4>Only in ULDB</h4>
+  <table class="table">
+    <thead>
+    <tr>
+      <th ng-repeat="row in rows">{{ row.description }}</th>
+      <th>Review</th>
+      <th>Unassign</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="result in uldbOnly">
+      <td ng-repeat="row in rows">
+        <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+        <div ng-if="row.opaque !== undefined">
+          <div>{{ row.read(result) }}</div>
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-success" ng-click="review(result, $index)">Review</button>
+      </td>
+      <td>
+        <button class="btn btn-danger" ng-click="unassign(result, $index)">Unassign</button>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+
+  <h4>Only in Salesforce</h4>
+  <table class="table">
+    <thead>
+    <tr>
+      <th ng-repeat="row in salesforceRows">{{ row.description }}</th>
+      <th>Match</th>
+      <th>Review</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="result in salesforceOnly">
+      <td ng-repeat="row in salesforceRows">
+        <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+        <div ng-if="row.opaque === 'stringTransform'">
+          <div>{{ row.read(result) }}</div>
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-warning" ng-click="match(result, $index)">Match</button>
+      </td>
+      <td>
+        <button class="btn btn-success" ng-click="review(result, $index)">Review</button>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+
+  <h4>In both</h4>
+  <table class="table">
+    <thead>
+    <tr>
+      <th ng-repeat="row in rows">{{ row.description }}</th>
+      <th>Review</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="result in both">
+      <td ng-repeat="row in rows">
+        <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+        <div ng-if="row.opaque === 'stringTransform'">
+          <div>{{ row.read(result) }}</div>
+        </div>
+        <div ng-if="row.opaque === 'link'">
+
+        </div>
+      </td>
+      <td>
+        <button class="btn btn-success" ng-click="review(result, $index)">Review</button>
+      </td>
+    </tr>
+
+    </tbody>
+  </table>
+</div>
+
+
+
+<script type="text/ng-template" id="salesforceModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">{{ method }} {{ title.singular }}</h3>
+  </div>
+
+  <div class="modal-body" style="height: 800px;">
+    <form class="form-horizontal">
+
+      <div class="form-group" ng-repeat="row in rows" ng-if="row.required">
+        <label for="blockName" class="col-sm-2 control-label">
+          {{ row.description }}
+        </label>
+
+        <div class="col-sm-10" ng-if="row.opaque === undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]">
+        </div>
+
+        <div class="col-sm-10" ng-if="row.opaque !== undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]"
+                 placeholder=""
+                 uib-typeahead="obj as obj[row.subfield] for obj in row.render($viewValue)">
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+  <div class="modal-footer">
+    <button ng-if="method === 'Add'" class="btn btn-success" type="button" ng-click="add(obj)">
+      Create!
+    </button>
+    <button ng-if="method === 'Edit'" class="btn btn-success" type="button" ng-click="edit(obj, selection.index)">
+      Save changes!
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+  </div>
+</script>
+
+
+
+<script type="text/ng-template" id="updateExisting.html">
+  <div class="modal-header">
+    <h3 class="modal-title">{{ method }} {{ title.singular }}</h3>
+  </div>
+
+  <div class="modal-body" style="height: 800px;">
+    <h4>In Salesforce:</h4>
+    <h4>Existing:</h4>
+    <form class="form-horizontal">
+
+      <div class="form-group" ng-repeat="row in rows" ng-if="row.required">
+        <label for="blockName" class="col-sm-2 control-label">
+          {{ row.description }}
+        </label>
+
+        <div class="col-sm-10" ng-if="row.opaque === undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]">
+        </div>
+
+        <div class="col-sm-10" ng-if="row.opaque !== undefined">
+          <input type="text" class="form-control" ng-model="obj[row.name]"
+                 placeholder=""
+                 uib-typeahead="obj as obj[row.subfield] for obj in row.render($viewValue)">
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+  <div class="modal-footer">
+    <button ng-if="method === 'Add'" class="btn btn-success" type="button" ng-click="add(obj, selection.index)">
+      Create!
+    </button>
+    <button ng-if="method === 'Edit'" class="btn btn-success" type="button" ng-click="edit(obj, selection.index)">
+      Save changes!
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+  </div>
+</script>

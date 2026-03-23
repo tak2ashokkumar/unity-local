@@ -1,0 +1,210 @@
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+	<h4>Add Server Connection</h4>
+  </div>
+
+  <div class="panel-body">
+	<form role="form"id="postform" action="" method="post">
+		 <input type='hidden' id="csrf_token" name='csrfmiddlewaretoken' value={{csrf_token}} />		
+	</form>
+	<form role="form" id="wizard" action="server.html" method="post" enctype='application/json'>
+		<input type="hidden" name="_popup" value="1" />
+	   	<input type="hidden" id="totalnic" value= {{no_of_nics}} />
+		<input type="hidden" name="_popup" value="1" />
+		<input type="hidden" id="santypeid" value= {{santypeid}} />
+		<input type="hidden" id="system_id" name="system_id" value= {{system_id}}>
+		<!--- Connection details -->
+
+		
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<h3 class="panel-title">Connection Details</h3>
+			</div>
+			
+			<div class="panel-body">
+			
+			    <div class="form-group">
+				<label for="id_cabinet" class="required">Cabinet * </label>
+				<div class="form-inline">
+					<select id="id_cabinet" class="form-control" ng-model="connection.cabinet" 						ng-change="GetAssociate(connection.cabinet);ClearValidation()" 						ng-options="cab as cab.name for cab in cabinets" style="width:100%;">
+					<option style="display:none" value="">Please select</option>
+					</select>
+					<label class="errormsg" ng-if="caberr">{{ cabMsg }}</label>
+					
+				</div>
+			    </div>
+			    <div class="form-group">
+				<label for="id_switch_id" class="optional">Switch </label>
+				
+				<select id="id_switch_id" class="form-control" ng-model="connection.switch" 							ng-options="sw.url as sw.name for sw in switch" style="width:100%;" multiple disabled>
+				
+		   		</select>
+			    </div>
+			    <div class="form-group">
+				<label for="id_pdu_id" class="optional">PDU</label>
+								
+				<select id="id_pdu_id" class="form-control" ng-model="connection.associatepdu" 							ng-options="cpdu.url as cpdu.assettag for cpdu in cabpdu" style="width:100%;" multiple disabled>
+				
+		   		</select>	
+			    </div>	
+			    
+				
+			</div>
+			
+		<!-- port details starts here ----->
+
+		<div  id="pdu_data" style="margin:1%;" ng-if="showPS">
+			<div class="panel-group" id="cabinet-group">
+				 <div class="panel panel-success">
+				    <div class="panel-heading">
+					<h5 class="panel-title">
+					    Power Supply Port
+					</h5>
+				    </div>
+				    
+				    <div class="panel-body">
+						<table class="table tabborder" cellspacing="0">
+							<thead>
+							 <tr>
+								<th class="col-md-1">PS Port</th>
+		
+								<th class="col-md-2">PDU</th>
+
+								<th class="col-md-1">PDU Port Number</th>
+							</tr>
+							</thead>
+							<tbody> 
+								<tr ng-repeat="ps in PS_Ports">
+									<td class="col-md-1"><input type="text" value="{{ps.system_port_name}}" class="form-control" 						 				ng-model="ps.system_port_name" disabled></input></td>
+									<td class="col-md-2">
+										<select class="form-control" ng-model="ps.pdu" ng-options="pspdu as pspdu.assettag for pspdu in pspdu" 											style="width:100%;">
+											<option style="display:none" value="">Please select</option>
+										</select>
+									</td>
+									<td class="col-md-1"><input type="text" value="{{ps.pdu_port_number}}" class="form-control" 						 			ng-model="ps.pdu_port_number"></input></td>
+								</tr>
+							</tbody>
+						</table>
+					    <!--<div><pre>{{PS_Ports_det | json}}</pre></div>-->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- port details ends here ----->
+		<!---IPMI details strats here --->
+			    <div id="ipmi_connection_data" style="margin:1%;">
+				<div class="panel-group" id="cabinet-group">
+				 <div class="panel panel-success">
+				    <div class="panel-heading">
+					<h5 class="panel-title">
+					    IPMI
+					</h5>
+				    </div>
+					<div class="panel-body">
+					  <div class="form-group">
+						<label for="id_ipmi_address" class="required">Address *</label>
+						
+							
+							<input class="form-control" id="id_ipmi_address" maxlength="45" 							ng-model="ipmi.ip_address" ng-blur="ValidateIP($event)" 								name="ip_address" placeholder="192.168.2.12" type="text" data4="iponly" 							ng-mouseover="DestroyValMsg($event)" ng-keypress="ClearValidation()">
+							<label class="errormsg" ng-if="ipmiaddrerr">{{ ipmiaddrMsg }}</label>
+					  </div>
+					  <div class="form-group">
+						<label for="id_ipmi_user" class="required">User *</label>
+						
+							<input class="form-control" id="id_ipmi_user" maxlength="45"
+							ng-model="ipmi.ipmi_user" ng-keypress="ClearValidation()" 								name="ipmi_user" placeholder="username" type="text" data4="alphanumeric">
+							<label class="errormsg" ng-if="ipmiuserrerr">{{ ipmiuserMsg }}</label>
+					  </div>
+					  <div class="form-group">
+						<label for="id_ipmi_password" class="required">Password *</label>
+						 <input class="form-control" id="id_ipmi_password" maxlength="45"
+						 ng-model="ipmi.ipmi_password" 							  							 ng-keypress="ClearValidation()" name="ipmi_password" placeholder="password" 							 type="password" autocomplete="off">
+						<label class="errormsg" ng-if="ipmipwdrerr">{{ ipmipwdMsg }}</label>
+					  </div>
+					  <div class="form-group">
+						<label for="id_ipmi_mac_address" class="optional">Mac Address</label>
+						
+							<input class="form-control" id="id_ipmi_mac_address" maxlength="45"   								ng-blur="validateMAC($event)" ng-model="ipmi.mac_address" name="mac_address" 								placeholder="00:AA:BB:CC:DD:EE" type="text" data4=""  
+							ng-mouseover="DestroyValMsg($event)" ng-keypress="ClearValidation()">
+						
+						
+					  </div>
+					
+					
+				         </div>
+				
+			    
+			</div>
+		    </div>
+		</div>
+		<!-- IPMI details ends here ----->
+		<!---Ethernet details strats here --->
+	    <div id="eth_connection_data" style="margin:1%;" ng-if="showETH">
+		<div class="panel-group" id="cabinet-group">
+		 <div class="panel panel-success" style="max-width: 198%;overflow: auto;">
+		    <div class="panel-heading" style="width: 200%;">
+			<h5 class="panel-title">
+			    Ethernet
+			</h5>
+		    </div>
+			<div class="panel-body" style="width: 200%;">
+			<table class="table tabborder" cellspacing="0">
+			    <thead>
+				 <tr>
+					<th class="col-md-1">Ethernet</th>
+		
+					<th class="col-md-2">MAC Address</th>
+
+					<th class="col-md-1">Mgmt Interface</th>
+
+					<th class="col-md-1">Bridge Mode</th>
+
+					<th class="col-md-1">IP Address</th>
+
+					<th class="col-md-1">Default Gateway</th>
+
+					<th class="col-md-1">PXE Interface</th>
+
+					<th class="col-md-2">Switch</th>
+
+					<th class="col-md-1">Port Number</th>
+	
+					<th class="col-md-2">VLAN Name</th>
+
+					<th class="col-md-1">VLAN Number</th>
+	    			</tr>
+				</thead>
+				<tbody> 
+					<tr ng-repeat="con in eth_det">
+						<td class="col-md-1"><input type="text" value="{{con.interface_name}}" class="form-control" 						 							ng-model="con.interface_name" disabled></input></td>
+						<td class="col-md-2"><input type="text" value="{{con.nic_macaddress}}" class="form-control" 						 							ng-model="con.nic_macaddress" ng-blur="validateMAC($event)" id="{{con.mac_id}}"></input></td>
+						<td class="col-md-1"><input class="ckeckbox cbox_view" ng-model="con.management_interface" 						name="management_interface" type="checkbox"></td>
+						<td class="col-md-1"><input class="ckeckbox cbox_view" ng-model="con.bridge_mode" 						 	name="bridgemode" type="checkbox"></td>
+						<td class="col-md-1"><input type="text" value="{{con.nic_ipaddress}}" class="form-control" 							 							ng-model="con.nic_ipaddress" ng-blur="ValidateIP($event)" id="{{con.ip_id}}" ng-disabled="con.bridge_mode"></input></td>
+						<td class="col-md-1"><input type="text" value="{{con.default_gateway}}" class="form-control" id="{{con.df_gwy_id}}" 							ng-model="con.default_gateway" ng-blur="ValidateDefGwy($event)" ng-disabled="con.bridge_mode"></input></td>
+						<td class="col-md-1"><input class="ckeckbox cbox_view" ng-model="con.pxeinterface" 						 	name="pxeinterface" type="checkbox" ng-disabled="con.bridge_mode"></td>
+						<td class="col-md-2">
+							<select class="form-control" ng-model="con.switch" ng-options="sw as sw.name for sw in switch" style="width:100%;">
+								<option style="display:none" value="">Please select</option>
+							</select>
+						</td>
+						<td class="col-md-1"><input type="text" class="form-control" ng-model="con.switch_port_number" id="{{con.sw_port_id}}"	   							ng-blur="GetVLANDetails($event)"> </input></td>
+						<td class="col-md-2"><input type="text" class="form-control" ng-model="con.vlan_name"> 							</input></td>
+						<td class="col-md-1"><input type="text" class="form-control" ng-model="con.vlan_number" id="{{con.vlan_id}}"  							ng-blur="validatevlan($event)"></input></td>
+					</tr>
+				</tbody>				
+			</table>
+			<!--div><pre>{{eth_det | json}}</pre></div-->
+		</div>
+		</div>
+		</div>
+		<!-- ethernet details ends here ----->
+	      </div>
+	      <button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelConnectionAdd()">Cancel</button>
+   	      <button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveConnectionAdd()">Save</button>
+	      <!--<label class="errormsg" ng-hide="conrequire">Atleast one data is required for add connection</label>-->
+	</form>
+  </div>
+</div>
+	

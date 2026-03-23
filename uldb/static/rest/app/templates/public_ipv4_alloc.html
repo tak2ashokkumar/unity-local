@@ -1,0 +1,25 @@
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <a href="tab.url"></a>
+  </uib-tab>
+</uib-tabset>
+
+<div class="row">
+  <div class="col-sm-12">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-12">
+          <input class="form-control ng-valid ng-dirty"
+                 type="text" id="searchKeyword"
+                 ng-model="searchKeyword" placeholder="Search by server name, type, OS, etc."
+                 ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<model-results></model-results>
+<div style="height: 50px;"></div>

@@ -1,0 +1,116 @@
+<style type="text/css">
+    .tabstyles {
+        padding: 0px !important;
+    }
+    
+    .deployments_pages {
+        min-height: 100vh;
+    }
+    
+    .date-wrapper {
+        width: unset;
+        box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.14);
+    }
+    
+    .date-wrapper .fa {
+        padding: 7px 0px 7px 7px;
+    }
+    
+    .daterange {
+        border-right: none;
+        min-height: auto;
+        padding: 9px 7px 5px 7px;
+    }
+    
+    .aws div {
+        color: orange;
+    }
+    
+    .azure div {
+        color: blue;
+    }
+    
+    .private_cloud div {
+        color: green;
+    }
+    
+    .paddingleft20px {
+        padding-left: 20px !important;
+    }
+    
+    .heading-color {
+        color: #313c52
+    }
+</style>
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <div>
+        <loading loader="{{loader}}"></loading>
+
+        <div class="row content-wrapper deployments_pages">
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+                <div class="col-xs-3 search-widget">
+                    <form class="navbar-form">
+                        <div class="form-group">
+                            <input class="form-control" type="text" ng-model="searchkey" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}" ng-change="getsearchoutput()">
+                            <button class="btn btn-search" type="submit" style="top: 4px;">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-xs-6 search-widget text-center">
+                    <h1 class="heading-color">Deployment Status</h1>
+                </div>
+
+                <div class="col-xs-3" style="float:right">
+                    <div class="action-bar table-button">
+                        <span class="count">{{ deployments.length || 0 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-color">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <section id="no-more-tables" class="margintop20 middle-wrapper">
+                        <table cellspacing="0" width="100%" ng-if="deployments.length != 0" class="display bg-color table table-condensed cf">
+                            <thead class="cf">
+                                <tr>
+                                    <th ng-repeat="header in deployment_headers" style="white-space: nowrap;">{{ header.title }} </th>
+                                    <!-- <th ng-if="actions != undefined">Actions</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="dpm in deployments | filter: searchKeyword" class="odd gradeX {{dpm.cloud_type}}">
+                                    <td>
+                                        <div>
+                                            {{ dpm.deployment_type}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            {{ dpm.cloud_type }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="{{dpm.cloud_type}}">{{ dpm.cloud_name }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ dpm.status }}</div>
+                                    </td>
+                                    <td class="dpm_date_width">
+                                        <div> {{ dpm.created_at | unityDate : $root.users_timezone}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div ng-if="deployments.length === 0 || deployments == undefined" class="bg-color content-wrapper">
+                            <no-records-found message="No Records Found!"></no-records-found>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>l
+</div>

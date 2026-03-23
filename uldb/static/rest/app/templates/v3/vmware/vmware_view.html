@@ -1,0 +1,115 @@
+<alerts></alerts>
+<div class="row dashboard-admin">
+    <div class="col-md-6">
+        <generictable
+            heading="Datacenters"
+            headers="vmware_datacenters_headers"
+            tabledata="vmware_datacenter.data.info"
+            modeldata="vmware_datacenter_modeldata"
+            rows="vmware_datacenter_rows"
+            addclick="vmware_datacenter_add(data)"
+            modeldata3="vmware_cluster_modeldata3"
+            rows3="vmware_cluster_rows"
+            addclick3="vmware_cluster_add(data3)"
+            switches="vmware_global_switches(args)"
+            actions="vmware_datacenter_actions">
+        </generictable>
+    </div>
+    <div class="col-md-6">
+        <generictable
+            heading="Clusters"
+            headers="vmware_clusters_headers"
+            tabledata="vmware_clusters.data.info"
+            modeldata1="vmware_hypervisors_modeldata1"
+            rows1="vmware_hypervisors_rows"
+            addclick1="vmware_hypervisors_add(data1)"
+
+            modeldata5="vmware_virtualmachines_modeldata5"
+            rows5="vmware_virtualmachines_rows"
+            addclick5="vmware_virtualmachines_add(data5)"
+
+            modeldata6="vmware_resource_pool_modeldata"
+            rows6="vmware_resource_pool_rows"
+            addclick6="vmware_resource_pool_add(data6)"
+            switches="vmware_global_switches(args)"
+            actions="vmware_clusters_actions">
+        </generictable>
+    </div>
+
+</div>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <generictable
+            heading="Hosts"
+            headers="vmware_hypervisors_headers"
+            tabledata="vmware_hypervisors.data.info"
+            rows="vmware_hypervisors_rows"
+            addclick="vmware_hypervisors_add(data)">
+        </generictable>
+    </div>
+</div>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <generictable
+            heading="Resource Pool"
+            headers="vmware_resource_pool_headers"
+            tabledata="vmware_resource_pool.data.info"
+            rows="vmware_resource_pool_rows"
+            addclick="vmware_resource_pool_add(data)"
+            switches="vmware_global_switches(args)"
+            actions="vmware_resource_pool_actions">
+        </generictable>
+    </div>
+</div>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <generictable
+            heading="Virtual Machines"
+            headers="vmware_virtual_machines_headers"
+            tabledata="vmware_virtualmachines.data.info"
+            rows="vmware_virtualmachines_rows"
+            addclick="vmware_virtualmachines_add(data)"
+            switches="vmware_global_switches(args)"
+            modeldata4="vmware_snapshot_modeldata4"
+            rows4="vmware_snapshot_rows"
+            addclick4="vmware_snapshot_add(data4)"
+            actions="vmware_virtualmachines_actions">
+        </generictable>
+    </div>
+</div>
+<div class="row dashboard-admin">
+    <div class="col-md-6">
+        <generictable
+            heading="Snapshots"
+            headers="vmware_snapshot_headers"
+            tabledata="vmware_snapshot.data.info">
+        </generictable>
+    </div>
+    <div class="col-md-6">
+        <generictable
+            heading="Folders"
+            headers="vmware_folders_headers"
+            tabledata="vmware_folders.data.info">
+        </generictable>
+    </div>
+</div>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <generictable
+            heading="Datastores"
+            headers="vmware_datastores_headers"
+            tabledata="vmware_datastores.data.info"
+            modeldata="vmware_datastores_modeldata">
+        </generictable>
+    </div>
+</div>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <generictable
+            heading="Customers"
+            headers="vmware_customers_headers"
+            tabledata="vmware_customers.data.info"
+            modeldata="vmware_customers_modeldata">
+        </generictable>
+    </div>
+</div>

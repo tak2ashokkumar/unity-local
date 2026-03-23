@@ -1,0 +1,787 @@
+<div class="row mt--3">
+    <div class="col-12 p-0">
+        <div class="card">
+            <div
+                class="card-title mb-2 px-2 py-2 border border-top-0 border-right-0 border-left-0 border-bottom-2 d-flex justify-content-between font-weight-bold">
+                <span class="h6 font-500 mt-1">Schedule Task - {{taskName}}</span>
+                <button class="btn btn-pill btn-warning btn-sm text-right" (click)="goBack()" tooltip="Back">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body text-muted">
+                <div class="row">
+                    <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                        <div class="d-flex flex-column align-items-center step" *ngIf="hostOrCloud == 'Cloud'">
+                            <span class="badge icon-wrap pointer-link" [class.active]="activeForm == 'Cloud'"
+                                (click)="manageActiveForm('Cloud')">
+                                <span class="fas fa-cog font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Parameters</label>
+                        </div>
+                        <div class="d-flex flex-column align-items-center step" *ngIf="hostOrCloud == 'Local'">
+                            <span class="badge icon-wrap pointer-link" [class.active]="activeForm == 'Cloud'"
+                                (click)="manageActiveForm('Cloud')">
+                                <span class="fas fa-cog font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Parameters</label>
+                        </div>
+                        <div class="d-flex flex-column align-items-center step" *ngIf="hostOrCloud == 'Host'">
+                            <span class="badge icon-wrap pointer-link" [class.active]="activeForm == 'Host'"
+                                (click)="manageActiveForm('Host')">
+                                <span class="fas fa-cog font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Parameters</label>
+                        </div>
+                        <div class="d-flex flex-column align-items-center step">
+                            <span class="badge icon-wrap pointer-link" [class.active]="activeForm == 'scheduleForm'"
+                                (click)="manageActiveForm('scheduleForm')">
+                                <span class="fas fa-calendar-alt font-xl"></span>
+                            </span>
+                            <label class="mt-1 font-md">Schedule</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 offset-4 divider-wrap">
+                        <hr class="divider-line w-85 ml-0">
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col">
+                        <ng-container [ngSwitch]="activeForm">
+                            <ng-container *ngSwitchCase="'Cloud'">
+                                <ng-container *ngTemplateOutlet="cloudFormRef"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'Host'">
+                                <ng-container *ngTemplateOutlet="hostFormRef"></ng-container>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'scheduleForm'">
+                                <ng-container *ngTemplateOutlet="scheduleFormRef"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #cloudFormRef>
+    <form *ngIf="cloudForm" [formGroup]="cloudForm">
+        <div class="form-group row" *ngIf="hostOrCloud == 'Cloud'">
+            <label for="cloud_image" class="col-2 ml-5 col-form-label text-right">Cloud :
+            </label>
+            <div class="col-4">
+                <img *ngIf="cloudImage" [src]="cloudImage" alt="">
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="hostOrCloud == 'Cloud'">
+            <label for="cloud_image" class="col-2 ml-5 col-form-label text-right">Select Account<em>*</em>
+                :
+            </label>
+            <div class="col-3">
+                <select id="cloud_account" class="form-control text-dark" formControlName="cloud_account"
+                    [ngClass]="{'is-invalid' : cloudFormErrors.cloud_account}">
+                    <option value="" disabled>Select Account Name</option>
+                    <option *ngFor="let account of cloudAccountData" [value]="account.value">
+                        {{ account.label }}
+                    </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="cloudFormErrors.cloud_account">
+                    {{cloudFormErrors.cloud_account}}</div>
+            </div>
+        </div>
+        <!-- <ng-container *ngIf="templateList && templateList.length > 0" formArrayName="templates">
+            <div class="form-group row" *ngFor="let template of cloudForm.get('templates').controls; let i = index"
+                [formGroupName]="i">
+                <label for="{{template.get('label').value}}" class="col-2 ml-5 text-right col-form-label">
+                    {{template.get('label').value}}<em>*</em> :
+                </label>
+                <div class="col-4">
+                    <select class="form-control" id="{{template.get('label').value}}" formControlName="value"
+                        [ngClass]="{'is-invalid': cloudFormErrors.templates[template.get('label').value]}"
+                        (change)="onTemplateCloudChange($event,  template.get('label').value)">
+                        <option value="" disabled selected>{{ template.get('label').value }}</option>
+                        <option *ngFor="let option of templateOptions[template.get('label').value]"
+                            [value]="option.value">
+                            {{option.label}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="cloudFormErrors.templates[template.get('label').value]">
+                        {{cloudFormErrors.templates[template.get('label').value]}}
+                    </div>
+                </div>
+            </div>
+        </ng-container> -->
+
+        <!-- <div class="form-group row">
+            <label for="task_name" class="col-2 ml-5 col-form-label text-right">Credentials <em>*</em>
+                :</label>
+            <div class="custom-control custom-radio mt-2">
+                <input id="local_radio" type="radio" class="custom-control-input" value="local" formControlName="cred">
+                <label class="custom-control-label" for="local_radio">Local</label>
+            </div>
+            <div class="col-2" *ngIf="cloudForm.get('cred')?.value == 'local'">
+                <select id="credentials" class="form-control" formControlName="credentials"
+                    [ngClass]="{'is-invalid' : cloudFormErrors.credentials}">
+                    <option value="" disabled>Select Credential</option>
+                    <option *ngFor="let cred of credentialList" [value]="cred.uuid"> {{cred.name}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="cloudFormErrors.credentials">
+                    {{cloudFormErrors.credentials}}
+                </div>
+            </div>
+            <div class="custom-control custom-radio ml-3 mt-2">
+                <input id="my_credential_radio" type="radio" class="custom-control-input" value="my_cred"
+                    formControlName="cred">
+                <label class="custom-control-label" for="my_credential_radio">My Credential</label>
+            </div>
+            <div class="col-2" *ngIf="cloudForm.get('cred')?.value == 'my_cred'">
+                <input id="username" class="form-control" type="text" formControlName="username"
+                    [class.is-invalid]="cloudFormErrors.username" placeholder="Enter UserName">
+                <div class="invalid-feedback" *ngIf="cloudFormErrors.username">
+                    {{cloudFormErrors.username}}
+                </div>
+            </div>
+            <div class="col-2" *ngIf="cloudForm.get('cred').value == 'my_cred'">
+                <custom-password-field formControlName="password"
+                    [options]="{errors:cloudFormErrors.password, placeholder:'Enter Password'}"
+                    [isDisabled]="cloudForm.get('password').disabled"></custom-password-field>
+                <div class="invalid-feedback" *ngIf="cloudFormErrors.password">
+                    {{cloudFormErrors.password}}
+                </div>
+            </div>
+        </div> -->
+
+        <!-- <ng-container *ngIf="!paramListIsObjFlag">
+            <ng-container *ngIf="parametersList && parametersList.length > 0">
+                <div class="row">
+                    <label for="task_name" class="col-2 ml-5 text-right col-form-label">Input
+                        Parameter<em>*</em> :</label>
+                    <div class="col-8 mx-0 border rounded p-3 position-relative">
+                        <div formArrayName="inputs">
+                            <div class="form-group row"
+                                *ngFor="let inputControl of cloudForm.get('inputs').controls; let i = index">
+                                <div [formGroupName]="i" class="col-12 row">
+
+                                    <div class="col-3 text-right align-self-center">
+                                        {{ parametersList[i]?.param_name}} :
+                                    </div>
+
+                                    <ng-container *ngIf="inputControl.get('param_type')">
+                                        <div class="col-4">
+                                            <input class="form-control" [id]="'template_name_' + i"
+                                                formControlName="template_name" type="text">
+                                        </div>
+                                        <ng-container *ngIf="inputControl.get('attribute')?.value">
+                                            <div class="col-4">
+                                                <input class="form-control" [id]="'attribute_' + i"
+                                                    formControlName="attribute" type="text">
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+
+                                    <ng-container
+                                        *ngIf="inputControl.get('default_value') && !inputControl.get('param_type')">
+                                        <div class="col-4">
+                                            <input class="form-control" [id]="'default_value_' + i"
+                                                formControlName="default_value" type="text"
+                                                [ngClass]="{ 'is-invalid': cloudFormErrors.inputs['default_value_' + i] }">
+                                            <div class="invalid-feedback"
+                                                *ngIf="cloudFormErrors.inputs['default_value_' + i]">
+                                                {{ cloudFormErrors.inputs['default_value_' + i] }}
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container> -->
+
+        <ng-container *ngIf="!paramListIsObjFlag">
+            <ng-container *ngIf="parametersList && parametersList.length > 0">
+                <div class="row">
+                    <!-- <label for="task_name" class="col-2 ml-5 text-right col-form-label">Input
+                                    Parameter<em>*</em> :</label> -->
+                    <!-- <div class="col-12 mx-0 border rounded p-3 position-relative"> -->
+                    <div formArrayName="inputs" class="col">
+                        <div class="form-group row"
+                            *ngFor="let inputControl of cloudForm.get('inputs').controls; let i = index">
+                            <div [formGroupName]="i" class="col-12 row">
+                                {{ cloudFormErrors.inputs[i]?.default_value }}
+                                <!-- CASE 1: When param_type is 'Input Template' -->
+                                <ng-container
+                                    *ngIf="inputControl.get('param_type')?.value === 'Input Template'; else normalInput">
+                                    <!-- Label -->
+                                    <div class="col-2 ml-5 text-right col-form-label">
+                                        {{ parametersList[i]?.label }}<em>*</em> :
+                                    </div>
+
+                                    <!-- Dropdown bound to default_value -->
+                                    <div class="col-3">
+                                        <select class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [disabled]="!templateOptions[parametersList[i]?.label]?.length"
+                                            [ngClass]="{ 'is-invalid': cloudFormErrors.inputs[i]?.default_value }">
+                                            <option value="" disabled>
+                                                {{ parametersList[i]?.label }}
+                                            </option>
+                                            <option *ngFor="let opt of templateOptions[parametersList[i]?.label]"
+                                                [value]="opt.value">
+                                                {{ opt.label }}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="cloudFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.label }} is required
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                <!-- CASE 2: When param_type is NOT 'Input Template' -->
+                                <ng-template #normalInput>
+                                    <div class="col-2 ml-5 text-right col-form-label">
+                                        {{ formatParamName(parametersList[i]?.param_name) }}<em>*</em> :
+                                    </div>
+
+                                    <!-- String -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'String'">
+                                        <input class="form-control text-dark" type="text" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': cloudFormErrors.inputs[i]?.default_value }"
+                                            placeholder="Enter default value">
+                                        <div class="invalid-feedback" *ngIf="cloudFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- Number -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Number'">
+                                        <input class="form-control text-dark" type="number" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': cloudFormErrors.inputs[i]?.default_value }"
+                                            placeholder="Enter default value">
+                                        <div class="invalid-feedback" *ngIf="cloudFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- Boolean -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Boolean'">
+                                        <select class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': cloudFormErrors.inputs[i]?.default_value }">
+                                            <option value="" disabled>Select Boolean</option>
+                                            <option [value]="true">True</option>
+                                            <option [value]="false">False</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="cloudFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- List -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'List'">
+                                        <input class="form-control text-dark" type="text" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': cloudFormErrors.inputs[i]?.default_value }"
+                                            placeholder='Enter default value e.g. ["item1", "item2"]'>
+                                        <div class="invalid-feedback" *ngIf="cloudFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- Dictionary -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Dictionary'">
+                                        <input class="form-control text-dark" type="text" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': cloudFormErrors.inputs[i]?.default_value }"
+                                            placeholder='Enter default value e.g. {"key": "value"}'>
+                                        <div class="invalid-feedback" *ngIf="cloudFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- Secret -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Secret'">
+                                        <custom-password-field formControlName="default_value" class="text-dark"
+                                            [options]="{ errors: cloudFormErrors.inputs[i]?.default_value, placeholder: 'Enter default value' }">
+                                        </custom-password-field>
+                                        <div class="invalid-feedback" *ngIf="cloudFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- </div> -->
+                </div>
+            </ng-container>
+        </ng-container>
+    </form>
+    <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+        <button class="btn btn-md btn-outline-danger mr-2" type="button" (click)="goBack()">Cancel</button>
+        <button class="btn btn-success" type="button" (click)="onSubmitCloudForm()">Next</button>
+    </div>
+</ng-template>
+
+<ng-template #hostFormRef>
+    <form *ngIf="hostForm" [formGroup]="hostForm">
+        <!-- <div class="form-group row mb-2">
+            <label for="ip" class="col-2 ml-5 col-form-label text-right">Enter IP Address<em>*</em>
+            </label>
+            <div class="col-4">
+                <input id="ip" class="form-control" type="text" formControlName="ip"
+                    placeholder="Enter IP Address (multiple Allowed, comma seperated)"
+                    [ngClass]="{'is-invalid' : hostFormErrors.ip}">
+                <div class="invalid-feedback" *ngIf="hostFormErrors.ip">
+                    {{hostFormErrors.ip}}</div>
+            </div>
+        </div> -->
+        <!-- <div class="col-2 ml-4 mb-2 col-form-label text-right pr-0">OR</div> -->
+
+        <!-- <div class="form-group row">
+            <label for="host_type" class="col-2 ml-5 col-form-label text-right">Host Type : </label>
+            <div class="col-2">
+                <select id="host_type" class="form-control" formControlName="host_type">
+                    <option value="">Select Host Name</option>
+                    <option value="datacenter">Datacenter</option>
+                    <option value="cloud">Cloud</option>
+                    <option value="tag">Tag</option>
+                    <option value="device_type">Device Type</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="hostForm.get('host_type')?.value == 'datacenter'">
+            <label for="datacenter" class="col-2 ml-5 col-form-label text-right">Data Center :
+            </label>
+            <div class="col-2">
+                <select id="datacenter" class="form-control" formControlName="datacenter">
+                    <option value="">Select DC</option>
+                    <option *ngFor="let d of dc" [value]="d.uuid">{{ d.name }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="hostForm.get('host_type')?.value == 'datacenter'">
+            <label for="device_category" class="col-2 ml-5 col-form-label text-right">Device
+                Category :
+            </label>
+            <div class="col-2">
+                <select id="device_category" class="form-control" formControlName="device_category">
+                    <option value="">Select Device Category</option>
+                    <option value="compute">Compute</option>
+                    <option value="network">Network</option>
+                    <option value="storage">Storage</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="hostForm.get('host_type')?.value == 'cloud'">
+            <label for="cloud" class="col-2 ml-5 col-form-label text-right">Cloud Name :
+            </label>
+            <div class="col-2">
+                <select id="cloud" class="form-control" formControlName="cloud"
+                    [ngClass]="{'is-invalid' : hostFormErrors.cloud}">
+                    <option value="">Select Cloud Name</option>
+                    <option *ngFor="let cloud of cloudWithIMg" [value]="cloud.type">{{ cloud.type }}
+                    </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="hostFormErrors.cloud">
+                    {{hostFormErrors.cloud}}</div>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="hostForm.get('host_type')?.value == 'cloud'">
+            <label for="account_name" class="col-2 ml-5 col-form-label text-right">Account Name :
+            </label>
+            <div class="col-2">
+                <select id="account_name" class="form-control" formControlName="account_name"
+                    [ngClass]="{'is-invalid' : hostFormErrors.account_name}">
+                    <option value="">Select Account Name</option>
+                    <option *ngFor="let account of cloudAccountNames" [value]="account.uuid">{{
+                        account.account_name }}
+                    </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="hostFormErrors.account_name">
+                    {{hostFormErrors.account_name}}</div>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="hostForm.get('host_type')?.value == 'tag'">
+            <label for="tag" class="col-2 ml-5 col-form-label text-right">Tag :
+            </label>
+            <div class="col-2">
+                <select id="tag" class="form-control" formControlName="tag"
+                    [ngClass]="{'is-invalid' : hostFormErrors.tag}">
+                    <option value="">Select Tag</option>
+                    <option *ngFor="let tag of tags" [value]="tag.tag_name">{{ tag.tag_name }}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="hostFormErrors.tag">
+                    {{hostFormErrors.tag}}</div>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="hostForm.get('host_type')?.value == 'device_type'">
+            <label for="device_type" class="col-2 ml-5 col-form-label text-right">Device Type :
+            </label>
+            <div class="col-4">
+                <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
+                    class="form-control w-100 p-0" style="height:auto;" formControlName="device_type"
+                    [ngClass]="{'is-invalid' : hostFormErrors.device_type}"></multiselect-dropdown>
+                <div class="invalid-feedback" *ngIf="hostFormErrors.device_type">
+                    {{hostFormErrors.device_type}}
+                </div>
+            </div>
+        </div> -->
+
+
+        <!-- <div class="form-group row">
+            <label for="host" class="col-2 ml-5 col-form-label text-right">Select Hosts<em>*</em> :</label>
+            <div class="col-4">
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle col-12" type="button" (click)="toggleDropdown($event)">
+                        {{ getSelectedHostsText() }}
+                    </button>
+                    <div *ngIf="dropdownOpen" class="dropdown-menu show col-12"
+                        style="display: block; height: auto; overflow-y: auto; max-height: 200px;">
+                        <div class="card-header p-1 dropdown-open">
+                            <table-search-box [searchValue]="searchValue" (searched)="onSearched($event)">
+                            </table-search-box>
+                        </div>
+                        <div class="card-body px-2 py-1 dropdown-open">
+                            <table class="table text-left">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th></th>
+                                        <th>HostName</th>
+                                        <th>IP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let host of filteredHosts" (click)="toggleSelection(host, $event)"
+                                        [ngClass]="{'selected': isSelected(host)}">
+                                        <td>
+                                            <span *ngIf="isSelected(host)"
+                                                class="fas fa-check text-success mt-2"></span>
+                                        </td>
+                                        <td>{{ host.name }}</td>
+                                        <td>{{ host.ip_address || 'N/A' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-danger font-xs" *ngIf="hostFormErrors.host">
+                    {{hostFormErrors.host}}
+                </div>
+            </div>
+        </div> -->
+
+        <div class="form-group row">
+            <label for="host_type" class="col-2 ml-5 col-form-label text-right">Filters :</label>
+            <div class="col-9">
+                <div class="row">
+                    <!-- Host Type -->
+                    <div class="col-3">
+                        <select id="host_type" class="form-control text-dark" formControlName="host_type">
+                            <option value="">Select Host Type</option>
+                            <!-- <option value="datacenter">Datacenter</option> -->
+                            <option value="cloud">Cloud</option>
+                            <option value="tag">Tag</option>
+                            <option value="device_type">Device Type</option>
+                        </select>
+                    </div>
+
+                    <!-- Datacenter (Only if selected) -->
+                    <div class="col-3" *ngIf="hostForm.get('host_type')?.value === 'datacenter'">
+                        <select id="datacenter" class="form-control text-dark" formControlName="datacenter">
+                            <option value="">Select DC</option>
+                            <option *ngFor="let d of dc" [value]="d.uuid">{{ d.name }}</option>
+                        </select>
+                    </div>
+
+                    <!-- Device Category (Only if Datacenter selected) -->
+                    <div class="col-3" *ngIf="hostForm.get('host_type')?.value === 'datacenter'">
+                        <select id="device_category" class="form-control text-dark" formControlName="device_category">
+                            <option value="">Select Device Category</option>
+                            <option value="compute">Compute</option>
+                            <option value="network">Network</option>
+                            <option value="storage">Storage</option>
+                        </select>
+                    </div>
+
+                    <!-- Cloud -->
+                    <div class="col-3" *ngIf="hostForm.get('host_type')?.value === 'cloud'">
+                        <select id="cloud" class="form-control text-dark" formControlName="cloud"
+                            [ngClass]="{'is-invalid' : hostFormErrors.cloud}">
+                            <option value="">Select Cloud</option>
+                            <option *ngFor="let cloud of cloudWithIMg" [value]="cloud.type">{{ cloud.type }}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="hostFormErrors.cloud">{{ hostFormErrors.cloud
+                            }}</div>
+                    </div>
+
+                    <!-- Cloud Account -->
+                    <div class="col-3" *ngIf="hostForm.get('host_type')?.value === 'cloud'">
+                        <select id="account_name" class="form-control text-dark" formControlName="account_name"
+                            [ngClass]="{'is-invalid' : hostFormErrors.account_name}">
+                            <option value="">Select Account</option>
+                            <option *ngFor="let account of cloudAccountNames" [value]="account.uuid">{{
+                                account.account_name }}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="hostFormErrors.account_name">{{
+                            hostFormErrors.account_name }}</div>
+                    </div>
+
+                    <!-- Tag -->
+                    <div class="col-3" *ngIf="hostForm.get('host_type')?.value === 'tag'">
+                        <select id="tag" class="form-control text-dark" formControlName="tag"
+                            [ngClass]="{'is-invalid' : hostFormErrors.tag}">
+                            <option value="">Select Tag</option>
+                            <option *ngFor="let tag of tags" [value]="tag.tag_name">{{ tag.tag_name }}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="hostFormErrors.tag">{{ hostFormErrors.tag }}
+                        </div>
+                    </div>
+
+                    <!-- Device Type -->
+                    <div class="col-3" *ngIf="hostForm.get('host_type')?.value === 'device_type'">
+                        <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
+                            class="form-control p-0 text-dark" formControlName="device_type"
+                            [ngClass]="{'is-invalid' : hostFormErrors.device_type}">
+                        </multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="hostFormErrors.device_type">{{
+                            hostFormErrors.device_type }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="ip" class="col-2 ml-5 col-form-label text-right">Targets<em>*</em> :
+            </label>
+            <div class="col-9">
+                <!-- <input id="ip" class="form-control" type="text" formControlName="ip"
+                                placeholder="Enter IP Address (multiple Allowed, comma seperated)"
+                                [ngClass]="{'is-invalid' : hostFormErrors.ip}"> -->
+                <app-auto-complete-multi formControlName="targets" [apiFn]="searchTargets"
+                    placeholder="Search by IP Address or Name"
+                    [ngClass]="{'is-invalid' : hostFormErrors.targets}"></app-auto-complete-multi>
+                <div class="invalid-feedback" *ngIf="hostFormErrors.targets">
+                    {{hostFormErrors.targets}}</div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="cred" class="col-2 ml-5 col-form-label text-right">Credentials <em>*</em>
+                :</label>
+            <div class="custom-control custom-radio mt-2">
+                <input id="local_radio" type="radio" class="custom-control-input" value="local" formControlName="cred">
+                <label class="custom-control-label" for="local_radio">Local</label>
+            </div>
+            <div class="col-2" *ngIf="hostForm.get('cred')?.value == 'local'">
+                <select id="credentials" class="form-control text-dark" formControlName="credentials"
+                    [ngClass]="{'is-invalid' : hostFormErrors.credentials}">
+                    <option value="" disabled>Select Credential</option>
+                    <option *ngFor="let cred of credentialList" [value]="cred.uuid"> {{cred.name}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="hostFormErrors.credentials">
+                    {{hostFormErrors.credentials}}
+                </div>
+            </div>
+            <div class="custom-control custom-radio ml-3 mt-2">
+                <input id="my_credential_radio" type="radio" class="custom-control-input" value="my_cred"
+                    formControlName="cred">
+                <label class="custom-control-label" for="my_credential_radio">My Credential</label>
+            </div>
+            <div class="col-2" *ngIf="hostForm.get('cred')?.value == 'my_cred'">
+                <input id="username" class="form-control text-dark" type="text" formControlName="username"
+                    [class.is-invalid]="hostFormErrors.username" placeholder="Enter UserName">
+                <div class="invalid-feedback" *ngIf="hostFormErrors.username">
+                    {{hostFormErrors.username}}
+                </div>
+            </div>
+            <div class="col-2" *ngIf="hostForm.get('cred').value == 'my_cred'">
+                <custom-password-field formControlName="password"
+                    [options]="{errors:hostFormErrors.password, placeholder:'Enter Password'}"
+                    [isDisabled]="hostForm.get('password').disabled"></custom-password-field>
+                <div class="invalid-feedback" *ngIf="hostFormErrors.password">
+                    {{hostFormErrors.password}}
+                </div>
+            </div>
+        </div>
+
+        <!-- <ng-container *ngIf="templateList && templateList.length > 0" formArrayName="templates">
+            <div class="form-group row" *ngFor="let template of hostForm.get('templates').controls; let i = index"
+                [formGroupName]="i">
+                <label for="{{template.get('label').value}}" class="col-2 ml-5 text-right col-form-label">
+                    {{template.get('label').value}}<em>*</em> :
+                </label>
+                <div class="col-4">
+                    <select class="form-control" id="{{template.get('label').value}}" formControlName="value"
+                        [ngClass]="{'is-invalid': hostFormErrors.templates[template.get('label').value]}"
+                        (change)="onTemplateHostChange($event,  template.get('label').value)">
+                        <option value="" disabled selected>{{ template.get('label').value }}</option>
+                        <option *ngFor="let option of templateOptions[template.get('label').value]"
+                            [value]="option.value">
+                            {{option.label}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="hostFormErrors.templates[template.get('label').value]">
+                        {{hostFormErrors.templates[template.get('label').value]}}
+                    </div>
+                </div>
+            </div>
+        </ng-container> -->
+
+        <ng-container *ngIf="!paramListIsObjFlag">
+            <ng-container *ngIf="parametersList && parametersList.length > 0">
+                <div class="row">
+                    <!-- <label for="task_name" class="col-2 ml-5 text-right col-form-label">Input
+                                    Parameter<em>*</em> :</label> -->
+                    <!-- <div class="col-12 mx-0 border rounded p-3 position-relative"> -->
+                    <div formArrayName="inputs" class="col">
+                        <div class="form-group row"
+                            *ngFor="let inputControl of hostForm.get('inputs').controls; let i = index">
+                            <div [formGroupName]="i" class="col-12 row">
+                                {{ hostFormErrors.inputs[i]?.default_value }}
+                                <!-- CASE 1: When param_type is 'Input Template' -->
+                                <ng-container
+                                    *ngIf="inputControl.get('param_type')?.value === 'Input Template'; else normalInput">
+                                    <!-- Label -->
+                                    <div class="col-2 ml-5 text-right col-form-label">
+                                        {{ parametersList[i]?.label }}<em>*</em> :
+                                    </div>
+
+                                    <!-- Dropdown bound to default_value -->
+                                    <div class="col-3">
+                                        <select class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [disabled]="!templateOptions[parametersList[i]?.label]?.length"
+                                            [ngClass]="{ 'is-invalid': hostFormErrors.inputs[i]?.default_value }">
+                                            <option value="" disabled>
+                                                {{ parametersList[i]?.label }}
+                                            </option>
+                                            <option *ngFor="let opt of templateOptions[parametersList[i]?.label]"
+                                                [value]="opt.value">
+                                                {{ opt.label }}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="hostFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.label }} is required
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                <!-- CASE 2: When param_type is NOT 'Input Template' -->
+                                <ng-template #normalInput>
+                                    <div class="col-2 ml-5 text-right col-form-label">
+                                        {{ formatParamName(parametersList[i]?.param_name) }}<em>*</em> :
+                                    </div>
+
+                                    <!-- STRING -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'String'">
+                                        <input type="text" class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': hostFormErrors.inputs[i]?.default_value }"
+                                            placeholder="Enter default value" />
+                                        <div class="invalid-feedback" *ngIf="hostFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- NUMBER -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Number'">
+                                        <input type="number" class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': hostFormErrors.inputs[i]?.default_value }"
+                                            placeholder="Enter default value" />
+                                        <div class="invalid-feedback" *ngIf="hostFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- BOOLEAN -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Boolean'">
+                                        <select class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': hostFormErrors.inputs[i]?.default_value }">
+                                            <option value="" disabled>Select Boolean</option>
+                                            <option [value]="true">True</option>
+                                            <option [value]="false">False</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="hostFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- LIST -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'List'">
+                                        <input type="text" class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': hostFormErrors.inputs[i]?.default_value }"
+                                            placeholder='Enter default value e.g. ["abc", "def"]' />
+                                        <div class="invalid-feedback" *ngIf="hostFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- DICTIONARY -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Dictionary'">
+                                        <input type="text" class="form-control text-dark" [id]="'default_value_' + i"
+                                            formControlName="default_value"
+                                            [ngClass]="{ 'is-invalid': hostFormErrors.inputs[i]?.default_value }"
+                                            placeholder='Enter default value e.g. {"key1": "value1"}' />
+                                        <div class="invalid-feedback" *ngIf="hostFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+
+                                    <!-- SECRET -->
+                                    <div class="col-3" *ngIf="inputControl.get('param_type')?.value === 'Secret'">
+                                        <custom-password-field formControlName="default_value" class="text-dark"
+                                            [options]="{ errors: hostFormErrors.inputs[i]?.default_value, placeholder: 'Enter default value' }">
+                                        </custom-password-field>
+                                        <div class="invalid-feedback" *ngIf="hostFormErrors.inputs[i]?.default_value">
+                                            {{ parametersList[i]?.param_name }} is required
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- </div> -->
+                </div>
+            </ng-container>
+        </ng-container>
+    </form>
+    <div class="d-flex justify-content-center mb-3 mt-2">
+        <button class="btn btn-md btn-outline-danger mr-2" type="button" (click)="goBack()">Cancel</button>
+        <button class="btn btn-md btn-success" type="button" (click)="onSubmitHostForm()">Next</button>
+    </div>
+</ng-template>
+
+<ng-template #scheduleFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <unity-schedule></unity-schedule>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-md btn-outline-danger mr-2" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success" type="button" (click)="onSubmitScheduleForm()">Submit</button>
+        </div>
+    </div>
+</ng-template>

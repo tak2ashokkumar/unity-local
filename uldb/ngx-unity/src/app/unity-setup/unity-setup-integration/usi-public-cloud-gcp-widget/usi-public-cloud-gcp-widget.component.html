@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'GCP'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addGcpAccount()"
+    (viewButtonClick)="viewGcpAccount()" [moduleName]="'Public Cloud'" [addAccessType]="'Manage Public Cloud'"
+    [viewAccessType]="'View Public Cloud'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<public-cloud-gcp-crud (onCrud)="onCrud($event)"></public-cloud-gcp-crud>

@@ -1,0 +1,128 @@
+<alerts></alerts>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-sm-12">
+            <h3><p>{{region_name_float}} - Details</p></h3>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Users"
+                headers="aws_user_list_headers"
+                tabledata="aws_user_list_content.data"
+                addclick="aws_dashboard_add(data)"
+                switches=""
+                actions="aws_user_list_content.actions">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Instances"
+                headers="aws_instance_list_headers"
+                tabledata="aws_instance_list_content.data"
+                click="aws_list_click(data)"
+                modeldata="aws_create_instance_modaldata"
+                rows="create_aws_instance_dropdowns"
+                addclick="aws_instance_add(data)"
+                switches="aws_switches(args)"
+                actions="aws_instance_list_content.actions"
+                modeldata1="aws_clone_instance_modaldata"
+                addclick1="aws_clone_instance_add(data1)"
+                modeldata3="aws_create_image_modaldata"
+                addclick3="aws_image_add(data3)"
+                modeldata4="aws_attachinstance_modaldata"
+                rows4="aws_attachinstance_dropdowns"
+                addclick4="attach_autoscaling_group(data4)"
+                modeldata5="aws_attachinterface_modaldata"
+                rows5="aws_attachinterface_dropdowns"
+                addclick5="attach_network_interface(data5)"
+                modeldata6="aws_attachloadbalancer_modaldata"
+                rows6="aws_attachloadbalancer_dropdowns"
+                addclick6="attach_loadbalancer(data6)">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Snapshots"
+                headers="aws_snapshot_list_headers"
+                tabledata="aws_snapshot_list_content.data"
+                modeldata1="aws_snapshot_list_modeldata"
+                rows="aws_snapshot_list_rows"
+                addclick1="aws_copy_snapshot(data1)"
+                actions="aws_snapshot_list_content.actions">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Volumes"
+                headers="aws_volume_list_headers"
+                tabledata="aws_volume_list_content.data"
+                modeldata="aws_dashboard"
+                rows="aws_dashboard_rows"
+                addclick="aws_dashboard_add(data)"
+                actions="aws_volume_list_content.actions">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Available Volumes"
+                headers="aws_available_volume_list_headers"
+                tabledata="aws_availablevolume_list_content.data.data"
+                modeldata="aws_dashboard"
+                rows="aws_dashboard_rows"
+                addclick="aws_dashboard_add(data)"
+                actions="aws_loadbalancer_list_content.actions">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Load Balancers"
+                headers="aws_load_balancer_list_headers"
+                tabledata="aws_loadbalancer_list_content.data"
+                modeldata="aws_dashboard"
+                rows="aws_dashboard_rows"
+                addclick="aws_dashboard_add(data)"
+                actions="aws_loadbalancer_list_content.actions">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Policies"
+                headers="aws_policy_list_headers"
+                tabledata="aws_policy_list_content.data"
+                switches="aws_switches(args)"
+                actions="aws_policy_list_content.actions">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Auto Scaling Groups"
+                headers="aws_asg_headers"
+                tabledata="aws_asg_list_content.data"
+                modeldata=""
+                rows=""
+                addclick=""
+                actions="">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Network Interfaces"
+                headers="aws_network_interface_headers"
+                tabledata="aws_netinter_list_content.data"
+                modeldata=""
+                rows=""
+                addclick=""
+                actions="">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="Security Groups"
+                headers="aws_security_group_headers"
+                tabledata="aws_security_group_content.data">
+            </awsgenerictable>
+        </div>
+    </div>
+</div>

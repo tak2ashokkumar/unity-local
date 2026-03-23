@@ -1,0 +1,159 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                        <span class="h6 mb-0 font-500">Device Mapping</span>
+                        <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                            <i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-2">
+                        <form *ngIf="form" [formGroup]="form">
+                            <div class="form-group col-12 text-center">
+                                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="name" class="col-2 text-right col-form-label">Name<em>* </em> :</label>
+                                <div class="col-4">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="formErrors.name" placeholder="Enter Name">
+                                    <div class="invalid-feedback" *ngIf="formErrors.name">
+                                        {{formErrors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="device_mapping" class="col-2 text-right col-form-label">Device
+                                    Mapping : </label>
+                                <div class="col-4 d-flex align-items-center">
+                                    <!-- <div>
+                                        <input id="device_mapping" class="ut-checkbox" type="checkbox"
+                                            formControlName="device_mapping">
+                                        <label for="device_mapping" class="primary mb-0"> &nbsp;</label>
+                                    </div> -->
+                                    <div class="w-100">
+                                        <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
+                                            [texts]="deviceTypeSelectionTexts" class="form-control p-0"
+                                            style="height:auto;" formControlName="device_types"
+                                            (dropdownClosed)="getDevicesByDeviceTypes()"
+                                            [ngClass]="{'is-invalid' : formErrors.device_types}">
+                                        </multiselect-dropdown>
+                                        <div class="invalid-feedback" *ngIf="formErrors.device_types">
+                                            {{formErrors.device_types}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 py-0">
+                                    <div class="row mx-0 border position-relative rounded mt-4 px-2 pt-3 pb-0"
+                                        [class.border-danger]="formErrors.devices">
+                                        <div class="bg-white font-md section-name-one"
+                                            [class.text-danger]="formErrors.devices">Device
+                                            Selection
+                                        </div>
+                                        <ng-container [ngTemplateOutlet]='deviceSelectionRef'></ng-container>
+                                    </div>
+                                    <!-- <div class="row mx-0 d-flex invalid-feedback" *ngIf="formErrors.devices">
+                                        {{formErrors.devices}}
+                                    </div> -->
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer bg-transparent d-flex justify-content-center border-top-0 pt-0">
+                        <button class="btn btn-sm btn-success" type="button"
+                            (click)="submit()">Submit</button>
+                        <button class="btn btn-md btn-danger ml-1" type="button" (click)="goBack()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #deviceSelectionRef>
+    <div class="col-12 p-0 d-flex justify-content-between align-items-center">
+        <div class="w-15 px-0 py-2"></div>
+        <div class="w-30 pl-0 py-2 pr-2">
+            <div class="card rounded-5 mb-0">
+                <app-spinner [name]="'devicesList'"></app-spinner>
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+                    <div class="d-flex align-items-center font-500 w-40">
+                        <span class="badge badge-secondary font-xs-sm">{{deviceCount}}</span>
+                        <span class="ml-1">Devices</span>
+                    </div>
+                    <div class="d-flex align-items-center font-500 w-60">
+                        <search-box [searchValue]="devicesCriteria.searchValue" [customClass]="'form-control-sm'"
+                            (searched)="onDeviceSearched($event)" class="w-100"></search-box>
+                    </div>
+                </div>
+                <div class="card-body p-0 scrollable-list">
+                    <div *ngIf="deviceCount" class="h-100 w-100">
+                        <virtual-scroller #scroll [items]="devices" (vsEnd)="fetchMoreDevices($event)"
+                            class="h-100 w-100">
+                            <div class="d-flex align-items-center border-bottom px-2 py-1 pointer-link"
+                                *ngFor="let d of scroll.viewPortItems"
+                                [class.nopointerevents]="isDeviceInSelectedList(d)" (click)="onClickToSelectDevice(d)">
+                                <span class="text-primary" [ngClass]="devicesSelectedClass(d)"></span>
+                                <span class="font-sm ml-2">
+                                    <span *ngIf="d?.deviceIcon" [class]="d?.deviceIcon"></span>
+                                    <span class="ml-1">{{d?.name}} </span>
+                                </span>
+                            </div>
+                            <div *ngIf="devicesLoading" class="loader px-3 text-primary font-lg-xl font-500"></div>
+                        </virtual-scroller>
+                    </div>
+                    <div class="h-100 d-flex justify-content-center align-items-center" *ngIf="!deviceCount">No Devices
+                        found.</div>
+                </div>
+            </div>
+        </div>
+        <div class="w-5 d-flex flex-column p-2">
+            <div class="align-items-center align-items-center d-flex flex-column">
+                <span *ngIf="devicesToBeSelected.length"
+                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{devicesToBeSelected?.length}}</span>
+                <span class="fas fa-arrow-right font-lg p-2 pointer-link"
+                    [ngClass]="devicesToBeSelected?.length ? 'text-primary-500' : 'text-muted'"
+                    (click)="addToSelectedDevices()" tooltip="add"></span>
+            </div>
+            <div class="align-items-center align-items-center d-flex flex-column">
+                <span class="fas fa-arrow-left font-lg p-2 pointer-link"
+                    [ngClass]="devicesToBeRemoved?.length ? 'text-primary-500' : 'text-muted'"
+                    (click)="removeFromSelectedDevices()" tooltip="remove"></span>
+                <span *ngIf="devicesToBeRemoved?.length"
+                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{devicesToBeRemoved?.length}}</span>
+            </div>
+        </div>
+        <div class="w-35 px-0 py-2">
+            <div class="card rounded-5 mb-0">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+                    <div class="d-flex align-items-center font-500 w-40">
+                        <span class="badge badge-secondary font-xs-sm">{{selectedDevices?.length}}</span>
+                        <span class="ml-1">Selected</span>
+                    </div>
+                    <div class="d-flex align-items-center font-500 w-60" [style.visibility]="'hidden'">
+                        <search-box [searchValue]="devicesCriteria.searchValue" [customClass]="'form-control-sm'"
+                            (searched)="onSelectedSearch($event)" class="w-100"></search-box>
+                    </div>
+                </div>
+                <div class="card-body p-0 scrollable-list">
+                    <div *ngIf="deviceCount" class="h-100 w-100">
+                        <div class="d-flex align-items-center border-bottom px-2 py-1 pointer-link"
+                            *ngFor="let d of selectedDevices; let i=index" (click)="removeDeviceFromSelection(d)">
+                            <span class="text-primary"
+                                [ngClass]="d.toBeRemoved ? 'fas fa-check-square' : 'far fa-square'"></span>
+                            <span class="font-sm ml-2">
+                                <span *ngIf="d?.deviceIcon" [class]="d?.deviceIcon"></span>
+                                <span class="ml-1">{{d?.name}} </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="h-100 d-flex justify-content-center align-items-center"
+                        *ngIf="!selectedDevices?.length">No Devices
+                        selected.</div>
+                </div>
+            </div>
+        </div>
+        <div class="w-15 px-0 py-2"></div>
+    </div>
+</ng-template>

@@ -1,0 +1,40 @@
+<style>
+.ipfield{
+	width: 92px;
+	margin-top: -5px;
+	text-align: center;
+}
+</style>
+<form class="form-horizontal">
+    <div class="form-group" ng-repeat="row in rows7">
+            <span ng-if= "row.type != 'hidden'">
+                <label for="blockName" class="col-sm-3 control-label">{{ row.description }}*</label>
+            </span>
+            <div ng-if="!(row.description.indexOf('IP') > -1)">
+                <div ng-if="!(row.name=='port') ">
+                    <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'password') || (row.type == 'file')">
+                        <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" maxlength="{{row.maxlength}}" required>
+                    </div>
+                </div>
+                <div ng-if="(row.name=='port') ">
+                    <div class="col-sm-9" ng-if="(row.type == 'text')">
+                        <input type="{{ row.type }}" class="{{ row.class }}" id="update_port" ng-model="obj[row.name]" value="{{row.value}}" onkeyup="set_portval(this.id);return false;"  >
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9 ng-scope" ng-if="(row.type == 'text') && (row.description.indexOf('IP') > -1)">
+                <input type="text" id="ip_field_10"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,'ip_field_21'); return false;" class="ipfield" ng-model="obj[row.name]" >.
+                <input type="text" id="ip_field_20"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,'ip_field_31'); return false;" class="ipfield" ng-model="obj.ip2">.
+                <input type="text" id="ip_field_30"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,'ip_field_42'); return false;" class="ipfield" ng-model="obj.ip3">.
+                <input type="text" id="ip_field_40"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,''); return false;" class="ipfield" ng-model="obj.ip4">
+            </div>
+            <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                <select ng-options="option for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+            </div>
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+            </div>
+    </div>
+</form>

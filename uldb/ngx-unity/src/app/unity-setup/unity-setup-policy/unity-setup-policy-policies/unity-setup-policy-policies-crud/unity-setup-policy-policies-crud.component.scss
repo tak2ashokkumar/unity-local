@@ -1,0 +1,103 @@
+ul {
+    list-style: none;
+}
+
+ul li {
+    text-align: center;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #c8ced3;
+
+    label {
+        border-radius: 25px;
+        width: 100%;
+        padding: 0.25rem 0.5rem;
+        display: inherit;
+        border-color: #73818f;
+        font-size: 0.765625rem;
+        line-height: 1.5;
+        margin-bottom: 0px !important;
+
+        input {
+            visibility: hidden;
+        }
+    }
+
+    label.active {
+        background-color: #378ad8 !important;
+        color: #ffffff !important;
+    }
+}
+
+ul li:first-child {
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    border-right: none !important;
+}
+
+ul li:last-child {
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    border-left: none !important;
+}
+
+.policy-checkbox {
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 28px;
+    /* Increased */
+    height: 28px;
+    /* Increased */
+    margin: 0;
+    background: white;
+    border: 2px solid #c8ced3;
+    border-radius: 20%;
+    cursor: pointer;
+    vertical-align: middle;
+
+    &:checked {
+        background: #378ad8 !important;
+        border-color: #378ad8 !important;
+    }
+
+    &.warning:checked {
+        background: #d97400 !important;
+        border-color: #d97400 !important;
+    }
+
+    &.success:checked {
+        background: #0cbb70 !important;
+        border-color: #0cbb70 !important;
+    }
+
+    &.danger:checked {
+        background: #c00 !important;
+        border-color: #c00 !important;
+    }
+
+    &:disabled {
+        background: #ddd;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    &:checked::after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        /* Adjusted for bigger box */
+        left: 9px;
+        /* Adjusted for center alignment */
+        width: 6px;
+        /* Thicker tick */
+        height: 12px;
+        /* Longer tick */
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        /* Thicker stroke */
+        transform: rotate(45deg);
+    }
+}

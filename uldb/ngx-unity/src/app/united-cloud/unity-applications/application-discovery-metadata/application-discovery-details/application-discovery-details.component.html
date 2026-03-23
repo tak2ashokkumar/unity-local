@@ -1,0 +1,331 @@
+<div class="row mb-2">
+    <div class="col-4 pr-0">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'serverInfoLoader'"></app-spinner>
+            <div class="card-header font-lg font-500 bg-transparent py-2">Server Information</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Server Name :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.name}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Server IP :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.hostIp}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Port :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.port}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">User Agent :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.userAgent}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Http Flavor :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.httpFlavor}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Telemetry Sdk Lang :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.sdkLanguage}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Service Version :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.serviceVersion}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">File Path :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.filePath}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Latency :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.latency}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Throughput :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.throughput}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-5 text-right text-muted">Error Rate :</div>
+                    <div class="col-7 pl-0">{{serverInformationViewData?.erroRate}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-8">
+        <shared-application-topology [data]="topologyResponse?.topology_data"></shared-application-topology>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-8">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'utilizationTrendLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1">
+                <div class="font-lg font-500 ">Utilization Trend</div>
+                <custom-date-dropdown [options]="utilizationOverviewViewData.dropdownOptions"
+                    [enableCustomDateRange]="true" [customClass]="'form-control-sm'"
+                    [default]="utilizationOverviewViewData.defaultSelected"
+                    (onSubmit)="onUtilizationWidgetFormChanged($event)">
+                </custom-date-dropdown>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+
+                    <!-- CPU Section -->
+                    <div class="col-md-6 border-end">
+                        <div class="mb-1">CPU</div>
+                        <div class="d-flex justify-content-around">
+                            <div>
+                                <div class="text-muted">Current</div>
+                                <div class="fw-bold">
+                                    {{utilizationOverviewViewData?.utilizationRateChartDataAndOthers?.currentCPU}}
+                                </div>
+                            </div>
+                            <div class="mx-2 my-1 border border-secondary"></div>
+                            <div>
+                                <div class="text-muted">Average Utilization</div>
+                                <div class="fw-bold">
+                                    {{utilizationOverviewViewData?.utilizationRateChartDataAndOthers?.averageCPU}}
+                                </div>
+                            </div>
+                            <div class="mx-2 my-1 border border-secondary"></div>
+                            <div>
+                                <div class="text-muted">Peak Utilization</div>
+                                <div class="fw-bold">
+                                    {{utilizationOverviewViewData?.utilizationRateChartDataAndOthers?.peakCPU}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border border-secondary"></div>
+
+                    <!-- Memory Section -->
+                    <div class="col border-end">
+                        <div class="mb-1">Memory</div>
+                        <div class="d-flex justify-content-around">
+                            <div>
+                                <div class="text-muted">Current</div>
+                                <div class="fw-bold">
+                                    {{utilizationOverviewViewData?.utilizationRateChartDataAndOthers?.currentMemory}}
+                                </div>
+                            </div>
+                            <div class="mx-2 my-1 border border-secondary"></div>
+                            <div>
+                                <div class="text-muted">Average Utilization</div>
+                                <div class="fw-bold">
+                                    {{utilizationOverviewViewData?.utilizationRateChartDataAndOthers?.averageMemory}}
+                                </div>
+                            </div>
+                            <div class="mx-2 my-1 border border-secondary"></div>
+                            <div>
+                                <div class="text-muted">Peak Utilization</div>
+                                <div class="fw-bold">
+                                    {{utilizationOverviewViewData?.utilizationRateChartDataAndOthers?.peakMemory}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <div class="my-1 border border-secondary"></div> -->
+
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <ng-container
+                            *ngIf="utilizationOverviewViewData && utilizationOverviewViewData.utilizationRateChartData">
+                            <div echarts [options]="utilizationOverviewViewData?.utilizationRateChartData.options"
+                                [defaultHeight]="250">
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 pl-0">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-2">
+                <div class="font-lg font-500">Application Metrics</div>
+            </div>
+            <div class="card-body">
+                <ng-container *ngIf="MetricsInfoViewData || MetricsInfoViewData.length > 0">
+                    <div class="mx-auto" style="max-width: 350px;">
+                        <div class="row d-flex mb-2" *ngFor="let view of MetricsInfoViewData">
+                            <div class="col-9 text-right text-muted">{{view.metricName}} :</div>
+                            <div class="col-3 pl-0">{{view.latestValue}}</div>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="!MetricsInfoViewData || MetricsInfoViewData.length == 0">
+                    <div class="row d-flex justify-content-center align-items-center mb-2 h-100">
+                        <span>No Data Available</span>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card round-edge">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-1">
+                <div class="font-lg font-500">Recent Traces</div>
+                <button class="action-icons mb-0 fas fa-eye font-sm" tooltip="View All Traces"
+                    (click)="goToTraces()"></button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive-no-truncate">
+                    <table class="table table-sm text-left">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Trace Id</th>
+                                <th>Span Id</th>
+                                <th>Service</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>IP Address</th>
+                                <th>Http Url</th>
+                                <th>Http Method</th>
+                                <th>Language</th>
+                                <th>Port</th>
+                                <th>User Agent</th>
+                                <th>Status</th>
+                                <th>Status Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of logsAndTracesViewData?.topTraces">
+                                <td class="tdw-8 text-truncate">
+                                    <div>{{view?.traceId}}</div>
+                                </td>
+                                <td class="tdw-8 text-truncate">
+                                    <div>{{view?.spanId}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view?.serviceName}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view?.startTime}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view?.endTime}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div>{{view?.hostname}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view?.httpUrl}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div>{{view?.httpMethod}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div>{{view?.sdkLanguage}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div>{{view?.hostPort}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div>{{view?.userAgent}}</div>
+                                </td>
+                                <td class="tdw-5 text-center">
+                                    <shared-device-status [status]="view.status"></shared-device-status>
+                                </td>
+                                <td class="tdw-5 text-center">
+                                    <div>{{view?.statusCode}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center text-muted py-4" *ngIf="!logsAndTracesViewData?.topTraces?.length">No Traces
+                    were found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card round-edge">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-1">
+                <div class="font-lg font-500">Recent Logs</div>
+                <button class="action-icons mb-0 fas fa-eye font-sm" tooltip="View All Logs"
+                    (click)="goToLogs()"></button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive-no-truncate">
+                    <table class="table table-sm text-left">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Hostname</th>
+                                <th>Service</th>
+                                <th>Application</th>
+                                <th>Status</th>
+                                <th>Message</th>
+                                <th>Id</th>
+                                <!-- <th>Http Route</th> -->
+                                <!-- <th>File Path</th> -->
+                                <th>Timestamp</th>
+                                <!-- <th>Status Code</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of logsAndTracesViewData?.topLogs">
+                                <td class="tdw-10 text-truncate">
+                                    <div>{{view.hostname}}</div>
+                                </td>
+                                <td class="tdw-10 text-truncate">
+                                    <div>{{view.serviceName}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view.application}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <!-- <div [tooltip]="view.status">{{view.status}}</div> -->
+                                    <span [ngClass]="view.statusIcon" [tooltip]="view.status"></span>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view.message}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view.id}}</div>
+                                </td>
+                                <!-- <td class="tdw-10">
+                                    <div>{{view.httpRoute}}</div>
+                                </td> -->
+                                <!-- <td class="tdw-10">
+                                    <div>{{view.filePath}}</div>
+                                </td> -->
+                                <td class="tdw-10">
+                                    <div>{{view.timestamp}}</div>
+                                </td>
+                                <!-- <td class="tdw-10">
+                                    <div>{{view.statusCode}}</div>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center text-muted py-4" *ngIf="!logsAndTracesViewData?.topLogs?.length">No Logs were
+                    found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #nodeDetails>
+    <div class="card border-0 mb-0" *ngIf="hoveredNode">
+        <div class="card-body p-0 pt-1">
+            <p class="card-text mb-1">Name: <span class="text-muted">{{hoveredNode.name}}</span></p>
+            <p class="card-text mb-1">Type: <span class="text-muted">{{ hoveredNode.type}}</span></p>
+            <p class="card-text mb-1" *ngIf="hoveredNode.subtype">Subtype: <span
+                    class="text-muted">{{hoveredNode.subtype}}</span></p>
+            <ng-container *ngFor="let item of hoveredNode.metadata | keyvalue">
+                <p class="card-text mb-1" *ngIf="item.value">
+                    {{ item.key }}: <span class="text-muted">{{ item.value }}</span>
+                </p>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,303 @@
+<div class="row">
+    <div class="col-3 pr-0">
+
+        <div class="card flex-row mb-2 overflow-hidden pointer-link round-edge">
+            <div class="card-body col-6 custom-hover-effect left-card pl-1 pointer-link px-0 py-2" [class.active]="selection == 'category'" (click)="filterByCategoryType()">
+                <div class="d-flex flex-row align-items-center">
+                    <span class="badge px-1" [ngClass]="{'badge-primary': selection === 'category', 'badge-secondary': selection == 'resource'}">{{gcpSummary?.totalCategories}}</span>
+                    <span class="px-1">Categories</span>
+                </div>
+            </div>
+            <div class="card-body col-6 custom-hover-effect right-card pl-1 pointer-link px-0 py-2" [class.active]="selection == 'resource'"  (click)="filterByResourceType()">
+                <div class="d-flex flex-row align-items-center">
+                    <span class="badge px-1" [ngClass]="{'badge-secondary': selection == 'category', 'badge-primary': selection == 'resource'}">{{gcpSummary?.totalResources}}</span>
+                    <span class="px-1">Resources</span>
+                </div>
+            </div>
+        </div>
+
+        <ng-template [ngIf]="selection === 'resource'">
+            <div *ngFor="let view of resourcesDetailViewData?.resourceCounts"
+                class="card round-edge px-1 mb-2 pointer-link custom-hover-effect"
+                [class.active]="view.id == resourceId" (click)="filterByResourceType(view)">
+                <div class="card-body py-2 my-1">
+                    <div class="row">
+                        <div class="card-title mb-0 px-0 col text-truncate" [tooltip]="view.name">
+                            <img [src]="view.iconPath" width="17" height="17" *ngIf="view.iconPath">
+                            <span class="ml-2">{{ view.name }}</span>
+                        </div>
+                        <div class="text-primary ml-auto mr-2">{{ view.resourceCount }}</div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+
+
+        <ng-template [ngIf]="selection === 'category'">
+            <div *ngFor="let view of resourcesDetailViewData?.resourceCounts; let i = index"
+                class="card round-edge px-1 mb-2">
+                <div class="card-body py-2 my-1">
+                    <div class="row">
+                        <div class="card-title mb-0 px-0 col text-truncate pointer-link" [tooltip]="view.name" (click)="manageOpenWidget(i)">
+                            <img [src]="view.iconPath" width="17" height="17" *ngIf="view.iconPath">
+                            <span class="ml-2">{{ view.name }}</span>
+                        </div>
+                        <div class="text-primary ml-auto mr-2">{{ view.resourceCount }}</div>
+                        <span class="fas mt-1 pointer-link"
+                            [ngClass]="{'fa-angle-down':!view.isOpen,'fa-angle-up':view.isOpen}"
+                            (click)="manageOpenWidget(i)"></span>
+                    </div>
+                    <div *ngIf="view.isOpen" class="fold pl-0 row" [ngClass]="{'open' : view.isOpen}">
+                        <ng-container [ngTemplateOutlet]='serviceDetails'
+                            [ngTemplateOutletContext]="{view:view.subcategories}"></ng-container>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+
+    <div class="col-9">
+        <div class="row">
+            <div class="col">
+                <div class="card round-edge mb-0">
+                    <div class="card-body py-2 my-1">
+                        <div class="card-title mb-0">Total Subscription</div>
+                        <span class="text-primary text-value">{{gcpSummary?.totalGcpAccounts}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card round-edge mb-0">
+                    <div class="card-body py-2 my-1">
+                        <div class="card-title mb-0">Total Services</div>
+                        <span class="text-primary text-value">{{gcpSummary?.totalServices}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card round-edge mb-0">
+                    <div class="card-body py-2 my-1">
+                        <div class="card-title mb-0">Total Cost</div>
+                        <span class="text-primary text-value pointer-link" (click)="goToCost()" accessControl
+                            moduleName="Cost Analysis" accessType="View Cost Analysis"
+                            elementType="div">${{gcpSummary?.totalCost}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <app-spinner [name]="'resourcesList'"></app-spinner>
+            <div
+                class="card-header bg-transparent border-bottom-1 d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex justify-content-center align-items-center">
+                    <span class="badge badge-secondary font-sm font-500">{{count}}</span>
+                    <span class="ml-1">{{selectedResourceName}}</span>
+                </div>
+                <div class="col-7 d-flex justify-content-end align-items-center">
+                    <div class="col-4" *ngIf="gcpAccountData?.length">
+                        <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="gcpAccountData"
+                            [settings]="accountDetailsSettings" [texts]="accountDetailsTexts"
+                            [(ngModel)]="currentCriteria.multiValueParam.account_uuid"
+                            (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                    </div>
+                    <button *ngIf="selectedResourceName == 'VM instances'"
+                        class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="createInstance()"
+                        tooltip="Add Instance" accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+                        elementType="btn"><i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn btn-pill btn-warning btn-sm ml-2" (click)="goBack()" tooltip="Back">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                    <data-refresh-btn [page]="currentCriteria.pageNo"
+                        (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </div>
+            <div class="card-body pt-1">
+                <div class="row mt-1 mb-2">
+                    <div class="col-3">
+                        <table-search-box (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col-9">
+                        <div class="row justify-content-end mr-1">
+                            <div class="col-3">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [options]="gcpRegions" [settings]="regionSettings"
+                                    [texts]="userSelectionRegionTexts"
+                                    [(ngModel)]="currentCriteria.multiValueParam.region"
+                                    (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                            </div>
+                            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-sm text-left font-xs-sm font-500">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <th *ngIf="selectedResourceName == 'VM instances'">Status</th>
+                            <th>Type</th>
+                            <th>Account Name</th>
+                            <th>Service</th>
+                            <th>Location</th>
+                            <th class="action-icons-column" *ngIf="selectedResourceName == 'VM instances'">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData" truncateText>
+                            <td class="text-primary pointer-link tdw-25">
+                                <div class="text-truncate" (click)="goToResource(view)" [tooltip]="view.name">
+                                    {{view.name}}</div>
+                            </td>
+                            <td *ngIf="selectedResourceName == 'VM instances'">
+                                <shared-device-status [status]="view.powerStatus"></shared-device-status>
+                            </td>
+                            <td>
+                                <div class="text-truncate">{{view.resourceType}}</div>
+                            </td>
+                            <td>
+                                <div class="text-truncate">{{view.accountName}}</div>
+                            </td>
+                            <td>
+                                <div class="text-truncate" [tooltip]="view.service">{{view.service}}</div>
+                            </td>
+                            <td>
+                                <div>{{view.location}}</div>
+                            </td>
+                            <td class="action-icons-column" *ngIf="selectedResourceName == 'VM instances'">
+                                <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
+                                    [ngClass]="{'action-icons-on':view.powerStatusOn, 'action-icons-disabled':!view.isPowerIconEnabled}"
+                                    [tooltip]="view.powerTooltipMessage" (click)="powerToggle(view)" accessControl
+                                    moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                    elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                    [ngClass]="{'action-icons-disabled':!view.isCreateTicketIconEnabled}"
+                                    tooltip="Manage by creating support ticket" (click)="createVMTicket(view)"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!viewData.length">No Resources available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #createInstanceRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Create Instance
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="createInstanceModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="createInstanceForm" [formGroup]="createInstanceForm">
+                <div class="form-group">
+                    <label class="form-col-form-label" for="account_uuid">Account Name<em>*</em></label>
+                    <select id="account_uuid" class="form-control" formControlName="account_uuid"
+                        [class.is-invalid]="createInstanceErrors.account_uuid">
+                        <option value="" disabled> Select Account Name</option>
+                        <option *ngFor="let view of gcpAccountData" [ngValue]="view.uuid">{{view.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createInstanceErrors.account_uuid">
+                        {{createInstanceErrors.account_uuid}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="name">Name<em>*</em></label>
+                    <input id="name" class="form-control" type="text" formControlName="name"
+                        [class.is-invalid]="createInstanceErrors.name">
+                    <div class="invalid-feedback" *ngIf="createInstanceErrors.name">
+                        {{createInstanceErrors.name}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="zone">Zone<em>*</em></label>
+                    <select id="zone" class="form-control" formControlName="zone"
+                        [class.is-invalid]="createInstanceErrors.zone">
+                        <option value="" disabled> Select Zone</option>
+                        <option *ngFor="let view of gcpRegions" [value]="view">{{view}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createInstanceErrors.zone">
+                        {{createInstanceErrors.zone}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="machine_type">Machine Type<em>*</em></label>
+                    <multiselect-dropdown [options]="machineTypeList" [settings]="machineTypeSettings"
+                        class="form-control p-0" style="height:auto;" formControlName="machine_type"
+                        [class.is-invalid]="createInstanceErrors.machine_type"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="createInstanceErrors.machine_type">
+                        {{createInstanceErrors.machine_type}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="image">Image<em>*</em></label>
+                    <multiselect-dropdown [options]="imageList" [settings]="imageListSettings" class="form-control p-0"
+                        style="height:auto;" formControlName="image"
+                        [class.is-invalid]="createInstanceErrors.image"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="createInstanceErrors.image">
+                        {{createInstanceErrors.image}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="submitCreateInstance()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="createInstanceModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmPower>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{confirmInput?.confirmTitle}}
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {{confirmInput?.confirmMessage}}
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmToggle()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #serviceDetails let-view="view">
+    <div *ngFor="let v of view; let j = index" class="row col-12 p-0">
+        <div class="col-1 pr-0 d-flex justify-content-end">
+            <div class="custom-border-left w-100 mb-3 align-items-center"
+                [ngClass]="j == 0 ? 'mt--1' : 'custom-margin-top'"></div>
+        </div>
+        <div class="col-11 pl-2 justify-content-between row round-edge d-flex mb-1 pointer-link custom-hover-effect"
+            (click)="filterByCategoryType(v)" [class.active]="v.id == resourceId">
+            <div class="row col px-0 ml-3 my-1">
+                <div class="card-title mb-0 w-80  d-flex" [tooltip]="v.service">
+                    <img [src]="v.iconPath" width="17" height="17" *ngIf="v.iconPath">
+                    <div class="ml-2 text-truncate"> {{v?.service}}</div>
+                </div>
+                <div class="text-primary  ml-auto mr-2">{{v?.value}}</div>
+            </div>
+        </div>
+    </div>
+</ng-template>

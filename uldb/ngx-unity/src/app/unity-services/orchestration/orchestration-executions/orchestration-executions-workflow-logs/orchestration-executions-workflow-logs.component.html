@@ -1,0 +1,288 @@
+<div class="card mb-2 mt--3">
+    <div class="card-body py-2">
+        <div class="row">
+            <div class="col-11">
+                <div class="row mb-1">
+                    <div class="col">
+                        <h5>{{workflowDetailsViewData?.templateName}}<span
+                                class="text-muted">({{workflowDetailsViewData?.id}})</span></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col d-flex justify-content-start">
+                        <div class="mr-5">
+                            <span class="text-muted">Type: </span>
+                            <span>{{workflowDetailsViewData?.type}}</span>
+                        </div>
+                        <!-- <div class="mr-5">
+                            <span class="text-muted">Target: </span>
+                            <span>{{workflowDetailsViewData?.target}}</span>
+                        </div> -->
+                        <div class="mr-5">
+                            <span class="text-muted">Started On: </span>
+                            <span>
+                                {{workflowDetailsViewData?.startTime}}</span>
+                        </div>
+                        <div class="mr-5">
+                            <span class="text-muted">Started By: </span>
+                            <span>{{workflowDetailsViewData?.startedBy}}</span>
+                        </div>
+                        <div class="mr-5">
+                            <span class="text-muted">Duration: </span>
+                            <span>{{workflowDetailsViewData?.duration}}</span>
+                        </div>
+                        <div>
+                            <span class="text-muted">Status: </span>
+                            <span
+                                [ngClass]="getColor(workflowDetailsViewData?.status)">{{workflowDetailsViewData?.status}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-1 d-flex justify-content-end align-items-end">
+                <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                <button class="btn btn-pill btn-warning btn-sm ml-1" (click)="goBack()" tooltip="Back">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <ng-container *ngIf="isAdvanced || isAgentic">
+    <orchestration-execution-logs-new-workflow-widget *ngIf="workflowDetails"
+        [workflowDetails]="workflowDetails"></orchestration-execution-logs-new-workflow-widget>
+</ng-container> -->
+<ng-container *ngIf="!isAdvanced && !isAgentic">
+    <orchestration-execution-logs-workflow-widget *ngIf="workflowDetails"
+        [workflowDetails]="workflowDetails"></orchestration-execution-logs-workflow-widget>
+</ng-container>
+
+<ng-container *ngIf="showWorkflowWidget">
+    <orchestration-execution-logs-new-workflow-widget *ngIf="workflowDetails" [workflowDetails]="workflowDetails">
+    </orchestration-execution-logs-new-workflow-widget>
+</ng-container>
+
+
+
+<!-- <div class="card round-edge mb-2">
+    <div class="card-header p-0">
+        <div class="row header-bgr mx-0">
+            <div class="col-7 p-2">Execution Logs</div>
+            <div class="col-5 p-2 vertical-line">Output</div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="row mx-0">
+            <div class="col-7 p-3">
+                <pre>{{workflowLogsViewData?.executionLog}}</pre>
+            </div>
+            <div class="col-5 px-3 pt-3 vertical-line">
+                <ng-container *ngIf="workflowOutputViewData.length">
+                    <ng-container *ngFor="let output of workflowOutputViewData">
+                        <div class="row mb-2">
+                            <div class="col-4 mr-4 pl-3">
+                                <div class="text-muted text-xs mr-2">Task</div>
+                                <div>
+                                    <span class="text-value-xs">{{output?.taskName}}</span>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted text-xs mr-2">Status</div>
+                                <div>
+                                    <span class="text-value-xs"
+                                        [ngClass]="getColor(output?.executionStatus)">{{output?.executionStatus}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3" *ngIf="output?.output">
+                            <div class="col px-0">
+                                <div class="row mx-0">
+                                    <div class="col d-flex justify-content-between align-items-center pl-3">
+                                        <div class="p-0 text-muted text-xs">Output</div>
+                                        <button class="action-icons fas fa-copy font-sm mr-2" tooltip="Copy"
+                                            (click)="copyOutput()"></button>
+                                    </div>
+                                </div>
+                                <div class="row mx-3 mt-2 output-bgr">
+                                    <div class="col p-2" #copyContent>
+                                        <pre style="overflow-x: hidden; white-space: pre-wrap;">{{output?.output}}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+<div class="card rounded mb-0 border border-bottom-0 mt--4">
+    <div class="card-body p-0 h-100">
+        <div class="row mx-0">
+            <div class="col-2">
+                <div class="mt-2" *ngIf="workflowTaskListViewData">
+                    <div *ngFor="let task of workflowTaskListViewData; let i = index"
+                        class="position-relative mb-3 w-100">
+                        <div *ngIf="task.name !== 'Start' && task.name !== 'End'">
+                            <div class="d-flex align-items-center pointer-link ms-4 justify-content-between"
+                                style="gap: 8px;" (click)="showTaskDetails(task)">
+                                <div class="d-flex align-items-center" style="gap: 8px;">
+                                    <div class="position-relative rounded-circle d-flex align-items-center justify-content-center"
+                                        [ngClass]="getStatusClass(task.status)"
+                                        style="width: 24px; height: 24px; z-index: 1;">
+                                        <i class="fas fa-check small" [ngClass]="task.statusColor"></i>
+                                    </div>
+                                    <div [ngClass]="task.statusColor">
+                                        {{ task.name }}
+                                    </div>
+                                </div>
+                                <i *ngIf="selectedTask?.name === task.name" class="fa fa-solid fa-angle-right"></i>
+                            </div>
+                            <div *ngIf="i < workflowTaskListViewData.length - 1"
+                                class="position-absolute start-0 top-100" [ngClass]="getStatusClass(task.status)"
+                                style="width: 1px; height: 24px; margin-left: 11px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-5 vertical-line">
+                <div class="bg-light-grey row border-bottom p-2">
+                    <span>Details</span>
+                </div>
+                <ng-container *ngIf="workflowTaskListViewData; else noOutput">
+                    <ng-container>
+                        <div class="row my-3" style="max-height: 300px; overflow-y: auto;">
+                            <div class="col-12" *ngIf="selectedTask">
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted">Name</div>
+                                    <div class="col-8">: {{ selectedTask.name }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted">Start Time</div>
+                                    <div class="col-8">: {{ selectedTask.startTime }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted">End Time</div>
+                                    <div class="col-8">: {{ selectedTask.endTime }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted">Duration</div>
+                                    <div class="col-8">: {{ selectedTask.duration }}</div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4 text-muted">Execution Status</div>
+                                    <div class="col-8">: {{ selectedTask.status }}</div>
+                                </div>
+
+                                <div class="mb-2" *ngIf="selectedTask?.inputs?.length">
+                                    <div *ngFor="let inp of selectedTask.inputs" class="row mb-2">
+                                        <div class="col-4 text-muted">
+                                            {{ filterName(inp.param_name) }}
+                                        </div>
+                                        <div *ngIf="!isAgentic" class="col-8">
+                                            : {{ inp.value }}
+                                        </div>
+                                        <div *ngIf="isAgentic" class="col-8">
+                                            : {{ inp.default_value }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+
+            <div class="col-5 vertical-line">
+                <div class="bg-light-grey row border-bottom p-2">
+                    <span>Output</span>
+                </div>
+
+                <ng-container *ngIf="workflowOutputViewData.length > 0; else noDetails">
+                    <ng-container *ngFor="let output of workflowOutputViewData">
+                        <ng-container *ngIf="selectedTask?.name === output.taskName">
+                            <ng-container *ngIf="output.type !== 'Chart Task'">
+                                <div class="row mb-3" style="max-height: 300px; overflow-y: auto;"
+                                    *ngIf="output?.output">
+                                    <div class="col px-1">
+                                        <div class="row m-0 mt-2" *ngIf="output?.output">
+                                            <div class="col-12 p-0">
+                                                <div class="row m-0 mt-2 output-bgr">
+                                                    <div class="col-12 p-0 p-3 position-relative">
+                                                        <button
+                                                            class="action-icons fas fa-copy font-sm position-absolute"
+                                                            tooltip="Copy" style="top: 8px; right: 4px; z-index: 1;"
+                                                            (click)="copyOutput()">
+                                                        </button>
+                                                        <pre class="mb-0 pr-4" #copyContent>{{ output?.output }}</pre>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="output.type === 'Chart Task'">
+                                <ng-container *ngIf="output.output.chart_type === 'Bar'">
+                                    <div echarts [options]="barChartData.options" [extentions]="barChartData.extensions"
+                                        [defaultHeight]="300"></div>
+                                </ng-container>
+                                <ng-conatiner *ngIf="output.output.chart_type === 'Pie'">
+                                    <div echarts [options]="pieChartData.options" [extentions]="pieChartData.extensions"
+                                        [defaultHeight]="300">
+                                    </div>
+                                </ng-conatiner>
+                                <ng-conatiner *ngIf="output.output.chart_type === 'Line'">
+                                    <div echarts [options]="lineChartData.options"
+                                        [extentions]="lineChartData.extensions" [defaultHeight]="300">
+                                    </div>
+                                </ng-conatiner>
+                                <ng-conatiner *ngIf="output.output.chart_type === 'Area'">
+                                    <div echarts [options]="AreaChartData.options"
+                                        [extentions]="AreaChartData.extensions" [defaultHeight]="300">
+                                    </div>
+                                </ng-conatiner>
+                            </ng-container>
+                        </ng-container>
+
+                    </ng-container>
+                </ng-container>
+
+                <!-- Fallback when no output is present -->
+                <ng-template #noOutput>
+                    <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                        <span class="text-muted">No output available</span>
+                    </div>
+                </ng-template>
+
+                <ng-template #noDetails>
+                    <div class="d-flex justify-content-center align-items-center" style="height: 150px;">
+                        <span class="text-muted">No details available</span>
+                    </div>
+                </ng-template>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="card rounded-0 border-top-0">
+    <div class="card-header p-0 border-top-0">
+        <div class="row bg-light-grey p-2 mx-0">
+            <span>Logs</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="row mx-0" style="max-height: 400px; overflow-y: auto;">
+            <div class="p-3">
+                <pre>{{ workflowLogsViewData?.executionLog }}</pre>
+            </div>
+        </div>
+    </div>
+</div>

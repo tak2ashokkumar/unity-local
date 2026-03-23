@@ -1,0 +1,142 @@
+<!--<a href="#/ipv4_public/assignments"><small>back to assignments</small></a>
+
+<h2>information about {{ ipBlock }}</h2>
+
+<h3>customer: {{ block.related.customer.organization_name }}</h3>
+
+<h3>ips</h3>
+<table class="table">
+  <thead>
+  <tr>
+    <th>ip addr</th>
+    <th>device</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="address in block.addresses | orderBy: 'address_int'">
+    <td>{{ address.address }}</td>
+    <td>{{ address.device.name }}</td>
+  </tr>
+  </tbody>
+</table>-->
+
+<div class="row">
+  <div class="col-sm-6">
+   <span ng-if="breadCrumb">
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<div class="location-table">
+  <div class="col-sm-8">
+    <card>
+      <div class="row">
+        <div class="col-sm-12">
+            <h4>Information about {{ ipBlock }} ({{ block.related.customer.organization_name || "Unassigned" }})</h4>
+          <div class="row">
+            <div class="col-sm-5">
+              <strong>Address</strong>
+            </div>
+            <div class="col-sm-3">
+              <!--<strong>Device</strong>-->
+            </div>
+          </div>
+          <div ng-repeat="address in block.addresses | orderBy: 'address_int'" class="zone-table">
+            <div class="row"
+                 ng-click="selectAddress(address, $index)"
+                 ng-class="{'assignment-active': isSelectedAddress(address)}">
+              <div class="col-sm-5">
+                {{ address.address }}
+              </div>
+              <div class="col-sm-3">
+                <!--{{ address.device.name }}-->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </card>
+  </div>
+  <div class="col-sm-4 detail-level">
+    <div ng-if="selectionExists()">
+      <h4>{{ selectedAddress.address.address }}</h4>
+      <table class="table table-responsive">
+        <tbody>
+        <tr>
+          <th>ARIN Allocation</th>
+          <td>
+            <span>{{ block.name }}</span>
+          </td>
+        </tr>
+        </tbody>
+        <tbody>
+        <tr>
+          <th>Parent</th>
+          <td>
+            <span>{{ block.prefix }}/{{ block.prefixlen }}</span>
+          </td>
+        </tr>
+        </tbody>
+        <tbody>
+        <tr>
+          <!--<th>Associated Device</th>
+          <td>
+            <span>{{ selectedAddress.address.device.name }}</span>
+          </td>-->
+        </tr>
+        </tbody>
+        <tbody>
+        <tr>
+          <!--<th>Device Type</th>
+          <td>
+            <span>{{ selectedAddress.address.device | title }}</span>
+          </td>-->
+        </tr>
+        </tbody>
+      </table>
+      <!--<p>
+        <button class="btn btn-info" ng-click="setDevice()">Assign Device</button>
+      </p>
+      <p>
+        <button class="btn btn-danger" ng-click="">Remove Device</button>
+      </p>-->
+    </div>
+  </div>
+</div>
+
+<!--<script type="text/ng-template" id="deviceModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Set Device for {{ currentObject.address }}</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="device" class="col-sm-2 control-label">
+          Device
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control"
+                 ng-model="device"
+                 placeholder="Type the name of a device to search..."
+                 uib-typeahead="device as device.name for device in getInstances($viewValue)">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="assign(currentObject, device)">
+      Assign device
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+  </div>
+</script>-->

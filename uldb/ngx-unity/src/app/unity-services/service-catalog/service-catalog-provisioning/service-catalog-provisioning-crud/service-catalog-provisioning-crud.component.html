@@ -1,0 +1,287 @@
+<div class="row" style="min-height: 600px;">
+    <div class="col-12">
+        <div class="card rounded-0 border-top-0">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{action}} Catalog</span>
+                <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body py-2">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="form-group col-12 text-center">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="name" class="col-2 text-right col-form-label">Name<em>* </em> :</label>
+                        <div class="col-5">
+                            <input id="name" class="form-control" type="text" formControlName="name"
+                                [class.is-invalid]="formErrors.name" placeholder="Enter Name">
+                            <div class="invalid-feedback" *ngIf="formErrors.name">
+                                {{formErrors.name}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="description" class="col-2 text-right col-form-label">Description<em>* </em>
+                            :</label>
+                        <div class="col-8">
+                            <textarea id="description" class="form-control static" rows='2'
+                                formControlName="description" [class.is-invalid]="formErrors.description"
+                                placeholder="Description"></textarea>
+                            <div class="invalid-feedback" *ngIf="formErrors.description">
+                                {{formErrors.description}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="description" class="col-2 text-right col-form-label">Category<em>* </em> :</label>
+                        <div class="col-5">
+                            <select id="category" class="form-control" type="text" formControlName="category"
+                                [class.is-invalid]="formErrors.category">
+                                <option [value]="''" disabled>Select category</option>
+                                <option value="Operational">Operational</option>
+                                <option value="Provisioning">Provisioning</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.category">
+                                {{formErrors.category}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="form.get('category')?.value == 'Operational'">
+                        <label class="col-2 text-right col-form-label" for="logo">Logo<em>*</em> : </label>
+                        <div class="col-5">
+                            <input id="file" class="form-control" type="file"
+                                (change)="playbookFile($event.target.files)" formControlName="logo" name="logo"
+                                [class.is-invalid]="formErrors.logo">
+                            <a *ngIf="catalogData && catalogData.logo" href="{{catalogData.logo}}"
+                                target="_blank">{{catalogData.logo_url}}</a>
+                            <div class="invalid-feedback" *ngIf="formErrors.logo">
+                                {{formErrors.logo}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="form.get('category')?.value == 'Provisioning'">
+                        <label for="cloud_type" class="col-2 text-right col-form-label">Cloud<em>* </em> :</label>
+                        <div class="col-4">
+                            <image-dropdown [onlyImage]="true" [values]="imageList" [defaultLabel]="'cloud'"
+                                (selectedDropdownValue)="getDropdownValue($event)"
+                                [class.is-invalid]="formErrors.cloud_type"
+                                [editCaseImageValue]="matchingCloud"></image-dropdown>
+                        </div>
+                        <div class="invalid-feedback" *ngIf="formErrors.cloud_type">
+                            {{formErrors.cloud_type}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="catalog_type" class="col-2 text-right col-form-label">Catalog Type<em>* </em>
+                            :</label>
+                        <div class="col -5 d-inline-block">
+                            <ul class="d-flex px-0 mb-0">
+                                <li>
+                                    <label class="pointer-link" [class.active]="catalogType == 'Task'">
+                                        <input type="radio" [value]="true" (click)="toggleStatus('Task')">
+                                        <span class="font-sm">Task</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="pointer-link" [class.active]="catalogType == 'Workflow'">
+                                        <input type="radio" [value]="false" (click)="toggleStatus('Workflow')">
+                                        <span class="font-sm">Workflow</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="form.get('catalog_type')?.value == 'Task'">
+                        <label for="task" class="col-2 text-right col-form-label">Task<em>* </em> :</label>
+                        <div class="col-4">
+                            <select id="task" class="form-control" type="text" formControlName="task"
+                                [class.is-invalid]="formErrors.task">
+                                <option [value]="''" disabled>Select Task</option>
+                                <option *ngFor="let c of taskList" [value]="c.uuid">{{c.name}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.task">{{formErrors.task}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="form.get('catalog_type')?.value == 'Workflow'">
+                        <label for="workflow" class="col-2 text-right col-form-label">Workflow<em>* </em> :</label>
+                        <div class="col-4">
+                            <select id="workflow" class="form-control" type="text" formControlName="workflow"
+                                [class.is-invalid]="formErrors.workflow">
+                                <option [value]="''" disabled>Select Workflow</option>
+                                <option *ngFor="let c of workflowList" [value]="c.uuid">{{c.workflow_name}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.workflow">{{formErrors.workflow}}</div>
+                        </div>
+                    </div>
+
+                    <ng-container *ngIf="form.get('catalog_type')?.value == 'Task'">
+                        <ng-container *ngIf="taskInput && taskInput.length > 0" formGroupName="inputs">
+                            <div class="row">
+                                <label for="name" class="col-2 text-right col-form-label">Input
+                                    Parameter :
+                                </label>
+                                <div class="col-8 mx-2 mb-3 border rounded p-3 position-relative">
+                                    <div class="form-group row"
+                                        *ngFor="let param of form.get('inputs').controls | keyvalue">
+                                        <div class="col-12 row">
+                                            <div class="col-3 text-right align-self-center">{{param.key}} :
+                                            </div>
+
+                                            <ng-container *ngIf="form.get('inputs').get(param.key).get('param_type')">
+                                                <div class="col-4" [formGroup]="form.get('inputs').get(param.key)">
+                                                    <div class="form-group row">
+
+                                                        <div class="col">
+                                                            <input class="form-control" disabled
+                                                                [id]="'template_name' + param.key"
+                                                                formControlName="template_name" type="text">
+                                                        </div>
+
+                                                        <ng-container
+                                                            *ngIf="form.get('inputs').get(param.key).get('attribute').value">
+                                                            <div class="col">
+                                                                <input class="form-control" disabled
+                                                                    [id]="'attribute' + param.key"
+                                                                    formControlName="attribute" type="text">
+                                                            </div>
+                                                        </ng-container>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+                                            <ng-container
+                                                *ngIf="form.get('inputs').get(param.key).get('default_value') && !form.get('inputs').get(param.key).get('param_type')">
+                                                <div class="col-4" [formGroup]="form.get('inputs').get(param.key)">
+                                                    <input class="form-control" [id]="'default_value' + param.key"
+                                                        formControlName="default_value" type="text">
+                                                    <!-- <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[param.key + '_default_value']">
+                                                        {{formErrors.inputs[param.key + '_default_value']}}
+                                                    </div> -->
+                                                </div>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
+
+
+                    <ng-container *ngIf="form.get('catalog_type')?.value == 'Workflow' && !inputLengthZeroSingle">
+                        <div class="row" *ngIf="workflowDetailsData && workflowDetailsData.length >0">
+                            <label for="name" class="col-2 text-right col-form-label">Input
+                                Parameter<em>*</em> :
+                            </label>
+                            <div class="col-8 border rounded p-2 position-relative mt-1 mx-2 mb-3">
+                                <ng-container *ngFor="let data of workflowDetailsData">
+                                    <ng-container *ngIf="data.inputs.length > 0">
+                                        <div class="pb-2 mb-2 mx-5 p-1 bg-white position-absolute" style="z-index: 1;">
+                                            {{data.taskName}}
+                                        </div>
+                                        <div class="col">
+                                            <div *ngIf="data.taskForm.get('inputs')" class="form-group row">
+                                                <div class="col">
+                                                    <div class="border rounded p-1 position-relative mt-3 mx-2">
+                                                        <div class="card-body pb-0">
+                                                            <ng-container formGroupName="inputs">
+                                                                <div class="form-group row"
+                                                                    *ngFor="let param of data.taskForm.get('inputs').controls | keyvalue">
+                                                                    <div class="col row">
+                                                                        <div class="col-4 text-right align-self-center">
+                                                                            {{param.key}} :
+                                                                        </div>
+                                                                        <ng-container
+                                                                            *ngIf="data.taskForm.get('inputs').get(param.key).get('param_type')">
+                                                                            <div class="col-4"
+                                                                                [formGroup]="data.taskForm.get('inputs').get(param.key)">
+                                                                                <div class="form-group row">
+                                                                                    <!-- Template Name Input -->
+                                                                                    <div class="col">
+                                                                                        <input class="form-control"
+                                                                                            disabled
+                                                                                            [id]="'template_name' + param.key"
+                                                                                            formControlName="template_name"
+                                                                                            type="text">
+                                                                                    </div>
+
+                                                                                    <!-- Attribute Input -->
+                                                                                    <ng-container
+                                                                                        *ngIf="data.taskForm.get('inputs').get(param.key).get('attribute').value">
+                                                                                        <div class="col">
+                                                                                            <input class="form-control"
+                                                                                                disabled
+                                                                                                [id]="'attribute' + param.key"
+                                                                                                formControlName="attribute"
+                                                                                                type="text">
+                                                                                        </div>
+                                                                                    </ng-container>
+                                                                                </div>
+                                                                            </div>
+                                                                        </ng-container>
+                                                                        <ng-container
+                                                                            *ngIf="data.taskForm.get('inputs').get(param.key).get('default_value') && !data.taskForm.get('inputs').get(param.key).get('param_type')">
+                                                                            <div class="col-4"
+                                                                                [formGroup]="data.taskForm.get('inputs').get(param.key)">
+                                                                                <input class="form-control"
+                                                                                    [id]="'default_value' + param.key"
+                                                                                    formControlName="default_value"
+                                                                                    type="text"
+                                                                                    [ngClass]="{'is-invalid': data.taskFormErrors.inputs[param.key + '_default_value']}">
+                                                                                <div class="invalid-feedback"
+                                                                                    *ngIf="data.taskFormErrors.inputs[param.key + '_default_value']">
+                                                                                    {{data.taskFormErrors.inputs[param.key
+                                                                                    +
+                                                                                    '_default_value']}}
+                                                                                </div>
+                                                                            </div>
+                                                                        </ng-container>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-container>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <div class="form-group row">
+                        <label for="price" class="col-2 text-right col-form-label">Price :</label>
+                        <div class="col-2">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input id="price" class="form-control" type="number" min="0" formControlName="price"
+                                    placeholder="Price">
+                            </div>
+                            <div class="invalid-feedback d-block" *ngIf="formErrors.price">
+                                {{formErrors.price}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="auto_approval" class="col-2 text-right col-form-label">Auto Approval<em>* </em>
+                            :</label>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <input class="form-check-input ml-1 form-check-xl" type="checkbox"
+                                    formControlName="auto_approval" style="min-width: 20px;min-height: 20px;">
+                                <!-- <input class="form-check-input" type="checkbox" id="auto_approval"
+                                    formControlName="auto_approval" > -->
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-md btn-success" type="button"
+                        (click)="confirmCatalogCreate()">Submit</button>
+                    <button class="btn btn-md btn-danger ml-1" type="button" (click)="goBack()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

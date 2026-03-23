@@ -1,0 +1,117 @@
+<div class="row">
+    <div class="col-12" *ngIf="!widgets.length">
+        <div class="card">
+            <div class="empty-clouds text-center py-5">No widgets configured for this user. <span class="btn-link pointer-link"
+                    (click)="addWidget()">Click here</span> to add.</div>
+        </div>
+    </div>
+    <div class="col-12" *ngIf="widgets.length">
+        <div class="row mb-2">
+            <div class="col">
+                <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="addWidget()">Add
+                    Widget</button>
+            </div>
+        </div>
+        <div class="card graph-card" *ngFor="let view of widgets">
+            <app-spinner [name]="view.device.id"></app-spinner>
+            <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                <div class="w-65 py-1">
+                <span> {{view.device.name}} - {{view.deviceType.type}}</span>
+                </div>
+                <div class="w-35">
+                    <button class="action-icons ml-1 far fa-trash-alt font-sm pull-right" (click)="deleteWidget(view)"
+                        tooltip="Delete" container="body"></button>
+                    <button class="action-icons ml-1 fas fa-pencil-alt font-sm pull-right" (click)="editWidget(view)"
+                        tooltip="Edit" container="body"></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 my-2 widget-graph" *ngFor="let graph of view.graphs">
+                        <h5 class="card-title text-warning">{{graph.name}}</h5>
+                        <div class="text-center mt-5" *ngIf="!graph.isLoaded">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </div>
+                        <div *ngIf="graph.isLoaded">
+                            <img class="img-fluid pointer-link" *ngIf="graph.image" [src]="'data:image/png;base64,'+graph.image">
+                            <div class="m-5" *ngIf="!graph.image">
+                                <span class="text-danger"> Invalid Graph </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #widgetFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Widget
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="widgetFormModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="widgetForm" [formGroup]="widgetForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label class="font-col-form-label" for="device_type">Device Type<em>*</em></label>
+                        <select id="device_type" class="form-control" formControlName="device_type" [class.is-invalid]="widgetFormErrors.device_type">
+                            <option value="" disabled>Select Device Type</option>
+                            <option *ngFor="let deviceType of deviceTypes" [ngValue]="deviceType">{{deviceType.type}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="widgetFormErrors.device_type">{{widgetFormErrors.device_type}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="font-col-form-label" for="device">Device List<em>*</em></label>
+                        <select id="device" class="form-control" formControlName="device" [class.is-invalid]="widgetFormErrors.device">
+                            <option value="" disabled>Select Device</option>
+                            <option *ngFor="let d of devices" [ngValue]="d">{{d.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="widgetFormErrors.device">{{widgetFormErrors.device}}</div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label class="font-col-form-label" for="graphs">Graph List<em>*</em></label>
+                        <multiselect-dropdown [options]="deviceGraphs" [settings]="mySettings" class="form-control p-0 w-100"
+                            style="height:auto;" formControlName="graphs" [ngClass]="{'is-invalid' : widgetFormErrors.graphs}">
+                        </multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="widgetFormErrors.graphs">{{widgetFormErrors.graphs}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmWidgetCreate()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="widgetFormModelRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Widget will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

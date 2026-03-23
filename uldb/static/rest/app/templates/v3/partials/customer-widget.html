@@ -1,0 +1,47 @@
+<div layout="row" class="customer-widget-area">
+  <div layout="column" flex-gt-xs="50">
+    <customer-widget ng-repeat="(index, selname) in CustomersWidgetData.data.info track by $index"
+                     ng-if="$index % 2 === 0"></customer-widget>
+    <customer-widget-add ng-if="CustomersWidgetData.data.info.length % 2 === 0"></customer-widget-add>
+  </div>
+  <div layout="column" flex-gt-xs="50">
+    <customer-widget ng-repeat="(index, selname) in CustomersWidgetData.data.info track by $index"
+                     ng-if="$index % 2 === 1"></customer-widget>
+    <customer-widget-add ng-if="CustomersWidgetData.data.info.length % 2 === 1"></customer-widget-add>
+  </div>
+  <!--
+  <div layout="column" flex-gt-xs="33">
+    <customer-widget ng-repeat="(index, selname) in CustomersWidgetData.data.info track by $index"
+                     ng-if="$index % 3 === 2"></customer-widget>
+    <customer-widget-add ng-if="placeholder.idx % 3 === 2"></customer-widget-add>
+  </div>
+  -->
+</div>
+<!--
+<div
+     class="cus-widget-item widget-item-wrapper col-lg-4 col-md-4">
+-->
+
+<!--</div>-->
+
+<!--
+<div class="panel panel-primary ">
+    <div class="panel-heading">
+        <div class="col-md-8 pinnewcustitle"><i class="fa fa-user fa-fw"></i> CUSTOMERS</div>
+        <div class="col-md-4 pinnewcus">
+            <div class="input-group">
+                <input auto-complete ui-items="names" id="autocomDash"
+                       placeholder="Pin customer..." ng-model="selected"
+                       type="text" class="form-control input-sm">
+                <span class="input-group-btn">
+                    <button ng-click="addCustomerItem()" class="btn  btn-pin btn-sm" id="btn-chat"> Pin </button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body limt-scroll-cus-widget">
+
+    </div>
+</div>
+-->

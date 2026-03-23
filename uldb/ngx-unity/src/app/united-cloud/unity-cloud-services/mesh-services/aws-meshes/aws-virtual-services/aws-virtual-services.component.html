@@ -1,0 +1,132 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body p-0">
+        <form class="form-horizontal">
+          <div class="form-group row mb-0">
+            <div class="col py-2 text-warning text-right">
+              <a class="nav-link py-0 align-middle" (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>App Mesh
+                List</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card rounded-0 border-top-0">
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+          <span class="badge badge-secondary font-sm">{{filteredViewData.length}}</span>
+          <span class="ml-1 font-lg">Virtual Services</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+          <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+        </div>
+      </div>
+      <div class="card-body py-2">
+        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+          <div class="w-25">
+            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+          </div>
+          <div>
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+        </div>
+        <table class="table text-left">
+          <thead class="bg-light">
+            <tr>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Mesh Name</th>
+              <th>Virtual Router</th>
+              <th>Backend Virtual Node</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let view of pagedviewData; let i = index;" setTableColumnWidth>
+              <td>
+                <div [tooltip]="view.virtualServiceName">{{view.virtualServiceName}}</div>
+              </td>
+              <td>
+                <div [tooltip]="view.virtualRouterStatus" class="text-capitalize">
+                  <i class="fa status-icon" [ngClass]="view.virtualRouterStatusIcon"></i> {{view.virtualRouterStatus}}
+                </div>
+              </td>
+              <td>
+                <div [tooltip]="view.meshName">{{view.meshName}}</div>
+              </td>
+              <td>
+                <div [tooltip]="view.virtualRouterName">{{view.virtualRouterName}}</div>
+              </td>
+              <td>
+                <div>
+                  <span *ngIf="!view.backendVirtualNode">N/A</span>
+                  <span *ngIf="view.backendVirtualNode" class="pointer-link text-primary"
+                    (click)="showInfo(view.backendVirtualNode)" tooltip="Backend Node Info">
+                    {{view.backendVirtualNode}}</span>
+                </div>
+              </td>
+              <td class="action-icons-column">
+                <button class="action-icons mb-0 fa fa-list-ul font-sm ml-1" (click)="goTo(view)" tooltip="Routes">
+                </button>
+                <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                  tooltip="Manage by creating support ticket" (click)="createTicket(view)">
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="filteredViewData.length"></table-entries>
+        <table-pager *ngIf="filteredViewData.length" [pageNo]="currentCriteria.pageNo"
+          [pageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+          (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted py-4" *ngIf="!filteredViewData.length">No services were found.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #nodeinfo>
+  <div class="card mb-0">
+    <div class="card-header">
+      Node details
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table text-left">
+        <tr>
+          <td><strong>Name</strong></td>
+          <td>{{info?.name}}</td>
+        </tr>
+        <tr>
+          <td><strong>Status</strong></td>
+          <td>{{info?.status}}</td>
+        </tr>
+        <tr>
+          <td><strong>Hostname</strong></td>
+          <td>{{info?.hostname}}</td>
+        </tr>
+        <tr>
+          <td><strong>Listener Protocal</strong></td>
+          <td>{{info?.listenerProtocal}}</td>
+        </tr>
+        <tr>
+          <td><strong>Listener Port</strong></td>
+          <td>{{info?.listenerPort}}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>

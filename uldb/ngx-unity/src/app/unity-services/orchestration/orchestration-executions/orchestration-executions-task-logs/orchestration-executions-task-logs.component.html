@@ -1,0 +1,103 @@
+<div class="row mt--3">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-12 p-0">
+        <div class="card mb-2">
+          <div class="card-body py-2 my-1">
+            <div class="card-title mb-0 pt">
+              <h5>{{taskDetails?.templateName}}<span class="text-muted"> ({{id}}) </span></h5>
+            </div>
+            <div class="row">
+              <div class="col-10">
+                <div class="row">
+                  <div class="col-1">
+                    <span class="text-muted">Type: </span>
+                    <span>{{taskDetails?.type}}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted">Started On: </span>
+                    <span>{{taskDetails?.startDate}} {{taskDetails?.startTime}}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted">Started By: </span>
+                    <span>{{taskDetails?.startedBy}}</span>
+                  </div>
+                  <div class="col-3">
+                    <span class="text-muted">Duration: </span>
+                    <span>{{taskDetails?.duration}}</span>
+                  </div>
+                  <div class="col-2">
+                    <span class="text-muted">Status: </span>
+                    <span [ngClass]="getColor(taskDetails?.status)">{{taskDetails?.status}}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-2">
+                <button class="btn btn-pill btn-warning btn-sm float ml-1" (click)="goBack()" tooltip="Back">
+                  <i class="fa fa-arrow-left"></i>
+                </button>
+                <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-2">
+          <div class="row header-bgr m-0">
+            <div class="col-6 p-2">
+              Details
+            </div>
+            <div class="col-6 p-2 vertical-line">
+              Output
+            </div>
+          </div>
+          <div class="row m-0">
+            <div class="col-6 p-2" style="max-height: 300px; overflow-y: auto;">
+              <div *ngIf="parametersArray.length > 0">
+                <div *ngFor="let param of parametersArray">
+                  <div class="col-12 mb-2">
+                    <div class="row align-items-center">
+                      <div class="col-5 text-muted">
+                        {{ filterName(param.get('param_name')?.value) }}
+                      </div>
+                      <div class="col-auto px-0">
+                        <span>:</span>
+                      </div>
+                      <div class="col-6">
+                        {{ param.get('value')?.value }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!parametersArray.length" class="text-center"> No Details Available</div>
+            </div>
+            <div class="col-6 p-2 vertical-line">
+              <div class="row m-0 mt-2" *ngIf="outputData?.output">
+                <div class="col-12 p-0">
+                  <div class="row m-0 mt-2 output-bgr">
+                    <div class="col-12 p-0 p-3 position-relative" #copyContent>
+                      <button class="action-icons fas fa-copy font-sm position-absolute" tooltip="Copy"
+                        style="top: 8px; right: 4px; z-index: 1;" (click)="copyOutput()">
+                      </button>
+                      <pre class="mb-0 pr-4">{{ outputData?.output }}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row header-bgr m-0">
+            <div class="col p-2">
+              Execution
+            </div>
+          </div>
+          <div class="row m-0">
+            <div class="col p-2">
+              <pre>{{executionLogsData?.executionLog}}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

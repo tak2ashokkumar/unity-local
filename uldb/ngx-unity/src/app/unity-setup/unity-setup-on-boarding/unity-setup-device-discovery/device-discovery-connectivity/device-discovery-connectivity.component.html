@@ -1,0 +1,149 @@
+<div class="card text-center">
+  <div class="card-body">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th>Collector Name</th>
+          <th>IP Address</th>
+          <th>SSH User</th>
+          <th>SSH Port</th>
+          <th>Deployment Status</th>
+          <th>Created On</th>
+          <th class="w-5">
+            <div>Actions</div>
+
+          </th>
+          <th class="w-10">
+            <button class="btn btn-warning btn-sm btn-pill pull-right" (click)="addAgent(templateNested)" [disabled]="viewData.length">Add
+              Collector</button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr *ngIf="scanForm" [formGroup]="scanForm">
+      <td>
+        <input class="form-control" formControlName="inet" [ngClass]="{'is-invalid' : formErrors.inet}" type="text">
+      </td>
+      <td colspan="2" class="align-middle">
+        <small class="text-danger" *ngIf="formErrors.inet">{{formErrors.inet}}</div>
+      </td>
+      <td class="align-middle">
+        <button class="btn btn-success btn-sm btn-pill" (click)="submitNewScan()">Initiate Scanning</button>
+        <button class="ml-2 btn btn-danger btn-sm btn-pill" (click)="cancelNewScan()">Cancel</button>
+      </td>
+    </tr> -->
+        <tr *ngFor="let view of viewData">
+          <td *ngIf="!view.updating">
+            <span>{{view.agentName}}</span>
+          </td>
+          <td *ngIf="view.updating">
+            <form *ngIf="editAgentForm" [formGroup]="editAgentForm">
+              <div class="form-group">
+                <input class="form-control" formControlName="name" type="text" placeholder="Name" [ngClass]="{'is-invalid' : editFormErrors.name}">
+                <small class="text-danger" *ngIf="editFormErrors.name">{{editFormErrors.name}}</small>
+              </div>
+              <div class="form-group mb-0">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+              </div>
+            </form>
+          </td>
+          <td>{{view.ipAddress}}</td>
+          <td>{{view.sshUser}}</td>
+          <td>{{view.sshPort}}</td>
+          <td>{{view.deplymentState}}</td>
+          <td>{{view.createdOn}}</td>
+          <td colspan="2">
+            <!-- <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" *ngIf="!view.updating" container="body"
+              tooltip="Edit" (click)="editAgentName(view)"></button> -->
+            <button class="action-icons mb-0 fas fa-check font-sm ml-1" container="body" *ngIf="view.updating" tooltip="Submit"
+              (click)="submitUpdateAgentNameForm(view)"></button>
+            <button class="action-icons mb-0 fas fa-times font-sm ml-1" container="body" *ngIf="view.updating" tooltip="Cancel"
+              (click)="cancelEdit(view)"></button>
+            <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body" *ngIf="!view.updating"
+              tooltip="Delete" (click)="deleteConfig(view)"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="viewData.length==0" class="text-center py-3">No configurations to display</p>
+    <next-prev></next-prev>
+  </div>
+</div>
+
+<ng-template #templateNested>
+  <div class="card mb-0">
+    <div class="card-header">
+      Add Collector
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeAddModal()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="agentForm" [formGroup]="agentForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label for="name">Name<em>*</em></label>
+          <input class="form-control" formControlName="name" type="text" placeholder="Name" [ngClass]="{'is-invalid' : formErrors.name}">
+          <small class="text-danger" *ngIf="formErrors.name">{{formErrors.name}}</small>
+        </div>
+        <div class="form-group">
+          <label for="ip_address">IP Address<em>*</em></label>
+          <input class="form-control" formControlName="ip_address" type="text" placeholder="IP Address" [ngClass]="{'is-invalid' : formErrors.ip_address}">
+          <small class="text-danger" *ngIf="formErrors.ip_address">{{formErrors.ip_address}}</small>
+        </div>
+        <div class="form-group">
+          <label for="ssh_port">SSH Port</label>
+          <input class="form-control" formControlName="ssh_port" type="text" placeholder="Default SSH Port : 22"
+            [ngClass]="{'is-invalid' : formErrors.ssh_port}">
+          <small class="text-danger" *ngIf="formErrors.ssh_port">{{formErrors.ssh_port}}</small>
+        </div>
+        <div class="form-group">
+          <label for="ssh_username">SSH Username<em>*</em></label>
+          <input class="form-control" formControlName="ssh_username" type="text" placeholder="SSH Username" [ngClass]="{'is-invalid' : formErrors.ssh_username}">
+          <small class="text-danger" *ngIf="formErrors.ssh_username">{{formErrors.ssh_username}}</small>
+        </div>
+        <div class="form-group">
+          <label for="ssh_password">SSH Password<em>*</em></label>
+          <input class="form-control" formControlName="ssh_password" type="password" placeholder="SSH Password"
+            [ngClass]="{'is-invalid' : formErrors.ssh_password}">
+          <small class="text-danger" *ngIf="formErrors.ssh_password">{{formErrors.ssh_password}}</small>
+        </div>
+        <div class="form-group">
+          <label for="snmp_community">SNMP Community</label>
+          <input class="form-control" formControlName="snmp_community" type="text" placeholder="SNMP Community"
+            [ngClass]="{'is-invalid' : formErrors.snmp_community}">
+          <small class="text-danger" *ngIf="formErrors.snmp_community">{{formErrors.snmp_community}}</small>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitAgentForm()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Collector Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Deleting Collector will disable Management & Monitoring for all your devices from UNITY. Are you sure to
+      continue?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

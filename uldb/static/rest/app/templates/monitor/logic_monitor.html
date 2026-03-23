@@ -1,0 +1,20 @@
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <a href="tab.url"></a>
+  </uib-tab>
+</uib-tabset>
+
+<alerts></alerts>
+<generic-panel heading="Logic Monitor" panel-type="primary">
+  <panel-body><model-results></model-results></panel-body>
+  <panel-footer>
+    <button class="btn btn-primary" ng-click="ctrl.add()">Add</button>
+    <button ng-show="iframe.src !== null" class="btn btn-info" ng-click="clearIframe()">Clear iframe</button>
+  </panel-footer>
+</generic-panel>
+
+<div ng-if="iframe.src !== null" style="height:90%">
+  <iframe class="proxy-iframe" style="height: 90%" src="{{ iframe.src }}"></iframe>
+</div>
+
+<div style="height: 50px;"></div>

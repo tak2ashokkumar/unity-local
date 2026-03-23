@@ -1,0 +1,226 @@
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="row ticket-row">
+          <div class="col-4">
+            <h4 class="font-lg">Tickets by Priority</h4>
+            <div class="vertical-align" *ngIf="priorityTicketsChartLoading">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div style="display:flex; flex-direction:column"
+              *ngIf="!priorityTicketsChartLoading && priorityTicketsChartData">
+              <div style="flex-grow:1; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="priorityTicketsChartOptions" [data]="priorityTicketsChartData"
+                  [colors]="priorityTicketsChartColor" [labels]="priorityTicketsChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="vertical-align" *ngIf="!priorityTicketsChartLoading && !priorityTicketsChartData">
+              <span class="text-center text-muted ">No Tickets Found.</span>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <h4 class="font-lg">Tickets by Status</h4>
+            <div class="vertical-align" *ngIf="ticketsByStatusChartLoading">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div style="display:flex; flex-direction:column"
+              *ngIf="!ticketsByStatusChartLoading && ticketsByStatusChartData">
+              <div style="flex-grow:1; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="ticketsByStatusChartOptions" [data]="ticketsByStatusChartData"
+                  [colors]="ticketsByStatusChartColor" [labels]="ticketsByStatusChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="vertical-align" *ngIf="!ticketsByStatusChartLoading && !ticketsByStatusChartData">
+              <span class="text-center text-muted ">No Tickets Found.</span>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <h4 class="font-lg">Solved by Response Time</h4>
+            <div class="vertical-align" *ngIf="solvedByResponseChartLoading">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div style="display:flex; flex-direction:column"
+              *ngIf="!solvedByResponseChartLoading && solvedByResponseChartData">
+              <div style="flex-grow:1; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="solvedByResponseChartOptions" [data]="solvedByResponseChartData"
+                  [colors]="solvedByResponseChartColor" [labels]="solvedByResponseChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="vertical-align" *ngIf="!solvedByResponseChartLoading && !solvedByResponseChartData">
+              <span class="text-center text-muted ">No Tickets Found.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col px-0">
+    <div class="card">
+      <div class="card-header text-center">
+        <div class="row">
+          <div class="col-8">
+            <form *ngIf="filterForm" [formGroup]="filterForm">
+              <div class="row">
+                <div class="col-3">
+                  <div class="form-group row">
+                    <label for="search"
+                      class="col-4 col-form-label col-form-label-sm text-right px-0">Search&nbsp;:&nbsp;</label>
+                    <div class="col-8 px-0">
+                      <input type="text" class="form-control form-control-sm" formControlName="search" id="search"
+                        placeholder="Enter Keyword">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="form-group mb-0 row">
+                    <label for="state"
+                      class="col-sm-4 col-form-label col-form-label-sm text-right px-0">State&nbsp;:&nbsp;</label>
+                    <div class="col-8 px-0">
+                      <select class="form-control form-control-sm" id="state" formControlName="state">
+                        <option [value]="''"> All </option>
+                        <option [value]="state" *ngFor="let state of stateLables">{{state}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group mb-0 row">
+                    <label for="datecreated" class="col-3 col-form-label col-form-label-sm text-right px-0">Date
+                      Created&nbsp;:&nbsp;</label>
+                    <div class="col-9 px-0">
+                      <div class="input-group-append " [owlDateTimeTrigger]="from">
+                      </div>
+                      <owl-date-time #from [hour12Timer]="true" [pickerType]="'calendar'"></owl-date-time>
+                      <input class="form-control rounded-left text-center" [owlDateTimeTrigger]="from"
+                        [owlDateTime]="from" type="text" formControlName="dateRange" [max]="maxDate"
+                        [selectMode]="'range'" (dateTimeInput)="onDateChanged()">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="form-group mb-0 row">
+                    <label for="priority"
+                      class="col-4 col-form-label col-form-label-sm text-right px-0">Priority&nbsp;:&nbsp;</label>
+                    <div class="col-8 px-0">
+                      <select class="form-control form-control-sm" id="priority" formControlName="priority">
+                        <option [value]="''">All</option>
+                        <option [value]="priority" *ngFor="let priority of priorityLables">{{priority}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3" *ngIf="!ticketType">
+                  <div class="form-group mb-0 row">
+                    <label for="ticket_type"
+                      class="col-4 col-form-label col-form-label-sm text-right px-0">Type&nbsp;:&nbsp;</label>
+                    <div class="col-8 px-0">
+                      <select class="form-control form-control-sm text-capitalize" id="ticket_type"
+                        formControlName="ticket_type">
+                        <option [value]="null">All</option>
+                        <option [value]="ticketTypeOptions.CHANGE_REQUEST">
+                          {{getReadableTicketType(ticketTypeOptions.CHANGE_REQUEST)}}</option>
+                        <option [value]="ticketTypeOptions.INCIDENT">{{ticketTypeOptions.INCIDENT}}</option>
+                        <option [value]="ticketTypeOptions.PROBLEM">{{ticketTypeOptions.PROBLEM}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col text-right">
+                  <div class="form-group mb-0">
+                    <button class="btn btn-sm btn-pill btn-warning pull-right" type="button"
+                      (click)="filterTickets()">Filter
+                      Tickets</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-4">
+            <div class="row">
+              <div class="col-12">
+                <span class="mr-2 pull-right">&nbsp;</span>
+                <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+                <!-- <a class="btn btn-pill btn-warning btn-sm text-white pull-right mr-4" *ngIf="viewData.length" (click)="downloadReport()">
+                  <i class="fa fa-download mr-2"></i>Download
+                </a> -->
+              </div>
+              <div class="col-12 mt-3">
+                <span class="text-muted ml-2 mt-1 font-sm float-right align-middle"><span
+                    class="badge badge-pill badge-secondary">{{count}}</span>&nbsp;Tickets</span>
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" *ngIf="!feedback"
+                  (click)="createTicket()" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+                  elementType="btn">Create
+                  Ticket</button>
+                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                  (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table text-left" sortableTable (sorted)="onSorted($event)">
+          <thead class="">
+            <tr>
+              <th>Ticket ID</th>
+              <th class="ticket-subject">Short Description</th>
+              <th sortable-column="state">State</th>
+              <th sortable-column="priority">Priority</th>
+              <!-- <th>Urgency</th> -->
+              <!-- <th>Severity</th> -->
+              <th sortable-column="opened_at">Created On</th>
+              <th sortable-column="sys_updated_on">Updated On</th>
+              <th>Resolution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ticket of viewData" setTableColumnWidth>
+              <td>
+                <a class="btn btn-link text-primary text-decoration-none p-0 table-column-btn"
+                  [tooltip]="ticket.ticketId" (click)="goToDetails(ticket)">{{ticket.ticketId}}</a>
+              </td>
+              <td>
+                <div [tooltip]="ticket.shortDescription">{{ticket.shortDescription}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.state">{{ticket.state}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.priority">{{ticket.priority}}</div>
+              </td>
+              <!-- <td>
+                    <div [tooltip]="ticket.urgency">{{ticket.urgency}}</div>
+                  </td> -->
+              <!-- <td>
+                    <div [tooltip]="ticket.severity">{{ticket.severity}}</div>
+                  </td> -->
+              <td>
+                <div [tooltip]="ticket.openedAt">{{ticket.openedAt}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.updatedOn">{{ticket.updatedOn}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.resolvedAt">{{ticket.resolvedAt}}</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted" *ngIf="!viewData.length">No Tickets To Display.</div>
+      </div>
+    </div>
+  </div>
+</div>

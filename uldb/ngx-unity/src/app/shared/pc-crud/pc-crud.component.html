@@ -1,0 +1,317 @@
+<div class="container-fluid mt-4" *ngIf="isAddorEditEnabled">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+            <span class="font-lg font-500">{{action}} Private Cloud</span>
+          </div>
+          <div class="card-body">
+            <div class="offset-2 col-8 ">
+              <form *ngIf="baseForm" [formGroup]="baseForm">
+                <div class="col-12 form-group">
+                  <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="platform_type">Cloud Type<em>*</em></label>
+                    <select class="form-control text-capitalize" id="platform_type" name="platform_type"
+                      formControlName="platform_type" [ngClass]="{'is-invalid' : baseFormErrors.platform_type}">
+                      <option [value]="''" disabled>Select Cloud Type</option>
+                      <!-- <option [value]="PlatFormMappingEnum.VMWARE">VMware vCenter</option> // Informed by backed to remove -->
+                      <option [value]="PlatFormMappingEnum.VCLOUD">{{PlatFormMappingEnum.VCLOUD}}</option>
+                      <option [value]="PlatFormMappingEnum.OPENSTACK">{{PlatFormMappingEnum.OPENSTACK}}</option>
+                      <option [value]="PlatFormMappingEnum.PROXMOX">{{PlatFormMappingEnum.PROXMOX}}</option>
+                      <option [value]="PlatFormMappingEnum.G3_KVM">UnitedPrivateCloud - KVM</option>
+                      <option [value]="PlatFormMappingEnum.HYPER_V">{{PlatFormMappingEnum.HYPER_V}}</option>
+                      <option [value]="PlatFormMappingEnum.ESXI">{{PlatFormMappingEnum.ESXI}}</option>
+                      <option [value]="PlatFormMappingEnum.CUSTOM">{{PlatFormMappingEnum.CUSTOM}}</option>
+                      <!-- <option [value]="PlatFormMappingEnum.UNITED_PRIVATE_CLOUD_VCENTER">
+                            {{PlatFormMappingEnum.UNITED_PRIVATE_CLOUD_VCENTER}}</option> -->
+                      <!-- <option [value]="PlatFormMappingEnum.NUTANIX">{{PlatFormMappingEnum.NUTANIX}}</option> -->
+                    </select>
+                    <div class="invalid-feedback" *ngIf="baseFormErrors.platform_type">{{baseFormErrors.platform_type}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="cloudname">Cloud Name<em>*</em></label>
+                    <input class="form-control" id="cloudname" type="text" formControlName="name"
+                      [ngClass]="{'is-invalid' : baseFormErrors.name}">
+                    <div class="invalid-feedback" *ngIf="baseFormErrors.name">{{baseFormErrors.name}}</div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="colocation_cloud">Datacenter<em>*</em></label>
+                    <select class="form-control text-capitalize" id="colocation_cloud" name="colocation_cloud"
+                      formControlName="colocation_cloud" [ngClass]="{'is-invalid' : baseFormErrors.colocation_cloud}">
+                      <option [value]="''" disabled>Select Datacenter</option>
+                      <option *ngFor="let dc of dataCenters" [ngValue]="dc">{{dc.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="baseFormErrors.colocation_cloud">
+                      {{baseFormErrors.colocation_cloud}}
+                    </div>
+                  </div>
+                  <div *ngIf="baseForm.get('collector')" class="col-6 form-group" formGroupName="collector">
+                    <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+                    <select id="collectoruuid" class="form-control" formControlName="uuid"
+                      [class.is-invalid]="baseFormErrors.collector.uuid">
+                      <option value="" disabled>Select Collector</option>
+                      <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="baseFormErrors.collector.uuid">
+                      {{baseFormErrors.collector.uuid}}
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <form *ngIf="vmWareForm" [formGroup]="vmWareForm">
+                <div class="row">
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="hostname">Host Name<em>*</em></label>
+                    <input class="form-control" id="hostname" type="text" formControlName="hostname"
+                      [ngClass]="{'is-invalid' : vmWareFormErrors.hostname}">
+                    <div class="invalid-feedback" *ngIf="vmWareFormErrors.hostname">{{vmWareFormErrors.hostname}}</div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="username">User Name<em>*</em></label>
+                    <input class="form-control" id="username" type="text" formControlName="username"
+                      [ngClass]="{'is-invalid' : vmWareFormErrors.username}">
+                    <div class="invalid-feedback" *ngIf="vmWareFormErrors.username">{{vmWareFormErrors.username}}</div>
+                  </div>
+                  <div class="col-6 form-group" *ngIf="!pcId">
+                    <label class="form-col-form-label" for="password">Password<em>*</em></label>
+                    <input class="form-control" id="password" type="password" formControlName="password"
+                      [ngClass]="{'is-invalid' : vmWareFormErrors.password}">
+                    <div class="invalid-feedback" *ngIf="vmWareFormErrors.password">{{vmWareFormErrors.password}}</div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="resource_pool_name">Resource Pool Name</label>
+                    <input class="form-control" id="resource_pool_name" type="text" formControlName="resource_pool_name"
+                      [ngClass]="{'is-invalid' : vmWareFormErrors.resource_pool_name}">
+                    <div class="invalid-feedback" *ngIf="vmWareFormErrors.resource_pool_name">
+                      {{vmWareFormErrors.resource_pool_name}}</div>
+                  </div>
+                  <div *ngIf="vmWareForm.get('collector')" class="col-6 form-group" formGroupName="collector">
+                    <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+                    <select id="collectoruuid" class="form-control" formControlName="uuid"
+                      [class.is-invalid]="vmWareFormErrors.collector.uuid">
+                      <option value="" disabled>Select Collector</option>
+                      <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="vmWareFormErrors.collector.uuid">
+                      {{vmWareFormErrors.collector.uuid}}
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <form *ngIf="vCloudForm" [formGroup]="vCloudForm">
+                <div class="row">
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="hostname">vCloud URL<em>*</em></label>
+                    <input class="form-control" id="hostname" type="text" formControlName="hostname"
+                      [ngClass]="{'is-invalid' : vCloudFormErrors.hostname}">
+                    <div class="invalid-feedback" *ngIf="vCloudFormErrors.hostname">{{vCloudFormErrors.hostname}}</div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="username">User Name<em>*</em></label>
+                    <input class="form-control" id="username" type="text" formControlName="username"
+                      [ngClass]="{'is-invalid' : vCloudFormErrors.username}">
+                    <div class="invalid-feedback" *ngIf="vCloudFormErrors.username">{{vCloudFormErrors.username}}</div>
+                  </div>
+                  <div class="col-6 form-group" *ngIf="!pcId">
+                    <label class="form-col-form-label" for="password">Password<em>*</em></label>
+                    <input class="form-control" id="password" type="password" formControlName="password"
+                      [ngClass]="{'is-invalid' : vCloudFormErrors.password}">
+                    <div class="invalid-feedback" *ngIf="vCloudFormErrors.password">{{vCloudFormErrors.password}}</div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="vcloud_org">Organization<em>*</em></label>
+                    <input class="form-control" id="vcloud_org" type="text" formControlName="vcloud_org"
+                      [ngClass]="{'is-invalid' : vCloudFormErrors.vcloud_org}">
+                    <div class="invalid-feedback" *ngIf="vCloudFormErrors.vcloud_org">{{vCloudFormErrors.vcloud_org}}
+                    </div>
+                  </div>
+                  <div *ngIf="vCloudForm.get('collector')" class="col-6 form-group" formGroupName="collector">
+                    <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+                    <select id="collectoruuid" class="form-control" formControlName="uuid"
+                      [class.is-invalid]="vCloudFormErrors.collector.uuid">
+                      <option value="" disabled>Select Collector</option>
+                      <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="vCloudFormErrors.collector.uuid">
+                      {{vCloudFormErrors.collector.uuid}}
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <form *ngIf="openStackForm" [formGroup]="openStackForm">
+                <div class="row">
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="hostname">Auth URL<em>*</em></label>
+                    <input class="form-control" id="hostname" type="text" formControlName="hostname"
+                      [ngClass]="{'is-invalid' : openStackFormErrors.hostname}">
+                    <div class="invalid-feedback" *ngIf="openStackFormErrors.hostname">{{openStackFormErrors.hostname}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="username">User Name<em>*</em></label>
+                    <input class="form-control" id="username" type="text" formControlName="username"
+                      [ngClass]="{'is-invalid' : openStackFormErrors.username}">
+                    <div class="invalid-feedback" *ngIf="openStackFormErrors.username">{{openStackFormErrors.username}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group" *ngIf="!pcId">
+                    <label class="form-col-form-label" for="password">Password<em>*</em></label>
+                    <input class="form-control" id="password" type="password" formControlName="password"
+                      [ngClass]="{'is-invalid' : openStackFormErrors.password}">
+                    <div class="invalid-feedback" *ngIf="openStackFormErrors.password">{{openStackFormErrors.password}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="project">Project<em>*</em></label>
+                    <input class="form-control" id="project" type="text" formControlName="project"
+                      [ngClass]="{'is-invalid' : openStackFormErrors.project}">
+                    <div class="invalid-feedback" *ngIf="openStackFormErrors.project">{{openStackFormErrors.project}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="user_domain">User Domain<em>*</em></label>
+                    <input class="form-control" id="user_domain" type="user_domain" formControlName="user_domain"
+                      [ngClass]="{'is-invalid' : openStackFormErrors.user_domain}">
+                    <div class="invalid-feedback" *ngIf="openStackFormErrors.user_domain">
+                      {{openStackFormErrors.user_domain}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="project_domain">Project Domain<em>*</em></label>
+                    <input class="form-control" id="project_domain" type="text" formControlName="project_domain"
+                      [ngClass]="{'is-invalid' : openStackFormErrors.project_domain}">
+                    <div class="invalid-feedback" *ngIf="openStackFormErrors.project_domain">
+                      {{openStackFormErrors.project_domain}}</div>
+                  </div>
+                  <div *ngIf="openStackForm.get('collector')" class="col-6 form-group" formGroupName="collector">
+                    <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+                    <select id="collectoruuid" class="form-control" formControlName="uuid"
+                      [class.is-invalid]="openStackFormErrors.collector.uuid">
+                      <option value="" disabled>Select Collector</option>
+                      <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="openStackFormErrors.collector.uuid">
+                      {{openStackFormErrors.collector.uuid}}
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <form *ngIf="proxmoxForm" [formGroup]="proxmoxForm">
+                <div class="row">
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="host_address">Host Address<em>*</em></label>
+                    <input class="form-control" id="host_address" type="text" formControlName="host_address"
+                      [ngClass]="{'is-invalid' : proxmoxFormErrors.host_address}">
+                    <div class="invalid-feedback" *ngIf="proxmoxFormErrors.host_address">
+                      {{proxmoxFormErrors.host_address}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group">
+                    <label class="form-col-form-label" for="username">User Name<em>*</em></label>
+                    <input class="form-control" id="username" type="text" formControlName="username"
+                      [ngClass]="{'is-invalid' : proxmoxFormErrors.username}">
+                    <div class="invalid-feedback" *ngIf="proxmoxFormErrors.username">{{proxmoxFormErrors.username}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group" *ngIf="!pcId">
+                    <label class="form-col-form-label" for="password">Password<em>*</em></label>
+                    <input class="form-control" id="password" type="password" formControlName="password"
+                      [ngClass]="{'is-invalid' : proxmoxFormErrors.password}">
+                    <div class="invalid-feedback" *ngIf="proxmoxFormErrors.password">{{proxmoxFormErrors.password}}
+                    </div>
+                  </div>
+                  <div class="col-6 form-group" *ngIf="proxmoxForm.controls.domain">
+                    <label class="form-col-form-label" for="domain">Domain<em>*</em></label>
+                    <input class="form-control" id="domain" type="domain" formControlName="domain"
+                      [ngClass]="{'is-invalid' : proxmoxFormErrors.domain}">
+                    <div class="invalid-feedback" *ngIf="proxmoxFormErrors.domain">{{proxmoxFormErrors.domain}}</div>
+                  </div>
+                  <div *ngIf="proxmoxForm.get('collector')" class="col-6 form-group" formGroupName="collector">
+                    <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+                    <select id="collectoruuid" class="form-control" formControlName="uuid"
+                      [class.is-invalid]="proxmoxFormErrors.collector.uuid">
+                      <option value="" disabled>Select Collector</option>
+                      <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="proxmoxFormErrors.collector.uuid">
+                      {{proxmoxFormErrors.collector.uuid}}
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmit()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      All associated devices will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #passwordChange>
+  <div class="card mb-0">
+    <div class="card-header">
+      Change Password
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="passwordChangeRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="passwordForm" [formGroup]="passwordForm">
+        <div class="col-6 form-group">
+          <label class="form-col-form-label" for="password">New Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password"
+            [ngClass]="{'is-invalid' : passwordFormErrors.password}">
+          <div class="invalid-feedback" *ngIf="passwordFormErrors.password">{{passwordFormErrors.password}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="confirm_password">Confirm New Password<em>*</em></label>
+          <input class="form-control" id="confirm_password" type="password" formControlName="confirm_password"
+            [ngClass]="{'is-invalid' : passwordFormErrors.confirm_password}">
+          <div class="invalid-feedback" *ngIf="passwordFormErrors.confirm_password">
+            {{passwordFormErrors.confirm_password}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="updatePassword()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="passwordChangeRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,99 @@
+<div class="row mx-2 mt-2">
+    <div class="col-12 p-0">
+        <div class="card rounded">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex align-items-center">
+                    <span class="font-lg-xl font-500">{{viewData?.workflow_name}}</span>
+                    <span *ngIf="viewData?.workflow_name" class="fas fa-edit text-warning font-sm ml-2"
+                        (click)="manageWorkflowDetails()"></span>
+                </div>
+                <!-- <span [popover]="popTemplate" containerClass="box" [isOpen]="isOpen" [outsideClick]="false"
+                    [style.position]="'absolute'" [style.top]="widgetAddMenuStyle.top"
+                    [style.left]="widgetAddMenuStyle.left">
+                </span>
+                <div>
+                    <button class="btn btn-sm btn-success font-500" type="button" (click)="saveWorkFlow()">
+                        <span class="font-xs-sm mx-1">Save Changes</span>
+                    </button>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                        (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                    </button>
+                </div> -->
+            </div>
+            <div class="card-body p-2">
+                <div class="row">
+                    <a href="https://github.com/nocode-js/sequential-workflow-designer/tree/main/angular/designer"
+                        target="_blank">Sequential Workflow Designer for Angular</a>.
+                </div>
+                <div class="row workflow-poc-body">
+                    <div class="col-9">
+                        <sqd-designer id="workflow-designer" *ngIf="isDesignReady" theme="light" [undoStackSize]="10" [definition]="definition"
+                            [toolboxConfiguration]="toolboxConfiguration" [stepsConfiguration]="stepsConfiguration"
+                            [validatorConfiguration]="validatorConfiguration" [controlBar]="true"
+                            [selectedStepId]="selectedStepId" [isReadonly]="isReadonly"
+                            [isToolboxCollapsed]="isToolboxCollapsed" [isEditorCollapsed]="isEditorCollapsed"
+                            [areEditorsHidden]="false" [rootEditor]="rootEditor" [stepEditor]="stepEditor"
+                            (onReady)="onDesignerReady($event)" (onDefinitionChanged)="onDefinitionChanged($event)"
+                            (onSelectedStepIdChanged)="onSelectedStepIdChanged($event)"
+                            (onIsToolboxCollapsedChanged)="onIsToolboxCollapsedChanged($event)"
+                            (onIsEditorCollapsedChanged)="onIsEditorCollapsedChanged($event)">
+                        </sqd-designer>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="btn btn-sm btn-primary" (click)="reloadDefinitionClicked()">Reload
+                            definition</button>
+                        &nbsp;
+                        <button type="button" class="btn btn-sm btn-primary" (click)="toggleReadonlyClicked()">
+                            {{ isReadonly ? 'Enable editing' : 'Disable editing' }}
+                        </button>
+                        &nbsp;
+                        <button type="button" class="btn btn-sm btn-primary" (click)="toggleSelectedStepClicked()">
+                            {{ selectedStepId ? 'Unselect' : 'Select first' }}
+                        </button>
+                        &nbsp;
+                        <button type="button" class="btn btn-sm btn-primary" (click)="toggleToolboxClicked()">
+                            {{ isToolboxCollapsed ? 'Show toolbox' : 'Hide toolbox' }}
+                        </button>
+                        &nbsp;
+                        <button type="button" class="btn btn-sm btn-primary" (click)="toggleEditorClicked()">
+                            {{ isEditorCollapsed ? 'Show editor' : 'Hide editor' }}
+                        </button>
+                        <div class="">
+                            Is valid: <strong>{{ isValid }}</strong>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-primary" (click)="newJob()">
+                                Add New JOB
+                            </button>
+
+                            <button type="button" class="btn btn-sm btn-primary" (click)="newIf()">
+                                Add New If
+                            </button>
+                        </div>
+
+                        <div class="mt-3">
+                            <div [innerHTML]="definitionJSON"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<ng-template #rootEditor let-editor>
+    <h2>Root Editor</h2>
+
+    <!-- <h3>Velocity</h3> -->
+    <!-- <mat-form-field class="full-width">
+        <input matInput type="number" [value]="editor.definition.properties.velocity" [readonly]="editor.isReadonly"
+            (input)="updateProperty(editor.definition.properties, 'velocity', $event, editor.context)" />
+    </mat-form-field> -->
+</ng-template>
+
+<ng-template #stepEditor let-editor>
+    <h2>Step Editor</h2>
+</ng-template>

@@ -1,0 +1,97 @@
+<div class="modal-header">
+  <h3 class="modal-title">{{ method }} {{ title.singular }}</h3>
+</div>
+
+<div class="modal-body">
+  <form class="form-horizontal">
+    <div class="form-group">
+      <label for="blockName" class="col-sm-2 control-label">
+        First Name
+      </label>
+
+      <div class="col-sm-10">
+        <input type="text" class="form-control" ng-model="obj.first_name">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="blockName" class="col-sm-2 control-label">
+        Last Name
+      </label>
+
+      <div class="col-sm-10">
+        <input type="text" class="form-control" ng-model="obj.last_name">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="blockName" class="col-sm-2 control-label">
+        Email Address
+      </label>
+
+      <div class="col-sm-10">
+        <input type="text" class="form-control" ng-model="obj.email">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="blockName" class="col-sm-2 control-label">
+        Active?
+      </label>
+
+      <div class="col-sm-10">
+        <input type="checkbox" class="form-control" ng-model="obj.is_active">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="blockName" class="col-sm-2 control-label">
+        Organization
+      </label>
+
+      <div class="col-sm-10">
+        <input type="text" class="form-control"
+               uib-typeahead="org as org.organization_name for org in getOrgs($viewValue)"
+               ng-model="obj.org">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="blockName" class="col-sm-2 control-label">
+        Access Types
+      </label>
+
+      <div class="col-sm-10">
+        <select multiple class="form-control"
+                ng-model="obj.access_types"
+                ng-options="a as a.name for a in accessTypes">
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="salesforceId" class="col-sm-2 control-label">
+        Salesforce Id
+      </label>
+
+      <div class="col-sm-10">
+        <input id="salesforceId" type="text" class="form-control"
+               ng-model="obj.salesforce_id">
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-danger" type="button" ng-click="cancel()">
+    No, not right now.
+  </button>
+  <button ng-if="method === 'Add'" class="btn btn-primary" type="button" ng-click="add(obj)">
+    Create!
+  </button>
+  <button ng-if="method === 'Edit'" class="btn btn-primary" type="button" ng-click="edit(obj, selection.index)">
+    Save changes!
+  </button>
+</div>

@@ -1,0 +1,15 @@
+[
+    {
+        "name": "Start",
+        "id": "start",
+        "type": "Start Task"
+    },
+    {
+        "name": "End",
+        "id": "end",
+        "type": "End Task",
+        "dependencies": [
+            "start"
+        ]
+    }
+]

@@ -1,0 +1,1108 @@
+<style type="text/css">
+    .cg-busy {
+        top: 0 !important;
+        left: 0 !important;
+        position: absolute !important;
+        height: 100% !important;
+
+    }
+
+    .cg-busy-default-sign {
+        top: 40% !important;
+        left: 10% !important;
+    }
+
+    .assets-bar .progress-bar-warning {
+        background-color: #BDBDBD;
+    }
+
+    select.pdu_select_box:focus {
+        outline: none;
+    }
+
+    .progress-bar-warning {
+        background-color: #ef7d02;
+    }
+    .bigtext2 {
+        font-size: 30px;
+      }
+</style>
+
+<style type="text/css">
+    .f1 {
+        background: #fff;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        border-radius: 4px;
+    }
+
+    p {
+        margin: 0 0 10px;
+    }
+
+    .f1-steps {
+        overflow: hidden;
+        position: relative;
+        margin-top: 10px;
+    }
+
+    .f1-progress {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: #ddd;
+    }
+
+    .f1-progress-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 1px;
+    }
+
+    /* Normal Color : #646464*/
+
+    .f1-step {
+        position: relative;
+        float: left;
+        width: 25%;
+        padding: 0 5px;
+    }
+
+    .f1-step-icon {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        /*margin-top: 4px;*/
+        background: #ddd;
+        font-size: 20px;
+        color: #646464;
+        line-height: 40px;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        border-radius: 5px;
+        padding: 0px;
+        outline: none;
+        border: 1px solid #646464;
+    }
+
+    .f1-step p {
+        color: #646464;
+        margin-top: 2px;
+    }
+
+    .f1-step.disabled .f1-step-icon {
+        width: 40px;
+        height: 40px;
+        margin-top: 0;
+        background: #ddd;
+        font-size: 16px;
+        color: #fff;
+        line-height: 40px;
+        outline: none;
+        border: 1px solid #ddd;
+        pointer-events: none;
+    }
+
+    .f1-step.disabled p {
+        color: #ccc;
+        pointer-events: none;
+    }
+
+    .f1-step.inprogress .f1-step-icon {
+        width: 40px;
+        height: 40px;
+        margin-top: 0;
+        background: #ff8800 !important;
+        font-size: 22px;
+        line-height: 40px;
+        color: #fff !important;
+        border: none;
+    }
+
+    .f1-step.inprogress p {
+        color: #ff8800 !important;
+    }
+
+    .f1-step.error .f1-step-icon {
+        width: 40px;
+        height: 40px;
+        margin-top: 0;
+        background: #e9533b !important;
+        font-size: 22px;
+        line-height: 40px;
+        color: #fff !important;
+        border: none;
+    }
+
+    .f1-step.error p {
+        color: #e9533b !important;
+    }
+
+    .f1-step.complete .f1-step-icon {
+        width: 40px;
+        height: 40px;
+        margin-top: 0;
+        background: #40ac40 !important;
+        font-size: 18px;
+        line-height: 40px;
+        color: #fff !important;
+        border: #097509;
+    }
+
+    .f1-step.complete p {
+        color: #40ac40 !important;
+    }
+
+    .f1-step.active .f1-step-icon {
+        width: 56px;
+        height: 56px;
+        margin-top: 0;
+        background: #646464;
+        font-size: 28px;
+        line-height: 56px;
+        outline: none;
+        color: #fff;
+    }
+
+    .f1-step.active p {
+        color: #646464;
+        margin-top: 10px;
+    }
+
+    .conn_req_modal {
+        width: 85% !important;
+        margin: 1% auto 0px auto !important;
+    }
+
+    .condense .form-group {
+        margin-bottom: 0px;
+    }
+
+    .condense label {
+        margin-top: 0px;
+    }
+
+    textarea {
+        resize: none;
+    }
+
+    .success_badge {
+        background-color: #40ac40;
+        padding: 20px 20px;
+        font-size: 70px;
+        border-radius: 60px;
+    }
+
+    .warning_badge {
+        background-color: #e48c11;
+        padding: 20px 20px;
+        font-size: 70px;
+        border-radius: 60px;
+    }
+
+    .error_badge {
+        background-color: #e9533b;
+        padding: 18px 25px;
+        font-size: 70px;
+        border-radius: 60px;
+    }
+</style>
+<!-- New Cabinet widget CSS -->
+<style>
+    .cabinet-widget {
+        /* padding: 10px 5px !important; */
+    }
+
+    .cabinet-table {
+        border: 10px ridge #acb4bc;
+        background-color: #292929;
+        border-collapse: initial !important;
+        table-layout: fixed;
+        width: 95%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    tr,
+    td,
+    tbody {
+        border-collapse: collapse !important;
+    }
+
+    .cabinet-widget td {
+        /* padding: 0 !important; */
+        width: 50%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .cabinet-widget .border-top-0 {
+        border: none !important;
+    }
+
+    .cabinet-widget .text-white {
+        color: #fff !important;
+    }
+
+    .cabinet-widget .pt-0 {
+        padding-top: 0 !important;
+    }
+
+    .cabinet-widget .pb-0 {
+        padding-bottom: 0 !important;
+    }
+
+    .cabinet-widget .px-0 {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    .cabinet-widget .py-0 {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .cabinet-widget .pt-1 {
+        padding-top: 5px !important;
+    }
+
+    .cabinet-widget .pb-1 {
+        padding-bottom: 5px !important;
+    }
+
+    .cabinet-widget .pt-2 {
+        padding-top: 10px !important;
+    }
+
+    .cabinet-widget .pb-2 {
+        padding-bottom: 10px !important;
+    }
+
+    .cabinet-widget .mb-0 {
+        margin-bottom: 0 !important;
+    }
+
+    .cabinet-widget .mb-1 {
+        margin-bottom: 10px !important;
+    }
+
+    .cabinet-widget .fa-lg {
+        margin-right: 0;
+    }
+
+    .cabinet-widget .align-middle {
+        height: 100%;
+        vertical-align: middle;
+    }
+    .cabinet-widget .card-padding {
+        padding:5px 10px !important;
+    }
+    .cabinet-widget .card-right-padding {
+        padding-right:20px !important;
+    }
+    .cabinet-widget .card-left-padding {
+        padding-left:20px !important;
+    }
+    .cabinet-ellipsis {
+        position: relative;
+    }
+    .cabinet-ellipsis:before {
+        content: '&nbsp;';
+        visibility: hidden;
+    }
+    .cabinet-ellipsis .apply-ellipsis {
+        position: absolute;
+        left: 5px;
+        right: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+<!-- <page-title title="Dashboard"></page-title> -->
+<div class="row tabs-level1">
+    <div class="col-xs-3">
+        <div class="ui-selectee">
+            <nav class="column">
+                <ul class="nav nav-tabs">
+                    <span class="ulheading">Dashboard</span>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <!-- <div class="col-xs-7" style="background : #fff;" ng-if="show_onboard_status">
+        <div class="col-xs-2" style="padding:10px 0px 10px 15px !important;">
+            <span style="font-size: 15px;color: #e48c11;">
+                Assets <br> Onboard <br> Status
+            </span>
+        </div>
+        <div class="col-md-10">
+            <div class="row" style="text-align: center;">
+                <form role="form" action="" method="post" class="f1 text-center">
+                    <div class="f1-steps">
+                        <div class="f1-progress">
+                            <div class="f1-progress-line" data-now-value="15.65" data-number-of-steps="4" style="width: 15.65%;"></div>
+                        </div>
+                        <div class="f1-step step-1" 
+                        ng-class="{'inprogress' : (onboarding_details.onb_status.vpn_req && !onboarding_details.vpn_status), 'complete' : onboarding_details.vpn_status}">
+                            <div class="f1-step-icon" ng-click="show_onboard_page()">
+                                <i class="fa fa-envelope-o"></i>
+                            </div>
+                            <p> Connect to Unity</p>
+                        </div>
+                        <div class="f1-step step-2" 
+                        ng-class="{'error' : (onboarding_details.onb_status.excel_start && !onboarding_details.onb_status.excel_end), 'complete' : onboarding_details.onb_status.excel_end }">
+                            <div class="f1-step-icon" ng-click="show_onboard_page()">
+                                <i class="fa fa-cloud-upload"></i>
+                            </div>
+                            <p>Onboard Assets</p>
+                        </div>
+                        <div class="f1-step step-3" 
+                        ng-class="{'inprogress' : (onboarding_details.onb_status.monitoring_start && !onboarding_details.onb_status.monitoring_error && !onboarding_details.onb_status.monitoring_end), 'error' : (onboarding_details.onb_status.monitoring_error), 'complete' : onboarding_details.onb_status.monitoring_end, 'disabled' : (!onboarding_details.vpn_status) }">
+                            <div class="f1-step-icon" ng-click="show_onboard_page()">
+                                <i class="fa fa-line-chart"></i>
+                            </div>
+                            <p>Monitoring</p>
+                        </div>
+                        <div class="f1-step step-4" 
+                        ng-class="{'error' : (onboarding_details.onb_status.manage_error), 'complete' : onboarding_details.onb_status.manage_end, 'disabled' : (!onboarding_details.vpn_status) }">
+                            <div class="f1-step-icon" class="btn" ng-click="show_onboard_page()">
+                                <i class="fa fa-television"></i>
+                            </div>
+                            <p>Management</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> -->
+    <div class="col-xs-7" style="background : #fff;">
+        &nbsp;
+    </div>
+    <div class="col-xs-2 company-name" style="padding-right: 15px !important;">
+        <a href="" class="no_pointer_events">
+            <i class="fa fa-cog" aria-hidden="true"></i>
+        </a>
+    </div>
+    <div class="col-xs-12" id="notificationArea" style="width:100%">
+    </div>
+</div>
+<!--Tabs Level 1 End-->
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="row db-info shadow-btm"> </div>
+</div>
+
+<div class="row">
+    <!--Tabs Level 1 End-->
+    <!--content wrapper Start-->
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper" style="padding-right : 0px !important;position:absolute;">
+        <div class="row" ng-if="show_onboard_status">
+            <h1>Devices On-boarding Status</h1>
+        </div>
+        <div class="row" style="padding-top:10px;" ng-show="show_onboard_status">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 pdu_widget_padding">
+                <div class="row middle-wrapper pdu_div_overflow" style="padding:10px">
+                    <div class="col-xs-12" style="padding: 0px !important;">
+                        <div class="row">
+                            <form role="form" action="" method="post" class="f1 text-center">
+                                <div class="f1-steps">
+                                    <div class="f1-progress">
+                                        <div class="f1-progress-line" data-now-value="15.65" data-number-of-steps="4"
+                                            style="width: 15.65%;"></div>
+                                    </div>
+                                    <div class="f1-step step-1" ng-class="{'inprogress' : (onboarding_details.onb_status.vpn_req && !onboarding_details.vpn_status), 'complete' : onboarding_details.vpn_status}">
+                                        <div class="f1-step-icon" ng-click="show_onboard_page()">
+                                            <i class="fa fa-envelope-o"></i>
+                                        </div>
+                                        <p> Connect to Unity</p>
+                                    </div>
+                                    <div class="f1-step step-2" ng-class="{'error' : (onboarding_details.onb_status.excel_start && !onboarding_details.onb_status.excel_end), 'complete' : onboarding_details.onb_status.excel_end }">
+                                        <div class="f1-step-icon" ng-click="show_onboard_page()">
+                                            <i class="fa fa-cloud-upload"></i>
+                                        </div>
+                                        <p>Onboard Devices</p>
+                                    </div>
+                                    <div class="f1-step step-3" ng-class="{'inprogress' : (onboarding_details.onb_status.monitoring_start && !onboarding_details.onb_status.monitoring_error && !onboarding_details.onb_status.monitoring_end), 'error' : (onboarding_details.onb_status.monitoring_error), 'complete' : onboarding_details.onb_status.monitoring_end, 'disabled' : (!onboarding_details.vpn_status) }">
+                                        <div class="f1-step-icon" ng-click="show_onboard_page()">
+                                            <i class="fa fa-line-chart"></i>
+                                        </div>
+                                        <p>Monitoring</p>
+                                    </div>
+                                    <div class="f1-step step-4" ng-class="{'error' : (onboarding_details.onb_status.manage_error), 'complete' : onboarding_details.onb_status.manage_end, 'disabled' : (!onboarding_details.vpn_status) }">
+                                        <div class="f1-step-icon" class="btn" ng-click="show_onboard_page()">
+                                            <i class="fa fa-television"></i>
+                                        </div>
+                                        <p>Management</p>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="privateCloud || publicCloudAWS || publicCloudAzure">
+            <h1>Infrastructure-as-a-Service</h1>
+        </div>
+        <div class="row paddingtop">
+            <div ng-repeat="item in privateCloud track by $index" class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-right : 20px !important; padding-bottom : 20px;"
+                ng-if="item.platform_type=='VMware' || item.platform_type=='OpenStack'|| item.platform_type == 'vCloud Director'">
+                <div ng-init="privateAllocations=allocations(item.uuid, item.platform_type)" cg-busy="{promise:privateAllocations, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+                    <div class="middle-wrapper Dashwrap {{item.classTop}}">
+                        <div class="row">
+                            <a class="dashboard_widget_link" href="{{item.href}}">
+                                <h4 class="widget-title">{{item.name}}</h4> - <h6>{{item.colocation_cloud}}</h6>
+                            </a>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 Dashborder-right pcw-bg-div">
+                                <div class="paddingright">
+                                    <div class="row paddingright pcw-bg-each" ng-repeat="bar in response[item.uuid] track by $index">
+                                        <div class="row">
+                                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                                <h2 class="pcw-bg-title" style="font-weight : 600;">{{bar.name}}</h2>
+                                            </div>
+                                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables"
+                                                style="margin-top : 5px;font-weight:bolder;">Available: {{
+                                                bar.availableValue }}</div>
+                                        </div>
+                                        <div class="row privateprogress">
+                                            <uib-progressbar max="100" value="bar.percentValue" animate="true " type="{{bar.type}}">
+                                                <i><span style="color:white;font-weight:normal;white-space:nowrap;font-style: normal; "></span></i>
+                                            </uib-progressbar>
+                                        </div>
+                                        <div class="row" style="margin-top : 5px;">
+                                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 lightcolor pcw-bg-lables"
+                                                style="font-weight:bolder;">Configured: {{ bar.allocatedValue }}</div>
+                                            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables"
+                                                style="font-weight:bolder;">Allocated: {{bar.totalValue}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 paddingleft" style="padding-top : 10px;">
+                                <div class="row pcw-stats-div">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="text-align : center">
+                                            <a ng-if="item.colo_cloud==null" href="#/pc_clouds/{{item.uuid}}/virtual_machines"
+                                                style="color: inherit;">
+                                                <p class="yellow-bigtextdash">{{item.virtualMachines}}</p>
+                                                <h2 class="smalltextdash">Virtual Machines</h2>
+                                            </a>
+
+                                            <a ng-if="item.colo_cloud" href="#/colo_cloud/{{item.colo_cloud}}/private_clouds/{{item.uuid}}/virtual_machines"
+                                                style="color: inherit;">
+                                                <p class="yellow-bigtextdash">{{item.virtualMachines}}</p>
+                                                <h2 class="smalltextdash">Virtual Machines</h2>
+                                            </a>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="text-align : center"
+                                            ng-init='cloud_devices_alerts(item.uuid)'>
+                                            <span ng-show="!angular.isDefined(devices_alert_count[item.uuid])">
+                                                <i class="fa fa-spinner fa-spin fa-lg"></i>
+                                            </span>
+                                            <a ng-if="item.colo_cloud==null" href="#/pc_clouds/{{item.uuid}}/all_devices"
+                                                style="color: inherit;">
+                                                <p class="red-bigtextdash" ng-show="angular.isDefined(devices_alert_count[item.uuid])">{{devices_alert_count[item.uuid]
+                                                    || 0}}</p>
+                                                <h2 class="smalltextdash">Alerts</h2>
+                                            </a>
+                                            <a ng-if="item.colo_cloud !=null" href="#/colo_cloud/{{item.colo_cloud}}/private_clouds/{{item.uuid}}/all_devices"
+                                                style="color: inherit;">
+                                                <p class="red-bigtextdash" ng-show="angular.isDefined(devices_alert_count[item.uuid])">{{devices_alert_count[item.uuid]
+                                                    || 0}}</p>
+                                                <h2 class="smalltextdash">Alerts</h2>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row paddingtop pcw-hdg-div">
+                                    <div class="row ">
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                            <h2 class="pcw-hdg-title">%Utilization</h2>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 pcw-hdg-stats" style="text-align : center;">
+                                            <span class="legendgreen"></span>
+                                            <span class="lightcolor paddingright">Used</span>
+                                            <span class="legendlight "></span>
+                                            <span class="lightcolor">Unused</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingright">
+                                            <div class="row minusmargin">
+                                                <canvas id="private-CPU-halfDonut{{item.uuid}}" width="50" height="50"></canvas>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                            <div class="row minusmargin">
+                                                <canvas id="private-RAM-halfDonut{{item.uuid}}" width="50" height="50"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 textcenter paddingright pcw-hdg-lables">vCPU</div>
+                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 textcenter paddingleft pcw-hdg-lables">RAM</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="showPublicCloudWidget">
+            <div ng-repeat="item in publicCloudAWS" class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-right : 20px !important; padding-bottom : 20px;">
+                <div ng-init="publicAWSAllocations = publicCloudallocations(item.id, item.platform_type)" class="middle-wrapper Dashwrap"
+                    cg-busy="{promise:publicAWSAllocations, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+                    <div class="row">
+                        <a href="#/public_cloud/aws-dashboard">
+                            <h4 class="widget-title">{{item.accountName}}</h4>
+                            <span class="dashboard_widget_link">- {{item.platform_type}}</span>
+                        </a>
+                    </div>
+
+                    <div class="row paddingtop">
+                        <div ng-repeat="bar in responseAWS[item.id] track by $index">
+                            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 Dashborder-right">
+                                <div class="row">
+                                    <span class="legendpurple"></span>
+                                    <span class="lightcolor paddingright">Running</span>
+                                    <span class="legendlight"></span>
+                                    <span class="lightcolor">Stopped</span>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+                                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 minusmargin2">
+                                        <canvas id="public-halfDonut-{{item.platform_type}}-{{item.id}}"></canvas>
+                                    </div>
+                                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="row textcenter minusmargincloud2">{{bar.ec2Instance}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="row textcenter minusmargincloud">{{bar.instances}}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 paddingleft">
+                                <div class="row">
+                                    <div ng-repeat="col in bar.column1" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                        <p class="{{col.color}} bigtext2">{{col.value}}</p>
+                                        <h2 class="pbcw-stat-name">{{col.name}}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div ng-repeat="col in bar.column2" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                        <p class="{{col.color}} bigtext2">{{col.value}}</p>
+                                        <h2 class="pbcw-stat-name">{{col.name}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-repeat="item in publicCloudAzure" class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-right : 20px !important; padding-bottom : 20px;">
+                <div ng-init="publicAzureAllocations = publicCloudallocations(item.id, item.platform_type)" class="middle-wrapper Dashwrap"
+                    cg-busy="{promise:publicAzureAllocations, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+                    <a href="#/public_cloud/azure-dashboard">
+                        <h4 class="widget-title">{{item.accountName}}</h4>
+                        <span class="dashboard_widget_link">- {{item.platform_type}}</span>
+                    </a>
+                    <div class="row paddingtop">
+                        <div ng-repeat="bar in responseAzure[item.id] track by $index">
+                            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 Dashborder-right">
+                                <div class="row">
+                                    <span class="legendpurple"></span>
+                                    <span class="lightcolor paddingright">Running</span>
+                                    <span class="legendlight"></span>
+                                    <span class="lightcolor">Stopped</span>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+                                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 minusmargin2">
+                                        <canvas id="public-halfDonut-{{item.platform_type}}-{{item.id}}"></canvas>
+                                    </div>
+                                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="row textcenter minusmargincloud2">{{bar.ec2Instance}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="row textcenter minusmargincloud">{{bar.instances}}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 paddingleft">
+                                <div class="row">
+                                    <div ng-repeat="col in bar.column1" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                        <p class="{{col.color}} bigtext2">{{col.value}}</p>
+                                        <h2 class="pbcw-stat-name">{{col.name}}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div ng-repeat="col in bar.column2" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                        <p class="{{col.color}} bigtext2">{{col.value}}</p>
+                                        <h2 class="pbcw-stat-name">{{col.name}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-repeat="item in publicCloudGCP" class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-right : 20px !important; padding-bottom : 20px;">
+                <div ng-init="publicGCPAllocations = publicCloudallocations(item.id, item.platform_type)" class="middle-wrapper Dashwrap"
+                    cg-busy="{promise:publicAzureAllocations, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+                    <a href="#/public_cloud/gcp-dashboard">
+                        <h4 class="widget-title">{{item.accountName}}</h4>
+                        <span class="dashboard_widget_link">- {{item.platform_type}}</span>
+                    </a>
+                    <div class="row paddingtop">
+                        <div ng-repeat="bar in responseGCP[item.id] track by $index">
+                            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 Dashborder-right">
+                                <div class="row">
+                                    <span class="legendpurple"></span>
+                                    <span class="lightcolor paddingright">Running</span>
+                                    <span class="legendlight"></span>
+                                    <span class="lightcolor">Stopped</span>
+                                </div>
+                                <div class="row ">
+                                    <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+                                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 minusmargin2">
+                                        <canvas id="public-halfDonut-{{item.platform_type}}-{{item.id}}"></canvas>
+                                    </div>
+                                    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="row textcenter minusmargincloud2">{{bar.ec2Instance}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="row textcenter minusmargincloud">{{bar.instances}}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 paddingleft">
+                                <div class="row">
+                                    <div ng-repeat="col in bar.column1" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                        <p class="{{col.color}} bigtext2">{{col.value}}</p>
+                                        <h2 class="pbcw-stat-name">{{col.name}}</h2>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div ng-repeat="col in bar.column2" class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingleft">
+                                        <p class="{{col.color}} bigtext2">{{col.value}}</p>
+                                        <h2 class="pbcw-stat-name">{{col.name}}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--PDU Health stats-->
+        <div class="row">
+            <div style="padding-right : 20px !important; padding-bottom : 20px;" ng-repeat="datacenter in datacenters"
+                ng-if="datacenter.cabinets.length" ng-class="datacenter.cabinets.length>4?'col-xs-12':'col-xs-6'">
+                <div class="middle-wrapper cabinet-widget" ng-if="datacenter.cabinets.length"
+                cg-busy="{promise:widgetLoading, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+                    <div class="row">
+                        <div class="col-xs-12" style="padding:10px 0 5px 10px !important;">
+                            <a class="dashboard_widget_link " href="#/colo_cloud/{{datacenter.datacenter_uuid}}/cabinets">
+                                <h4 class="widget-title">{{datacenter.datacenter_name}}</h4>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div ng-repeat="x in [].constructor(datacenter.cardCount) track by $index" ng-class="['card-padding',datacenter.cardPadding[$index],{'col-xs-6':datacenter.cabinets.length>4,'col-xs-12':datacenter.cabinets.length<=4}]">
+                            <div class="row" ng-init="cabinetArr=[($index * 4)+0,($index * 4)+1,($index * 4)+2,($index * 4)+3]">
+                                <div class="col-xs-3 text-center" ng-repeat="cabinetIndex in cabinetArr" ng-if="datacenter.cabinets[cabinetIndex]">
+                                    <table class="table table2 cabinet-table text-white" ng-init="cabinet=datacenter.cabinets[cabinetIndex]">
+                                        <tbody>
+                                            <tr>
+                                                <td class="px-0 border-top-0 pt-2 pb-0"><i class="fa fa-arrow-circle-up green"></i>&nbsp;{{cabinet.up_count}}</td>
+                                                <td class="px-0 border-top-0 pt-2 pb-0"><i class="fa fa-arrow-circle-down red"></i>&nbsp;{{cabinet.down_count}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-0 border-top-0 pb-1 pt-0" colspan="2"><small>Devices</small></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-0 pt-1" tooltip-class="customClass"
+                                                    tooltip-append-to-body="true" uib-tooltip="{{cabinet.alerts}} Alerts">{{cabinet.alerts}}<br /><small>Alerts</small></td>
+                                                <td class="px-0 pt-1" tooltip-class="customClass"
+                                                    tooltip-append-to-body="true" uib-tooltip="{{cabinet.occupied}} / {{cabinet.capacity}} RU">{{cabinet.occupied}} / {{cabinet.capacity}}<br /><small>RU</small></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-0 pt-1">
+                                                    <span class="align-middle" tooltip-class="customClass"
+                                                        tooltip-append-to-body="true" uib-tooltip="{{cabinet.max_temperature}}&deg;C">
+                                                        <i class="fa fa-thermometer-half yellow" style="display: inherit;">&nbsp;</i>{{cabinet.max_temperature}}&deg;C</span>
+                                                </td>
+                                                <td class="px-0 pt-1">
+                                                    <span class="align-middle" tooltip-class="customClass"
+                                                        tooltip-append-to-body="true" uib-tooltip="{{cabinet.total_power}}kW"><i
+                                                            class="fa fa-bolt green" style="display: inherit;">&nbsp;</i>{{cabinet.total_power}}kW</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-0 pt-2 pb-1" colspan="2">
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            <i class="fa cfa-socket fa-lg" tooltip-class="customClass"
+                                                                tooltip-append-to-body="true" uib-tooltip="{{cabinet.pdus[0].name}}"
+                                                                ng-class="cabinet.pdus[0].color"></i>
+                                                        </div>
+                                                        <div class="col-xs-6">
+                                                            <i class="fa cfa-socket fa-lg" tooltip-class="customClass"
+                                                                tooltip-append-to-body="true" uib-tooltip="{{cabinet.pdus[1].name}}"
+                                                                ng-class="cabinet.pdus[1].color"></i>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="px-0 pt-2 pb-1 border-top-0" colspan="2">
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            <i class="fa cfa-socket fa-lg" tooltip-class="customClass"
+                                                                tooltip-append-to-body="true" uib-tooltip="{{cabinet.pdus[2].name}}"
+                                                                ng-class="cabinet.pdus[2].color"></i>
+                                                        </div>
+                                                        <div class="col-xs-6">
+                                                            <i class="fa cfa-socket fa-lg" tooltip-class="customClass"
+                                                                tooltip-append-to-body="true" uib-tooltip="{{cabinet.pdus[3].name}}"
+                                                                ng-class="cabinet.pdus[3].color"></i>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="text-center">
+                                        <h6 class="" tooltip-class="customClass" tooltip-append-to-body="true"
+                                            uib-tooltip="{{cabinet.cabinet_name}}" style="margin: 0;font-size: 100%;">{{cabinet.cabinet_name}}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--PDU Health stats ends-->
+
+        <div class="row">
+
+            <div ng-include src="'static/rest/app/client/templates/partials/dashboard/assets_mgmt.html'"></div>
+
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3" style="padding-right : 10px !important; padding-bottom : 20px;"
+                ng-if="events && showMaintenanceWidget">
+                <div class="middle-wrapper Dashwrap maintenance-widget" style="height:290px">
+                    <div class="row">
+                        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                            <a href="#/maintenance-schedules">
+                                <h4 class="widget-title">Maintenance</h4>
+                            </a>
+                        </div>
+                        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 drop">
+                            <li class="dropdown">
+                                <span data-toggle="dropdown" class="dropdown-toggle" aria-expanded="false">All
+                                    Clouds</span>
+                            </li>
+                        </div>
+                    </div>
+                    <div ng-if="showCalender" class="row paddingtopbar main_cal_section">
+                        <div class="row calendar-arrow">
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                <a mwl-date-modifier date="viewDate" decrement="calendarView" ng-click="cellIsOpen = false">
+                                    <i class="fa  fa-angle-left" aria-hidden="true"></i></a>
+                            </div>
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8" style="padding-top:3px;">{{
+                                calendarTitle
+                                }}
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                <a mwl-date-modifier date="viewDate" increment="calendarView" ng-click="cellIsOpen = false">
+                                    <i class="fa  fa-angle-right" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                        <div class="dashcalendar">
+                            <mwl-calendar events="events" view="calendarView" view-title="calendarTitle" view-date="viewDate"
+                                on-event-click="eventClicked(calendarEvent)" on-event-times-changed="eventTimesChanged(calendarEvent); calendarEvent.startsAt = calendarNewEventStart; calendarEvent.endsAt = calendarNewEventEnd"
+                                cell-is-open="cellIsOpen" day-view-start="06:00" day-view-end="22:55" day-view-split="30"
+                                cell-modifier="modifyCell(calendarCell)" cell-auto-open-disabled="true"
+                                on-timespan-click="timespanClicked(calendarDate, calendarCell)">
+                            </mwl-calendar>
+                        </div>
+                    </div>
+
+                    <div ng-if="showEvents" class="maintenance">
+
+                        <div class="row maintenance-list">
+                            <ul>
+                                <li ng-repeat="item in cell_events">
+                                    <span class="pull-left eventDot" ng-style="{backgroundColor: item.color.primary}"></span>
+                                    <a ng-click="getEventsDetails(item)" href="">{{ item.title }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="row action-icons table-button">
+                            <a class="fa fa-chevron-left" ng-click="back()"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-if="showAlertsWidget" class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-right : 20px !important; padding-bottom : 20px;">
+                <div cg-busy="{promise:deviceAlerts, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+                    <!-- <loading object="{{device_alerts}}"></loading> -->
+                    <div class="middle-wrapper Dashwrap alerts-widget" style="height:290px">
+                        <div class="row no_pointer_events">
+                            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                <a href="">
+                                    <h4 class="widget-title">Alerts</h4>
+                                </a>
+                            </div>
+                            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 asset-indicators-section">
+                                <a href="" style="color: inherit;">
+                                    <span class=""> Total </span>
+                                    <span class="count">{{device_alerts.total_count || 0}}</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row paddingtop alerts-section">
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 alert_bars_padding">
+                                <i class="fa fa-object-group blue"></i>
+                                <a class="dashboard_widget_link" href="#/global_alerts/vms">
+                                    <span class="alerts-bar-label">VMs</span>
+                                </a>
+                                <uib-progressbar class="alerts-bar col-xs-9" max="device_alerts.vm_alert_count" value="device_alerts.vm_alert_count"
+                                    type="{{(device_alerts.vm_alert_count > 0) ? 'warning' : ''}}">
+                                    <span>{{device_alerts.vm_alert_count || 0}}</span>
+                                </uib-progressbar>
+                            </div>
+
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 alert_bars_padding">
+                                <i class="fa fa-database grey"></i>
+                                <a class="dashboard_widget_link no_pointer_events" href="">
+                                    <span class="alerts-bar-label">SANs</span>
+                                </a>
+                                <uib-progressbar class="alerts-bar col-xs-9" max="0" value="0" type="{{(device_alerts.alerts > 0) ? 'warning' : ''}}">
+                                    <span>0</span>
+                                </uib-progressbar>
+                            </div>
+
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 alert_bars_padding">
+                                <i class="fa fa-fire red"></i>
+                                <a class="dashboard_widget_link" href="#/global_alerts/firewalls">
+                                    <span class="alerts-bar-label">Firewalls</span>
+                                </a>
+                                <uib-progressbar class="alerts-bar col-xs-9" max="device_alerts.firewall_alert_count"
+                                    value="device_alerts.firewall_alert_count" type="{{(device_alerts.firewall_alert_count > 0) ? 'warning' : ''}}">
+                                    <span>{{device_alerts.firewall_alert_count || 0}}</span>
+                                </uib-progressbar>
+                            </div>
+
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 alert_bars_padding">
+                                <i class="fa fa-plug teal"></i>
+                                <a class="dashboard_widget_link" href="#/global_alerts/pdus">
+                                    <span class="alerts-bar-label">PDUs</span>
+                                </a>
+                                <uib-progressbar max="device_alerts.pdu_alert_count" value="device_alerts.pdu_alert_count"
+                                    class="alerts-bar col-xs-9" type="{{(device_alerts.pdu_alert_count > 0) ? 'warning' : ''}}">
+                                    <span>{{device_alerts.pdu_alert_count || 0}}</span>
+                                </uib-progressbar>
+                            </div>
+
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 alert_bars_padding">
+                                <i class="fa fa-sitemap green"></i>
+                                <a class="dashboard_widget_link" href="#/global_alerts/switches">
+                                    <span class="alerts-bar-label">Switches</span>
+                                </a>
+                                <uib-progressbar class="alerts-bar col-xs-9" max="device_alerts.switch_alert_count"
+                                    value="device_alerts.switch_alert_count" type="{{(device_alerts.switch_alert_count > 0) ? 'warning' : ''}}">
+                                    <span>{{device_alerts.switch_alert_count || 0}}</span>
+                                </uib-progressbar>
+                            </div>
+
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 alert_bars_padding">
+                                <i class="fa fa-server yellow"></i>
+                                <a class="dashboard_widget_link" href="#/global_alerts/hypervisors">
+                                    <span class="alerts-bar-label">Hypervisors</span>
+                                </a>
+                                <uib-progressbar class="alerts-bar col-xs-9" max="device_alerts.hypervisor_alert_count"
+                                    value="device_alerts.hypervisor_alert_count" type="{{(device_alerts.hypervisor_alert_count > 0) ? 'warning' : ''}}">
+                                    <span>{{device_alerts.hypervisor_alert_count || 0}}</span>
+                                </uib-progressbar>
+                            </div>
+
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 alert_bars_padding">
+                                <i class="fa fa-laptop yellow"></i>
+                                <a class="dashboard_widget_link" href="#/global_alerts/bm_servers">
+                                    <span class="alerts-bar-label">Bare Metals</span>
+                                </a>
+                                <uib-progressbar class="alerts-bar col-xs-9" max="device_alerts.bm_server_alert_count"
+                                    value="device_alerts.bm_server_alert_count" type="{{(device_alerts.bm_server_alert_count > 0) ? 'warning' : ''}}">
+                                    <span>{{device_alerts.bm_server_alert_count || 0}}</span>
+                                </uib-progressbar>
+                            </div>
+
+                            <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 alert_bars_padding">
+                                <i class="fa fa-balance-scale brown device_lb_icon"></i>
+                                <a class="dashboard_widget_link" href="#/global_alerts/loadbalancers">
+                                    <span class="alerts-bar-label device_lb">Load Balancers</span>
+                                </a>
+                                <uib-progressbar class="alerts-bar col-xs-7" max="device_alerts.load_balancer_alert_count"
+                                    value="device_alerts.load_balancer_alert_count" type="{{(device_alerts.load_balancer_alert_count > 0) ? 'warning' : ''}}">
+                                    <span>{{device_alerts.load_balancer_alert_count || 0}}</span>
+                                </uib-progressbar>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="ticketsLoaded && showTicketManagementWidget">
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-right : 20px !important; padding-bottom : 20px;">
+                <div class="middle-wrapper">
+                    <div class="middle-wrapper Dashwrap" style="padding-top : 11px; padding-bottom : 7px">
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                <ul class="dashtab" style="text-align : left !important;">
+                                    <li ng-class="{active: activeLineTab == 'Change Management'}">
+                                        <a class="widget-title" ng-click="getChangeMgmtTickets()">Change Management</a>
+                                    </li>
+                                    <li ng-class="{active: activeLineTab == 'Incident Management'}" style="margin-left: 20px !important;">
+                                        <a class="widget-title" ng-click="getIncidentMgmtTickets()">Incident
+                                            Management</a>
+                                    </li>
+                                    <li ng-class="{active: activeLineTab == 'Service Request'}" style="margin-left: 20px !important;">
+                                        <a class="widget-title" ng-click="getServiceRequestTickets()">Service
+                                            Request</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="text-align:right">
+                                <a href="{{activetabLink}}">
+                                    Full Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+                        <div class="row table-responsive height300px dash_tickets_section">
+                            <loading object="{{tickets}}"></loading>
+                            <section id="no-more-tables" class="margintop20">
+                                <table id="example" class="table">
+                                    <thead class="cf">
+                                        <tr>
+                                            <th ng-repeat="header in ticketHeaders">
+                                                {{header.title}}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-if="!zendesk_error">
+                                        <tr ng-repeat="ticket in tickets">
+                                            <td>
+                                                <a href="/main#/zendesk/ticket/{{ ticket.id}}">
+                                                    {{ticket.id}}
+                                                </a>
+                                            </td>
+                                            <td style="max-width:350px;">
+                                                <div ng-if="ticket.subject.length <= 45 ">
+                                                    {{ ticket.subject }}
+                                                </div>
+                                                <div ng-if="ticket.subject.length > 45 " tooltip-class="customClass"
+                                                    uib-tooltip="{{ticket.subject}}">
+                                                    {{ ticket.subject | limitTo:45 }}&nbsp;....
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ticket.status || 'N/A'}}
+                                            </td>
+                                            <td>
+                                                {{ticket.priority || 'N/A'}}
+                                            </td>
+                                            <td class="ticket_date_width">
+                                                {{ticket.created_at | unityDate : $root.users_timezone}}
+                                            </td>
+                                            <td class="ticket_date_width">
+                                                <div ng-if="has_metrics"> {{ ticket.assigned_on | unityDate :
+                                                    $root.users_timezone}}</div>
+                                                <div ng-if="!has_metrics">
+                                                    <i class="fa fa-spinner fa-spin"></i>
+                                                </div>
+                                            </td>
+                                            <td class="ticket_date_width">
+                                                <div ng-if="has_metrics"> {{ ticket.resolved_on | unityDate :
+                                                    $root.users_timezone}}</div>
+                                                <div ng-if="!has_metrics">
+                                                    <i class="fa fa-spinner fa-spin"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!-- <div ng-if="tickets.length == 0" class="bg-color content-wrapper" style="padding-top: 60px !important;">
+                                <no-records-found message="No Records found!!"></no-records-found>
+                            </div> -->
+                                <div ng-if="angular.isDefined(tickets) && (tickets.length == 0)" class="bg-color content-wrapper"
+                                    style="padding-top: 60px !important;">
+                                    <no-records-found ng-show="activeLineTab == 'Change Management'" message="No Change tickets to display"></no-records-found>
+                                    <no-records-found ng-show="activeLineTab == 'Incident Management'" message="No Incident tickets to display"></no-records-found>
+                                    <no-records-found ng-show="activeLineTab == 'Service Request'" message="No Service requests to display"></no-records-found>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        jQuery('img.svg_switch_icon').each(function () {
+            var $img = jQuery(this);
+            var imgID = $img.attr('id');
+            var imgClass = $img.attr('class');
+            var imgURL = $img.attr('src');
+
+            jQuery.get(imgURL, function (data) {
+                // Get the SVG tag, ignore the rest
+                var $svg = jQuery(data).find('svg');
+
+                // Add replaced image's ID to the new SVG
+                if (typeof imgID !== 'undefined') {
+                    $svg = $svg.attr('id', imgID);
+                }
+                // Add replaced image's classes to the new SVG
+                if (typeof imgClass !== 'undefined') {
+                    $svg = $svg.attr('class', imgClass + ' replaced-svg');
+                }
+
+                // Remove any invalid XML tags as per http://validator.w3.org
+                $svg = $svg.removeAttr('xmlns:a');
+
+                // Replace image with new SVG
+                $img.replaceWith($svg);
+
+            }, 'xml');
+
+        });
+    </script>

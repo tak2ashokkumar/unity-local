@@ -1,0 +1,81 @@
+<div class="container-fluid my-4">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="tab-content">
+                    <div class="tab-pane active p-2">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class="nav-link px-2 py-0">
+                                    <span class="font-xl font-500">{{viewData?.name}}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-auto">
+                                <button class="btn btn-pill btn-warning btn-sm mr-2" tooltip="Back" (click)="goBack()">
+                                    <i class="fa fa-arrow-left"></i>
+                                </button>
+                            </li>
+                            <li class="nav-item ml-1 float-right text-warning">
+                                <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <ng-container *ngIf="viewData">
+                    <ng-container
+                        *ngTemplateOutlet="propertiesRef; context: { $implicit: viewData?.attrs, isSub:false }"></ng-container>
+                </ng-container>
+                <ng-container *ngIf="!viewData">
+                    <div class="text-center text-muted bg-white py-5">No data to display.</div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #propertiesRef let-properties let-isSub="isSub">
+    <ul class="list-group" *ngIf="properties?.attributes?.length">
+        <li class="d-inline list-group-item" [class.border-0]="isSub" [class.pt-1]="isSub" [class.pb-2]="isSub">
+            <ng-container *ngFor="let obj of properties?.attributes; let first=first;; let last=last;">
+                <ng-container *ngFor="let attr of obj | keyvalue as attrs;">
+                    <span class="pr-2 font-sm" [class.pl-2]="!first" [class.border-right]="!last">
+                        <span class="font-500 text-muted">{{attr.key}} : </span>
+                        <span class="ml-1 text-muted">{{attr.value}}</span>
+                    </span>
+                </ng-container>
+            </ng-container>
+        </li>
+    </ul>
+    <ng-container *ngIf="properties?.objects?.length">
+        <ng-container *ngTemplateOutlet="objRef; context: { $implicit: properties?.objects }"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="properties?.lists?.length">
+        <ng-container *ngTemplateOutlet="listRef; context: { $implicit: properties?.lists }"></ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #objRef let-propObjects>
+    <ul class="list-group" *ngFor="let obj of propObjects">
+        <ng-container *ngFor="let view of obj | keyvalue">
+            <li class="d-inline list-group-item pt-2 pb-1">
+                <h5 class="font-lg font-500 text-muted">{{view?.key}}</h5>
+                <ng-container
+                    *ngTemplateOutlet="propertiesRef; context: { $implicit: view?.value, isSub:true}"></ng-container>
+            </li>
+        </ng-container>
+    </ul>
+</ng-template>
+
+<ng-template #listRef let-propLists>
+    <ul class="list-group" *ngFor="let view of propLists">
+        <ng-container *ngFor="let listObj of view | keyvalue">
+            <li class="d-inline list-group-item pt-2 pb-1">
+                <h5 class="font-lg font-500 text-muted">{{listObj?.key}}</h5>
+                <ng-container *ngFor="let obj of listObj?.value">
+                    <ng-container
+                        *ngTemplateOutlet="propertiesRef; context: { $implicit: obj, isSub:true }"></ng-container>
+                </ng-container>
+            </li>
+        </ng-container>
+    </ul>
+</ng-template>

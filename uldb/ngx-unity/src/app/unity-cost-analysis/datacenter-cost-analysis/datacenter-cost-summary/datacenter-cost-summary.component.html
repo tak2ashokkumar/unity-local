@@ -1,0 +1,96 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 m-0" *ngIf="view.dcList.length && view.billSummary">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-4">
+            <div class="card equalize-card border-0">
+              <div class="card-body px-1 py-0">
+                <div class="row">
+                  <div class="col-6 text-center pl-0">
+                    <span class="badge badge-light w-100">
+                      <div class="text-center py-3">
+                        <div class="text-value">{{view.billSummary.datacenters}}</div>
+                        <div class="text-muted mt-2">Datacenters Billed</div>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="col-6 text-center pl-0">
+                    <span class="badge badge-light w-100">
+                      <div class="text-center py-3">
+                        <div class="text-value">{{view.billSummary.numberOfCabinets}}</div>
+                        <div class="text-muted mt-2">Cabinets Billed</div>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="col-6 text-center pl-0 mt-2">
+                    <span class="badge badge-light w-100">
+                      <div class="text-center py-3">
+                        <div class="text-value">{{view.billSummary.numberOfPdus}}</div>
+                        <div class="text-muted mt-2 text-truncate">PDU's Billed</div>
+                      </div>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="card equalize-card">
+              <div class="card-body pb-2 text-center">
+                <div class="text-muted small text-uppercase font-weight-bold">Current month bill</div>
+                <div class="text-value-lg pb-3 pt-1">${{view.billSummary.currentMonthCost}}</div>
+                <div class="brand-card border-0 mb-0">
+                  <div class="brand-card-body py-0">
+                    <div>
+                      <div class="text-muted text-value-sm">${{view.billSummary.currentMonthCabinetsCost}}</div>
+                      <div class="text-muted small">Cabinets cost</div>
+                    </div>
+                    <div>
+                      <div class="text-muted text-value-sm">${{view.billSummary.currentMonthPdusCost}}</div>
+                      <div class="text-muted small">PDU's cost</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-1 offset-3">
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card mb-0 border-0">
+      <div class="card-body">
+        <table class="table text-left" *ngIf="view.dcList.length">
+          <thead>
+            <tr>
+              <th>Datacenter name</th>
+              <th>Location</th>
+              <th>Bill</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dc of view.dcList; let i = index;">
+              <td>{{dc.dcName}}</td>
+              <td>{{dc.dcLocation}}</td>
+              <td>{{dc.billAmount}}</td>
+              <td>
+                <button class="action-icons mb-0 fa fa-list-ul font-sm ml-1" [ngClass]="{'action-icons-disabled':!dc.infoBtnEnabled}"
+                  [tooltip]="dc.infoBtnTooltipMsg" (click)="showBillDetails(dc)"></button>
+                <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+                  (click)="createTicket(dc)">
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-center text-muted my-5 py-5" *ngIf="!view.dcList.length">No Datacenters available.</div>
+      </div>
+    </div>
+  </div>
+</div>

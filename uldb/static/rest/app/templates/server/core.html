@@ -1,0 +1,90 @@
+<div class="row">
+  <div class="col-sm-6 col-md-6 col-lg-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Server Details
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <td class="col-md-4">Server Name</td>
+            <td class="col-md-8">{{ handler.obj.name }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Alias</td>
+            <td class="col-md-8">{{ handler.obj.alias }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Asset Tag</td>
+            <td class="col-md-8">{{ handler.obj.asset_tag }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Serial Number</td>
+            <td class="col-md-8">{{ handler.obj.serial_number }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">CPUs</td>
+            <td class="col-md-8">{{ handler.obj.num_cpus }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Cores</td>
+            <td class="col-md-8">{{ handler.obj.num_cores }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Memory (MB)</td>
+            <td class="col-md-8">{{ handler.obj.memory_mb }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Storage (GB)</td>
+            <td class="col-md-8">{{ handler.obj.capacity_gb }}</td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Salesforce ID</td>
+            <td class="col-md-8"><a target="_blank" href="{{ salesforceResolve(handler.obj.salesforce_id) }}">
+              {{ handler.obj.salesforce_id }}
+            </a></td>
+          </tr>
+          <tr>
+            <td class="col-md-4">Customer</td>
+            <td class="col-md-8">
+              <a href="#/org/{{ handler.obj.customer.id }}">{{ handler.obj.customer.name }}</a>
+            </td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="ctrl.edit(handler.obj)">Edit Server Details</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-md-6 col-lg-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Instance Details
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr ng-repeat="col in inscols">
+            <td class="col-md-4">
+              <div>{{ col.description }}</div>
+            </td>
+            <td class="col-md-8">
+              <div ng-if="col.opaque === undefined"><strong>{{ insresult[col.name] }}</strong></div>
+              <div ng-if="col.opaque !== undefined">
+                <strong>{{ col.read(insresult) }}</strong>
+              </div>
+            </td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="modify_server_instance(insresult)">Modify Instance</button>
+      </div>
+    </div>
+  </div>
+</div>

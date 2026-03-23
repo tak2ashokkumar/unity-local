@@ -1,0 +1,9 @@
+<div class="input-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text bg-transparent border border-right-0">
+            <i class="fa fa-search"></i>
+        </span>
+    </div>
+    <input placeholder="Search" class="form-control border border-left-0 custom-search-input" id="prependedInput" size="16"
+        type="text" [ngModel]="searchValue" (ngModelChange)="onSearched($event)">
+</div>

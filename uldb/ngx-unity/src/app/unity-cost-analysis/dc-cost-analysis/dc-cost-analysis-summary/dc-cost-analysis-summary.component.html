@@ -1,0 +1,315 @@
+<div class="card border-0 mb-0">
+    <div class="card-header bg-white border-bottom-0 py-2 d-flex justify-content-between align-items-center">
+        <ul class="nav nav-tabs tabs-level1 custom-nav-container">
+            <li class="nav-item rounded-top tabs-level1-item">
+                <a class="nav-link tabs-level1-link border-0 text-success">Summary</a>
+            </li>
+        </ul>
+        <div class="d-flex align-items-center">
+            <select class="form-control-sm border-secondary" [(ngModel)]="selectedMonth" (ngModelChange)="getInfo()">
+                <option *ngFor="let month of months" [value]="month.value">{{ month.nameAndYear }}</option>
+            </select>
+            <button class="btn btn-pill btn-warning btn-sm ml-2" type="button" (click)="goToCostPlanner()" accessControl
+                moduleName="Cost Analysis" accessType="Manage Cost Analysis" elementType="btn">Cost Planner
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2 ml-0 mr-2">
+    <div class="col-3">
+        <div class="card border-0 mb-0 equalize-card" style="background-color: #f4f3ef;">
+            <div class="card-body p-0" *ngIf="widgetViewData">
+                <div class="card round-edge mb-2">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-lg">Total Cost</span>
+                            <span>${{widgetViewData.dcCost}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span>
+                                <i class="fas fa-database fa-sm text-warning-800 mr-2"></i>
+                                <span>Datacenter</span>
+                            </span>
+                            <span>
+                                <span class="h5 text-dark">{{widgetViewData.billedDatacenters}}</span>
+                                <span class="fa-sm text-muted">/{{widgetViewData.totalDatacenters}} Billed</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card round-edge mb-2">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between">
+                            <span>
+                                <i class="fas fa-table fa-sm text-danger-800 mr-2"></i>
+                                <span>Cabinets</span>
+                            </span>
+                            <span>${{widgetViewData.cabinetCost}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span>
+                                <span class="h5 text-dark">{{widgetViewData.billedCabinets}}</span>
+                                <span class="fa-sm text-muted">/{{widgetViewData.totalCabinets}} Billed</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card round-edge mb-0">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between">
+                            <span>
+                                <i class="fas fa-plug fa-sm text-success mr-2"></i>
+                                <span>PDU</span>
+                            </span>
+                            <span>${{widgetViewData.pduCost}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span>
+                                <span class="h5 text-dark">{{widgetViewData.billedPdus}}</span>
+                                <span class="fa-sm text-muted">/{{widgetViewData.totalPdus}} Billed</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-9 pl-0">
+        <div class="card equalize-card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-1">
+                <span class="font-lg font-500">Trailing 12 Months</span>
+                <div class="d-flex align-items-center" *ngIf="dcChartViewData">
+                    <div>
+                        <form *ngIf="dcCostViewData && dcCostViewData.length && dcChartViewData.form"
+                            [formGroup]="dcChartViewData.form">
+                            <div class="form-group mb-0">
+                                <multiselect-dropdown [options]="dcCostViewData" [settings]="dcSettings"
+                                    class="form-control p-0" (dropdownClosed)="onDCChange()" style="height:auto;"
+                                    formControlName="datacenters"></multiselect-dropdown>
+                            </div>
+                        </form>
+                    </div>
+                    <span class="font-xl font-500 ml-2">{{dcChartViewData.cost}}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas *ngIf="dcChartViewData.chartData" baseChart [chartType]="dcChartViewData.chartData.type"
+                    [labels]="dcChartViewData.chartData.lables" [datasets]="dcChartViewData.chartData.linedata"
+                    [options]="dcChartViewData.chartData.options" [plugins]="dcChartViewData.chartData.plugins"
+                    [legend]="dcChartViewData.chartData.legend" [colors]="dcChartViewData.chartData.colors"
+                    height="60"></canvas>
+                <div class="d-flex justify-content-center align-items-center h-100" *ngIf="!dcChartViewData.chartData">
+                    <div class="text-muted">No datacenter data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row row mr-2 mt-2 mb-2 ml-0" *ngFor="let view of dcCostViewData; let i = index">
+    <div class="col-12">
+        <div class="card rounded-top">
+            <div class="card-header rounded-top bg-white py-2">
+                <div class="d-flex">
+                    <div class="mr-2">
+                        <span class="h5 text-capitalize text-warning">{{view.name}}</span>
+                        <span class="text-capitalize d-block text-gray-700">{{view.location}}</span>
+                    </div>
+                    <div class="ml-auto">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <h5 class="mb-0 mr-2">${{view.billAmount}}</h5>
+                            <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                tooltip="Manage by creating support ticket" (click)="createDCTicket(view)"></button>
+                            <button class="action-icons mb-0 fa fa-angle-down font-sm ml-1"
+                                [tooltip]="view.isOpen ? 'Minimize' : 'Expand'" (click)="manageOpenWidget(i)"
+                                [attr.aria-expanded]="view.isOpen"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body rounded-bottom" [collapse]="!view.isOpen" [isAnimated]="true">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="card round-edge mb-1">
+                            <div class="card-body py-2">
+                                <div class="card-title mb-3 d-flex justify-content-between pb-4">
+                                    <span><i class="fa-solid fa-dollar-sign fas text-success mr-2"></i>Current
+                                        Year</span>
+
+                                    <div>
+                                        <h5 class="m-0 text-right">${{view.billAmount}}</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card round-edge mb-1">
+                            <div class="card-body py-2">
+                                <div class="card-title mb-2 d-flex justify-content-between">
+                                    <span><i class="fas text-success fa-sm mr-2 fa-solid fa-plug"></i>PDU</span>
+
+                                    <div>
+                                        <h5 class="m-0 text-right">${{view.pduCost}}</h5>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-2 mt-2 justify-content-between align-items-center">
+                                    <p class="font-xs m-0 text-gray-600"><span
+                                            class="h5 text-dark">{{view.billedPdusCount}}</span>/{{view.totalPdusCount}}
+                                        Billed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="card round-edge mb-1">
+                            <div class="card-body py-2">
+                                <div class="card-title mb-2 d-flex justify-content-between">
+                                    <span><i
+                                            class="fas text-danger-800 fa-sm mr-2 fa-solid fa-table"></i>Cabinets</span>
+
+                                    <div>
+                                        <h5 class="m-0 text-right">${{view.cabinetCost}}</h5>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-2 mt-2 justify-content-between align-items-center">
+                                    <p class="font-xs m-0 text-gray-600"><span
+                                            class="h5 text-dark">{{view.billedCabinetsCount}}</span>/{{view.totalCabinetsCount}}
+                                        Billed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 my-0 py-0">
+                        <div class="card-header bg-transparent border-bottom-0 mt-3 ml-0">
+                            <div class="d-flex justify-content-center align-items-center font-500">
+                                <span
+                                    class="badge badge-secondary font-sm">{{view?.cabinetBillDetails?.length||0}}</span>
+                                <span class="ml-1 font-lg">Cabinets</span>
+                            </div>
+                            <!-- <div class="row">
+                                <div class="col-12 px-0 mx-0">
+                                    <span class=""><span
+                                            class="badge badge-pill badge-secondary">{{view?.cabinetBillDetails?.length||
+                                            0}}</span>&nbsp;Cabinets</span>
+                                </div>
+                            </div> -->
+                        </div>
+                        <div class="card-body m-0 p-0">
+                            <table class="table text-left">
+                                <thead>
+                                    <tr>
+                                        <th>Cabinet Name</th>
+                                        <th>Contract Start Date</th>
+                                        <th>Contract End Date</th>
+                                        <th>Renewal</th>
+                                        <th>Annual Escalation</th>
+                                        <th>Cost</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let cabinet of view.cabinetBillDetails">
+                                        <td>
+                                            <div>
+                                                <i class="fas text-success fa-solid fa-check mr-1"></i>
+                                                <span>{{cabinet.deviceObject.name}}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>{{cabinet.deviceObject.contractStartDate}}</div>
+                                        </td>
+                                        <td>
+                                            <div>{{cabinet.deviceObject.contractEndDate}}</div>
+                                        </td>
+                                        <td>
+                                            <div>{{cabinet.deviceObject.renewal}}</div>
+                                        </td>
+                                        <td>
+                                            <div>{{cabinet.deviceObject.annualEscalation}}%</div>
+                                        </td>
+                                        <td>
+                                            <div>${{cabinet.cost}}</div>
+                                        </td>
+                                        <td class="action-icons-column">
+                                            <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                                tooltip="Manage by creating support ticket"
+                                                (click)="createTicket(cabinet,view)"></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 m-y0 py-0">
+                        <div class="card-header bg-transparent border-bottom-0 mt-0 ml-0">
+                            <div class="d-flex justify-content-center align-items-center font-500">
+                                <span class="badge badge-secondary font-sm">{{view?.pduBillDetails?.length||0}}</span>
+                                <span class="ml-1 font-lg">PDU's</span>
+                            </div>
+                            <!-- <div class="row">
+                                <div class="col-12 px-0 mx-0">
+                                    <span class=""><span
+                                            class="badge badge-pill badge-secondary">{{view?.pduBillDetails?.length ||
+                                            0}}</span>&nbsp;PDU</span>
+                                </div>
+                            </div> -->
+                        </div>
+                        <div class="card-body m-0 p-0">
+                            <table class="table text-left">
+                                <thead>
+                                    <tr>
+                                        <th>PDU Name</th>
+                                        <th>Model</th>
+                                        <th>Power Circuit</th>
+                                        <th>Cabinet</th>
+                                        <th>Annual Escalation</th>
+                                        <th>Cost</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let pdu of view.pduBillDetails">
+                                        <td>
+                                            <div>
+                                                <i class="fas text-success fa-solid fa-check mr-1"></i>
+                                                <span>{{pdu.deviceObject.name}}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>{{pdu.deviceObject.model}}</div>
+                                        </td>
+                                        <td>
+                                            <div>{{pdu.deviceObject.powerCircuit}}</div>
+                                        </td>
+                                        <td>
+                                            <div>{{pdu.deviceObject.cabinet}}</div>
+                                        </td>
+                                        <td>
+                                            <div>{{pdu.deviceObject.annualEscalation}}%</div>
+                                        </td>
+                                        <td>
+                                            <div>${{pdu.cost}}</div>
+                                        </td>
+                                        <td class="action-icons-column">
+                                            <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                                tooltip="Manage by creating support ticket"
+                                                (click)="createTicket(pdu,view)"></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

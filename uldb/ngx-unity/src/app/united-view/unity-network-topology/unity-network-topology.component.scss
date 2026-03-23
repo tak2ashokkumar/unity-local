@@ -1,0 +1,22 @@
+.topology-section {
+    height: 50vh;
+    width: 100%;
+}
+
+.chart-container {
+  width: 100%;
+  height: 600px;
+}
+
+.arrow-head {
+  fill: #666;
+}
+
+.node rect, .node circle {
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+.node text {
+  font-size: 12px;
+}

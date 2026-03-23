@@ -1,0 +1,51 @@
+
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="PDU Port Details">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Assettag</th>
+          <th>Port Number</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="pdu in pduresult">
+          <td>{{ pdu.related.system_port.name }}</td>
+          <td>{{ pdu.related.pdu.assettag }}</td>
+          <td>{{ pdu.pdu_port_number }}</td>
+
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="IPMI Details">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>IP Address</th>
+          <th>MAC Address</th>
+          <th>User</th>
+          <th>Port</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="ipmi in ipmidet">
+          <td>{{ ipmi.ip_address }}</td>
+          <td>{{ ipmi.mac_address }}</td>
+          <td>{{ ipmi.ipmi_user }}</td>
+          <td>{{ ipmi.ipmiport }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+  </div>
+</div>

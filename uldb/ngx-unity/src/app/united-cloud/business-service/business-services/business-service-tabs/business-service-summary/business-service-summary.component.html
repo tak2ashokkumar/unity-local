@@ -1,0 +1,735 @@
+<div class="d-flex justify-content-end align-items-center"
+    style="position: absolute; top: -64px; right: 1px; z-index: 100;">
+    <form [formGroup]="form" *ngIf="form" class="d-flex">
+        <div class="form-group">
+            <label for="businessUnit" class="form-label mb-1">Business Unit</label>
+            <select id="businessUnit" class="form-control" formControlName="businessUnit" style="width: 122px;">
+                <option value="" disabled>Select</option>
+                <option value="all">All</option>
+                <option *ngFor="let bu of businessUnits" [value]="bu.business_unit_id">{{ bu.business_unit_name }}
+                </option>
+            </select>
+        </div>
+        <div class="ml-2 form-group">
+            <label for="licenseCostCenter" class="form-label mb-1">License Cost Center</label>
+            <select id="licenseCostCenter" class="form-control" formControlName="licenseCostCenter">
+                <option value="" disabled>Select</option>
+                <option value="all">All</option>
+                <option *ngFor="let lcc of licenseCostCenters" [value]="lcc.license_centre_id">{{
+                    lcc.license_centre__name }}</option>
+            </select>
+        </div>
+        <div class="ml-2 form-group">
+            <label for="application" class="form-label mb-1">Application</label>
+            <select id="application" class="form-control" formControlName="application">
+                <option value="" disabled>Select</option>
+                <option value="all">All</option>
+                <option *ngFor="let app of applications" [value]="app.app_name_id">{{ app.app_name__name }}</option>
+            </select>
+        </div>
+    </form>
+    <div class="d-flex flex-column form-group" *ngIf="durationDropdownViewData?.dropdownOptions?.length">
+        <label for="custom-date-dropdown" class="mb-1 pb-0 ml-2">Duration</label>
+        <custom-date-dropdown [options]="durationDropdownViewData.dropdownOptions" [enableCustomDateRange]="true"
+            [default]="durationDropdownViewData.defaultSelected" (onSubmit)="ondurationDropdownChanged($event)">
+        </custom-date-dropdown>
+    </div>
+    <div class="col">
+        <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+        </button>
+    </div>
+</div>
+<hr class="my-0">
+<div class="row mt-2">
+    <div class="col px-1">
+        <div class="card mb-2 round-edge">
+            <div class="card-body d-flex justify-content-between align-items-center px-2 py-3 font-500">
+                <span>Availability</span>
+                <span class="d-flex align-items-center">
+                    <span class="text-primary font-lg">{{summaryData?.availability}}</span>
+                    <span class="ml-1 d-flex align-items-center">
+                        <span>(</span>
+                        <span class="text-success ml-1">
+                            <i class="fas fa-long-arrow-alt-up fa-xs"></i>
+                            <span class="font-xs-sm">{{summaryData?.up_count}}</span>
+                        </span>
+                        <span class="text-danger mx-1">
+                            <i class="fas fa-long-arrow-alt-down fa-xs"></i>
+                            <span class="font-xs-sm">{{summaryData?.down_count}}</span>
+                        </span>
+                        <span>)</span>
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-2 px-1">
+        <div class="card mb-2 round-edge">
+            <div class="card-body d-flex justify-content-between align-items-center px-2 py-3 font-500">
+                <span>Throughput</span>
+                <span class="text-primary font-lg">{{summaryData?.throughput}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col px-1">
+        <div class="card mb-2 round-edge">
+            <div class="card-body d-flex justify-content-between align-items-center px-2 py-3 font-500">
+                <span>Latency</span>
+                <span class="text-primary font-lg">{{summaryData?.latency}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col px-1">
+        <div class="card mb-2 round-edge">
+            <div class="card-body d-flex justify-content-between align-items-center px-2 py-3 font-500">
+                <span>Total Requests</span>
+                <span class="text-primary font-lg">{{summaryData?.total_requests}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-2 px-1">
+        <div class="card mb-2 round-edge">
+            <div class="card-body d-flex justify-content-between align-items-center px-2 py-3 font-500">
+                <span>App Memory</span>
+                <span class="text-primary font-lg">{{summaryData?.app_memory}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-2 px-1">
+        <div class="card mb-2 round-edge">
+            <div class="card-body d-flex justify-content-between align-items-center px-2 py-3 font-500">
+                <span>Response Time</span>
+                <span class="text-primary font-lg">{{summaryData?.response_time}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Application & Service Overview -->
+<div class="row">
+    <div class="col-6 px-1">
+        <div class="card round-edge mb-2">
+            <div class="card-header font-500 bg-transparent font-lg py-2">Application Overview</div>
+            <div class="card-body p-2">
+                <div class="row mx-0">
+                    <div class="col-4 px-0">
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                                <span class="font-sm">Avg. Throughput</span>
+                                <span class="text-primary font-lg">{{applicationOverviewWidgetData?.throughputAvg}}</span>
+                                <span class="text-primary font-sm pl-1">req/min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-2">
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                                <span class="font-sm">Avg. Availability</span>
+                                <span class="text-primary font-lg">{{applicationOverviewWidgetData?.availabilityAvg}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-0">
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                                <span class="font-sm">Avg. Response Time</span>
+                                <span class="text-primary font-lg">{{applicationOverviewWidgetData?.responseTimeAvg}}
+                                </span>
+                                <span class="text-primary font-sm pl-1">ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-12 px-0">
+                        <div class="card mb-2 border-0">
+                            <app-spinner [name]="applicationOverviewWidgetData.throughputLoader"></app-spinner>
+                            <!-- <div class="card-header font-500 bg-transparent font-lg py-0 border-0">Throughput</div> -->
+                            <div class="card-body border-0 p-0" style="min-height: 200px;">
+                                <ng-container *ngIf="applicationOverviewWidgetData?.throughputChartData">
+                                    <div echarts [options]="applicationOverviewWidgetData?.throughputChartData?.options"
+                                        [defaultHeight]="240">
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!applicationOverviewWidgetData?.throughputChartData">
+                                    <div class="d-flex justify-content-center align-items-center py-5">No data
+                                        available.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-12 px-0">
+                        <div class="card mb-2 border-0">
+                            <app-spinner [name]="applicationOverviewWidgetData.availabilityLoader"></app-spinner>
+                            <!-- <div class="card-header font-500 bg-transparent font-lg py-0 border-0">Availability</div> -->
+                            <div class="card-body border-0 p-0" style="min-height: 200px;">
+                                <ng-container *ngIf="applicationOverviewWidgetData?.availabilityChartData">
+                                    <div echarts
+                                        [options]="applicationOverviewWidgetData?.availabilityChartData?.options"
+                                        [defaultHeight]="240">
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!applicationOverviewWidgetData?.availabilityChartData">
+                                    <div class="d-flex justify-content-center align-items-center py-5">No data
+                                        available.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-12 px-0">
+                        <div class="card mb-2 border-0">
+                            <app-spinner [name]="applicationOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <!-- <div class="card-header font-500 bg-transparent font-lg py-0 border-0">Response Time</div> -->
+                            <div class="card-body border-0 p-0" style="min-height: 200px;">
+                                <ng-container *ngIf="applicationOverviewWidgetData?.responseTimeChartData">
+                                    <div echarts
+                                        [options]="applicationOverviewWidgetData?.responseTimeChartData?.options"
+                                        [defaultHeight]="240">
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!applicationOverviewWidgetData?.responseTimeChartData">
+                                    <div class="d-flex justify-content-center align-items-center py-5">No data
+                                        available.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 px-1">
+        <div class="card round-edge mb-2">
+            <div class="card-header font-500 bg-transparent font-lg py-2">Services Overview</div>
+            <div class="card-body p-2">
+                <div class="row mx-0">
+                    <div class="col-4 px-0">
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                                <span class="font-sm">Avg. Throughput</span>
+                                <span class="text-primary font-lg">{{servicesOverviewWidgetData?.throughputAvg}}</span>
+                                <span class="text-primary font-sm pl-1">req/min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-2">
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                                <span class="font-sm">Avg. Availability</span>
+                                <span
+                                    class="text-primary font-lg">{{servicesOverviewWidgetData?.availabilityAvg}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-0">
+                        <div class="card mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                                <span class="font-sm">Avg. Response Time</span>
+                                <span class="text-primary font-lg">{{servicesOverviewWidgetData?.responseTimeAvg}}
+                                </span>
+                                <span class="text-primary font-sm pl-1">ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-12 px-0">
+                        <div class="card mb-2 border-0">
+                            <app-spinner [name]="servicesOverviewWidgetData.throughputLoader"></app-spinner>
+                            <!-- <div class="card-header font-500 bg-transparent font-lg py-0 border-0">Throughput</div> -->
+                            <div class="card-body border-0 p-0" style="min-height: 200px;">
+                                <ng-container *ngIf="servicesOverviewWidgetData?.throughputChartData">
+                                    <div echarts [options]="servicesOverviewWidgetData?.throughputChartData?.options"
+                                        [defaultHeight]="240">
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!servicesOverviewWidgetData?.throughputChartData">
+                                    <div class="d-flex justify-content-center align-items-center py-5">No data
+                                        available.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-12 px-0">
+                        <div class="card mb-2 border-0">
+                            <app-spinner [name]="servicesOverviewWidgetData.availabilityLoader"></app-spinner>
+                            <!-- <div class="card-header font-500 bg-transparent font-lg py-0 border-0">Availability</div> -->
+                            <div class="card-body border-0 p-0" style="min-height: 200px;">
+                                <ng-container *ngIf="servicesOverviewWidgetData?.availabilityChartData">
+                                    <div echarts [options]="servicesOverviewWidgetData?.availabilityChartData?.options"
+                                        [defaultHeight]="240">
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!servicesOverviewWidgetData?.availabilityChartData">
+                                    <div class="d-flex justify-content-center align-items-center py-5">No data
+                                        available.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mx-0">
+                    <div class="col-12 px-0">
+                        <div class="card mb-2 border-0">
+                            <app-spinner [name]="servicesOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <!-- <div class="card-header font-500 bg-transparent font-lg py-0 border-0">Response Time</div> -->
+                            <div class="card-body border-0 p-0" style="min-height: 200px;">
+                                <ng-container *ngIf="servicesOverviewWidgetData?.responseTimeChartData">
+                                    <div echarts [options]="servicesOverviewWidgetData?.responseTimeChartData?.options"
+                                        [defaultHeight]="240">
+                                    </div>
+                                </ng-container>
+                                <ng-container *ngIf="!servicesOverviewWidgetData?.responseTimeChartData">
+                                    <div class="d-flex justify-content-center align-items-center py-5">No data
+                                        available.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Components Overview -->
+<div class="row">
+    <div class="col-12 px-1">
+        <div class="card round-edge mb-2">
+            <div class="card-header bg-transparent font-500 font-lg">
+                Components Overview
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Component Health</div>
+                                <div class="text-primary font-lg">{{componentsOverviewWidgetData?.healthAvg}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Duration</div>
+                                <div class="text-primary font-lg">{{componentsOverviewWidgetData?.durationAvg}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Response Time</div>
+                                <div class="text-primary font-lg">{{componentsOverviewWidgetData?.responseTimeAvg}}
+                                </div>
+                                <div class="text-primary font-sm pl-1">ms</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="componentsOverviewWidgetData.healthLoader"></app-spinner>
+                            <div
+                                class="card-header bg-transparent font-500 font-lg d-flex align-items-center justify-content-between">
+                                <span>Component Health</span>
+                                <!-- <span>
+                                    <span class="font-sm-xs">Avg. Throughput</span>
+                                    <span class="text-primary font-sm">{{componentsOverviewWidgetData?.healthAvg}}</span>
+                                </span> -->
+                            </div>
+                            <div class="card-body p-0">
+                                <!-- <div class="font-500">Response Time</div> -->
+                                <ng-container *ngIf="componentsOverviewWidgetData?.healthChartData">
+                                    <div echarts [options]="componentsOverviewWidgetData?.healthChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!componentsOverviewWidgetData.healthChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="componentsOverviewWidgetData.durationLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Component Duration</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="componentsOverviewWidgetData?.durationChartData">
+                                    <div echarts [options]="componentsOverviewWidgetData?.durationChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!componentsOverviewWidgetData.durationChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="componentsOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Component Response Time</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="componentsOverviewWidgetData?.responseTimeChartData">
+                                    <div echarts
+                                        [options]="componentsOverviewWidgetData?.responseTimeChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!componentsOverviewWidgetData.responseTimeChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Process Overview -->
+<div class="row">
+    <div class="col-12 px-1">
+        <div class="card round-edge mb-2">
+            <div class="card-header bg-transparent font-500 font-lg">
+                Process Overview
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Throughput</div>
+                                <div class="text-primary font-lg">{{processOverviewWidgetData?.throughputAvg}}</div>
+                                <div class="text-primary font-sm pl-1">req/min</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Availability</div>
+                                <div class="text-primary font-lg">{{processOverviewWidgetData?.availabilityAvg}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Response Time</div>
+                                <div class="text-primary font-lg">{{processOverviewWidgetData?.responseTimeAvg}}</div>
+                                <span class="text-primary font-sm pl-1">ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="processOverviewWidgetData.throughputLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Process Throughput</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="processOverviewWidgetData?.throughputChartData">
+                                    <div echarts [options]="processOverviewWidgetData?.throughputChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!processOverviewWidgetData.throughputChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="processOverviewWidgetData.availabilityLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Process Availability</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="processOverviewWidgetData?.availabilityChartData">
+                                    <div echarts [options]="processOverviewWidgetData?.availabilityChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!processOverviewWidgetData.availabilityChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="processOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Process Response Time</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="processOverviewWidgetData?.responseTimeChartData">
+                                    <div echarts [options]="processOverviewWidgetData?.responseTimeChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!processOverviewWidgetData.responseTimeChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Data & Messaging Service Overview -->
+<div class="row">
+    <div class="col-12 px-1">
+        <div class="card round-edge mb-2">
+            <div class="card-header bg-transparent font-500 font-lg">
+                Data & Messaging Service Overview
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Latency</div>
+                                <div class="text-primary font-lg">{{databaseOverviewWidgetData?.latencyAvg}}</div>
+                                <span class="text-primary font-sm pl-1">ms</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Response Time</div>
+                                <div class="text-primary font-lg">{{databaseOverviewWidgetData?.responseTimeAvg}}
+                                </div>
+                                <div class="text-primary font-sm pl-1">ms</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge mb-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Availability</div>
+                                <div class="text-primary font-lg">{{databaseOverviewWidgetData?.availabilityAvg}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 px-1">
+                        <div class="card round-edge">
+                            <app-spinner [name]="databaseOverviewWidgetData.latencyLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Query Latency</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="databaseOverviewWidgetData?.latencyChartData">
+                                    <div echarts [options]="databaseOverviewWidgetData?.latencyChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!databaseOverviewWidgetData.latencyChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge">
+                            <app-spinner [name]="databaseOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Query Response Time</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="databaseOverviewWidgetData?.responseTimeChartData">
+                                    <div echarts [options]="databaseOverviewWidgetData?.responseTimeChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!databaseOverviewWidgetData.responseTimeChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 px-1">
+                        <div class="card round-edge">
+                            <app-spinner [name]="databaseOverviewWidgetData.availabilityLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Data and Messaging Availability
+                            </div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="databaseOverviewWidgetData?.availabilityChartData">
+                                    <div echarts [options]="databaseOverviewWidgetData?.availabilityChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!databaseOverviewWidgetData.availabilityChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Host Overview -->
+<div class="row">
+    <div class="col-12 px-1">
+        <div class="card round-edge mb-2">
+            <div class="card-header bg-transparent font-500 font-lg">
+                Host Overview
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3 px-1">
+                        <div class="card mb-2 round-edge">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. CPU Utilization</div>
+                                <div class="text-primary font-lg">{{hostOverviewWidgetData?.cpuUtilizationAvg}}</div>
+                                <span class="text-primary font-sm pl-1">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 px-1">
+                        <div class="card mb-2 round-edge">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Memory Usage</div>
+                                <div class="text-primary font-lg">{{hostOverviewWidgetData?.memoryUsageAvg}}</div>
+                                <span class="text-primary font-sm pl-1">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 px-1">
+                        <div class="card mb-2 round-edge">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. Disk I/O</div>
+                                <div class="text-primary font-lg">{{hostOverviewWidgetData?.diskInputOutputTimeAvg}}
+                                </div>
+                                <span class="text-primary font-sm pl-1">iops</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 px-1">
+                        <div class="card mb-2 round-edge">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div class="font-500 font-lg">Avg. System Load</div>
+                                <div class="text-primary font-lg">{{hostOverviewWidgetData?.systemLoadTimeAvg}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 px-1 mb-2">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="hostOverviewWidgetData.cpuUtilizationLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">CPU Utilization</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="hostOverviewWidgetData?.cpuUtilizationChartData">
+                                    <div echarts [options]="hostOverviewWidgetData?.cpuUtilizationChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!hostOverviewWidgetData.cpuUtilizationChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 px-1 mb-2">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="hostOverviewWidgetData.memoryUsageLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Memory Usage</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="hostOverviewWidgetData?.memoryUsageChartData">
+                                    <div echarts [options]="hostOverviewWidgetData?.memoryUsageChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!hostOverviewWidgetData.memoryUsageChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="hostOverviewWidgetData.diskInputOutputTimeLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">Disk I/O</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="hostOverviewWidgetData?.diskInputOutputTimeChartData">
+                                    <div echarts
+                                        [options]="hostOverviewWidgetData?.diskInputOutputTimeChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!hostOverviewWidgetData.diskInputOutputTimeChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 px-1">
+                        <div class="card round-edge equalize-card">
+                            <app-spinner [name]="hostOverviewWidgetData.systemLoadTimeLoader"></app-spinner>
+                            <div class="card-header bg-transparent font-500 font-lg">System Load Average</div>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="hostOverviewWidgetData?.systemLoadTimeChartData">
+                                    <div echarts [options]="hostOverviewWidgetData?.systemLoadTimeChartData?.options"
+                                        [defaultHeight]="240" style="width: 100%; height: 240px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!hostOverviewWidgetData.systemLoadTimeChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 240px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Physical And Cloud Infrastructure -->
+<div class="row">
+    <div class="col-12 px-1">
+        <div class="card round-edge">
+            <app-spinner [name]="'privateCloudWidgetLoader'"></app-spinner>
+            <div class="card-header bg-transparent font-500 font-lg">Physical And Cloud Infrastructure</div>
+            <div class="card-body" style="min-height: 200px;">
+                <div class="row" *ngFor="let pcData of pcFastData">
+                    <ng-container
+                        *ngIf="pcData.platfromType == platformMapping.VMWARE_TYPE || pcData.platfromType == platformMapping.UNITED_PRIVATE_CLOUD_VCENTER">
+                        <div class="col-6">
+                            <private-cloud-widget-clusters [showCost]='false'
+                                [pcData]="pcData"></private-cloud-widget-clusters>
+                        </div>
+                    </ng-container>
+                    <ng-container
+                        *ngIf="pcData.platfromType !== platformMapping.VMWARE_TYPE && pcData.platfromType !== platformMapping.UNITED_PRIVATE_CLOUD_VCENTER">
+                        <div class="col-6">
+                            <private-cloud-widget [pcData]="pcData"></private-cloud-widget>
+                        </div>
+                    </ng-container>
+                </div>
+                <ng-container *ngIf="!pcFastData || pcFastData.length == 0">
+                    <div class="d-flex justify-content-center align-items-center py-5">No data available.</div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>

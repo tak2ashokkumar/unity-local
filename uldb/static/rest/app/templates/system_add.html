@@ -1,0 +1,90 @@
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4>Add System</h4>
+	</div>
+	<div class="panel-body">
+		<form role="form"id="postform" action="" method="post">
+			<input type='hidden' name='csrfmiddlewaretoken' id="csrf_token" value={{csrf_token}} />
+		</form>
+		<form role="form" id="system_add" action="server.html" method="post" enctype='application/json'>
+			<div class="form-group">
+				<button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelSystemAdd()">Cancel</button>
+				<button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveSystemAdd()">Save</button>
+			</div>
+			<div class="form-group">
+
+				<label for="id_system_name" class="required">Server Name * </label>				
+
+				<input type="text" ng-model="server.system_name" id="id_system_name" name="system_name" placeholder="Name" 					 					class="form-control" data4="alphanumeric" ng-keypress="ClearValidation()">
+				<label class="errormsg" ng-if="nameerr">{{ sysnameMsg }}</label>
+			</div>
+			<div class="form-group">
+
+				<label for="id_system_assettag" class="required">Assettag * </label>			
+
+				<input type="text" ng-model="server.system_assettag" id="id_system_assettag" name="system_assettag" 				 					placeholder="SYS1234" class="form-control" data4="alphanumeric" ng-keypress="ClearValidation()">
+				<label class="errormsg" ng-if="assettagerr">{{ assettagMsg }}</label>
+			</div>
+			<div class="form-group">
+
+				<label for="id_system_manufacturer" class="required">Manufacturer *</label>
+
+
+				<div class="form-group form-inline">
+					<select id="id_system_manufacturer" class="form-control" ng-model="server.system_manufacturer" 				 						ng-options="sm as sm.name for sm in system_manufacturer" style="width:100%;">
+						<option style="display:none" value="">Please select</option>
+					</select>
+					<label class="errormsg" ng-if="manufacturererr">{{ manufacturerMsg }}</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="id_system_type" class="optional">Type </label>
+				<div class="form-group form-inline">
+					<select id="id_system_type" class="form-control" ng-model="server.system_type" 				 							 						ng-options="st as st.system_type for st in system_type" ng-selected="PHYSICAL" style="width:100%;">
+						<option style="display:none" value="">Please select</option>
+					</select>
+					<label class="errormsg" ng-if="typeerr">{{ typeMsg }}</label>
+					
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="orgName" class="optional">Customer </label>
+				<div class="form-group form-inline">	
+					<input type="text" id="orgName" class="form-control" ng-model="server.customer" placeholder="Type customer to filter..."
+					typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="" ng-keypress="ClearValidation()" 						style="width:100%;">
+					<label class="errormsg" ng-if="customererr">{{ customerMsg }}</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="id_system_serialnumber" class="optional">Serial Number </label>
+
+				<input type="text" ng-model="server.serialnumber" id="id_system_serialnumber" name="serialnumber" placeholder="NOT ENTERED" 				class="form-control" data4="alphanumeric" ng-keypress="ClearValidation()">
+			</div>
+			<div class="form-group">
+				<label for="id_salesforce" class="optional" title="The Salesforce ID is contained within the URL of the asset on salesforce.com. For instance, SF10-CAB-7.01 would be located at https://na4.salesforce.com/a0R60000003NREJ, therefore the Salesforce ID is a0R60000003NREJ. Some URLs may have a question mark (?) in the URL path; when a question mark (?) is present, the Salesforce ID is everything in the path before the question mark.">Salesforce ID </label>
+
+				<input type="text" ng-model="server.salesforce_id"  id="id_salesforce" name="salesforce_id" placeholder="" 					 					class="form-control" data4="alphanumeric" ng-keypress="ClearValidation()">
+			</div>
+
+			<!--- chassis type-->
+
+			<div class="form-group">
+				<label for="id_system_type" class="optional">Chassis Type </label>
+				<div class="form-group form-inline">
+					<select id="id_chassis" class="form-control" ng-model="server.chassis_model" 					 						 						ng-options="ch as ch.model_name for ch in chassistype" style="width:100%;">
+						<option style="display:none" value="">Please select</option>
+					</select>
+					<label class="errormsg" ng-if="chassiserr">{{ chassisMsg }}</label>
+					
+				</div>
+			</div>
+
+			<button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelSystemAdd()">Cancel</button>
+			<button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveSystemAdd()">Save</button>
+
+		</form>
+	</div>
+
+</div>
+

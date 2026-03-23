@@ -1,0 +1,13 @@
+<form role="form">
+   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+       <div class="form-group ">
+           <label for="snapshotid"> Snapshot Id : </label>
+           <label class="control-label ng-binding" for="blockName"> {{obj.SnapshotId}}</label>
+       </div>
+       <div class="form-group">
+           <label for=""> Description * </label>
+           <label class="errormsg" ng-if="obj['descriptionerr']"> {{ obj['descriptionMsg']}} </label>
+           <textarea class="form-control ng-empty ng-invalid ng-invalid-required" required="" maxlength="256" value="" ng-model="obj.description"></textarea>
+       </div>
+   </div>
+</form>

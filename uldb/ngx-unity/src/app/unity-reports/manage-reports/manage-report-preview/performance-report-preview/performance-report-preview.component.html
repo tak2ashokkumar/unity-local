@@ -1,0 +1,39 @@
+<div class="card border-0 mb-0">
+    <div class="card-body p-0">
+        <table class="table table-sm text-left">
+            <thead class="bg-light">
+                <tr>
+                    <th>Device Name</th>
+                    <th>Device Type</th>
+                    <th>Device Status</th>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of viewData" truncateText>
+                    <td class="tdw-25">
+                        <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                    </td>
+                    <td class="tdw-15">
+                        <div [tooltip]="view.deviceType">{{view.deviceType}} </div>
+                    </td>
+                    <td class="tdw-10">
+                        <shared-device-status [status]="view.deviceStatus"></shared-device-status>
+                    </td>
+                    <td class="tdw-35">
+                        <div [tooltip]="view.metric">{{view.metric}} </div>
+                    </td>
+                    <td class="tdw-15">
+                        <div [tooltip]="view.metricValue">{{view.metricValue}} </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted py-5" *ngIf="!viewData.length">No data available.
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+<div class="row">
+    <div class="col-12">
+        <div class="tab-content">
+            <div class="tab-pane active p-2">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link py-0 pl-0 border-right text-success">{{device?.name}}</a>
+                    </li>
+                    <li class="nav-item" *ngFor="let tab of tabData">
+                        <a class="nav-link py-0" [ngClass]="isActive(tab)" (click)="goTo(tab.url)"
+                            *ngIf="tab.enabled">{{tab.name}}</a>
+                        <a class="nav-link py-0 disabled text-muted" *ngIf="!tab.enabled">{{tab.name}}</a>
+                    </li>
+                    <li class="nav-item ml-auto">
+                        <button *ngIf="device?.deviceType == vmWareVm" class="btn btn-pill btn-sm btn-warning font-500" 
+                            (click)="syncVmwareVmsForAdvancedDiscovery()" 
+                            [ngClass]="{'action-icons-disabled': syncInProgress}" accessControl moduleName="Private Cloud" 
+                            accessType="Manage Private Cloud" elementType="actionbtn">
+                            <span class="fa fa-spinner fa-spin fa-lg" *ngIf="syncInProgress"></span>
+                            <span class="fas fa-sync" *ngIf="!syncInProgress"></span>
+                            <span class="font-xs-sm mx-1">Advanced Scan</span>
+                        </button>
+                        <data-refresh-btn (refresh)="loadTabs()"></data-refresh-btn>
+                    </li>
+                    <li class="nav-item pt-1 float-right text-warning">
+                        <a class="nav-link py-0" (click)="goBack()">
+                            <i class="fa fa-arrow-left">&nbsp;</i>
+                            <span *ngIf="!isInfrastructureDeviceStats">{{device.deviceType}} List</span>
+                            <span *ngIf="isInfrastructureDeviceStats">Back</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mt-3" [class.px-4]="isCabinetViewDeviceStats" [ngClass]="addClass()">
+        <router-outlet></router-outlet>
+    </div>
+</div>

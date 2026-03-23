@@ -1,0 +1,228 @@
+<div class="row mb-2">
+    <div class="col-8 pr-0" style="min-height: 250px;">
+        <div class="card round-edge mb-0">
+            <!-- <app-spinner [name]="'cluster_details'"></app-spinner> -->
+            <div class="card-header py-2 bg-white">Node Details</div>
+            <div class="card-body d-flex justify-content-between font-sm px-0 py-0" *ngIf="view">
+                <div class="d-flex flex-column justify-content-between py-2 px-2 w-65" [ngClass]="getClusterDetailsWidthClass()"
+                    style="min-width: 65%;">
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Node Name</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.name}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Vendor Serial Number</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.vendorSerialNumber || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Version</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.os || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Management Name</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.managementName || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Management IP</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.managementIP || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2" *ngIf="view.metroCluster">
+                        <span class="text-muted w-35 text-right">Metrocluster</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.metroCluster.name || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2" *ngIf="view.metroCluster">
+                        <span class="text-muted w-35 text-right">Metrocluster Type</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.metroCluster.type || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">State</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">
+                            <span class="fa" [ngClass]="view.stateIcon"></span>
+                            <span class="ml-2">[ {{view.state}} ]</span>
+                        </span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Auto giveback</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.autoGiveBack || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2" *ngIf="view.serviceProcessor">
+                        <span class="text-muted w-35 text-right">Service Processor Address</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.serviceProcessor.ip_address}}</span>
+                    </div>
+                    <div class="d-flex mt-2" *ngIf="view.serviceProcessor">
+                        <span class="text-muted w-35 text-right">Service Processor Firmwar</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.serviceProcessor.firmware}}</span>
+                    </div>
+                    <div class="d-flex mt-2" *ngIf="view.serviceProcessor">
+                        <span class="text-muted w-35 text-right">Service Processor State</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.serviceProcessor.state}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Location</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.location || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Uptime</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.uptime | SecToDays}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">Partners</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.partners || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <span class="text-muted w-35 text-right">ha Enabled</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.haEnabled || 'NA'}}</span>
+                    </div>
+                    <div class="d-flex mb-2 mt-2">
+                        <span class="text-muted w-35 text-right">Model</span>
+                        <span class="w-5 text-center">:</span>
+                        <span class="w-60 font-500">{{view.model || 'NA'}}</span>
+                    </div>
+                </div>
+                <div class="w-35 border-left" *ngIf="node?.custom_attribute_data">
+                    <div class="card border-0 mb-0 rounded-0">
+                        <div class="card-header d-flex align-items-center justify-content-between custom-padding border-0"
+                            style="border-radius: 0 !important;">
+                            <span>Custom Attributes</span>
+                            <button class="action-icons fas fa-pencil-alt font-sm custom-button"
+                                (click)="onCustomAttributesEdit()" [tooltip]="'Edit'" container="body"
+                                accessControl moduleName="Custom Attributes"
+                                accessType="Manage Custom Attributes" elementType="actionbtn"></button>
+                        </div>
+                        <div class="card-body py-2" style="max-height: 295px; overflow: auto;">
+                            <div class="d-flex pb-2"
+                                *ngFor="let attr of node?.custom_attribute_data | keyvalue">
+                                <span class="text-muted font-500 text-truncate">{{attr.key}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card round-edge mb-2" style="height: calc(50% - 0.5rem) !important;">
+            <div class="card-header py-2 bg-white">Storage</div>
+            <div class="card-body d-flex flex-column justify-content-around align-items-center px-3" style="min-height: 200px">
+                <div *ngIf="view?.storageChartData">
+                    <canvas baseChart [chartType]="view.storageChartData.type" [labels]="view.storageChartData.lables"
+                        [data]="view.storageChartData.piedata" [options]="view.storageChartData.options"
+                        [plugins]="view.storageChartData.plugins" [legend]="view.storageChartData.legend"
+                        [colors]="view.storageChartData.colors" height="100"></canvas>
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="font-lg-xl font-500">Total {{view.storage.size}}</div>
+                        <div class="pt-2 font-sm font-500">
+                            <span class="fa fa-circle text-success"></span>
+                        <span class="ml-1">Used {{view.storage.used}}</span>
+                        </div>
+                        <div class="pt-2 font-sm font-500">
+                            <span class="fa fa-circle text-muted"></span>
+                        <span class="ml-1">Free {{view.storage.available}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!view.storageChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+        <div class="card round-edge mb-0 h-50">
+            <app-spinner [name]="'top_aggregates'"></app-spinner>
+            <div class="card-header py-2 bg-white">Top 5 Aggregates</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3" style="min-height: 200px">
+                <canvas *ngIf="aggregateChartData" baseChart [chartType]="aggregateChartData.type"
+                    [labels]="aggregateChartData.lables" [datasets]="aggregateChartData.bardata"
+                    [options]="aggregateChartData.options" [plugins]="aggregateChartData.plugins"
+                    [legend]="aggregateChartData.legend" [colors]="aggregateChartData.colors" height="120"></canvas>
+                <div *ngIf="!aggregateChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-6 pr-0">
+        <div class="card round-edge mb-0 equalize-card">
+            <app-spinner [name]="'top_volumes'"></app-spinner>
+            <div class="card-header py-2 bg-white">Top 5 Volumes</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3 py-2" style="min-height: 200px">
+                <canvas *ngIf="volumeChartData" baseChart [chartType]="volumeChartData.type"
+                    [labels]="volumeChartData.lables" [datasets]="volumeChartData.bardata"
+                    [options]="volumeChartData.options" [plugins]="volumeChartData.plugins"
+                    [legend]="volumeChartData.legend" [colors]="volumeChartData.colors" height="120"></canvas>
+                <div *ngIf="!volumeChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card round-edge mb-0 equalize-card">
+            <app-spinner [name]="'top_luns'"></app-spinner>
+            <div class="card-header py-2 bg-white">Top 5 LUNs</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3 py-2" style="min-height: 200px">
+                <canvas *ngIf="lunChartData" baseChart [chartType]="lunChartData.type" [labels]="lunChartData.lables"
+                    [datasets]="lunChartData.bardata" [options]="lunChartData.options" [plugins]="lunChartData.plugins"
+                    [legend]="lunChartData.legend" [colors]="lunChartData.colors" height="120"></canvas>
+                <div *ngIf="!lunChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mt-2">
+        <div class="card round-edge mb-0">
+            <app-spinner [name]="'processor_utilization'"></app-spinner>
+            <div class="card-header py-2 bg-white">CPU Utilization</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3 py-2">
+                <canvas *ngIf="cpuChartData" baseChart [chartType]="cpuChartData.type" [labels]="cpuChartData.lables"
+                    [datasets]="cpuChartData.linedata" [options]="cpuChartData.options" [plugins]="cpuChartData.plugins"
+                    [legend]="cpuChartData.legend" [colors]="cpuChartData.colors" height="100"></canvas>
+                <div *ngIf="!cpuChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #customAttributes>
+    <div class="card mb-0">
+        <div class="card-header">
+            Edit Custom Attributes
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <unity-devices-custom-attributes-crud [deviceType]="deviceType" [deviceId]="nodeId"
+                [deviceAttrs]="node?.custom_attribute_data" [isOutBound]="false"
+                [showLoader]="true"></unity-devices-custom-attributes-crud>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="submitCustomAttributesForm()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

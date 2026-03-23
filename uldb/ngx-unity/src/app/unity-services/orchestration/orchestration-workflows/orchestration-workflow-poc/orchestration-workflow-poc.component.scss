@@ -1,0 +1,408 @@
+@import '../../../../unity-chatbot/unity-chatbot.component.scss';
+
+.wrapper {
+  display: flex;
+}
+
+.toolbox {
+  min-height: 75vh !important;
+  height: calc(100vh - 155px);
+  width: 248px;
+  background-color: white;
+  max-height: 46.18rem;
+  /* Set a height limit (adjust as needed) */
+  overflow-y: auto;
+  /* Shows scrollbar only when needed */
+  scrollbar-width: thin;
+  /* Makes the scrollbar thin (for Firefox) */
+  scrollbar-color: #888 transparent;
+  /* Hides scrollbar when not in use */
+  position: relative;
+}
+
+/* WebKit-based browsers (Chrome, Safari, Edge) */
+.toolbox::-webkit-scrollbar {
+  width: 6px;
+  /* Thin scrollbar */
+}
+
+.toolbox::-webkit-scrollbar-thumb {
+  background-color: #888;
+  /* Scrollbar color */
+  border-radius: 10px;
+  /* Rounded edges */
+}
+
+.toolbox::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Darker color on hover */
+}
+
+.toolbox::-webkit-scrollbar-track {
+  background: transparent;
+  /* Transparent track */
+}
+
+/* Remove arrows from scrollbar */
+.toolbox::-webkit-scrollbar-button {
+  display: none;
+}
+
+.right-button {
+  background-color: white;
+  /* Set a height limit (adjust as needed) */
+}
+
+/* Left Sidebar */
+.left-sidebar {
+  left: 0;
+  /* Align to the left */
+}
+
+/* Right Sidebar */
+.right-sidebar {
+  right: 0;
+  /* Align to the right */
+  width: 300px !important;
+}
+
+.drag-item {
+  color: black;
+  text-align: left;
+  cursor: grab;
+  // border: 1px solid black
+}
+
+#drawflow {
+  flex: 1;
+  // height: 100vh;
+  min-height: 75vh !important;
+  height: calc(100vh - 155px);
+  // height: calc(90vh + 10vw);
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  background: linear-gradient(-90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(-90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, white 1px),
+    linear-gradient(transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+    linear-gradient(-90deg, #aaa 1px, white 1px),
+    linear-gradient(-90deg, transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+    linear-gradient(#aaa 1px, transparent 1px), #f2f2f2;
+  background-size:
+    12px 12px,
+    12px 12px,
+    120px 120px,
+    120px 120px,
+    240px 240px,
+    240px 240px,
+    240px 240px,
+    240px 240px;
+}
+
+.default-node {
+  text-align: center;
+  font-size: 14px;
+  color: #000;
+  background: white !important;
+  width: auto !important;
+  padding: 0px !important;
+  border-radius: 0px !important;
+  border: none !important;
+  cursor: grab !important;
+}
+
+.start-node {
+  width: 50px !important;
+  height: 50px;
+  padding: 0px !important;
+  text-align: center;
+  font-size: 8px;
+  background: #83dfae !important;
+  border: 1px solid #29945b !important;
+  border-radius: 50% !important;
+  color: #29945b !important;
+  cursor: grab !important;
+}
+
+.end-node {
+  width: 50px !important;
+  height: 50px;
+  padding: 0px !important;
+  text-align: center;
+  font-size: 8px;
+  background-color: #ffa1a1 !important;
+  border: 1px solid #b72525 !important;
+  color: #b72525 !important;
+  border-radius: 50% !important;
+  cursor: grab !important;
+}
+
+.custom-node {
+  // background-color: #f5f5f5;
+  width: 150px;
+  height: 70px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  border: 2px solid #eaeaea;
+  border-radius: 5px;
+  cursor: grab !important;
+}
+
+.custom-node .node-header {
+  background-color: #eaeaea;
+  padding: 3px 3px 3px 5px;
+  border-bottom: 1px solid #dcdcdc;
+  cursor: pointer !important;
+  font-size: small;
+  text-align: left;
+  border-radius: 4px 4px 0px 0px !important;
+}
+
+.node-header-active {
+  background-color: #0d6efd !important;
+  color: white;
+  padding: 5px;
+  border-bottom: 1px solid #dcdcdc;
+  border-radius: 4px 4px 0px 0px !important;
+  cursor: pointer !important;
+  text-align: left;
+}
+
+.custom-node .node-image img {
+  margin-top: 8px;
+  // width: 50px;
+  // height: 50px;
+}
+
+.custom-node .node-outputs {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.custom-node .node-output {
+  padding: 5px;
+  background-color: #fffbcc;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: grab !important;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+}
+
+.drawflow .drawflow-node.default-node .output {
+  border: 1px solid #0d6efd;
+  width: 12px !important;
+  height: 12px !important;
+  right: 6px !important;
+  top: 0px !important;
+  cursor: pointer !important;
+  background-color: #86C3FC !important;
+}
+
+.drawflow .drawflow-node.default-node .input {
+  visibility: hidden !important;
+  // background-color: #eaeaea;
+  // border: 1px solid #ddd;
+  width: 10px !important;
+  height: 10px !important;
+  left: -4px !important;
+  // top: 15px !important;
+  // cursor: pointer !important;
+}
+
+.drawflow .drawflow-node.start-node .output {
+  background-color: #83dfae !important;
+  border: 1px solid #29945b !important;
+  width: 12px !important;
+  height: 12px !important;
+  right: 6px !important;
+  cursor: pointer !important;
+}
+
+.drawflow .drawflow-node.end-node .input {
+  visibility: hidden !important;
+  // background-color: #ffa1a1 !important;
+  // border: 1px solid #b72525 !important;
+  // width: 10px !important;
+  // height: 10px !important;
+  left: -13px !important;
+  // cursor: pointer !important;
+}
+
+.drawflow .drawflow-node.end-node .drawflow-delete {
+  display: none;
+}
+
+.drawflow .drawflow-node.start-node .drawflow-delete {
+  display: none;
+}
+
+.drawflow .connection path {
+  stroke: #5C6873 !important;
+  /* Color of the arrow */
+  stroke-width: 2px !important;
+  /* Thickness */
+  fill: none;
+  stroke-linecap: round;
+  /* Makes the line edges round */
+  marker-end: url(#arrow);
+  /* Attach an arrow marker */
+  cursor: pointer;
+  // stroke-opacity: 0.5 !important;
+}
+
+
+.accordion {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.accordion-header {
+  background: #D8ECFF;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  // transition: background 0.3s;
+}
+
+.arrow {
+  font-size: 10px;
+  // transition: transform 0.3s ease;
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  // transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.accordion-body.active {
+  max-height: none;
+  /* Removes height restrictions */
+  height: auto;
+  /* Expands based on content */
+  overflow: visible;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.highlight {
+  background-color: yellow;
+}
+
+.auto-open {
+  color: #007bff;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  // margin: 0 10px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.info-icon {
+  background: #e9f5ff;
+  border-radius: 50%;
+  padding: 5px;
+}
+
+.zoom-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.zoom-dropdown {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.task-sidebar {
+  max-width: 300px;
+  /* Set a fixed width for better layout */
+  width: 20%;
+  transition: all 0.3s ease-in-out;
+}
+
+.custom-input {
+  width: 170px !important;
+  /* Adjust the width as needed */
+}
+
+// .dropdown-menu {
+//   top: calc(100% - 77%) !important;
+// }
+
+.dropdown-menu.show {
+  display: block !important;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.suggestion-drop {
+  width: 95%;
+}
+
+.form-position {
+  position: absolute;
+  right: 0;
+  border: 1px solid #dcdcdc;
+}
+
+.ask-ai-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 40px;
+  // display: inline-flex;
+  // align-items: center;
+  // gap: 8px;
+  // padding: 8px 18px;
+  // border: none;
+  // border-radius: 999px;
+  // background: linear-gradient(90deg, #28e0ff, #a04dff);
+  // color: white;
+  // font-family: Arial, sans-serif;
+  // font-weight: 600;
+  // font-size: 14px;
+  // cursor: pointer;
+  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  // transition: transform 0.15s ease, box-shadow 0.15s ease;
+  // outline: none;
+}
+
+// .ask-ai-btn:hover {
+//   transform: translateY(-1px);
+//   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+// }
+
+// .ask-ai-btn svg {
+//   width: 18px;
+//   height: 18px;
+//   fill: white;
+// }

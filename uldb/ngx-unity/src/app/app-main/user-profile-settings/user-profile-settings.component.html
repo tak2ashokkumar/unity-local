@@ -1,0 +1,444 @@
+<app-main-tab [tabItems]="tabItems">
+</app-main-tab>
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="row" *ngIf="orgSettings">
+            <div class="col-12 px-0" *ngIf="monitoringPermissionSet.view"
+                [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
+                <div class="card mb-0">
+                    <div class="card-header bg-transparent font-500 py-2">
+                        <div class="row">
+                            <div class="col-10 font-lg-xl">
+                                Auto Remediation
+                            </div>
+                            <div class="col">
+                                <span class="ml-2 float-right align-middle" style="height: 10px;">
+                                    <div class="autoRemediation-switch-container">
+                                        <input type="checkbox" id="check" (click)="toggleRemediationSwitch()"
+                                            [checked]="orgSettings.auto_remediation_enabled">
+                                        <label for="check" class="autoRemediation-toggle-button"></label>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 px-0 mt-2" *ngIf="aimlPermissionSet.view"
+                [class.nopointerevents]="!monitoringPermissionSet.manage || isGlobalReadOnly">
+                <div class="card mb-2">
+                    <div
+                        class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
+                        <span class="font-lg-xl">Auto Ticketing</span>
+                        <div class="d-flex" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+                            elementType="div-hide">
+                            <button *ngIf="orgSettings.auto_ticketing_enabled" class="btn btn-pill btn-sm btn-warning"
+                                type="button" (click)="resetToDefaultAutoTicketingSettings()">Reset to default
+                                settings</button>
+                            <span class="ml-2 float-right align-middle">
+                                <div class="autoTicketing-switch-container">
+                                    <input type="checkbox" id="autoTicketingCheck"
+                                        [checked]="orgSettings.auto_ticketing_enabled"
+                                        (click)="toggleTicketingSwitch()">
+                                    <label for="autoTicketingCheck" class="autoTicketing-toggle-button"></label>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body" *ngIf="orgSettings.auto_ticketing_enabled">
+                        <form *ngIf="autoTicketingForm" [formGroup]="autoTicketingForm">
+                            <div class="row">
+                                <div class="form-group col-4">
+                                    <label for="ticketing_instance" class="font-lg">Default ITSM
+                                        Instance<em>*</em></label>
+                                    <select class="form-control" id="ticketing_instance"
+                                        [compareWith]="compareInstances" formControlName="ticketing_instance"
+                                        name="ticketing_instance"
+                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.ticketing_instance}">
+                                        <option [value]="null" disabled>Select ITSM Instance</option>
+                                        <option *ngFor="let ins of itsmInstances" [ngValue]="ins">
+                                            {{ins.name }}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="autoTicketingFormErrors.ticketing_instance">
+                                        {{autoTicketingFormErrors.ticketing_instance}}
+                                    </div>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label class="severity font-lg">Severity<em>*</em></label>
+                                    <multiselect-dropdown [options]="severityOptions" [settings]="severityTypeSettings"
+                                        class="form-control p-1" style="height:auto;"
+                                        formControlName="auto_ticketing_severity"
+                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.auto_ticketing_severity}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback"
+                                        *ngIf="autoTicketingFormErrors.auto_ticketing_severity">
+                                        {{autoTicketingFormErrors.auto_ticketing_severity}}</div>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label for="delay" class="font-lg">Delay<em>*</em></label>
+                                    <input class="form-control" type="text" formControlName="auto_ticketing_delay"
+                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.auto_ticketing_delay}" />
+                                    <div class="invalid-feedback" *ngIf="autoTicketingFormErrors.auto_ticketing_delay">
+                                        {{autoTicketingFormErrors.auto_ticketing_delay}}
+                                    </div>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label for="delay" class="font-lg">Ticket Subject Format</label>
+                                    <input class="form-control" type="text" [placeholder]="'{{ example }}'"
+                                        formControlName="ticket_subject_format"
+                                        [ngClass]="{'is-invalid' : autoTicketingFormErrors.ticket_subject_format}" />
+                                    <div class="invalid-feedback" *ngIf="autoTicketingFormErrors.ticket_subject_format">
+                                        {{autoTicketingFormErrors.ticket_subject_format}}
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row">
+                            <button class="btn btn-pill btn-md btn-warning ml-2" type="button" (click)="saveSettings()"
+                                accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+                                elementType="btn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-2">
+                    <div
+                        class="card-header bg-transparent font-500 py-2 d-flex justify-content-between align-items-center">
+                        <span class="font-lg-xl">RCA AI Analysis</span>
+                        <div class="rcaAI-switch-container">
+                            <input type="checkbox" id="rca" (click)="toggleRcaAISwitch()"
+                                [checked]="orgSettings.attach_rca_to_ticket">
+                            <label for="rca" class="rcaAI-toggle-button"></label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="">
+                            <span>Automatically include an AI-generated RCA report to the ITSM ticket. </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col px-0">
+                <div class="card mb-2">
+                    <div class="card-header bg-transparent ml-0 card-title font-lg">
+                        <div class="row">
+                            <div class="col-8">
+                                <h4 class="card-title d-inline font-lg mb-0">{{user.fullName}}
+                                </h4>
+                            </div>
+                            <div class="col-4">
+                                <button class="btn btn-warning btn-sm btn-pill float-right align-middle"
+                                    (click)="changePasswordBuildForm()">Change
+                                    Password</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                {{user.email}}
+                            </div>
+                            <div class="col-4">
+                                <!-- Zendesk Integration Status - <small class="text-muted font-sm">{{user.zendeskStatus}}</small> -->
+                            </div>
+                            <div class="col-4">
+                                <div class="float-right">Last Login - <small
+                                        class="text-muted font-sm">{{user.lastLogin}}</small></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row">
+                            <div class="col-6">
+                                <table class="user-profile-table">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <h4 class="card-title font-lg mb-0 align-middle">Timezone Settings</h4>
+                                            </td>
+                                            <td rowspan="2">
+                                                <button class="btn btn-warning btn-sm btn-pill float-right align-middle"
+                                                    (click)="changeTimeZone()">Change
+                                                    Timezone</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                {{user.userTimeZone}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="user-profile-table">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <h4 class="card-title font-lg mb-0 align-middle">Two-Factor
+                                                    Authentication</h4>
+                                            </td>
+                                            <td rowspan="2">
+                                                <button routerLink="/settings/twofactor"
+                                                    class="btn btn-warning btn-sm btn-pill float-right align-middle">Manage</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                {{user.twoFactorAuth}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 px-0">
+                <div class="card mb-2">
+                    <div class="card-header py-2">Roles</div>
+                    <div class="card-body">
+                        <div *ngFor="let role of user.roles">
+                            {{role}}
+                        </div>
+                        <div *ngIf="!user.roles.length">
+                            No Roles Assigned
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 pr-0">
+                <div class="card mb-2">
+                    <div class="card-header py-2">Groups</div>
+                    <div class="card-body">
+                        <div *ngFor="let group of user.groups">
+                            {{group.name}}
+                        </div>
+                        <div *ngIf="!user.groups.length">
+                            No Groups Assigned
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 px-0">
+                <div class="card mb-2">
+                    <div class="card-header py-2">Access Types Granted</div>
+                    <div class="card-body">
+                        <div class="row mb-2" *ngFor="let type of user.accessTypes">
+                            <div class="col-4">
+                                {{type.name}}
+                            </div>
+                            <div class="col-8">
+                                {{type.description}}
+                            </div>
+                        </div>
+                        <div *ngIf="!user.accessTypes.length">
+                            No Access Types Granted
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 pr-0">
+                <div class="card mb-2">
+                    <div class="card-header py-2">My Dashboards</div>
+                    <div class="card-body p-0">
+                        <ul class="list-group" *ngIf="dashboardList?.length">
+                            <ng-container *ngFor="let db of dashboardList">
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <span class="text-truncate">{{db.name}}</span>
+                                    <div *ngIf="db.is_default" class="pr-3">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span class="text-muted font-sm-xs ml-1">(Default)</span>
+                                    </div>
+                                    <button *ngIf="!db.is_default"
+                                        class="btn btn-warning btn-sm btn-pill float-right align-middle"
+                                        (click)="setDefaultDashboard(db)">Set as Default</button>
+                                </li>
+                            </ng-container>
+                        </ul>
+                        <div *ngIf="!dashboardList?.length"
+                            class="d-flex justify-content-center align-items-center py-5">
+                            <span> No Dashboards created yet.</span>
+                            <a class="ml-1" [routerLink]="['/app-dashboard/create']">Click here</a> &nbsp; to create
+                            one.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #changePasswordTemplate>
+    <div class="card mb-0 border-0" *ngIf="changePasswordForm">
+        <div class="card-header">
+            <span class="h6">Change Password</span>
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="changePasswordModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="changePasswordForm">
+                <div class="form-group">
+                    <label for="cc">Old Password<em>*</em></label>
+                    <input class="form-control" id="old_pass" type="password" formControlName="old_pass"
+                        placeholder="Old Password" [ngClass]="{'is-invalid' : changePasswordFormErrors.old_pass}">
+                    <div class="invalid-feedback" *ngIf="changePasswordFormErrors.old_pass">
+                        {{changePasswordFormErrors.old_pass}}</div>
+
+                </div>
+                <div class="form-group">
+                    <label for="cc">New Password<em>*</em></label>
+                    <input class="form-control" id="pass1" type="password" formControlName="pass1"
+                        placeholder="New Password" [ngClass]="{'is-invalid' : changePasswordFormErrors.pass1}">
+                    <div class="invalid-feedback" *ngIf="changePasswordFormErrors.pass1">
+                        {{changePasswordFormErrors.pass1}}</div>
+
+                </div>
+                <div class="form-group">
+                    <label for="cc">Confirm Password<em>*</em></label>
+                    <input class="form-control" id="pass2" type="password" formControlName="pass2"
+                        placeholder="Confirm Password" [ngClass]="{'is-invalid' : changePasswordFormErrors.pass2}">
+                    <div class="invalid-feedback" *ngIf="changePasswordFormErrors.pass2">
+                        {{changePasswordFormErrors.pass2}}</div>
+
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onChangePasswordSubmit()">Change
+                Password</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="changePasswordModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #changeTZTemplate>
+    <div class="card mb-0 border-0" *ngIf="changeTZForm">
+        <div class="card-header">
+            <span class="h6">Change Timezone</span>
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="changeTZModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="changeTZForm">
+                <div class="form-group">
+                    <label for="timezone">Timezone<em>*</em></label>
+                    <select class="form-control text-capitalize" id="timezone" name="timezone"
+                        formControlName="timezone">
+                        <option *ngFor="let timeZone of timeZoneList" [ngValue]="timeZone">{{timeZone}}</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onChangeTZSubmit()">Update
+                Timezone</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="changeTZModalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDefaultDashboardRef>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to set the selcted one as default dashboard ?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-outline-warning font-500" type="button"
+                (click)="defaultDashboardModalRef.hide()">Cancel</button>
+            <button class="btn btn-sm btn-pill btn-warning ml-2 px-4 font-500" type="button"
+                (click)="confirmSetDefaultDashboard()">Yes</button>
+        </div>
+    </div>
+</ng-template>
+
+
+<!--
+     DO NOT DELETE THIS.
+     UNCOMMENT TO CONTINUE WORK ON NEW PROFIL PAGE DESIGN
+--->
+
+<!-- <div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-white" [ngClass]="{'border-bottom-0':profileCollapsed}">
+                        <h4 class="card-title font-lg mb-0 align-middle d-inline">Profile</h4>
+                        <div class="card-header-actions">
+                            <button class="action-icons mb-0 fas font-sm ml-1"
+                                [ngClass]="profileCollapsed ? 'fa-chevron-down':'fa-chevron-up'"
+                                [tooltip]="profileCollapsed? 'Expand':'Minimize'"
+                                (click)="profileCollapsed = !profileCollapsed" [attr.aria-expanded]="!profileCollapsed">
+                            </button>
+                        </div>
+                    </div>
+                    <div [collapse]="profileCollapsed" [isAnimated]="true">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h5>
+                                                UL Customer
+                                            </h5>
+                                            <small class="text-muted font-sm mb-2 d-block">
+                                                {{user.email}}
+                                            </small>
+                                            <button class="btn btn-ghost-warning align-middle"
+                                                (click)="changePasswordBuildForm()">Change
+                                                Password</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h5>
+                                                TimeZone Settings
+                                            </h5>
+                                            <small class="text-muted font-sm mb-2 d-block">
+                                                {{user.userTimeZone}}
+                                            </small>
+                                            <button class="btn btn-ghost-warning align-middle"
+                                                (click)="changeTimeZone()">Change
+                                                Timezone</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h5>
+                                                Two-Factor Authentication
+                                            </h5>
+                                            <small class="text-muted font-sm mb-2 d-block">
+                                                {{user.twoFactorAuth}}
+                                            </small>
+                                            <button class="btn btn-ghost-warning align-middle"
+                                                routerLink="/settings/twofactor">Manage</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->

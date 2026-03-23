@@ -1,0 +1,393 @@
+// @import url("https://fonts.googleapis.com/css?family=Poppins");
+
+$bottom-margin: 30px;
+$line-width: 1px;
+// $line-color: #e0dfdb;
+$line-color: #d6dade;
+$bg-color: #efe6e2;
+
+.tree {
+  $color: #222;
+  $border-color: #ddd;
+  $background-color: #eee;
+  $border-weight: 1px;
+  $margin: 12px;
+
+  margin: 0px;
+  padding: 0px;
+
+  &:not(:empty):before,
+  &:not(:empty):after,
+  ul:not(:empty):before,
+  ul:not(:empty):after,
+  li:not(:empty):before,
+  li:not(:empty):after {
+    display: block;
+    position: absolute;
+    content: "";
+  }
+
+  ul,
+  li {
+    position: relative;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style: none;
+  }
+
+  &.cascade {
+    li {
+      margin-left: 2 * $margin;
+
+      div {
+        margin-top: $margin;
+      }
+
+      &:before {
+        border-left: $border-weight solid $border-color;
+        height: 100%;
+        width: 0;
+        top: 0;
+        left: -$margin;
+      }
+
+      &:after {
+        border-top: $border-weight solid $border-color;
+        width: $margin;
+        left: -$margin;
+        top: $margin * 2;
+      }
+
+      &:last-child:before {
+        height: $margin * 2;
+        top: 0;
+      }
+    }
+
+    & > li {
+      &:first-child:before {
+        top: $margin * 2;
+      }
+
+      &:only-child {
+        margin-left: 0;
+      }
+
+      &:only-child:before,
+      &:only-child:after {
+        content: none;
+      }
+    }
+  }
+
+  &.horizontal {
+    li {
+      display: flex;
+      align-items: center;
+      margin-left: $margin * 2;
+
+      div {
+        margin: $margin/2 0;
+      }
+
+      &:before {
+        border-left: $border-weight solid $border-color;
+        height: 100%;
+        width: 0;
+        top: 0;
+        left: -$margin;
+      }
+
+      &:first-child:before {
+        height: 50%;
+        top: 50%;
+      }
+
+      &:last-child:before {
+        height: 50%;
+        bottom: 50%;
+        top: auto;
+      }
+
+      &:after,
+      ul:after {
+        border-top: $border-weight solid $border-color;
+        height: 0;
+        width: $margin;
+        top: 50%;
+        left: -$margin;
+      }
+
+      &:only-child:before {
+        content: none;
+      }
+
+      ul:after {
+        left: 0;
+      }
+    }
+
+    & > li {
+      &:only-child {
+        margin-left: 0;
+      }
+
+      &:only-child:before,
+      &:only-child:after {
+        content: none;
+      }
+    }
+  }
+
+  &.vertical {
+    display: flex;
+
+    ul {
+      display: flex;
+      justify-content: center;
+    }
+
+    li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      div {
+        margin: $margin $margin/2;
+      }
+
+      &:before {
+        border-left: $border-weight solid $border-color;
+        height: $margin;
+        width: 0;
+        top: 0;
+      }
+
+      &:after {
+        border-top: $border-weight solid $border-color;
+        height: 0;
+        width: 100%;
+      }
+
+      &:first-child:after {
+        border-top: $border-weight solid $border-color;
+        height: 0;
+        width: 50%;
+        left: 50%;
+      }
+
+      &:last-child:after {
+        border-top: $border-weight solid $border-color;
+        height: 0;
+        width: 50%;
+        right: 50%;
+      }
+
+      &:only-child:after {
+        content: none;
+      }
+
+      ul:before {
+        border-left: $border-weight solid $border-color;
+        height: $margin;
+        width: 0;
+        top: -$margin;
+      }
+    }
+
+    & > li {
+      &:only-child:before,
+      &:only-child:after {
+        content: none;
+      }
+    }
+  }
+
+  %subcascade {
+    align-items: center;
+    flex-direction: column;
+    padding: 0 $margin;
+
+    // &:before {
+    //   left: 2 * $margin;
+    // }
+
+    // &:after {
+    //   left: 0;
+    // }
+
+    &:first-child:after {
+      // left: 2 * $margin;
+      // width: 100%;
+      width: 50%;
+      right: 50%;
+    }
+
+    &:last-child:after {
+      // left: 0;
+      // width: 2 * $margin;
+      width: 50%;
+      right: 50%;
+    }
+
+    ul,
+    li {
+      display: block;
+    }
+
+    ul:before,
+    ul:after,
+    li:before,
+    li:after {
+      border: none;
+    }
+
+    div {
+      margin: 0;
+      margin-top: $margin;
+    }
+
+    li {
+      margin-left: 2 * $margin;
+
+      &:before {
+        border-left: $border-weight solid $border-color;
+        height: 100%;
+        width: 0;
+        top: 0;
+        left: -$margin;
+      }
+
+      &:after {
+        border-top: $border-weight solid $border-color;
+        width: $margin;
+        height: 0;
+        left: -$margin;
+        top: $margin * 2;
+        content: "";
+      }
+
+      &:last-child:before {
+        height: $margin * 2;
+        top: 0;
+      }
+    }
+  }
+
+  &.vertical .cascade {
+    @extend %subcascade;
+  }
+
+  &.vertical.cascade-1 {
+    & > li {
+      @extend %subcascade;
+    }
+  }
+
+  &.vertical.cascade-2 {
+    & > li > ul > li {
+      @extend %subcascade;
+    }
+  }
+
+  &.vertical.cascade-2 {
+    & > li > ul > li {
+      @extend %subcascade;
+    }
+  }
+
+  &.vertical.cascade-3 {
+    & > li > ul > li > ul > li {
+      @extend %subcascade;
+    }
+  }
+
+  &.vertical.cascade-4 {
+    & > li > ul > li > ul > li > ul > li {
+      @extend %subcascade;
+    }
+  }
+}
+
+/* Node styling for the container that holds circle and label */
+.node {
+  font-weight: 600;
+  text-align: center;
+  position: relative; /* Crucial for positioning CSS lines relative to nodes */
+  z-index: 10; /* Ensure nodes are above CSS lines */
+
+  /* Styling for the circular part of the node */
+  .node-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    margin-top: 0px !important;
+  }
+
+  .node-icon {
+    margin: 0px !important;
+  }
+
+  /* Styling for the label text below the circle */
+  .node-label {
+    font-size: 0.8rem !important;
+  }
+}
+
+.node.node-orange {
+  .node-circle {
+    background-color: #ffe8c0;
+    border-color: #ff8800;
+  }
+  .fa,
+  .fas,
+  .fab,
+  .node-label {
+    color: #ff8800;
+  }
+}
+
+.node.node-green {
+  .node-circle {
+    background-color: #a4e8c4;
+    border-color: #0cbb70;
+  }
+  .fa,
+  .fas,
+  .fab,
+  .node-label {
+    color: #0cbb70;
+  }
+}
+
+.node.node-red {
+  .node-circle {
+    background-color: #f5cccc;
+    border-color: #c00;
+  }
+
+  .fa,
+  .fas,
+  .fab,
+  .node-label {
+    color: #c00;
+  }
+}
+
+.shared-resources .node-label {
+  font-size: small !important;
+}
+
+hr {
+  margin: 10px 0;
+  border: none;
+  height: 1px;
+  background-color: $bg-color;
+}

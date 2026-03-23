@@ -1,0 +1,56 @@
+@import "variables";
+
+.tabs-level1 {
+  transition: left 0.25s, right 0.25s, width 0.25s;
+  border-bottom: none !important;
+}
+
+.tabs-level1 {
+  padding: 0rem 0.5rem;
+  margin-bottom: 1.5rem;
+  list-style: none;
+  background-color: $white;
+}
+
+.tabs-level1-item {
+  margin-bottom: 0;
+  cursor: pointer;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid $white;
+  border-bottom:none;
+  outline: none;
+  background-color: $secondary;
+}
+
+.tabs-level1-item-scroll {
+  margin-bottom: 0;
+  cursor: pointer;
+  border: 1px solid $white;
+  border-bottom:none;
+  outline: none;
+  background-color: $secondary;
+}
+
+.tabs-level1-item.active {
+  color: $green;
+  background-color: $white;
+  cursor: default;
+}
+
+.tabs-level1-item.active,
+.tabs-level1-item.active .tabs-level1-link {
+  cursor: default;
+}
+.tabs-level1-item.active:focus,
+.tabs-level1-item.active:hover {
+  background-color: $white;
+}
+.tabs-level1-link:hover {
+  border: 1px solid transparent;
+}
+.custom-nav-container {
+  width: 100%;
+}
+.no-bg {
+  background-color: transparent !important;
+}

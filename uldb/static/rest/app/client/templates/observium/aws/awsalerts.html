@@ -1,0 +1,39 @@
+<div class="row page_wrapper margin_top20px">
+  <div class="col-xs-12 content-wrapper">
+    <h1>AWS Instance Alerts</h1>
+  </div>
+</div>
+<div class="page_wrapper" style="float:left">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="aws_alerts !== undefined">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table class="table table-condensed table-hover margin0">
+                <thead>
+                    <tr>
+                      <th>Alert</th>
+                      <th>Status</th>
+                      <th>Checked</th>
+                      <th>Changed</th>
+                      <th>Alerted</th>
+                      <th>Entity ID</th>
+                      <th>Entity Type</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="(alertid,alert) in aws_alerts.alerts">
+                        <td> <span ng-bind-html="alert.alert_name"></span> </td>
+                        <td> <span ng-bind-html="alert.status"></span> </td>
+                        <td> <span ng-bind-html="alert.checked"></span> </td>
+                        <td> <span ng-bind-html="alert.changed"></span> </td>
+                        <td> <span ng-bind-html="alert.alerted"></span> </td>
+                        <td> <span ng-bind-html="alert.entity_id"></span> </td>
+                        <td> <span ng-bind-html="alert.entity_type"></span> </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="!aws_alerts.alerts && !loader" class="content-wrapper">
+                <no-records-found message="No Alerts to display"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>

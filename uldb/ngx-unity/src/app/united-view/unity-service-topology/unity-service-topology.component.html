@@ -1,0 +1,446 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card rounded-0 mb-2">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                        <span class="ml-1 font-lg">Service Topology</span>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <data-refresh-btn (refresh)="refreshServiceTopology()"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body px-2 py-0">
+                        <ng-container *ngTemplateOutlet="resourceRef; context: { $implicit: viewData}"></ng-container>
+                        <ng-container *ngIf="viewData?.sharedResources?.length > 0">
+                            <hr />
+                            <ng-container
+                                *ngTemplateOutlet="sharedResourcesRef; context: { $implicit: viewData?.sharedResources}"></ng-container>
+                            <hr />
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-2">
+                <tabset ariaLabel="customTabs">
+                    <tab id="overview" heading="Overview" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngIf="activeView == 'overview'">
+                            <ng-container *ngTemplateOutlet="infraElementsRef"></ng-container>
+                        </ng-container>
+                    </tab>
+                    <tab id="alerts" heading="Alerts" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngIf="activeView == 'alerts'">
+                            <ng-container *ngTemplateOutlet="alertsRef"></ng-container>
+                        </ng-container>
+                    </tab>
+                    <tab id="cost" heading="Cost" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngIf="activeView == 'cost'">
+                            <ng-container *ngTemplateOutlet="costRef"></ng-container>
+                        </ng-container>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #resourceRef let-view>
+    <div class="d-flex justify-content-center">
+        <ul class="tree vertical cascade-3">
+            <li>
+                <ng-container *ngTemplateOutlet="nodeRef; context: { $implicit: view}"></ng-container>
+                <ng-container *ngIf="view?.children?.length > 0">
+                    <ng-container *ngTemplateOutlet="childRef; context: { $implicit: view.children}"></ng-container>
+                </ng-container>
+
+                <!-- <ul>
+                    <li>
+                        <div>node</div>
+                        <ul>
+                            <li>
+                                <div>node</div>
+                            </li>
+                            <li>
+                                <div>node</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <div>node</div>
+                        <ul>
+                            <li>
+                                <div>node</div>
+                                <ul>
+                                    <li>
+                                        <div>node</div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <div>node</div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul> -->
+            </li>
+        </ul>
+    </div>
+</ng-template>
+
+<ng-template #childRef let-children>
+    <ul *ngIf="children.length > 0">
+        <li *ngFor="let child of children; let i = index">
+            <ng-container *ngIf="child.entityType != 'device'">
+                <ng-container *ngTemplateOutlet="nodeRef; context: { $implicit: child}"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="child.entityType == 'device'">
+                <ng-container *ngTemplateOutlet="deviceNodeRef; context: { $implicit: child}"></ng-container>
+            </ng-container>
+            <ng-container *ngTemplateOutlet="childRef; context: { $implicit: child.children}"></ng-container>
+        </li>
+    </ul>
+</ng-template>
+
+<ng-template #nodeRef let-viewNode>
+    <div class="node d-flex flex-column align-items-center" [class]="viewNode?.nodeClass">
+        <div class="node-circle m-0" [id]="viewNode?.uuid">
+            <div class="node-icon">
+                <i [class]="viewNode?.iconClass"></i>
+            </div>
+        </div>
+        <span class="node-label">{{viewNode?.label}}</span>
+    </div>
+</ng-template>
+
+<ng-template #deviceNodeRef let-viewNode>
+    <div class="node d-flex align-items-center mt-0 py-1" [class]="viewNode.nodeClass">
+        <div class="node-circle m-0" [id]="viewNode.uuid">
+            <div class="node-icon">
+                <i [class]="viewNode.iconClass"></i>
+            </div>
+        </div>
+        <span class="node-label ml-1">{{viewNode.label}}</span>
+    </div>
+</ng-template>
+
+<ng-template #sharedResourcesRef let-resources>
+    <div class="text-center text-muted">Shared Resources</div>
+    <div class="shared-resources d-flex justify-content-center align-items-center">
+        <div class="node d-flex align-items-center mr-2" [class]="r.nodeClass"
+            *ngFor="let r of resources; let i = index">
+            <div class="node-circle" [id]="r.uuid">
+                <div class="node-icon">
+                    <i [class]="r.iconClass"></i>
+                </div>
+            </div>
+            <span class="node-label ml-1">{{r.label}}</span>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #infraElementsRef>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <app-spinner [name]="'infraElementsLoader'"></app-spinner>
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{infraElements.length}}</span>
+                <span class="ml-1 font-lg">Infrastructure Elements</span>
+            </div>
+            <div>
+                <data-refresh-btn (refresh)="refreshInfraElements()"></data-refresh-btn>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                <div class="w-25">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm text-left mb-0 font-sm">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Device Name</th>
+                                    <th>Management IP</th>
+                                    <th>Device Type</th>
+                                    <th>CPU Usage (%)</th>
+                                    <th>vCPU Allocation vs Usage</th>
+                                    <th>Memory Usage (%)</th>
+                                    <th>Provisioned vs Consumed Memory</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of infraElements;let i = index" truncateText>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.managementIp">{{view.managementIp}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.deviceType">{{view.deviceType}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.cpuUsage">{{view.cpuUsage}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div class="row">
+                                            <div class="col">
+                                                <small class="text-muted utilization-font-size">Capacity:
+                                                    {{view?.vcpuAllocation}}</small>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="progress progress-xs">
+                                                    <div class="progress-bar" [ngClass]="view?.vCPUUsedBarColor"
+                                                        role="progressbar" [style.width.%]="view?.vCPUUsedPercentage"
+                                                        aria-valuenow="percentData.active" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+
+                                                    <div class="progress-bar bg-secondary" role="progressbar"
+                                                        [style.width.%]="view?.vCPUFreePercentage"
+                                                        aria-valuenow="percentData.unknown" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <small class="text-muted utilization-font-size">Used:
+                                                    {{view?.vcpuUsed}}</small>
+                                            </div>
+                                            <div class="col ml-auto text-right">
+                                                <small class="text-muted utilization-font-size">Free:
+                                                    {{view?.vcpuFree}}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.memoryUsage">{{view.memoryUsage}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div class="row">
+                                            <div class="col">
+                                                <small class="text-muted utilization-font-size">Capacity:
+                                                    {{view?.memoryCapacity}}</small>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="progress progress-xs">
+                                                    <div class="progress-bar" [ngClass]="view?.memoryUsedBarColor"
+                                                        role="progressbar" [style.width.%]="view?.memoryUsedPercentage"
+                                                        aria-valuenow="percentData.active" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+
+                                                    <div class="progress-bar bg-secondary" role="progressbar"
+                                                        [style.width.%]="view?.memoryFreePercentage"
+                                                        aria-valuenow="percentData.unknown" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <small class="text-muted utilization-font-size">Used:
+                                                    {{view?.memoryUsed}}</small>
+                                            </div>
+                                            <div class="col ml-auto text-right">
+                                                <small class="text-muted utilization-font-size">Free:
+                                                    {{view?.memoryFree}}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="col-12">
+                            <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count">
+                            </table-entries>
+                            <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                            <div class="text-center text-muted py-4" *ngIf="!infraElements.length">No associated
+                                Infrastructure Elements found.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #alertsRef>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <app-spinner [name]="'alertsLoader'"></app-spinner>
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{alerts.length}}</span>
+                <span class="ml-1 font-lg">Alerts</span>
+            </div>
+            <div>
+                <data-refresh-btn (refresh)="refreshInfraElements()"></data-refresh-btn>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                <div class="w-25">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm text-left mb-0 font-sm">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Alert ID</th>
+                                    <th>Device Name</th>
+                                    <th>Managemennt IP</th>
+                                    <th>Device Type</th>
+                                    <th>Count</th>
+                                    <th>Event Metric</th>
+                                    <th>Event Time</th>
+                                    <th>Severity</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of alerts;let i = index" truncateText>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.alertId">{{view.alertId}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.managementIp">{{view.managementIp}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.deviceType">{{view.deviceType}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view?.count">{{view?.count}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view?.eventMetric">{{view?.eventMetric}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view?.eventTime">{{view?.eventTime}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <i class="fa status-icon" [ngClass]="view.severityIcon"
+                                            [tooltip]="view.severity" container="body"></i>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="view?.description">{{view?.description}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="col-12">
+                            <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count">
+                            </table-entries>
+                            <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                            <div class="text-center text-muted py-4" *ngIf="!alerts.length">No associated
+                                alerts found.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #costRef>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <app-spinner [name]="'costElementsLoader'"></app-spinner>
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">{{costElements.length}}</span>
+                <span class="ml-1 font-lg">Cost Elements</span>
+            </div>
+            <div>
+                <data-refresh-btn (refresh)="refreshInfraElements()"></data-refresh-btn>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                <div class="w-25">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm text-left mb-0 font-sm">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Device Name</th>
+                                    <th>IP Address</th>
+                                    <th>Device Type</th>
+                                    <th>CPU Usage (%)</th>
+                                    <th>Memory Usage (%)</th>
+                                    <th>Disk Usage</th>
+                                    <th>Compute Cost ($)</th>
+                                    <th>OS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let d of costElements;let i = index">
+                                    <td class="tdw-20">
+                                        <div [tooltip]="d.deviceName">{{d.deviceName}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="d.ipAddress">{{d.ipAddress}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="d.deviceType">{{d.deviceType}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="d.cpuUsage">{{d.cpuUsage}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="d?.memoryUsage">{{d?.memoryUsage}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="d?.diskUsage">{{d?.diskUsage}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="d?.computeCost">{{d?.computeCost}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="d?.os">{{d?.os}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="col-12">
+                            <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count">
+                            </table-entries>
+                            <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                            <div class="text-center text-muted py-4" *ngIf="!costElements.length">No associated
+                                Cost Elements found.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

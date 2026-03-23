@@ -1,0 +1,348 @@
+<ng-container *ngIf="activeTabId">
+    <ng-container [ngSwitch]="activeTabId">
+        <ng-container *ngSwitchCase="'ipAddress'">
+            <ng-container *ngTemplateOutlet="ipAddressRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'macAddress'">
+            <ng-container *ngTemplateOutlet="macAddressRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'interface'">
+            <ng-container *ngTemplateOutlet="interfaceRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'os'">
+            <ng-container *ngTemplateOutlet="osRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'hardwareComponents'">
+            <ng-container *ngTemplateOutlet="hardwareComponentsRef"></ng-container>
+        </ng-container>
+    </ng-container>
+</ng-container>
+
+<ng-template #ipAddressRef>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'ipAddressSpinner'"></app-spinner>
+                <div class="card-body">
+                    <ng-container *ngTemplateOutlet="formRef"></ng-container>
+                    <div class="py-5 text-center" *ngIf="!form"> No Data Available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #osRef>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'osSpinner'"></app-spinner>
+                <div class="card-body">
+                    <ng-container *ngTemplateOutlet="formRef"></ng-container>
+                    <div class="py-5 text-center" *ngIf="!form"> No Data Available</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #formRef>
+    <form [formGroup]="form" *ngIf="form">
+        <div class="row text-right">
+            <ng-container *ngFor="let field of fields">
+                <div class="col-6">
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">{{ field.label }}</label>
+                        <div class="col-9">
+                            <!-- TEXT -->
+                            <input *ngIf="field.type === 'text'" class="form-control" [formControlName]="field.key"
+                                [readonly]="field.readonly">
+
+                            <!-- NUMBER -->
+                            <input *ngIf="field.type === 'number'" type="number" class="form-control"
+                                [formControlName]="field.key" [readonly]="field.readonly">
+
+                            <!-- DATE -->
+                            <input *ngIf="field.type === 'date'" type="date" class="form-control"
+                                [formControlName]="field.key" [readonly]="field.readonly">
+
+                            <!-- TEXTAREA -->
+                            <textarea *ngIf="field.type === 'textarea'" class="form-control"
+                                [formControlName]="field.key" [readonly]="field.readonly"></textarea>
+
+                            <!-- CHECKBOX -->
+                            <input *ngIf="field.type === 'checkbox'" type="checkbox" [formControlName]="field.key"
+                                [readonly]="field.readonly">
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #macAddressRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'macAddressSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Name Format</th>
+                                    <th>MAC Address</th>
+                                    <th>Protocol Type</th>
+                                    <th>Address</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Item</th>
+                                    <th>Last Scan Date</th>
+                                    <th>Token ID</th>
+                                    <th>Company</th>
+                                    <th>Short Description</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of macAddressViewData;let i = index">
+                                    <td>
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.nameFormat}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.macAddress}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.protocolType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.address}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.category}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.type}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.item}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.lastScanDate}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.tokenId}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.company}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.shortDescription}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.description}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" *ngIf="!macAddressViewData?.length">
+                            No data available.
+                        </div>
+                    </div>
+                    <div class="col-12" *ngIf="count">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #interfaceRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'interfaceSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Network Address</th>
+                                    <th>Permanent Address</th>
+                                    <th>Port Type</th>
+                                    <th>Manufacturer</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Item</th>
+                                    <th>Last Scan Date</th>
+                                    <th>Token ID</th>
+                                    <th>Company</th>
+                                    <th>Short Description</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of interfaceViewData;let i = index">
+                                    <td>
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.networkAddresses}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.permanentAddress}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.portType}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.manufacturer}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.category}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.type}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.item}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.lastScanDate}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.tokenId}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.company}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.shortDescription}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.description}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" *ngIf="!interfaceViewData?.length">
+                            No data available.
+                        </div>
+                    </div>
+                    <div class="col-12" *ngIf="count">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #hardwareComponentsRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'hardwareSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Manufacturer</th>
+                                    <th>Model</th>
+                                    <th>Version</th>
+                                    <th>Market Version</th>
+                                    <th>Serial Number</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Item</th>
+                                    <th>Token ID</th>
+                                    <th>Company</th>
+                                    <th>Short Description</th>
+                                    <th>Description</th>
+                                    <th>End of Life</th>
+                                    <th>End of Support</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of hardwareViewData; let i = index">
+                                    <td>
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.manufacturer}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.model}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.version}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.marketVersion}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.serialNumber}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.category}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.type}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.item}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.tokenId}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.company}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.shortDescription}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.description}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.endOfLife}}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{view.endOfSupport}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" *ngIf="!hardwareViewData?.length">
+                            No data available.
+                        </div>
+                    </div>
+                    <div class="col-12" *ngIf="count">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

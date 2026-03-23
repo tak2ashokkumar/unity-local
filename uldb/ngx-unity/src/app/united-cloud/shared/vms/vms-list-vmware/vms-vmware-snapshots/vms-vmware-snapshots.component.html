@@ -1,0 +1,201 @@
+<div class="row">
+    <div class="col-12">
+        <div class="tab-content">
+            <div class="tab-pane active p-2">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link py-0 pl-0 border-right text-success">{{device?.name}}</a>
+                    </li>
+                    <li class="nav-item" *ngFor="let tab of tabData">
+                        <a class="nav-link py-0" [ngClass]="isActive(tab)" (click)="goTo(tab.url)">{{tab.name}}</a>
+                    </li>
+                    <li class="nav-item ml-auto">
+                        <data-refresh-btn (refresh)="getSanpshots()"></data-refresh-btn>
+                    </li>
+                    <li class="nav-item float-right text-warning">
+                        <a class="nav-link py-0 " (click)="goBack()">
+                            <i class="fa fa-arrow-left">&nbsp;</i>
+                            <span>{{device?.deviceType}} List</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mt-3">
+        <div class="row">
+            <div class="col-12">
+                <div class="card rounded-0 border-top-0">
+                    <div class="card-header bg-transparent border-bottom-0">
+                        <div class="row">
+                            <div class="col ">
+                                <button class="btn btn-warning btn-pill btn-sm ml-2 pull-right" (click)="takeSnapshot()">Take
+                                    snapshot</button>
+                                <button class="btn btn-warning btn-pill btn-sm ml-2 pull-right" *ngIf="viewData.length"
+                                    (click)="deleteAllSnapshots()">Delete all snapshots</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="steps">
+                            <div class="steps-container" *ngFor="let view of viewData; let i = index;">
+                                <div class="content">
+                                    <div class="card">
+                                        <div class="card-header bg-white" [ngClass]="{'border-bottom-0':view.isCollapsed}">
+                                            {{view.name}}
+                                            <div class="card-header-actions">
+                                                <button class="action-icons mb-0 fas fa-redo-alt font-sm ml-1" tooltip="Revert"
+                                                    (click)="revertSnapshot(view)">
+                                                </button>
+                                                <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                                    (click)="deleteSnapshot(view)">
+                                                </button>
+                                                <button class="action-icons mb-0 fas font-sm ml-1" [ngClass]="view.isCollapsed ? 'fa-chevron-down':'fa-chevron-up'"
+                                                    [tooltip]="view.isCollapsed? 'Expand details':'Minimize details'"
+                                                    (click)="view.isCollapsed = !view.isCollapsed" [attr.aria-expanded]="!view.isCollapsed">
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div [collapse]="view.isCollapsed" [isAnimated]="true">
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-3">Description</dt>
+                                                    <dd class="col-9">{{view.description}}</dd>
+                                                    <dt class="col-3">Create Date</dt>
+                                                    <dd class="col-9">
+                                                        {{view.createTime}}
+                                                    </dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="step-icon" [class.bg-primary]="view.active">{{i+1}}</div>
+                            </div>
+                        </div>
+                        <div class="text-center text-muted pt-3 pb-5" *ngIf="!viewData.length">No associated snapshots were
+                            found.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #snapShotFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Take Snapshot
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="snapShotForm" [formGroup]="snapShotForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label" for="name">Name<em>*</em></label>
+                        <input id="name" class="form-control" type="text" formControlName="name" [class.is-invalid]="snapShotFormErrors.name">
+                        <div class="invalid-feedback" *ngIf="snapShotFormErrors.name">{{snapShotFormErrors.name}}</div>
+                    </div>
+
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label" for="description">Description</label>
+                        <textarea id="description" class="form-control" type="text" formControlName="description"
+                            [class.is-invalid]="snapShotFormErrors.description"></textarea>
+                        <div class="invalid-feedback" *ngIf="snapShotFormErrors.description">
+                            {{snapShotFormErrors.description}}</div>
+                    </div>
+
+                    <div class="form-group col-12 col-form-label">
+                        <div class="form-check form-check-inline mr-1">
+                            <input class="form-check-input" id="memory" type="checkbox" formControlName="memory"
+                                [class.is-invalid]="snapShotFormErrors.memory">
+                            <label class="form-check-label" for="memory">Include VM's memory</label>
+                            <div class="invalid-feedback" *ngIf="snapShotFormErrors.memory">
+                                {{snapShotFormErrors.memory}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-12 col-form-label">
+                        <div class="form-check form-check-inline mr-1">
+                            <input class="form-check-input" id="quiesce" type="checkbox" formControlName="quiesce"
+                                [class.is-invalid]="snapShotFormErrors.quiesce">
+                            <label class="form-check-label" for="quiesce">Quiesce guest file system(requires VM
+                                tools)</label>
+                            <div class="invalid-feedback" *ngIf="snapShotFormErrors.quiesce">
+                                {{snapShotFormErrors.quiesce}}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitCreateSnapshot()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This snapshot will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmSnapshotDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+<ng-template #confirmDeleteAll>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            All snapshot will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDeleteAllSnapshots()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmRevert>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Revert
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This snapshot will be reverted. Are you sure you want to Revert?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmRevertSnapshot()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

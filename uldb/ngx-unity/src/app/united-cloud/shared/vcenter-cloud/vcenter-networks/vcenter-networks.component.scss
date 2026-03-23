@@ -1,0 +1,19 @@
+.networks-tabs {
+    .value {
+        color: #378ad8 !important;
+    }
+
+    .card.active {
+        border: 1px solid #378ad8 !important;
+        font-weight: bold !important;
+
+        background-color: #378ad8 !important;
+        color: #fff !important;
+
+        // color: #378ad8 !important;
+
+        .value {
+            color: #fff !important;
+        }
+    }
+}

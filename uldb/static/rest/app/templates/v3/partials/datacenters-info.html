@@ -1,0 +1,33 @@
+<tab heading="maintaince_schedules">
+    <div class="panel panel-default" ng-controller="UladminController">
+        <div class="panel-heading">
+            <div class="col-md-8 pinnewcustitle">
+                <i class="fa fa-clock-o fa-fw"></i>{{heading}}
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th ng-repeat="row in datacenters.vm_datacenters.headers">
+                        <div ng-if="row.hide === undefined">{{ row | uppercase }}</div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in datacenters.vm_datacenters.info">
+                    <td>
+                        <div>{{ row.name }}</div>
+                    </td>
+                    <td>
+                        <div>{{ row.hosts }}</div>
+                    </td>
+                    <td>
+                        <div>{{ row.virtual_machines }}</div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</tab>

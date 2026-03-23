@@ -1,0 +1,146 @@
+<ng-template [ngIf]="showBriefInfo" [ngIfElse]="cabinetCompleteInfo">
+  <div class="col-12">
+    <div class="card mb-2">
+      <div class="card-header font-weight-bold px-2">
+        Cabinet: {{cabinetInfo.name}}
+      </div>
+      <div class="card-header px-2 py-1">
+        <button *ngIf="cabinetInfo.createTicket" class="pull-right action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+          (click)="createTicket()" [class.action-icons-disabled]="!cabinetInfo.createTicket.isEnabled" container="body"
+          [tooltip]="cabinetInfo.createTicket.tooltipText"></button>
+      </div>
+
+      <div class="card-body pt-2 pb-1 px-2">
+        <div class="row">
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Cabinet Type</small>
+              <br>
+              <span class="info-value">{{cabinetInfo.type || 'NA'}}</span>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Model</small>
+              <br>
+              <span class="info-value">{{cabinetInfo.model || 'NA'}}</span>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Cabinet Size</small>
+              <br>
+              <span class="info-value">{{cabinetInfo.unitCapacity + 'U'}}</span>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Available RU</small>
+              <br>
+              <span class="info-value">{{cabinetInfo.availableUnits + 'U'}}</span>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="greenITEnabled && cabinetInfo.carbonFootPrint">
+            <div class="mt-2 mb-1 py-2">
+              <span class="info-value">
+                <i class="fas fa-leaf text-success"></i>&nbsp;
+                <span [innerHTML]="cabinetInfo.carbonFootPrint"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 mt-2" *ngFor="let pdu of pdus">
+            <div class="alert alert-secondary d-flex align-items-center border mb-0 p-1" role="alert">
+              <div class="w-60 text-left">
+                <div class="text-value text-warning text-truncate">
+                  <span class="small text-uppercase font-weight-bold">
+                    <i class="fa fa-plug pdus"></i> &nbsp; {{pdu.name}}
+                  </span>
+                </div>
+                <div class="text-muted font-weight-bold text-truncate small ml-3">Socket Count : {{pdu.sockets}}</div>
+              </div>
+              <div class="w-40 text-right">
+                <button *ngIf="pdu.recycle" class="action-icons ml-0 mb-0 fa fa-recycle font-sm"
+                  (click)="recyclePDU(pdu)" [class.action-icons-disabled]="!pdu.recycle.isEnabled"
+                  [tooltip]="pdu.recycle.tooltipText" container="body" accessControl moduleName="Datacenter"
+                  accessType="Manage Datacenter" elementType="actionbtn"></button>
+                <button *ngIf="pdu.observiumStats" class="action-icons ml-1 mb-0 fas fa-chart-line font-sm  pull-right"
+                  (click)="goToStats(pdu)" [class.action-icons-disabled]="!pdu.observiumStats.isEnabled"
+                  container="body" [tooltip]="pdu.observiumStats.tooltipText" accessControl moduleName="Monitoring"
+                  accessType="View Monitoring" elementType="actionbtn"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #cabinetCompleteInfo>
+  <div class="col-12">
+    <div class="card mb-2">
+      <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+        <div class="w-75 py-1">
+          <span> Cabinet: {{cabinetInfo.name}} ({{cabinetInfo.type}} - {{cabinetInfo.model}})</span>
+        </div>
+        <div class="w-25">
+          <button *ngIf="cabinetInfo.createTicket" class="pull-right action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+            (click)="createTicket()" [class.action-icons-disabled]="!cabinetInfo.createTicket.isEnabled"
+            container="body" [tooltip]="cabinetInfo.createTicket.tooltipText"></button>
+        </div>
+      </div>
+      <div class="card-body pt-2 pb-1 px-2">
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Cabinet Size</small>
+              <br>
+              <span class="info-value">{{cabinetInfo.unitCapacity + 'U'}}</span>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Available RU</small>
+              <br>
+              <span class="info-value">{{cabinetInfo.availableUnits + 'U'}}</span>
+            </div>
+          </div>
+          <div class="col-sm-4" *ngIf="greenITEnabled && cabinetInfo.carbonFootPrint">
+            <div class="mt-2 mb-1 py-2">
+              <span class="info-value">
+                <i class="fas fa-leaf text-success"></i>&nbsp;
+                <span [innerHTML]="cabinetInfo.carbonFootPrint"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4 mt-2" *ngFor="let pdu of cabinetInfo.allPDUs">
+            <div class="alert alert-secondary d-flex align-items-center border mb-0 p-1" role="alert">
+              <div class="w-50 text-left">
+                <div class="text-value text-warning text-truncate">
+                  <span class="small text-uppercase font-weight-bold">
+                    <i class="fa fa-plug pdus"></i> &nbsp; {{pdu.name}}
+                  </span>
+                </div>
+                <div class="text-muted font-weight-bold text-truncate small ml-3">Socket Count : {{pdu.sockets}}</div>
+              </div>
+              <div class="w-50 text-right">
+                <button *ngIf="pdu.recycle" class="action-icons ml-0 mb-0 fa fa-recycle font-sm"
+                  (click)="recyclePDU(pdu)" [class.action-icons-disabled]="!pdu.recycle.isEnabled"
+                  [tooltip]="pdu.recycle.tooltipText" container="body" accessControl moduleName="Datacenter"
+                  accessType="Manage Datacenter" elementType="actionbtn"></button>
+                <button *ngIf="pdu.observiumStats" class="action-icons ml-1 mb-0 fas fa-chart-line font-sm  pull-right"
+                  (click)="goToStats(pdu)" [class.action-icons-disabled]="!pdu.observiumStats.isEnabled"
+                  container="body" [tooltip]="pdu.observiumStats.tooltipText" accessControl moduleName="Monitoring"
+                  accessType="View Monitoring" elementType="actionbtn"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

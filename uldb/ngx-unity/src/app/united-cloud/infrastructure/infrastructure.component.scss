@@ -1,0 +1,33 @@
+.custom-border {
+    border-left: 2px solid #c8ced3;
+}
+
+.progress {
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.model-margin {
+    margin-left: 2rem !important;
+}
+
+.device-margin {
+    margin-left: 3.5rem !important;
+}
+
+// table {
+//     width:400px;
+// }
+
+tbody {
+    display:block;
+    height:200px;
+    overflow:auto;
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;/* even columns width , fix width of table too*/
+}
+// thead {
+//     width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
+// }

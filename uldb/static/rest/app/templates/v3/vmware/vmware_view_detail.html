@@ -1,0 +1,17 @@
+<div class="row dashboard-admin">
+    <div class="col-md-12" ng-show="listsnapshot">
+        <generictable
+            heading="Snapshot"
+            headers="vmware_listsnapshot_headers"
+            tabledata="vmware_listsnapshot.data.info">
+        </generictable>
+    </div>
+    <div class="col-md-6" ng-show="listdata">
+        <generictable
+            heading="DATASTORES"
+            headers="vmware_datastores_headers"
+            tabledata="vmware_datastores.data.info"
+            modeldata="vmware_datastores_modeldata">
+        </generictable>
+    </div>
+</div>

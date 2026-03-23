@@ -1,0 +1,48 @@
+.section-name {
+  position: absolute;
+  top: -0.75rem;
+  left: 1rem;
+  z-index: 1;
+  padding: 0 0.5rem;
+  font-size: 1.02rem;
+}
+
+.section-name-two {
+  position: absolute;
+  top: -1rem;
+  right: 1rem;
+  z-index: 1;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+::ng-deep .ng-select .ng-select-container,
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  min-height: calc(1.5em + 0.6rem + 2px) !important;
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: #5c6873;
+}
+
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  height: calc(1.5em + 0.6rem + 2px) !important;
+  font-size: 0.76rem !important;
+  font-weight: 400;
+  color: #5c6873;
+}
+
+::ng-deep ng-select.is-invalid .ng-select-container {
+  border: 1px solid #cc0000 !important;
+}
+
+::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  color: #5c6873 !important;
+}
+
+::ng-deep .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  font-size: 0.76rem !important;
+}
+
+::ng-deep .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+  margin-bottom: 0 !important;
+}

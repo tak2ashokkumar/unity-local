@@ -1,0 +1,137 @@
+<ng-container>
+    <div class="card w-100">
+        <div class="card-header bg-white">
+            <div class="row">
+                <div class="col-10">
+                    <form *ngIf="filterForm" [formGroup]="filterForm">
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-group row px-2">
+                                    <label for="datacenters" class="col-3 col-form-label col-form-label-sm px-0">Datacenters<em>*</em>:&nbsp;</label>
+                                    <div class="col-9">
+                                        <multiselect-dropdown [options]="datacenters" [settings]="dcSettings" class="form-control p-0"
+                                            (dropdownClosed)="dcChange()" style="height:auto;" formControlName="data_center"></multiselect-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group row mb-0 px-2">
+                                    <label for="cabinets" class="col-3 col-form-label col-form-label-sm px-0">Cabinets:&nbsp;</label>
+                                    <div class="col-9">
+                                        <multiselect-dropdown [options]="cabinets" [settings]="cabinetSettings" class="form-control p-0"
+                                            style="height:auto;" formControlName="cabinets" [isDisabled]="!selectedFileterData.data_center.length"></multiselect-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group row mb-0 px-2">
+                                    <label for="cabinets" class="col-3 col-form-label col-form-label-sm px-0">Device
+                                        Types:&nbsp;</label>
+                                    <div class="col-9">
+                                        <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
+                                            class="form-control p-0" style="height:auto;" formControlName="device_types"></multiselect-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <label class="col-form-label col-form-label-sm" for="inputGroupSelect02">Duration<em>*</em>:&nbsp;&nbsp;&nbsp;</label>
+                                    </div>
+                                    <select class="custom-select" id="inputGroupSelect02" formControlName="period"
+                                        [class.is-invalid]="filterFormErrors.period">
+                                        <option [value]="duration.CURRENT_YEAR">Current Year</option>
+                                        <option [value]="duration.CURRENT_QUARTER">Current Quarter</option>
+                                        <option [value]="duration.LAST_QUARTER">Last Quarter</option>
+                                        <option [value]="duration.LAST_TWO_QUARTERS">Last 2 Quarters</option>
+                                        <option [value]="duration.LAST_THREE_QUARTERS">Last 3 Quarters</option>
+                                        <option [value]="duration.LAST_YEAR">Last Year</option>
+                                        <option [value]="duration.CUSTOM">Custom</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="filterFormErrors.period">{{filterFormErrors.period}}</div>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="input-group">
+                                    <label class="mb-0 mt-1" for="from">From :&nbsp;</label>
+                                    <input type="text" id="from" class="form-control" formControlName="from" #from="bsDatepicker"
+                                        bsDatepicker [bsConfig]="{ minMode : 'month', dateInputFormat: 'MMMM YYYY', containerClass: 'theme-dark-blue' }"
+                                        [outsideClick]="false" [maxDate]="now" />
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="input-group">
+                                    <label class="mb-0 mt-1" for="to">To :&nbsp;</label>
+                                    <input type="text" id="to" class="form-control" formControlName="to" #to="bsDatepicker"
+                                        bsDatepicker [bsConfig]="{ minMode : 'month', dateInputFormat: 'MMMM YYYY', containerClass: 'theme-dark-blue' }"
+                                        [outsideClick]="false" [minDate]="filterForm.controls.from.value" [maxDate]="now" />
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-group row mb-0 px-2 mt-2">
+                                    <div class="col text-center">
+                                        <button class="btn btn-sm btn-pill btn-warning" type="button" (click)="filterData()"
+                                            [disabled]="filterForm.pristine">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-2 border-left">
+                    <div class="row">
+                        <data-refresh-btn class="col-12" [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+                    </div>
+                    <div class="row" *ngIf="viewData.length">
+                        <form *ngIf="columnForm" class="col-12" [formGroup]="columnForm">
+                            <div class="form-group mb-0 mt-3">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;" formControlName="columns"
+                                    [options]="tableColumns" [settings]="columnSelectionSettings" [texts]="columnSelectionTexts"
+                                    (dropdownClosed)="columnChange()"></multiselect-dropdown>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-2 text-center border-bottom-0">
+            <div class="table-responsive" tableStickyScroll>
+                <table class="table table-sm text-left" *ngIf="viewData.length">
+                    <thead class="bg-light">
+                        <tr>
+                            <th *ngFor="let col of columnsSelected">{{col.name}}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData">
+                            <td *ngFor="let col of columnsSelected">
+                                <!-- <button *ngIf="col.type=='btn-link'" class="btn btn-link text-decoration-none p-0 table-column-btn"
+                                    type="button">{{view[col.key]}}</button> -->
+                                <div *ngIf="!col.type || col.type=='text'">{{view[col.key]}}</div>
+                                <ng-container *ngIf="col.type=='tags'" [ngTemplateOutlet]='tagsList'
+                                    [ngTemplateOutletContext]="{tags:view[col.key]}"></ng-container>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No Usage Data found.</div>
+                <div class="text-center text-muted py-5" *ngIf="viewData.length && !columnsSelected.length">No Columns
+                    selected to display.</div>
+            </div>
+        </div>
+    </div>
+    <ng-template #tagsList let-tags="tags">
+        <div triggers="mouseenter:mouseleave" placement="top">
+            <span *ngFor="let tag of tags" class="badge badge-pill badge-primary">{{tag}}</span>
+        </div>
+        <div *ngIf="!tags.length">N/A</div>
+    </ng-template>
+
+    <ng-template #tagsTooltipTmpl let-tags="tags">
+        <div class="font-weight-bold">
+            <span *ngFor="let tag of tags" class="badge badge-pill badge-primary m-1 font-sm">{{tag}}</span>
+        </div>
+    </ng-template>
+</ng-container>

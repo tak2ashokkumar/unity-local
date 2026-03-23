@@ -1,0 +1,140 @@
+<div class="d-flex justify-content-end move-dropdowns-up-end-of-top-tabs">
+    <div class="w-16">
+        <multiselect-dropdown class="form-control px-0 py-1" [options]="gpuList" [settings]="gpuSettings"
+            [texts]="gpuTexts" (dropdownClosed)="onGpuFilterChange()"
+            [(ngModel)]="dropdownsViewData.selectedGpuValue"></multiselect-dropdown>
+    </div>
+    <div>
+        <custom-date-dropdown [options]="durationDropdownViewData.dropdownOptions" [enableCustomDateRange]="true"
+            [default]="durationDropdownViewData.defaultSelected" (onSubmit)="ondurationDropdownChanged($event)">
+        </custom-date-dropdown>
+    </div>
+    <div style="padding-top: 0.2rem;">
+        <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3 pr-1">
+        <div class="card round-edge mb-2">
+            <app-spinner [name]="gpuSummaryWidgetData.avgUtilizationPerLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Avg Utilization Percentage</div>
+                <div class="font-500 text-primary font-lg-xl ml-1 mt-2">
+                    {{gpuSummaryWidgetData.avgUtilizationPercentage}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 px-1">
+        <div class="card round-edge mb-2">
+            <app-spinner [name]="gpuSummaryWidgetData.avgTemperatureLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Avg Temperature</div>
+                <div class="font-500 text-primary font-lg-xl ml-1 mt-2">
+                    {{gpuSummaryWidgetData.avgTemperature}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 px-1">
+        <div class="card round-edge mb-2">
+            <app-spinner [name]="gpuSummaryWidgetData.avgPowerDrawLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Avg Power Draw</div>
+                <div class="font-500 text-primary font-lg-xl ml-1 mt-2">
+                    {{gpuSummaryWidgetData.avgPowerDraw}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pl-1">
+        <div class="card round-edge mb-2">
+            <app-spinner [name]="gpuSummaryWidgetData.avgMemoryUsedLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Avg Memory Used</div>
+                <div class="font-500 text-primary font-lg-xl ml-1 mt-2">
+                    {{gpuSummaryWidgetData.avgMemoryUsed}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-6 pr-1">
+        <div class="card round-edge mb-2 chart-min-height">
+            <app-spinner [name]="avgUtilizationWidgetData.loader"></app-spinner>
+            <div class="card-header border-0 bg-white p-2" *ngIf="avgUtilizationWidgetData.chartData">
+                Avg Utilization Percentage (%)
+            </div>
+            <div class="card-body p-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!avgUtilizationWidgetData.chartData}">
+                <ng-container *ngIf="avgUtilizationWidgetData.chartData">
+                    <div echarts [options]="avgUtilizationWidgetData.chartData.options"
+                        [extentions]="avgUtilizationWidgetData.chartData.extensions" [defaultHeight]="240"></div>
+                </ng-container>
+                <div *ngIf="!avgUtilizationWidgetData.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 pl-1">
+        <div class="card round-edge mb-2 chart-min-height">
+            <app-spinner [name]="avgTemperatureUsageWidgetData.loader"></app-spinner>
+            <div class="card-header border-0 bg-white p-2" *ngIf="avgTemperatureUsageWidgetData.chartData">
+                Avg Temperature (°C)
+            </div>
+            <div class="card-body p-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!avgTemperatureUsageWidgetData.chartData}">
+                <ng-container *ngIf="avgTemperatureUsageWidgetData.chartData">
+                    <div echarts [options]="avgTemperatureUsageWidgetData.chartData.options"
+                        [extentions]="avgTemperatureUsageWidgetData.chartData.extensions" [defaultHeight]="240"></div>
+                </ng-container>
+                <div *ngIf="!avgTemperatureUsageWidgetData.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 pr-1">
+        <div class="card round-edge mb-2 chart-min-height">
+            <app-spinner [name]="avgMemoryUsageWidgetData.loader"></app-spinner>
+            <div class="card-header border-0 bg-white p-2" *ngIf="avgMemoryUsageWidgetData.chartData">
+                Avg Memory (MB)
+            </div>
+            <div class="card-body p-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!avgMemoryUsageWidgetData.chartData}">
+                <ng-container *ngIf="avgMemoryUsageWidgetData.chartData">
+                    <div echarts [options]="avgMemoryUsageWidgetData.chartData.options"
+                        [extentions]="avgMemoryUsageWidgetData.chartData.extensions" [defaultHeight]="240"></div>
+                </ng-container>
+                <div *ngIf="!avgMemoryUsageWidgetData.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 pl-1">
+        <div class="card round-edge mb-2 chart-min-height">
+            <app-spinner [name]="avgPowerUsageWidgetData.loader"></app-spinner>
+            <div class="card-header border-0 bg-white p-2" *ngIf="avgPowerUsageWidgetData.chartData">
+                Avg Power (Watt)
+            </div>
+            <div class="card-body p-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!avgPowerUsageWidgetData.chartData}">
+                <ng-container *ngIf="avgPowerUsageWidgetData.chartData">
+                    <div echarts [options]="avgPowerUsageWidgetData.chartData.options"
+                        [extentions]="avgPowerUsageWidgetData.chartData.extensions" [defaultHeight]="240"></div>
+                </ng-container>
+                <div *ngIf="!avgPowerUsageWidgetData.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 pr-1">
+        <div class="card round-edge mb-2 chart-min-height">
+            <app-spinner [name]="avgFanSpeedUsageWidgetData.loader"></app-spinner>
+            <div class="card-header border-0 bg-white p-2" *ngIf="avgFanSpeedUsageWidgetData.chartData">
+                Avg Fan speed (RPM)
+            </div>
+            <div class="card-body p-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!avgFanSpeedUsageWidgetData.chartData}">
+                <ng-container *ngIf="avgFanSpeedUsageWidgetData.chartData">
+                    <div echarts [options]="avgFanSpeedUsageWidgetData.chartData.options"
+                        [extentions]="avgFanSpeedUsageWidgetData.chartData.extensions" [defaultHeight]="240"></div>
+                </ng-container>
+                <div *ngIf="!avgFanSpeedUsageWidgetData.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>

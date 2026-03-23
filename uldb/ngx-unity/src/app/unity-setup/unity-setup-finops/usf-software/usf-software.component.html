@@ -1,0 +1,108 @@
+<form *ngIf="form" [formGroup]="form">
+    <div class="form-group">
+        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 form-group d-flex">
+            <label for="software_type" class="col-4 col-form-label-sm text-right">Software Type<em>*</em> :</label>
+            <div class="col-6">
+                <select class="form-control form-control-sm" id="software_type" formControlName="software_type"
+                    [ngClass]="{'is-invalid' : formErrors.software_type}">
+                    <option [value]="''" disabled>Select</option>
+                    <option *ngFor="let swType of softwareTypesList" [value]="swType">{{swType}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.software_type">
+                    {{formErrors.software_type}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_metrics_unit" class="col-4 col-form-label-sm text-right">Metrics Unit<em>*</em> :</label>
+            <div class="col-6">
+                <input id="software_metrics_unit" class="form-control form-control-sm" type="text"
+                    placeholder="Enter Metrics Unit" formControlName="software_metrics_unit"
+                    [class.is-invalid]="formErrors.software_metrics_unit">
+                <div class="invalid-feedback" *ngIf="formErrors.software_metrics_unit">
+                    {{formErrors.software_metrics_unit}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_application" class="col-4 col-form-label-sm text-right">Applications / Services<em>*</em> :</label>
+            <div class="col-6">
+                <input id="software_application" class="form-control form-control-sm" type="text" placeholder="Enter Application"
+                    formControlName="software_application" [class.is-invalid]="formErrors.software_application">
+                <div class="invalid-feedback" *ngIf="formErrors.software_application">
+                    {{formErrors.software_application}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_rate_value" class="col-4 col-form-label-sm text-right">Rate Value<em>*</em> :</label>
+            <div class="col-6">
+                <input id="software_rate_value" class="form-control form-control-sm" type="text" placeholder="Enter Rate Value"
+                    formControlName="software_rate_value" [class.is-invalid]="formErrors.software_rate_value">
+                <div class="invalid-feedback" *ngIf="formErrors.software_rate_value">
+                    {{formErrors.software_rate_value}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_technology_type" class="col-4 col-form-label-sm text-right">Technology Type<em>*</em> :</label>
+            <div class="col-6">
+                <select class="form-control form-control-sm" id="software_technology_type" formControlName="software_technology_type"
+                    [ngClass]="{'is-invalid' : formErrors.software_technology_type}">
+                    <option [value]="''" disabled>Select</option>
+                    <option *ngFor="let techType of technologyTypesList" [value]="techType">{{techType}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.software_technology_type">
+                    {{formErrors.software_technology_type}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_rate_frequency" class="col-4 col-form-label-sm text-right">Rate Frequency<em>*</em> :</label>
+            <div class="col-6">
+                <select class="form-control form-control-sm" id="software_rate_frequency" formControlName="software_rate_frequency"
+                    [ngClass]="{'is-invalid' : formErrors.software_rate_frequency}">
+                    <option [value]="''" disabled>Select</option>
+                    <option *ngFor="let ratefreq of rateFrequenyList" [value]="ratefreq">{{ratefreq}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.software_rate_frequency">
+                    {{formErrors.software_rate_frequency}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_product_edition" class="col-4 col-form-label-sm text-right">Product Edition<em>*</em> :</label>
+            <div class="col-6">                
+                <select class="form-control form-control-sm" id="software_product_edition" formControlName="software_product_edition"
+                    [ngClass]="{'is-invalid' : formErrors.software_product_edition}">
+                    <option [value]="''" disabled>Select</option>
+                    <option *ngFor="let product of productEditionsList" [value]="product">{{product}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.software_product_edition">
+                    {{formErrors.software_product_edition}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_support_type" class="col-4 col-form-label-sm text-right">Support Type<em>*</em> :</label>
+            <div class="col-6">
+                <select class="form-control form-control-sm" id="software_support_type" formControlName="software_support_type"
+                    [ngClass]="{'is-invalid' : formErrors.software_support_type}">
+                    <option [value]="''" disabled>Select</option>
+                    <option *ngFor="let supptype of supportTypesList" [value]="supptype">{{supptype}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.software_support_type">
+                    {{formErrors.software_support_type}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="software_metrics_type" class="col-4 col-form-label-sm text-right">Metrics Type<em>*</em> :</label>
+            <div class="col-6">
+                <select class="form-control form-control-sm" id="software_metrics_type" formControlName="software_metrics_type"
+                    [ngClass]="{'is-invalid' : formErrors.software_metrics_type}">
+                    <option [value]="''" disabled>Select</option>
+                    <option *ngFor="let metric of metricsTypesList" [value]="metric">{{metric}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.software_metrics_type">
+                    {{formErrors.software_metrics_type}}</div>
+            </div>
+        </div>
+    </div>
+</form>

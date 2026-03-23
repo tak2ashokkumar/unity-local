@@ -1,0 +1,178 @@
+<div class="row">
+  <div class="col-lg-3">
+    <h4>Machine Types</h4>
+    <nvd3 options="hosts_opts" data="hosts_data"></nvd3>
+  </div>
+  <div class="col-lg-3">
+    <h4>Host Checks</h4>
+    <nvd3 options="hosts_opts" data="alerts_data"></nvd3>
+  </div>
+  <div class="col-lg-3">
+    <h4>Service Checks</h4>
+    <nvd3 options="hosts_opts" data="service_data"></nvd3>
+  </div>
+  <div class="col-lg-3">
+    <h4>Compute Spread</h4>
+    <nvd3 options="hosts_opts" data="compute_data"></nvd3>
+  </div>
+</div>
+
+<div class="row" ng-controller="NetworkingController">
+  <div class="col-lg-12" ng-if="(model && model.results.length)" ng-cloak>
+    <div class="panel panel-primary dash-panel">
+      <div class="panel-heading">
+        <strong>Network Utilization:</strong> {{ currentName }}
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-lg-8">
+            <nvd3 options="options" data="data"></nvd3>
+          </div>
+          <div class="col-lg-4">
+            <table class="table table-hover">
+              <thead>
+              <tr>
+                <th ng-repeat="row in rows">{{ row.description }}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="result in model.results"
+                  ng-click="select(result, $index)"
+                  ng-class="{'active success': result === selection.selected}">
+                <td ng-repeat="row in rows">
+                  <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+                  <div ng-if="row.opaque !== undefined">
+                    {{ row.read(result) }}
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <uib-pagination total-items="model.count" items-per-page="pageSize"
+                        ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12" ng-controller="DashboardMonitoredHostController">
+    <div class="panel panel-primary" ng-if="model.count > 0">
+      <div class="panel-heading">
+        <strong>Host Uptime</strong>
+      </div>
+      <div class="panel-body">
+
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th ng-repeat="row in rows">{{ row.description }}</th>
+            <th>State</th>
+            <th>Description</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="result in model.results"
+              ng-click="select(result, $index)"
+              ng-class="{'success': result.state === 'OK', 'danger': result.state === 'CRITICAL'}">
+            <td ng-repeat="row in rows">
+              <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+              <div ng-if="row.opaque !== undefined">
+                {{ row.read(result) }}
+              </div>
+            </td>
+            <td>
+              {{ result.last_known_state | nagios_state }}
+            </td>
+            <td>
+              {{ result.last_known_output }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <uib-pagination total-items="model.count" items-per-page="pageSize"
+                        ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-lg-6 col-md-12" ng-controller="ServerController">
+    <div class="panel panel-primary dash-panel">
+      <div class="panel-heading">
+        Servers and Hypervisors
+      </div>
+      <div class="panel-body">
+        <table class="table table-responsive table-hover">
+          <thead>
+          <tr>
+            <th class="{{ row.col_class }}" ng-repeat="row in dashboardRows">{{ row.description }}</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="result in model.results"
+              ng-click="select(result, $index)"
+              ng-class="{'active success': result === selection.selected}">
+            <td ng-repeat="row in dashboardRows">
+              <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+              <div ng-if="row.opaque === 'stringTransform'">
+                {{ row.read(result) }}
+              </div>
+              <div ng-if="row.opaque === 'link'">
+                <a href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+              </div>
+            </td>
+
+          </tr>
+          </tbody>
+        </table>
+
+        <uib-pagination total-items="model.count" items-per-page="pageSize"
+                        ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6 col-sm-12" ng-controller="VirtualMachineController">
+    <div class="panel panel-primary dash-panel">
+      <div class="panel-heading">
+        Virtual Machines
+      </div>
+      <div class="panel-body">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th ng-repeat="row in dashboardRows">{{ row.description }}</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="result in model.results"
+              ng-click="select(result, $index)"
+              ng-class="{'active success': result === selection.selected}">
+            <td ng-repeat="row in dashboardRows">
+              <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+              <div ng-if="row.opaque === 'stringTransform'">
+                {{ row.read(result) }}
+              </div>
+              <div ng-if="row.opaque === 'link'">
+                <a href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <uib-pagination total-items="model.count" items-per-page="pageSize"
+                        ng-model="model.currentPage" ng-change="pageChanged(model.currentPage)"></uib-pagination>
+
+      </div>
+    </div>
+  </div>
+</div>

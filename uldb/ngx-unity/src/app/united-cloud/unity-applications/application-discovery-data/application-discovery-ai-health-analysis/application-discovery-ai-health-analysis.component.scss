@@ -1,0 +1,64 @@
+.services-container {
+    max-height: 230px;
+    overflow-y: auto;
+}
+
+/* hide scrollbar */
+.services-container::-webkit-scrollbar {
+    width: 0;
+}
+
+.services-container {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.service-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.service-row:last-child {
+    border-bottom: none;
+}
+
+.badge {
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+
+/* background variants */
+.bg-danger-soft {
+  background-color: #fdecea;
+}
+
+.bg-warning-soft {
+  background-color: #fff4e5;
+}
+
+.bg-info-soft {
+  background-color: #e7f3ff;
+}
+
+/* soft badges */
+.bg-danger-soft {
+    background: #fdecea;
+}
+
+.bg-warning-soft {
+    background: #fff4e5;
+}
+
+.bg-success-soft {
+    background: #e6f7ef;
+}
+
+.badge {
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 6px 10px;
+}

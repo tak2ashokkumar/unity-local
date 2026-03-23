@@ -1,0 +1,43 @@
+<h3>Public IPv4 Allocations</h3>
+
+<alerts></alerts>
+
+<table class="table table-condensed table-hover">
+  <thead>
+  <tr>
+    <th ng-repeat="field in fields">{{ field.description }}</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="allocation in model.results"
+      ng-click="selection.selected = allocation; selection.index = $index"
+      ng-class="{'selected': allocation === selection.selected}">
+    <td ng-repeat="field in fields">{{ allocation[field.name] }}</td>
+    <td>
+      <button ng-if="allocation === selection.selected"
+              class="btn btn-warning btn-xs"
+              ng-click="ctrl.edit(allocation, $index)">
+        <span class="glyphicon glyphicon-pencil"></span> Edit
+      </button>
+    </td>
+    <td>
+      <button ng-if="allocation === selection.selected"
+              class="btn btn-danger btn-xs"
+              ng-click="ctrl.remove(allocation, $index)" confirm>
+        <i class="glyphicon glyphicon-erase" aria-hidden="true"></i> Delete
+      </button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+
+<div class="row">
+  <div class="col-sm-1">
+    <button class="btn btn-default" ng-click="ctrl.add()">Add</button>
+  </div>
+</div>
+
+
+

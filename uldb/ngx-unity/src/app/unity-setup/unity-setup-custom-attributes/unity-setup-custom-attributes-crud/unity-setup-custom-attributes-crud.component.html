@@ -1,0 +1,162 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card rounded-0">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <span class="font-lg font-weight-bold">{{action}} Custom Attribute</span>
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-horizontal" *ngIf="form" [formGroup]="form">
+                            <div class="form-group text-center" *ngIf="nonFieldErr">
+                                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-2 text-right">
+                                    <span class="text-muted">Name<em>*</em></span>
+                                    <span class="text-muted pl-2">:</span>
+                                </div>
+                                <div class="col-4 pl-0">
+                                    <input id="name" class="form-control form-control-sm" type="text"
+                                        placeholder="Enter Name" formControlName="name"
+                                        [ngClass]="{'is-invalid' : formErrors.name}">
+                                    <div class="invalid-feedback" *ngIf="formErrors.name">
+                                        {{formErrors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-2 text-right">
+                                    <span class="text-muted">Resource Type<em>*</em></span>
+                                    <span class="text-muted pl-2">:</span>
+                                </div>
+                                <div class="col-2 pl-0">
+                                    <select class="form-control form-control-sm" id="carrier"
+                                        formControlName="resource_type"
+                                        [ngClass]="{'is-invalid' : formErrors.resource_type}">
+                                        <option [ngValue]="''">Select Resouce Type</option>
+                                        <option *ngFor="let rs of unityDeviceTypes" [value]="rs.value">
+                                            {{rs.label}}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.resource_type">
+                                        {{formErrors.resource_type}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-2 text-right">
+                                    <span class="text-muted">Value Type<em>*</em></span>
+                                    <span class="text-muted pl-2">:</span>
+                                </div>
+                                <div class="col-2 pl-0">
+                                    <select class="form-control form-control-sm" id="value_type"
+                                        formControlName="value_type" [ngClass]="{'is-invalid' : formErrors.value_type}">
+                                        <option [ngValue]="''">Select Value Type</option>
+                                        <option value="Char">String</option>
+                                        <option value="Integer">Integer</option>
+                                        <option value="Boolean">Boolean</option>
+                                        <option value="Choice">List</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.value_type">
+                                        {{formErrors.value_type}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row"
+                                *ngIf="form.get('choice_values') && choiceValues?.controls?.length">
+                                <div class="col-2 text-right">
+                                    <span class="text-muted">Value<em>*</em></span>
+                                    <span class="text-muted pl-2">:</span>
+                                </div>
+                                <div class="col-10 px-0">
+                                    <div class="row mx-0" formArrayName="choice_values">
+                                        <ng-container
+                                            *ngFor="let ctl of choiceValues?.controls; let i = index; let l=last;">
+                                            <div class="pl-0 d-flex flex-column justify-content-between align-items-center"
+                                                [ngClass]="(i+1) % 6 ? 'col-2' : i ==0 ? 'col-2': 'col'">
+                                                <ng-container *ngIf="i == 0">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        [formControlName]="i"
+                                                        [class.is-invalid]="formErrors.choice_values[i]">
+                                                    <div class="invalid-feedback" *ngIf="formErrors.choice_values[i]">
+                                                        {{formErrors.choice_values[i]}}</div>
+                                                </ng-container>
+                                                <ng-container *ngIf="i > 0">
+                                                    <div class="input-group" [class.mt-2]="i >= 6">
+                                                        <input type="text" class="form-control form-control-sm"
+                                                            [formControlName]="i"
+                                                            [class.is-invalid]="formErrors.choice_values[i]">
+                                                        <div class="input-group-append pointer-link"
+                                                            (click)="removeValueField(i)">
+                                                            <span class="input-group-text" [class.is-invalid]="formErrors.choice_values[i]">
+                                                                <span class="far fa-trash-alt"></span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="invalid-feedback" *ngIf="formErrors.choice_values[i]">
+                                                            {{formErrors.choice_values[i]}}</div>
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                            <button class="btn btn-pill btn-warning pull-right btn-sm h-100"
+                                                [class.mt-2]="i >= 6" (click)="addValueField(i)" *ngIf="l">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback" *ngIf="formErrors.value">
+                                    {{formErrors.value}}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-2 text-right">
+                                    <span class="text-muted">Default Value</span>
+                                    <span class="text-muted pl-2">:</span>
+                                </div>
+                                <div class="col-2 pl-0">
+                                    <ng-container [ngSwitch]="form.get('value_type').value">
+                                        <ng-container *ngSwitchCase="'Choice'">
+                                            <select id="default_value" class="form-control form-control-sm"
+                                                formControlName="default_value"
+                                                [class.is-invalid]="formErrors.default_value">
+                                                <option [ngValue]="''">Select Default Value</option>
+                                                <ng-container *ngFor="let ctl of choiceValues?.controls">
+                                                    <option *ngIf="ctl.value" [value]="ctl.value">{{ctl.value}}</option>
+                                                </ng-container>
+                                            </select>
+                                        </ng-container>
+
+                                        <ng-container *ngSwitchCase="'Boolean'">
+                                            <select id="default_value" class="form-control form-control-sm"
+                                                formControlName="default_value"
+                                                [class.is-invalid]="formErrors.default_value">
+                                                <option [ngValue]="''">Select Default Value</option>
+                                                <option value="true">True</option>
+                                                <option value="false">False</option>
+                                            </select>
+                                        </ng-container>
+
+                                        <ng-container *ngSwitchDefault>
+                                            <input id="default_value" class="form-control form-control-sm" type="text"
+                                                placeholder="Enter Default Value" formControlName="default_value"
+                                                [class.is-invalid]="formErrors.default_value">
+                                        </ng-container>
+                                    </ng-container>
+                                    <div class="invalid-feedback" *ngIf="formErrors.default_value">
+                                        {{formErrors.default_value}}</div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                            <button class="btn btn-success ml-2" (click)="onSubmit()">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+<!-- <ui-breadcrumbs displayname-property="Management Console" template-url=""></ui-breadcrumbs> -->
+<style type="text/css">
+    .cg-busy {
+        top : 0px !important;
+        left : 0px !important;
+    }
+</style>
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading loader="{{loader}}"></loading>
+    <page-title title="DevOps Console"></page-title>
+    <aside id="side-wrapper" ng-scrollbars ng-scrollbars-config="scrollbarConfig" style="height: 100%;">
+        <div ng-if="!user_org_logo">
+            <img alt="United Layer" id="Image-175275" src="static/images/Unity-AI.png" 
+        style="width:100%; background-color:#ffffff; padding-top:20px; padding-bottom:10px;"/>
+        </div>
+        <div ng-if="user_org_logo" class="text-align-center" >
+            <img ng-src="data:image/png;base64,{{ user_org_logo }}" style="width:100%;"/>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div uib-accordion close-others="oneAtATime" ng-if="device && device.device_name">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">Server : </span> <span>{{device.device_name}}</span></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div uib-accordion close-others="oneAtATime" ng-if="device && device.ip_address">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">IP Address : </span> <span>{{device.ip_address}}</span></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div uib-accordion close-others="oneAtATime" ng-if="device && device.port">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">Port : </span> <span>{{device.port}} </span></div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+
+    <span id="device_error"  style="color:red"></span>
+    <div id="terminal-container" class="xterm-container"></div>
+</div>

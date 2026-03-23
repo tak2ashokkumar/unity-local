@@ -1,0 +1,356 @@
+<div class="card">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+            <span class="ml-1 font-lg">Bills</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="addOrEditBill()"
+                accessControl moduleName="UnityConnect" accessType="Manage UnityConnect" elementType="btn">
+                <span class="fas fa-plus"></span>
+                <span class="font-xs-sm mx-1">Bill</span>
+            </button>
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm text-left fold-table">
+            <thead class="bg-light">
+                <tr>
+                    <th>Bill Name</th>
+                    <th>Type</th>
+                    <th>Allowed</th>
+                    <th>Used</th>
+                    <th>Overusage</th>
+                    <th></th>
+                    <th>Estimated Cost</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let view of viewData; let i = index">
+                    <tr>
+                        <td>{{view.billName}}</td>
+                        <td>{{view.billType}}</td>
+                        <td>{{view.allowed}}</td>
+                        <td>{{view.used}}</td>
+                        <td [style.width.vw]="3">{{view.overusage}}</td>
+                        <td [style.width.vw]="10">
+                            <div class="progress" [style.height.px]="20">
+                                <div *ngIf="!view.overUsedPercentage"
+                                    class="progress-bar bg-success-500 font-weight-bold" role="progressbar"
+                                    [style.width.%]="view.usedPercentage" aria-valuenow="view.usedPercentage"
+                                    tooltip="used" container="body" aria-valuemin="0" aria-valuemax="100">
+                                    {{view.usedPercentage}}%</div>
+                                <div *ngIf="!view.overUsedPercentage"
+                                    class="progress-bar bg-success-400 font-weight-bold" role="progressbar"
+                                    [style.width.%]="view.unusedPercentage" aria-valuenow="view.unusedPercentage"
+                                    tooltip="available" container="body" aria-valuemin="0" aria-valuemax="100">
+                                    {{view.unusedPercentage}}%</div>
+                                <div *ngIf="view.overUsedPercentage" class="progress-bar bg-danger-500 font-weight-bold"
+                                    role="progressbar" [style.width.%]="view.overUsedPercentage"
+                                    aria-valuenow="view.overUsedPercentage" tooltip="over used" container="body"
+                                    aria-valuemin="0" aria-valuemax="100">{{view.overUsedPercentage}}%</div>
+                                <div *ngIf="view.overUsedPercentage" class="progress-bar bg-danger-400 font-weight-bold"
+                                    role="progressbar" [style.width.%]="100 - view.overUsedPercentage"
+                                    aria-valuenow="100 - view.overUsedPercentage" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </td>
+                        <td>${{view.estimatedBillingFee}}</td>
+                        <td class="action-icons-column">
+                            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                (click)="addOrEditBill(view)" accessControl moduleName="UnityConnect"
+                                accessType="Manage UnityConnect" elementType="actionbtn"></button>
+                            <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                (click)="deleteBill(view)" accessControl moduleName="UnityConnect"
+                                accessType="Manage UnityConnect" elementType="actionbtn"></button>
+                            <button class="action-icons mb-0 fas font-sm ml-1"
+                                [ngClass]="view.isOpen ? 'fa-caret-up' : 'fa-caret-down'"
+                                (click)="openRow(view)"></button>
+                        </td>
+                    </tr>
+                    <tr class="fold" #fold [ngClass]="{'open' : view.isOpen}">
+                        <td colspan="8">
+                            <ng-container [ngTemplateOutlet]='billingInfo'
+                                [ngTemplateOutletContext]="{view:view}"></ng-container>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No records to display</div>
+    </div>
+</div>
+
+<ng-template #billingInfo let-view="view">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card equalize-card">
+                <div class="card-header font-weight-bold py-2">
+                    Billing Information
+                    <small class="text-muted font-italic pull-right">*Actual overage fee may vary based on the
+                        contract.</small>
+                </div>
+                <div class="card-body py-2">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-0">
+                                <label>Type:&nbsp;</label>
+                                <span>{{view.billType}}</span>
+                            </p>
+                            <p class="mb-0">
+                                <label>Bill Last Calculated:&nbsp;</label>
+                                <span>{{view.billLastCalculated}}</span>
+                            </p>
+                            <p class="mb-0">
+                                <label>Ports:&nbsp;</label>
+                                <span class="btn-link"
+                                    *ngFor="let port of view.mappedPorts">{{port.mapped_name}},&nbsp;</span>
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0">
+                                <label>Billing Period:&nbsp;</label>
+                                <span>{{view.billingPeriod}}</span>
+                            </p>
+                            <p class="mb-0">
+                                <label>Estimated Billing Fee:&nbsp;</label>
+                                <span>${{view.estimatedBillingFee}}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card equalize-card bg-light">
+                                <div class="card-body pb-0">
+                                    <div class="row">
+                                        <div class="col-4 text-center">
+                                            <span
+                                                class="badge bg-success-200 text-success-500 w-100 border border-success">
+                                                <div class="text-center py-2">
+                                                    <div class="text-truncate font-sm">Allowed</div>
+                                                    <div class="card-value mt-2">{{view.allowed}}</div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <span
+                                                class="badge bg-warning-200 text-warning-500 w-100 border border-warning">
+                                                <div class="text-center py-2">
+                                                    <div class="text-truncate font-sm">Used</div>
+                                                    <div class="card-value mt-2">{{view.used}}</div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div class="col-4 text-center">
+                                            <span
+                                                class="badge bg-danger-200 text-danger-500 w-100 border border-danger">
+                                                <div class="text-center py-2">
+                                                    <div class="text-truncate font-sm">Overusage</div>
+                                                    <div class="card-value mt-2">{{view.overusage}}</div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="w-100 mt-5 pt-3" *ngIf="view.overUsedPercentage">
+                                                <div class="progress" [style.height.px]="20">
+                                                    <div class="progress-bar bg-warning-500 font-weight-bold"
+                                                        role="progressbar" [style.width.%]="100" aria-valuenow="100"
+                                                        aria-valuemin="0" aria-valuemax="100"> Used
+                                                        {{view.used}}</div>
+                                                </div>
+                                                <div class="progress" [style.height.px]="20">
+                                                    <div class="progress-bar bg-success-500 font-weight-bold"
+                                                        role="progressbar"
+                                                        [style.width.%]="(view.allowedValue/view.usedValue)*100"
+                                                        aria-valuenow="(view.allowedValue/view.usedValue)*100"
+                                                        aria-valuemin="0" aria-valuemax="100">{{view.allowed}}</div>
+                                                    <div class="progress-bar bg-danger-500 font-weight-bold"
+                                                        role="progressbar"
+                                                        [style.width.%]="100 - ((view.allowedValue/view.usedValue)*100)"
+                                                        aria-valuenow="100-((view.allowedValue/view.usedValue)*100)"
+                                                        aria-valuemin="0" aria-valuemax="100">{{view.overusage}}</div>
+                                                </div>
+                                                <div class="pt-1">
+                                                    <small>Allowed({{view.allowed}})</small>
+                                                    <small class="pull-right">Overusage({{view.overusage}})</small>
+                                                </div>
+                                            </div>
+                                            <div class="w-100 mt-5 pt-5" *ngIf="!view.overUsedPercentage">
+                                                <div class="progress" [style.height.px]="20">
+                                                    <div class="progress-bar bg-success-500 font-weight-bold"
+                                                        role="progressbar" [style.width.%]="100" aria-valuenow="100"
+                                                        aria-valuemin="0" aria-valuemax="100"> Allowed
+                                                        {{view.allowed}}</div>
+                                                </div>
+                                                <div class="progress" [style.height.px]="20">
+                                                    <div class="progress-bar bg-warning-500 font-weight-bold"
+                                                        role="progressbar" [style.width.%]="view.usedPercentage"
+                                                        aria-valuenow="view.usedPercentage" aria-valuemin="0"
+                                                        aria-valuemax="100">{{view.used}}</div>
+                                                    <div class="progress-bar bg-warning-400 text-warning-700 font-weight-bold"
+                                                        role="progressbar" [style.width.%]="view.unusedPercentage"
+                                                        aria-valuenow="view.unusedPercentage" aria-valuemin="0"
+                                                        aria-valuemax="100">{{view.unused}}</div>
+                                                </div>
+                                                <div class="pt-1">
+                                                    <small>Used({{view.used}})</small>
+                                                    <small class="pull-right">Free({{view.unused}})</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card equalize-card bg-light">
+                                <div class="card-body pb-0">
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <span
+                                                class="badge bg-primary-200 text-primary-500 w-90 border border-primary">
+                                                <div class="text-center py-2">
+                                                    <div class="text-truncate font-sm">95th Percentile</div>
+                                                    <div class="card-value mt-2">{{view.user95th}}</div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <span class="badge bg-gray-700 text-white w-90 border border-dark">
+                                                <div class="text-center py-2">
+                                                    <div class="text-truncate font-sm">Average</div>
+                                                    <div class="card-value mt-2">{{view.usedAverage}}</div>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div class="col-10 offset-1 p-0">
+                                            <div class="card mb-0 border-0 bg-light">
+                                                <div class="card-body p-0 chart-block">
+                                                    <canvas *ngIf="view.chartData" baseChart
+                                                        [chartType]="view.chartData.type"
+                                                        [labels]="view.chartData.lables"
+                                                        [datasets]="view.chartData.datasets"
+                                                        [options]="view.chartData.options"
+                                                        [plugins]="view.chartData.plugins"
+                                                        [legend]="view.chartData.legend"
+                                                        [colors]="view.chartData.colors" height="150"></canvas>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #billFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Bill
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="billFormModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="billForm" [formGroup]="billForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label">Bill Name<em>*</em></label>
+                        <input id="bill_name" class="form-control" type="text" formControlName="bill_name"
+                            [class.is-invalid]="billFormErrors.bill_name">
+                        <div class="invalid-feedback" *ngIf="billFormErrors.bill_name">{{billFormErrors.bill_name}}
+                        </div>
+                    </div>
+
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label">Ports<em>*</em></label>
+                        <multiselect-dropdown [options]="mappedPorts" [settings]="portSettings" class="form-control p-0"
+                            style="height:auto;" formControlName="mapped_ports"
+                            [ngClass]="{'is-invalid' : billFormErrors.mapped_ports}"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="billFormErrors.mapped_ports">
+                            {{billFormErrors.mapped_ports}}</div>
+                    </div>
+
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label">Bill Type<em>*</em></label>
+                        <select id="bill_type" class="form-control" formControlName="bill_type"
+                            [class.is-invalid]="billFormErrors.bill_type">
+                            <option *ngFor="let choice of billChoices" [ngValue]="choice.key"> {{choice.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="billFormErrors.bill_type">{{billFormErrors.bill_type}}
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label">Allowed Usage<em>*</em></label>
+                        <div class="row">
+                            <div class="col-8 pr-0">
+                                <input id="allowed_threshold" class="form-control" type="text"
+                                    formControlName="allowed_threshold"
+                                    [class.is-invalid]="billFormErrors.allowed_threshold">
+                                <div class="invalid-feedback" *ngIf="billFormErrors.allowed_threshold">
+                                    {{billFormErrors.allowed_threshold}}</div>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <select id="threshold_unit" class="form-control" formControlName="threshold_unit"
+                                    [class.is-invalid]="billFormErrors.threshold_unit">
+                                    <option *ngFor="let unit of billUnits" [ngValue]="unit"> {{unit}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label">Cost/MB<em>*</em></label>
+                        <input id="cost_per_mb" class="form-control" type="text" formControlName="cost_per_mb"
+                            [class.is-invalid]="billFormErrors.cost_per_mb">
+                        <div class="invalid-feedback" *ngIf="billFormErrors.cost_per_mb">{{billFormErrors.cost_per_mb}}
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Description</label>
+                        <textarea rows="3" id="description" class="form-control"
+                            formControlName="description"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmAddOrEditBill()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="billFormModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDeleteRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Bill will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

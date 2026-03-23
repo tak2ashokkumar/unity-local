@@ -1,0 +1,35 @@
+<md-card layout="column">
+  <md-card-title>
+    <md-card-title-text>
+      <span class="md-headline"><a href="#/customer-dashboard/{{ selname.id }}/">{{ selname.name }}</a></span>
+      <!--<span class="md-subhead">{{ selname.location }}</span>-->
+    </md-card-title-text>
+  </md-card-title>
+  <md-card-content layout="column">
+    <stat-bar name="'Hosts'" stats="selname.host_stats"></stat-bar>
+    <stat-bar name="'Services'" stats="selname.service_stats"></stat-bar>
+    <div class="progress-item" ng-click="redirect_cust(selname.id)" style="cursor: pointer;">
+      <div class="col-md-5 device-text progress-text">
+        Throughput
+      </div>
+      <div class="progress col-md-7 ">
+        <span>{{ selname.throughput | number: 2 }}</span>
+      </div>
+    </div>
+  </md-card-content>
+  <md-card-icon-actions layout="row" layout-align="end">
+    <md-menu>
+      <md-button aria-label="Open demo menu" class="md-icon-button" ng-click="$mdMenu.open($event)">
+        <md-icon aria-label="menu" class="material-icons">menu</md-icon>
+      </md-button>
+      <md-menu-content>
+        <md-menu-item>
+          <md-button ng-click="popCust(selname)" confirm>
+            <md-icon aria-label="menu" class="material-icons">delete_forever</md-icon>
+            Remove {{ selname.name }}
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+  </md-card-icon-actions>
+</md-card>

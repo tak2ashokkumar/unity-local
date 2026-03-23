@@ -1,0 +1,467 @@
+<style type="text/css">
+    .tabstyles {
+        padding: 0px !important;
+    }
+    
+    .deployments_pages {
+        min-height: 100vh;
+    }
+    
+    .date-wrapper {
+        width: unset;
+        box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.14);
+    }
+    
+    .date-wrapper .fa {
+        padding: 7px 0px 7px 7px;
+    }
+    
+    .daterange {
+        border-right: none;
+        min-height: auto;
+        padding: 9px 7px 5px 7px;
+    }
+    
+    .aws div {
+        color: orange;
+    }
+    
+    .azure div {
+        color: blue;
+    }
+    
+    .private_cloud div {
+        color: green;
+    }
+    
+    .paddingleft20px {
+        padding-left: 20px !important;
+    }
+    
+    .heading-color {
+        color: #313c52
+    }
+</style>
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <div>
+        <loading loader="{{loader}}"></loading>
+
+        <div class="row content-wrapper deployments_pages">
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+                <div class="col-xs-3 search-widget">
+                    <form class="navbar-form">
+                        <div class="form-group">
+                            <input class="form-control" type="text" ng-model="searchkey" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}" ng-change="getsearchoutput()">
+                            <button class="btn btn-search" type="submit" style="top: 4px;">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-xs-6 search-widget text-center">
+                    <h1 class="heading-color">Deployment Status (Recent 5)</h1>
+                </div>
+
+                <div class="col-xs-3" style="float:right">
+                    <div class="action-bar table-button">
+                        <span class="count">{{ deployments.length || 0 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-color">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <section id="no-more-tables" class="margintop20 middle-wrapper">
+                        <table cellspacing="0" width="100%" ng-if="deployments.length != 0" class="display bg-color table table-condensed cf">
+                            <thead class="cf">
+                                <tr>
+                                    <th ng-repeat="header in deployment_headers" style="white-space: nowrap;">{{ header.title }} </th>
+                                    <!-- <th ng-if="actions != undefined">Actions</th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="dpm in deployments | filter: searchKeyword" class="odd gradeX {{dpm.cloud_type}}">
+                                    <td>
+                                        <div>
+                                            {{ dpm.deployment_type}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            {{ dpm.cloud_type }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="{{dpm.cloud_type}}">{{ dpm.cloud_name }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ dpm.status }}</div>
+                                    </td>
+                                    <td class="dpm_date_width">
+                                        <div> {{ dpm.created_at | unityDate : $root.users_timezone}}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div ng-if="deployments.length === 0 || deployments == undefined" class="bg-color content-wrapper">
+                            <no-records-found message="No Records Found!"></no-records-found>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="col-xs-12 paddingtop10px">
+                <div class="row">
+                    <h2 class="heading-color">Select the deployment platform type</h2>
+                </div>
+                <div class="col-xs-12">
+                    <div class="row middle-wrapper" style="padding-right:20px;padding-top:20px;">
+                        <div class="col-xs-3 paddingleft20px">
+                            <div class="">
+                                <div class="panel panel-default" ng-click="deployEngine('SAP')">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">SAP HANA</h3>
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <img src="/static/img/saphana.png" height="100" width="150">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-3 paddingleft20px">
+                            <div class="">
+                                <div class="panel panel-default" ng-click="deployEngine('SAP')">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">MySQL</h3>
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <img src="/static/img/mysql.png" height="100" width="150">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-3 paddingleft20px">
+                            <div class="">
+                                <div class="panel panel-default" ng-click="deployEngine('SAP')">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Redis</h3>
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <img src="/static/img/redis.png" height="100" width="150">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 paddingleft20px">
+                            <div class="">
+                                <div class="panel panel-default" ng-click="deployEngine('SAP')">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Apache Kafka</h3>
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <img src="/static/img/kafka.png" height="100" width="150">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row middle-wrapper" style="padding-right:20px;padding-top:20px;">
+                        <div class="col-xs-3 paddingleft20px">
+                            <div class="">
+                                <div class="panel panel-default" ng-click="deployEngine('SAP')">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Kubernetes</h3>
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <img src="/static/img/kubernetes.png" height="100" width="150">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 paddingleft20px">
+                            <div class="">
+                                <div class="panel panel-default" ng-click="deployEngine('ORACLE')">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Oracle DB</h3>
+                                    </div>
+                                    <div class="panel-body text-center">
+                                        <img src="/static/img/oracle-db.png" height="100" width="150">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>l
+</div>
+
+<script type="text/ng-template" id="selectCloud.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="close_modal()">&times;</button>
+        <span class="modal-title">Select Cloud Type</span>
+    </div>
+    <div class="modal-form">
+        <div class="row middle-wrapper" style="padding-right:20px;padding-top:20px;">
+            <div class="col-xs-4  paddingleft20px">
+                <div class="">
+                    <div class="panel panel-default" ng-click="invokeDeploymentForm('AWS')">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">AWS</h3>
+                        </div>
+                        <div class="panel-body text-center">
+                            <img src="/static/img/aws.png" height="100" width="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-4  paddingleft20px">
+                <div class="">
+                    <div class="panel panel-default" ng-click="invokeDeploymentForm('Azure')">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Azure</h3>
+                        </div>
+                        <div class="panel-body text-center">
+                            <img src="/static/img/azure.png" height="100" width="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-4  paddingleft20px">
+                <div class="">
+                    <div class="panel panel-default" ng-click="invokeDeploymentForm('GCP')">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">GCP</h3>
+                        </div>
+                        <div class="panel-body text-center">
+                            <img src="/static/img/gcp.png" height="100" width="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row middle-wrapper" style="padding-right:20px;padding-top:20px;">
+            <div class="col-xs-4  paddingleft20px">
+                <div class="">
+                    <div class="panel panel-default" ng-click="invokeDeploymentForm('VMware')">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">VMware</h3>
+                        </div>
+                        <div class="panel-body text-center">
+                            <img src="/static/img/vmware.png" height="100" width="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-4  paddingleft20px">
+                <div class="">
+                    <div class="panel panel-default" ng-click="invokeDeploymentForm('ORACLE')">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Oracle Cloud</h3>
+                        </div>
+                        <div class="panel-body text-center">
+                            <img src="/static/img/oracle-cloud.png" height="100" width="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer modal-buttons">
+    </div>
+</script>
+
+<script type="text/ng-template" id="inputFormSAP.html">
+    <div class="modal-content">
+        <form role="form" name="userForm">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="close_modal()">&times;</button>
+                <h4 class="modal-title">SAP HANA Deployment</h4>
+            </div>
+            <div class="modal-body" id="authentication_loader" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}" style="padding:20px 40px;">
+                <div class="modal-form">
+                    <div class="form-group" ng-if="errorMsg">
+                        <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-show="disableAccess == undefined">
+                        <div class="paddingR">
+                            <div class="form-group">
+                                <label for="request.aws_account" class="col-sm-3 control-label">
+                                    AWS account
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.aws_account" ng-options="acc as acc.account_name for acc in aws_accounts" ng-change="clearSelections()" required>
+                                        <option value="">Select Account</optins>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.region" class="col-sm-3 control-label">
+                                    AWS Region
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.region" ng-options="a.region_code as a.region_name for a in regions" ng-change="loadRegionSpecificEntities(request.aws_account, request.region)" required>
+                                        <option value="">Select Region</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.aws_instance_type" class="col-sm-3 control-label">
+                                    Instance Type
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.aws_instance_type" ng-options="ins for ins in instance_types" required>
+                                        <option value="">Select Instance Type</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.ami" class="col-sm-3 control-label">
+                                    Operating System
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.ami" ng-options="img.ImageId as img.Name for img in images_list" required>
+                                        <option value="">Select OS</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.vpc" class="col-sm-3 control-label">
+                                    VPC
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.vpc" ng-options="v.VpcId as (v.VpcId + ' -- ' + v.CidrBlock) for v in vpc_list" ng-change="loadVPCEntities(request.aws_account, request.region, request.vpc)" required>
+                                        <option value="">Select VPC</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.subnet" class="col-sm-3 control-label">
+                                    Subnet
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.subnet" ng-options="s.SubnetId as (s.SubnetId + ' -- ' + s.CidrBlock) for s in subnets_list" required>
+                                        <option value="">Select Subnet</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.subnet" class="col-sm-3 control-label">
+                                    Security Groups
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.security_group" ng-options="sg.GroupId as (sg.GroupId + ' -- ' + sg.GroupName) for sg in security_group_list" required>
+                                        <option value="">Select Security Group</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.hana_sid" class="col-sm-3 control-label">
+                                    HANA SID
+                                </label>
+
+                                <div>
+                                    <input type="text" class="form-control" ng-model="request.hana_sid" placeholder="HANA SID" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.hana_password" class="col-sm-3 control-label">
+                                    HANA Password
+                                </label>
+
+                                <div>
+                                    <input type="password" class="form-control" ng-model="request.hana_password" placeholder="HANA Password" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.data_disk_size" class="col-sm-3 control-label">
+                                    Data Disk Size
+                                </label>
+
+                                <div>
+                                    <input type="number" min=0 class="form-control" ng-model="request.data_disk_size" placeholder="Data Disk Size" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.log_disk_size" class="col-sm-3 control-label">
+                                    Log Disk Size
+                                </label>
+
+                                <div>
+                                    <input type="number" min=0 class="form-control" ng-model="request.log_disk_size" placeholder="Data Disk Size" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.key_pair" class="col-sm-3 control-label">
+                                    Select AWS Key Pair
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.key_pair" ng-options="k.KeyName as k.KeyName for k in key_pair_list" required>
+                                        <option value="">Select Key Pair</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="">Attach Key Pair : </label>
+                                <button type="button" ngf-select="uploadFiles($files)" multiple ngf-max-size="20MB">Upload {{ request.key_pair.KeyName }} Key Pair</button>
+                                <span ng-if="pem_err_msg" style="color:red">{{pem_err_msg}}</span>
+                                <br>
+                            </div>
+                            <div class="form-group">
+                                
+                                <ul>
+                                    <li class="btn btn-primary attachment_btn" ng-repeat="attachment in attachments">
+                                        {{attachment.name}}
+                                        <a ng-click="remove_attachment($index,attachment)" class="times_icon">
+                                            <span>&times;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- </div> -->
+            <!-- <div class="modal-footer modal-buttons"> -->
+            <div class="modal-footer modal-buttons" ng-show="disableAccess == undefined">
+                <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+                    Close
+                </button>
+                <button type="submit" class="btn btn-default" ng-click="deploy(request)">
+                    Deploy
+                </button>
+            </div>
+            <!-- </div> -->
+        </form>
+    </div>
+</script>

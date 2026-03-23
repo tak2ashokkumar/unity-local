@@ -1,0 +1,160 @@
+<div class="row px-3 mt-3">
+    <div class="col">
+        <div class="card round-edge mb-3">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center px-2 py-1">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="">{{ budgetViewData?.name }}</span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center">
+                    <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" container="body"
+                        (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                    </button>
+                    <!-- <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn> -->
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <div class="row">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Name :
+                    </label>
+                    <div class="col-10 px-0 col-form-label">
+                        {{ budgetViewData?.name }}
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Scope :
+                    </label>
+                    <div class="col-10 px-0 col-form-label">
+                        {{ budgetViewData?.scope }}
+                    </div>
+                </div>
+                <div class="row" *ngIf="budgetViewData?.scope == 'Cloud'">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Cloud Type :
+                    </label>
+                    <div class="col-10 px-0 col-form-label">
+                        <img *ngIf="!budgetViewData.cloudIsCustom" [src]="budgetViewData.cloudImg"
+                            [alt]="budgetViewData.cloud" style="height: 25px;
+                            max-width: -webkit-fill-available;
+                            max-height: -webkit-fill-available;" />
+                        <span *ngIf="budgetViewData.cloudIsCustom"
+                            class="text-uppercase font-500 font-md text-info ml-2">{{budgetViewData?.cloud}}</span>
+                    </div>
+                </div>
+                <div class="row" *ngIf="budgetViewData?.scope == 'Cloud Account'">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Cloud Account :
+                    </label>
+                    <div class="col-10 col-form-label d-flex align-items-center px-0">
+                        <div class="border-right pr-2">
+                            <img *ngIf="!budgetViewData.cloudIsCustom" [src]="budgetViewData.cloudImg"
+                                [alt]="budgetViewData.cloud" style="height: 25px;
+                                max-width: -webkit-fill-available;
+                                max-height: -webkit-fill-available;" />
+                            <span *ngIf="budgetViewData.cloudIsCustom"
+                                class="text-uppercase font-500 font-md text-info ml-2">{{budgetViewData?.cloud}}</span>
+                        </div>
+                        <div class="px-2">
+                            {{ budgetViewData?.cloudName }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Period :
+                    </label>
+                    <div class="col-10 px-0 col-form-label">
+                        {{ budgetViewData?.period }}
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Start Date :
+                    </label>
+                    <div class="col-2 px-0 col-form-label">
+                        {{ budgetViewData?.periodSelectionStart}}
+                    </div>
+                    <label for="task_name" class="col-1 text-gray-600 col-form-label text-right px-0">End Date :
+                    </label>
+                    <div class="col-2 col-form-label">
+                        {{ budgetViewData?.periodSelectionEnd }}
+                    </div>
+
+                </div>
+                <div class="row">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Created By :
+                    </label>
+                    <div class="col-2 px-0 col-form-label">
+                        {{ budgetViewData?.createdBy?.fullName }}
+                    </div>
+                    <label for="task_name" class="col-1 text-gray-600 col-form-label text-right px-0">Created On :
+                    </label>
+                    <div class="col-2 col-form-label">
+                        {{ budgetViewData?.createdAt }}
+                    </div>
+
+                </div>
+                <div class="row">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Modified By :
+                    </label>
+                    <div class="col-2 px-0 col-form-label">
+                        {{ budgetViewData?.updatedBy?.fullName}}
+                    </div>
+                    <label for="task_name" class="col-1 text-gray-600 col-form-label text-right px-0">Modified On :
+                    </label>
+                    <div class="col-2 col-form-label">
+                        {{ budgetViewData?.updatedAt }}
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="task_name" class="col-2 text-gray-600 col-form-label text-right">Description :
+                    </label>
+                    <div class="col-10 px-0 col-form-label">
+                        {{ budgetViewData?.description }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row px-3">
+    <div class="col-5 mb-3 pr-1">
+        <div class="table-responsive card equalize-card round-edge">
+            <table class="table mb-0" style="border-collapse: separate;border-spacing: 1px;">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th>{{ budgetViewData?.invoice }}</th>
+                        <th>Budget ($)</th>
+                        <th>Actual Spent ($)</th>
+                        <th>Difference ($)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of budgetViewData?.budgetAmountDetail;" [ngClass]="view.class">
+                        <td>{{view.name}}</td>
+                        <td>{{view.amount}}</td>
+                        <td>{{view.spent}}</td>
+                        <td>{{view.difference}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center" *ngIf="!budgetViewData?.budgetAmountDetail?.length">
+                <div class="py-2 text-center text-muted align-items-center">No data available.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-7 mb-3">
+        <div class="card round-edge equalize-card p-3">
+            <div class="card-body">
+                <div class="col-12 d-flex justify-content-center">
+                    <canvas *ngIf="budgetViewData.chartData" baseChart [chartType]="budgetViewData.chartData.type"
+                        [labels]="budgetViewData.chartData.lables" [datasets]="budgetViewData.chartData.datasets"
+                        [options]="budgetViewData.chartData.options" [plugins]="budgetViewData.chartData.plugins"
+                        [legend]="budgetViewData.chartData.legend" [colors]="budgetViewData.chartData.colors"
+                        height="200">
+                    </canvas>
+                    <div class="align-items-center" *ngIf="!budgetViewData.chartData?.lables?.length">
+                        <div class="text-center text-muted">No data available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

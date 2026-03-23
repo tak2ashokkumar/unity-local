@@ -1,0 +1,59 @@
+<ui-breadcrumbs displayname-property="Terraform Web Console" template-url=""></ui-breadcrumbs>
+<aside id="side-wrapper" ng-scrollbars ng-scrollbars-config="scrollbarConfig" style="height: 100%;">
+    <img alt="United Layer" id="Image-175275" src="static/images/Unity.png" style="width:100%;" />
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div uib-accordion close-others="oneAtATime" ng-if="virtual_machine">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">VM Name : </span> <span>{{virtual_machine}}</span></div>
+                        </div>
+                    </li>
+                </ul>
+        </div>
+        <div uib-accordion close-others="oneAtATime" ng-if="ip_address">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">IP Address : </span> <span>{{ip_address}}</span></div>
+                        </div>
+                    </li>
+                </ul>
+        </div>
+        <div uib-accordion close-others="oneAtATime" ng-if="username">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">Username : </span> <span>{{username}} </span></div>
+                        </div>
+                    </li>
+                </ul>
+        </div>
+        <div uib-accordion close-others="oneAtATime" ng-if="port">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">Port : </span> <span>{{port}} </span></div>
+                        </div>
+                    </li>
+                </ul>
+        </div>
+
+        <div uib-accordion close-others="oneAtATime" ng-if="last_login">
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[0]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <div class="row"><span class="leftnav-title">Last Login : </span> <span>OCT 27th 2017 </span></div>
+                        </div>
+                    </li>
+                </ul>
+        </div>
+    </div>
+</aside>  
+<span id="vm_error"  style="color:red"></span>
+<div id="terminal-container" ng-if="!iframe" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+	<loading object="{{vm_auth}}"></loading>
+</div>
+<div id="terminal-container" ng-if="iframe" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+	<loading object="{{vm_auth}}"></loading>
+</div>

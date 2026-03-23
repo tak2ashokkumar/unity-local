@@ -1,0 +1,264 @@
+<!--Content Start-->
+
+<style type="text/css">
+    .f1 {
+        background: #fff;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        border-radius: 4px;
+    }
+
+    p {
+        margin: 0 0 10px;
+    }
+    
+    .f1-steps {
+        overflow: hidden;
+        position: relative;
+        margin-top: 20px;
+    }
+
+    .f1-progress {
+        position: absolute;
+        top: 24px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: #ddd;
+    }
+    .f1-progress-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 1px;
+        /*background: #f35b3f;*/
+    }
+
+    /* Normal Color : #646464*/
+
+    .f1-step {
+        position: relative;
+        float: left;
+        width: 25%;
+        padding: 0 5px;
+    }
+    .f1-step-icon {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        margin-top: 4px;
+        background: #ddd;
+        font-size: 20px;
+        color: #646464;
+        line-height: 40px;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        border-radius: 5px;
+        padding: 0px;
+        outline: none;
+        border : 1px solid #646464;
+    }
+    
+    .f1-step p {
+        color: #646464;
+        margin-top: 2px;
+    }
+
+    .f1-step.disabled .f1-step-icon {
+        width: 40px;
+        height: 40px;
+        margin-top: 0;
+        background: #ddd;
+        font-size: 16px;
+        color: #fff;
+        line-height: 40px;
+        outline: none;
+        border : 1px solid #ddd;
+        pointer-events : none;
+    }
+
+    .f1-step.disabled p {
+        color: #ccc;
+        pointer-events : none;
+    }
+
+    .f1-step.inprogress .f1-step-icon {
+        width: 48px;
+        height: 48px;
+        margin-top: 0;
+        background: #ff8800 !important;
+        font-size: 22px;
+        line-height: 48px;
+        color: #fff !important;
+        border : none;
+    }
+
+    .f1-step.inprogress p {
+        color: #ff8800 !important;
+    }
+
+    .f1-step.error .f1-step-icon {
+        width: 48px;
+        height: 48px;
+        margin-top: 0;
+        background: #e9533b !important;
+        font-size: 22px;
+        line-height: 48px;
+        color: #fff !important;
+        border : none;
+    }
+
+    .f1-step.error p {
+        color: #e9533b !important;
+    }
+
+    .f1-step.complete .f1-step-icon {
+        width: 48px;
+        height: 48px;
+        margin-top: 0;
+        background: #40ac40 !important;
+        font-size: 22px;
+        line-height: 48px;
+        color: #fff !important;
+        border : none;
+    }
+
+    .f1-step.complete p {
+        color: #40ac40 !important;
+    }
+
+    .f1-step.active .f1-step-icon {
+        width: 56px;
+        height: 56px;
+        margin-top: 0;
+        background: #646464;
+        font-size: 28px;
+        line-height: 56px;
+        outline: none;
+        color: #fff;
+    }
+
+    .f1-step.active p {
+        color: #646464;
+        margin-top: 10px;
+    }
+
+    .conn_req_modal {
+        width: 85% !important;
+        margin : 1% auto 0px auto !important;
+    }
+
+    .condense .form-group {
+        margin-bottom: 0px;
+    }
+
+    .condense label {
+        margin-top: 0px;
+    }
+
+    textarea {
+        resize : none;
+    }
+
+    .success_badge {
+        background-color: #40ac40;
+        padding : 20px 20px;
+        font-size: 70px;
+        border-radius: 60px;
+    }
+
+    .warning_badge {
+        background-color: #e48c11;
+        padding : 20px 20px;
+        font-size: 70px;
+        border-radius: 60px;
+    }
+
+    .error_badge {
+        background-color: #e9533b;
+        padding : 18px 25px;
+        font-size: 70px;
+        border-radius: 60px;
+    }
+
+    ol li {
+        padding: 5px;
+    }
+
+
+</style>
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 tabs-level1">
+        <div class="ui-selectee">
+            <nav class="column">
+                <ul class="nav nav-tabs">
+                    <span class="ulheading">Customer Devices Onboard</span>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row content-wrapper onboard_screen" style="font-size:18px !important;padding-top : 65px !important;">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 bg-color content-wrapper"
+        style="padding-top : 50px !important;padding-bottom : 50px !important;">
+            <loading loader="{{loader}}"></loading>
+            <form role="form" action="" method="post" class="f1 text-center">
+                <div class="f1-steps">
+                    <div class="f1-progress">
+                        <div class="f1-progress-line" data-now-value="15.65" data-number-of-steps="4" style="width: 15.65%;"></div>
+                    </div>
+                    <div class="f1-step step-1" 
+                    ng-class="{'active' : (active_step_no == 1), 'inprogress' : (user_obj.onb_status.vpn_req && !user_obj.vpn_status), 'complete' : user_obj.vpn_status}">
+                        <div class="f1-step-icon" ng-click="show_connection_page()">
+                            <i class="fa fa-envelope-o"></i>
+                            <!-- <i class="fa" ng-class="user_obj.vpn_status ? 'fa-check' : 'fa-envelope-o'"></i> -->
+                        </div>
+                        <p> Connect to Unity</p>
+                    </div>
+                    <div class="f1-step step-2" 
+                    ng-class="{'active' : (active_step_no == 2), 'error' : (user_obj.onb_status.excel_start && !user_obj.onb_status.excel_end), 'complete' : user_obj.onb_status.excel_end }">
+                        <div class="f1-step-icon" ng-click="show_add_devices_page()">
+                            <i class="fa fa-cloud-upload"></i>
+                            <!-- <i class="fa" ng-class="!user_obj.onb_status.excel_start ? fa-cloud-upload : (user_obj.onb_status.excel_end ? 'fa-check' : fa-exclamation-triangle)"></i> -->
+                        </div>
+                        <p>Onboard Devices</p>
+                    </div>
+                    <div class="f1-step step-3" 
+                    ng-class="{'active' : (active_step_no == 3), 'inprogress' : (user_obj.onb_status.monitoring_start && !user_obj.onb_status.monitoring_error && !user_obj.onb_status.monitoring_end), 'error' : (user_obj.onb_status.monitoring_error), 'complete' : user_obj.onb_status.monitoring_end, 'disabled' : (!user_obj.vpn_status) }">
+                        <div class="f1-step-icon" ng-click="show_monitoring_configure_page()">
+                            <i class="fa fa-line-chart"></i>
+                            <!-- <i class="fa" ng-class="!user_obj.onb_status.monitoring_start ? fa-line-chart : (user_obj.onb_status.monitoring_error ? 'fa-close' : (user_obj.onb_status.monitoring_end ? 'fa-check' : 'fa-exclamation-triangle'))"></i> -->
+                        </div>
+                        <p>Monitoring</p>
+                    </div>
+                    <div class="f1-step step-4" 
+                    ng-class="{'active' : (active_step_no == 4), 'error' : (user_obj.onb_status.manage_error), 'complete' : user_obj.onb_status.manage_end, 'disabled' : (!user_obj.vpn_status) }">
+                        <div class="f1-step-icon" class="btn" ng-click="show_proxy_configure_page()">
+                            <i class="fa fa-television"></i>
+                            <!-- <i class="fa" ng-class="user_obj.onb_status.manage_error ? fa-close : (user_obj.onb_status.manage_end ? 'fa-check' : 'fa-television')"></i> -->
+                        </div>
+                        <p>Management</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 bg-color content-wrapper" 
+        style="padding-top : 0px !important;">
+            <div style="margin : 20px; margin-top : 0px;margin-bottom : 0px;">
+                <h1 style="margin-left:-20px;"> Onboarding Instructions/Notes</h1>
+                <ol>
+                    <li style="padding-top : 10px;"> Above sequence shows the present status of the onboarding activity.</li>
+                    <li> The boxes are clickable to perform/continue the onboarding process.</li>
+                    <li> First action button is to create a request for connectivity establishment.</li>
+                    <li> Second action button shows the status of connectivity.</li>
+                    <li> Third option is to add/upload the devices.</li>
+                    <li> Fourth is to activate monitoring and fifth is to activate console access.</li>
+                    <li> Unitill the devices are not successfully added along with connectivity the 4th and 5th steps cannot be initiated.</li>
+                    <li> The uploading of devices requires you to download a template excel file and fill the device details as per instructions and upload it back.</li>
+                    <li> In case of errors the same excel will be returned back with error messages.</li>
+                    <li> You can rectify the errors and upload the same excel back to complete the process.</li>
+                </ol>
+            </div>
+        </div> -->
+    </div>
+</div>

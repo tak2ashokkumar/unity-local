@@ -1,0 +1,174 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="card round-edge">
+            <div class="card-header d-flex justify-content-between bg-white align-items-center py-2">
+                <div class="font-500">{{actionMessage}} Cost Model</div>
+                <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                        class="fa fa-arrow-left"></i></button>
+            </div>
+            <div class="card-body">
+                <form *ngIf="form" [formGroup]="form">
+                    <div *ngIf="nonFieldErr" class="row form-group offset-1">
+                        <div class="invalid-credentials text-left">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-2 text-right align-self-center">Name<em>* </em>:</div>
+                        <div class="col-3">
+                            <input class="form-control" type="text" placeholder="Enter Name" formControlName="plan_name"
+                                [class.is-invalid]="formErrors.plan_name">
+                            <div class="invalid-feedback" *ngIf="formErrors.plan_name">{{formErrors.plan_name}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right mt-1">Description<em>* </em>:</div>
+                        <div class="col-4">
+                            <textarea class="form-control" type="text" placeholder="Enter Description"
+                                formControlName="plan_description"
+                                [class.is-invalid]="formErrors.plan_description"></textarea>
+                            <div class="invalid-feedback" *ngIf="formErrors.plan_description">
+                                {{formErrors.plan_description}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right  align-self-center">Region<em>* </em>:</div>
+                        <div class="col-2">
+                            <multiselect-dropdown [options]="regionData" [settings]="regionSettings"
+                                [texts]="userSelectionTexts" class="form-control p-0" style="height:auto;"
+                                formControlName="regions" (dropdownClosed)="onRegionChange()"
+                                [ngClass]="{'is-invalid' : formErrors.regions}">
+                            </multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.regions">{{formErrors.regions}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right  align-self-center">Datacenters<em>* </em>:</div>
+                        <div class="col-2">
+                            <multiselect-dropdown [options]="datacenterList" [settings]="regionSettings"
+                                [texts]="userSelectionDCTexts" class="form-control p-0" style="height:auto;"
+                                formControlName="datacenters" [ngClass]="{'is-invalid' : formErrors.datacenters}">
+                            </multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.datacenters">{{formErrors.datacenters}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right  align-self-center">Plan Type<em>* </em>:</div>
+                        <div class="col-2">
+                            <select class="form-control" type="text" formControlName="plan_type"
+                                [class.is-invalid]="formErrors.plan_type">
+                                <option [value]="''" disabled>Select Cost Model</option>
+                                <option [value]="'All At One Price'">All At One Price</option>
+                                <option [value]="'CPU Only'">CPU Only</option>
+                                <option [value]="'Memory Only'">Memory Only</option>
+                                <option [value]="'Disk Only'">Disk Only</option>
+                                <option [value]="'CPU and Memory'">CPU and Memory</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.plan_type">{{formErrors.plan_type}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="planType == 'All At One Price' || planType == 'Disk Only'">
+                        <div class="col-2 text-right align-self-center">Disk Type<em>* </em>:</div>
+                        <div class="col-2">
+                            <select class="form-control" type="text" formControlName="disk_type"
+                                [class.is-invalid]="formErrors.disk_type">
+                                <option [value]="''" disabled>Select Disk</option>
+                                <option [value]="'HDD'">HDD</option>
+                                <option [value]="'SSD'">SSD</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.disk_type">{{formErrors.disk_type}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right align-self-center">Price Unit<em>* </em>:</div>
+                        <div class="col-2">
+                            <select class="form-control" type="text" formControlName="price_unit"
+                                [class.is-invalid]="formErrors.price_unit">
+                                <option [value]="''" disabled>Select Price Unit</option>
+                                <option [value]="'Minute'">Minute</option>
+                                <option [value]="'Hourly'">Hourly</option>
+                                <option [value]="'Daily'">Daily</option>
+                                <option [value]="'Monthly'">Monthly</option>
+                                <option [value]="'Yearly'">Yearly</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.price_unit">{{formErrors.price_unit}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right  align-self-center">Allocation :</div>
+                        <div class="col-3">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('price_allocation').value == 'Always'">
+                                            <input type="radio" [value]="'Always'" formControlName="price_allocation">
+                                            <span class="font-sm mr-2"
+                                                [ngClass]="form.get('price_allocation').value == 'Always' ? 'mr-3' : 'mr-2'">Always</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('price_allocation').value == 'Running Only'"
+                                            [ngClass]="form.get('price_allocation').value == 'Running Only' ? 'pl-2' : 'pl-0'">
+                                            <input type="radio" [value]="'Running Only'"
+                                                formControlName="price_allocation">
+                                            <span class="font-sm mr-2">Running Only</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-2 text-right align-self-center">Unit Cost<em>* </em>:</div>
+                        <div class="col-2">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span id="unit_cost_symbol" class="input-group-text bg-light rounded-left">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </span>
+                                </div>
+                                <input class="form-control w-60" id="unit_cost_price" type="number"
+                                    formControlName="unit_cost_price" min="0"
+                                    [class.is-invalid]="formErrors.unit_cost_price">
+                            </div>
+                            <small class="text-danger" *ngIf="formErrors.unit_cost_price">{{formErrors.unit_cost_price}}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="row form-group offset-1">
+                        <div class="text-black text-left font-500">*Note: Resource units costs are measured as
+                            follows -
+                            CPU: Per CPU, Memory: Per GB, Disk: Per GB</div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-2">
+                <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success ml-3" type="button" (click)="onSubmit()" accessControl
+                    moduleName="Cost Plan" accessType="Manage Cost Plan"
+                    elementType="actionbtn">{{actionMessage}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmUpdate>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>New updates will apply to all associated accounts from today onwards. Are you sure you want to update?
+            </div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="onEditSubmit()">Update</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

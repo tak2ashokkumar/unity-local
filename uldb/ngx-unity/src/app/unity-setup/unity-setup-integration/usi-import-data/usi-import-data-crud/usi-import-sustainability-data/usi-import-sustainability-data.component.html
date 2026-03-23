@@ -1,0 +1,18 @@
+<form class="form" [formGroup]="sustainibilityForm" *ngIf="sustainibilityForm">
+    <div class="row">
+        <div class="form-group col-12">
+            <label for="name">Cloud<em>*</em></label>
+            <select id="cloud_type" class="form-control" formControlName="cloud_type"
+                [ngClass]="{'is-invalid' : formErrors.cloud_type}">
+                <option [value]="''" disabled>Select Cloud</option>
+                <option [value]="'AWS'">AWS</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="formErrors.cloud_type">{{formErrors.cloud_type}}</div>
+        </div>
+    </div>
+</form>
+<ng-container [ngSwitch]="cloudType">
+    <ng-container *ngSwitchCase="'AWS'">
+        <usi-import-aws-data (formData)="childFormData($event)"></usi-import-aws-data>
+    </ng-container>
+</ng-container>

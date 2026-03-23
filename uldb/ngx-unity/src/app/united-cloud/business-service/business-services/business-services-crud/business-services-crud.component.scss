@@ -1,0 +1,94 @@
+.add-new-option {
+    font-weight: bold;
+    color: #378ad8;
+    background-color: #e0f7fa;
+}
+
+.section-name {
+    position: absolute;
+    top: -0.75rem;
+    left: 1rem;
+    z-index: 1;
+    padding: 0 0.5rem;
+    font-size: 1.02rem;
+}
+
+.custom-radio {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    font-weight: 500;
+    margin-right: 1rem;
+}
+
+.custom-radio input[type="radio"] {
+    display: none;
+    /* hide default radio */
+}
+
+.radio-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    margin-right: 8px;
+    position: relative;
+    display: inline-block;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.custom-radio input[type="radio"]:checked+.radio-btn {
+    background-color: #007bff;
+    /* blue background */
+    border-color: #007bff;
+}
+
+.check-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.2s ease;
+}
+
+.custom-radio input[type="radio"]:checked+.radio-btn .check-icon {
+    transform: translate(-50%, -50%) scale(1);
+    /* show tick inside */
+}
+
+::ng-deep .ng-select .ng-select-container,
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+//   min-height: calc(1.5em + 0.6rem + 2px) !important;
+//   font-size: 0.76rem;
+  font-weight: 400;
+  color: #5c6873;
+}
+
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+//   height: calc(1.5em + 0.6rem + 2px) !important;
+//   font-size: 0.76rem !important;
+  font-weight: 400;
+  color: #5c6873;
+}
+
+::ng-deep ng-select.is-invalid .ng-select-container {
+  border: 1px solid #cc0000 !important;
+}
+
+::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  color: #5c6873 !important;
+}
+
+// ::ng-deep .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+//   font-size: 0.76rem !important;
+// }
+
+// ::ng-deep .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
+//   margin-bottom: 0 !important;
+// }

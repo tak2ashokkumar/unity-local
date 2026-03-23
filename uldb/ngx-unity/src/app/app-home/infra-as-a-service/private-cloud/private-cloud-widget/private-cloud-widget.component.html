@@ -1,0 +1,130 @@
+<div class="card h-100 mb-0" [class.border-danger]="dataError" appWidgetLazyLoader (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="pcData.uuid"></app-spinner>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-12">
+        <shared-device-status [status]="pcData.status" class="align-start mr-1"
+          *ngIf="pcData.status"></shared-device-status>
+
+        <a class="d-inline-block font-lg text-dark text-decoration-none h4"
+          (click)="goTo(pcData.drillDownLink)">{{pcData.name}}
+          - <small class="text-muted font-sm">{{pcData.datacenter}}</small></a>
+
+        <span class="pull-right fas fa-exclamation-triangle text-warning font-lg" [tooltip]="dataError" container="body"
+          *ngIf="dataError"></span>
+      </div>
+    </div>
+    <div class="row mt-2" [class.disabled-widget]="dataError">
+      <div class="col-sm-5 border-right">
+        <div class="row mb-2">
+          <div class="col">
+            <span class="part-font-weight">vCPU</span>
+          </div>
+          <div class="col ml-auto mb-1 text-truncate">
+            <small class="text-muted utilization-font-size">Available: {{view.vCPUAvailable}} vCPU</small>
+          </div>
+          <div class="col-12">
+            <div class="progress progress-sm">
+              <div class="progress-bar" role="progressbar" [style.width.%]="view.vCPUUtilizationValue"
+                [ngClass]="getProgressClass(view.vCPUUtilizationValue)" aria-valuenow="view.vCPUUtilizationValue"
+                aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          <div class="col w-50 text-truncate">
+            <small class="text-muted utilization-font-size mb-0 mt-1">Configured: {{view.vCPUConfigured}} vCPU</small>
+          </div>
+          <div class="col w-50 text-truncate">
+            <small class="text-muted utilization-font-size mb-0 mt-1">Allocated: {{view.vCPUAllocated}} vCPU</small>
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col">
+            <span class="part-font-weight">RAM</span>
+          </div>
+          <div class="col ml-auto mb-1 text-truncate">
+            <small class="text-muted utilization-font-size">Available: {{view.RAMAvailableValue}}
+              {{view.RAMAvailableUnit}}</small>
+          </div>
+          <div class="col-12">
+            <div class="progress progress-sm">
+              <div class="progress-bar" role="progressbar" [style.width.%]="view.RAMUtilizationValue"
+                [ngClass]="getProgressClass(view.RAMUtilizationValue)" aria-valuenow="view.RAMUtilizationValue"
+                aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          <div class="col w-50 text-truncate">
+            <small class="text-muted utilization-font-size mb-0 mt-1">Configured: {{view.RAMConfiguredValue}}
+              {{view.RAMConfiguredUnit}}</small>
+          </div>
+          <div class="col w-50 text-truncate">
+            <small class="text-muted utilization-font-size mb-0 mt-1">Allocated: {{view.RAMAllocatedValue}}
+              {{view.RAMAllocatedUnit}}</small>
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col">
+            <span class="part-font-weight">Storage</span>
+          </div>
+          <div class="col ml-auto mb-1 text-truncate">
+            <small class="text-muted utilization-font-size">Available: {{view.diskSpaceAvailableValue}}
+              {{view.diskSpaceAvailableUnit}}</small>
+          </div>
+          <div class="col-12">
+            <div class="progress progress-sm">
+              <div class="progress-bar" role="progressbar" [style.width.%]="view.diskSpaceUtilizationValue"
+                [ngClass]="getProgressClass(view.diskSpaceUtilizationValue)"
+                aria-valuenow="view.diskSpaceUtilizationValue" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          <div class="col w-50 text-truncate">
+            <small class="text-muted utilization-font-size mb-0 mt-1">Configured: {{view.diskSpaceConfiguredValue}}
+              {{view.diskSpaceConfiguredUnit}}</small>
+          </div>
+          <div class="col w-50 text-truncate">
+            <small class="text-muted utilization-font-size mb-0 mt-1">Allocated: {{view.diskSpaceAllocatedValue}}
+              {{view.diskSpaceAllocatedUnit}}</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="row">
+          <div class="col-6 text-center">
+            <a class="d-block font-lg text-dark text-decoration-none text-value" (click)="goTo(view.vmDrilldownLink)">
+              <div class="text-value">{{view.vmCount}}</div>
+              <div class="text-muted small">Virtual Machines</div>
+            </a>
+          </div>
+          <div class="col-6 text-center">
+            <a class="d-block font-lg text-dark text-decoration-none text-value"
+              (click)="goTo(view.alertsDrilldownLink)">
+              <div class="text-value">{{view.failedAlertsCount}}</div>
+              <div class="text-muted small">Alerts</div>
+            </a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 mt-3">
+            <div style="display:flex; flex-direction:column">
+              <div style="flex-grow:1; height:100px; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="vCPUChartOptions" [data]="vCPUChartData" [colors]="vCPUChartColor"
+                  [labels]="vCPUChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="text-center"><small class="text-muted font-weight-bold">vCPU</small></div>
+          </div>
+          <div class="col-6 mt-3">
+            <div style="display:flex; flex-direction:column">
+              <div style="flex-grow:1; height:100px; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="ramChartOptions" [data]="ramChartData" [colors]="ramChartColor"
+                  [labels]="ramChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="text-center"><small class="text-muted font-weight-bold">RAM</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

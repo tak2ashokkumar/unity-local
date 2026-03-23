@@ -1,0 +1,188 @@
+<div class="row">
+  <div class="form-group col-12">
+    <input id="activate_monitoring" class="ut-checkbox" type="checkbox" (click)="monitoringFormCheck()"
+      [checked]="monitoringEnabled">
+    <label for="activate_monitoring" class="primary">Activate monitoring</label>
+  </div>
+</div>
+
+<ng-container>
+  <ng-template #templatesRef>
+    <div class="card mb-0">
+      <div class="card-header p-1">
+        <table-search-box [searchValue]="searchValue" (searched)="onSearched($event)">
+        </table-search-box>
+      </div>
+      <div class="card-body px-2 py-1" style="height:300px; overflow-y: auto;">
+        <div class="mb-1 pointer-link" *ngFor="let tmpl of filteredTemplates; let i = index"
+          (click)="selectTemplate(i)">
+          <span class="fas fa-check text-success" [style.visibility]="tmpl.isSelected ? 'visible' : 'hidden'"></span>
+          <span class="ml-2">{{tmpl.template_name}}</span>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="form" *ngIf="form && monitoringEnabled">
+    <div class="row">
+      <div class="form-group col-6">
+        <label for="ip_address" class="form-col-form-label">SNMP IP<em>*</em></label>
+        <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+          [tooltip]="'IP Address of the device on which SNMP is configured'"></i>
+        <input id="ip_address" class="form-control" formControlName="ip_address" type="text"
+          [class.is-invalid]="formErrors.ip_address">
+        <div class="invalid-feedback" *ngIf="formErrors.ip_address">
+          {{formErrors.ip_address}}</div>
+      </div>
+      <div class="form-group col-6">
+        <label for="snmp_version" class="form-col-form-label" for="snmp_version">SNMP Protocol Version<em>*</em></label>
+        <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+          [tooltip]="'Select SNMP versions V1, V2C, V3'"></i>
+        <select id="snmp_version" class="form-control" formControlName="snmp_version"
+          [ngClass]="{'is-invalid' : formErrors.snmp_version}">
+          <option [value]="''" disabled>Select</option>
+          <option [value]="SNMPVersionMapping.V1">{{SNMPVersionMapping.V1}}</option>
+          <option [value]="SNMPVersionMapping.V2C">{{SNMPVersionMapping.V2C}}</option>
+          <option [value]="SNMPVersionMapping.V3">{{SNMPVersionMapping.V3}}</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="formErrors.snmp_version">
+          {{formErrors.snmp_version}}</div>
+      </div>
+      <ng-container [ngSwitch]="form.controls.snmp_version.value">
+        <ng-container *ngSwitchCase="SNMPVersionMapping.V1">
+          <ng-container *ngTemplateOutlet="V1_V2C"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="SNMPVersionMapping.V2C">
+          <ng-container *ngTemplateOutlet="V1_V2C"></ng-container>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="SNMPVersionMapping.V3">
+          <ng-container *ngTemplateOutlet="V3"></ng-container>
+        </ng-container>
+
+        <ng-template #V1_V2C>
+          <div class="form-group col-6" *ngIf="form.controls.snmp_community">
+            <label for="snmp_community" class="form-col-form-label">SNMP String<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'SNMP string configured on the device'"></i>
+            <input id="snmp_community" class="form-control" type="text" formControlName="snmp_community"
+              [class.is-invalid]="formErrors.snmp_community">
+            <div class="invalid-feedback" *ngIf="formErrors.snmp_community">
+              {{formErrors.snmp_community}}</div>
+          </div>
+        </ng-template>
+
+        <ng-template #V3>
+          <div class="form-group col-6" *ngIf="form.controls.snmp_authlevel">
+            <label for="snmp_authlevel" class="form-col-form-label" for="snmp_authlevel">Auth Level<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'Select Auth Level noAuthNoPriv, authNoPriv, authPriv'"></i>
+            <select id="snmp_authlevel" class="form-control" formControlName="snmp_authlevel"
+              [ngClass]="{'is-invalid' : formErrors.snmp_authlevel}">
+              <option [value]="''" disabled>Select</option>
+              <option [value]="AuthLevelMapping.NoAuthNoPriv">{{AuthLevelMapping.NoAuthNoPriv}}</option>
+              <option [value]="AuthLevelMapping.AuthNoPriv">{{AuthLevelMapping.AuthNoPriv}}</option>
+              <option [value]="AuthLevelMapping.AuthPriv">{{AuthLevelMapping.AuthPriv}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="formErrors.snmp_authlevel">
+              {{formErrors.snmp_authlevel}}</div>
+          </div>
+
+          <ng-container [ngSwitch]="form.controls.snmp_authlevel.value">
+
+            <ng-container *ngSwitchCase="AuthLevelMapping.AuthNoPriv">
+              <ng-container *ngTemplateOutlet="AUTHNOPRIV"></ng-container>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="AuthLevelMapping.AuthPriv">
+              <ng-container *ngTemplateOutlet="AUTHNOPRIV"></ng-container>
+              <ng-container *ngTemplateOutlet="AUTHPRIV"></ng-container>
+            </ng-container>
+
+
+            <ng-template #AUTHNOPRIV>
+              <div class="form-group col-6" *ngIf="form.controls.snmp_authname">
+                <label for="snmp_authname" class="form-col-form-label">Auth Username<em>*</em></label>
+                <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                  [tooltip]="'Username for Authentication'"></i>
+                <input id="snmp_authname" class="form-control" type="text" formControlName="snmp_authname"
+                  [class.is-invalid]="formErrors.snmp_authname">
+                <div class="invalid-feedback" *ngIf="formErrors.snmp_authname">
+                  {{formErrors.snmp_authname}}</div>
+              </div>
+              <div class="form-group col-6" *ngIf="form.controls.snmp_authpass">
+                <label for="snmp_authpass" class="form-col-form-label">Auth Password<em>*</em></label>
+                <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                  [tooltip]="'Password for Authentication'"></i>
+                <!-- <input id="snmp_authpass" class="form-control" type="password" formControlName="snmp_authpass"
+                  [class.is-invalid]="formErrors.snmp_authpass"> -->
+                <custom-password-field formControlName="snmp_authpass"
+                  [options]="{id:'snmp_authpass', errors:formErrors.snmp_authpass, placeholder:''}"
+                  [isDisabled]="form.get('snmp_authpass').disabled"></custom-password-field>
+                <div class="invalid-feedback" *ngIf="formErrors.snmp_authpass">
+                  {{formErrors.snmp_authpass}}</div>
+              </div>
+              <div class="form-group col-6" *ngIf="form.controls.snmp_authalgo">
+                <label for="snmp_authalgo" class="form-col-form-label">Auth Algorithm<em>*</em></label>
+                <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                  [tooltip]="'Select Auth Algorithm ex:MD5,SHA'"></i>
+                <select id="snmp_authalgo" class="form-control" type="text" formControlName="snmp_authalgo"
+                  [class.is-invalid]="formErrors.snmp_authalgo">
+                  <option [value]="''" disabled>Select</option>
+                  <option [value]="auth.value" *ngFor="let auth of authAlgos">{{auth.label}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.snmp_authalgo">{{formErrors.snmp_authalgo}}</div>
+              </div>
+            </ng-template>
+
+            <ng-template #AUTHPRIV>
+              <div class="form-group col-6" *ngIf="form.controls.snmp_cryptopass">
+                <label for="snmp_cryptopass" class="form-col-form-label">Crypto Password<em>*</em></label>
+                <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                  [tooltip]="'Crypto Password for Authentication'"></i>
+                <!-- <input id="snmp_cryptopass" class="form-control" type="password" formControlName="snmp_cryptopass"
+                  [class.is-invalid]="formErrors.snmp_cryptopass"> -->
+                <custom-password-field formControlName="snmp_cryptopass"
+                  [options]="{id:'snmp_cryptopass', errors:formErrors.snmp_cryptopass, placeholder:''}"
+                  [isDisabled]="form.get('snmp_cryptopass').disabled"></custom-password-field>
+                <div class="invalid-feedback" *ngIf="formErrors.snmp_cryptopass">
+                  {{formErrors.snmp_cryptopass}}</div>
+              </div>
+              <div class="form-group col-6" *ngIf="form.controls.snmp_cryptoalgo">
+                <label for="snmp_cryptoalgo" class="form-col-form-label">Crypto Algorithm<em>*</em></label>
+                <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                  [tooltip]="'Select Crypto Algorithm ex:AES,DES'"></i>
+                <select id="snmp_cryptoalgo" class="form-control" type="text" formControlName="snmp_cryptoalgo"
+                  [class.is-invalid]="formErrors.snmp_cryptoalgo">
+                  <option [value]="''" disabled>Select</option>
+                  <option [value]="crypto.value" *ngFor="let crypto of cryptoAlgos">{{crypto.label}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.snmp_cryptoalgo">{{formErrors.snmp_cryptoalgo}}</div>
+              </div>
+            </ng-template>
+          </ng-container>
+        </ng-template>
+      </ng-container>
+
+      <div class="form-group col-12" *ngIf="isTenantOrg">
+        <label class="form-col-form-label">Templates <em>*</em></label>
+        <span class="text-danger ml-2" *ngIf="formErrors.mtp_templates">{{formErrors.mtp_templates}}
+        </span>
+        <div class="card">
+          <div class="card-body pb-5">
+            <span *ngIf="selectedTemplates.length">
+              <span *ngFor="let tmpl of selectedTemplates; let i = index;"
+                class="badge badge-pill badge-secondary font-xs py-2 mb-2 mr-2">
+                {{tmpl.template_name}}
+                <span class="fas fa-times pointer-link pl-1" (click)="unSelectTemplate(i)"></span>
+              </span>
+            </span>
+            <button class="action-icons fas fa-plus" containerClass="modalPopover" [popover]="templatesRef"
+              placement="right" container="body" [outsideClick]="true" (onHidden)="updateSelectedTemplates()"></button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</ng-container>

@@ -1,0 +1,56 @@
+<div class="card-body card-body-custom d-flex flex-column p-0">
+    <ng-container *ngIf="!onChat">
+        <div class="row mx-0 my-3">
+            <div *ngFor="let tab of tabs" class="col d-flex">
+                <button class="btn btn-pill d-flex flex-grow-1 tab-icon justify-content-center"
+                    style="white-space: nowrap;" (click)="manageTabs(tab)"
+                    [ngClass]="{'active': tab.isSelected}">{{tab.name}}</button>
+            </div>
+        </div>
+        <div class="custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top">
+            <!-- <div #messagesContainer class="messages-container d-flex flex-column justify-content-between h-100"> -->
+            <h6 class="font-lg my-3 ml-3">History</h6>
+            <ng-container *ngIf="!infiniteHistoryList?.length && !isHistoryLoading">
+                <div class="d-flex align-items-center justify-content-center p-5">
+                    <span class="ml-2 ">No history available.</span>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="!infiniteHistoryList?.length && isHistoryLoading">
+                <div class="d-flex align-items-center justify-content-center p-5">
+                    <span class="fas fa-spinner fa-spin fa-lg"></span>
+                    <span class="ml-2 ">Loading</span>
+                </div>
+            </ng-container>
+            <virtual-scroller #scroll [items]="infiniteHistoryList" (vsEnd)="fetchMoreHistory($event)"
+                class="w-100 p-2 mb-3 scroll-container" style="overflow-x: hidden; flex: 1; min-height: 0;"
+                [enableUnequalChildrenSizes]="true">
+                <div *ngFor="let history of scroll.viewPortItems; let i = index">
+                    <ng-container *ngIf="history.displayLabel">
+                        <div class="px-3 pb-1" [ngClass]="{'pt-3': i != 0}">
+                            <span class="text-muted font-weight-bold">
+                                {{ history.displayLabel }}
+                            </span>
+                        </div>
+                    </ng-container>
+                    <div class="card round-edge mb-2 mx-3">
+                        <div class="card-body px-2 py-1 default-query" style="cursor: pointer"
+                            (click)="toSelectedHistoryChat(history)">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-muted font-sm ml-2 hover-text">{{history.title}}</div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center rounded-circle angle-icon">
+                                    <i class="fas fa-angle-right font-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </virtual-scroller>
+            <!-- </div> -->
+        </div>
+    </ng-container>
+    <ng-container *ngIf="onChat">
+        <uch-chat class="h-100" [selectedHistory]="selectedHistory" (goBack)="handleBack()"></uch-chat>
+    </ng-container>
+</div>

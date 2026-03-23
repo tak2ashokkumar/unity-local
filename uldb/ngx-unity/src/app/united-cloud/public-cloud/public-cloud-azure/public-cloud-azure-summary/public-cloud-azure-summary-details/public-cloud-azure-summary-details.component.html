@@ -1,0 +1,675 @@
+<div class="row">
+    <div class="col-2 pr-0">
+        <div class="card round-edge px-1 mb-2 pointer-link custom-hover-effect"
+            [class.active]="allResource == 'Resources'" (click)="filterByResourceType()">
+            <div class="card-body py-2 my-1">
+                <div class="row">
+                    <div class="card-title mb-0">
+                        <span class="fa fa-list-ul text-primary"></span>
+                        <span class="ml-2">All Resources</span>
+                    </div>
+                    <div class="text-primary ml-auto mr-2">{{azureSummary?.totalResources}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card round-edge px-1 mb-2 pointer-link custom-hover-effect" [class.active]="view.id == resourceId"
+            *ngFor="let view of resourcesDetailViewData?.resourceCounts"
+            (click)="filterByResourceType(view.id, view.displayName)">
+            <div class="card-body py-2 my-1">
+                <div class="row">
+                    <div class="card-title mb-0 w-75 text-truncate" [tooltip]="view.displayName">
+                        <img [src]="view.iconPath" width="17" height="17" *ngIf="view.iconPath">
+                        <span class="ml-2">{{view.displayName}}</span>
+                    </div>
+                    <div class="text-primary ml-auto mr-2">{{view.resourceCount}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-10">
+        <div class="row">
+            <div class="col">
+                <div class="card round-edge mb-0">
+                    <div class="card-body py-2 my-1">
+                        <div class="card-title mb-0">Total Subscription</div>
+                        <span class="text-primary text-value">{{azureSummary?.totalAzureAccounts}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card round-edge mb-0">
+                    <div class="card-body py-2 my-1">
+                        <div class="card-title mb-0">Total Services</div>
+                        <span class="text-primary text-value">{{resourcesDetailViewData?.totalResourceTypeCount}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card round-edge mb-0">
+                    <div class="card-body py-2 my-1">
+                        <div class="card-title mb-0">Total Cost</div>
+                        <span class="text-primary text-value pointer-link" (click)="goToCost()" accessControl
+                            moduleName="Cost Analysis" accessType="View Cost Analysis"
+                            elementType="div">${{azureSummary?.totalCost}}</span>
+                        <!-- <span class="font-xs text-muted font-500 ml-1"><span
+                                [ngClass]="accountCostDetailViewData?.totalCost.iconClass"></span>{{accountCostDetailViewData?.totalCost.percentageChange}}%
+                            Since last month</span> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div
+                class="card-header bg-transparent border-bottom-1 d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex justify-content-center align-items-center">
+                    <span class="badge badge-secondary font-sm font-500">{{count}}</span>
+                    <span class="ml-1">{{selectedResourceName}}</span>
+                </div>
+                <div class="col-7 d-flex justify-content-end align-items-center">
+                    <div class="col-4" *ngIf="azureAccountViewData?.length">
+                        <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                            [options]="azureAccountViewData" [settings]="accountDetailsSettings"
+                            [texts]="accountDetailsTexts" [(ngModel)]="currentCriteria.multiValueParam.account_uuid"
+                            (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                    </div>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="createVM()"
+                        *ngIf="selectedResourceName == 'Virtual Machines'" tooltip="Add VM" accessControl
+                        moduleName="Public Cloud" accessType="Manage Public Cloud" elementType="btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="createNic()"
+                        *ngIf="selectedResourceName == 'Network Interfaces'" tooltip="Create NIC" accessControl
+                        moduleName="Public Cloud" accessType="Manage Public Cloud" elementType="btn"><i
+                            class="fas fa-plus"></i></button>
+                    <button class="btn btn-pill btn-warning btn-sm ml-2" (click)="goBack()" tooltip="Back">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                    <data-refresh-btn [page]="currentCriteria.pageNo"
+                        (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </div>
+            <div class="card-body pt-1">
+                <div class="row mt-1 mb-2">
+                    <div class="col-3">
+                        <table-search-box (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col-9">
+                        <div class="row justify-content-end mr-1">
+                            <div class="col-3">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [options]="resourceGroups" [settings]="resourceGroupSettings"
+                                    [texts]="userSelectionTexts"
+                                    [(ngModel)]="currentCriteria.multiValueParam.resource_group"
+                                    (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                            </div>
+                            <div class="col-3">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [options]="azureLocations" [settings]="locationSettings"
+                                    [texts]="userSelectionLocationTexts"
+                                    [(ngModel)]="currentCriteria.multiValueParam.region"
+                                    (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                            </div>
+                            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-sm text-left font-xs-sm font-500">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Resource Group</th>
+                            <th>Account Name</th>
+                            <th>Subscription ID</th>
+                            <th *ngIf="selectedResourceName == 'Virtual Machines'">Management Ip</th>
+                            <th>Tags</th>
+                            <th>Location</th>
+                            <th *ngIf="allowedStatsResources.includes(selectedResourceName)" class="text-center"> Actions</th>                              
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData" truncateText>
+                            <td class="text-primary pointer-link tdw-10">
+                                <div class="text-truncate" (click)="goToResource(view)" [tooltip]="view.name">
+                                    {{view.name}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div class="text-truncate" [tooltip]="view.resourceType">{{view.resourceType}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div class="text-truncate" [tooltip]="view.resourceGroup">{{view.resourceGroup}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div class="text-truncate">{{view.accountName}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div class="text-truncate" [tooltip]="view.subscriptionId">{{view.subscriptionId}}</div>
+                            </td>
+                            <td *ngIf="selectedResourceName == 'Virtual Machines'" class="tdw-10">
+                                <div class="text-truncate">{{view.managementIp}}</div>
+                            </td>
+                            <td class="tdw-20">
+                                <div>
+                                    <span *ngFor="let item of view.tags | keyvalue" class="text-truncate"
+                                        [tooltip]="item.key + ': ' + item.value">
+                                        {{item.key}}: {{item.value}}<br>
+                                    </span>
+                                    <span *ngIf="!view.tags">N/A</span>
+                                </div>
+                            </td>
+                            <td class="tdw-10">
+                                <div [tooltip]="view.location" class="text-truncate">{{view.location}}</div>
+                            </td>
+                            <td class="action-icons-column text-right text-truncate p-1 tdw-10" *ngIf="allowedStatsResources.includes(selectedResourceName)">
+                                <button *ngIf="selectedResourceName == 'Virtual Machines'"
+                                    class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
+                                    [ngClass]="{'action-icons-on':view.powerStatusOn, 'action-icons-disabled':!view.isPowerIconEnabled}"
+                                    [tooltip]="view.powerTooltipMessage" (click)="powerToggle(view)" accessControl
+                                    moduleName="Public Cloud" accessType="Manage Public Cloud" elementType="actionbtn">
+                                </button>
+
+                                <!-- <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
+                                [tooltip]="view.sameTabTootipMessage"
+                                [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
+                                (click)="consoleSameTab(view)"></button>
+
+                            <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
+                                [tooltip]="view.newTabToolipMessage"
+                                [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}"
+                                (click)="consoleNewTab(view)"></button> -->
+
+                                <button *ngIf="allowedStatsResources.includes(selectedResourceName)"
+                                    class="action-icons mb-0 font-sm ml-1" [ngClass]="{'action-icons-disabled': (selectedResourceName !== 'Virtual Machines') && !view.isStatsEnabled}" (click)="(selectedResourceName !== 'Virtual Machines' && !view.isStatsEnabled) ? null : goToStats(view)" [tooltip]="view.isStatsEnabled ? view.statsTooltipMessage : ''" container="body" accessControl moduleName="Monitoring" accessType="View Monitoring" elementType="actionbtn">
+                                    <i class="fas fa-chart-line"></i>
+                                </button>
+
+
+                                <span *ngIf="selectedResourceName == 'Virtual Machines'" dropdown
+                                    placement="bottom right" container="body">
+                                    <button *ngIf="selectedResourceName == 'Virtual Machines'" id="button-container"
+                                        dropdownToggle type="button"
+                                        class="action-icons mb-1 mt-1 fa fa-ellipsis-h font-sm ml-1"
+                                        data-toggle="dropdown" aria-controls="icons-dropdown-container" (click)="false"
+                                        [tooltip]="'More Actions'"></button>
+                                    <div id="icons-dropdown-container"
+                                        class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                                        aria-labelledby="button-container">
+                                        <button *ngIf="selectedResourceName == 'Virtual Machines'"
+                                            class="action-icons my-1 fas fa-external-link-square-alt font-sm ml-1"
+                                            [tooltip]="view.sameTabTootipMessage" container="body"
+                                            [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
+                                            (click)="consoleSameTab(view)" accessControl moduleName="Public Cloud"
+                                            accessType="Remote Management" elementType="actionbtn"></button>
+                                        <button *ngIf="selectedResourceName == 'Virtual Machines'"
+                                            class="action-icons mb-1 fas fa-external-link-alt font-sm ml-1"
+                                            [tooltip]="view.newTabToolipMessage" container="body"
+                                            [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}"
+                                            (click)="consoleNewTab(view)" accessControl moduleName="Public Cloud"
+                                            accessType="Remote Management" elementType="actionbtn">
+                                        </button>
+                                        <button *ngIf="selectedResourceName == 'Virtual Machines'"
+                                            class="action-icons mb-1 fas fa-pencil-alt font-sm ml-1"
+                                            tooltip="Update Tags" container="body" (click)="manageTags(view)"
+                                            accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                            elementType="actionbtn">
+                                        </button>
+                                        <button *ngIf="selectedResourceName == 'Virtual Machines'"
+                                            class="action-icons mb-1 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                            container="body" (click)="deleteVM(view)" accessControl
+                                            moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                            elementType="actionbtn">
+                                        </button>
+                                    </div>
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!viewData.length">No Resources available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #switchAzureVmPowerRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{confirmTitle}} Power Toggle
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="switchAzureVmPowerModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="vmActionForm" [formGroup]="vmActionForm">
+                <div class="form-group">
+                    <label class="form-col-form-label" for="username">Username<em>* </em></label>
+                    <input id="username" class="form-control" type="text" formControlName="username"
+                        [class.is-invalid]="vmActionFormErrors.username">
+                    <div class="invalid-feedback" *ngIf="vmActionFormErrors.username">
+                        {{vmActionFormErrors.username}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="password">Password<em>* </em></label>
+                    <input id="password" class="form-control" type="password" formControlName="password"
+                        [class.is-invalid]="vmActionFormErrors.password">
+                    <div class="invalid-feedback" *ngIf="vmActionFormErrors.password">
+                        {{vmActionFormErrors.password}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmToggle()">Confirm</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="switchAzureVmPowerModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #deleteAzureVm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteVmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="vmActionForm" [formGroup]="vmActionForm">
+                <div class="form-group">
+                    <label class="form-col-form-label" for="username">Username<em>* </em></label>
+                    <input id="username" class="form-control" type="text" formControlName="username"
+                        [class.is-invalid]="vmActionFormErrors.username">
+                    <div class="invalid-feedback" *ngIf="vmActionFormErrors.username">
+                        {{vmActionFormErrors.username}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="password">Password<em>* </em></label>
+                    <input id="password" class="form-control" type="password" formControlName="password"
+                        [class.is-invalid]="vmActionFormErrors.password">
+                    <div class="invalid-feedback" *ngIf="vmActionFormErrors.password">
+                        {{vmActionFormErrors.password}}</div>
+                </div>
+            </form>
+            <!-- This Virtual Machine will be deleted. Are you sure you want to delete? -->
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmVMDelete()">Delete</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteVmModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{confirmInput?.confirmTitle}}
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {{confirmInput?.confirmMessage}}
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmToggle()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #createAzureVm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add Virtual Machine
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="createVmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="createVMForm" [formGroup]="createVMForm">
+                <div class="form-group">
+                    <label class="form-col-form-label" for="account_uuid">Account Name<em>*</em></label>
+                    <select id="account_uuid" class="form-control" formControlName="account_uuid"
+                        [class.is-invalid]="createVMFormErrors.account_uuid">
+                        <option value="" disabled> Select Account Name</option>
+                        <option *ngFor="let view of azureAccountViewData" [ngValue]="view.uuid">{{view.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.account_uuid">
+                        {{createVMFormErrors.account_uuid}}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-col-form-label" for="resource_group">Resource Group<em>*</em></label>
+                    <select id="resource_group" class="form-control" formControlName="resource_group"
+                        [class.is-invalid]="createVMFormErrors.resource_group">
+                        <option [value]="" disabled> Select Resource Group</option>
+                        <option *ngFor="let view of vmCreationResourceGroups" [ngValue]="view">
+                            {{view}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.resource_group">
+                        {{createVMFormErrors.resource_group}}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-col-form-label" for="name">VM Name<em>* </em></label>
+                    <input id="name" class="form-control" type="text" formControlName="name"
+                        [class.is-invalid]="createVMFormErrors.name">
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.name">{{createVMFormErrors.name}}</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-col-form-label" for="username">VM login User<em>* </em></label>
+                    <input id="username" class="form-control" type="text" formControlName="username"
+                        [class.is-invalid]="createVMFormErrors.username">
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.username">
+                        {{createVMFormErrors.username}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="password">Password<em>* </em></label>
+                    <input id="password" class="form-control" type="password" formControlName="password"
+                        [class.is-invalid]="createVMFormErrors.password">
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.password">
+                        {{createVMFormErrors.password}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="location">Location<em>* </em></label>
+                    <select id="location" class="form-control" formControlName="location"
+                        [class.is-invalid]="createVMFormErrors.location">
+                        <option value="" disabled> Select Location</option>
+                        <option *ngFor="let location of azureLocations" [ngValue]="location">{{location.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.location">
+                        {{createVMFormErrors.location}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="os_type">
+                        <span>OS Image<em>*</em></span>
+                        <i class="ml-2 fa fa-spinner fa-spin" *ngIf="loadingOS"></i>
+                    </label>
+                    <select id="os_type" class="form-control" formControlName="os_type"
+                        [class.is-invalid]="createVMFormErrors.os_type">
+                        <option value="" disabled> Select OS Type</option>
+                        <option *ngFor="let type of OSTypes" [ngValue]="type">{{type.sku}}-{{type.version}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.os_type">{{createVMFormErrors.os_type}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="nic">NIC<em>* </em></label>
+                    <select id="nic" class="form-control" formControlName="nic"
+                        [class.is-invalid]="createVMFormErrors.nic">
+                        <option [value]="" disabled> Select NIC</option>
+                        <option *ngFor="let nic of filteredNics" [value]="nic.name">{{nic.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.nic">{{createVMFormErrors.nic}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="storage_account">Storage Account<em>* </em></label>
+                    <select id="storage_account" class="form-control" formControlName="storage_account"
+                        [class.is-invalid]="createVMFormErrors.storage_account">
+                        <option [value]="" disabled> Select Storage Account</option>
+                        <option *ngFor="let account of filteredStorageAccounts" [value]="account.name">
+                            {{account.name + ' (' + account.kind + ')'}} </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.storage_account">
+                        {{createVMFormErrors.storage_account}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="availability_set">Availability Set</label>
+                    <select id="availability_set" class="form-control" formControlName="availability_set"
+                        [class.is-invalid]="createVMFormErrors.availability_set">
+                        <option [value]="" disabled> Select Availability Set</option>
+                        <option *ngFor="let set of filteredAvailablitySets" [value]="set.id">{{set.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createVMFormErrors.availability_set">
+                        {{createVMFormErrors.availability_set}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="tags">Tags</label>
+                    <div *ngFor="let tag of tags | keyvalue">
+                        <div class="row">
+                            <div class="form-group col-5">
+                                <input type="text" [value]="tag.key" class="form-control" placeholder="Key" readonly />
+                            </div>
+                            <div class="form-group col-5">
+                                <input type="text" [value]="tag.value" class="form-control" placeholder="Value"
+                                    readonly />
+                            </div>
+                            <div class="form-group col-2">
+                                <button class="btn btn-sm btn-danger" type="button" (click)="removeTag(tag.key)"><i
+                                        class="fas fa-trash-alt font-sm"></i></button>
+                                <button class="ml-2 btn btn-sm btn-success" type="button" (click)="editTag(tag.key)"><i
+                                        class="fas fa-pencil-alt font-sm"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <form [formGroup]="tagForm" *ngIf="tagForm">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="form-group col-5">
+                            <input type="text" class="form-control" placeholder="Key" formControlName="key"
+                                [class.is-invalid]="tagFormErrors.key" />
+                            <div class="invalid-feedback" *ngIf="tagFormErrors.key">
+                                Tag key is required</div>
+                        </div>
+                        <div class="form-group col-5">
+                            <input type="text" class="form-control" placeholder="Value" formControlName="value"
+                                [class.is-invalid]="tagFormErrors.value" />
+                            <div class="invalid-feedback" *ngIf="tagFormErrors.value">
+                                Tag value is required</div>
+                        </div>
+                        <div class="form-group col-2">
+                            <button class="ml-2 btn btn-sm btn-success" type="button" (click)="addTag()"><i
+                                    class="fas fa-plus font-sm"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmVMCreate()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="createVmModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tagsRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Tags
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="tagsModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form class="row mx-0" *ngIf="vmActionForm" [formGroup]="vmActionForm">
+                <div class="col-6 form-group mb-0">
+                    <label class="form-col-form-label" for="username">Username<em>* </em></label>
+                    <input id="username" class="form-control" type="text" formControlName="username"
+                        [class.is-invalid]="vmActionFormErrors.username">
+                    <div class="invalid-feedback" *ngIf="vmActionFormErrors.username">
+                        {{vmActionFormErrors.username}}</div>
+                </div>
+                <div class="col-6 form-group mb-0">
+                    <label class="form-col-form-label" for="password">Password<em>* </em></label>
+                    <input id="password" class="form-control" type="password" formControlName="password"
+                        [class.is-invalid]="vmActionFormErrors.password">
+                    <div class="invalid-feedback" *ngIf="vmActionFormErrors.password">
+                        {{vmActionFormErrors.password}}</div>
+                </div>
+            </form>
+            <hr>
+            <form [formGroup]="tagForm" *ngIf="tagForm">
+                <div class="form-group mb-0">
+                    <div *ngFor="let tag of tags | keyvalue">
+                        <div class="row mx-0">
+                            <div class="col-5 form-group">
+                                <input type="text" [value]="tag.key" class="form-control" placeholder="Key" readonly />
+                            </div>
+                            <div class="col-5 form-group">
+                                <input type="text" [value]="tag.value" class="form-control" placeholder="Value"
+                                    readonly />
+                            </div>
+                            <div class="col-2 form-group">
+                                <button class="btn btn-sm btn-danger mt-1" type="button" (click)="removeTag(tag.key)"><i
+                                        class="fas fa-trash-alt font-sm"></i></button>
+                                <button class="ml-2 btn btn-sm btn-success mt-1" type="button"
+                                    (click)="editTag(tag.key)"><i class="fas fa-pencil-alt font-sm"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="tags">Add a new tag</label>
+                    <div class="row mx-0">
+                        <div class="form-group col-5">
+                            <input type="text" class="form-control" placeholder="Key" formControlName="key"
+                                [class.is-invalid]="tagFormErrors.key" />
+                            <div class="invalid-feedback" *ngIf="tagFormErrors.key">
+                                Tag key is required</div>
+                        </div>
+                        <div class="form-group col-5">
+                            <input type="text" class="form-control" placeholder="Value" formControlName="value"
+                                [class.is-invalid]="tagFormErrors.value" />
+                            <div class="invalid-feedback" *ngIf="tagFormErrors.value">
+                                Tag value is required</div>
+                        </div>
+                        <div class="form-group col-2">
+                            <button class="ml-2 btn btn-sm btn-success mt-1" type="button" (click)="addTag()">
+                                <i class="fas fa-plus font-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmVMTagsUpdate()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="tagsModalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #createnic>
+    <div class="card mb-0">
+        <div class="card-header">
+            Create NIC
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="createNICModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="createNICForm" [formGroup]="createNICForm">
+                <div class="form-group">
+                    <label class="form-col-form-label" for="account_uuid">Account Name<em>*</em></label>
+                    <select id="account_uuid" class="form-control" formControlName="account_uuid"
+                        [class.is-invalid]="createNICFormErrors.account_uuid">
+                        <option value="" disabled> Select Account Name</option>
+                        <option *ngFor="let view of azureAccountViewData" [ngValue]="view.uuid">{{view.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createNICFormErrors.account_uuid">
+                        {{createNICFormErrors.account_uuid}}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-col-form-label" for="resource_group">Resource Group<em>*</em></label>
+                    <select id="resource_group" class="form-control" formControlName="resource_group"
+                        [class.is-invalid]="createNICFormErrors.resource_group">
+                        <option value="" disabled> Select Resource Group</option>
+                        <option *ngFor="let rg of vmCreationResourceGroups" [ngValue]="rg">
+                            {{rg}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createNICFormErrors.resource_group">
+                        {{createNICFormErrors.resource_group}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="name">Nic Name<em>* </em></label>
+                    <input id="name" class="form-control" type="text" formControlName="name"
+                        [class.is-invalid]="createNICFormErrors.name">
+                    <div class="invalid-feedback" *ngIf="createNICFormErrors.name">{{createNICFormErrors.name}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="vnet">Virtual Network<em>* </em></label>
+                    <select id="vnet" class="form-control" formControlName="vnet"
+                        [class.is-invalid]="createNICFormErrors.vnet">
+                        <option value="" disabled> Select Virtual Networks</option>
+                        <option *ngFor="let vnet of virtualNetworks" [ngValue]="vnet">{{vnet.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createNICFormErrors.vnet">{{createNICFormErrors.vnet}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="subnet">Subnet<em>* </em></label>
+                    <select id="subnet" class="form-control" formControlName="subnet"
+                        [class.is-invalid]="createNICFormErrors.subnet">
+                        <option value="" disabled> Select Virtual Networks</option>
+                        <option *ngFor="let subnet of virtualNetworkSubnets" [ngValue]="subnet">{{subnet.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createNICFormErrors.subnet">{{createNICFormErrors.subnet}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="username">Username<em>* </em></label>
+                    <input id="username" class="form-control" type="text" formControlName="username"
+                        [class.is-invalid]="createNICFormErrors.username">
+                    <div class="invalid-feedback" *ngIf="createNICFormErrors.username">
+                        {{createNICFormErrors.username}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="password">Password<em>* </em></label>
+                    <input id="password" class="form-control" type="password" formControlName="password"
+                        [class.is-invalid]="createNICFormErrors.password">
+                    <div class="invalid-feedback" *ngIf="createNICFormErrors.password">
+                        {{createNICFormErrors.password}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmNICCreate()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="createNICModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

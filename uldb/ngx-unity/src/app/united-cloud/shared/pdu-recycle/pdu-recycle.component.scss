@@ -1,0 +1,42 @@
+h5.divider {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+h5.divider:before,
+h5.divider:after {
+  content: "";
+  flex: 0 1 100%;
+  border-bottom: 5px dotted #ccc;
+  margin: 0 1rem;
+}
+
+hr {
+  border: none;
+  border-top: 5px dotted #ccc;
+  // color: #fff;
+}
+
+.divider:before {
+  margin-left: 0;
+}
+
+.divider:after {
+  margin-right: 0;
+}
+
+.divider[text-position="right"]:after,
+.divider[text-position="left"]:before {
+  content: none;
+}
+
+div.allSockets {
+  margin-bottom: 0rem;
+}
+
+div.socketList {
+  columns: 4;
+  -webkit-columns: 4;
+  -moz-columns: 4;
+}

@@ -1,0 +1,165 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card rounded-0">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center font-500">
+                            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+                            <span class="ml-1 font-lg">Custom Attributes</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button class="btn btn-pill btn-sm btn-warning font-500" type="button" accessControl
+                                moduleName="Custom Attributes" accessType="Manage Custom Attributes" elementType="btn"
+                                (click)="add()">
+                                <span class="fas fa-plus"></span>
+                                <span class="font-xs-sm mx-1">Attribute</span>
+                            </button>
+                            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                            <div class="w-15">
+                                <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"
+                                    [customClass]="'form-control-sm'"></search-box>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center w-40">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [options]="valueTypes" [settings]="valueTypeSettings" [texts]="valueTypeTexts"
+                                    (dropdownClosed)="onFilterChange()"
+                                    [(ngModel)]="currentCriteria.multiValueParam.value_type"></multiselect-dropdown>
+
+                                <multiselect-dropdown class="form-control p-0 ml-2" style="height:auto;"
+                                    [options]="resourceTypes" [settings]="resourceTypeSettings"
+                                    [texts]="resourceTypeTexts" (dropdownClosed)="onFilterChange()"
+                                    [(ngModel)]="currentCriteria.multiValueParam.resource_type"></multiselect-dropdown>
+
+                                <table-page-size class="w-50 ml-2" [currentPageSize]="currentCriteria.pageSize"
+                                    [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                        <table class="table table-sm text-left">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Resource Type</th>
+                                    <th>Value Type</th>
+                                    <th>Default Value</th>
+                                    <th>Modified By</th>
+                                    <th>Modified On</th>
+                                    <th>Created By</th>
+                                    <th>Created On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData; let i = index;" truncateText>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.name">{{view.name}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.resourceType">{{view.resourceType}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.valueType">{{view.valueType}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <form *ngIf="view.valueForm" [formGroup]="view.valueForm">
+                                            <ng-container [ngSwitch]="view.valueType">
+                                                <ng-container *ngSwitchCase="'Choice'">
+                                                    <select id="default_value" class="form-control form-control-sm"
+                                                        formControlName="default_value"
+                                                        (change)="onChangeValue($event, i)" accessControl
+                                                        moduleName="Custom Attributes"
+                                                        accessType="Manage Custom Attributes" elementType="formelem">
+                                                        <option [ngValue]="''">Select Value</option>
+                                                        <ng-container *ngFor="let choice of view?.choiceValues">
+                                                            <option *ngIf="choice" [value]="choice">{{choice}}</option>
+                                                        </ng-container>
+                                                    </select>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'Boolean'">
+                                                    <select id="default_value" class="form-control form-control-sm"
+                                                        formControlName="default_value"
+                                                        (change)="onChangeValue($event, i)" accessControl
+                                                        moduleName="Custom Attributes"
+                                                        accessType="Manage Custom Attributes" elementType="formelem">
+                                                        <option [value]="''">Select Value</option>
+                                                        <option value="true">True</option>
+                                                        <option value="false">False</option>
+                                                    </select>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchDefault>
+                                                    <input id="default_value" class="form-control form-control-sm"
+                                                        type="text" placeholder="Enter Value"
+                                                        formControlName="default_value" accessControl
+                                                        moduleName="Custom Attributes"
+                                                        accessType="Manage Custom Attributes" elementType="formelem"
+                                                        [class.is-invalid]="view.valueForm.get('default_value').invalid"
+                                                        (change)="onChangeValue($event, i)">
+                                                </ng-container>
+                                            </ng-container>
+                                        </form>
+                                        <span class="fa fa-spinner fa-spin" *ngIf="!view.valueForm"></span>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.updatedBy">{{view.updatedBy}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.updatedAt">{{view.updatedAt}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.createdBy">{{view.createdBy}}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.createdAt">{{view.createdAt}}</div>
+                                    </td>
+                                    <td class="action-icons-column">
+                                        <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                            (click)="edit(view)" accessControl moduleName="Custom Attributes"
+                                            accessType="Manage Custom Attributes" elementType="actionbtn">
+                                        </button>
+                                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                            (click)="deleteAttribute(view)" accessControl moduleName="Custom Attributes"
+                                            accessType="Manage Custom Attributes" elementType="actionbtn">
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No attributes available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Attribute will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

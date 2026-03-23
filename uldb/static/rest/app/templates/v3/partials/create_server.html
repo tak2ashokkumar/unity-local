@@ -1,0 +1,32 @@
+<form class="form-horizontal">
+    <div class="form-group" ng-repeat="row in rowsvmtenant" ng-if="row.required">
+        <span ng-if= "row.type != 'hidden'">
+            <label for="blockName" class="col-sm-3 control-label">
+                {{ row.description }}*
+            </label>
+            <div class="col-sm-9" ng-if=" row.type != 'select' ">
+                <input type="text" class="form-control" maxlength="128" ng-model="obj[row.name]">
+            </div>
+            <div class="col-sm-9" ng-if=" row.type == 'select' && row.name == 'flavor_id' ">
+                <img src="/static/img/v3/loading_gif_small.gif" ng-if="!obj.new_flist">
+                <span ng-if="obj.new_flist">
+                    <select ng-options="option.id as option.name for option in obj.new_flist" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- select {{ row.description | lowercase }} --</option>
+                    </select>
+                </span>
+            </div>
+            <div class="col-sm-9" ng-if=" row.type == 'select' && row.name == 'image_id' ">
+                <img src="/static/img/v3/loading_gif_small.gif" ng-if="!obj.new_image_list">
+                <span ng-if="obj.new_image_list">
+                    <select ng-options="option.image_id as option.name for option in obj.new_image_list" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- select {{ row.description | lowercase }} --</option>
+                    </select>
+                </span>
+            </div>
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+            </div>
+
+        </span>
+    </div>
+</form>

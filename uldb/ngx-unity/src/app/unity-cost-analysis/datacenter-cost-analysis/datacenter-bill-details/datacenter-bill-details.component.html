@@ -1,0 +1,199 @@
+<div *ngIf="datacenters.length">
+  <div class="card mb-2 border-bottom-0">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-4 text-center">
+          <form>
+            <select class="custom-select mr-sm-2 py-0" [ngModel]="dcId" (ngModelChange)="getDCBill($event)" name="dcSelection">
+              <option [ngValue]="dc.dc_uuid" *ngFor="let dc of datacenters">{{dc.name}}</option>
+            </select>
+          </form>
+          <div class="card my-0 border-0">
+            <div class="card-body px-0">
+              <span class="badge badge-success text-white w-100">
+                <div class="text-center py-4">
+                  <div *ngIf="!view.billData" class="text-value"><i class="fa fa-spinner fa-spin"></i></div>
+                  <div *ngIf="view.billData" class="text-value">${{view.billData.currentMonthCost}}</div>
+                  <div class="text-muted mt-2">Total Current month cost</div>
+                </div>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-7">
+          <div class="card equalize-card border-0">
+            <div class="card-body px-1 py-0">
+              <div class="row">
+                <div class="col-4 text-center pl-0">
+                  <span class="badge badge-light w-100">
+                    <div class="text-center py-2">
+                      <div *ngIf="!view.billData" class="text-value"><i class="fa fa-spinner fa-spin"></i></div>
+                      <div *ngIf="view.billData" class="text-value">{{view.billData.numberOfCabinets}}</div>
+                      <div class="text-muted my-2">Number of Cabinets</div>
+                    </div>
+                  </span>
+                </div>
+                <div class="col-4 text-center pl-0">
+                  <span class="badge badge-light w-100">
+                    <div class="text-center py-2">
+                      <div *ngIf="!view.billData" class="text-value"><i class="fa fa-spinner fa-spin"></i></div>
+                      <div *ngIf="view.billData" class="text-value">{{view.billData.billedCabinetCount}}</div>
+                      <div class="text-muted my-2">Cabinets Billed</div>
+                    </div>
+                  </span>
+                </div>
+                <div class="col-4 text-center pl-0">
+                  <span class="badge badge-light w-100">
+                    <div class="text-center py-2">
+                      <div *ngIf="!view.billData" class="text-value"><i class="fa fa-spinner fa-spin"></i></div>
+                      <div *ngIf="view.billData" class="text-value">${{view.billData.cabinetCost}}</div>
+                      <div class="text-muted my-2 text-truncate">Cabinet Cost</div>
+                    </div>
+                  </span>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-4 text-center pl-0">
+                  <span class="badge badge-light w-100">
+                    <div class="text-center py-2">
+                      <div *ngIf="!view.billData" class="text-value"><i class="fa fa-spinner fa-spin"></i></div>
+                      <div *ngIf="view.billData" class="text-value">{{view.billData.numberOfPdus}}</div>
+                      <div class="text-muted my-2 text-truncate">Number of PDUs</div>
+                    </div>
+                  </span>
+                </div>
+                <div class="col-4 text-center pl-0">
+                  <span class="badge badge-light w-100">
+                    <div class="text-center py-2">
+                      <div *ngIf="!view.billData" class="text-value"><i class="fa fa-spinner fa-spin"></i></div>
+                      <div *ngIf="view.billData" class="text-value">{{view.billData.billedPduCount}}</div>
+                      <div class="text-muted my-2 text-truncate">PDUs Billed</div>
+                    </div>
+                  </span>
+                </div>
+                <div class="col-4 text-center pl-0">
+                  <span class="badge badge-light w-100">
+                    <div class="text-center py-2">
+                      <div *ngIf="!view.billData" class="text-value"><i class="fa fa-spinner fa-spin"></i></div>
+                      <div *ngIf="view.billData" class="text-value">${{view.billData.pdusCost}}</div>
+                      <div class="text-muted my-2 text-truncate">PDUs Cost</div>
+                    </div>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-1">
+          <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card cabinet-list mb-2 border-top-0 border-bottom-0">
+    <app-spinner [name]="'cabinet-list'"></app-spinner>
+    <div class="card-body p-0">
+      <table class="table text-left">
+        <thead>
+          <tr>
+            <th>Cabinet Name</th>
+            <th>Contract Start Date</th>
+            <th>Contract End Date</th>
+            <th>Renewal</th>
+            <th>Annual Escalation</th>
+            <th>Cost</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cb of view.cabinets; let i = index" setTableColumnWidth>
+            <td>
+              <div [tooltip]="cb.name">{{cb.name}}</div>
+            </td>
+            <td>
+              <div [tooltip]="cb.contractStartDate">{{cb.contractStartDate}}</div>
+            </td>
+            <td>
+              <div [tooltip]="cb.contractEndDate">{{cb.contractEndDate}}</div>
+            </td>
+            <td>
+              <div [tooltip]="cb.renewal">{{cb.renewal}}</div>
+            </td>
+            <td>
+              <div [tooltip]="cb.annualEscalation">{{cb.annualEscalation}}</div>
+            </td>
+            <td>
+              <div [tooltip]="cb.cost">{{cb.cost}}</div>
+            </td>
+            <td class="action-icons-column">
+              <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit cabinet" (click)="editCabinet(i)">
+              </button>
+              <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+                (click)="createCabinetTicket(i)"></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center text-muted" *ngIf="!view.cabinets.length">No associated Cabinets available.</div>
+    </div>
+  </div>
+
+  <div class="card pdu-list border-top-0">
+    <app-spinner [name]="'pdu-list'"></app-spinner>
+    <div class="card-body p-0">
+      <table class="table text-left">
+        <thead>
+          <tr>
+            <th>PDU Name</th>
+            <th>Model</th>
+            <th>Power Circuit</th>
+            <th>Cabinet</th>
+            <th>Annual Escalation</th>
+            <th>Cost</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pdu of view.pdus; let i = index" setTableColumnWidth>
+            <td>
+              <div [tooltip]="pdu.name">{{pdu.name}}</div>
+            </td>
+            <td>
+              <div [tooltip]="pdu.model">{{pdu.model}}</div>
+            </td>
+            <td>
+              <div [tooltip]="pdu.powerCircuit">{{pdu.powerCircuit}}</div>
+            </td>
+            <td>
+              <div [tooltip]="pdu.cabinet">{{pdu.cabinet}}</div>
+            </td>
+            <td>
+              <div [tooltip]="pdu.annualEscalation">{{pdu.annualEscalation}}</div>
+            </td>
+            <td>
+              <div [tooltip]="pdu.cost">{{pdu.cost}}</div>
+            </td>
+            <td class="action-icons-column">
+              <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit PDU" (click)="editPDU(i)">
+              </button>
+              <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+                (click)="createPDUTicket(i)"></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center text-muted" *ngIf="!view.pdus.length">No associated PDU's available.</div>
+    </div>
+  </div>
+  <cabinet-crud (onCrud)="onCrud($event)"></cabinet-crud>
+  <pdu-crud (onCrud)="onCrud($event)"></pdu-crud>
+</div>
+
+<div *ngIf="!datacenters.length">
+  <div class="card mb-0 border-0">
+    <div class="card-body">
+      <div class="text-center text-muted my-5 py-5">No Datacenters available.</div>
+    </div>
+  </div>
+</div>

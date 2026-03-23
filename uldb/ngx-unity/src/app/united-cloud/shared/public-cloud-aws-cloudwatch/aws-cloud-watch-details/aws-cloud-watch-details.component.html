@@ -1,0 +1,46 @@
+<div class="card equalize-card">
+  <app-spinner [name]="'aws-cloud-watch-details'"></app-spinner>
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title ">
+    <h4 class="card-title font-lg">Instance Details</h4>
+  </div>
+  <div class="card-body pt-0">
+    <div class="row align-items">
+      <div class="col">
+        <table class="table table-responsive-sm" *ngIf="data">
+          <tbody>
+            <tr>
+              <td>Instance Type</td>
+              <td>{{data?.InstanceType}}</td>
+            </tr>
+            <tr>
+              <td>Availability Zone</td>
+              <td>{{data?.AvailabilityZone}}</td>
+            </tr>
+            <tr>
+              <td>Security Group</td>
+              <td>{{data?.SecurityGroup}}</td>
+            </tr>
+            <tr>
+              <td>Instance State</td>
+              <td>{{data?.InstanceState}}</td>
+            </tr>
+            <tr>
+              <td>Monitoring State</td>
+              <td>{{data?.MonitoringState}}</td>
+            </tr>
+            <tr>
+              <td>Key Name</td>
+              <td><span *ngIf="!data.KeyName">{{data?.KeyName}}</span><span *ngIf="!data.KeyName">N/A</span></td>
+            </tr>
+            <tr>
+              <td>Launch Time</td>
+              <td>
+                {{data?.LaunchTime | date:dateFormat:userInfo.userTimeZoneAbbr}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

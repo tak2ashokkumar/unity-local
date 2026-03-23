@@ -1,0 +1,195 @@
+<div class="card text-center">
+    <div class="card-header bg-white border-0 pb-0 mt-3">
+        <div class="row">
+            <!-- <div class="col-3">
+                <div class="input-prepend input-group custom-input-group">
+                    <div class="input-group-prepend"><span class="input-group-text bg-transparent border-right-0">
+                            <i class="fa fa-search"></i></span>
+                    </div>
+                    <input placeholder="Enter keyword" class="form-control  form-control-sm border-left-0 custom-search-input"
+                        id="prependedInput" size="16" type="text" tableSeachBox>
+                </div>
+            </div> -->
+            <div class="col ">
+                <span class="text-muted ml-2 font-sm float-right align-middle">
+                    <span class="badge badge-pill badge-secondary">{{viewData.length}}</span>&nbsp;LoadBalancers</span>
+                <!-- <div class="btn-group pull-right" dropdown>
+                    <button class="btn btn-warning btn-sm" type="button">Upload</button>
+                    <button id="button-basic" dropdownToggle type="button" class="btn btn-warning btn-sm dropdown-toggle dropdown-toggle-split"
+                        aria-controls="dropdown-basic">
+                        <span class="caret"></span>
+                        <span class="sr-only">Split button!</span>
+                    </button>
+                    <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+                        <li role="menuitem"><a class="dropdown-item">Download</a></li>
+                    </ul>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table text-left fold-table">
+            <thead>
+                <tr>
+                    <th>Hostname</th>
+                    <th>Management IP</th>
+                    <th>Manufacturer</th>
+                    <th>Model</th>
+                    <th>Cabinet</th>
+                    <th>Position</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let view of viewData; let i = index">
+                    <tr class="view" (click)="open(view)" accessControl moduleName="Onboarding"
+                        accessType="Manage Onboarding" elementType="div">
+                        <td>
+                            <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button">
+                                <i class="fas row-caret" [ngClass]="view.isOpen ? 'fa-caret-down' : 'fa-caret-right'"
+                                    *ngIf="view.openEnabled" [ngClass]="{'opened': view.isOpen}">&nbsp;</i>
+                                <i class="fas fa-check row-caret" *ngIf="!view.openEnabled">&nbsp;</i>{{view.hostname}}
+                            </button>
+                        </td>
+                        <td>
+                            <div>{{view.ip}}</div>
+                        </td>
+                        <td>
+                            <div>{{view.manufaturer}}</div>
+                        </td>
+                        <td>
+                            <div>{{view.model}}</div>
+                        </td>
+                        <td>
+                            <div>{{view.cabinet}}</div>
+                        </td>
+                        <td>
+                            <div>{{view.form.get('position').value}}</div>
+                        </td>
+                        <td>
+                            <div>{{view.form.get('size').value}}</div>
+                        </td>
+                    </tr>
+                    <tr class="fold" #fold [ngClass]="{'open' : view.isOpen}">
+                        <td colspan="7">
+                            <form [formGroup]="view.form" *ngIf="view.form">
+                                <div class="form-group">
+                                    <div class="invalid-credentials" *ngIf="view.nonFieldErr">{{view.nonFieldErr}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-3">
+                                        <label class="form-col-form-label">Name<em>*</em></label>
+                                        <input id="{{i}}-name" class="form-control" type="text" formControlName="name"
+                                            [class.is-invalid]="view.formErrors.name">
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.name">
+                                            {{view.formErrors.name}}</div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="form-col-form-label">Private Cloud</label>
+                                        <multiselect-dropdown [options]="privateclouds" [settings]="cloudSettings"
+                                            class="form-control p-0" style="height:auto;" formControlName="cloud"
+                                            [ngClass]="{'is-invalid' : view.formErrors.cloud}"></multiselect-dropdown>
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.cloud">
+                                            {{view.formErrors.cloud}}</div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="form-col-form-label">Management IP</label>
+                                        <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                            containerClass="info-multi-line"
+                                            [tooltip]="'Device IP Address for Console Access'"></i>
+                                        <input id="{{i}}-management_ip" class="form-control" type="text"
+                                            formControlName="management_ip"
+                                            [class.is-invalid]="view.formErrors.management_ip">
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.management_ip">
+                                            {{view.formErrors.management_ip}}</div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="font-col-form-label"
+                                            for="manufacturer">Manufacturer<em>*</em></label>
+                                        <select id="{{i}}-manufacturer" class="form-control"
+                                            formControlName="manufacturer"
+                                            [class.is-invalid]="view.formErrors.manufacturer">
+                                            <option value="" disabled>Select Manufacturer</option>
+                                            <option *ngFor="let manufacturer of manufacturers"
+                                                [value]="manufacturer.id">
+                                                {{manufacturer.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.manufacturer">
+                                            {{view.formErrors.manufacturer}}</div>
+                                    </div>
+                                    <div class="form-group col-3" formGroupName="model">
+                                        <label class="font-col-form-label" for="modelid">Model<em>*</em></label>
+                                        <select id="{{i}}-modelid" class="form-control" formControlName="id"
+                                            [class.is-invalid]="view.formErrors.model.id">
+                                            <option value="" disabled>Select Model</option>
+                                            <option *ngFor="let model of view.models" [value]="model.id">
+                                                {{model.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.model.id">
+                                            {{view.formErrors.model.id}}</div>
+                                    </div>
+                                    <div class="form-group col-3" formGroupName="cabinet">
+                                        <label class="font-col-form-label" for="cabinetid">Cabinet</label>
+                                        <select id="{{i}}-cabinetid" class="form-control" formControlName="id"
+                                            [class.is-invalid]="view.formErrors.cabinet.id">
+                                            <option value="">Select Cabinet</option>
+                                            <option *ngFor="let cabinet of cabinets" [value]="cabinet.id">
+                                                {{cabinet.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.cabinet.id">
+                                            {{view.formErrors.cabinet.id}}</div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="form-col-form-label">Position</label>
+                                        <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                            containerClass="info-multi-line"
+                                            [tooltip]="'Position of device in the cabinet\nEg.1,2,3,4...'"></i>
+                                        <input id="{{i}}-position" class="form-control" type="number" min="0"
+                                            formControlName="position" [class.is-invalid]="view.formErrors.position">
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.position">
+                                            {{view.formErrors.position}}</div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="form-col-form-label">Size<em>*</em></label>
+                                        <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                            containerClass="info-multi-line"
+                                            [tooltip]="'Size of the Device\nEg.1, 2, 3'"></i>
+                                        <input id="{{i}}-size" class="form-control" type="number" min="1"
+                                            formControlName="size" [class.is-invalid]="view.formErrors.size">
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.size">
+                                            {{view.formErrors.size}}</div>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="form-col-form-label">Asset Tag</label>
+                                        <input id="{{i}}-asset_tag" class="form-control" type="text"
+                                            formControlName="asset_tag" [class.is-invalid]="view.formErrors.asset_tag">
+                                        <div class="invalid-feedback" *ngIf="view.formErrors.asset_tag">
+                                            {{view.formErrors.asset_tag}}</div>
+                                    </div>
+                                    <!-- <div class="form-group col-3">
+                                        <label class="form-col-form-label">Observium ID</label>
+                                        <input id="{{i}}-observium_id" class="form-control" type="text" formControlName="observium_id">
+                                    </div> -->
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center text-muted" *ngIf="!viewData.length">No associated Loadbalancers available.
+                </div>
+                <br>
+            </div>
+            <div class="col">
+                <button *ngIf="viewData.length" class="btn btn-sm btn-success pull-right ml-1" type="button"
+                    (click)="submit()" accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                    elementType="btn">Submit</button>
+                <next-prev></next-prev>
+            </div>
+        </div>
+    </div>
+</div>

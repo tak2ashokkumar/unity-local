@@ -1,0 +1,325 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card round-edge border-top-0">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center font-500">
+                            <span class="badge badge-secondary font-sm">{{count}}</span>
+                            <span class="ml-1 font-lg">Accounts</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button class="btn btn-pill btn-sm btn-warning mx-2 px-3 font-500" type="button"
+                                (click)="addAccount()" accessControl moduleName="Public Cloud"
+                                accessType="Manage Public Cloud" elementType="btn">
+                                <span class="font-sm">Add Account</span>
+                            </button>
+                            <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" container="body"
+                                (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                            </button>
+                            <data-refresh-btn [page]="currentCriteria.pageNo"
+                                (refresh)="refreshData($event)"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                            <div class="d-flex justify-content-start w-20">
+                                <div class="w-100">
+                                    <search-box [searchValue]="currentCriteria.searchValue"
+                                        (searched)="onSearched($event)"></search-box>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end w-80">
+                                <table-page-size *ngIf="viewData.length" [currentPageSize]="currentCriteria.pageSize"
+                                    [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                        <table class="table table-sm text-left">
+                            <thead class="bg-light">
+                                <th>Name</th>
+                                <th class="text-center">Discover Resources</th>
+                                <th *ngIf="cloudNameForEndpoint !== 'aws'" class="text-center">Discover Topology</th>
+                                <th class="text-center">Manage Account</th>
+                                <th class="text-center">Cost Analysis</th>
+                                <th *ngIf="cloudNameForEndpoint === 'gcp'" class="text-center">Sustainability</th>
+                                <th *ngIf="cloudNameForEndpoint === 'azure'" class="text-center text-truncate">Azure AD Attribute Mapping</th>
+                                <th class="text-center">Event Ingestion</th>
+                                <th class="text-center">Actions</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData" truncateText>
+                                    <td [ngClass]="{'text-primary pointer-link': view.discoverResources}" class="tdw-15">
+                                        <div [tooltip]="view.name" (click)="loadResources(view)">{{view.name}}</div>
+                                    </td>
+                                    <td class="w-15 text-center">
+                                        <span class="fas fa-lg" [ngClass]="view.discoverResourcesIcon"
+                                            [tooltip]="view.discoverResources"></span>
+                                    </td>
+                                    <td *ngIf="cloudNameForEndpoint !== 'aws'" class="w-15 text-center">
+                                        <span class="fas fa-lg" [ngClass]="view.discoverDependencyIcon"
+                                            [tooltip]="view.discoverDependency"></span>
+                                    </td>
+                                    <td class="w-15 text-center">
+                                        <span class="fas fa-lg" [ngClass]="view.isManagedIcon"
+                                            [tooltip]="view.isManaged"></span>
+                                    </td>
+                                    <td class="w-20 text-center">
+                                        <span class="fas fa-lg" [ngClass]="view.costAnalysisIcon"
+                                            [tooltip]="view.costAnalysis"></span>
+                                    </td>
+                                    <td *ngIf="cloudNameForEndpoint === 'gcp'" class="w-15 text-center">
+                                        <span class="fas fa-lg" [ngClass]="view.sustainabilityIcon"
+                                            [tooltip]="view.sustainability"></span>
+                                    </td>
+                                    <td *ngIf="cloudNameForEndpoint === 'azure'" class="w-15 text-center">
+                                        <span class="fas fa-lg" [ngClass]="view.azureAdIntegrationIcon"
+                                            [tooltip]="view.azureAdIntegration"></span>
+                                    </td>
+                                    <td class="w-15 text-center">
+                                        <span class="fas fa-lg" [ngClass]="view.ingestEventIcon"
+                                            [tooltip]="view.ingestEvent"></span>
+                                    </td>
+                                    <td class="action-icons-column text-center">
+                                        <button class="action-icons mb-0 fas fa-sync font-sm ml-1"
+                                            (click)="syncNow(view)"
+                                            [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
+                                            [ngClass]="view.syncInProgress ? 'action-icons-disabled fa-spin': !view.discoverResources ? 'action-icons-disabled fa-sync': 'fa-sync'"
+                                            accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                            elementType="actionbtn">
+                                        </button>
+                                        <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
+                                            tooltip="Schedule History" (click)="getScheduleHistory(view)"></button>
+                                        <button class="action-icons fas fa-pencil-alt font-sm ml-1"
+                                            (click)="editAccount(view)" tooltip="Edit Account">
+                                        </button>
+                                        <span dropdown placement="bottom right" container="body">
+                                            <button id="button-container"
+                                                class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                                                data-toggle="dropdown" aria-controls="icons-dropdown-container"
+                                                dropdownToggle (click)="false" [tooltip]="'More Actions'"
+                                                container="body" accessControl moduleName="Public Cloud"
+                                                accessType="Manage Public Cloud" elementType="actionbtn"></button>
+                                            <div container="body" id="icons-dropdown-container"
+                                                class="dropdown-menu dropdown-menu-right text-center mt-2 py-2" *dropdownMenu
+                                                aria-labelledby="button-container">
+                                                <button class="action-icons mt-0 mb-0 fas fa-trash-alt font-sm"
+                                                    tooltip="Delete Account" (click)="deleteAccount(view)"
+                                                    container="body">
+                                                </button>
+                                                <button class="action-icons mt-2 mb-1 fas fa-magic font-sm"
+                                                    tooltip="Test Payload"
+                                                    [ngClass]="{'action-icons-disabled': !view.ingestEvent}"
+                                                    (click)="testPayload(view)" accessControl moduleName="Public Cloud"
+                                                    accessType="Manage Public Cloud" elementType="actionbtn"
+                                                    container="body">
+                                                </button>
+                                                <button class="action-icons mt-2 mb-0 fas fa-key font-sm"
+                                                    tooltip="Copy Key"
+                                                    [ngClass]="{'action-icons-disabled': !view.ingestEvent}"
+                                                    (click)="copyKey(view.token,view)" container="body">
+                                                </button>
+                                                <button class="action-icons mt-2 mb-0 fas fa-link font-sm"
+                                                    tooltip="Copy URL"
+                                                    [ngClass]="{'action-icons-disabled': !view.ingestEvent}"
+                                                    (click)="copyKey(view.url,view)" container="body">
+                                                </button>
+                                                <ng-container *ngIf="cloudNameForEndpoint == 'gcp'">
+                                                    <button class="action-icons mt-2 mb-0 fas fa-ticket-alt font-sm"
+                                                        tooltip="Manage by creating support ticket"
+                                                        (click)="createTicket(view)" container="body">
+                                                    </button>
+                                                </ng-container>
+                                                <ng-container *ngIf="cloudNameForEndpoint === 'oci'">
+                                                    <button class="action-icons mt-2 mb-0 fas fa-ticket-alt font-sm"
+                                                        tooltip="Manage by creating support ticket"
+                                                        (click)="createTicketOracle(view)" container="body">
+                                                    </button>
+                                                </ng-container>
+                                            </div>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"></table-entries>
+                        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No accounts available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #payload>
+    <div class="card mb-0">
+        <div class="card-header">
+            Test Payload
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="payloadModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="payloadForm" [formGroup]="payloadForm">
+                <div class="row form-group">
+                    <div class="col">
+                        <label class="form-col-form-label">Payload<em>*</em></label>
+                        <textarea class="form-control" name="payload" id="payload" formControlName="payload"
+                            [ngClass]="{'is-invalid' : payloadFormErrors.payload}"
+                            placeholder="Enter Payload"></textarea>
+                        <div class="invalid-feedback" *ngIf="payloadFormErrors.payload">{{payloadFormErrors.payload}}
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!isSubmit" class="row form-group">
+                    <div class="col">
+                        <label class="form-col-form-label">Response</label>
+                        <textarea class="form-control" name="payload" id="payload" rows="3" formControlName="response"
+                            readonly></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button *ngIf="isSubmit" class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="submitPayload()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="payloadModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleHistory>
+    <div class="card mb-0">
+        <div class="card-header">
+            Schedule History
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="scheduleHistoryRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body pt-0 pb-0">
+            <div class="row mt-1 mb-2">
+                <div class="col-3">
+                    <table-search-box (searched)="onSearchedScheduleHistory($event)"></table-search-box>
+                </div>
+                <div class="col-9">
+                    <div class="row justify-content-end mr-1">
+                        <table-page-size [currentPageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                            [totalCount]="scheduleHistoryCount"
+                            (pageSizeChange)="pageSizeChangeScheduleHistory($event)"></table-page-size>
+                    </div>
+                </div>
+            </div>
+            <table class="table text-left">
+                <thead>
+                    <tr>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Executed By </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of scheduleHistoryData">
+                        <td>{{view.startedAt}}</td>
+                        <td>{{view.lastRun}}</td>
+                        <td>{{view.duration}}</td>
+                        <td class="{{view.statusClass}}">
+                            {{view.status}}
+                            <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+                        </td>
+                        <td>{{view.updatedBy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table-entries [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                [totalCount]="scheduleHistoryCount"></table-entries>
+            <table-pager *ngIf="scheduleHistoryData.length" [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+                [pageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"
+                (pageChange)="pageChangeScheduleHistory($event)"></table-pager>
+            <p *ngIf="scheduleHistoryData.length==0" class="text-center py-3">No history to display</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="scheduleHistoryRef.hide()"
+                type="button">Close</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #accessKey>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change API Keys
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="accessKeyModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="accessKeyForm" [formGroup]="accessKeyForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="accessKeyFormErrors.error">{{accessKeyFormErrors.error}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="access_key">Email:<em>*</em></label>
+                    <input class="form-control" id="access_key" type="text" formControlName="email"
+                        [ngClass]="{'is-invalid' : accessKeyFormErrors.email}">
+                    <div class="invalid-feedback" *ngIf="accessKeyFormErrors.email">
+                        {{accessKeyFormErrors.email}}</div>
+                </div>
+                <!-- <div class="form-group">
+                    <label class="form-col-form-label" for="secret_key">Secret Key<em>*</em></label>
+                    <input class="form-control" id="secret_key" type="password" formControlName="secret_key"
+                        [ngClass]="{'is-invalid' : accessKeyFormErrors.secret_key}">
+                    <div class="invalid-feedback" *ngIf="accessKeyFormErrors.secret_key">
+                        {{accessKeyFormErrors.secret_key}}</div>
+                </div> -->
+                <div class="form-group">
+                    <label class="form-col-form-label" for="service_account_info">Service Account Info:
+                        <em>*</em></label>
+                    <textarea class="form-control" id="service_account_info" formControlName="service_account_info"
+                        [ngClass]="{'is-invalid' : accessKeyFormErrors.service_account_info}"></textarea>
+                    <div class="invalid-feedback" *ngIf="accessKeyFormErrors.service_account_info">
+                        {{accessKeyFormErrors.service_account_info}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="updateAPIKeys()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="accessKeyModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

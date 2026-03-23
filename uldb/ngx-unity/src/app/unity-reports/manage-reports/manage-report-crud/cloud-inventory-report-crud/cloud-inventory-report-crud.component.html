@@ -1,0 +1,318 @@
+<form *ngIf="form" [formGroup]="form">
+
+    <div class="mt-4 px-3 pt-3 border rounded position-relative">
+        <div class="bg-white position-absolute section-name-one font-md font-500">Filters</div>
+
+        <div *ngIf="reportType == 'Cloud Inventory'"
+            class="mwidth d-flex align-items-center form-control section-name-two ">
+            <label class="form-col-form-label align-items-center mx-2 my-0 text-center ">Match</label>
+            <div class="custom-control custom-radio mr-2">
+                <input id="all" type="radio" class="custom-control-input" value="all" name="filter_match"
+                    formControlName="filter_match">
+                <label class="custom-control-label" for="all">All</label>
+            </div>
+            <div class="custom-control custom-radio">
+                <input id="any" type="radio" class="custom-control-input" value="any" name="filter_match"
+                    formControlName="filter_match">
+                <label class="custom-control-label" for="any">Any</label>
+            </div>
+        </div>
+        <div class="invalid-feedback d-block " *ngIf="formErrors.filter_match">
+            {{formErrors.filter_match}}
+        </div>
+
+        <div class="col-10 pb-3" formArrayName="filters">
+            <div *ngFor="let filter of filters.controls; let i = index;let first = first; let last = last;">
+                <div class="row form-group" [formGroupName]="i">
+                    <div class="col-3">
+                        <label for="name" class="form-col-form-label">Attribute<em>*</em></label>
+                        <select class="form-control" formControlName="attribute"
+                            [class.is-invalid]="formErrors.filters[i].attribute"
+                            (change)="updateFilterOptions($event.target.value, i)">
+                            <option [value]="''" disabled>Select Attribute</option>
+                            <option *ngFor="let attr of attributeList" [value]="attr.value">{{attr.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.filters[i].attribute">
+                            {{formErrors.filters[i].attribute}}
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label for="name" class="form-col-form-label">Operator
+                            <em>*</em></label>
+                        <select class="form-control" formControlName="operator"
+                            [class.is-invalid]="formErrors.filters[i].operator">
+                            <option [value]="''" disabled>Select Operator</option>
+                            <option *ngFor="let operator of operatorList[i]" [value]="operator.value">
+                                {{operator.key}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.filters[i].operator">
+                            {{formErrors.filters[i].operator}}
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <label for="name" class="form-col-form-label">Value<em>*</em></label>
+                        <ng-container [ngSwitch]="optionType[i]">
+                            <ng-container *ngSwitchCase="'multi-select'">
+                                <multiselect-dropdown class="form-control p-0" formControlName="value"
+                                    [options]="optionList[i]" [settings]="optionSettings"
+                                    [class.is-invalid]="formErrors.filters[i]?.value"></multiselect-dropdown>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'multi-select-simple'">
+                                <multiselect-dropdown class="form-control p-0" formControlName="value"
+                                    [options]="optionList[i]" [settings]="simpleOptionSettings"
+                                    [class.is-invalid]="formErrors.filters[i]?.value"></multiselect-dropdown>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'date'">
+                                <div class="input-group">
+                                    <owl-date-time #selectdate [pickerType]="'calendar'"></owl-date-time>
+                                    <input class="form-control rounded-left" name="value" formControlName="value"
+                                        [owlDateTimeTrigger]="selectdate" [owlDateTime]="selectdate" type=" text">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="selectdate">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'date-time'">
+                                <div class="input-group">
+                                    <owl-date-time #dateTimePicker [pickerType]="'both'"
+                                        [scrollStrategy]="scrollStrategy">
+                                    </owl-date-time>
+                                    <input type="text" class="form-control rounded-left"
+                                        placeholder="Select date & time" formControlName="value"
+                                        [owlDateTimeTrigger]="dateTimePicker" [owlDateTime]="dateTimePicker">
+                                    <div class="input-group-append" [owlDateTimeTrigger]="dateTimePicker">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'number'">
+                                <input id="name" type="number" class="col form-control" formControlName="value"
+                                    placeholder="Enter Value" [class.is-invalid]="formErrors.filters[i]?.value">
+                            </ng-container>
+                            <ng-container *ngSwitchDefault>
+                                <input id="name" type="text" class="col form-control" formControlName="value"
+                                    placeholder="Enter Value" [class.is-invalid]="formErrors.filters[i]?.value">
+                            </ng-container>
+                        </ng-container>
+                        <div class="invalid-feedback" *ngIf="formErrors.filters[i]?.value">
+                            {{formErrors.filters[i]?.value}}
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-1">
+                        <span class="form-control border-0 p-0">
+                            <button tooltip="Remove Parameter" class="action-icons fas fa-minus font-sm ml-1"
+                                (click)="removeFilter(i)" *ngIf="form.get('filters').controls.length > 1"></button>
+                            <button tooltip="Add Parameter" class="action-icons fas fa-plus font-sm ml-1" *ngIf="last"
+                                (click)="addFilter(i)"></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="bottom-section mt--3">
+            <button class="btn btn-sm btn-success">Apply Filters</button>
+        </div> -->
+    </div>
+
+    <div class="border position-relative rounded mt-5 px-3 pt-3">
+        <div class="bg-white font-md font-500 section-name-one">Field Selection</div>
+        <div class="col-10 form-group d-flex align-items-center justify-content-center mb-2">
+            <div class="col-5">
+                <div class="card rounded-5 mb-0">
+                    <div class="card-header bg-white px-0 d-flex justify-content-start align-items-center px-2 py-1">
+                        <input class="" id="check" type="checkbox" [checked]="allFieldsChecked"
+                            (click)="$event.stopPropagation();checkAllFields(allFieldsChecked)">
+                        <span class="text-muted text-left align-middle px-1">&nbsp;All</span>
+                        <span class="badge badge-lg badge-secondary">{{allFieldsListArray?.length}}</span>
+                        <!-- <table-search-box></table-search-box> -->
+                    </div>
+                    <div class="card-body py-0 px-0 scrollable-list">
+                        <div class="d-flex align-content-center border-bottom px-2"
+                            *ngFor="let item of allFieldsListArray">
+                            <input class="" id="{{item.key}}" type="checkbox" [checked]="item.checked"
+                                (click)="toggleCheck(item)">
+                            <label class="pl-2 m-0 font-sm-xs" for="{{item.key}}"
+                                (click)="toggleCheck(item)">{{item.key}}</label>
+                        </div>
+                        <div class="text-center text-muted p-4 align-self-center" *ngIf="!allFieldsListArray.length">No
+                            Fields available</div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column p-2">
+                <div class="align-content-center align-items-center d-flex flex-column">
+                    <span *ngIf="allSelectedCount"
+                        class="badge badge-sm badge-secondary bg-primary-500 text-white">{{allSelectedCount}}</span>
+                    <span class="fas fa-arrow-right font-lg p-2 pointer-link"
+                        [ngClass]="allSelectedCount ? 'text-primary-500' : 'text-muted'" (click)="addFields()"
+                        tooltip="add"></span>
+                </div>
+                <div class="align-content-center align-items-center d-flex flex-column">
+                    <span class="fas fa-arrow-left font-lg p-2 pointer-link"
+                        [ngClass]="selectedFieldsCount ? 'text-primary-500' : 'text-muted'" (click)="removeFields()"
+                        tooltip="remove"></span>
+                    <span *ngIf="selectedFieldsCount"
+                        class="badge badge-sm badge-secondary bg-primary-500 text-white">{{selectedFieldsCount}}</span>
+                </div>
+            </div>
+            <div class="col-5">
+                <div class="card rounded-5 mb-0">
+                    <div class="card-header bg-white d-flex justify-content-start align-items-center px-2 py-1">
+                        <input class="" id="check" type="checkbox" [checked]="selectedFieldsChecked"
+                            (click)="$event.stopPropagation();checkAllSelectedFields(selectedFieldsChecked)">
+                        <span class="text-muted text-left align-middle px-1">&nbsp;Selected</span>
+                        <span class="badge badge-lg badge-secondary">{{selectedFieldsListArray?.length}}</span>
+                        <!-- <table-search-box></table-search-box> -->
+                    </div>
+                    <div class="card-body py-0 px-0 scrollable-list">
+                        <div class="d-flex align-content-center border-bottom px-2"
+                            *ngFor="let item of selectedFieldsListArray">
+                            <input class="" id="{{item.key}}" type="checkbox" [checked]="item.checked"
+                                (click)="toggleCheck(item)">
+                            <label class="pl-2 m-0 font-sm-xs" for="{{item.key}}"
+                                (click)="toggleCheck(item)">{{item.key}}</label>
+                        </div>
+                        <div class="text-center text-muted p-4 align-self-center"
+                            *ngIf="!selectedFieldsListArray.length">No Fields Selected</div>
+                    </div>
+                </div>
+                <div class="invalid-feedback d-block " *ngIf="formErrors.fields">
+                    {{formErrors.fields}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="form.get('period')" class="border position-relative rounded mt-4 p-3" formGroupName="period">
+        <div class="bg-white font-md font-500 section-name-one">Period</div>
+        <div class="col-10 form-group d-flex align-items-center">
+            <label class="col-2 form-col-form-label align-items-center m-0 text-center">Period<em>*</em>:</label>
+            <div class="col-6">
+                <div class="d-inline-block">
+                    <ul class="d-flex px-0 mb-0">
+                        <li>
+                            <label class="pointer-link px-4"
+                                [class.active]="form.get('period').get('period_type').value === 'last'">
+                                <input type="radio" formControlName="period_type" name="period_type" [value]="'last'">
+                                <span class="font-sm mr-2">Last</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="pointer-link px-4"
+                                [class.active]="form.get('period').get('period_type').value === 'current'">
+                                <input type="radio" formControlName="period_type" name="period_type"
+                                    [value]="'current'">
+                                <span class="font-sm mr-2">Current</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="pointer-link px-4"
+                                [class.active]="form.get('period').get('period_type').value === 'custom'">
+                                <input type="radio" formControlName="period_type" name="period_type" [value]="'custom'">
+                                <span class="font-sm mr-2">Custom</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div [ngSwitch]="form.get('period').get('period_type').value">
+            <div *ngSwitchCase="'last'" class="col-10 form-group d-flex align-items-center">
+                <label class="col-2 form-col-form-label m-0 text-center">Last <em>*</em></label>
+                <div class="col-6 d-flex align-items-center">
+                    <div class="col-2 form-group m-0">
+                        <input id="counter" type="number" formControlName="counter" placeholder="Counter"
+                            class="form-control form-control-sm" min="1"
+                            [class.is-invalid]="formErrors.period?.counter">
+                        <div *ngIf="formErrors.period?.counter" class="invalid-feedback">{{ formErrors.period?.counter
+                            }}
+                        </div>
+                    </div>
+                    <div class="col-4 form-group m-0">
+                        <select class="form-control form-control-sm" formControlName="range"
+                            [class.is-invalid]="formErrors.period.range">
+                            <option [value]="''" disabled>Select</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                            <option value="quarter">Quarter</option>
+                            <option value="year">Year</option>
+                        </select>
+                        <div *ngIf="formErrors.period?.range" class="invalid-feedback">{{ formErrors.period.range }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngSwitchCase="'current'" class="col-10 form-group d-flex align-items-center">
+                <label class="col-2 form-col-form-label m-0 text-center">Current <em>*</em></label>
+                <div class="col-6 d-flex align-items-center">
+                    <div class="col-2 form-group m-0">
+                        <input id="c_counter" type="number" min="1" formControlName="counter" placeholder="Counter"
+                            class="form-control form-control-sm" [class.is-invalid]="formErrors.period?.counter">
+                        <div *ngIf="formErrors.period?.counter" class="invalid-feedback">{{ formErrors.period.counter }}
+                        </div>
+                    </div>
+                    <div class="col-4 form-group m-0">
+                        <select class="form-control form-control-sm" formControlName="range"
+                            [class.is-invalid]="formErrors.period.range">
+                            <option [value]="" disabled>Select</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                            <option value="quarter">Quarter</option>
+                            <option value="year">Year</option>
+                        </select>
+                        <div *ngIf="formErrors.period?.range" class="invalid-feedback">{{ formErrors.period?.range }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div *ngSwitchCase="'custom'" class="col-10 form-group d-flex align-items-center">
+                <label class="col-2 form-col-form-label m-0 text-center">Custom <em>*</em></label>
+                <div class="col-6 d-flex align-items-center">
+                    <div class="col-6">
+                        <label for="start_date" class="form-col-form-label">Start Date<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #startDate [pickerType]="'calendar'"></owl-date-time>
+                            <input class="form-control form-control-sm rounded-left" name="start_date"
+                                formControlName="start_date" [owlDateTimeTrigger]="startDate" [owlDateTime]="startDate"
+                                type="text">
+                            <div class="input-group-append pointer-link" [owlDateTimeTrigger]="startDate"
+                                [class.is-invalid]="formErrors.period?.start_date">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="formErrors.period?.start_date" class="invalid-feedback d-block">
+                            {{ formErrors.period?.start_date }}
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label for="end_date" class="form-col-form-label">End Date<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #endDate [pickerType]="'calendar'"></owl-date-time>
+                            <input class="form-control form-control-sm rounded-left" name="end_date"
+                                formControlName="end_date" [owlDateTimeTrigger]="endDate"
+                                [min]="form.controls.period.controls.start_date.value" [owlDateTime]="endDate"
+                                type="text">
+                            <div class="input-group-append pointer-link" [owlDateTimeTrigger]="endDate"
+                                [class.is-invalid]="formErrors.period?.end_date">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div *ngIf="formErrors.period?.end_date" class="invalid-feedback d-block">
+                            {{ formErrors.period?.end_date }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>

@@ -1,0 +1,61 @@
+@import "variables";
+
+.tab-content {
+  cursor: default;
+}
+table {
+  width: 100%;
+}
+.component-summary td {
+  vertical-align: middle !important;
+  text-align: center !important;
+  padding: 0 !important;
+}
+tr:not(.hyp-border),
+td,
+table {
+  border: none !important;
+}
+table p {
+  padding-bottom: 0 !important;
+}
+.summary-icons {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  cursor: default;
+  color: $white !important;
+  outline: none;
+  text-align: center;
+  &.hypervisor {
+    background-color: $hypervisor;
+  }
+  &.vms {
+    background-color: $vms;
+  }
+  &.bms {
+    background-color: $bms;
+  }
+  &.otherdev {
+    background-color: $otherdev;
+  }
+  &.firewalls {
+    background-color: $firewalls;
+  }
+  &.lbs {
+    background-color: $lbs;
+  }
+  &.switches {
+    background-color: $switches;
+  }
+  &.cfa-kubernetes {
+    background-color: $pdus;
+  }
+  &.fa-hdd {
+    background-color: $storage;
+  }
+  &.fa-database {
+    background-color: $database;
+  }
+}

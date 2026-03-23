@@ -1,0 +1,213 @@
+<div class="row p-2 parent-container">
+  <div class="col-12">
+    <div class="card rounded mb-0">
+      <!-- First Row Header Start -->
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+        <div class="d-flex align-items-center pl-3">
+          <div>
+            <span class="font-lg-xl font-500">{{workFlowViewData?.name}}</span>
+          </div>
+          <div *ngIf="workFlowViewData?.name">
+            <button class="btn btn-null text-muted fas fa-pencil-alt" title="Edit Workflow"
+              (click)="openWorkflowModal('edit')">
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-start gap-2 pr-3">
+          <span *ngIf="workFlowViewData?.isInProgress" class="text-success font-500">Workflow is being
+            saved.</span>
+          <div class="polling-loader mr-2">
+            <i [ngClass]="getStatusFaClass(workflowStatus)"></i><span class="ml-2">{{workflowStatus}}</span>
+          </div>
+
+          <button *ngIf="hasNode" class="btn btn-primary btn-sm mr-2" type="button" aria-haspopup="true"
+            aria-expanded="false" (click)="toggleDropdown();onFromBeginning()" [disabled]="isWorkflowExecuting">
+            <i class="fas fa-play mr-1"></i>
+            Run
+          </button>
+
+          <button *ngIf="currentSessionId && isWorkflowExecuting" class="btn btn-danger btn-sm mr-2" type="button"
+            aria-haspopup="true" aria-expanded="false" (click)="stopPolling()">
+            <i class="fas fa-stop mr-1"></i>
+            Stop
+          </button>
+
+          <button *ngIf="currentSessionId && resumeBtn" class="btn btn-outline-primary btn-sm mr-2" type="button"
+            (click)="toggleDropdown()" aria-haspopup="true" aria-expanded="false" (click)="onResume()"
+            [disabled]="isWorkflowExecuting"><i class="fas fa-forward"></i>
+            Resume
+          </button>
+
+          <button class="btn btn-sm btn-success font-500" type="button" [disabled]="workFlowViewData?.isInProgress"
+            (click)="saveWorkFlow()" [disabled]="isWorkflowExecuting">
+            <span class="fas fa-spinner" *ngIf="workFlowViewData?.isInProgress"></span>
+            <span class="font-xs-sm mx-1">Save Workflow</span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm ml-2"
+            (click)="showHelpPanel = true; showBeginner = false;">
+            <i class="fas fa-question-circle"></i>
+          </button>
+          <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+            (click)="returnWorkflow()"><i class="fa fa-arrow-left"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body row m-0 p-0 d-flex font-sm body-container"
+        [ngClass]="isLeftCollapsed ? 'left-collapsed'  : isBottomCollapsed ? 'bottom-collapsed' : ''">
+
+        <button class="icon-btn icon-cross btn btn-null tb mr-2" (click)="isLeftCollapsed = !isLeftCollapsed">
+          <i [ngClass]="isLeftCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'"></i>
+        </button>
+        <div class="col-3 m-0 p-0 left-panel">
+          <orchestration-workflow-agentic-left-menu (dragStart)="onDragStart($event)"
+            [emptyCanvas]="emptyCanvas"></orchestration-workflow-agentic-left-menu>
+        </div>
+
+        <div class="col-9 m-0 p-0 right-panel">
+          <div id="agentic-drawflow" (drop)="drop($event)" (dragover)="allowDrop($event)">
+            <div class="center-text-container text-center" *ngIf="emptyCanvas">
+              Add a Trigger to define the starting point of the workflow
+            </div>
+
+            <div class="toolbar-container"
+              [style.bottom.px]="showExecutionLogsFlag ? isBottomCollapsed ? 50 : logsHeight + 60 : 25">
+              <div class="toolbar-actions">
+                <button class="icon-btn btn btn-null tb" (click)="changeZoom(-1)">
+                  <i class="fa fa-search-minus text-muted"></i>
+                </button>
+                <button class="icon-btn btn btn-null tb" (click)="resetZoom()">
+                  <i class="fa fa-expand text-muted"></i>
+                </button>
+                <button class="icon-btn btn btn-null tb" (click)="changeZoom(1)">
+                  <i class="fa fa-search-plus text-muted"></i>
+                </button>
+                <button class="workflow-var-btn btn btn-null tb" (click)="openWorkflowVarModal()">
+                  <span class="fx-icon">
+                    <i>f</i>(x) Variables
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="bottom-panel" *ngIf="showExecutionLogsFlag" [style.left]="isLeftCollapsed ? '0%' : '25%'"
+            [style.width]="isLeftCollapsed ? '100%' : '75%'_"
+            [style.height.px]="isBottomCollapsed ? headerHeight : logsHeight + headerHeight"> -->
+          <div class="bottom-panel" *ngIf="showExecutionLogsFlag" [ngClass]="{
+       'left-open': !isLeftCollapsed,
+       'right-open': showHelpPanel || showBeginner
+     }" [style.height.px]="isBottomCollapsed ? headerHeight : logsHeight + headerHeight">
+
+            <div class="card rounded-0 h-100 d-flex flex-column">
+              <div class="resize-handle" *ngIf="!isBottomCollapsed" (mousedown)="startResize($event)">
+              </div>
+              <div class="card-header logs-header" (click)="toggleLogs()">
+                <div class="row bg-light-grey mx-0 align-items-center">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="fas mr-2" [ngClass]="isBottomCollapsed ? 'fa-chevron-up' : 'fa-chevron-down'">
+                    </i>
+                    <span class="font-weight-bold mb-0">Logs</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body p-0 flex-grow-1 overflow-hidden" *ngIf="!isBottomCollapsed">
+                <div class="h-100 overflow-auto">
+                  <div class="p-3">
+                    <pre class="mb-0">{{ workflowLogsViewData?.executionLog }}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="col-3 m-0 p-0 extreme-right-panel" [ngClass]="{ open: showHelpPanel }"> -->
+        <orchestration-workflow-agentic-right-menu *ngIf="showHelpPanel && !showBeginner"
+          (closeSidebar)="showHelpPanel = false"></orchestration-workflow-agentic-right-menu>
+        <!-- </div> -->
+
+        <!-- <div class="col-3 m-0 p-0 extreme-right-panel" [ngClass]="{ open: showBeginner }"> -->
+        <orchestration-workflow-execute *ngIf="showBeginner && !showHelpPanel" [selectedNode]="triggerNode"
+          [workFlowData]="workFlowData" (closeSidebar)="showBeginner = false" (triggerSubmit)="onTriggerSubmit($event)"
+          [chatUpdates$]="chatUpdates$"></orchestration-workflow-execute>
+        <!-- </div> -->
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Workflow Modal Start -->
+<ng-template #workflowDetailsFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Workflow Details
+    </div>
+    <div class="card-body">
+      <form *ngIf="workflowDetailsForm" [formGroup]="workflowDetailsForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-12">
+            <label for="name" class="form-col-form-label text-muted">Name<em>*</em></label>
+            <input id="name" class="form-control text-dark" type="text" formControlName="name"
+              [class.is-invalid]="workflowDetailsFormErrors.name">
+            <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.name">
+              {{workflowDetailsFormErrors.name}}
+            </div>
+          </div>
+          <div class="form-group col-12">
+            <label for="description" class="form-col-form-label text-muted">Description</label>
+            <textarea id="description" class="form-control static text-dark" rows='2' formControlName="description"
+              [class.is-invalid]="workflowDetailsFormErrors.description" placeholder="Description"></textarea>
+            <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.description">
+              {{workflowDetailsFormErrors.description}}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="onSubmitWorkflowDetails()">{{editWorkflowFlag ? 'Update' : 'Start'}}</button>
+      <button class="btn btn-sm btn-danger pull-right" type="button"
+        (click)="onCloseWorkFlowDetails()">{{editWorkflowFlag ? 'Back' : 'Cancel'}}</button>
+    </div>
+  </div>
+</ng-template>
+<!-- Workflow Modal End -->
+
+<ng-template #confirmreturn>
+  <div class="card mb-0">
+    <div class="card-header">
+      Unsaved Changes
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="workflowReturnModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      You have unsaved changes. Do you want to leave without saving?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right" (click)="workflowReturnModalRef.hide()"
+        type="button">Cancel</button>
+      <button class="btn btn-sm btn-danger pull-right mr-2" type="button" (click)="confirmReturn()">Leave</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Svg for Arrow Start -->
+<svg width="0" height="0">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <!-- Filled triangle -->
+      <path d="M0,0 L10,5 L0,10 Z" fill="#5C6873" />
+    </marker>
+  </defs>
+</svg>
+
+<!-- Svg For Arrow End -->

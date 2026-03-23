@@ -1,0 +1,56 @@
+<alerts></alerts>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <azureresourcegrouplist
+                heading="Resource group List"
+                headers="azure_resource_group_headers"
+                tabledata="azure_resource_group"
+                modeldata="azure_resource_group_modeldata"
+                modeldata1="azure_create_virtual_machine"
+                rows="azure_resource_group_rows"
+                rows1="azure_create_vm_rows"
+                addclick="azure_resource_group_add(data)"
+                addclick1="azure_create_vm(data)"
+                addclick2="azure_add_nic(data)"
+                editclick = "azure_resource_group_edit(data)"
+                deleteclick = "azure_resource_group_delete(data)"
+                deleteconfirm = "azure_resource_group_delete_modal"
+                viewresource = "load_resources(data)"
+                viewvirtualmachine = "load_virtualmachine(data)"
+                actions="azure_resource_group.actions">
+            </azureresourcegrouplist>
+            <br/>
+
+            <!--- This division will show the resources within a resource group--->
+            <div ng-show = "resource_list">
+                <azureresourcelist
+                    heading="Resource List"
+                    headers="azure_resource_headers"
+                    tabledata="azure_resource_content"
+                    rows="azure_resource_content_rows"
+                    showclosebutton = 'yes'
+                    hideresource = "hideresourcetable()"
+                >
+                </azureresourcelist>
+            </div>
+
+            <div ng-show = "vm_list">
+                <azurevmlist
+                    heading="Virtual Machine  List"
+                    headers="azure_vm_headers"
+                    tabledata="azure_vm_content"
+                    rows="azure_vm_content_rows"
+                    showclosebutton = 'yes'
+                    hidevirtualmachine = "hidevirtualmachinetable()"
+                    attachloadbalancer = "attachloadbalancer()"
+
+                >
+                </azurevmlist>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>

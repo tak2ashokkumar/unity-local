@@ -1,0 +1,106 @@
+<style>
+.ipfield{
+	width: 92px;
+	margin-top: -5px;
+	text-align: center;
+}
+</style>
+<form class="form-horizontal">
+    <div class="form-group" ng-repeat="row in rows4">
+        <div ng-if="row.required">
+            <span ng-if= "row.type != 'hidden'">
+                <label for="blockName" class="col-sm-3 control-label">{{ row.description }}*</label>
+            </span>
+            <div ng-if="!(row.description.indexOf('IP') > -1)">
+                <div ng-if="!(row.name=='port') ">
+                    <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'password') || (row.type == 'file')">
+                        <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" maxlength="{{row.maxlength}}" required>
+                    </div>
+                </div>
+                <div ng-if="(row.name=='port') ">
+                    <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'password') || (row.type == 'file')">
+                        <input type="{{ row.type }}" class="{{ row.class }}" id="port" ng-model="obj[row.name]" value="{{row.value}}" onkeyup="set_portval(this.id);return false;" placeholder="443" >
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9 ng-scope" ng-if="(row.type == 'text') && (row.description.indexOf('IP') > -1)">
+                <input type="text" id="ip_field_1"  maxlength="3" onkeyup="set_ipval(this.id); return false;" class="ipfield" ng-model="obj[row.name]" >.
+                <input type="text" id="ip_field_2"  maxlength="3" onkeyup="set_ipval(this.id); return false;" class="ipfield" ng-model="obj.ip2">.
+                <input type="text" id="ip_field_3"  maxlength="3" onkeyup="set_ipval(this.id); return false;" class="ipfield" ng-model="obj.ip3">.
+                <input type="text" id="ip_field_4"  maxlength="3" onkeyup="set_ipval(this.id); return false;" class="ipfield" ng-model="obj.ip4">
+            </div>
+            <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="4" maxlength="255" cols="40" required></textarea>
+            </div>
+            <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                <select ng-options="option for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+            </div>
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+            </div>
+        </div>
+        <div ng-if="!row.required">
+            <div ng-if="row.depends == undefined">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}">
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                    <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="4" maxlength="255" cols="40"></textarea>
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                    <select ng-options="option for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]">
+                        <option value="">-- select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+            <div ng-if="row.depends != undefined">
+                <div ng-if="obj[row.depends.depends_on] == row.depends.value">
+                    <span ng-if= "row.type != 'hidden'">
+                        <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                    </span>
+                    <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                        <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}">
+                    </div>
+                    <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                        <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="4" maxlength="255" cols="40"></textarea>
+                    </div>
+                    <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                        <select ng-options="option for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]">
+                            <option value="">-- select {{ row.description | lowercase }} --</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-9" style="float: right;">
+                        <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                    </div>
+                    <!--<div ng-switch-when="{{row.depends.value}}">
+                        <span ng-if= "row.type != 'hidden'">
+                            <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                        </span>
+                        <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                            <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}">
+                        </div>
+                        <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                            <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="4" maxlength="255" cols="40"></textarea>
+                        </div>
+                        <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                            <select ng-options="option for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]">
+                                <option value="">&#45;&#45; select &#45;&#45;</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-9" style="float: right;">
+                            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

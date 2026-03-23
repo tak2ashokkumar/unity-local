@@ -1,0 +1,275 @@
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row justify-content-between">
+                            <div class="col-5 font-weight-bold">
+                                <span
+                                    class="badge bg-secondary acc-count font-weight-bold rounded-3 align-middle">{{count}}</span>
+                                <span class="ml-2 font-weight-bold align-middle">Identifier Rules</span>
+                            </div>
+                            <div class="col">
+                                <data-refresh-btn [page]="currentCriteria.pageNo"
+                                    (refresh)="refreshData($event)"></data-refresh-btn>
+                                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button"
+                                    container="body" (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pt-2">
+                        <div class="row pb-2">
+                            <div class="col-2">
+                                <search-box [searchValue]="currentCriteria.searchValue"
+                                    (searched)="onSearched($event)"></search-box>
+                            </div>
+                            <div class="col">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                        <table class="table table-sm text-left fold-table">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Rule Name</th>
+                                    <th>Applies To</th>
+                                    <th>Description</th>
+                                    <th>Active</th>
+                                    <th>Independent</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let view of viewData; let i = index">
+                                    <tr truncateText>
+                                        <td class="text-primary pointer-link tdw-25" (click)="selectView(view)">
+                                            <div [tooltip]="view.name">{{view.name || 'NA'}}</div>
+                                        </td>
+                                        <td class="tdw-20">
+                                            <div [tooltip]="view.applies_label">
+                                                <span *ngIf="view.details">{{view.applies_label || 'NA'}}</span>
+                                                <span *ngIf="!view.details"><i class="fa fa-spinner fa-spin">&nbsp;</i></span>
+                                            </div>
+                                        </td>
+                                        <td class="tdw-25">
+                                            <div [tooltip]="view.description">{{view.description || 'NA'}}</div>
+                                        </td>
+                                        <td class="tdw-10">
+                                            <div class="btn-group btn-group-sm rounded-pill border" role="group"
+                                                aria-label="is Active">
+                                                <button type="button" class="btn btn-sm rounded-pill font-xs-sm"
+                                                    [class.btn-primary]="view.active == 'true'"
+                                                    (click)="switchIdentifierRuleStatus('true', i)">Enable</button>
+                                                <button type="button" class="btn btn-sm rounded-pill font-xs-sm"
+                                                    [class.btn-primary]="view.active == 'false'"
+                                                    (click)="switchIdentifierRuleStatus('false', i)">Disable</button>
+                                            </div>
+                                        </td>
+                                        <td class="tdw-10">
+                                            <div [tooltip]="view.independent">{{view.independent}}</div>
+                                        </td>
+                                    </tr>
+                                    <tr class="fold" #fold [ngClass]="{'open' : view.isOpen}">
+                                        <td colspan="5">
+                                            <ng-container [ngTemplateOutlet]='identifierRuleInfoRef'
+                                                [ngTemplateOutletContext]="{view:view, idx:i}"></ng-container>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count"></table-entries>
+                        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No Rules Available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #identifierRuleInfoRef let-view="view" let-idx="idx">
+    <div class="row">
+        <div class="col-3">
+            <div class="card round-edge mt-1">
+                <div class="card-body">
+                    <div class="mt-2">
+                        <button class="text-left btn btn-block" type="button"
+                            [ngClass]="isActive(view, 'entry_attributes')"
+                            (click)="show(view, 'entry_attributes')">Entry Attributes</button>
+                    </div>
+                    <div class="mt-2">
+                        <button class="text-left btn btn-block" type="button"
+                            [ngClass]="isActive(view, 'reconciliation_rules')"
+                            (click)="show(view, 'reconciliation_rules')">Reconciliation Rules</button>
+                    </div>
+                    <div class="mt-2">
+                        <button class="text-left btn btn-block" type="button"
+                            [ngClass]="isActive(view, 'refresh_rules')" (click)="show(view, 'refresh_rules')">Data Refresh
+                            Rules</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-9">
+            <ng-container [ngSwitch]="view.target">
+                <ng-container *ngSwitchCase="'entry_attributes'">
+                    <ng-container [ngTemplateOutlet]='entryAttributesRef'
+                        [ngTemplateOutletContext]="{view:view, parentIndex:idx}"></ng-container>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'reconciliation_rules'">
+                    <ng-container [ngTemplateOutlet]='ReconciliationRulesRef'
+                        [ngTemplateOutletContext]="{view:view, parentIndex:idx}"></ng-container>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="'refresh_rules'">
+                    <ng-container [ngTemplateOutlet]='RefreshRulesref'
+                        [ngTemplateOutletContext]="{view:view, parentIndex:idx}"></ng-container>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #entryAttributesRef let-view="view" let-parentIndex="parentIndex">
+    <div class="card mt-1">
+        <div class="card-body p-0">
+            <table class="table table-sm text-left mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Priority</th>
+                        <th>Active</th>
+                        <th>Allow Null Attribute</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let r of view?.entry_attributes; let j = index" truncateText>
+                        <td class="tdw-25">
+                            <div [tooltip]="r.attributes">{{r.attributes}}</div>
+                        </td>
+                        <td class="tdw-25">
+                            <div [tooltip]="r.order">{{r.order}}</div>
+                        </td>
+                        <td class="tdw-25">
+                            <div class="btn-group btn-group-sm rounded-pill border" role="group" aria-label="is Active">
+                                <button type="button" class="btn btn-sm rounded-pill font-xs"
+                                    [ngClass]="r.active == 'true' ? 'btn-primary' : 'px-0'"
+                                    (click)="switchEntryAttributeStatus('true', j, parentIndex)">Enable</button>
+                                <button type="button" class="btn btn-sm rounded-pill font-xs"
+                                    [ngClass]="r.active == 'false' ? 'btn-primary' : 'px-0'"
+                                    (click)="switchEntryAttributeStatus('false', j, parentIndex)">Disable</button>
+                            </div>
+                        </td>
+                        <td class="tdw-25">
+                            <div [tooltip]="r.allow_null_attribute">{{r.allow_null_attribute}}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center text-muted py-4" *ngIf="!view?.entry_attributes.length">No Attributes Available.
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #ReconciliationRulesRef let-view="view" let-parentIndex="parentIndex">
+    <div class="card mt-1">
+        <div class="card-body p-0">
+            <table class="table table-sm text-left mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Source & Priority</th>
+                        <th>Attributes</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let r of view?.reconciliation_rules; let c = index">
+                        <tr truncateText>
+                            <td class="tdw-40">
+                                <div [tooltip]="r.discoverySourcePriority">{{r.discoverySourcePriority || 'NA'}}</div>
+                            </td>
+                            <td class="tdw-30">
+                                <div [tooltip]="r.attributes">{{r.attributes || 'All'}}</div>
+                            </td>
+                            <td class="tdw-30">
+                                <div class="btn-group btn-group-sm rounded-pill border" role="group" aria-label="is Active">
+                                    <button type="button" class="btn btn-sm rounded-pill font-xs"
+                                        [ngClass]="r.active == 'true' ? 'btn-primary' : 'px-0'"
+                                        (click)="switchReconciliationRuleStatus('true', c, parentIndex)">Enable</button>
+                                    <button type="button" class="btn btn-sm rounded-pill font-xs"
+                                        [ngClass]="r.active == 'false' ? 'btn-primary' : 'px-0'"
+                                        (click)="switchReconciliationRuleStatus('false', c, parentIndex)">Disable</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+            <div class="text-center text-muted py-4" *ngIf="!view?.reconciliation_rules.length">No Rules Available.
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #RefreshRulesref let-view="view" let-parentIndex="parentIndex">
+    <div class="card mt-1">
+        <div class="card-body p-0">
+            <table class="table table-sm text-left mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <!-- <th>Name</th> -->
+                        <th>Discovery Source</th>
+                        <th>Duration</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let r of view?.refresh_rules; let k = index">
+                        <tr truncateText>
+                            <!-- <td class="tdw-25">
+                                <div [tooltip]="r.name">{{r.name}}</div>
+                            </td> -->
+                            <td class="tdw-30">
+                                <div [tooltip]="r.discovery_source">{{r.discovery_source}}</div>
+                            </td>
+                            <td class="tdw-30">
+                                <div [tooltip]="r.duration">{{r.duration}}</div>
+                            </td>
+                            <td class="tdw-30">
+                                <div class="btn-group btn-group-sm rounded-pill border" role="group" aria-label="is Active">
+                                    <button type="button" class="btn btn-sm rounded-pill font-xs"
+                                        [ngClass]="r.active == 'true' ? 'btn-primary' : 'px-0'"
+                                        (click)="switchRefreshRuleStatus('true', k, parentIndex)">Enable</button>
+                                    <button type="button" class="btn btn-sm rounded-pill font-xs"
+                                        [ngClass]="r.active == 'false' ? 'btn-primary' : 'px-0'"
+                                        (click)="switchRefreshRuleStatus('false', k, parentIndex)">Disable</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
+            </table>
+            <div class="text-center text-muted py-4" *ngIf="!view?.refresh_rules.length">No Rules Available.</div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to enable?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

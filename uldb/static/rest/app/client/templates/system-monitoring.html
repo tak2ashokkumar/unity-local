@@ -1,0 +1,71 @@
+<style type="text/css">
+    select,  select:focus{
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    .graph_selcetion_form .form-control {
+        font-size: 12px !important;
+        width: 82%;
+        padding-right: 0px;
+    }
+    .graph_selcetion_form .form-control.device_name {
+        font-size: 13px !important;
+        font-weight: 600;
+    }
+    .graph_selcetion_form .select-arrow {
+        margin-right: 0px;
+    }
+</style>
+
+<loading loader="{{loader}}"></loading>
+<div class="row" style="margin-right: -15px !important;" ng-if="device_data.results.length > 0">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" ng-repeat="widget in device_data.results[0].widget_data"
+     style="padding-right : 10px !important; padding-bottom : 10px;" >
+        <div class="row page_wrapper" ng-init="widget = update_widget(widget)">
+            <div class="col-xs-12 ">
+                <form role="form" class="graph_selcetion_form" name="graph_selcetion_form" novalidate>
+                    <div class="form-group col-xs-3">
+                        <select class="form-control device_name" ng-model="widget.selected_device" ng-change="set_selected_device(widget)">
+                            <option ng-repeat="widget_obj in device_data.results[0].widget_data"
+                             value="{{widget_obj.data.device_abs_name}}">{{widget_obj.data.device_abs_name}}</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                    <div class="form-group col-xs-3 col-xs-offset-2 pull-left" style="padding-right: 10px !important;">
+                        <select class="form-control" ng-model="widget.selected_first_graph"
+                         ng-change="set_first_graph_for_device(widget)">
+                            <option ng-repeat="graph_obj in widget.graph_type_arr" value="{{graph_obj.DISPLAYNAME}}">{{graph_obj.DISPLAYNAME}}</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                    <div class="form-group col-xs-3 pull-right" style="margin-right:10px;padding-right: 10px !important;">
+                        <select class="form-control" ng-model="widget.selected_second_graph" 
+                        ng-change="set_second_graph_for_device(widget)">
+                            <option ng-repeat="graph_obj in widget.graph_type_arr" value="{{graph_obj.DISPLAYNAME}}">{{graph_obj.DISPLAYNAME}}</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="col-xs-12" style="min-height: 120px;">
+                <table>
+                    <tbody>
+                        <tr ng-click="show_observium_page(widget)">
+                            <td>
+                                <img class="pduhealthgraphsimg" ng-src="data:image/png;base64,{{ widget.first_graph.graph }}">
+                            </td>
+                            <td>
+                                <img class="pduhealthgraphsimg" ng-src="data:image/png;base64,{{ widget.second_graph.graph }}">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="padding:20px" ng-if="device_data.results.length === 0">
+    <no-records-found message=" No devices configured for monitoring"></no-records-found>
+</div>

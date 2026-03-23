@@ -1,0 +1,161 @@
+
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+
+<script type="text/ng-template" id="currentCloudData.html">
+  <div class="row">
+    <div class="col-sm-12">
+      <form class="form-horizontal">
+        <div class="form-group">
+          <div class="col-xs-12">
+            <input class="form-control ng-valid ng-dirty"
+                   type="text" id="searchKeyword"
+                   ng-model="searchKeyword" placeholder="Search private clouds"
+                   ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+<div>
+  <div ng-if="!private_clouds">
+    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </div>
+  <div ng-if="private_clouds.length != 0">
+    <table class="table table-condensed">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Virtualization Platform</th>
+        <th>Servers</th>
+        <th>VMs</th>
+        <th>Network Devices</th>
+        <th>Manage</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-click="selObj(cloud)"
+          ng-class="{'success': cloud === sel.cloud }"
+          ng-repeat="cloud in private_clouds | filter: searchKeyword">
+        <td><a href="#/cloud/{{ cloud.uuid }}">{{ cloud.name }}</a></td>
+        <td>{{ cloud.platform_type }}</td>
+        <td>{{ cloud.servers.length || 0 }}</td>
+        <td>{{ cloud.vms.length || 0}}</td>
+        <td>{{ cloud.switches.length || 0 + cloud.load_balancers.length || 0  + cloud.firewalls.length }}</td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu action-button">
+              <li ng-if="proxy_link(cloud) !== null"><a
+                  href="#/{{ proxy_prefix(cloud) }}/{{ proxy_link(cloud)[0].uuid }}">Manage {{ cloud.platform_type }}</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div ng-if="private_clouds.length == 0">
+    <h3 class="align-center">No records to display</h3>
+  </div>
+</div>
+
+</script>
+
+<script type="text/ng-template" id="vcenterData.html">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          {{ vheading }}
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Access URL</th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in vcenterData">
+
+              <td>{{ row.name }}</td>
+
+              <td><a href="#/vmware-vcenter/{{ row.uuid }}" class="btn btn-success">Access</a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="esxiData.html">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          {{ eheading }}
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Access URL</th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in esxiData">
+
+              <td>{{ row.name }}</td>
+
+              <td><a href="#/vmware-esxi/{{ row.uuid }}" class="btn btn-success">Access</a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="openstackData.html">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          {{ oheading }}
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>Access URL</th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in openstackData">
+
+              <td>{{ row.name }}</td>
+
+              <td><a href="#/openstack-proxy/{{row.uuid}}" class="btn btn-success">Access</a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>

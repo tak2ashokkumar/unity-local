@@ -1,0 +1,362 @@
+<div class="row mx-0">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div class="d-flex flex-column">
+            <div class="d-flex align-items-center">
+                <h4 class="mb-1">{{activeBoard?.name}}</h4>
+                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                    (click)="editDashboard(activeBoard)" accessControl moduleName="Dashboard"
+                                accessType="Manage Dashboard" elementType="btn"></button>
+            </div>
+            <span class="d-flex align-items-center font-xs">
+                <span class="text-dark font-500">Widgets: {{dashboardWidgets?.length}}</span>
+                <span class="mx-2">|</span>
+                <span class="text-success font-500">Published: {{publishedWidgets?.length}}</span>
+                <span class="mx-2">|</span>
+                <span class="text-warning font-500">Draft: {{dashboardWidgets?.length -
+                    publishedWidgets?.length}}</span>
+            </span>
+        </div>
+        <div class="d-flex flex-column">
+            <span>Refresh Interval: {{activeBoard?.refresh_interval_in_sec/60}} mins</span>
+            <span class="font-xs text-warning text-right font-500">Refreshing in : {{dashboardRefreshCountDown}}
+                secs</span>
+        </div>
+    </div>
+    <ng-container *ngFor="let widget of publishedWidgets; let i = index">
+        <ng-container [ngSwitch]="widget.widget_type">
+            <ng-container *ngSwitchCase="'host_availability'">
+                <ng-container *ngTemplateOutlet="hostAvailabilityRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'private_cloud'">
+                <ng-container *ngTemplateOutlet="privateCloudRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'public_cloud'">
+                <ng-container *ngTemplateOutlet="publicCloudRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'infra_summary'">
+                <ng-container *ngTemplateOutlet="infraSummaryRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'cloud_cost'">
+                <ng-container *ngTemplateOutlet="cloudCostRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'alerts'">
+                <ng-container *ngTemplateOutlet="alertsRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'sustainability'">
+                <ng-container *ngTemplateOutlet="sustainabilityRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'monitoring'">
+                <ng-container *ngTemplateOutlet="monitoringRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+            <ng-container *ngSwitchCase="'device_by_os'">
+                <ng-container *ngTemplateOutlet="deviceByOSRef; context: { $implicit: widget }"></ng-container>
+            </ng-container>
+        </ng-container>
+    </ng-container>
+    <ng-container *ngIf="!publishedWidgets.length">
+        <div class="col-12">
+            <div class="card content-wrap mt-4">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <h1 class="title-section mb-3">No Widgets Created / Published Yet!</h1>
+                    <span class="text-section font-lg mb-3">Add one with data you intend
+                        to view or pubnlish which you already created. Once you do, this page will be populated with the
+                        widgets you have added to your dashboard.</span>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<ng-template #hostAvailabilityRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <ng-container *ngIf="!widget?.customLegends">
+                        <div echarts [options]="widget?.chartData?.options" [extentions]="widget?.chartData?.extensions"
+                            [defaultHeight]="220"></div>
+                    </ng-container>
+                    <ng-container *ngIf="widget?.customLegends">
+                        <div class="row mx-0">
+                            <div class="col-6 p-0">
+                                <div echarts [options]="widget?.chartData?.options"
+                                    [extentions]="widget?.chartData?.extensions" [defaultHeight]="220"></div>
+                            </div>
+                            <div class="col-6 p-0 overflow-auto d-flex flex-column justify-content-center"
+                                style="max-height: 220px;">
+                                <div *ngFor="let item of widget.data; let i = index"
+                                    class="d-flex justify-content-between align-items-center">
+                                    <span class="w-52 d-flex justify-content-between">
+                                        <span class="w-75 text-truncate">
+                                            <i class="fa fa-xs" [ngClass]="getDeviceIcon(item.name)"></i>
+                                            <span class="ml-1 font-xs-sm">{{getDeviceDisplayNames(item.name)}}</span>
+                                        </span>
+                                        <span class="ml-1 w-25 font-xs-sm">: {{item.count}}</span>
+                                    </span>
+                                    <span class="ml-2 w-16">
+                                        <span class="fa fa-circle fa-xs text-success">&nbsp;</span>
+                                        <span class="ml-1 font-xs-sm">{{item.Up}}</span>
+                                    </span>
+                                    <span class="ml-2 w-16">
+                                        <span class="fa fa-circle fa-xs text-danger">&nbsp;</span>
+                                        <span class="ml-1 font-xs-sm">{{item.Down}}</span>
+                                    </span>
+                                    <span class="ml-2 w-16">
+                                        <span class="fa fa-circle fa-xs text-secondary">&nbsp;</span>
+                                        <span class="ml-1 font-xs-sm">{{item.Unknown}}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #privateCloudRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div class="row mx-0">
+                        <div class="col-8 p-0">
+                            <div echarts [options]="widget?.chartData?.options"
+                                [extentions]="widget?.chartData?.extensions" [defaultHeight]="220"></div>
+                        </div>
+                        <div class="col-4 p-0 overflow-auto font-xs-sm d-flex flex-column justify-content-center"
+                            style="max-height: 220px;">
+                            <div *ngFor="let item of widget.data; let i = index"
+                                class="d-flex justify-content-start align-items-center">
+                                <span class="w-75 text-truncate">{{item.name}}</span>
+                                <span class="ml-1 w-25">: {{item.count}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #publicCloudRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div class="row mx-0">
+                        <div class="col-8 p-0">
+                            <div echarts [options]="widget?.chartData?.options"
+                                [extentions]="widget?.chartData?.extensions" [defaultHeight]="220"></div>
+                        </div>
+                        <div class="col-4 p-0 overflow-auto font-xs-sm d-flex flex-column justify-content-center"
+                            style="max-height: 220px;">
+                            <div *ngFor="let item of widget.data; let i = index"
+                                class="d-flex justify-content-start align-items-center">
+                                <span class="w-75 text-truncate">{{item.name}}</span>
+                                <span class="ml-1 w-25">: {{item.count}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #infraSummaryRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div class="row mx-0">
+                        <div class="col-8 p-0">
+                            <div echarts [options]="widget?.chartData?.options"
+                                [extentions]="widget?.chartData?.extensions" [defaultHeight]="220"></div>
+                        </div>
+                        <div class="col-4 p-0 overflow-auto font-xs-sm d-flex flex-column justify-content-center"
+                            style="max-height: 220px;">
+                            <div *ngFor="let item of widget.data; let i = index"
+                                class="d-flex justify-content-start align-items-center">
+                                <span class="w-75 text-truncate">{{item.name}}</span>
+                                <span class="ml-1 w-25">: {{item.count}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #cloudCostRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div echarts [options]="widget?.chartData?.options" [extentions]="widget?.chartData?.extensions"
+                        [defaultHeight]="220"></div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #alertsRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div echarts [options]="widget?.chartData?.options" [extentions]="widget?.chartData?.extensions"
+                        [defaultHeight]="220"></div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #sustainabilityRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div echarts [options]="widget?.chartData?.options" [extentions]="widget?.chartData?.extensions"
+                        [defaultHeight]="220"></div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #monitoringRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.metricesMappingData?.length">
+                    <div *ngFor="let device of widget?.metricesMappingData; let i = index;"
+                        class="row border-bottom mx-2 py-1">
+                        <div class="col-12 d-flex justify-content-between align-items-center px-0"
+                            (click)="onDeviceSelect(device)" style="cursor: pointer;">
+                            <div class="d-flex align-items-center">
+                                <shared-device-status [status]="device.status" [hideTooltip]="true"
+                                    class="mr-1"></shared-device-status>
+                                <div class="font-500 text-muted py-1">{{device.name}}</div>
+                            </div>
+                            <span class="text-muted font-500 mr-2">{{device.metrics.length}}</span>
+                        </div>
+                        <ng-container *ngIf="device.isSelected">
+                            <div class="col-12 d-flex justify-content-between align-items-center"
+                                *ngFor="let metric of widget?.metricesMappingData[i].metrics">
+                                <div class="w-80 d-flex align-items-center">
+                                    <div class="text-muted text-truncate font-xs-sm text-truncate font-500 py-1 px-2"
+                                        [tooltip]="metric.name">{{metric.name}}</div>
+                                </div>
+                                <div *ngIf="metric.value || metric.value == 0" class="w-20 d-flex align-items-center">
+                                    <span [tooltip]="metric?.value + metric?.unit"
+                                        class="text-muted text-truncate font-xs-sm text-truncate font-500">
+                                        {{ metric?.value}}{{metric?.unit}}
+                                    </span>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div echarts [options]="widget?.chartData?.options" [extentions]="widget?.chartData?.extensions"
+                        [defaultHeight]="220"></div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #deviceByOSRef let-widget>
+    <div class="col-6 p-1">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                <span class="font-lg font-500">{{widget?.name}}</span>
+                <span *ngIf="!dataSyncEnd" class="font-xss text-warning font-500">{{syncInProgressMsg}}</span>
+                <span *ngIf="dataError" class="pull-right fas fa-exclamation-triangle text-warning font-lg"
+                    [tooltip]="dataError" container="body"></span>
+            </div>
+            <div class="card-body custom-height p-0">
+                <ng-container *ngIf="widget?.chartData && widget?.totalCount">
+                    <div echarts [options]="widget?.chartData?.options" [extentions]="widget?.chartData?.extensions"
+                        [defaultHeight]="220"></div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!widget?.totalCount">
+                    <span class="font-lg font-500 py-5">No data available.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template>
+
+</ng-template>

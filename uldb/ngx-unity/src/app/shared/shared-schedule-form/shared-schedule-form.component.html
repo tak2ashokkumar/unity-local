@@ -1,0 +1,270 @@
+<p>sdfdsgsdfgdfg</p>
+<form *ngIf="scheduleForm" [formGroup]="scheduleForm">
+    <ng-container formGroupName="schedule">
+        <div class="row">
+            <div class="col-2 text-right pr-0">Schedule <em>*</em> : </div>
+            <div class="col-8">
+                <div class="d-inline-block">
+                    <ul class="d-flex px-0 mb-0">
+                        <li>
+                            <label class="pointer-link"
+                                [class.active]="scheduleForm.get('schedule').get('schedule_type').value=='none'">
+                                <input type="radio" formControlName="schedule_type" [value]="'none'">
+                                <span class="font-sm mr-2">None</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="pointer-link"
+                                [class.active]="scheduleForm.get('schedule').get('schedule_type').value=='hourly'">
+                                <input type="radio" formControlName="schedule_type" [value]="'hourly'">
+                                <span class="font-sm mr-2">Hourly</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="pointer-link"
+                                [class.active]="scheduleForm.get('schedule').get('schedule_type').value=='daily'">
+                                <input type="radio" formControlName="schedule_type" [value]="'daily'">
+                                <span class="font-sm mr-2">Daily</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="pointer-link"
+                                [class.active]="scheduleForm.get('schedule').get('schedule_type').value=='weekly'">
+                                <input type="radio" formControlName="schedule_type" [value]="'weekly'">
+                                <span class="font-sm mr-2">Weekly</span>
+                            </label>
+                        </li>
+                        <li>
+                            <label class="pointer-link"
+                                [class.active]="scheduleForm.get('schedule').get('schedule_type').value=='monthly'">
+                                <input type="radio" formControlName="schedule_type" [value]="'monthly'">
+                                <span class="font-sm mr-2">Monthly</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <ng-container
+            *ngIf="scheduleForm.get('schedule').get('schedule_type').value == 'hourly' || scheduleForm.get('schedule').get('schedule_type').value == 'daily' || scheduleForm.get('schedule').get('schedule_type').value == 'weekly' || scheduleForm.get('schedule').get('schedule_type').value == 'monthly'">
+            <div class="form-group row mt-3">
+                <div class="col-2 text-right px-0 mt-4">Range of Recurrence <em>*</em> : </div>
+                <div class="col-10">
+                    <div class="form-group row mt-0">
+                        <div class="col-2">
+                            <div>Start Date <em>*</em></div>
+                            <div class="input-group">
+                                <owl-date-time #startDate [pickerType]="'calendar'"></owl-date-time>
+                                <input class="form-control rounded-left" name="start_date" formControlName="start_date"
+                                    [owlDateTimeTrigger]="startDate" [owlDateTime]="startDate"
+                                    [max]="scheduleForm.get('schedule').get('end_date').value" type="text"
+                                    placeholder="Date" [class.is-invalid]="scheduleFormErrors.schedule.start_date">
+                                <div class="input-group-append" [owlDateTimeTrigger]="startDate">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.start_date">
+                                    {{scheduleFormErrors.schedule.start_date}}</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div>End Date <em>*</em></div>
+                            <div class="row">
+                                <div class="col-4 pr-0 pt-2">
+                                    <div class="form-check d-inline pr-2">
+                                        <input class="form-check-input form-check-inline pr-0" type="radio" id="never"
+                                            name="end_date_status" formControlName="end_date_status" value="never">
+                                        <label class="form-check-label" for="never">Never</label>
+                                    </div>
+                                    <div class="form-check d-inline">
+                                        <input class="form-check-input form-check-inline" type="radio" id="on"
+                                            name="end_date_status" formControlName="end_date_status" value="on">
+                                        <label class="form-check-label" for="on">On</label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <owl-date-time #endDate [pickerType]="'calendar'"></owl-date-time>
+                                        <input class="form-control rounded-left pr-0" name="end_date"
+                                            formControlName="end_date" [owlDateTimeTrigger]="endDate"
+                                            [owlDateTime]="endDate"
+                                            [min]="scheduleForm.get('schedule').get('start_date').value" type="text"
+                                            placeholder="Date"
+                                            [class.is-invalid]="scheduleFormErrors.schedule.end_date">
+                                        <div class="input-group-append" [owlDateTimeTrigger]="endDate">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                        <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.end_date">
+                                            {{scheduleFormErrors.schedule.end_date}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="scheduleForm.get('schedule').get('schedule_type').value == 'hourly'"
+                        formGroupName="hourly">
+                        <div class="form-group row mt-3">
+                            <div class="col-5">
+                                <div class="row">
+                                    <div class="col-2 pr-0">Every</div>
+                                    <div class="col-3 pl-0">
+                                        <input class="form-control form-control-sm" type="number" min="0" max="23"
+                                            placeholder="Hr" formControlName="hours_interval"
+                                            [class.is-invalid]="scheduleFormErrors.schedule.hourly.hours_interval">
+                                        <div class="invalid-feedback d-block">
+                                            {{scheduleFormErrors.schedule.hourly.hours_interval}}</div>
+                                    </div>
+                                    <div class="col-2 pr-0">Hours<em>*</em></div>
+                                    <div class="col-3 pl-0">
+                                        <input class="form-control form-control-sm" type="number" min="0" max="59"
+                                            placeholder="Ms" formControlName="minutes_interval"
+                                            [class.is-invalid]="scheduleFormErrors.schedule.hourly.minutes_interval">
+                                        <small class="invalid-feedback d-block"
+                                            *ngIf="scheduleFormErrors.schedule.hourly.minutes_interval">
+                                            {{scheduleFormErrors.schedule.hourly.minutes_interval}}</small>
+                                    </div>
+                                    <div class="col-2">Mins<em>*</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="scheduleForm.get('schedule').get('schedule_type').value == 'daily'"
+                        formGroupName="daily">
+                        <div class="form-group row mt-3">
+                            <div class="col-4">
+                                <div class="row">
+                                    <div class="col-2 pr-0">Every</div>
+                                    <div class="col-4">
+                                        <input class="form-control form-control-sm" type="number" min="0" max="23"
+                                            formControlName="days_interval"
+                                            [class.is-invalid]="scheduleFormErrors.schedule.daily.days_interval">
+                                        <div class="invalid-feedback"
+                                            *ngIf="scheduleFormErrors.schedule.daily.days_interval">
+                                            {{scheduleFormErrors.schedule.daily.days_interval}}</div>
+                                    </div>
+                                    <div class="col-2 pr-0">Day(s)<em>*</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="scheduleForm.get('schedule').get('schedule_type').value == 'weekly'"
+                        formGroupName="weekly">
+                        <div class="form-group row mt-3">
+                            <div class="col-2">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [settings]="weekDaysSettings" [options]="weekDaysOptions"
+                                    formControlName="week_days"
+                                    [class.is-invalid]="scheduleFormErrors.schedule.weekly.week_days"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.weekly.week_days">
+                                    {{scheduleFormErrors.schedule.weekly.week_days}}</div>
+                            </div>
+                            <!-- <div class="col-4 d-flex align-items-center mr-5 pt-1">
+                                <div class="form-check mr-3" *ngFor="let day of days; let i=index;">
+                                    <input class="form-check-input form-check-xl" type="checkbox" id="{{i}}-weekDays"
+                                        [checked]="scheduleForm.get('schedule').get('weekly').get('week_days').value.includes(day)"
+                                        (change)="onCheckboxChange(day)" />
+                                    <label class="form-check-label" for="{{i}}-weekDays">{{day}}</label>
+                                </div>
+                            </div> -->
+                            <div class="w-2 pt-2 ml-2">at</div>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <owl-date-time #schedule_time [pickerType]="'timer'"></owl-date-time>
+                                    <input class="form-control rounded-left" name="at" formControlName="at"
+                                        [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text"
+                                        [class.is-invalid]="scheduleFormErrors.schedule.weekly.at">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                    </div>
+                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.weekly.at">
+                                        {{scheduleFormErrors.schedule.weekly.at}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="scheduleForm.get('schedule').get('schedule_type').value == 'monthly'"
+                        formGroupName="monthly">
+                        <div class="form-group row mt-3">
+                            <div class="w-2 pt-2 ml-2">
+                                <div class="form-check d-inline">
+                                    <input class="form-check-input form-check-inline" type="radio" name="monthly_type"
+                                        formControlName="monthly_type" value="day">
+                                </div>
+                            </div>
+                            <div class="w-3 pt-2">Day</div>
+                            <div class="col-2">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [settings]="daysSettings" [options]="daysOptions" formControlName="days"
+                                    [class.is-invalid]="scheduleFormErrors.schedule.monthly.days"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.monthly.days">
+                                    {{scheduleFormErrors.schedule.monthly.days}}</div>
+                            </div>
+                            <div class="w-2 pt-2 ml-2">of</div>
+                            <div class="col-2">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [settings]="monthsSettings" [options]="monthsOptions" formControlName="months"
+                                    [class.is-invalid]="scheduleFormErrors.schedule.monthly.months"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.monthly.months">
+                                    {{scheduleFormErrors.schedule.monthly.months}}</div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="w-2 pt-2 ml-2">
+                                <div class="form-check d-inline">
+                                    <input class="form-check-input form-check-inline" type="radio" name="monthly_type"
+                                        formControlName="monthly_type" value="every">
+                                </div>
+                            </div>
+                            <div class="w-4 pt-2">Every</div>
+                            <div class="col-2">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [settings]="weeksSettings" [options]="weeksOptions" formControlName="weeks"
+                                    [class.is-invalid]="scheduleFormErrors.schedule.monthly.weeks"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.monthly.weeks">
+                                    {{scheduleFormErrors.schedule.monthly.weeks}}</div>
+                            </div>
+                            <div class="col-2">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [settings]="weekDaysSettings" [options]="weekDaysOptions"
+                                    formControlName="week_days"
+                                    [class.is-invalid]="scheduleFormErrors.schedule.monthly.week_days"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.monthly.week_days">
+                                    {{scheduleFormErrors.schedule.monthly.week_days}}</div>
+                            </div>
+                            <div class="w-2 pt-2 ml-2">of</div>
+                            <div class="col-2">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [settings]="monthsSettings" [options]="monthsOptions" formControlName="every_months"
+                                    [class.is-invalid]="scheduleFormErrors.schedule.monthly.every_months"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.monthly.every_months">
+                                    {{scheduleFormErrors.schedule.monthly.every_months}}</div>
+                            </div>
+                            <div class="w-2 pt-2 ml-2">at</div>
+                            <div class="col-2">
+                                <div class="input-group">
+                                    <owl-date-time #schedule_time [pickerType]="'timer'"></owl-date-time>
+                                    <input class="form-control rounded-left" name="at" formControlName="at"
+                                        [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text"
+                                        [class.is-invalid]="scheduleFormErrors.schedule.monthly.at">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                    </div>
+                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.schedule.monthly.at">
+                                        {{scheduleFormErrors.schedule.monthly.at}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+</form>

@@ -1,0 +1,930 @@
+<div class="col-xs-12" ng-controller="AllDevicesController" ng-if="(tabname === 'all_devices')">
+    <loading
+        object="{{virtual_machines_loaded && hypervisors_loaded && switches_loaded && load_balancers_loaded && firewalls_loaded && custom_devices_loaded && baremetals_loaded}}">
+    </loading>
+
+    <style type="text/css">
+        table tbody tr td {
+            width: 20%;
+        }
+
+        .search-widget .navbar-form .form-control.width100 {
+            width: 100%;
+        }
+    </style>
+
+    <div class="page_wrapper" style="float:left;" ng-show="firewalls.length > 0">
+        <div class="row content-wrapper bg-color">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 search-widget">
+                <div class="col-xs-2 padding_top8px">
+                    <h1>Firewalls</h1>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 pull-right">
+                    <div class="col-xs-7">
+                        <form class="navbar-form">
+                            <div class="form-group width100">
+                                <input class="form-control width100" type="text" ng-model="searchFirewalls"
+                                    id="searchFirewalls" placeholder="Enter keyword">
+                                <button class="btn btn-search" type="submit" style="top: 4px;">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-5 action-bar pull-right padding_top8px text_right">
+                        <span class="count">{{ ((firewalls | filter: searchFirewalls).length) || 0 }}</span>
+                        <span class="count-text"> Firewalls</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <section id="no-more-tables" class="margintop20 middle-wrapper">
+                <table class="table  table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th> Device Name </th>
+                            <th> Status </th>
+                            <th> Alerts </th>
+                            <th> Actions </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="firewall in firewalls | filter: searchFirewalls">
+                            <td>
+                                <a tabindex="0" popover-trigger="'outsideClick'"
+                                    uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover"
+                                    href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('firewall', firewall)"
+                                    ng-click="show_observium_details(firewall)">
+                                    {{firewall.name}}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    ng-if="angular.isObject(firewall.observium_details) && !angular.isDefined(firewall.observium_details.device_data)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                                <span ng-if="!angular.isObject(firewall.observium_details)">
+                                    <device-not-configured></device-not-configured>
+                                </span>
+                                <span
+                                    ng-if="angular.isObject(firewall.observium_details) && angular.isDefined(firewall.observium_details.device_data)">
+                                    <span ng-if="firewall.observium_details.device_data.status == 1">
+                                        <device-up></device-up>
+                                    </span>
+                                    <span ng-if="firewall.observium_details.device_data.status == 0"
+                                        class="device_status_down">
+                                        <device-down></device-down>
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <span ng-if="angular.isUndefined(firewall.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(firewall.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('firewall', firewall.uuid, firewall)" href=""
+                                        ng-if="firewall.failed_alerts_count > 0">
+                                        {{ firewall.failed_alerts_count}}
+                                    </a>
+                                    <span ng-if="(firewall.failed_alerts_count == 0)"> {{ firewall.failed_alerts_count}}
+                                    </span>
+                                    <span
+                                        ng-if="(!firewall.failed_alerts_count && (firewall.failed_alerts_count != 0))">
+                                        NA </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-icons">
+                                    <span tooltip-class="customClass" uib-tooltip="{{firewall.message}}">
+                                        <a ng-click="show_device_stats(firewall.uuid, 'firewall')"
+                                            ng-if="firewall.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="firewall.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <div ng-if="((firewalls_loaded) && firewalls.length===0 || (((firewalls | filter: searchFirewalls).length) == 0 ))"
+                class="content-wrapper">
+                <no-records-found message="No Firewalls associated with this private cloud !!"></no-records-found>
+            </div>
+        </div>
+    </div>
+
+    <div class="page_wrapper" style="float:left;" ng-class="{'margin_top10px' : firewalls.length > 0}"
+        ng-show="load_balancers.length > 0">
+        <div class="row content-wrapper bg-color">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 search-widget">
+                <div class="col-xs-2 padding_top8px">
+                    <h1>Load Balancers</h1>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 pull-right">
+                    <div class="col-xs-7">
+                        <form class="navbar-form">
+                            <div class="form-group width100">
+                                <input class="form-control width100" type="text" ng-model="searchLoadBalancers"
+                                    id="searchLoadBalancers" placeholder="Enter keyword">
+                                <button class="btn btn-search" type="submit" style="top: 4px;">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-5 action-bar pull-right padding_top8px text_right">
+                        <span class="count">{{ ((load_balancers | filter: searchLoadBalancers).length) || 0 }}</span>
+                        <span class="count-text"> Load Balancers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <section id="no-more-tables" class="margintop20 middle-wrapper">
+                <table class="table  table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th> Device Name </th>
+                            <th> Status </th>
+                            <th> Alerts </th>
+                            <th> Actions </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="load_balancer in load_balancers | filter: searchLoadBalancers">
+                            <td>
+                                <a tabindex="0" popover-trigger="'outsideClick'"
+                                    uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover"
+                                    href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('load_balancer', load_balancer)"
+                                    ng-click="show_observium_details(load_balancer)">
+                                    {{load_balancer.name}}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    ng-if="angular.isObject(load_balancer.observium_details) && !angular.isDefined(load_balancer.observium_details.device_data)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="!angular.isObject(load_balancer.observium_details)">
+                                    <device-not-configured></device-not-configured>
+                                </span>
+                                <span
+                                    ng-if="angular.isObject(load_balancer.observium_details) && angular.isDefined(load_balancer.observium_details.device_data)">
+                                    <span ng-if="load_balancer.observium_details.device_data.status == 1">
+                                        <device-up></device-up>
+                                    </span>
+                                    <span ng-if="load_balancer.observium_details.device_data.status == 0">
+                                        <device-down></device-down>
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <span ng-if="angular.isUndefined(load_balancer.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(load_balancer.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('load_balancer', load_balancer.uuid, load_balancer)"
+                                        href="" ng-if="load_balancer.failed_alerts_count > 0">
+                                        {{ load_balancer.failed_alerts_count}}
+                                    </a>
+                                    <span ng-if="(load_balancer.failed_alerts_count == 0)">
+                                        {{ load_balancer.failed_alerts_count}} </span>
+                                    <span
+                                        ng-if="(!load_balancer.failed_alerts_count && (load_balancer.failed_alerts_count != 0))">
+                                        NA </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-icons">
+                                    <span tooltip-class="customClass" uib-tooltip="{{load_balancer.message}}">
+                                        <a ng-click="show_device_stats(load_balancer.uuid, 'load_balancer')"
+                                            ng-if="load_balancer.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="load_balancer.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <div ng-if="((load_balancers_loaded) && load_balancers.length===0 || (((load_balancers | filter: searchLoadBalancers).length) == 0 ))"
+                class="content-wrapper">
+                <no-records-found message="No Load Balancers associated with this private cloud !!"></no-records-found>
+            </div>
+        </div>
+    </div>
+
+    <div class="page_wrapper" style="float:left" ng-show="switches.length > 0"
+        ng-class="{'margin_top10px' : (firewalls.length > 0) || (load_balancers.length > 0)}">
+        <div class="row content-wrapper bg-color">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 search-widget">
+                <div class="col-xs-2 padding_top8px">
+                    <h1>Switches</h1>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 pull-right">
+                    <div class="col-xs-7">
+                        <form class="navbar-form">
+                            <div class="form-group width100">
+                                <input class="form-control width100" type="text" ng-model="searchSwitches"
+                                    id="searchSwitches" placeholder="Enter keyword">
+                                <button class="btn btn-search" type="submit" style="top: 4px;">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-5 action-bar pull-right padding_top8px text_right">
+                        <span class="count">{{ ((switches | filter: searchSwitches).length) || 0 }}</span>
+                        <span class="count-text"> Switches</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <section id="switchs" class="margintop20 middle-wrapper">
+                <table class="table  table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th> Device Name </th>
+                            <th> Status </th>
+                            <th> Alerts </th>
+                            <th> Actions </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="switch in switches | filter: searchSwitches">
+                            <td>
+                                <a tabindex="0" popover-trigger="'outsideClick'"
+                                    uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover"
+                                    href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('switch', switch)"
+                                    ng-click="show_observium_details(switch)">
+                                    {{switch.name}}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    ng-if="angular.isObject(switch.observium_details) && !angular.isDefined(switch.observium_details.device_data)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                                <span ng-if="!angular.isObject(switch.observium_details)">
+                                    <device-not-configured></device-not-configured>
+                                </span>
+                                <span
+                                    ng-if="angular.isObject(switch.observium_details) && angular.isDefined(switch.observium_details.device_data)">
+                                    <span ng-if="switch.observium_details.device_data.status == 1">
+                                        <device-up></device-up>
+                                    </span>
+                                    <span ng-if="switch.observium_details.device_data.status == 0">
+                                        <device-down></device-down>
+                                    </span>
+                                </span>
+                            </td>
+
+
+                            <td>
+                                <span ng-if="angular.isUndefined(switch.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(switch.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('switch', switch.uuid, switch)" href=""
+                                        ng-if="switch.failed_alerts_count > 0">
+                                        {{ switch.failed_alerts_count}}
+                                    </a>
+                                    <span ng-if="(switch.failed_alerts_count == 0)"> {{ switch.failed_alerts_count}}
+                                    </span>
+                                    <span ng-if="(!switch.failed_alerts_count && (switch.failed_alerts_count != 0))"> NA
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-icons">
+                                    <span tooltip-class="customClass" uib-tooltip="{{switch.message}}">
+                                        <a ng-click="show_device_stats(switch.uuid, 'switch')"
+                                            ng-if="switch.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="switch.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <div ng-if="((switches_loaded) && switches.length===0 || (((switches | filter: searchSwitches).length) == 0 ))"
+                class="content-wrapper">
+                <no-records-found message="No Switches associated with this private cloud !!"></no-records-found>
+            </div>
+        </div>
+    </div>
+
+    <div class="page_wrapper margin_top10px" style="float:left;" ng-show="hypervisors.length > 0">
+        <div class="row content-wrapper bg-color">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 search-widget">
+                <div class="col-xs-2 padding_top8px">
+                    <h1>Hypervisors</h1>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 pull-right">
+                    <div class="col-xs-7">
+                        <form class="navbar-form">
+                            <div class="form-group width100">
+                                <input class="form-control width100" type="text" ng-model="searchHypervisors"
+                                    id="searchHypervisors" placeholder="Enter keyword">
+                                <button class="btn btn-search" type="submit" style="top: 4px;">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-5 action-bar pull-right padding_top8px text_right">
+                        <span class="count">{{ ((hypervisors | filter: searchHypervisors).length) || 0 }}</span>
+                        <span class="count-text"> Hypervisors </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <section id="hypervisors" class="margintop20 middle-wrapper">
+                <table class="table  table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th> Device Name </th>
+                            <th> Status </th>
+                            <th> Alerts </th>
+                            <th> Actions </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="hypervisor in hypervisors | filter: searchHypervisors">
+                            <td>
+                                <a tabindex="0" popover-trigger="'outsideClick'"
+                                    uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover"
+                                    href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('hypervisor',hypervisor)"
+                                    ng-click="show_observium_details(hypervisor)">
+                                    {{hypervisor.name}}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    ng-if="angular.isObject(hypervisor.observium_details) && !angular.isDefined(hypervisor.observium_details.device_data)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                                <span ng-if="!angular.isObject(hypervisor.observium_details)">
+                                    <device-not-configured></device-not-configured>
+                                </span>
+
+                                <span
+                                    ng-if="angular.isObject(hypervisor.observium_details) && angular.isDefined(hypervisor.observium_details.device_data)">
+                                    <span ng-if="hypervisor.observium_details.device_data.status == 1">
+                                        <device-up></device-up>
+                                    </span>
+                                    <span ng-if="hypervisor.observium_details.device_data.status == 0">
+                                        <device-down></device-down>
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <span ng-if="angular.isUndefined(hypervisor.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(hypervisor.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('servers', hypervisor.uuid, hypervisor)" href=""
+                                        ng-if="hypervisor.failed_alerts_count > 0">
+                                        {{ hypervisor.failed_alerts_count}}
+                                    </a>
+                                    <span ng-if="(hypervisor.failed_alerts_count == 0)">
+                                        {{ hypervisor.failed_alerts_count}} </span>
+                                    <span
+                                        ng-if="(!hypervisor.failed_alerts_count && (hypervisor.failed_alerts_count != 0))">
+                                        NA </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-icons">
+                                    <span tooltip-class="customClass" uib-tooltip="{{hypervisor.message}}">
+                                        <a ng-click="show_device_stats(hypervisor.uuid, 'hypervisor')"
+                                            ng-if="hypervisor.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="hypervisor.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <div ng-if="((hypervisors_loaded) && hypervisors.length===0 || (((hypervisors | filter: searchHypervisors).length) == 0 ))"
+                class="content-wrapper">
+                <no-records-found message="No Hypervisors associated with this private cloud !!"></no-records-found>
+            </div>
+        </div>
+    </div>
+
+    <div class="page_wrapper margin_top10px" style="float:left;" ng-show="baremetals.length > 0">
+        <div class="row content-wrapper bg-color">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 search-widget">
+                <div class="col-xs-2 padding_top8px">
+                    <h1>Bare Metal Servers</h1>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 pull-right">
+                    <div class="col-xs-7">
+                        <form class="navbar-form">
+                            <div class="form-group width100">
+                                <input class="form-control width100" type="text" ng-model="searchBaremetals"
+                                    id="searchBaremetals" placeholder="Enter keyword">
+                                <button class="btn btn-search" type="submit" style="top: 4px;">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-5 action-bar pull-right padding_top8px text_right">
+                        <span class="count">{{ ((baremetals | filter: searchBaremetals).length) || 0 }}</span>
+                        <span class="count-text"> Bare Metal Servers </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <section id="baremetals" class="margintop20 middle-wrapper">
+                <table class="table  table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th> Device Name </th>
+                            <th> Status </th>
+                            <th> Alerts </th>
+                            <th> Actions </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="bm_server in baremetals | filter: searchBaremetals">
+                            <td>
+                                <a tabindex="0" popover-trigger="'outsideClick'"
+                                    uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover"
+                                    href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('bm_server', bm_server.server)"
+                                    ng-click="show_observium_details(bm_server.server)">
+                                    {{bm_server.server.name}}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    ng-if="angular.isObject(bm_server.server.observium_details) && !angular.isDefined(bm_server.server.observium_details.device_data)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                                <span ng-if="!angular.isObject(bm_server.server.observium_details)">
+                                    <device-not-configured></device-not-configured>
+                                </span>
+                                <span
+                                    ng-if="angular.isObject(bm_server.server.observium_details) && angular.isDefined(bm_server.server.observium_details.device_data)">
+                                    <span ng-if="bm_server.server.observium_details.device_data.status == 1">
+                                        <device-up></device-up>
+                                    </span>
+                                    <span ng-if="bm_server.server.observium_details.device_data.status == 0"
+                                        class="device_status_down">
+                                        <device-down></device-down>
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <span ng-if="angular.isUndefined(bm_server.server.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(bm_server.server.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('servers', bm_server.server.uuid, bm_server)" href=""
+                                        ng-if="bm_server.server.failed_alerts_count > 0">
+                                        {{ bm_server.server.failed_alerts_count }}
+                                    </a>
+                                    <span ng-if="(bm_server.server.failed_alerts_count == 0)">
+                                        {{ bm_server.server.failed_alerts_count}} </span>
+                                    <span
+                                        ng-if="(!bm_server.server.failed_alerts_count && (bm_server.server.failed_alerts_count != 0))">
+                                        NA </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-icons">
+                                    <span tooltip-class="customClass" uib-tooltip="{{bm_server.server.message}}">
+                                        <a ng-click="show_device_stats(bm_server.server.uuid, 'hypervisor')"
+                                            ng-if="bm_server.server.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="bm_server.server.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <div ng-if="((baremetals_loaded) && baremetals.length===0 || (((baremetals | filter: searchBaremetals).length) == 0 ))"
+                class="content-wrapper">
+                <no-records-found message="No Bare metals associated with this private cloud !!"></no-records-found>
+            </div>
+        </div>
+    </div>
+
+    <div class="page_wrapper margin_top10px" style="float:left;" ng-show="virtual_machines.length > 0">
+        <div class="row content-wrapper bg-color">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 search-widget">
+                <div class="col-xs-2 padding_top8px">
+                    <h1>Virtual Machines</h1>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 pull-right">
+                    <div class="col-xs-7">
+                        <form class="navbar-form">
+                            <div class="form-group width100">
+                                <input class="form-control width100" type="text" ng-model="searchVms" id="searchVms"
+                                    placeholder="Enter keyword">
+                                <button class="btn btn-search" type="submit" style="top: 4px;">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-5 action-bar pull-right padding_top8px text_right">
+                        <span class="count">{{ ((virtual_machines | filter: searchVms).length) || 0 }}</span>
+                        <span class="count-text"> Virtual Machines </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <section id="switchs" class="margintop20 middle-wrapper">
+                <table class="table  table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th> Device Name </th>
+                            <th> Status </th>
+                            <th> Alerts </th>
+                            <th> Actions </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="vm in virtual_machines | filter: searchVms">
+                            <td>
+                                <a tabindex="0" ng-if="vm.cloud.platform_type == 'VMware'"
+                                    uib-popover-template="popoverobj.templateUrl" popover-trigger="'outsideClick'"
+                                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('vmware', vm)" ng-click="show_observium_details(vm)">
+                                    {{vm.name}}
+                                </a>
+
+                                <a tabindex="0" ng-if="vm.cloud.platform_type == 'vCloud Director'"
+                                    uib-popover-template="popoverobj.templateUrl" popover-trigger="'outsideClick'"
+                                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('vcloud', vm)" ng-click="show_observium_details(vm)">
+                                    {{vm.name}}
+                                </a>
+
+                                <a tabindex="0" ng-if="vm.cloud.platform_type == 'OpenStack'"
+                                    popover-trigger="'outsideClick'" uib-popover-template="popoverobj.templateUrl"
+                                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('openstack', vm)"
+                                    ng-click="show_observium_details(vm)">
+                                    {{vm.name}}
+                                </a>
+
+                                <a tabindex="0" ng-if="angular.isUndefined(vm.cloud)"
+                                    uib-popover-template="popoverobj.templateUrl" popover-trigger="'outsideClick'"
+                                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                                    ng-init="get_observium_details('custom_vm', vm)"
+                                    ng-click="show_observium_details(vm)">
+                                    {{vm.name}}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span
+                                    ng-if="angular.isObject(vm.observium_details) && !angular.isDefined(vm.observium_details.device_data)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                                <span ng-if="!angular.isObject(vm.observium_details)">
+                                    <device-not-configured></device-not-configured>
+                                </span>
+
+                                <span
+                                    ng-if="angular.isObject(vm.observium_details) && angular.isDefined(vm.observium_details.device_data)">
+                                    <span ng-if="vm.observium_details.device_data.status == 1">
+                                        <device-up></device-up>
+                                    </span>
+                                    <span ng-if="vm.observium_details.device_data.status == 0">
+                                        <device-down></device-down>
+                                    </span>
+                                </span>
+                            </td>
+
+                            <td ng-if="vm.cloud.platform_type == 'vCloud Director'">
+                                <span ng-if="angular.isUndefined(vm.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(vm.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('vcloud', vm.uuid, vm)" href=""
+                                        ng-if="vm.failed_alerts_count > 0">
+                                        {{ vm.failed_alerts_count}}
+                                    </a>
+                                    <span ng-if="(vm.failed_alerts_count == 0)"> {{ vm.failed_alerts_count}} </span>
+                                    <span ng-if="!vm.failed_alerts_count || (vm.failed_alerts_count != 0)"> NA </span>
+                                </span>
+                            </td>
+
+                            <td ng-if="vm.cloud.platform_type == 'VMware'">
+                                <span ng-if="angular.isUndefined(vm.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(vm.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('vmware', vm.uuid, vm)" href=""
+                                        ng-if="vm.failed_alerts_count > 0">
+                                        {{ vm.failed_alerts_count}}
+                                    </a>
+                                    <span ng-if="(vm.failed_alerts_count == 0)"> {{ vm.failed_alerts_count}} </span>
+                                    <span ng-if="(!vm.failed_alerts_count && (vm.failed_alerts_count != 0))"> NA </span>
+                                </span>
+                            </td>
+
+                            <td ng-if="vm.cloud.platform_type == 'OpenStack'">
+                                <span ng-if="angular.isUndefined(vm.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(vm.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('openstack', vm.uuid, vm)" href=""
+                                        ng-if="vm.failed_alerts_count > 0">
+                                        {{ vm.failed_alerts_count}}
+                                    </a>
+                                    <span ng-if="(vm.failed_alerts_count == 0)"> {{ vm.failed_alerts_count}} </span>
+                                    <span ng-if="(!vm.failed_alerts_count && (vm.failed_alerts_count != 0))"> NA </span>
+                                </span>
+                            </td>
+
+                            <td ng-if="angular.isUndefined(vm.cloud)">
+                                <span ng-if="angular.isUndefined(vm.failed_alerts_count)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+
+                                <span ng-if="angular.isDefined(vm.failed_alerts_count)">
+                                    <a ng-click="getDeviceAlerts('Custom Cloud Virtual Machine', vm.uuid, vm)" href=""
+                                        ng-if="vm.failed_alerts_count > 0">
+                                        {{ vm.failed_alerts.count}}
+                                    </a>
+                                    <span ng-if="(vm.failed_alerts_count == 0)"> {{ vm.failed_alerts_count}} </span>
+                                    <span ng-if="(!vm.failed_alerts_count && (vm.failed_alerts_count != 0))"> NA </span>
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="action-icons">
+                                    <span tooltip-class="customClass" uib-tooltip="{{vm.message}}"
+                                        ng-if="vm.cloud.platform_type == 'VMware'">
+                                        <a ng-click="show_device_stats(vm.uuid, 'vmwarevm')"
+                                            ng-if="vm.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="vm.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+                                    <span tooltip-class="customClass" uib-tooltip="{{vm.message}}"
+                                        ng-if="vm.cloud.platform_type == 'vCloud Director'">
+                                        <a ng-click="show_device_stats(vm.uuid, 'vcloudvm')"
+                                            ng-if="vm.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="vm.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+                                    <span tooltip-class="customClass" uib-tooltip="{{vm.message}}"
+                                        ng-if="vm.cloud.platform_type == 'OpenStack'">
+                                        <a ng-click="show_device_stats(vm.uuid, 'openstackvm')"
+                                            ng-if="vm.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="vm.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+                                    <span tooltip-class="customClass" uib-tooltip="{{vm.message}}"
+                                        ng-if="angular.isUndefined(vm.cloud)">
+                                        <a ng-click="show_device_stats(vm.uuid, 'customvm')"
+                                            ng-if="vm.observium_details !== null">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="vm.observium_details === null">
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <div ng-if="((virtual_machines_loaded) && virtual_machines.length===0 || (((virtual_machines | filter: searchVms).length) == 0 ))"
+                class="content-wrapper">
+                <no-records-found message="No Virtual machines associated with this private cloud !!">
+                </no-records-found>
+            </div>
+        </div>
+    </div>
+
+    <div class="page_wrapper margin_top10px" style="float:left;" ng-show="custom_devices.length > 0">
+        <div class="row content-wrapper bg-color">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 search-widget">
+                <div class="col-xs-2 padding_top8px">
+                    <h1>Other Devices</h1>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 pull-right">
+                    <div class="col-xs-7">
+                        <form class="navbar-form">
+                            <div class="form-group width100">
+                                <input class="form-control width100" type="text" ng-model="searchCustomDevices"
+                                    id="searchCustomDevices" placeholder="Enter keyword">
+                                <button class="btn btn-search" type="submit" style="top: 4px;">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-5 action-bar pull-right padding_top8px text_right">
+                        <span class="count">{{ ((custom_devices | filter: searchCustomDevices).length) || 0 }}</span>
+                        <span class="count-text"> Other Devices </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <section id="no-more-tables" class="margintop20 middle-wrapper">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th> Device Name </th>
+                            <th> Status </th>
+                            <th> Friendly Name </th>
+                            <th> Type </th>
+                            <th> Actions </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="device in custom_devices | filter: searchCustomDevices">
+                            <td>
+                                <a tabindex="0" ng-init="get_uptime_details(device)" popover-trigger="'outsideClick'"
+                                    uib-popover-template="customdevicedetailspopoverobj.templateUrl"
+                                    popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                                    ng-click="show_uptime_details(device)">
+                                    {{device.name}}
+                                </a>
+                            </td>
+
+                            <td>
+                                <span ng-if="angular.isUndefined(device.details)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                                <span ng-if="angular.isDefined(device.details)">
+                                    <span ng-if="!angular.isObject(device.details)">
+                                        <device-not-configured></device-not-configured>
+                                    </span>
+                                    <span
+                                        ng-if="angular.isObject(device.details) && angular.isDefined(device.details.status)">
+                                        <span ng-if="device.details.status == 'up'">
+                                            <device-up></device-up>
+                                        </span>
+                                        <span ng-if="device.details.status == 'down'">
+                                            <device-down></device-down>
+                                        </span>
+                                        <span ng-if="device.details.status === 'paused'">
+                                            <i class="fa fa-pause-circle-o yellow"></i> Paused
+                                        </span>
+                                        <span ng-if="device.details.status === 'not checked yet'">
+                                            <i class="fa fa-exclamation-circle-o yellow"></i> Not checked yet
+                                        </span>
+                                        <span ng-if="device.details.status === 'seems down'">
+                                            <i class="fa fa-exclamation-circle-o yellow"></i> Seems down
+                                        </span>
+                                    </span>
+                                </span>
+                            </td>
+                            <td>
+                                <span ng-if="!angular.isDefined(device.details.status)">
+                                    <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                                <span>
+                                    {{device.details.friendly_name}}
+                                </span>
+                            </td>
+                            <td>
+                                {{ device.type }}
+                            </td>
+                            <td>
+                                <div class="action-icons">
+                                    <span tooltip-class="customClass"
+                                        uib-tooltip="{{angular.isObject(device.details) ? 'Device Info' : 'Not Configured to Monitor'}}">
+                                        <a ng-click="show_customdevice_details(device)"
+                                            ng-if="angular.isObject(device.details)">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </a>
+                                        <a ng-if="!angular.isObject(device.details)">
+                                            <i class="fa fa-info-circle fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <div ng-if="((custom_devices_loaded) && custom_devices.length===0 || ((( custom_devices| filter: searchCustomDevices).length) == 0 ))"
+                class="content-wrapper">
+                <no-records-found message="No Custom devices associated with this private cloud !!"></no-records-found>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="(firewalls.length===0 && virtual_machines.length===0 && hypervisors.length===0 && switches.length===0 && load_balancers.length===0 && custom_devices.length===0 && baremetals.length===0)"
+        class="content-wrapper">
+        <no-records-found message="No devices associated with this private cloud !!"></no-records-found>
+    </div>
+    <observium-stats-popup></observium-stats-popup>
+    <script type="text/ng-template" id="customdevicedetailstemplate.html">
+        <div class="row">
+            <table class="table" ng-show="device_details">
+                <tbody>
+                    <tr>
+                        <th class="col-md-4 table_no_top_border">
+                            <div ng-if="device_details.up_since">Uptime</div>
+                        </th>
+                        <td class="col-md-8 table_no_top_border">
+                            <div ng-if="device_details.up_since">{{device_details.up_since | unityObserviumTime}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="col-md-4 table_no_top_border">
+                            <div ng-if="device_details.down_since">Downtime</div>
+                        </th>
+                        <td class="col-md-8 table_no_top_border">
+                            <div ng-if="device_details.down_since">{{device_details.down_since | unityObserviumTime}}</div>
+                        </td>
+                    </tr>
+               </tbody>
+            </table>
+            <div class="col-xs-12" ng-show="angular.isDefined(device_details) && (device_details === null)" style="padding : 20px">
+                <p>Device not Configured in Uptime Robot</p>
+            </div>
+        </div>
+    </script>
+</div>

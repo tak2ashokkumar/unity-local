@@ -1,0 +1,126 @@
+<ng-container>
+    <div class="card">
+        <div class="card-body">
+            <form class="form-inline" [formGroup]="filterForm" *ngIf="filterForm">
+                <div class="col-3">
+                    <div class="form-group">
+                        <select class="form-control w-100" formControlName="duration" [class.is-invalid]="filterFormErrors.duration">
+                            <option [value]="duration.LAST_24_HOURS">Last 24 Hours</option>
+                            <option [value]="duration.LAST_WEEK">Last Week</option>
+                            <option [value]="duration.LAST_MONTH">Last Month</option>
+                            <!-- <option [value]="duration.LAST_YEAR">Last Year</option> -->
+                            <!-- <option [value]="duration.CUSTOM">Custom</option> -->
+                        </select>
+                        <div class="invalid-feedback" *ngIf="filterFormErrors.duration">{{filterFormErrors.duration}}</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="input-group">
+                        <label for="start_date">Start Date :&nbsp;</label>
+                        <owl-date-time #start_date [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" formControlName="start_date" [owlDateTimeTrigger]="start_date"
+                            [owlDateTime]="start_date" type="text" name="start_date" placeholder="start_date" [max]="now">
+                        <div class="input-group-append " [owlDateTimeTrigger]="start_date">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="input-group">
+                        <label for="end_date">End Date :&nbsp;</label>
+                        <owl-date-time #end_date [hour12Timer]="true"></owl-date-time>
+                        <input class="form-control rounded-left" formControlName="end_date" [owlDateTimeTrigger]="end_date"
+                            [owlDateTime]="end_date" type="text" name="end_date" placeholder="end_date" [min]="filterForm.controls.start_date.value"
+                            [max]="now">
+                        <div class="input-group-append " [owlDateTimeTrigger]="end_date">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2 text-left">
+                    <button class="btn btn-warning btn-pill" (click)="onSubmit()">Update</button>
+                </div>
+                <div class="col-1">
+                    <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="card mb-0 border-0 equalize-card">
+                        <div class="card-body py-0 chart-block">
+                            <canvas *ngIf="severityChartData" baseChart [chartType]="severityChartData.type" [labels]="severityChartData.lables"
+                                [datasets]="severityChartData.bardata" [options]="severityChartData.options" [plugins]="severityChartData.plugins"
+                                [legend]="severityChartData.legend" [colors]="severityChartData.colors" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card mb-0 border-0 equalize-card">
+                        <div class="card-body py-0 chart-block">
+                            <canvas *ngIf="severityTrendChartData" baseChart [chartType]="severityTrendChartData.type"
+                                [labels]="severityTrendChartData.lables" [datasets]="severityTrendChartData.linedata"
+                                [options]="severityTrendChartData.options" [plugins]="severityTrendChartData.plugins"
+                                [legend]="severityTrendChartData.legend" [colors]="severityTrendChartData.colors"
+                                height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-6">
+                    <div class="card mb-0 border-0 equalize-card">
+                        <div class="card-body py-0 chart-block">
+                            <canvas *ngIf="topDevicesByAlertsChartData" baseChart [chartType]="topDevicesByAlertsChartData.type"
+                                [labels]="topDevicesByAlertsChartData.lables" [datasets]="topDevicesByAlertsChartData.bardata"
+                                [options]="topDevicesByAlertsChartData.options" [plugins]="topDevicesByAlertsChartData.plugins"
+                                [legend]="topDevicesByAlertsChartData.legend" [colors]="topDevicesByAlertsChartData.colors"
+                                height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card mb-0 border-0 equalize-card">
+                        <div class="card-body py-0 chart-block">
+                            <canvas *ngIf="topDevicesByAlertsTrendChartData" baseChart [chartType]="topDevicesByAlertsTrendChartData.type"
+                                [labels]="topDevicesByAlertsTrendChartData.lables" [datasets]="topDevicesByAlertsTrendChartData.linedata"
+                                [options]="topDevicesByAlertsTrendChartData.options" [plugins]="topDevicesByAlertsTrendChartData.plugins"
+                                [legend]="topDevicesByAlertsTrendChartData.legend" [colors]="topDevicesByAlertsTrendChartData.colors"
+                                height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-6">
+                    <div class="card mb-0 border-0 equalize-card">
+                        <div class="card-body py-0 chart-block">
+                            <canvas *ngIf="alertsByDCChartData" baseChart [chartType]="alertsByDCChartData.type"
+                                [labels]="alertsByDCChartData.lables" [datasets]="alertsByDCChartData.bardata"
+                                [options]="alertsByDCChartData.options" [plugins]="alertsByDCChartData.plugins"
+                                [legend]="alertsByDCChartData.legend" [colors]="alertsByDCChartData.colors" height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card mb-0 border-0 equalize-card">
+                        <div class="card-body py-0 chart-block">
+                            <canvas *ngIf="alertsByDCTrendChartData" baseChart [chartType]="alertsByDCTrendChartData.type"
+                                [labels]="alertsByDCTrendChartData.lables" [datasets]="alertsByDCTrendChartData.linedata"
+                                [options]="alertsByDCTrendChartData.options" [plugins]="alertsByDCTrendChartData.plugins"
+                                [legend]="alertsByDCTrendChartData.legend" [colors]="alertsByDCTrendChartData.colors"
+                                height="150"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>

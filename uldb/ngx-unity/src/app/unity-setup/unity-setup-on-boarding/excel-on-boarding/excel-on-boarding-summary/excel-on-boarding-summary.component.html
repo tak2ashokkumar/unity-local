@@ -1,0 +1,72 @@
+<div class="row" *ngIf="viewData">
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.pdus" [moduleName]="'Datacenter'"
+            [accessType]="'View Datacenter'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.firewalls" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.switches" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.lbs" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.servers" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.hypervisors" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.mac" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.storage" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.mobiles" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.database" [moduleName]="'Private Cloud'"
+            [accessType]="'View Private Cloud'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.dcs" [moduleName]="'Datacenter'"
+            [accessType]="'View Datacenter'"></unity-setup-on-boarding-summary>
+    </div>
+
+    <div class="col-3">
+        <unity-setup-on-boarding-summary [data]="viewData.cabinets" [moduleName]="'Datacenter'"
+            [accessType]="'View Datacenter'"></unity-setup-on-boarding-summary>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <excel-on-boarding-next-prev [hide]="'true'"></excel-on-boarding-next-prev>
+        <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="gotToDashboard()" accessControl
+            moduleName="Dashboard" accessType="View Dashboard" elementType="btn">Go
+            to Dashboard</button>
+        <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="goPrev()">Prev</button>
+        <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="gotToHome()">Home</button>
+    </div>
+</div>

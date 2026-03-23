@@ -1,0 +1,42 @@
+<style type="text/css">
+  .cg-busy {
+    z-index: 1060;
+  }
+</style>
+
+<form role="form" name="access_check_form" novalidate ng-submit="access_check_form.$valid && checkUserAccess(access_check_form)">
+  <div class="modal-header">
+    <span class="modal-title">Authenticate</span>
+  </div>
+  <div class="modal-form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="form-group">
+        <label for="ip_address">IP Address*</label>
+        <span class="errormsg" ng-if="access_check_form.$submitted && access_check_form.ip_address.$invalid">(This field is required)</span>
+        <input type="text" name="ip_address" class="form-control" ng-model="device.ip_address" required disabled/>
+      </div>
+      <div class="form-group">
+        <label for="port">Port Number*</label>
+        <span class="errormsg" ng-if="access_check_form.$submitted && access_check_form.port.$invalid">(This field is required)</span>
+        <input type="text" name="port" class="form-control"  ng-model="device.port" required disabled/>
+      </div>
+      <div class="form-group">
+        <label for="user_name">Username*</label>
+        <span class="errormsg" ng-if="access_check_form.$submitted && access_check_form.user_name.$invalid">(This field is required)</span>
+        <input type="text" name="user_name" class="form-control" ng-model="device.username" autofocus required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password*</label>
+        <span class="errormsg" ng-if="access_check_form.$submitted && access_check_form.password.$invalid">(This field is required)</span>
+        <input type="password" name="password" class="form-control"  ng-model="device.password" required/>
+      </div>
+      <div class="form-group" ng-if="access_failed">
+        <span class="errormsg">Username or Password did not match.</span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer modal-buttons">
+    <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-default new_btn" type="submit"> Connect </button>
+  </div>
+</form>

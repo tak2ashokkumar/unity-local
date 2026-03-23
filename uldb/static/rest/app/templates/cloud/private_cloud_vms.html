@@ -1,0 +1,135 @@
+<alerts></alerts>
+
+<div ng-if="!openstack_loaded && !vmware_loaded"">
+  <h4><span class="fa fa-spinner spinning"></span> Loading...</h4>
+</div>
+
+ <span ng-if="loader">
+    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+</span>
+
+<div ng-if="openstack_result.length > 0">
+  <table class="table">
+    <thead>
+    <tr>
+      <th class="{{ row.col_class }}" ng-repeat="row in openstack_rows">{{ row.description }}</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="result in openstack_result"
+        ng-click="select(result, $index)"
+        ng-class="{'active success': result === selection.selected}">
+      <td ng-repeat="row in openstack_rows">
+        <div ng-if="row.opaque === undefined && row.name ==='last_known_state'">{{ result[row.name] | powerState}}</div>
+        <div ng-if="row.opaque === undefined && row.name !=='last_known_state'">
+          <div ng-if="row.name ==='management_ip'"> <span ng-if="result.management_ip">{{ result[row.name] }}</span><span ng-if="!result.management_ip">Not Assigned</span></div>
+          <div ng-if="row.name !=='management_ip'">{{ result[row.name] }}
+        </div>
+        <div ng-if="row.opaque === 'stringTransform'">
+          {{ row.read(result) }}
+        </div>
+        <div ng-if="row.opaque === 'link'">
+          <a href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+        </div>
+        <div ng-if="row.opaque === 'string'">
+          {{ row.read(result).innerText }}
+        </div>
+      </td>
+      <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu action-button">
+
+              <!-- New Xterm -->
+              <li ng-class="{'disabled': !result.power}" ng-if="result.management_ip"><a href="" ng-click="console_vm(result.instance_id, cloud_type)">VM Console in Same Tab</a></li>
+              <li ng-class="{'disabled': !result.power}" ng-if="result.management_ip"><a href="/vm-console-ul#/openstack-vm/webconsole/{{ result.instance_id }}" target="_blank">VM Console in New Tab</a></li>
+              <li ng-if="!result.management_ip" ><a href="" ng-click="addManagementIPAddress(result, result.instance_id, cloud_type)">Add Management IP</a></li>
+              <li ng-if="result.management_ip" ><a href="" ng-click="addManagementIPAddress(result, result.instance_id, cloud_type)">Edit Management IP</a></li>
+              <li ng-if="result.is_visible" ><a href="" ng-click="disableVisibility(result.instance_id, cloud_type)">Hide VM</a> </li>
+              <li ng-if="!result.is_visible" ><a href="" ng-click="enableVisibility(result.instance_id, cloud_type)">Show VM</a></li>
+
+              <li ng-class="{'disabled': result.power}" ng-click="powerOn(result.instance_id, cloud_type)"><a href="">Power On</a></li>
+              <li ng-class="{'disabled': !result.power}" ng-click="powerOff(result.instance_id, cloud_type)"><a l="">Power Off</a></li>
+            </ul>
+
+          </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <uib-pagination total-items="model.count" items-per-page="pageSize"
+                  ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+</div>
+
+<h4 ng-if="openstack_loaded && openstack_result.length === 0">There are no vms associated with this account.</h4>
+
+
+<div ng-if="vmware_result.length > 0">
+  <table class="table">
+    <thead>
+    <tr>
+      <th class="{{ row.col_class }}" ng-repeat="row in vmware_rows">{{ row.description }}</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="result in vmware_result"
+        ng-click="select(result, $index)"
+        ng-class="{'active success': result === selection.selected}">
+      <td ng-repeat="row in vmware_rows">
+        <div ng-if="row.opaque === undefined && row.name ==='state'">{{ result[row.name] | powerState}}</div>
+        <div ng-if="row.opaque === undefined && row.name !=='state'">
+          <div ng-if="row.name ==='management_ip'"> <span ng-if="result.management_ip">{{ result[row.name] }}</span><span ng-if="!result.management_ip">Not Assigned</span></div>
+          <div ng-if="row.name !=='management_ip'">{{ result[row.name] }}
+        </div>
+        <div ng-if="row.opaque === 'stringTransform'">
+          {{ row.read(result) }}
+        </div>
+        <div ng-if="row.opaque === 'link'">
+          <a href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+        </div>
+        <div ng-if="row.opaque === 'string'">
+          {{ row.read(result).innerText }}
+        </div>
+      </td>
+      <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu action-button">
+
+              <!-- New Xterm -->
+              <li ng-class="{'disabled': !result.power}" ng-if="result.management_ip"><a href="" ng-click="console_vm(result.instance_id, cloud_type)">VM Console in Same Tab</a></li>
+              <li ng-class="{'disabled': !result.power}" ng-if="result.management_ip"><a href="/vm-console-ul#/vmware-vm/webconsole/{{ result.instance_id }}" target="_blank">VM Console in New Tab</a></li>
+              <li ng-if="!result.management_ip" ><a href="" ng-click="addManagementIPAddress(result, result.uuid, cloud_type)">Add Management IP</a></li>
+              <li ng-if="result.management_ip" ><a href="" ng-click="addManagementIPAddress(result, result.uuid, cloud_type)">Edit Management IP</a></li>
+              <li ng-if="result.is_visible" ><a href="" ng-click="disableVisibility(result.instance_id, cloud_type)">Hide VM</a> </li>
+              <li ng-if="!result.is_visible" ><a href="" ng-click="enableVisibility(result.instance_id, cloud_type)">Show VM</a></li>
+              <li ng-class="{'disabled': result.power}" ng-click="powerOn(result.instance_id, cloud_type)"><a href="">Power On</a></li>
+              <li ng-class="{'disabled': !result.power}" ng-click="powerOff(result.instance_id, cloud_type)"><a l="">Power Off</a></li>
+
+               <!-- Old Xterm -->
+              <!-- <li ng-class="{'disabled': !result.power}"><a href="/main#/vmware-wmks-vm/webconsole/iframe/{{ result.instance_id }}">VM Console in Same Tab</a></li>
+              <li ng-class="{'disabled': !result.power}"><a href="/terminal#/vmware-wmks-vm/webconsole/{{ result.instance_id }}" target="_blank">VM Console in New Tab</a></li> -->
+            </ul>
+
+          </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <uib-pagination total-items="model.count" items-per-page="pageSize"
+                  ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+</div>
+
+<h4 ng-if="vmware_loaded && vmware_result.length === 0">There are no vms associated with this account.</h4>

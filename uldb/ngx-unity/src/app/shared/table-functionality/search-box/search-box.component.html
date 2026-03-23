@@ -1,0 +1,9 @@
+<div class="input-group">
+    <div class="input-group-prepend">
+        <span class="input-group-text" [ngClass]="isSmallControl ? 'p-1' : 'p-2'">
+            <i class="fa fa-search" [class.font-xs-sm]="isSmallControl"></i>
+        </span>
+    </div>
+    <input placeholder="Search" class="form-control" [ngClass]="customClass" id="prependedInput" size="16" type="text"
+        [ngModel]="searchValue" (keydown.enter)="$event.preventDefault()" (ngModelChange)="onSearched($event)">
+</div>

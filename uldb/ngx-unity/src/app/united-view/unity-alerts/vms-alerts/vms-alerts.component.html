@@ -1,0 +1,88 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card text-center">
+      <div class="card-header bg-transparent border-bottom-0 mt-3">
+        <div class="row">
+          <div class="col-3">
+            <table-search-box (searched)="onSearched($event)"></table-search-box>
+          </div>
+          <div class="col ">
+            <span class="ml-2 text-muted font-sm float-right align-middle"><span class="badge badge-pill badge-secondary">{{filteredVMAlerts.length}}</span>&nbsp;{{tabItem.deviceName}}</span>
+            <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="filteredVMAlerts.length"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table text-left" *ngIf="filteredVMAlerts.length">
+          <thead>
+            <tr>
+              <th>Device Name</th>
+              <th>Cloud Name</th>
+              <th>Alerts Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let device of pagedviewData">
+              <td><button class="btn btn-link text-decoration-none p-0" data-toggle="modal" (click)="showInfo(device)">{{device.deviceName}}</button></td>
+              <td>{{device.cloudName}}</td>
+              <td>{{device.alertCount}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="filteredVMAlerts.length"></table-entries>
+        <table-pager *ngIf="filteredVMAlerts.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="filteredVMAlerts.length" (pageChange)="pageChange($event)"></table-pager>
+        <div *ngIf="!filteredVMAlerts.length " class="text-muted text-center">
+          No monitoring enabled for {{tabItem.deviceName}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #alertinfo>
+  <div class="modal-header">
+    <div>{{vm.deviceName}} Alerts</div>
+    <div class="card-header-actions">
+      <a class="card-header-action btn-close" (click)="modalRef.hide()">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="card-body">
+      <table class="table text-left">
+        <thead>
+          <tr>
+            <th>Alert</th>
+            <th>Status</th>
+            <th>Checked</th>
+            <th>Changed</th>
+            <th>Alerted</th>
+            <th>Entity ID</th>
+            <th>Entity Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ad of vm.alerts">
+            <td>{{ad.alertName}}</td>
+            <td>{{ad.status}}</td>
+            <td>{{ad.checked}}</td>
+            <td>{{ad.changed}}</td>
+            <td>{{ad.alerted}}</td>
+            <td>{{ad.entityId}}</td>
+            <td>{{ad.entityType}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!vm.alerts.length" class="text-center">
+        No Alerts to display
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()">Close</button>
+  </div>
+</ng-template>

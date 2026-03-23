@@ -1,0 +1,166 @@
+<ng-template #template>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Mesh Service
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="baseForm" [formGroup]="baseForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="service_type">Service Type<em>*</em></label>
+          <select class="form-control text-capitalize" id="service_type" name="service_type" formControlName="service_type"
+            [ngClass]="{'is-invalid' : baseFormErrors.service_type}">
+            <option [value]="''" disabled>Select Service Type</option>
+            <option [value]="MeshServiceTypeMapping.ANTHOS">Anthos Traffic Director</option>
+            <option [value]="MeshServiceTypeMapping.AWS">App Mesh</option>
+            <option [value]="MeshServiceTypeMapping.ISTIO">Istio</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="baseFormErrors.service_type">{{baseFormErrors.service_type}}</div>
+        </div>
+      </form>
+      <form *ngIf="anthosForm" [formGroup]="anthosForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="name">Account Name<em>*</em></label>
+          <input class="form-control" id="name" type="text" formControlName="name" [ngClass]="{'is-invalid' : anthosFormErrors.name}">
+          <div class="invalid-feedback" *ngIf="anthosFormErrors.name">{{anthosFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="email">Email<em>*</em></label>
+          <input class="form-control" id="email" type="text" formControlName="email" [ngClass]="{'is-invalid' : anthosFormErrors.email}">
+          <div class="invalid-feedback" *ngIf="anthosFormErrors.email">{{anthosFormErrors.email}}</div>
+        </div>
+        <div class="form-group" *ngIf="!svcId">
+          <label class="form-col-form-label" for="service_account_info">Service Account Info<em>*</em></label>
+          <textarea class="form-control" id="service_account_info" formControlName="service_account_info" [ngClass]="{'is-invalid' : anthosFormErrors.service_account_info}"></textarea>
+          <div class="invalid-feedback" *ngIf="anthosFormErrors.service_account_info">{{anthosFormErrors.service_account_info}}</div>
+        </div>
+      </form>
+      <form *ngIf="appMeshForm" [formGroup]="appMeshForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="account_name">Account Name<em>*</em></label>
+          <input class="form-control" id="account_name" type="text" formControlName="account_name" [ngClass]="{'is-invalid' : appMeshFormErrors.account_name}">
+          <div class="invalid-feedback" *ngIf="appMeshFormErrors.account_name">{{appMeshFormErrors.account_name}}</div>
+        </div>
+        <div class="form-group" *ngIf="!svcId">
+          <label class="form-col-form-label" for="access_key">Access Key<em>*</em></label>
+          <input class="form-control" id="access_key" type="text" formControlName="access_key" [ngClass]="{'is-invalid' : appMeshFormErrors.access_key}">
+          <div class="invalid-feedback" *ngIf="appMeshFormErrors.access_key">{{appMeshFormErrors.access_key}}</div>
+        </div>
+        <div class="form-group" *ngIf="!svcId">
+          <label class="form-col-form-label" for="secret_key">Secret Key<em>*</em></label>
+          <input class="form-control" id="secret_key" type="password" formControlName="secret_key" [ngClass]="{'is-invalid' : appMeshFormErrors.secret_key}">
+          <div class="invalid-feedback" *ngIf="appMeshFormErrors.secret_key">{{appMeshFormErrors.secret_key}}</div>
+        </div>
+      </form>
+      <form *ngIf="istioForm" [formGroup]="istioForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="name">Name<em>*</em></label>
+          <input class="form-control" id="name" type="text" formControlName="name" [ngClass]="{'is-invalid' : istioFormErrors.name}">
+          <div class="invalid-feedback" *ngIf="istioFormErrors.name">{{istioFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="hostname">Hostname<em>*</em></label>
+          <input class="form-control" id="hostname" type="text" formControlName="hostname" [ngClass]="{'is-invalid' : istioFormErrors.hostname}">
+          <div class="invalid-feedback" *ngIf="istioFormErrors.hostname">{{istioFormErrors.hostname}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" type="text" formControlName="username" [ngClass]="{'is-invalid' : istioFormErrors.username}">
+          <div class="invalid-feedback" *ngIf="istioFormErrors.username">{{istioFormErrors.username}}</div>
+        </div>
+        <div class="form-group" *ngIf="!svcId">
+          <label class="form-col-form-label" for="password">Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password" [ngClass]="{'is-invalid' : istioFormErrors.password}">
+          <div class="invalid-feedback" *ngIf="istioFormErrors.password">{{istioFormErrors.password}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      All associated devices will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #passwordChange>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{credAction}}
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="passwordChangeRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-group" *ngIf="nonFieldErr">
+        <div class="invalid-credentials">{{nonFieldErr}}</div>
+      </div>
+      <form *ngIf="anthosCredForm" [formGroup]="anthosCredForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="service_account_info">Service Account Info<em>*</em></label>
+          <textarea class="form-control" id="service_account_info" formControlName="service_account_info" [ngClass]="{'is-invalid' : anthosCredFormErrors.service_account_info}"></textarea>
+          <div class="invalid-feedback" *ngIf="anthosCredFormErrors.service_account_info">{{anthosCredFormErrors.service_account_info}}</div>
+        </div>
+      </form>
+
+      <form *ngIf="appMeshCredForm" [formGroup]="appMeshCredForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="access_key">Access Key<em>*</em></label>
+          <input class="form-control" id="access_key" type="text" formControlName="access_key" [ngClass]="{'is-invalid' : appMeshCredFormErrors.access_key}">
+          <div class="invalid-feedback" *ngIf="appMeshCredFormErrors.access_key">{{appMeshCredFormErrors.access_key}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="secret_key">Secret Key<em>*</em></label>
+          <input class="form-control" id="secret_key" type="password" formControlName="secret_key" [ngClass]="{'is-invalid' : appMeshCredFormErrors.secret_key}">
+          <div class="invalid-feedback" *ngIf="appMeshCredFormErrors.secret_key">{{appMeshCredFormErrors.secret_key}}</div>
+        </div>
+      </form>
+
+      <form *ngIf="istioCredForm" [formGroup]="istioCredForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="password">New Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password" [ngClass]="{'is-invalid' : istioCredFormErrors.password}">
+          <div class="invalid-feedback" *ngIf="istioCredFormErrors.password">{{istioCredFormErrors.password}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="confirm_password">Confirm New Password<em>*</em></label>
+          <input class="form-control" id="confirm_password" type="password" formControlName="confirm_password"
+            [ngClass]="{'is-invalid' : istioCredFormErrors.confirm_password}">
+          <div class="invalid-feedback" *ngIf="istioCredFormErrors.confirm_password">{{istioCredFormErrors.confirm_password}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="updatePassword()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="passwordChangeRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

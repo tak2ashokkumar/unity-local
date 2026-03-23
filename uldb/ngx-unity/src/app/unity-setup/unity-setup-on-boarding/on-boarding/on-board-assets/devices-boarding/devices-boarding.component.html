@@ -1,0 +1,116 @@
+<div class="pt-3 px-3">
+  <div class="row">
+    <div class="col-4">
+      <div class="card equalize-card">
+        <div class="card-header">Excel File</div>
+        <!-- <div class="card-body">
+          <span class="text-muted mb-2">Download Template Excel File to fill in the details</span>
+        </div> -->
+        <div class="card-body border-0 bg-transparent">
+          <div>
+            <div class="btn-group" dropdown>
+              <button id="button-basic" dropdownToggle type="button" class="btn btn-warning btn-pill dropdown-toggle"
+                aria-controls="dropdown-basic">
+                Select a file to download <span class="caret"></span>
+              </button>
+              <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+                <li role="menuitem"><a class="dropdown-item" *ngIf="excelFilePath" [href]="excelFilePath">Excel Used
+                    for onboarding</a></li>
+                <li class="divider dropdown-divider"></li>
+                <li role="menuitem"><a class="dropdown-item" [href]="assetsDownloadPath">Excel with onboarded assets</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card equalize-card">
+        <div class="card-header">Upload Sheet</div>
+        <div class="card-body">
+          <input type="file" #file hidden accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            (change)="detectFiles($event.target.files)">
+          <button class="btn btn-brand btn-lg btn-light" type="button" (click)="file.click()">
+            <span class="mr-3 font-sm">Select File</span>
+            <i class="fa fa-upload pull-right bg-warning"></i>
+          </button>
+          <span *ngIf="fileToUpload" class="btn btn-primary mt-2 btn-sm">{{fileToUpload.name}}</span>
+          <small *ngIf="invalidFileSize" class="font-sm text-danger">{{invalidFileSize}}</small>
+        </div>
+        <div class="card-footer border-0 bg-transparent">
+          <button type="button" class="btn btn-warning btn-sm btn-pill pull-right" (click)="uploadFile()" [disabled]="!fileToUpload">Upload</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card equalize-card">
+        <div class="card-header">Update vCenter Details</div>
+        <div class="card-body">
+          <span class="text-muted">Please update vcenter passwords</span>
+        </div>
+        <div class="card-footer border-0 bg-transparent">
+          <button type="button" class="btn btn-warning btn-sm btn-pill pull-right" (click)="updateVCenter()">Update
+            vCenter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-12">
+      <ul class="px-3 text-muted">
+        <li>Click on Download Now button to download template excel file. <a href="/media/onboarding_files/sample/OnboardingSampleExcel.xlsx">Click
+            here</a> to download sample asset details
+          file.</li>
+        <li>Fill in the sheets with asset details according to the catogeries mentioned.</li>
+        <li>Upload the filled file.</li>
+        <li>The status of each asset, whether it is saved or not can be known from Status column with the description
+          in the Remarks.</li>
+        <li>If there are errors, please correct the details accordingly and re-upload the file.</li>
+        <li>Repeat the process until all the assets are saved successfully.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<ng-template #vcenter>
+  <div class="card mb-0">
+    <div class="card-header">
+      List of Vcenters
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="vcenterModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table text-left" *ngIf="viewData.length">
+        <thead>
+          <tr>
+            <th>Cloud Name</th>
+            <th>Vcenter Url</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of viewData">
+            <td class="border-0">{{view.cloudName}}</td>
+            <td class="border-0">{{view.hostname}}</td>
+            <td class="border-0">{{view.username}}</td>
+            <td class="border-0"><input type="password" class="form-control" [(ngModel)]="view.password"></td>
+            <td class="border-0">
+              <i class="fa" *ngIf="view.message" [ngClass]="view.icon" [tooltip]="view.message"></i>
+              <i class="fa fa-spinner fa-spin" *ngIf="updatingVCenters"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="viewData.length==0" class="text-center">No records to display</p>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="updatePassword()" [disabled]="!viewData.length">Update</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="vcenterModalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>

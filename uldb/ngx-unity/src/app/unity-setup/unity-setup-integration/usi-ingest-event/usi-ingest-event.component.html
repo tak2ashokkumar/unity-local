@@ -1,0 +1,315 @@
+<h5 class="mt-4">Event Ingestion</h5>
+<div class="row mb-1">
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.nagios.imageURL" class="w-100" [alt]="'Nagios'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.nagios.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.nagios.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.nagios.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewNagiosInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addNagiosInsatnce()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <usi-event-ingestion-nagios-crud (onCrud)="onNagiosCrud($event)"></usi-event-ingestion-nagios-crud>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.zabbix.imageURL" class="w-100" [alt]="'Zabbix'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.zabbix.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.zabbix.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.zabbix.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewZabbixInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addZabbixInsatnce()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <usi-event-ingestion-zabbix-crud (onCrud)="onZabbixCrud($event)"></usi-event-ingestion-zabbix-crud>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.opsRamp.imageURL" class="w-100" [alt]="'OpsRamp'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.opsRamp.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.opsRamp.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.opsRamp.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewOpsRampInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addOpsRampInsatnce()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <usi-event-ingestion-opsramp-crud (onCrud)="onOpsRampCrud($event)"></usi-event-ingestion-opsramp-crud>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.appDynamics.imageURL" class="w-100" [alt]="'AppDynamics'"
+                            loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.appDynamics.length">
+                            <button
+                                class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.appDynamics.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.appDynamics.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewAppDynamicsInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addAppDynamicsInstance()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <usi-event-ingestion-app-dynamics-crud
+            (onCrud)="onAppDynamicsCrud($event)"></usi-event-ingestion-app-dynamics-crud>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.logicMonitor.imageURL" class="w-100" [alt]="'Logic Monitor'"
+                            loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.logicMonitor.length">
+                            <button
+                                class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.logicMonitor.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.logicMonitor.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewLogicMonitorInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addLogicMonitorInstance()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <usi-event-ingestion-logic-monitor-crud
+            (onCrud)="onLogicMonitorCrud($event)"></usi-event-ingestion-logic-monitor-crud>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.dynatrace.imageURL" class="w-100" [alt]="'Dynatrace'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.dynatrace.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.dynatrace.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.dynatrace.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewDynatraceInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addDynatraceInsatnce()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <usi-event-ingestion-dynatrace-crud (onCrud)="onDynatraceCrud($event)"></usi-event-ingestion-dynatrace-crud>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.newRelic.imageURL" class="w-100" [alt]="'New Relic'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.newRelic.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.newRelic.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.newRelic.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewNewRelicInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addNewRelicInsatnce()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <usi-event-ingestion-new-relic-crud (onCrud)="onNewRelicCrud($event)"></usi-event-ingestion-new-relic-crud>
+    </div>
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.custom.imageURL" class="w-100" [alt]="'Custom Monitoring'"
+                            loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.custom.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.custom.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.custom.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewCustomInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addCustomInsatnce()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3 mb-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="eventIngestion.email.imageURL" class="w-100" [alt]="'Email'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="eventIngestion.email.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{eventIngestion.email.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="eventIngestion.email.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewEmailInstanceDetails()" accessControl
+                                [moduleName]="'Integrations'" [accessType]="'View Integrations'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addEmailInsatnce()" accessControl [moduleName]="'Integrations'"
+                            [accessType]="'Add Integrations'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

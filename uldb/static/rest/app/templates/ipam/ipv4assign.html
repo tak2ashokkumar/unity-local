@@ -1,0 +1,87 @@
+<div class="row">
+  <div class="col-sm-4">
+    <h3>IPv4 Assignments</h3>
+  </div>
+</div>
+
+<script type="text/ng-template" id="alert23.html">
+  <div class="alert alert-{{ type }}" role="alert">
+    <button type="button" class="close" data-dismiss="alert" ng-click="close()">
+      <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+    </button>
+    <div ng-transclude></div>
+  </div>
+</script>
+
+<div class="row">
+  <div class="col-sm-6">
+    <uib-alert template-url="alert23.html" ng-repeat="alert in alerts" type="{{ alert.severity }}"
+               close="alertService.closeAlert($index)"
+               dismiss-on-timeout="10000">
+      {{ alert.msg }}
+    </uib-alert>
+  </div>
+</div>
+
+
+<table class="table table-hover">
+  <thead>
+  <tr>
+    <th class="col-sm-2">Customer</th>
+    <th class="col-sm-1">Prefix</th>
+    <th class="col-sm-1">details</th>
+    <th class="col-sm-1">prefix length</th>
+    <th class="col-sm-1">num_hosts</th>
+    <th class="col-sm-2 col-sm-offset-1">parent name</th>
+    <th class="col-sm-1"></th>
+    <th class="col-sm-1"></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="assignment in model.results" ng-click="selectAssignment(assignment)"
+      ng-class="{'ip-selected': assignment === currentAssignment,
+                 'ip-sibling-aggregatable': assignment === sibling,
+                 'ip-sibling-non-aggregatable': relatedTo(assignment) }">
+    <td>
+      <customerselect customer="assignment.related.customer"
+                      func="setCustomer(assignment)()">
+      </customerselect>
+    </td>
+    <td>
+      <a href='' ng-click="selectAssignment(assignment)">
+        {{ formatIp(assignment) }}
+      </a>
+    </td>
+    <td>
+      <a href='#/ipv4_public/assignments/{{ assignment.prefix }}'>
+        Details
+      </a>
+    </td>
+    <td>{{ assignment.prefixlen }}</td>
+    <td>{{ assignment.num_hosts_int }}</td>
+    <td>{{ assignment.name }}</td>
+    <td>
+      <button class="btn btn-danger"
+              ng-if="assignment.splittable == true && currentAssignment === assignment"
+              ng-click="split(assignment)">
+        Split!
+      </button>
+    </td>
+    <td>
+      <button class="btn btn-success"
+              ng-if="assignment === sibling"
+              ng-click="aggregate();$event.stopPropagation()">
+        Aggregate
+      </button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<uib-pagination total-items="model.count" items-per-page="pageSize" max-size="5" rotate="false"
+                ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+
+
+

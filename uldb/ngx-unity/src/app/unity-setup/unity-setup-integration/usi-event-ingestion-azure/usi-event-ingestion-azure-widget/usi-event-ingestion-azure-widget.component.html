@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'Azure Monitoring'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addInsatnce()"
+    (viewButtonClick)="viewInstanceDetails()" [moduleName]="'Integrations'" [addAccessType]="'Add Integrations'"
+    [viewAccessType]="'View Integrations'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<usi-event-ingestion-azure-crud (onCrud)="onCrud($event)"></usi-event-ingestion-azure-crud>

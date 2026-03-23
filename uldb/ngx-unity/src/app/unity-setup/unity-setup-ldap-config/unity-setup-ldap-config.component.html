@@ -1,0 +1,101 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card rounded-0 border-top-0">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center font-500">
+                            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+                            <span class="ml-1 font-lg">LDAP Configs</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button class="btn btn-pill btn-sm btn-warning font-500" type="button"
+                                (click)="goToCreate()" accessControl moduleName="User Management"
+                                accessType="Manage Users" elementType="btn">
+                                <span class="fas fa-plus"></span>
+                                <span class="font-xs-sm mx-1">LDAP Config</span>
+                            </button>
+                            <button class="btn btn-pill btn-warning btn-sm ml-2" type="button" container="body"
+                                (click)="goBack()" *ngIf="isIntergrationPage"><i class="fa fa-arrow-left"></i>
+                            </button>
+                            <data-refresh-btn [page]="1" (refresh)="refreshData($event)"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <table class="table table-sm text-left">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>LDAP Url</th>
+                                    <th>Username</th>
+                                    <th>Domain Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData" truncateText>
+                                    <td class="tdw-35">
+                                        <button class="btn btn-link text-decoration-none p-0 table-column-btn"
+                                            type="button" [tooltip]="view.ldapUrl">{{view.ldapUrl}}</button>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="view.username">{{view.username}}</div>
+                                    </td>
+                                    <td class="tdw-20">
+                                        <div [tooltip]="view.dc">{{view.dc}}</div>
+                                    </td>
+                                    <td class="action-icons-column">
+                                        <button class="action-icons mb-0 fas fa-sync font-sm ml-1"
+                                            (click)="syncNow(view)"
+                                            [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
+                                            [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}"
+                                            accessControl moduleName="User Management" accessType="Manage Users"
+                                            elementType="actionbtn">
+                                        </button>
+                                        <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1"
+                                            tooltip="Edit LDAP Config" (click)="goToEdit(view)" accessControl
+                                            moduleName="User Management" accessType="Manage Users"
+                                            elementType="actionbtn">
+                                        </button>
+                                        <button class="action-icons mb-0 fa fa-users font-sm ml-1" tooltip="Import User"
+                                            (click)="goToImportUser(view)">
+                                        </button>
+                                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1"
+                                            tooltip="Delete LDAP Config" (click)="delete(view)" accessControl
+                                            moduleName="User Management" accessType="Manage Users"
+                                            elementType="actionbtn">
+                                        </button>
+                                        <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                            tooltip="Manage by creating support ticket"
+                                            (click)="createTicket(view)"></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No LDAP Config were found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #deleteConfirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

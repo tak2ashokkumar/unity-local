@@ -1,0 +1,171 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div
+                        class="card-title mb-2 px-2 py-2 border-bottom d-flex justify-content-between font-weight-bold">
+                        <span class="h6 pt-1 font-500">Integration</span>
+                        <button class="btn btn-pill btn-warning btn-sm text-right" (click)="goBack()" tooltip="Back">
+                            <i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'accountDetailsForm'"
+                                        (click)="manageActiveForm('accountDetailsForm')">
+                                        <span class="fas fa-cog font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Account Details</label>
+                                </div>
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'configurationForm'"
+                                        (click)="manageActiveForm('configurationForm')">
+                                        <span class="fas fa-clock font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Configuration</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 divider-wrap">
+                                <hr class="divider-line w-90 ml-0">
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col">
+                                <ng-container [ngSwitch]="activeForm">
+                                    <ng-container *ngSwitchCase="'accountDetailsForm'">
+                                        <ng-container *ngTemplateOutlet="accountDetailsFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'configurationForm'">
+                                        <ng-container *ngTemplateOutlet="configurationFormRef"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #accountDetailsFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="accountDetailsForm" [formGroup]="accountDetailsForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="name" class="form-col-form-label">Name<em>*</em></label>
+                                <input id="name" class="form-control" type="text" formControlName="name"
+                                    placeholder="Enter Account Name" [class.is-invalid]="accountDetailsFormErrors.name">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.name">
+                                    {{accountDetailsFormErrors.name}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="accountType" class="form-col-form-label">Account
+                                    Type<em>*</em></label>
+                                <select id="accountType" class="form-control" formControlName="account_type"
+                                    [ngClass]="{'is-invalid' : accountDetailsFormErrors.account_type}">
+                                    <option [value]="''" disabled>Select Account Type</option>
+                                    <option *ngFor="let accountType of accountTypesList" [value]="accountType.value">
+                                        {{accountType.label}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.account_type">
+                                    {{accountDetailsFormErrors.account_type}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group" *ngIf="accountDetailsForm.controls.client_id">
+                                <label for="client_id" class="form-col-form-label">Client Id<em>*</em></label>
+                                <input id="client_id" class="form-control" type="text" formControlName="client_id"
+                                    placeholder="Enter Client Id"
+                                    [class.is-invalid]="accountDetailsFormErrors.client_id">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.client_id">
+                                    {{accountDetailsFormErrors.client_id}}</div>
+                            </div>
+                            <div class="col-6 form-group" *ngIf="accountDetailsForm.controls.client_secret">
+                                <label for="client_secret" class="form-col-form-label">Client
+                                    Secret<em>*</em></label>
+                                <input id="client_secret" class="form-control" type="text"
+                                    formControlName="client_secret" placeholder="Enter Client Secret"
+                                    [class.is-invalid]="accountDetailsFormErrors.client_secret">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.client_secret">
+                                    {{accountDetailsFormErrors.client_secret}}</div>
+                            </div>
+                            <div class="col-6 form-group" *ngIf="accountDetailsForm.controls.topic_name">
+                                <label for="topic_name" class="form-col-form-label">Topic Name<em>*</em></label>
+                                <input id="topic_name" class="form-control" type="text" formControlName="topic_name"
+                                    placeholder="Enter Topic Name"
+                                    [class.is-invalid]="accountDetailsFormErrors.topic_name">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.topic_name">
+                                    {{accountDetailsFormErrors.topic_name}}</div>
+                            </div>
+                            <div class="col-6 form-group" *ngIf="accountDetailsForm.controls.tenant_id">
+                                <label for="tenant_id" class="form-col-form-label">Tenant Id<em>*</em></label>
+                                <input id="tenant_id" class="form-control" type="text" formControlName="tenant_id"
+                                    placeholder="Enter Tenant Id"
+                                    [class.is-invalid]="accountDetailsFormErrors.tenant_id">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.tenant_id">
+                                    {{accountDetailsFormErrors.tenant_id}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="email" class="form-col-form-label">Email Id<em>*</em></label>
+                                <input id="email" class="form-control" type="text" formControlName="email"
+                                    placeholder="Enter Email Id" [class.is-invalid]="accountDetailsFormErrors.email">
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.email">
+                                    {{accountDetailsFormErrors.email}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="collectorId" class="form-col-form-label">Collector<em>*</em></label>
+                                <select id="collectorId" class="form-control" formControlName="collector"
+                                    [ngClass]="{'is-invalid' : accountDetailsFormErrors.collector}">
+                                    <option [value]="''" disabled>Select Collector</option>
+                                    <option *ngFor="let cl of collectors" [value]="cl.uuid">{{cl.name}}</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="accountDetailsFormErrors.collector">
+                                    {{accountDetailsFormErrors.collector}}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitAccountDetailsForm()">Next</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #configurationFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <usi-event-ingestion-crud [paramList]="paramList" [instance]="emailData"
+                        [eventIngestionCheck]="'true'" [eventAttribute]="'Email'"
+                        (formUpdate)="onFormUpdate($event)"></usi-event-ingestion-crud>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmit()">Submit</button>
+        </div>
+    </div>
+</ng-template>

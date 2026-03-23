@@ -1,0 +1,132 @@
+
+   <div class="panel panel-default">
+       <div class="panel-heading">
+		<h4>Add Component</h4>
+       </div>
+       <div class="panel-body">
+	<!--<form role="form" method="post" id="postform">-->
+	<form role="form"id="postform" action="" method="post">
+            <input type='hidden' name='csrfmiddlewaretoken' id="csrf_token" value={{csrf_token}} />
+         </form>
+         <form role="form" action="" method="post" enctype='application/json'>
+
+	    <div ng-include src="'static/rest/app/templates/generic_modal.html'"></div>
+	    <!--- Motherboard -->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">Motherboard</h3>
+		</div>
+
+		<div class="panel-body">
+			<div class="form-inline">
+		   	   <select id="id_motherboard" class="form-control" ng-model="component.motherboard" ng-change="FillAssociate()" 						ng-options="mb as mb.assettag for mb in motherboard" style="width:95%;">
+				<option style="display:none" value="">Please select</option>
+			   </select>
+			   <span ng-click="AddMB();ctrl.add();" class="addmb"><i class="fa fa-plus-circle fa-2x" title="Add"></i></span>
+			</div>
+			<label class="errormsg" ng-if="motherboarderr">{{ motherboardMsg }}</label>
+		</div>
+	    </div>
+
+	    <!--- harddisk --->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">Storage </h3>
+		</div>
+
+		<div class="panel-body">
+
+		   <select id="id_disk" class="form-control" ng-model="component.disks" 					 								 				ng-options="dk as dk.serialnumber for dk in disk" style="width:100%;" multiple>
+
+			</select>
+		   <label class="errormsg" ng-if="diskerr">{{ diskMsg }}</label>
+
+		</div>
+	    </div>
+
+	    <!--- CPU --->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">CPU</h3>
+		</div>
+
+		<div class="panel-body">
+			<select id="id_cpu" class="form-control" ng-model="component.cpu" 					 									 				ng-options="cpu as cpu.serialnumber for cpu in cpu" style="width:100%;" multiple>
+
+			</select>
+		 	<label class="errormsg" ng-if="cpuerr">{{ cpuMsg }}</label>
+		</div>
+	    </div>
+
+	    <!--- Memory --->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">Memory</h3>
+		</div>
+
+		<div class="panel-body">
+		   <select id="id_memory" class="form-control" ng-model="component.memory" 					 				 			 				ng-options="memory as memory.serialnumber for memory in memory" style="width:100%;" multiple>
+
+		   </select>
+		   <label class="errormsg" ng-if="memoryerr">{{ memoryMsg }}</label>
+		</div>
+	    </div>
+
+
+
+	    <!--- NIC External--->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">NIC (External)</h3>
+		</div>
+
+		<div class="panel-body">
+			<select id="id_nic" class="form-control" ng-model="component.nic" 					 				  							 				ng-options="nic as nic.assettag for nic in nic" style="width:100%;" multiple>
+
+		   	</select>
+
+		</div>
+	    </div>
+
+	    <!--- RAID Controller -->
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">RAID Controller</h3>
+		</div>
+
+		<div class="panel-body">
+			<select id="id_raidcontroller" class="form-control" ng-model="component.raid"  				 				 					 				ng-options="dc as dc.controller for dc in raidController" style="width:100%;" multiple>
+
+		   	</select>
+
+		</div>
+	    </div>
+
+
+	    <!--- IPMI -->
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">IPMI (External)</h3>
+		</div>
+
+		<div class="panel-body">
+			<select id="id_ipmi" class="form-control" ng-model="component.ipmi" 							 								 				ng-options="ipmi as ipmi.assettag for ipmi in ipmi" style="width:100%;" multiple>
+
+		   	</select>
+
+		</div>
+	    </div>
+
+	   <button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelComponentAdd()">Cancel</button>
+	   <button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveComponentAdd()">Save</button>
+
+	</form>
+      </div>
+
+   </div>
+

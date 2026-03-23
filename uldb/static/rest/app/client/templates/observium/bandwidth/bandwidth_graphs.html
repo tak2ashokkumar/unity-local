@@ -1,0 +1,54 @@
+<style type="text/css">
+	.ulsubheading{
+		margin-left: 2%;
+	}
+
+</style>
+
+<loading loader="{{loader}}"></loading>
+<div class="row tabs-level1" style="margin-top: 10px;height: 35px;" ng-show="submenutabs">
+    <div class="col-xs-10 col-sm-10 col-md-8 col-lg-8" style="padding-left: 5px !important;">
+        <div class="ui-selectee">
+            <nav class="column subtabs">
+                <uib-tabset ng-show="submenutabs" active="activeSubTab">
+                    <uib-tab ng-repeat="subtab in submenutabs" index="$index" heading="{{subtab.tabname}}"
+                    select="getGraphSubtabsData(subtab);"></uib-tab>
+                </uib-tabset>
+            </nav>
+        </div>
+    </div>
+     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 company-name pull-right" style="padding-right: 15px !important;">
+        <a href="" ng-click="goToPreviousPage()" style="padding-top:0px;width: 100%;" class="menubackoption">
+          <i  style="font-size: 14px; padding-top: 7px;padding-right: 5px;" class="fa fa-arrow-left" aria-hidden="true"></i>
+          <span style="font-size:15px;">Port List</span>
+        </a>
+    </div>
+</div>
+
+<div class="row" ng-show="!showDetailsView">
+	 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 page_wrapper">
+		<div class="row" ng-repeat="switch_graph_obj in switch_graph_data">
+		    <sub-title title="{{switch_graph_obj.displayName}}"></sub-title>
+		    <table>
+		    	<tbody>
+		    		<tr ng-click="getGraphforDefaultDateRange(switch_graph_obj)">
+		    			<td>
+		    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ switch_graph_obj.graphDetails.graph_by_day }}">
+		    			</td>
+		    			<td>
+		    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ switch_graph_obj.graphDetails.graph_by_week }}">
+		    			</td>
+		    			<td>
+		    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ switch_graph_obj.graphDetails.graph_by_month }}">
+		    			</td>
+		    			<td>
+		    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ switch_graph_obj.graphDetails.graph_by_year }}">
+		    			</td>
+		    		</tr>
+		    	</tbody>
+		    </table>
+		</div>
+	</div>
+</div>
+
+<observium-graph-details ng-show="showDetailsView"></observium-graph-details>

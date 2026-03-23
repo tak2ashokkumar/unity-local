@@ -1,0 +1,55 @@
+<div class="row">
+
+  <div class="col-xs-6">
+    <div class="panel panel-primary" ng-controller="Widget2Controller">
+      <div class="panel-heading">
+        {{ panel_heading }}
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr ng-attr-id="{{ 'object-' + $index }}" ng-repeat="server in servers">
+            <td>{{ server.system_name }}</td>
+            <td>{{ server.system_assettag }}</td>
+            <td>{{ server.system_manufacturer }}</td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-6">
+    <div class="panel panel-primary" ng-controller="Widget1Controller">
+      <div class="panel-heading">
+        {{ panel_heading }}
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr ng-repeat="dc in datacenters">
+            <td>{{ dc.name }}</td>
+            <td>{{ dc.lat }}</td>
+            <td>{{ dc.long }}</td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+<style>.angular-google-map-container { height: 400px; }</style>
+<div class="row">
+  <div class="col-xs-6">
+    <div class="panel panel-primary" ng-controller="Widget3Controller">
+      <div class="panel-heading">
+        {{ panel_heading }}
+      </div>
+      <div class="panel-body">
+        <ui-gmap-google-map center='map.center' zoom='map.zoom' options='map.options' ng-cloak></ui-gmap-google-map>
+      </div>
+    </div>
+  </div>
+</div>

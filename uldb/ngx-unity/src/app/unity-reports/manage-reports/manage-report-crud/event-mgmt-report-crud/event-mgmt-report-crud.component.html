@@ -1,0 +1,20 @@
+<form *ngIf="form" [formGroup]="form">
+    <div class="border position-relative rounded mt-4 p-3">
+        <div class="bg-white font-md font-500 section-name-one">Event Management Details</div>
+        <div class="row">
+            <div class="form-group col-4">
+                <label class="form-col-form-label">Type<em>*</em></label>
+                <select class="form-control" formControlName="report_type"
+                    [ngClass]="{'is-invalid' : formErrors.report_type}">
+                    <option [value]="''">Select Type</option>
+                    <option [value]="'events'">Events</option>
+                    <option [value]="'alert'">Alerts</option>
+                    <option [value]="'suppression'">Suppression</option>
+                    <option [value]="'correlation'">Correlation</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.report_type">
+                    {{formErrors.report_type}}</div>
+            </div>
+        </div>
+    </div>
+</form>

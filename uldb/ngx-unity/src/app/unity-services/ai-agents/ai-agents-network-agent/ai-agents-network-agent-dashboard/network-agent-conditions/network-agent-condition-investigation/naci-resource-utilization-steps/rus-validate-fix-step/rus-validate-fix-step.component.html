@@ -1,0 +1,46 @@
+<div class="card mb-2">
+    <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1 px-2">
+        <div class="d-flex align-items-center">
+            <i class="far fa-check-circle text-primary step-icon rounded-circle pt-2 pl-2 mr-2"></i>
+            <div class="font-500">Validate Fix</div>
+        </div>
+        <button type="button" class="btn p-0 border-0 bg-transparent shadow-none text-muted"
+            [tooltip]="isValidateFixOpen ? 'Minimize' : 'Expand'" (click)="toggleValidateFix()"
+            [attr.aria-expanded]="isValidateFixOpen">
+            <i class="fas fa-lg" [ngClass]="isValidateFixOpen ? 'fa-chevron-up' : 'fa-chevron-down'">
+            </i>
+        </button>
+    </div>
+
+    <div class="card-body" [collapse]="!isValidateFixOpen">
+        <ng-container *ngIf="validateFixViewData">
+            <div>
+                <span class="font-sm-xs text-muted">Target Device: </span> <span
+                    class="font-sm-xs font-500">{{validateFixViewData?.targetDevice || 'NA'}}</span>
+            </div>
+            <div>
+                <span class="font-sm-xs text-muted">Execution Status: </span> <span
+                    class="font-sm-xs font-500">{{validateFixViewData?.executionStatus || 'NA'}}</span>
+            </div>
+            <div class="card mt-3">
+                <div class="card-header bg-white py-1">
+                    <div class="row">
+                        <span class="font-lg font-500 text-truncate ml-2">Logs</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0" *ngIf="validateFixViewData?.logs?.length">
+                        <li *ngFor="let log of validateFixViewData?.logs">
+                            {{ log }}</li>
+                    </ul>
+                    <div *ngIf="!validateFixViewData?.logs?.length">
+                        <div class="text-center text-muted h-100">No data available.</div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="!validateFixViewData">
+            <div class="text-center text-muted py-5">No Validate Fix data found.</div>
+        </ng-container>
+    </div>
+</div>

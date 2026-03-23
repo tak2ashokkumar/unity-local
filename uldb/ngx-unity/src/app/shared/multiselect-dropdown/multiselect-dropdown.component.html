@@ -1,0 +1,100 @@
+<div class="dropdown" [ngClass]="settings.containerClasses" [class.open]="isVisible">
+  <button type="button" class="truncate d-flex justify-content-between align-items-center"
+    [ngClass]="settings.buttonClasses" (click)="toggleDropdown()" [disabled]="isDisabled">
+    <span class="text-left truncate">{{ title }}</span>
+    <span class="fas fa-angle-down"></span>
+  </button>
+  <ul *ngIf="isVisible" class="dropdown-menu" [class.pull-right]="settings.pullRight"
+    [class.dropdown-menu-right]="settings.pullRight" [style.max-height]="settings.maxHeight"
+    [style.width]="settings.width" style="display: block; height: auto; overflow-y: auto;">
+    <li class="dropdown-item search p-2" *ngIf="settings.enableSearch">
+      <input type="text" class="form-control form-control-sm" placeholder="{{ texts.searchPlaceholder }}"
+        [(ngModel)]="searchFilterText" [ngModelOptions]="{ standalone: true }"
+        (ngModelChange)="onSearchTextChangeDebounced()" autofocus>
+    </li>
+    <li class="dropdown-item check-control check-control-check p-2" *ngIf="settings.showCheckAll" (click)="checkAll()">
+      <a href="javascript:;" role="menuitem" tabindex="-1" class="text-decoration-none w-100 d-flex align-items-center">
+        <span class="w-10 text-center font-sm"
+          [ngClass]="{'glyphicon glyphicon-ok': settings.checkedStyle !== 'fontawesome','fa fa-check': settings.checkedStyle === 'fontawesome'}"></span>
+        <span class="w-90 font-500 font-sm"> {{ texts.checkAll }} </span>
+      </a>
+    </li>
+    <li class="dropdown-item check-control check-control-uncheck p-2" *ngIf="settings.showUncheckAll"
+      (click)="uncheckAll()">
+      <a href="javascript:;" role="menuitem" tabindex="-1" class="text-decoration-none w-100 d-flex align-items-center">
+        <span class="w-10 text-center font-sm"
+          [ngClass]="{'glyphicon glyphicon-remove': settings.checkedStyle !== 'fontawesome','fa fa-times': settings.checkedStyle === 'fontawesome'}"></span>
+        <span class="w-90 font-500 font-sm"> {{ texts.uncheckAll }} </span>
+      </a>
+    </li>
+    <li class="dropdown-item check-control check-control-check p-2" *ngIf="isLoading">
+      <a href="javascript:;" role="menuitem" tabindex="-1">
+        <span class="d-flex justify-content-center fas fa-spinner fa-spin"></span>
+      </a>
+    </li>
+    <ng-container *ngIf="!isLoading && !settings.groupBy">
+      <li class="dropdown-item border-0 p-2" [ngClass]="{'bg-secondary': option.isDisabled, 'onItemHover': !option.isDisabled}"
+        [ngStyle]="getItemStyle(option)" *ngFor="let option of options; let i = index;"
+        (click)="setSelected($event, option)">
+        <a role="menuitem" tabindex="-1" class="text-decoration-none w-100 d-flex align-items-center onHover">
+          <input *ngIf="settings.checkedStyle === 'checkboxes'" type="checkbox" [checked]="isSelected(option)"
+            (click)="preventCheckboxCheck($event, option)" />
+          <span *ngIf="settings.checkedStyle === 'glyphicon'" class="w-10 text-center" class="glyphicon"
+            [class.glyphicon-ok]="isSelected(option)"></span>
+          <span *ngIf="settings.checkedStyle === 'fontawesome'" class="w-10 text-center">
+            <i *ngIf="!isSelected(option)" class="far fa-square"
+              [ngClass]="option.isDisabled ? 'text-white' : 'custom-grey-text'" aria-hidden="true"></i>
+            <i *ngIf="isSelected(option)" class="fas fa-check-square"
+              [ngClass]="option.isDisabled ? 'text-white' : 'custom-grey-text'" aria-hidden="true"></i>
+          </span>
+          <span #hideTooltip *ngIf="settings.enableTooltip"
+            [ngClass]="settings.itemClasses + (option.isDisabled ? ' text-white' : ' custom-grey-text')"
+            [tooltip]="getLabelValue(option)" class="w-90 text-truncate font-sm" [container]="tooltipContainer[i]">
+            {{ getLabelValue(option) }}
+          </span>
+          <span *ngIf="!settings.enableTooltip"
+            [ngClass]="settings.itemClasses + (option.isDisabled ? ' text-white' : ' custom-grey-text')"
+            class="w-90 text-truncate font-sm">
+            {{ getLabelValue(option) }}
+          </span>
+        </a>
+      </li>
+    </ng-container>
+    <!-- <li *ngIf="settings.showCheckAll || settings.showUncheckAll" class="dropdown-divider divider"></li> -->
+
+    <ng-container *ngIf="!isLoading && settings.groupBy">
+
+      <ng-container *ngFor="let option of options | searchFilter:searchFilterText:settings.lableToDisplay">
+
+        <li class="dropdown-header text-capitalize bg-white" *ngIf="option.isOptionGroupName"
+          (click)="toggleGroupCollapse(option)">
+          <strong>{{option.optionGroupName}}</strong>
+          <i class="fas pull-right" [ngClass]="getGroupArrowIcon(option)"></i>
+        </li>
+
+        <ng-container *ngIf="!option.isOptionGroupName">
+          <li class="dropdown-item border-0" [ngStyle]="getItemStyle(option)" (click)="setSelected($event, option)"
+            *ngIf="!isGroupCollapsed(option)">
+            <a role="menuitem" tabindex="-1" class="text-decoration-none">
+              <input *ngIf="settings.checkedStyle === 'checkboxes'" type="checkbox" [checked]="isSelected(option)"
+                (click)="preventCheckboxCheck($event, option)" />
+              <span *ngIf="settings.checkedStyle === 'glyphicon'" style="width: 16px;" class="glyphicon"
+                [class.glyphicon-ok]="isSelected(option)"></span>
+              <span *ngIf="settings.checkedStyle === 'fontawesome'" style="width: 16px;display: inline-block;">
+                <i *ngIf="isSelected(option)" class="fa fa-check" aria-hidden="true"></i>
+              </span>
+              <span #hideTooltip *ngIf="settings.enableTooltip" [ngClass]="settings.itemClasses"
+                [tooltip]="getLabelValue(option)" class="w-90 text-truncate font-sm" [container]="tooltipContainer[i]">
+                {{ getLabelValue(option) }}
+              </span>
+              <span *ngIf="!settings.enableTooltip" [ngClass]="settings.itemClasses">
+                {{ getLabelValue(option) }}
+              </span>
+            </a>
+          </li>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+
+  </ul>
+</div>

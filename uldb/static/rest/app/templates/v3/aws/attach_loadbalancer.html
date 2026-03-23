@@ -1,0 +1,18 @@
+<alerts></alerts>
+<form role="form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group ng-scope">
+            <label for="blockName">Loadbalancer *</label>
+            <select ng-if="!angular.isDefined(rows6.loadbalancer_list) || (rows6.loadbalancer_list.length === 0)" ng-options="row.load_balancer as row.load_balancer for row in rows6.loadbalancer_list" class="form-control" ng-model="obj.load_balancer" disabled>
+                <option selected="selected" value="">-- no loadbalancer present --</option>
+            </select>
+            <select ng-if="angular.isDefined(rows6.loadbalancer_list) && (rows6.loadbalancer_list.length > 0)" ng-options="row.load_balancer as row.load_balancer for row in rows6.loadbalancer_list" class="form-control" ng-model="obj.load_balancer">
+                <option selected="selected" value="">-- choose a loadbalancer --</option>
+            </select>
+            <span class="select-arrow"></span>
+            <label class="errormsg" ng-if="obj['load_balancererr']">{{ obj['load_balancerMsg'] }}</label>
+        </div>
+        <p ng-if="obj.load_balancer" class="text-center"> Are you sure you want to attach to the instance  <b>{{obj.instance_id}}</b> ?</p>
+    </div>
+</form>
+    

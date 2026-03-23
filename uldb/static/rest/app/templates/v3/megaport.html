@@ -1,0 +1,240 @@
+<alerts></alerts>
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+
+
+<script type="text/ng-template" id="megaportlocationData.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+    <div>
+        <span ng-if="!megaport_locations">
+          <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+        </span>
+    <span ng-if="megaport_locations.length != 0">
+    <table class="display" cellspacing="0" width="100%">
+      <tr>
+        <td>
+
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th class="col-lg-1">Datacenter</th>
+              <th class="col-lg-1">Country</th>
+              <th class="col-lg-1">Status</th>
+              <th class="col-lg-1">Network Region</th>
+              <th class="col-lg-1">Market</th>
+              <th class="col-lg-2">Address</th>
+              <!--<th class="col-lg-1">Action</th>-->
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="location in megaport_locations">
+              <td>{{ location.name }}</td>
+              <td>{{ location.country }}</td>
+              <td>{{ location.status }}</td>
+              <td>{{ location.networkRegion }}</td>
+              <td>{{ location.market }}</td>
+              <td>
+                  <span ng-if="location.address.street != 'null'">Street:{{ location.address.street }},</span>
+                  <span ng-if="location.address.state != 'null'">State: {{ location.address.state }},</span>
+                  <span ng-if="location.address.postcode != 'null'">Postcode: {{ location.address.postcode }}</span>
+              </td>
+              <!--<td>-->
+                  <!--<div class="btn-group">-->
+                    <!--<button type="button" class="btn btn-dropdown btn-default"-->
+                            <!--data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                    <!--<span class="caret"></span>-->
+                    <!--</button>-->
+                    <!--<ul class="dropdown-menu">-->
+                      <!--&lt;!&ndash;<li><a href ng-click="buy_port(location, $index)">Buy Port</a></li>&ndash;&gt;-->
+                      <!--&lt;!&ndash;<li><a href ng-click="openModal(action.button,row)">Buy Port</a></li>&ndash;&gt;-->
+                    <!--</ul>-->
+                  <!--</div>-->
+              <!--</td>-->
+            </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+    </span>
+    <span ng-if="megaport_locations.length == 0">
+      <h3 class="align-center">No records to display</h3>
+    </span>
+</div>
+
+<modal visible="showModal">
+    <ng-include src="modeldata.page"></ng-include>
+</modal>
+
+    <!--megaport-data data="megaport_locations"></megaport-data-->
+</script>
+
+<script type="text/ng-template" id="megaportpartnerlocationData.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+
+    <div>
+        <span ng-if="!megaport_partner_locations">
+          <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+        </span>
+        <span ng-if="megaport_partner_locations.length != 0">
+        <table class="display" cellspacing="0" width="100%">
+          <tr>
+            <td>
+
+              <table class="table table-condensed">
+                <thead>
+                <tr>
+                  <th class="col-lg-1">Title</th>
+                  <th class="col-lg-1">Connect Type</th>
+                  <th class="col-lg-1">Company Name</th>
+                  <th class="col-lg-1">VXC Permitted</th>
+                  <th class="col-lg-1">Rank</th>
+                  <th class="col-lg-2">Product Uid</th>
+                  <th class="col-lg-1">Speed (Gbps)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="location in megaport_partner_locations">
+                  <td>{{ location.title }}</td>
+                  <td>{{ location.connectType }}</td>
+                  <td>{{ location.companyName }}</td>
+                  <td>{{ location.vxcPermitted }}</td>
+                  <td>{{ location.rank }}</td>
+                  <td>{{ location.productUid }}</td>
+                    <td>{{ location.speed }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+        </span>
+        <span ng-if="megaport_partner_locations.length == 0">
+          <h3 class="align-center">No records to display</h3>
+        </span>
+    </div>
+    <!--megaport-data data="megaport_partner_locations"></megaport-data-->
+</script>
+<script type="text/ng-template" id="buymegaport.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+    <div style="clear:both">
+    <span ng-if="show_loader==true">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader" style=" z-index: 1000;">
+    </span>
+    <form class="form-horizontal">
+        <div class="form-group" ng-repeat="row in port_rows">
+            <div ng-if="row.required">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">{{ row.description }}*</label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'date' && row.name=='start_date')">
+                    <div class="input-group date">
+                        <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                    </div>
+                    <datetimepicker data-ng-model="obj[row.name]"
+                            data-datetimepicker-config="{ dropdownSelector: '#dropdownStart', renderOn: 'end-date-changed' }"
+                            data-on-set-time="startDateOnSetTime()"
+                            data-before-render="startDateBeforeRender($dates)"></datetimepicker>
+                </div>
+
+                <div class="col-sm-9" ng-if="(row.type == 'text' && row.name!='customer') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+                </div>
+
+                <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                    <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" port_rows="4" maxlength="128" cols="40" required></textarea>
+                </div>
+                <div class="col-sm-9" ng-if="(row.type == 'select' && row.name == 'market' )">
+                    <select ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-change="load_locations(obj[row.name])" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" ng-if="(row.type == 'select' && row.name != 'market')">
+                    <select ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+            <div ng-if="!row.required">
+                <div ng-if="row.depends == undefined">
+                    <span ng-if= "row.type != 'hidden'">
+                        <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                    </span>
+                    <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                        <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}">
+                    </div>
+                    <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                        <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" port_rows="4" maxlength="128" cols="40"></textarea>
+                    </div>
+                    <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                        <select ng-options="option for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]">
+                            <option value="">-- Select {{ row.description | lowercase }} --</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-9" style="float: right;">
+                        <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                    </div>
+                </div>
+                <div ng-if="row.depends != undefined">
+                    <div ng-if="row.depends">
+                        <span ng-if= "row.type != 'hidden'">
+                            <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                        </span>
+                        <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                            <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" maxlength="128" value="{{row.value}}">
+                        </div>
+                        <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                            <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" port_rows="4" maxlength="128" cols="40"></textarea>
+                        </div>
+                        <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                            <select ng-options="option for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]">
+                                <option value="">-- Select {{ row.description | lowercase }} --</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-9" style="float: right;">
+                            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <span>
+                <label for="blockName" class="col-sm-3 control-label">Location*</label>
+            </span>
+            <div class="col-sm-9">
+                <select ng-options="option.long for option in location_row_options track by option.short" class="form-control" ng-model="obj['location']" required>
+                    <option value="">-- Select location --</option>
+                </select>
+            </div>
+        </div>
+
+        <!--<button class="btn btn-success" ng-click="buy_port()">Save</button>-->
+    </form>
+    <button class="btn btn-primary" type="button" ng-click="buy_port(obj)" ng-disabled="disableButton">Create</button>
+</div>
+</script>

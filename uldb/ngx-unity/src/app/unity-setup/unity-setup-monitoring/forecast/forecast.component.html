@@ -1,0 +1,203 @@
+<div class="row">
+  <div class="card round-edge mt-3 w-100">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+      <div class="d-flex justify-content-center align-items-center font-500">
+        <span class="badge badge-secondary font-sm">{{count}}</span>
+        <span class="ml-1 font-lg">Forecast</span>
+      </div>
+      <div class="d-flex justify-content-end align-items-center">
+        <button class="action-icons mb-0 far fa-trash-alt font-sm mr-2" tooltip="Delete" *ngIf="this.showBulkDeleteIcon"
+          (click)="bulkDeleteForecast()"></button>
+        <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="addForecast()">
+          <span class="fas fa-plus"></span>
+          <span class="font-xs-sm mx-1">Forecast</span>
+        </button>
+        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+      </div>
+    </div>
+    <div class="card-body py-2">
+      <div class="col-12 p-0 mb-2">
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <div class="w-80">
+            <div class="w-20">
+              <table-search-box [searchValue]="currentCriteria.searchValue"
+                (searched)="onSearched($event)"></table-search-box>
+            </div>
+          </div>
+          <div class="w-10">
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+        </div>
+      </div>
+      <table class="table table-sm text-left">
+        <thead class="bg-light">
+          <tr>
+            <th>
+              <input type="checkbox" [(ngModel)]="allDevicesSelected" (change)="toggleAllDevices($event.target.checked)"
+                class="large-checkbox" />
+            </th>
+            <th>Device Name</th>
+            <th>Device Status</th>
+            <th>Total Metrics</th>
+            <th>Alert Count</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let device of viewData; let i = index">
+            <!-- Device row -->
+            <tr>
+              <td class="tdw-5">
+                <input type="checkbox" [(ngModel)]="device.selected" (change)="onDeviceCheckboxChange(device,$event)"
+                  class="large-checkbox" />
+              </td>
+              <td (click)="toggleChildTable(i)" style="cursor: pointer;" class="tdw-10 text-primary">
+                {{ device.name }}
+              </td>
+              <td class="tdw-5">
+                <shared-device-status [status]="device.deviceStatus"></shared-device-status>
+              </td>
+              <td class="tdw-10">{{ device.totalMetrics }}</td>
+              <td class="tdw-10">{{ device.alertCount }}</td>
+              <td class="action-icons-column">
+                <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                (click)="deleteDeviceForecast(device)"></button>
+                <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                  tooltip="Manage by creating support ticket" container="body" (click)="createTicket(device)"></button>
+              </td>
+            </tr>
+
+            <!-- Nested metrics row -->
+            <tr *ngIf="expandedDeviceIndex === i">
+              <td colspan="6" class="pt-0">
+                <table class="table table-sm text-left mb-0">
+                  <thead class="bg-light">
+                    <tr>
+                      <th style="width: 5%;">
+                        <input type="checkbox" [(ngModel)]="device.allMetricsSelected"
+                          (change)="toggleAllMetrics(device,$event)" class="large-checkbox" />
+                      </th>
+                      <th style="width: 16%;">Forecast Metric Name</th>
+                      <th style="width: 12%;">Projection Period</th>
+                      <th style="width: 9%;">Alerting</th>
+                      <th style="width: 9%;">Threshold</th>
+                      <th style="width: 9%;">Severity</th>
+                      <th style="width: 13%;">Created On</th>
+                      <th style="width: 10%;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of device.items;let j=index;">
+                      <td>
+                        <input type="checkbox" [(ngModel)]="item.selected"
+                          (change)="toggleSingleItem(device, item, $event)" class="large-checkbox" />
+                      </td>
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.projectionPeriod }}</td>
+                      <td>{{ item.alerting }}</td>
+                      <td>{{ item.threshold }}</td>
+                      <td>
+                        <div class="ml-3">
+                          <i class="fa status-icon" [ngClass]="item.severityIcon" [tooltip]="item.severity"
+                            container="body"></i>
+                        </div>
+                      </td>
+                      <td>{{ item.createdAt }}</td>
+                      <td class="action-icons-column">
+                        <button class="action-icons mb-0 font-sm ml-1"
+                          [ngClass]="item.enabled ? 'fas fa-toggle-on' : 'fas fa-toggle-off'"
+                          [tooltip]="item.enabled ? 'Enabled' : 'Disabled'"
+                          (click)="toggleMetric(device,i,j)"></button>
+                        <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                          (click)="deleteForecast(device,j)"></button>
+                        <button class="action-icons mb-0 fas fa-pencil-alt fa-xs font-sm ml-1" tooltip="Edit"
+                          (click)="EditForecast(device,j)"></button>
+                        <button class="action-icons mb-0 fas fa-history font-sm ml-1" tooltip="History"
+                          (click)="viewForecastHistory(device,j)"></button>
+                        <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(device,j)"
+                          tooltip="View Graphs">
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+      <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+        [totalCount]="count"></table-entries>
+
+      <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+        [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+      <div class="text-center text-muted" *ngIf="!viewData.length">No associated Forecasts found.
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #confirmdelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This Forecast will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmForecastDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmBulkDelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmBulkDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      All the selected Forecasts will be deleted. Are you sure you want to delete them?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmBulkForecastDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmBulkDeleteModalRef.hide()"
+        type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmDeviceDelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmDeviceDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      All the Forecast Metrics for this Device will be deleted. Are you sure you want to delete them?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmDeviceForecastDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeviceDeleteModalRef.hide()"
+        type="button">No</button>
+    </div>
+  </div>

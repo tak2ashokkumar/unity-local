@@ -1,0 +1,37 @@
+<div class="modal-header">
+  <h3 class="modal-title" style="text-align: center;">PDU Socket mappings</h3>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>PDU Socket No.</th>
+        <th>Device</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="n in socketDeviceMappings">
+        <td>{{ n.socket_number }}</td>
+        <td>
+          <span>
+            <select ng-options="device as device.readable_name for device in availableDevices track by device.uuid" ng-model="n.selected_device">
+            </select>
+            <span class="select-arrow"></span>
+          </span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="modal-footer">
+  <p ng-if="angular.isDefined(errorMsg)" style="color:red">{{errorMsg}}</p>
+  <button type="button" class="btn btn-cancel" ng-click="close()">
+    Close
+  </button>
+  <button type="submit" class="btn btn-default" ng-class="{'fa-disabled': loading_response}" ng-click="update_mappings()">
+    Save
+  </button>
+</div>
+

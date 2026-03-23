@@ -1,0 +1,162 @@
+<ng-container>
+    <ng-template #categoryTypeKeywordRef>
+        <form *ngIf="selectedCategoryType" [formGroup]="categoryKeywordForm">
+            <div class="form-group mb-2">
+                <input class="form-control" type="text" formControlName="keywords"
+                    [ngClass]="{'is-invalid' : categoryKeywordFormErrors.keywords}">
+            </div>
+            <div class="invalid-feedback d-flex mb-3" *ngIf="categoryKeywordFormErrors.keywords">
+                {{categoryKeywordFormErrors.keywords}}
+            </div>
+            <div class="form-group">
+                <button class="btn btn-sm btn-primary" type="button" (click)="onSubmitKeywordCategory()">Add</button>
+            </div>
+        </form>
+    </ng-template>
+    <ng-template #eventTypeListRef>
+        <div class="card border-0 mb-0">
+            <div class="card-header p-1">
+                <table-search-box (searched)="onSearchedEvent($event)"></table-search-box>
+            </div>
+            <div class="card-body px-2 py-1" style="max-height:200px; overflow-y: auto;">
+                <div class="mb-1 form-check checkbox pointer-link" *ngFor="let e of filteredEventTypes; let i = index">
+                    <label *ngIf="!selectedCategoryType.eventType.includes(e)">
+                        <input class="form-check-input" type="checkbox" [value]="e"
+                            (change)="onSelectEventType($event, e)">
+                        <span>{{e}}</span>
+                    </label>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 pt-0">
+                <button class="btn btn-sm btn-primary" type="button" (click)="onSubmitSelectedEventTypes()">Add</button>
+            </div>
+        </div>
+    </ng-template>
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card mb-0">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                    <div class="d-flex justify-content-center align-items-center font-500">
+                        <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+                        <span class="ml-1 font-lg">Category Types</span>
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                        <button class="btn btn-pill btn-sm btn-warning mx-2 px-3 font-500" type="button"
+                            (click)="addCategory()">
+                            <span class="font-sm">Add Category Type</span>
+                        </button>
+                        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData()"></data-refresh-btn>
+                    </div>
+                </div>
+                <div class="card-body py-2">
+                    <table class="table table-sm text-left">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Event Category</th>
+                                <th>Keyword</th>
+                                <!-- <th>Event Type</th> -->
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of viewData; let i=index" setTableColumnWidth>
+                                <td>
+                                    <div class="row" *ngIf="view.onForm">
+                                        <div class="col-10">
+                                            <form *ngIf="view.categoryForm" [formGroup]="view.categoryForm">
+                                                <div class="form-group mb-0">
+                                                    <input id="name" type="text" formControlName="name"
+                                                        class="line-input font-sm-xs" placeholder="Enter Category Name"
+                                                        autocomplete="off" />
+                                                </div>
+                                            </form>
+                                            <div class="d-flex invalid-feedback" *ngIf="view.categoryFormErrors.name">
+                                                {{view.categoryFormErrors.name}}
+                                            </div>
+                                        </div>
+                                        <div class="col-2 px-0 pt-2 text-center">
+                                            <a class="fas fa-check text-muted" (click)="onSubmitCategory(view)"></a>
+                                            <a class="card-header-action btn-close text-muted ml-3"
+                                                (click)="resetCategoryName(view)">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div *ngIf="!view.onForm" (click)="onEditCategory(i)">
+                                        <span class="text-primary">{{view.categoryType}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="keywords-container" *ngIf="view.categoryType">
+                                        <div *ngFor="let keywords of view.keywords; let j = index"
+                                            class="btn btn-pill btn-light btn-sm ml-2 w-auto text-muted">
+                                            {{ keywords }}
+                                            <a class="card-header-action btn-close text-muted"
+                                                (click)="deleteKeywordCategory(i,j)">
+                                                <i class="fas fa-times ml-1"></i>
+                                            </a>
+                                        </div>
+                                        <span class="fas fa-plus-circle text-primary fa-lg pointer-link ml-1"
+                                            [popover]="categoryTypeKeywordRef" container="body" placement="right"
+                                            [outsideClick]="true" [isOpen]="view.isAddkeywordsPopover"
+                                            (click)="addCategoryTypeKeyword(i); $event.stopPropagation();$event.preventDefault();"></span>
+                                    </div>
+                                </td>
+                                <!-- <td>
+                                    <div class="keywords-container" *ngIf="view.categoryType">
+                                        <div *ngFor="let event of view.eventType; let k = index"
+                                            class="btn btn-pill btn-light btn-sm ml-2 w-auto text-muted">
+                                            {{ event }}
+                                            <a class="card-header-action btn-close text-muted"
+                                                (click)="deleteCategoryEventKeyword(i,k)">
+                                                <i class="fas fa-times ml-1"></i>
+                                            </a>
+                                        </div>
+                                        <span class="fas fa-plus-circle text-primary fa-lg pointer-link ml-1"
+                                            [popover]="eventTypeListRef" [isOpen]="view.isAddEventTypePopover"
+                                            [outsideClick]="true" containerClass="modalPopover" container="body"
+                                            placement="right"
+                                            (click)="bindEventTypeToEventCategory(i);$event.stopPropagation();$event.preventDefault();"></span>
+                                    </div>
+                                </td> -->
+                                <td class="action-icons-column">
+                                    <button class="action-icons mb-0 font-sm ml-1" [class]="view.statusIconClass"
+                                        [tooltip]="view.statusIconTooltip" *ngIf="view.categoryType"
+                                        (click)="switchCategoryStatus(view)"></button>
+                                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                        *ngIf="view.categoryType" (click)="categoryDelete(view.uuid, i)"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!viewData.length" class="d-flex py-4 justify-content-center align-items-center">
+                        No Category Type available.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #deleteCategoryRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteCategoryModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This event will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmCategoryDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteCategoryModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

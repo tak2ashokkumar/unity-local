@@ -1,0 +1,55 @@
+<style type="text/css">
+   .pdu_graphs {
+      width: 98%;
+   }
+   .subtitleclass {
+      padding-left: 20px !important;
+   }
+</style>
+
+
+<loading object="{{pdu_health_graphs}}"></loading>
+<div class="row tabs-level1" ng-if="pdu_health_graphs">
+    <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 subtitleclass">
+        <div class="ui-selectee">
+            <nav class="column">
+                <ul class="nav nav-tabs">
+                    <span class="ulheading" style="line-height: 45px;">
+                    {{pdu_details.hostname}} (last 24 hours)</span>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 company-name" style="padding-right: 15px !important;">
+        <a href="" ng-click="goToPreviousPage()">
+          <i  style="font-size: 15px; padding-top: 7px;padding-right: 5px;" class="fa fa-arrow-left" aria-hidden="true"></i>
+          <span style="font-size:17px;">Back</span>
+        </a>
+    </div>
+</div>
+<!-- <div ng-if="error_details" class="content-wrapper">
+    <no-records-found message="{{error_details.data}}"></no-records-found>
+</div> -->
+<div class="page_wrapper margin_top20px" style="float:left" ng-if="pdu_health_graphs">
+    <div class="row" ng-if="pdu_health_graphs.device_status_graph">
+        <sub-title title="Status"></sub-title>
+        <img class="pdu_graphs" src="data:image/png;base64,{{ pdu_health_graphs.device_status_graph }}">
+    </div>
+    <div class="row margin_top20px" ng-if="pdu_health_graphs.device_current_graph">
+        <sub-title title="Current"></sub-title>
+        <img class="pdu_graphs" src="data:image/png;base64,{{ pdu_health_graphs.device_current_graph }}">
+    </div>
+    <div class="row margin_top20px" ng-if="pdu_health_graphs.device_power_graph">
+        <sub-title title="Power"></sub-title>
+        <img class="pdu_graphs" src="data:image/png;base64,{{ pdu_health_graphs.device_power_graph }}">
+    </div>
+    <div class="row margin_top20px" ng-if="pdu_health_graphs.device_voltage_graph">
+        <sub-title title="Voltage"></sub-title>
+        <img class="pdu_graphs" src="data:image/png;base64,{{ pdu_health_graphs.device_voltage_graph }}">
+    </div>
+</div>
+
+<div style="float:left; width:100%;" ng-if="error_details">
+    <no-records-found message="{{error_details.data.message}}"></no-records-found>
+</div>
+

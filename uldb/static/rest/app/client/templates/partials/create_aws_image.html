@@ -1,0 +1,38 @@
+
+    <form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength">
+        <div class="form-group ng-scope">
+            <label class="col-sm-4 control-label ng-binding" for="blockName">Instance Id *</label>
+            <div class="col-sm-8 ng-scope">
+                <label class="control-label ng-binding" for="blockName">{{obj.instance_id}}</label>
+            </div>
+            <div class="col-sm-8" style="float: right;">
+                <label class="errormsg" ng-if="obj['instance_iderr']">{{ obj['instance_idMsg'] }}</label>
+            </div>
+        </div>
+        <div class="form-group ng-scope">
+            <label class="col-sm-4 control-label ng-binding" for="blockName">Image Name *</label>
+            <div class="col-sm-8 ng-scope">
+                <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" required="" value="" ng-model="obj.name">
+            </div>
+            <div class="col-sm-8" style="float: right;">
+                <label class="errormsg" ng-if="obj['nameerr']">{{ obj['nameMsg'] }}</label>
+            </div>
+        </div>
+        <div class="form-group ng-scope">
+            <label class="col-sm-4 control-label ng-binding" for="blockName">Image Description *</label>
+            <div class="col-sm-8 ng-scope">
+                <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" required="" value="" ng-model="obj.description">
+            </div>
+            <div class="col-sm-8" style="float: right;">
+                <label class="errormsg" ng-if="obj['descriptionerr']">{{ obj['descriptionMsg'] }}</label>
+            </div>
+        </div>
+        <div class="form-group ng-scope">
+            <label class="col-sm-4 control-label ng-binding" for="blockName">No reboot</label>
+            <div class="col-sm-8 ng-scope">
+                <label class="ng-binding">
+                    <input class="ckeckbox cbox_view ng-pristine ng-untouched ng-valid ng-empty" type="checkbox" name="No reboot" ng-model="obj.reboot">
+                </label>
+            </div>
+        </div>
+    </form>

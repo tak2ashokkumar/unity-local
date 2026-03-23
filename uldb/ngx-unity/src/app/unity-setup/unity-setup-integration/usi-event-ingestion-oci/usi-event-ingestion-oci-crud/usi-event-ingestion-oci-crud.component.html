@@ -1,0 +1,64 @@
+<ng-template #create>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Instance
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="form">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="name">Instance Name<em>*</em></label>
+                    <input class="form-control" id="name" formControlName="name" type="text" placeholder="Enter Name"
+                        [ngClass]="{'is-invalid' : formErrors.name}">
+                    <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="ingestion_type">Ingestion Type<em>*</em></label>
+                    <select id="ingestion_type" class="form-control" formControlName="ingestion_type"
+                        [class.is-invalid]="formErrors.ingestion_type">
+                        <option value="" disabled>Select Ingestion Type</option>
+                        <option value="Webhook">Webhook</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.ingestion_type">{{formErrors.ingestion_type}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="host_identity">Tenancy Id<em>*</em></label>
+                    <input class="form-control" id="host_identity" formControlName="host_identity" type="text"
+                        placeholder="Enter Tenancy Id" [ngClass]="{'is-invalid' : formErrors.host_identity}">
+                    <div class="invalid-feedback" *ngIf="formErrors.host_identity">{{formErrors.host_identity}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" (click)="onSubmit()" type="button">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

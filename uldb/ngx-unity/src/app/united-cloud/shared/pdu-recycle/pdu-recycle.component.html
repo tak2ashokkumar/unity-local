@@ -1,0 +1,110 @@
+<ng-template #pduRecycle>
+  <div class="card mb-0">
+    <div class="card-header">
+      Please provide credentials to recycle this PDU.
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <label class="text-danger">*Only authorized users are allowed to perform this action. Please provide your
+        credentials.</label>
+      <form [formGroup]="pduRecycleAuthForm">
+        <div class="form-group">
+          <label for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" formControlName="username" type="text" placeholder="Username"
+            [class.is-invalid]="authFormErrors.username">
+          <div class="invalid-feedback" *ngIf="authFormErrors.username">{{authFormErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password<em>*</em></label>
+          <input class="form-control" id="password" formControlName="password" type="password" placeholder="Password"
+            [class.is-invalid]="authFormErrors.password">
+          <div class="invalid-feedback" *ngIf="authFormErrors.password">{{authFormErrors.password}}</div>
+        </div>
+      </form>
+
+      <form [formGroup]="pduRecycleSocketForm">
+
+        <div class="form-group">
+          <div class="checkbox allSockets">
+            <label for="allsockets"></label>
+            <input id="allsockets" type="checkbox" formControlName="all_outlets" [class.is-invalid]="socketFormErrors.notselcted">Reboot
+            to All Outlets
+          </div>
+        </div>
+        <h5 class="divider">OR</h5>
+        <div class="form-group socketList">
+          <div *ngFor="let socket of pduToRecycle.sockets; let i = index">
+            <label for="{{'socket' + socket}}">
+              <input type="checkbox" [id]="socket" (click)="toggleCheckSocket(socket)"> Socket {{socket}}
+            </label>
+          </div>
+        </div>
+        <div class="row text-center">
+          <div *ngIf="socketFormErrors.invalidSocketSelection" class="invalid-feedback d-block font-sm">
+            {{socketFormErrors.invalidSocketSelection}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onRecycleRequest()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #pduSelectedSocketRecycle>
+  <div class="card mb-0">
+    <div class="card-header">
+      Please provide credentials to recycle this PDU.
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <label class="text-danger">*Only authorized users are allowed to perform this action. Please provide your
+        credentials.</label>
+      <form [formGroup]="pduRecycleAuthForm">
+        <div class="form-group">
+          <label for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" formControlName="username" type="text" placeholder="Username"
+            [class.is-invalid]="authFormErrors.username">
+          <div class="invalid-feedback" *ngIf="authFormErrors.username">{{authFormErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password<em>*</em></label>
+          <input class="form-control" id="password" formControlName="password" type="password" placeholder="Password"
+            [class.is-invalid]="authFormErrors.password">
+          <div class="invalid-feedback" *ngIf="authFormErrors.password">{{authFormErrors.password}}</div>
+        </div>
+      </form>
+
+      <form [formGroup]="pduRecycleSocketForm">
+        <hr class="divider" />
+        <div class="form-group mb-0">
+          <label for="allsockets">Reboot</label>
+        </div>
+        <div class="form-group socketList">
+          <div *ngFor="let socket of pduToRecycle.sockets; let i = index">
+            <label for="{{'socket' + socket}}">
+              <input type="checkbox" [id]="socket" (click)="toggleCheckSocket(socket)"> Socket {{socket}}
+            </label>
+          </div>
+        </div>
+        <div class="row text-center">
+          <div *ngIf="socketFormErrors.invalidSocketSelection" class="invalid-feedback d-block font-sm">
+            {{socketFormErrors.invalidSocketSelection}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onRecycleRequest()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>

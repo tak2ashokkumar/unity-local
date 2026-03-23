@@ -1,0 +1,26 @@
+@import "variables";
+
+.reset-action-icon {
+  color: $gray-600;
+  &:hover,
+  &:focus {
+    background: $primary;
+    color: $white;
+    outline: none;
+  }
+}
+.impersonated-icon {
+  display: inline-block;
+  padding: 0.1rem 0.5em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+  position: absolute !important;
+  right: 10px !important;
+  top: -5px !important;
+}

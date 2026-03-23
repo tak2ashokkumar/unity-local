@@ -1,0 +1,13 @@
+<div class="toolbar">
+  <button (click)="applyQuickFixes()">Quick Fix All</button>
+</div>
+
+<div #editor class="editor" (mousemove)="onEditorMouseMove($event)"></div>
+
+<!-- Hover Quick Fix Menu -->
+<div #quickFixMenu class="quick-fix-menu" [style.left.px]="menuX" [style.top.px]="menuY" *ngIf="showMenu">
+  <div class="message">{{ hoveredMessage?.message }}</div>
+  <div *ngFor="let fix of hoveredMessage?.fixes">
+    <button (click)="applySpecificFix(fix)">{{ fix.label }}</button>
+  </div>
+</div>

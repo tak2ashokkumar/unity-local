@@ -1,0 +1,180 @@
+<alerts></alerts>
+
+<span ng-if="usage_view">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dropdown">
+                <a class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown" data-target="#" href="">
+                    <div class="input-group">
+                        <input
+                            name="start_date"
+                            id="start_date"
+                            type="text"
+                            class="form-control"
+                            data-ng-model="dateValue.startDate"
+                            data-date-time-input="YYYY-MM-DD"
+                            placeholder="Start Date"
+                            ng-change="set_start_date(dateValue.startDate);">
+                            <span class="input-group-addon">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </span>
+                    </div>
+                </a>
+                <ul class="dropdown-menu action-button" role="menu" aria-labelledby="dLabel">
+                    <datetimepicker
+                        data-ng-model="dateValue.startDate"
+                        data-datetimepicker-config="{ dropdownSelector: '#dropdown1',  startView:'day', minView:'day'}"
+                        data-before-render="beforeRender($view, $dates, $leftDate, $upDate, $rightDate)">
+                    </datetimepicker>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="dropdown">
+                <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="">
+                    <div class="input-group">
+                        <input
+                            name="end_date"
+                            id="end_date"
+                            type="text"
+                            class="form-control"
+                            data-ng-model="dateValue.endDate"
+                            data-date-time-input="YYYY-MM-DD"
+                            placeholder="End Date">
+                            <span class="input-group-addon">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </span>
+                    </div>
+                </a>
+                <ul class="dropdown-menu action-button" role="menu" aria-labelledby="dLabel">
+                    <datetimepicker
+                        data-ng-model="dateValue.endDate"
+                        data-datetimepicker-config="{ dropdownSelector: '#dropdown2',  startView:'day', minView:'day' }" data-before-render="beforeRender($view, $dates, $leftDate, $upDate, $rightDate)">
+                    </datetimepicker>
+                  </ul>
+              </div>
+        </div>
+    </div>
+    <hr />
+    <button
+        type="button"
+        class="btn btn-sm btn-success"
+        ng-click="get_usage_details(dateValue.startDate, dateValue.endDate, details);">
+        Submit
+    </button>
+    <br/>
+    <br/>
+    <span ng-if="tenant_usage_details">
+        <div class="row">
+            <div class="col-md-12">
+                <generictable
+                    heading="Tenant Usage"
+                    headers="tenant_usage_headers"
+                    tabledata="tenant_usage_details.data.data">
+                </generictable>
+            </div>
+        </div>
+    </span>
+</span>
+
+
+<span ng-if="token_set_view">
+    <div class="row">
+        <div class="col-md-12">
+            <generictable
+                heading="Tokens"
+                headers="token_headers"
+                tabledata="os_tokens_content.data.data">
+            </generictable>
+        </div>
+    </div>
+</span>
+
+
+<span ng-if="security_group_view">
+    <div class="row">
+        <div class="col-sm-12">
+            <generictable
+                heading="Host Security Groups"
+                headers="security_group_headers"
+                tabledata="host_security_group_content.data.data"
+                actions="">
+            </generictable>
+        </div>
+    </div>
+</span>
+
+
+<span ng-if="flavor_access_view">
+    <div class="row">
+        <div class="col-md-12">
+            <generictable
+                heading="Flavors Access Information"
+                headers="access_headers"
+                tabledata="flavor_access_content.data.data">
+            </generictable>
+        </div>
+    </div>
+</span>
+
+<span ng-if="keypair_view">
+    <div class="row">
+        <div class="col-sm-12">
+            <generictable
+                heading="Key Pair"
+                headers="keypair_headers"
+                tabledata="os_keypairs.data.data"
+                modeldata="keypair_modeldata"
+                rows="keypair_rows"
+                addclick="create_keypair(data)"
+                actions="keypair_actions"
+                download-ssh="download_sshfile(args)"
+                delete-operation="delete_info(args)">
+            </generictable>
+        </div>
+    </div>
+</span>
+
+<span ng-if="flavor_view">
+    <div class="row">
+        <div class="col-md-12">
+            <generictable
+                heading="Flavor(s) for tenant"
+                headers="tenant_flavor_headers"
+                tabledata="flavor_content.data.data"
+                modeldata="flavor_content_modaldata"
+                rows="flavor_rows"
+                addclick="flavor_add(data)"
+                actions="flavor_actions"
+                delete-operation="delete_info(args)"
+                navigate-operation="navigate_to(args)">
+            </generictable>
+        </div>
+    </div>
+</span>
+
+<span ng-if="vms_list">
+    <div class="row">
+        <div class="col-md-12">
+            <generictable
+                heading="Server (VM)"
+                headers="vms_list_headers"
+                tabledata="vm_tenant_content.data.data">
+            </generictable>
+        </div>
+    </div>
+</span>
+
+
+<span ng-if="images_list">
+    <div class="row">
+        <div class="col-sm-12">
+            <generictable
+                heading="Images"
+                headers="imagelist_headers"
+                tabledata="tenant_images_content.data.data">
+            </generictable>
+        </div>
+    </div>
+</span>

@@ -1,0 +1,10 @@
+.btn-outline-secondary:not(:disabled):not(.disabled):active:focus,
+.btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
+.show > .btn-outline-secondary.dropdown-toggle:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.card.data-card {
+  min-height: 40vh;
+}

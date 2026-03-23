@@ -1,0 +1,412 @@
+<div class="container-fluid mt-4">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <span class="font-lg font-500">Integration</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'credentialForm'"
+                                        (click)="manageActiveForm('credentialForm')">
+                                        <span class="fas fa-cog font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Add Credentials</label>
+                                </div>
+                                <div *ngIf="credentialForm">
+                                    <div class="d-flex flex-column align-items-center step">
+                                        <span class="badge icon-wrap pointer-link"
+                                            [class.active]="activeForm == 'filterForm'"
+                                            (click)="manageActiveForm('filterForm')">
+                                            <span class="fas fa-clipboard-list font-xl"></span>
+                                        </span>
+                                        <label class="mt-1 font-md">Filters</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'scheduleForm'"
+                                        (click)="manageActiveForm('scheduleForm')">
+                                        <span class="fas fa-clock font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Scheduled Discovery</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 divider-wrap">
+                                <hr class="divider-line w-85 ml-0">
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col">
+                                <ng-container [ngSwitch]="activeForm">
+                                    <ng-container *ngSwitchCase="'credentialForm'">
+                                        <ng-container *ngTemplateOutlet="credentialFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'filterForm'">
+                                        <ng-container *ngTemplateOutlet="filterFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'scheduleForm'">
+                                        <ng-container *ngTemplateOutlet="scheduleFormRef"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #credentialFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <form *ngIf="credentialForm" [formGroup]="credentialForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="name" class="form-col-form-label">Account Name<em>*</em></label>
+                                <input id="name" class="form-control" type="text" formControlName="name"
+                                    placeholder="Enter Account Name" [class.is-invalid]="credentialFormErrors.name">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.name">
+                                    {{credentialFormErrors.name}}</div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col d-flex align-items-center justify-content-start">
+                                <div class="w-25">
+                                    <input id="discover_resources" class="ut-checkbox" type="checkbox"
+                                        formControlName="discover_resources">
+                                    <label for="discover_resources" class="primary mb-0">Discover Resources</label>
+                                </div>
+                                <div class="w-25">
+                                    <input id="discover_dependency" class="ut-checkbox" type="checkbox"
+                                        formControlName="discover_dependency">
+                                    <label for="discover_dependency" class="primary mb-0">Discover Topology</label>
+                                </div>
+                                <div class="w-22">
+                                    <input id="is_managed" class="ut-checkbox" type="checkbox"
+                                        formControlName="is_managed">
+                                    <label for="is_managed" class="primary mb-0">Manage Account</label>
+                                </div>
+                                <div class="w-20">
+                                    <input id="cost_analysis" class="ut-checkbox" type="checkbox"
+                                        formControlName="cost_analysis">
+                                    <label for="cost_analysis" class="primary mb-0">Cost Analysis</label>
+                                </div>
+                                <div class="w-30">
+                                    <input id="azure_ad_integ" class="ut-checkbox" type="checkbox"
+                                        formControlName="azure_ad_integ">
+                                    <label for="azure_ad_integ" class="primary mb-0">Azure AD Attribute Mapping</label>
+                                </div>
+                                <div class="w-22">
+                                    <input id="ingest_event" class="ut-checkbox" type="checkbox"
+                                        formControlName="ingest_event">
+                                    <label for="ingest_event" class="primary mb-0">Event Ingestion</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border round-edge p-4 position-relative mt-2 mx-0"
+                            *ngIf="credentialForm.get('discover_resources').value || credentialForm.get('azure_ad_integ').value">
+                            <div class="pb-2 mb-3 bg-white position-absolute section-name">Discover Resources
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="client_id" class="form-col-form-label">Client ID<em>*</em></label>
+                                <input id="client_id" class="form-control" type="text" formControlName="client_id"
+                                    placeholder="Enter Client ID" [class.is-invalid]="credentialFormErrors.client_id">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.client_id">
+                                    {{credentialFormErrors.client_id}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="tenant_id" class="form-col-form-label">Tenant ID<em>*</em></label>
+                                <input id="tenant_id" class="form-control" type="text" formControlName="tenant_id"
+                                    placeholder="Enter Tenant ID" [class.is-invalid]="credentialFormErrors.tenant_id">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.tenant_id">
+                                    {{credentialFormErrors.tenant_id}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="client_secret" class="form-col-form-label">Client Secret<em>*</em></label>
+                                <custom-password-field formControlName="client_secret"
+                                    [options]="{id:'client_secret', errors:credentialFormErrors.client_secret, placeholder:'Enter Client Secret'}"></custom-password-field>
+                                <!-- <input id="client_secret" class="form-control" type="text"
+                                    formControlName="client_secret" placeholder="Enter Client Secret"
+                                    [class.is-invalid]="credentialFormErrors.client_secret"> -->
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.client_secret">
+                                    {{credentialFormErrors.client_secret}}
+                                </div>
+                            </div>
+                            <div class="col-6 form-group" *ngIf="credentialForm.get('discover_resources').value">
+                                <label for="subscription_id" class="form-col-form-label">Subscription
+                                    ID<em>*</em></label>
+                                <input id="subscription_id" class="form-control" type="text"
+                                    formControlName="subscription_id" placeholder="Enter Subscription ID"
+                                    [class.is-invalid]="credentialFormErrors.subscription_id">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.subscription_id">
+                                    {{credentialFormErrors.subscription_id}}</div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12 border rounded p-4 mt-3 mb-3"
+                            *ngIf="credentialForm.get('azure_ad_integ').value">
+                            <div class="section-name-one">Azure AD Attribute Mapping</div>
+                            <div class="row mx-0">
+                                <div class="col-6 form-group pl-0">
+                                    <label class="form-col-form-label text-left">Resource<em>*</em></label>
+                                    <select class="form-control text-capitalize" type="text"
+                                        formControlName="resource_type"
+                                        (change)="onSelectAzureADResource($event.target.value)"
+                                        [class.is-invalid]="credentialFormErrors.resource_type">
+                                        <option [value]="''" disabled>Select</option>
+                                        <option *ngFor="let rs of azureADResources" [ngValue]="rs">
+                                            {{rs}}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.resource_type">
+                                        {{credentialFormErrors.resource_type}}
+                                    </div>
+                                </div>
+                                <div class="col-12 border rounded px-3 pt-3 pb-0" formArrayName="attributes_map"
+                                    *ngIf="credentialForm.get('attributes_map')">
+                                    <div
+                                        *ngFor="let ctrl of credentialForm.get('attributes_map').controls; let i = index; let l=last;">
+                                        <div class="row" [formGroupName]="i">
+                                            <div class="col-5 form-group">
+                                                <label class="form-col-form-label text-left">UnityOne
+                                                    Entity<em>*</em></label>
+                                                <select class="form-control text-capitalize"
+                                                    formControlName="unity_attr"
+                                                    [class.is-invalid]="credentialFormErrors?.attributes_map[i]?.unity_attr">
+                                                    <option [value]="''" disabled>Select</option>
+                                                    <option *ngFor="let attr of unityOneUserAttributes"
+                                                        [value]="attr.value">{{attr.label}}
+                                                    </option>
+                                                </select>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="credentialFormErrors?.attributes_map[i]?.unity_attr">
+                                                    {{credentialFormErrors?.attributes_map[i].unity_attr}}
+                                                </div>
+                                            </div>
+                                            <div class="col-5 form-group">
+                                                <label class="form-col-form-label text-left">Azure
+                                                    Entity<em>*</em></label>
+                                                <select class="form-control text-capitalize"
+                                                    formControlName="azure_attr"
+                                                    [class.is-invalid]="credentialFormErrors?.attributes_map[i]?.azure_attr">
+                                                    <option [value]="''" disabled>Select
+                                                    </option>
+                                                    <option *ngFor="let attr of azureADResourceUserAttributes"
+                                                        [value]="attr.value">{{attr.label}}
+                                                    </option>
+                                                </select>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="credentialFormErrors?.attributes_map[i]?.azure_attr">
+                                                    {{credentialFormErrors?.attributes_map[i].azure_attr}}
+                                                </div>
+                                            </div>
+                                            <div class="col-2 mt-4 pt-1">
+                                                <button (click)="removeAttributeMapping(i)"
+                                                    class="action-icons mb-0 fas fa-minus font-sm ml-1"
+                                                    tooltip="Remove Condition"
+                                                    *ngIf="credentialForm.get('attributes_map').controls.length > 1"></button>
+                                                <button (click)="addAttributeMapping(i)"
+                                                    class="action-icons mb-0 fas fa-plus font-sm ml-1" *ngIf="l"
+                                                    tooltip="Add Condition"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <usi-event-ingestion-crud [paramList]="paramList" [instance]="instance"
+                            [eventIngestionCheck]="credentialForm.get('ingest_event').value" [eventAttribute]="'Azure'"
+                            [defaultEventIngestionValues]="defaultEventIngestionValues"
+                            (formUpdate)="onFormUpdate($event)"></usi-event-ingestion-crud>
+                    </form>
+                    <!-- <form *ngIf="resourceForm" [formGroup]="resourceForm">
+                    </form> -->
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button"
+                (click)="onSubmitCredentialForm()">{{credFormButtonName}}</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #filterFormRef>
+    <div class="card border-0">
+        <div class="card-body text-black">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="filterForm" [formGroup]="filterForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row mx-0" *ngIf="credentialForm.get('discover_resources').value">
+                            <div class="col-6 form-group">
+                                <label for="discover_services" class="form-col-form-label">Azure Resource
+                                    Services<em>*</em></label>
+                                <select id="discover_services" class="form-control" formControlName="discover_services"
+                                    [class.is-invalid]="filterFormErrors.discover_services">
+                                    <option value="" disabled>Select</option>
+                                    <option value="All">All</option>
+                                    <option value="Custom">Custom</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="filterFormErrors.discover_services">
+                                    {{filterFormErrors.discover_services}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="services" class="form-col-form-label">
+                                    <span>Services</span>
+                                    <ng-container
+                                        *ngIf="filterForm.get('discover_services').value == 'Custom'"><em>*</em></ng-container>
+                                </label>
+                                <multiselect-dropdown id="services_to_discover" [options]="services"
+                                    [settings]="serviceSettings" class="form-control p-0" style="height:auto;"
+                                    formControlName="services_to_discover"
+                                    [ngClass]="{'is-invalid' : filterFormErrors.services_to_discover}"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="filterFormErrors.services_to_discover">
+                                    {{filterFormErrors.services_to_discover}}</div>
+                            </div>
+                            <!-- <div class="col-3 form-group">
+                                    <input id="onboard_device" class="ut-checkbox" type="checkbox"
+                                        formControlName="onboard_device">
+                                    <label class="primary" for="onboard_device">Onboard Devices</label>
+                                </div>
+                                <div class="col-3 form-group">
+                                    <input id="dependency_map" class="ut-checkbox" type="checkbox"
+                                        formControlName="dependency_map">
+                                    <label class="primary" for="dependency_map">Dependency Map</label>
+                                </div> -->
+
+
+                            <!-- <div class="col-12 form-group">
+                                <input id="is_managed" class="ut-checkbox" type="checkbox" formControlName="is_managed">
+                                <label class="primary" for="is_managed">Manage</label>
+                            </div>
+                            <div class="col-12 form-group">
+                                <input id="azure_ad_integ" class="ut-checkbox" type="checkbox"
+                                    formControlName="azure_ad_integ">
+                                <label class="primary" for="azure_ad_integ">Azure AD Integration</label>
+                            </div>
+                            <div class="col-12 form-group">
+                                <input id="ingest_event" class="ut-checkbox" type="checkbox"
+                                    formControlName="ingest_event">
+                                <label class="primary" for="ingest_event">Event Ingestion</label> -->
+                        </div>
+                        <div class="row mx-0">
+                            <div class="col-12 border rounded p-4 mt-3 mb-3" *ngIf="credentialForm.get('azure_ad_integ').value">
+                                <div class="section-name-one">Azure AD Attribute Mapping</div>
+                                <div class="row mx-0">
+                                    <div class="col-6 form-group pl-0">
+                                        <label class="form-col-form-label text-left">Resource<em>*</em></label>
+                                        <select class="form-control text-capitalize" type="text"
+                                            formControlName="resource_type"
+                                            (change)="onSelectAzureADResource($event.target.value)"
+                                            [class.is-invalid]="filterFormErrors.resource_type">
+                                            <option [value]="''" disabled>Select</option>
+                                            <option *ngFor="let rs of azureADResources" [ngValue]="rs">
+                                                {{rs}}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="filterFormErrors.resource_type">
+                                            {{filterFormErrors.resource_type}}
+                                        </div>
+                                    </div>
+                                    <div class="col-12 border rounded px-3 pt-3 pb-0" formArrayName="attributes_map"
+                                        *ngIf="filterForm.get('attributes_map')">
+                                        <div
+                                            *ngFor="let ctrl of filterForm.get('attributes_map').controls; let i = index; let l=last;">
+                                            <div class="row" [formGroupName]="i">
+                                                <div class="col-5 form-group">
+                                                    <label class="form-col-form-label text-left">UnityOne
+                                                        Entity<em>*</em></label>
+                                                    <select class="form-control text-capitalize"
+                                                        formControlName="unity_attr"
+                                                        [class.is-invalid]="filterFormErrors?.attributes_map[i]?.unity_attr">
+                                                        <option [value]="''" disabled>Select</option>
+                                                        <option *ngFor="let attr of unityOneUserAttributes"
+                                                            [value]="attr.value">{{attr.label}}
+                                                        </option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="filterFormErrors?.attributes_map[i]?.unity_attr">
+                                                        {{filterFormErrors?.attributes_map[i].unity_attr}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-5 form-group">
+                                                    <label class="form-col-form-label text-left">Azure
+                                                        Entity<em>*</em></label>
+                                                    <select class="form-control text-capitalize"
+                                                        formControlName="azure_attr"
+                                                        [class.is-invalid]="filterFormErrors?.attributes_map[i]?.azure_attr">
+                                                        <option [value]="''" disabled>Select
+                                                        </option>
+                                                        <option *ngFor="let attr of azureADResourceUserAttributes"
+                                                            [value]="attr.value">{{attr.label}}
+                                                        </option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="filterFormErrors?.attributes_map[i]?.azure_attr">
+                                                        {{filterFormErrors?.attributes_map[i].azure_attr}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-2 mt-4 pt-1">
+                                                    <button (click)="removeAttributeMapping(i)"
+                                                        class="action-icons mb-0 fas fa-minus font-sm ml-1"
+                                                        tooltip="Remove Condition"
+                                                        *ngIf="filterForm.get('attributes_map').controls.length > 1"></button>
+                                                    <button (click)="addAttributeMapping(i)"
+                                                        class="action-icons mb-0 fas fa-plus font-sm ml-1" *ngIf="l"
+                                                        tooltip="Add Condition"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitFilterForm()">Save & Next</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <!-- <shared-schedule-form></shared-schedule-form> -->
+                    <unity-schedule></unity-schedule>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(false)">Save</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(true)">Save & Run</button>
+        </div>
+    </div>
+</ng-template>

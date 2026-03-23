@@ -1,0 +1,291 @@
+<style type="text/css">
+	.summary .cardbox-inner{
+        padding: 8px;
+        color: #848484;
+        font-size: 15px;
+    }
+
+    .summary .cardbox-inner .device_type{
+      font-size: 11px;
+      color : gray
+    }
+
+    .summary .cardbox-inner .device_category{
+      font-size: 13px;
+    }
+</style>
+<loading loader="{{loader}}"></loading>
+<div class="page_wrapper summary content-wrapper" style="float:left" ng-if="private_clouds.length>0">
+  	<div class="row">
+      	<section id="no-more-tables">
+          	<table class="Summary-box table table-condensed">
+	            <thead class="summarytd">
+	                <tr>
+	                  	<th>Name</th>
+	                  	<th>Virtualization Platform</th>
+	                  	<th>Hypervisors</th>
+	                  	<th>Virtual Machines</th>
+	                  	<th>Manage</th>
+	                </tr>
+	            </thead>
+	            <tbody class="summarytd">
+	                <tr>
+	                  	<td>
+                        <a ng-if="colo_cloud_id && data_availabe" href="#/colo_cloud/{{ colo_cloud_id }}/private_clouds/{{ cloud.uuid }}/virtual_machines">{{ cloud.name }}</a>
+                        <a ng-if="!colo_cloud_id && data_availabe" href="#/pc_clouds/{{ cloud.uuid }}/virtual_machines">{{ cloud.name }}</a>
+	                    	<span ng-if="!data_availabe">{{ cloud.name }}</span>
+	                  	</td>
+	                  	<td>{{ cloud.display_platform }}</td>
+	                  	<td class="numeric"> 
+	                    	<i class="fa-server fa fa-fw fa-lg red"></i>{{ cloud.hypervisors.length || 0 }}
+	                  	</td>
+	                  	<td>
+	                    	<i class="fa-object-group fa fa-fw fa-lg blue"></i>{{ vm_summary_count || 0 }}
+	                  	</td>
+	                  	<td>
+	                    	<div class="action-icons">
+                <a class="fa fa-pencil" tooltip-class="customClass" uib-tooltip="Edit" ng-click="update_pc(cloud)"></a>
+                <a class="fa fa-key" ng-if="cloud.display_platform != 'Custom'" tooltip-class="customClass" uib-tooltip="Change Password" ng-click="changePasswordModal(cloud)"></a>
+                <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete" ng-click="delete_pc()"></a>
+
+								<a ng-if="proxy_platform_link" tooltip-class="customClass" uib-tooltip="Manage in Same Tab"
+								   class="fa fa-external-link-square blue-text" ng-href="{{ proxy_platform_link }}"></a>
+								<a ng-if="proxy_link_cloud" tooltip-class="customClass" uib-tooltip="Manage in New Tab"
+								   ng-click="update_activity_log_entry(cloud)" href="{{ proxy_link_cloud }}" target="_blank"
+								   class="fa fa-external-link blue-text"></a>
+								<a tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+								   ng-click="manage_request_cloud(cloud)" class="fa fa-ticket blue-text"></a>
+							</div>
+	                  	</td>
+	                </tr>
+	            </tbody>
+          	</table>
+      	</section>
+  	</div>
+
+  	<div class="row paddingtop">
+    	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-right: 10px!important">
+        	<div class="cardbox">
+              	<div class="row cardbox-header">Component Summary </div>
+              	<div class="row">
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 Dashborder-right">
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-server yellowbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <p class="yellow small-text">{{cloud.hypervisors.length}}</p>
+                                    <h2 class="device_category">Hypervisors</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-object-group bluebg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <p class="blue small-text">{{vm_summary_count || 0}}</p>
+                                    <h2 class="device_category">Virtual Machines</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-laptop neonredbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <p class="neonred small-text">{{cloud.bm_server.length}}</p>
+                                    <h2 class="device_category">Bare Metal Servers</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 text-align-center">
+                              <i class="fa fa-sliders neonyellowbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 text-align-center">
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                  <p class="neonyellow small-text">{{customDevicesCount || 0}}</p>
+                                  <h2 class="device_category">Other Devices</h2>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-3 text-align-center"  style="margin-top:5px;">
+                              <i class="fa fa-fire redbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-10 col-sm-10 col-md-10 col-lg-9 text-align-center">
+                              <!-- <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"> -->
+                                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                    <p class="red small-text">{{cloud.firewall.length - shared_firewalls.length}}</p>
+                                    <h2 class="device_type">Dedicated</h2>
+                                </div>
+                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                    <p class="red small-text">{{shared_firewalls.length}}</p>
+                                    <h2 class="device_type">Shared</h2>
+                                </div>
+                              <!-- </div> -->
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <h2 class="device_category">Firewalls</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-3 text-align-center" style="margin-top:5px;">
+                              <i class="fa fa-balance-scale brownbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-10 col-sm-10 col-md-10 col-lg-9 text-align-center">
+                              <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                  <p class="brown small-text">{{cloud.load_balancer.length - shared_load_balancers.length}}</p>
+                                  <h2 class="device_type">Dedicated</h2>
+                              </div>
+                              <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                  <p class="brown small-text">{{shared_load_balancers.length}}</p>
+                                  <h2 class="device_type">Shared</h2>
+                              </div>
+                              <!-- </div> -->
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <h2 class="device_category">Load Balancers</h2>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row cardbox-inner">
+                          <div class="col-xs-2 col-sm-2 col-md-2 col-lg-3 text-align-center"  style="margin-top:5px;">
+                              <i class="fa fa-sitemap greenbg fontsize25px"></i>
+                          </div>
+                          <div class="col-xs-10 col-sm-10 col-md-10 col-lg-9 text-align-center">
+                              <!-- <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"> -->
+                                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                    <p class="green small-text">{{cloud.switch.length - shared_switches.length}}</p>
+                                    <h2 class="device_type">Dedicated</h2>
+                                </div>
+                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+                                    <p class="green small-text">{{shared_switches.length}}</p>
+                                    <h2 class="device_type">Shared</h2>
+                                </div>
+                              <!-- </div> -->
+                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <h2 class="device_category">Switches</h2>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+        	</div>
+    	</div>
+
+        <!-- CardBox for vmware, OpenStack -->
+	    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"  >
+	      	<div  ng-show="data_availabe" class="row" ng-if="(platform_type == 'OpenStack' || platform_type == 'VMware' || platform_type == 'vCloud Director')">
+	          	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingleft paddingright">
+	              	<div class="cardbox" style="height: 165px;">
+	                  	<div class="row cardbox-header">vCPU</div>
+	                  	<div class="row">
+	                      	<div class="row cardbox-inner">
+	                        	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+	                            <!--<h3 class="pcw-bg-title" style="font-weight : 600;">VCPUs</h3>-->
+	                        	</div>
+	                        	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="margin-top : 5px;font-weight:bolder;">Available: {{vcpus_available || 0}} vCPU</div>
+	                      	</div>
+	                      	<div class="row cardbox-inner" style="padding-top: 0px; padding-bottom: 0px;">
+	                          	<div class="progress">
+	                              	<uib-progressbar max="100" value="vcpus_percent" animate="true" type="{{vcpu_bar}}">
+	                              	</uib-progressbar>
+	                          	</div>
+	                      	</div>
+	                      	<div class="row cardbox-inner" >
+	                          	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 lightcolor pcw-bg-lables" style="font-weight:bolder;">Configured: {{vcpus_used || 0}} vCPU</div>
+	                          	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="font-weight:bolder;">Allocated: {{vcpus_total || 0}} vCPU</div>
+	                      	</div>
+	                  	</div>
+	            	</div>
+	        	</div>
+
+	          	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingleft">
+	              	<div class="cardbox" style="height: 165px;">
+	                  	<div class="row cardbox-header">RAM </div>
+	                  	<div class="row">
+	                      	<div class="row cardbox-inner">
+		                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+		                            <!--<h3 class="pcw-bg-title" style="font-weight : 600;">RAM</h3>-->
+		                        </div>
+	                        	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="margin-top : 5px;font-weight:bolder;">Available: {{memory_available || 0}} GB</div>
+	                      	</div>
+	                      	<div class="row cardbox-inner" style="padding-top: 0px; padding-bottom: 0px;">
+	                          	<div class="progress_bar_section">
+	                              	<uib-progressbar max="100" value="memory_percent" animate="true" type="{{memory_bar}}">
+	                              	</uib-progressbar>
+	                          	</div>
+	                      	</div>
+	                      	<div class="row cardbox-inner">
+	                          	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 lightcolor pcw-bg-lables" style="font-weight:bolder;">Configured: {{memory_used || 0}} GB</div>
+	                          	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="font-weight:bolder;">Allocated: {{memory_total || 0}} GB</div>
+	                      	</div>
+	                  	</div>
+	              	</div>
+	          	</div>
+
+	          	<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingleft">
+	              	<div class="cardbox" style="height: 165px;">
+	                  	<div class="row cardbox-header">Storage Disk</div>
+	                  	<div class="row">
+	                      	<div class="row cardbox-inner">
+	                        	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+	                            	<!--<h3 class="pcw-bg-title" style="font-weight : 600;">Storage</h3>-->
+	                        	</div>
+	                        	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="margin-top : 5px;font-weight:bolder;">Available: {{storage_available || 0}} GB</div>
+	                      	</div>
+	                      	<div class="row cardbox-inner" style="padding-top: 0px; padding-bottom: 0px;">
+	                          	<div class="progress_bar_section">
+	                              	<uib-progressbar max="100" value="storage_percent" animate="true" type="{{storage_bar}}">
+	                              	</uib-progressbar>
+	                          	</div>
+	                      	</div>
+	                      	<div class="row cardbox-inner">
+	                          	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 lightcolor pcw-bg-lables" style="font-weight:bolder;">Configured: {{storage_used || 0}} GB</div>
+	                          	<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 table-button lightcolor pcw-bg-lables" style="font-weight:bolder;">Allocated: {{storage_total || 0}} GB</div>
+	                      	</div>
+	                  	</div>
+              		</div>
+          		</div>
+	    	</div>
+	    </div>
+	</div>
+</div>
+
+<script type="text/ng-template" id="changePassword.html">
+  <div class="modal-header">
+      <h3 class="modal-title">Change Password</h3>
+  </div>
+  <div class="modal-form">
+    <form role="form">
+      <div class="form-group">
+          <label for="name" class="control-label">
+              New Password*
+          </label>
+          <span class="errormsg" ng-if="new_password_err">({{ new_password_err }})</span>
+          <input id="name" class="form-control" type="password" required="required" ng-model="new_password">
+      </div>
+      <div class="form-group">
+          <label for="name" class="control-label">
+              Confirm New Password*
+          </label>
+          <span class="errormsg" ng-if="confirm_password_err">({{ confirm_password_err }})</span>
+          <input id="name" class="form-control" type="password" required="required" ng-model="confirm_new_password">
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-cancel" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-default" type="button" ng-click="change_password(new_password, confirm_new_password)">
+      Save
+    </button>
+  </div>
+</script>

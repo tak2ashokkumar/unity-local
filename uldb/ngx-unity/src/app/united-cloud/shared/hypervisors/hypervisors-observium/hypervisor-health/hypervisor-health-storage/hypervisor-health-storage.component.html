@@ -1,0 +1,3 @@
+<div *ngFor="let config of graphConfig; let last = last;" [ngClass]="{'mb-3':last}">
+  <device-graphs [data]="config"></device-graphs>
+</div>

@@ -1,0 +1,48 @@
+<app-main-tab [tabItems]="tabItems">
+  <ng-template>
+    <div dropdown placement="bottom right" container="body" accessControl moduleName="Datacenter"
+      accessType="Manage Datacenter" elementType="div-hide">
+      <div class="nav-item" data-toggle="dropdown" aria-controls="dropdown-container" dropdownToggle>
+        <a class="nav-link rounded-top border-0 "><i class="fa fa-ellipsis-v align-middle"></i></a>
+      </div>
+      <div id="dropdown-container" class="dropdown-menu dropdown-menu-right mt-0" *dropdownMenu
+        aria-labelledby="button-container">
+        <a class="dropdown-item" (click)="addDatacenter()"><i class="fa fa-plus-square"></i>Add</a>
+        <a class="dropdown-item" (click)="editDatacenter()" *ngIf="tabItems.length"><i
+            class="fas fa-pencil-alt"></i>Edit</a>
+        <a class="dropdown-item" (click)="deleteDatacenter()" *ngIf="tabItems.length"><i
+            class="far fa-trash-alt"></i>Delete</a>
+      </div>
+    </div>
+  </ng-template>
+</app-main-tab>
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col-12" *ngIf="!tabItems.length">
+        <div class="empty-clouds text-center pt-5" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+          elementType="div">No datacenter Configured for this user. <span class="btn-link pointer-link"
+            (click)="addDatacenter()">Click
+            here</span> to add.</div>
+      </div>
+      <div class="col-12" *ngIf="tabItems.length">
+        <scrollable-tab [selector]="'active'">
+          <div class="nav-item border-right border-light" #scrollLeft>
+            <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-left"></i></a>
+          </div>
+          <ul class="nav nav-tabs nav-tabs custom-nav-container border-bottom-0" #tabContent role="tablist">
+            <li class="nav-item bg-secondary rounded-top" *ngFor="let tab of tabData">
+              <a class="nav-link" [ngClass]="isActive(tab)" (click)="goTo(tab)">
+                <i class="fa" [ngClass]="tab.icon"></i> {{tab.name}}</a>
+            </li>
+          </ul>
+          <div class="nav-item border-left border-light" #scrollRight>
+            <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-right"></i></a>
+          </div>
+        </scrollable-tab>
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>
+<dc-crud (onCrud)="onCrud($event)"></dc-crud>

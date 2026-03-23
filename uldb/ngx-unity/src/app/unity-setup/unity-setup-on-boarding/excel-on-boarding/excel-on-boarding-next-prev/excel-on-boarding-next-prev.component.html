@@ -1,0 +1,4 @@
+<button class="btn btn-sm btn-primary pull-right ml-1" *ngIf="!isNextDisabled()" type="button"
+    (click)="saveAndGoNext()">Next</button>
+<button class="btn btn-sm btn-primary pull-right ml-1" *ngIf="!isPrevDisabled() && !isNextDisabled()" type="button"
+    (click)="saveAndGoPrev()">Prev</button>

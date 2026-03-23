@@ -1,0 +1,74 @@
+@import "variables";
+
+.floating-terminal-card {
+  position: fixed;
+  bottom: 0;
+  z-index: 2000;
+  &:hover {
+    border-top: 5px solid #acb4bc !important;
+    border-radius: 0;
+  }
+  //   width: calc(100% - 225px);
+}
+
+// .terminal-header {
+//   background-color: $floating-terminal;
+// }
+.terminal-body {
+  background-color: $black;
+}
+mwlResizable {
+  box-sizing: border-box;
+}
+.resize-handle-top {
+  position: absolute;
+  height: 5px;
+  cursor: row-resize;
+  width: 100%;
+}
+// .nav-actions{
+//   background-color: $floating-terminal !important;
+// }
+.custom-nav-container {
+  background-color: $floating-terminal;
+  width: 100%;
+}
+
+.terminal-container {
+  height: 100%;
+}
+
+.floating-tabs {
+  transition: left 0.25s, right 0.25s, width 0.25s;
+  border-bottom: none !important;
+  padding: 0.25rem 0.5rem 0 0.5rem;
+  list-style: none;
+  color: $black;
+  background-color: $floating-terminal;
+  .floating-tabs-item {
+    // cursor: pointer;
+    border: 1px solid $floating-terminal;
+    border-bottom: none;
+    .nav-link {
+      cursor: default;
+      border: none;
+      padding: 0.5rem 0.5rem;
+      &:hover {
+        color: inherit !important;
+      }
+      .fa-times {
+        cursor: pointer;
+      }
+    }
+  }
+}
+.nav-actions {
+  .nav-link {
+    &:hover{
+      background-color: $gray-400;
+    }
+    .fa {
+      color: $dark;
+    }
+  }
+}

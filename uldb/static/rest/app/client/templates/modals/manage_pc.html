@@ -1,0 +1,117 @@
+<div class="modal-header">
+    <h3 class="modal-title">{{ modal_obj.method }} Private Cloud</h3>
+</div>
+
+<div class="modal-form">
+    <form role="form">
+        <!-- Common fields for all types of cloud -->
+        <div class="form-group" ng-if="modal_obj.method == 'Add'">
+            <label for="name" class="control-label">
+                Cloud Type*
+            </label>
+            <span class="errormsg" ng-if="modal_obj.platform_typeerr">({{ modal_obj.platform_typeMsg }})</span>
+            <select ng-model="modal_obj.platform_type" ng-options="x for x in pc_types"></select>
+            <span class="select-arrow"></span>
+        </div>
+
+        <div class="form-group" ng-if="modal_obj.method == 'Save'">
+            <label for="name" class="control-label">
+                Cloud Type*
+            </label>
+            <span class="errormsg" ng-if="modal_obj.platform_typeerr">({{ modal_obj.platform_typeMsg }})</span>
+            <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.platform_type" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="name" class="control-label">
+                Cloud Name*
+            </label>
+            <span class="errormsg" ng-if="modal_obj.nameerr">({{ modal_obj.nameMsg }})</span>
+            <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.name">
+        </div>
+        <div ng-if="!modal_obj.datacenter" class="form-group">
+            <label for="datacenter" class="control-label">
+                Datacenter
+            </label>
+            <span class="errormsg" ng-if="modal_obj.colocation_clouderr">({{ modal_obj.colocation_cloudMsg }})</span>
+            <select ng-model="modal_obj.colocation_cloud" ng-options="dc as dc.name for dc in datacenters track by dc.id"></select>
+            <span class="select-arrow"></span>
+
+        </div>
+        <!-- Common fields for all types of cloud -->
+
+
+        <div ng-if="(modal_obj.platform_type == 'OpenStack') || (modal_obj.platform_type == 'VMware') || (modal_obj.platform_type == 'vCloud Director')">
+            <div class="form-group">
+                <label for="hostname" class="control-label">
+                    <span ng-if="(modal_obj.platform_type == 'OpenStack')">Auth URL*</span>
+                    <span ng-if="(modal_obj.platform_type == 'VMware')">Hostname*</span>
+                    <span ng-if="(modal_obj.platform_type == 'vCloud Director')">vCloud URL*</span>
+                </label>
+                <span class="errormsg" ng-if="modal_obj.hostnameerr">({{ modal_obj.hostnameMsg }})</span>
+                <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.hostname" ng-change="setvcloudOrg()">
+            </div>
+            <div class="form-group">
+                <label for="username" class="control-label">
+                    Username*
+                </label>
+                <span class="errormsg" ng-if="modal_obj.usernameerr">({{ modal_obj.usernameMsg }})</span>
+                <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.username">
+            </div>
+            <div class="form-group" ng-if="modal_obj.method == 'Add'">
+                <label for="password" class="control-label">
+                    Password*
+                </label>
+                <span class="errormsg" ng-if="modal_obj.passworderr">({{ modal_obj.passwordMsg }})</span>
+                <input id="name" class="form-control" type="password" required="required" ng-model="modal_obj.password">
+            </div>
+
+            <!-- vcloud Director form fields -->
+            <div ng-if="(modal_obj.platform_type == 'vCloud Director')">
+                <div class="form-group">
+                    <label for="vcloud_org" class="control-label">
+                        Organization*
+                    </label>
+                    <span class="errormsg" ng-if="modal_obj.vcloud_orgerr">({{ modal_obj.vcloud_orgMsg }})</span>
+                    <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.vcloud_org">
+                </div>
+            </div>
+            <!-- vcloud Director form fields -->
+
+            <!-- OpenStack form fields -->
+            <div ng-if="(modal_obj.platform_type == 'OpenStack')">
+                <div class="form-group">
+                    <label for="project" class="control-label">
+                        Project*
+                    </label>
+                    <span class="errormsg" ng-if="modal_obj.projecterr">({{ modal_obj.projectMsg }})</span>
+                    <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.project">
+                </div>
+                <div class="form-group">
+                    <label for="user_domain" class="control-label">
+                        User Domain*
+                    </label>
+                    <span class="errormsg" ng-if="modal_obj.user_domainerr">({{ modal_obj.user_domainMsg }})</span>
+                    <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.user_domain">
+                </div>
+                <div class="form-group">
+                    <label for="project_domain" class="control-label">
+                        Project Domain*
+                    </label>
+                    <span class="errormsg" ng-if="modal_obj.project_domainerr">({{ modal_obj.project_domainMsg }})</span>
+                    <input id="name" class="form-control" type="text" required="required" ng-model="modal_obj.project_domain">
+                </div>
+            </div>
+            <!-- OpenStack form fields -->
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-cancel" type="button" ng-click="cancel()">
+        Cancel
+    </button>
+    <button class="btn btn-default" type="button" ng-click="manage_pc_obj()">
+        <span ng-bind="modal_obj.method"></span>
+    </button>
+</div>

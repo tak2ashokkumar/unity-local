@@ -1,0 +1,155 @@
+<form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength" multipart="true">
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">
+                Name
+                <span ng-if="row.required">*</span>
+            </label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" maxlength="128" required="" value="" ng-model="obj.id_name">
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Description</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <textarea class="form-control ng-empty ng-valid-maxlength ng-touched" cols="40" maxlength="256" rows="4" value="" ng-model="obj.id_description" type="textarea"></textarea>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+</div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Image Source*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <select class="form-control ng-empty" ng-init="obj.id_source_type='Image Location'" ng-model="obj.id_source_type">
+                <!--<option class="ng-binding" value="" selected="selected">&#45;&#45; select image source &#45;&#45;</option>-->
+                <option label="Image Location" value="Image Location" selected="selected">Image Location
+                <span ng-if="row.required">*</span></option>
+                <!--<option label="Image File" value="Image File">Image File</option>-->
+            </select>
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj.id_source_typeerr">{{ obj.id_source_typeMsg }}</label>
+            </div>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope" ng-if="obj.id_source_type == 'Image Location'">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Image Location*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty" type="text" value="" maxlength="128" ng-model="obj.id_image_url">
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj.id_image_urlerr">{{ obj.id_image_urlMsg }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope" ng-if="obj.id_source_type == 'Image File'">
+        <!--<span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Image File</label>
+        </span>-->
+        <!--<div class="col-sm-9 ng-scope">
+            <input class="switched ng-empty" type="file" value="" ng-model="obj.id_image_file" ng-change="obj.id_image_file = {{this.files}}">
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>-->
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Format*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <select ng-options="row.name as row.label for row in rows.disk_format" class="form-control ng-empty ng-invalid ng-invalid-required" required="" ng-model="obj.id_disk_format"></select>
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj.id_disk_formaterr">{{ obj.id_disk_formatMsg }}</label>
+            </div>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Architecture</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <select class="form-control ng-empty ng-invalid ng-invalid-required" required="" ng-model="obj.id_architecture">
+                <option class="ng-binding" value="" selected="selected">-- select architecture --</option>
+                <option class="ng-binding" value="i386" selected="selected">i386</option>
+                <option class="ng-binding" value="x86_64" selected="selected">x86_64</option>
+            </select>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Minimum Disk (GB)</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty" type="number" id="min_disk_id" min="0" max="99" onblur="validate_spinner(this.id, this.min, this.max);" onkeydown="is_number_key(this.id);" value="" ng-model="obj.id_minimum_disk">
+        </div>
+        <span id="min_disk_msg_id" style="margin-left: 17px;"></span>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Minimum RAM (MB)</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty" type="number" id="min_ram_id" min="256" max="4096" onblur="validate_spinner(this.id, this.min, this.max);" onkeydown="is_number_key(this.id);" value="" ng-model="obj.id_minimum_ram">
+        </div>
+        <span id="min_ram_msg_id" style="margin-left: 17px;"></span>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope" ng-if="obj.id_source_type == 'Image Location'">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Copy Data</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input type="checkbox" checked value="" ng-model="obj.id_is_copying">
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Public</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input type="checkbox" value="" ng-model="obj.id_is_public">
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Protected</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input  type="checkbox" value="" ng-model="obj.id_protected" >
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+        </div>
+    </div>
+</form>

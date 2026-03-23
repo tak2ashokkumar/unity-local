@@ -1,0 +1,174 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4>Edit Virtual Server</h4>
+	</div>
+	<div class="panel-body">
+	<form role="form"id="postform" action="" method="post">
+		<input type='hidden' name='csrfmiddlewaretoken'	id="csrf_token" value={{csrf_token}} />			
+	</form>
+	<form role="form" id="wizard" method="post" enctype='application/json'>
+		<input type="hidden" name="_popup" value="1" />
+
+		<div class="panel-body">
+			<div class="form-group">
+
+				<label for="id_system_name" class="required">Virtual System Name *</label>					
+
+				<input type="text" id="id_system_name" name="virtualsystem_name" placeholder="Name" ng-model="vserver.name" 				 					class="form-control" data4="alphanumeric">
+				<label class="errormsg" ng-if="nameerr">{{ nameMsg }}</label>	
+			</div>
+			<div class="form-group">
+				<label for="id_hypervisor" class="required">Select Hypervisor * </label>
+
+				<select id="id_system_manufacturer" class="form-control" ng-model="vserver.system" 				 							 					ng-options="sys as sys.system_name for sys in systems track by sys.url" style="width:100%;">
+					<option style="display:none" value="">Please select</option>
+				</select>
+				<label class="errormsg" ng-if="hypervisorerr">{{ hypervisorMsg }}</label>
+			</div>
+		<div class="form-group">
+			<label for="id_user_name" class="required">User Name * </label>
+			<input type="text" id="id_user_name" name="os_rootuser" placeholder="root user" ng-model="vserver.os_rootuser" 					 				class="form-control" data4="alphanumeric">
+			<label class="errormsg" ng-if="usernameerr">{{ usernameMsg }}</label>
+		</div>
+		<div class="form-group">
+
+			<label for="id_os_id" class="required">OS Name * </label>
+
+			<select id="id_os_id" class="form-control" ng-model="vserver.os" 														 				ng-options="os as os.name + ' ' +os.version for os in os track by os.url" style="width:100%;">
+				<option style="display:none" value="">Please select</option>
+			</select>
+			<label class="errormsg" ng-if="oserr">{{ OSMsg }}</label>		
+
+
+		</div>		
+
+		<div class="row">
+			<div class="panel panel-success">
+				<div class="panel-heading">
+					<h5 class=""><label for="id_cloudtype" class="required" value="novalidation_required">Instance/Cloud Type * </label></h5>
+				</div>
+				<div class="panel-body" id="id_cloudtype">
+
+					<label class="btn btn-default" style="margin-right:5px;">
+					<input name="cloud_type_id" class="groupradio" value="0" type="radio" ng-click="GetCustom()" 						 						ng-checked="true"> Custom</input>
+					</label>
+
+					<label class="btn btn-default" ng-repeat="ct in cloudtypes" style="margin-right:5px;">
+					<input name="cloud_type_id" class="groupradio" value="{{ct.url}}"  type="radio" 						 						ng-click="GetCloudValues(ct.url)">{{ ct.cloud_type}}</input>
+					</label>
+
+
+
+					<!--starts here -->
+					<fieldset ng-disabled="cloudtypedisable">
+						<div class="form-group" style="margin-top:1%;">
+							<label for="id_vcpu" class="required">vCPU* </label>
+
+							<input type="number" class="form-control" id="id_vcpu" name="vcpu" min="1" max="1024" step="1" 								placeholder="Maximum 1024 vCPU" data4="" ng-model="vserver.vcpu" ng-keyup="minmax($event,1,1024)">
+							<label class="errormsg" ng-if="vcpuerr">{{ vcpuMsg }}</label>
+						</div>
+						<div class="form-group">
+							<label for="id_memory_size" class="required">Memory Size * </label>
+
+							<div class="form-inline">
+								<input class="form-control" id="id_memory_size" maxlength="45" name="memory_size" placeholder= "32" 								type="number" data4="" ng-model="vserver.memory" style="width:50%;">
+								<select class="form-control" id="id_memory_measure_type" ng-model="vserver.memory_measure_type" 								style="width:48% !important;">
+									<option value="MB">MB</option>
+									<option value="GB">GB</option>
+									<option value="TB">TB</option>
+								</select>
+								<label class="errormsg" ng-if="memorysizeerr">{{ memorysizeMsg }}</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="id_disk_size" class="required">Disk Size * </label>
+
+								<div class="form-inline">
+									<input class="form-control" id="id_disk_size" maxlength="45" placeholder = "200" 					  										name="disk_size" type="number" data4="" ng-model="vserver.disk" style="width:50%;" 										ng-keypress="ValidateFloat($event)">
+									<select class="form-control" id="id_disk_measure_type" ng-model="vserver.disk_measure_type" 									style="width:48% !important;">
+										<option value="MB">MB</option>
+										<option value="GB">GB</option>
+										<option value="TB">TB</option>
+									</select>
+									<label class="errormsg" ng-if="disksizeerr">{{ disksizeMsg }}</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="id_no_of_ethernet" class="required">No of Ethernet * </label>
+
+								<input type="number" class="form-control" id="id_no_of_ethernet" ng-model="vserver.no_of_ethernet" min="1" 									max="32" step="1" placeholder="Maximum 32 Ethernet" ng-blur="FillCustomETH(vserver.no_of_ethernet)" data4="" 									ng-keyup="minmax($event,1,32)"> 
+								<label class="errormsg" ng-if="NOEerr">{{ NOEMsg }}</label>
+							</div>
+						</fieldset>
+						<!-- ends here -->
+
+					</div>
+
+
+				</div>
+
+			</div>	
+
+
+			<div class="row">
+			<!--- Customer details -->
+
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Customer Details</h3>
+					</div>
+
+					<div class="panel-body">
+						<div class="form-group">
+							<label for="orgName" class="required">Customer </label>
+
+
+							<div class="form-group form-inline">		
+
+								<input type="text" id="orgName" class="form-control"
+								ng-model="vserver.customer"
+								placeholder="Type customer to filter..."
+								typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="" 							     	ng-keypress="ClearValidation()" ng-keydown="ClearURL()" style="width:100%;">
+
+								<label class="errormsg" ng-if="customererr">{{ customerMsg }}</label>
+
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="id_admin_id" class="required">Admin Name *</label>
+							<select id="id_admin_id" class="form-control" ng-model="vserver.admin" 				 						 								ng-options="ad as ad.id for ad in admin track by ad.url" style="width:100%;">
+								<option  value="">Please select</option>
+							</select>
+							<label class="errormsg" ng-if="adminnameerr">{{ adminNameMsg }}</label>
+						</div>
+						<div class="form-group">
+							<label for="id_ordered_date" class="required">Ordered Date </label>
+
+								<div class="dropdown">
+									<a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown" data-target="#" href="">    
+									<div class="input-group">
+										<input type="text" class="form-control" data-ng-model="vserver.ordered_date" 											data-date-time-input="DD/MM/YYYY hh:mm" >
+										<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+									</div>    
+									</a>
+									<ul class="dropdown-menu action-button" role="menu" aria-labelledby="dLabel">
+										<datetimepicker data-ng-model="vserver.ordered_date" 
+										data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }">
+										</datetimepicker>
+									</ul>
+								</div>				
+
+								<label class="errormsg" ng-if="orddateerr">{{ ordDateMsg }}</label>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				
+		</div>
+		<button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelVServerEdit()">Cancel</button>
+		<button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveVServerEdit()">Save</button>
+	</form>
+	</div>
+</div>
+

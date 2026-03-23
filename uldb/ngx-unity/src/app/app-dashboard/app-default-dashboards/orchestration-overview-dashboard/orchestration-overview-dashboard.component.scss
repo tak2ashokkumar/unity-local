@@ -1,0 +1,95 @@
+body {
+    overflow: auto !important;
+    /* Ensure scrolling is allowed */
+}
+
+.execution-container {
+    margin-top: 20px;
+}
+
+.execution-row {
+    margin-bottom: 20px;
+}
+
+.section1 {
+    min-height: 250px;
+    max-height: 450px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.section2 {
+    min-height: 250px;
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.section3 {
+    min-height: 300px;
+    max-height: 650px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.section4 {
+    min-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.bar-chart {
+    height: 30px;
+    line-height: 30px;
+}
+
+.bar {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+    /* Smooth zoom effect */
+}
+
+.bar:hover {
+    transform: scale(1.1);
+    /* Slight zoom effect */
+    z-index: 10;
+    /* Bring the hovered bar above others */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Add a subtle shadow */
+}
+
+.bar-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 4px;
+    font-size: 12px;
+}
+
+.avg-time {
+    font-size: 14px;
+}
+
+.legend {
+    font-size: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+
+.legend-color {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #ccc;
+}

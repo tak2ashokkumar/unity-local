@@ -1,0 +1,37 @@
+<div class="card border-0 topology-card mb-0">
+    <app-spinner [name]="'unity-topology'"></app-spinner>
+    <div class="card-body py-0">
+        <div class="text-center text-muted m-5 p-5 font-lg" *ngIf="!networkViewData || !networkViewData.nodes.length">No
+            Azure Infrastructure discovered.</div>
+        <div id="azure-node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo"></div>
+        <div class="row">
+            <div class="pr-0 col-12">
+                <div class="discovery-network-container" id="discovery-network-container" #visGraph>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #nodeDetails>
+    <div class="card border-0 mb-0" *ngIf="hoveredNode">
+        <div class="card-body p-0 pt-1" *ngIf="hoveredNode.is_device">
+            <p class="card-text mb-1" (click)="goTo(hoveredNode)">Name: <span
+                    [ngClass]="hoveredNode.redirectLink? 'text-primary pointer-link':'text-muted'">{{hoveredNode.name}}</span>
+            </p>
+            <p class="card-text mb-1">Management IP: <span class="text-muted">{{hoveredNode.ip_address}}</span></p>
+            <p class="card-text mb-1">Device Type: <span class="text-muted">{{hoveredNode.displayType}}</span></p>
+            <p class="card-text mb-1">Onboarding Status: <span class="text-muted">{{hoveredNode.onboarded ?
+                    'Onboarded' : 'Not Onboarded'}}</span></p>
+            <p class="card-text mb-1">Alerts: <span class="text-muted">{{hoveredNode.alert_count}}</span></p>
+        </div>
+        <div class="card-body p-0 pt-1" *ngIf="!hoveredNode.is_device">
+            <p class="card-text mb-1">Name: <span class="text-muted">{{hoveredNode.name}}</span></p>
+            <p class="card-text mb-1">Type: <span class="text-muted">{{hoveredNode.displayType}}</span></p>
+            <p class="card-text mb-1" *ngIf="hoveredNode.platform_type">Platform Type: <span
+                    class="text-muted">{{hoveredNode.platform_type}}</span></p>
+            <p class="card-text mb-1" *ngIf="hoveredNode.datacenter"> Datacenter: <span
+                    class="text-muted">{{hoveredNode.datacenter}}</span></p>
+        </div>
+    </div>
+</ng-template>

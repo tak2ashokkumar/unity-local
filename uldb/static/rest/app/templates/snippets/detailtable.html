@@ -1,0 +1,58 @@
+<table class="table">
+  <thead>
+  <tr ng-repeat="col in cols">
+    <td class="col-md-4">
+      <div>{{ col.description }}</div>
+    </td>
+    <td>
+      <div ng-if="col.opaque === undefined"><strong>{{ result[col.name] }}</strong></div>
+      <div ng-if="col.opaque !== undefined">
+        {{ col.read(server) }}
+      </div>
+        
+    </td>
+  </tr>
+  <tr ng-if="result.cisco_firewall || result.juniper_firewall || result.cisco_switch || result.juniper_switch || result.f5lb_proxy || result.netscaler_proxy">
+    <td class="col-md-4">
+      <div>Manage Status</div>
+    </td>
+    <td>
+      <div>
+          
+        <div ng-if="result.cisco_firewall.length !==0 || result.juniper_firewall.length !==0 || result.cisco_switch.length !==0 || result.juniper_switch.length !==0 || result.f5lb_proxy.length !==0 || result.netscaler_proxy.length !==0">
+
+            <a ng-repeat="p in result.cisco_firewall" href="/admin#/cisco-firewall/{{ p.uuid }}" class="btn btn-primary" ng-if="result.cisco_firewall.length !== 0">Manage Cisco</a></li>
+
+            <a ng-repeat="p in result.juniper_firewall" href="/admin#/juniper-firewall/{{ p.uuid }}" class="btn btn-primary" ng-if="result.juniper_firewall.length !== 0">Manage Juniper</a>
+
+
+            <a ng-repeat="p in result.cisco_switch" href="/admin#/cisco-switch/{{ p.uuid }}" class="btn btn-primary" ng-if="result.cisco_switch.length !== 0">Manage Cisco</a></li>
+
+            <a ng-repeat="p in result.juniper_switch" href="/admin#/juniper-switch/{{ p.uuid }}" class="btn btn-primary" ng-if="result.juniper_switch.length !== 0">Manage Juniper</a>
+
+
+            <a ng-repeat="p in result.f5lb_proxy" href="/admin#/f5-lb-proxy/{{ p.uuid }}" class="btn btn-primary" ng-if="result.f5lb_proxy.length !== 0">Manage F5 LB</a>
+
+            <a ng-repeat="p in result.netscaler_proxy" href="/admin#/citrix-vpx-device/{{ p.uuid }}" class="btn btn-primary" ng-if="result.netscaler_proxy.length !== 0">Manage Netscaler</a>
+
+            <a href="/admin#/cisco-firewall/" class="btn btn-primary" ng-if="result.cisco_firewall.length === 0">Configure Cisco</a></li>
+
+            <a href="/admin#/juniper-firewall/" class="btn btn-primary" ng-if="result.juniper_firewall.length === 0">Configure Juniper</a>
+
+            <a href="/admin#/cisco-switch/" class="btn btn-primary" ng-if="result.cisco_switch.length === 0">Configure Cisco</a></li>
+
+            <a href="/admin#/juniper-switch/" class="btn btn-primary" ng-if="result.juniper_switch.length === 0">Configure Juniper</a>
+
+
+            <a href="/admin#/f5-lb-proxy/" class="btn btn-primary" ng-if="result.f5lb_proxy.length === 0">Configure F5 LB</a>
+
+            <a href="/admin#/citrix-vpx-device/" class="btn btn-primary" ng-if="result.netscaler_proxy.length === 0">Configure Netscaler</a>
+
+
+
+        </div>
+      </div>
+    </td>
+  </tr>
+  </thead>
+</table>

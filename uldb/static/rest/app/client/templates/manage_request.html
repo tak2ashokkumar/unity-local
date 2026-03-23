@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <span class="modal-title"> Create New Ticket</span>
+</div>
+<div class="modal-form">
+    <form role="form" name="create_ticket_form">
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="form-group">
+                <label for="">Subject*</label>
+                <span class="errormsg" ng-if="ticket_subject_errmsg">({{ ticket_subject_errmsg }})</span>
+                <input name="subject" placeholder="What is your issue about?" required="required" class="form-control" type="text" ng-class="{'has-error': ticket_subject_errmsg }" ng-model="request.subject"/>
+            </div>
+            <div class="form-group">
+                <label for="collaborators">CC</label>
+                <span ng-repeat="collaborator in collaborators"> {{collaborator}}</span>
+                <input name="collaborators" id="collaborators" placeholder="example@unityonecloud.com" class="form-control" type="text" ng-model="request.collaborators"/>
+            </div>
+            <div class="form-group">
+                    <label for="">Priority*</label>
+                    <span class="errormsg" ng-if="ticket_priority_errmsg">({{ ticket_priority_errmsg }})</span>
+                    <select   ng-options="option.long for option in ticket_priority_list track by option.short"
+                                     class="form-control"  required="required" ng-class="{'has-error': ticket_priority_errmsg }" ng-model="request.priority">
+                                  <option value="">Select priority</option>
+                    </select>
+            </div>
+            <div class="form-group">
+                <label for="">Description*</label>
+                <span class="errormsg" ng-if="ticket_desc_errmsg"> ({{ ticket_desc_errmsg }})</span>
+                <textarea rows="5" placeholder="Describe your issue here." required="required" class="form-control" type="text" ng-model="request.description_text" autofocus></textarea>
+            </div>
+            <div class="form-group">
+                <label for="">Metadata (Uneditable)</label>
+                <textarea class="form-control" type="text" disabled>{{description}}</textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer modal-buttons">
+    <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-default" ng-click="createRequest(request, 'task')" type="submit"> Create Ticket</button>
+</div>

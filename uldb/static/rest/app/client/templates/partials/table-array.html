@@ -1,0 +1,12 @@
+<table class="table table-condensed">
+  <thead>
+  <tr>
+    <th ng-repeat="e in elems">{{ e }}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="item in arr">
+    <td ng-repeat="e in elems">{{ item[e] }}</td>
+  </tr>
+  </tbody>
+</table>

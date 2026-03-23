@@ -1,0 +1,154 @@
+<ng-template #template>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Schedule
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="scheduleForm" [formGroup]="scheduleForm">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-col-form-label" for="name">Report Name<em>*</em></label>
+                            <input class="form-control" id="name" type="text" formControlName="name" [ngClass]="{'is-invalid' : scheduleFormErrors.name}">
+                            <div class="invalid-feedback" *ngIf="scheduleFormErrors.name">{{scheduleFormErrors.name}}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="search" class="form-col-form-label">Schedule</label>
+                            <select class="form-control" id="status" formControlName="frequency" [ngClass]="{'is-invalid' : scheduleFormErrors.frequency}">
+                                <option [value]="''" disabled>Select</option>
+                                <option [value]="reportScheduleIntervals.MONTHLY">{{reportScheduleIntervals.MONTHLY}}</option>
+                                <option [value]="reportScheduleIntervals.WEEKLY">{{reportScheduleIntervals.WEEKLY}}</option>
+                                <option [value]="reportScheduleIntervals.DAILY">{{reportScheduleIntervals.DAILY}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="scheduleFormErrors.frequency">{{scheduleFormErrors.frequency}}</div>
+                        </div>
+                    </div>
+                    <div class="col-6 form-group" *ngIf="scheduleForm.controls.frequency.value == reportScheduleIntervals.MONTHLY">
+                        <label for="scheduled_time" class="form-col-form-label">Schedule Date and Time<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #scheduled_time [hour12Timer]="true"></owl-date-time>
+                            <input class="form-control rounded-left" name="scheduled_time" formControlName="scheduled_time"
+                                [owlDateTimeTrigger]="scheduled_time" [owlDateTime]="scheduled_time" type="text"
+                                [ngClass]="{'is-invalid' : scheduleFormErrors.scheduled_time}">
+                            <div class="input-group-append " [owlDateTimeTrigger]="scheduled_time">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="scheduleFormErrors.scheduled_time">{{scheduleFormErrors.scheduled_time}}</div>
+                    </div>
+                    <div class="col-6 form-group" *ngIf="scheduleForm.controls.frequency.value == reportScheduleIntervals.DAILY">
+                        <label for="scheduled_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #scheduled_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                            <input class="form-control rounded-left" name="scheduled_time" formControlName="scheduled_time"
+                                [owlDateTimeTrigger]="scheduled_time" [owlDateTime]="scheduled_time" type="text"
+                                [ngClass]="{'is-invalid' : scheduleFormErrors.scheduled_time}">
+                            <div class="input-group-append " [owlDateTimeTrigger]="scheduled_time">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="scheduleFormErrors.scheduled_time">{{scheduleFormErrors.scheduled_time}}</div>
+                    </div>
+                    <div class="col-3 form-group" *ngIf="scheduleForm.controls.frequency.value == reportScheduleIntervals.WEEKLY">
+                        <label for="scheduled_day" class="form-col-form-label">Schedule Day<em>*</em></label>
+                        <select class="form-control" id="scheduled_day" formControlName="scheduled_day" [ngClass]="{'is-invalid' : scheduleFormErrors.scheduled_day}">
+                            <option [value]="'Sunday'" selected>Sunday</option>
+                            <option [value]="'Monday'">Monday</option>
+                            <option [value]="'Tuesday'">Tuesday</option>
+                            <option [value]="'Wednesday'">Wednesday</option>
+                            <option [value]="'Thursday'">Thursday</option>
+                            <option [value]="'Friday'">Friday</option>
+                            <option [value]="'Saturday'">Saturday</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="scheduleFormErrors.scheduled_day">{{scheduleFormErrors.scheduled_day}}</div>
+                    </div>
+                    <div class="col-3 form-group" *ngIf="scheduleForm.controls.frequency.value == reportScheduleIntervals.WEEKLY">
+                        <label for="scheduled_time" class="form-col-form-label">Schedule Time<em>*</em></label>
+                        <div class="input-group">
+                            <owl-date-time #scheduled_time [pickerType]="'timer'" [hour12Timer]="true"></owl-date-time>
+                            <input class="form-control rounded-left" name="scheduled_time" formControlName="scheduled_time"
+                                [owlDateTimeTrigger]="scheduled_time" [owlDateTime]="scheduled_time" type="text"
+                                [ngClass]="{'is-invalid' : scheduleFormErrors.scheduled_time}">
+                            <div class="input-group-append " [owlDateTimeTrigger]="scheduled_time">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="scheduleFormErrors.scheduled_time">{{scheduleFormErrors.scheduled_time}}</div>
+                    </div>
+                    <div class="col-6" *ngIf="user.isUserAdmin">
+                        <div class="form-group">
+                            <label for="status" class="form-col-form-label">Select Recipients</label>
+                            <multiselect-dropdown [options]="orgUsers" [settings]="emailSettings" class="form-control p-0"
+                                style="height:auto;" formControlName="recipient_emails" [ngClass]="{'is-invalid' : scheduleFormErrors.recipient_emails}"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="scheduleFormErrors.recipient_emails">{{scheduleFormErrors.recipient_emails}}</div>
+                        </div>
+                    </div>
+                    <div class="col-6" *ngIf="user.isUserAdmin">
+                        <div class="form-group">
+                            <label class="form-col-form-label" for="additional_emails">Additional Emails</label>
+                            <input class="form-control" id="additional_emails" type="text" placeholder="Comma seperated emails"
+                                formControlName="additional_emails" [ngClass]="{'is-invalid' : scheduleFormErrors.additional_emails}">
+                            <div class="invalid-feedback" *ngIf="scheduleFormErrors.additional_emails">{{scheduleFormErrors.additional_emails}}</div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check checkbox">
+                            <input class="form-check-input" id="attachment" type="checkbox" formControlName="attachment">
+                            <label class="form-check-label" for="attachment">Include detailed report as an
+                                attachment</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #successtemplate>
+    <div class="card mb-0">
+        <div class="card-body">
+            Schedule created successfully
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="goToSchedule()">View Schedule</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="successModalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

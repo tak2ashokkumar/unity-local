@@ -1,0 +1,9 @@
+<div class="container notification text-center rounded-0">
+  <div class="row text-center position-fixed notification-content w-100" *ngFor="let alert of alerts;let i = index;">
+    <alert [type]="alert.type" [dismissOnTimeout]="alert.timeout" dismissible="true" (onClosed)="onClosed(i)"
+      class="col-12 px-0">
+      <span [innerHTML]="alert.message"></span>
+      <strong class="pull-right">{{i+1}}/{{alerts.length}}</strong>
+    </alert>
+  </div>
+</div>

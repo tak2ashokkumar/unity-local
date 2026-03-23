@@ -1,0 +1,68 @@
+<div class="card mb-0 round-edge">
+    <div class="card-header">
+        {{action}} Report
+    </div>
+    <div class="card-body">
+        <form *ngIf="form" [formGroup]="form">
+            <div class="form-group">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="row">
+                <div class="form-group col-6">
+                    <label class="form-col-form-label">Report Name<em>*</em></label>
+                    <input id="name" class="form-control" type="text" formControlName="name"
+                        [class.is-invalid]="formErrors.name">
+                    <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                </div>
+                <div class="form-group col-6">
+                    <label class="form-col-form-label">Module</label>
+                    <select class="form-control" formControlName="feature"
+                        [ngClass]="{'is-invalid' : formErrors.feature}">
+                        <option [value]="''">Select Module</option>
+                        <option [value]="'datacenter'">Datacenter</option>
+                        <option [value]="'private'">Private</option>
+                        <option [value]="'public'">Public</option>
+                        <option [value]="'events'">Event Managment</option>
+                        <option [value]="'sustainability'">Sustainability</option>
+                        <option [value]="'ITSM'">ITSM</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="formErrors.feature">
+                        {{formErrors.feature}}</div>
+                </div>
+            </div>
+        </form>
+        <ng-container *ngIf="form" [ngSwitch]="form.get('feature').value">
+            <ng-container *ngSwitchCase="'datacenter'">
+                <datacenter-report-crud (formData)="childFormData($event)"
+                    [datacenter]="selectedReport?.report_meta"></datacenter-report-crud>
+            </ng-container>
+            <ng-container *ngSwitchCase="'private'">
+                <private-cloud-report-crud (formData)="childFormData($event)"
+                    [private]="selectedReport?.report_meta"></private-cloud-report-crud>
+            </ng-container>
+            <ng-container *ngSwitchCase="'public'">
+                <public-cloud-report-crud (formData)="childFormData($event)"
+                    [public]="selectedReport?.report_meta"></public-cloud-report-crud>
+            </ng-container>
+            <ng-container *ngSwitchCase="'events'">
+                <event-mgmt-report-crud (formData)="childFormData($event)"
+                    [events]="selectedReport?.report_meta"></event-mgmt-report-crud>
+            </ng-container>
+            <ng-container *ngSwitchCase="'sustainability'">
+                <sustainability-report-crud (formData)="childFormData($event)"
+                    [sustainability]="selectedReport?.report_meta"></sustainability-report-crud>
+            </ng-container>
+            <ng-container *ngSwitchCase="'ITSM'">
+                <itsm-report-crud (formData)="childFormData($event)"
+                    [itsm]="selectedReport?.report_meta"></itsm-report-crud>
+            </ng-container>
+        </ng-container>
+    </div>
+    <div class="card-footer border-top-0 bg-white">
+        <button class="btn btn-sm btn-outline-warning btn-pill" type="button" (click)="goBack()">Back</button>
+        <button class="btn btn-sm btn-warning ml-1 btn-pill" type="button" *ngIf="!reportId" (click)="onSubmit()">Create
+            Report</button>
+        <button class="btn btn-sm btn-warning ml-1 btn-pill" type="button" *ngIf="reportId" (click)="onSubmit()">Update
+            Report</button>
+    </div>
+</div>

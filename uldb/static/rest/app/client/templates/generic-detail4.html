@@ -1,0 +1,61 @@
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Properties
+  </div>
+  <div class="panel-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Attribute</th>
+          <th>Current Value</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr ng-repeat="row in rows">
+          <td class="col-md-4">
+            <div>{{ row.description }}</div>
+          </td>
+          <td>
+            <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+            <div ng-if="row.opaque === 'stringTransform'">
+              {{ row.read(result) }}
+            </div>
+            <div ng-if="row.opaque === 'link'">
+              <a href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+            </div>
+          </td>
+        </tr>
+        <tr ng-if="result.cisco_proxy || result.juniper_proxy || result.f5lb_proxy || result.netscaler_proxy">
+          <td class="col-md-4">
+            <div>Manage Status</div>
+          </td>
+          <td>
+            <div>
+                
+              <div ng-if="result.cisco_proxy.length !==0 || result.juniper_proxy.length !==0|| result.f5lb_proxy.length !==0 || result.netscaler_proxy.length !==0">
+
+                  <a ng-repeat="p in result.cisco_proxy" href="/main#/cisco-proxy/{{ p.uuid }}" class="btn btn-primary" ng-if="result.cisco_proxy.length !== 0">Manage</a></li>
+
+                  <a ng-repeat="p in result.juniper_proxy" href="/main#/juniper-switch/{{ p.uuid }}" class="btn btn-primary" ng-if="result.juniper_proxy.length !== 0">Manage</a>
+
+                  <span class="menu-disabled" ng-if="result.cisco_proxy.length === 0">Not Configured</span>
+
+                  <span class="menu-disabled" ng-if="result.juniper_proxy.length === 0">Not Configured</span>
+
+                  <span class="menu-disabled" ng-if="result.f5lb_proxy.length === 0 && result.netscaler_proxy.length === 0">Not Configured</span>
+
+                  <a ng-repeat="p in result.f5lb_proxy" href="{{ p.proxy_url }}" target="_blank" class="btn btn-primary" ng-if="result.f5lb_proxy.length !== 0">Manage F5 LB</a>
+
+                  <a ng-repeat="p in result.netscaler_proxy" href="{{ p.proxy_url }}" target="_blank" class="btn btn-primary" ng-if="result.netscaler_proxy.length !== 0">Manage Netscaler</a>
+
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,927 @@
+<div class="col-12 mb-2 mt-2">    
+    <div class="card round-edge equalize-card">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+            <span class="font-lg font-500">Customer Behavior Insights KPISs</span>
+        </div>
+        <div class="card-body px-2" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+            <div class="row mx-0">
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="sessionToOrderFunnelWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="sessionToOrderFunnelWidgetViewData?.chartData">
+                                <div echarts [options]="sessionToOrderFunnelWidgetViewData?.chartData?.options"
+                                    [extentions]="sessionToOrderFunnelWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!sessionToOrderFunnelWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Session To Order Funnel data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="returningCustomerCategoryWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="returningCustomerCategoryWidgetViewData?.chartData">
+                                <div echarts [options]="returningCustomerCategoryWidgetViewData?.chartData?.options"
+                                    [extentions]="returningCustomerCategoryWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300">
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="!returningCustomerCategoryWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Returning Customer Category data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="newCustomersWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="newCustomersWidgetViewData?.chartData">
+                                <div echarts [options]="newCustomersWidgetViewData?.chartData?.options"
+                                    [extentions]="newCustomersWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300">
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="!newCustomersWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No New Customers data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <div class="card round-edge equalize-card">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+            <span class="font-lg font-500">Conversion & Sales Funnel KPIs</span>
+        </div>
+        <div class="card-body px-2" style="min-height:400px;max-height:641px;overflow-y: auto;overflow-x: hidden;">
+            <div class="row mx-0">
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="checkoutAbondanRateWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="checkoutAbondanRateWidgetViewData?.chartData">
+                                <div echarts [options]="checkoutAbondanRateWidgetViewData?.chartData?.options"
+                                    [extentions]="checkoutAbondanRateWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!checkoutAbondanRateWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No checkout Abondan Rate data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="conversionRateWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="conversionRateWidgetViewData?.chartData">
+                                <div echarts [options]="conversionRateWidgetViewData?.chartData?.options"
+                                    [extentions]="conversionRateWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300">
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="!conversionRateWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No conversion Rate data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="orderPlcedWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="orderPlcedWidgetViewData?.chartData">
+                                <div echarts [options]="orderPlcedWidgetViewData?.chartData?.options"
+                                    [extentions]="orderPlcedWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300">
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="!orderPlcedWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Orders Placed data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mx-0 mt-2">
+                <div class="col-12 px-2 d-flex justify-content-center"
+                    style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0 flex-grow-1">
+                        <app-spinner [name]="newVsReturningCustomersWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="newVsReturningCustomersWidgetViewData?.chartData">
+                                <div echarts [options]="newVsReturningCustomersWidgetViewData?.chartData?.options"
+                                    [extentions]="newVsReturningCustomersWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!newVsReturningCustomersWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No New vs Returning Customers data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <div class="card round-edge equalize-card">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+            <span class="font-lg font-500">Traffic & Engagement KPIs</span>
+        </div>
+        <div class="card-body px-2" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+            <div class="row mx-0">
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="categoriesViewedWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="categoriesViewedWidgetViewData?.chartData">
+                                <div echarts [options]="categoriesViewedWidgetViewData?.chartData?.options"
+                                    [extentions]="categoriesViewedWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!categoriesViewedWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Categories Viewed data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="trafficSourceOverGivenPeriodWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="trafficSourceOverGivenPeriodWidgetViewData?.chartData">
+                                <div echarts [options]="trafficSourceOverGivenPeriodWidgetViewData?.chartData?.options"
+                                    [extentions]="trafficSourceOverGivenPeriodWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300">
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="!trafficSourceOverGivenPeriodWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Traffic Source data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                    <div class="card equalize-card border-0">
+                        <app-spinner [name]="uniqueVisitorsWidgetViewData?.loader"></app-spinner>
+                        <div class="card-body p-0 d-flex flex-column justify-content-around">
+                            <ng-container *ngIf="uniqueVisitorsWidgetViewData?.chartData">
+                                <div echarts [options]="uniqueVisitorsWidgetViewData?.chartData?.options"
+                                    [extentions]="uniqueVisitorsWidgetViewData?.chartData?.extensions"
+                                    [defaultHeight]="300">
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="!uniqueVisitorsWidgetViewData?.chartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Unique Visitors data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <div class="card round-edge equalize-card p-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2 ">
+            <span class="font-lg font-500">Performance & Reliability KPI's</span>
+        </div>
+        <div class="card-body">
+            <div class="row mb-2">
+                <div class="col-4">
+                    <div class="card round-edge equalize-card border-0" style="min-height: 220px;">
+                        <app-spinner [name]="'ApplicationResponseTimeLoader'"></app-spinner>
+                        <!-- <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2 ">
+                        <span class="font-lg font-500">Application Response Time (ms)</span>
+                    </div> -->
+                        <div class="card-body p-0">
+                            <ng-container *ngIf="applicationResponseTimeViewData">
+                                <div echarts [options]="applicationResponseTimeViewData.options"
+                                    [extentions]="applicationResponseTimeViewData.extensions" [defaultHeight]="260">
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="!applicationResponseTimeViewData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card round-edge equalize-card border-0" style="min-height: 220px;">
+                        <app-spinner [name]="'ErrorRateLoader'"></app-spinner>
+                        <!-- <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2 ">
+                        <span class="font-lg font-500">Error Rate (% of Failed Interactions)</span>
+                    </div> -->
+                        <div class="card-body p-0">
+                            <ng-container *ngIf="errorRateViewData">
+                                <div echarts [options]="errorRateViewData.options"
+                                    [extentions]="errorRateViewData.extensions" [defaultHeight]="260"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!errorRateViewData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card round-edge equalize-card border-0" style="min-height: 220px;">
+                        <app-spinner [name]="'PyamentFailureRateLoader'"></app-spinner>
+                        <!-- <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center  border-bottom p-2 ">
+                        <span class="font-lg font-500">Payment Failure Rate (%)</span>
+                    </div> -->
+                        <div class="card-body p-0">
+                            <ng-container *ngIf="paymentFailureViewData">
+                                <div echarts [options]="paymentFailureViewData.options"
+                                    [extentions]="paymentFailureViewData.extensions" [defaultHeight]="260"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!paymentFailureViewData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-12">
+                    <div class="card round-edge equalize-card border-0" style="min-height: 280px;">
+                        <app-spinner [name]="'PaymentGatewayLatencyLoader'"></app-spinner>
+                        <!-- <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center  border-bottom p-2 ">
+                        <span class="font-lg font-500">Payment Gateway Latency (ms)</span>
+                    </div> -->
+                        <div class="card-body p-0">
+                            <ng-container *ngIf="paymentGatewayLatencyViewData">
+                                <div echarts [options]="paymentGatewayLatencyViewData.options"
+                                    [extentions]="paymentGatewayLatencyViewData.extensions" [defaultHeight]="260"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!paymentGatewayLatencyViewData">
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    No Data found.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <div class="row">
+        <div class="col-6">
+            <div class="card round-edge equalize-card h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2 ">
+                    <span class="font-lg font-500">Revenue & Customer Value KPIs</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <div class="card round-edge equalize-card border-0" style="min-height: 230px;">
+                                <app-spinner [name]="'RevenueByCategoryLoader'"></app-spinner>
+                                <!-- <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2 ">
+                        <span class="font-lg font-500">Revenue By Category</span>
+                    </div> -->
+                                <div class="card-body p-0">
+                                    <ng-container *ngIf="revenueByCategoryViewData">
+                                        <div echarts [options]="revenueByCategoryViewData.options"
+                                            [extentions]="revenueByCategoryViewData.extensions" [defaultHeight]="280">
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="!revenueByCategoryViewData">
+                                        <div class="d-flex justify-content-center align-items-center h-100 text-center">
+                                            No revenue by category data found.
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card round-edge equalize-card border-0" style="min-height: 230px;">
+                                <app-spinner [name]="'RevenueByTrafficSourceLoader'"></app-spinner>
+                                <!-- <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2 ">
+                        <span class="font-lg font-500">Error Rate (% of Failed Interactions)</span>
+                    </div> -->
+                                <div class="card-body p-0">
+                                    <ng-container *ngIf="revenueByTrafficSourceViewData">
+                                        <div echarts [options]="revenueByTrafficSourceViewData.options"
+                                            [extentions]="revenueByTrafficSourceViewData.extensions"
+                                            [defaultHeight]="280">
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="!revenueByTrafficSourceViewData">
+                                        <div class="d-flex justify-content-center align-items-center h-100 text-center">
+                                            No revenue by traffic source data found.
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 pl-0">
+            <div class="card round-edge equalize-card -100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2 ">
+                    <span class="font-lg font-500">Operational / Anomaly Detection KPIs</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="card round-edge equalize-card border-0" style="min-height: 230px;">
+                                <app-spinner [name]="'OperationalAnomalyDetectionLoader'"></app-spinner>
+                                <!-- <div
+                        class="card-header bg-white d-flex justify-content-between align-items-center  border-bottom p-2 ">
+                        <span class="font-lg font-500">Payment Failure Rate (%)</span>
+                    </div> -->
+                                <div class="card-body p-0">
+                                    <ng-container *ngIf="operationalAnomalyDetectionViewData">
+                                        <div echarts [options]="operationalAnomalyDetectionViewData.options"
+                                            [extentions]="operationalAnomalyDetectionViewData.extensions"
+                                            [defaultHeight]="280">
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="!operationalAnomalyDetectionViewData">
+                                        <div class="d-flex justify-content-center align-items-center h-100 text-center">
+                                            No operation anomaly data found.
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <div class="row">
+        <div class="col-12">
+            <div class="card round-edge mb-0">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                    <div class="d-flex justify-content-center align-items-center font-500">
+                        <span class="badge badge-secondary font-sm">{{countForServicesOverview}}</span>
+                        <span class="ml-1 font-lg">Services Overview</span>
+                    </div>
+                </div>
+                <div class="card-body py-2">
+                    <app-spinner [name]="serviceLoader"></app-spinner>
+                    <div class="row mx-0 d-flex justify-content-between align-items-center">
+                        <div class="w-25">
+                            <search-box [searchValue]="currentCriteriaForServicesOverview.searchValue"
+                                (searched)="onSearchedForServicesOverview($event)"></search-box>
+                        </div>
+                        <div class="d-flex">
+                            <div class="card round-edge mb-2 mr-2">
+                                <div class="card-body d-flex align-items-center py-2">
+                                    <span class="font-500 font-ml mr-2 py-1">Avg. Throughput</span>
+                                    <span class="text-primary font-lg">{{avgThroughput}}</span>
+                                </div>
+                            </div>
+                            <div class="card round-edge mb-2  mr-2">
+                                <div class="card-body d-flex align-items-center py-2">
+                                    <span class="font-500 font-ml mr-2 py-1">Avg. Availability</span>
+                                    <span class="text-primary font-lg">{{avgAvailablility}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card round-edge mb-2">
+                                <div class="card-body d-flex align-items-center py-2">
+                                    <span class="font-500 font-ml py-1 mr-1">Avg. Response Time</span>
+                                    <span class="text-primary font-lg">{{avgLatency}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-sm text-left" sortableTable
+                        (sorted)="onSortedForServicesOverview($event)">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Service Name</th>
+                                <th>Throughput</th>
+                                <th>Availablility(%)</th>
+                                <th>Response Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let service of serviceViewData" truncateText>
+                                <td class="tdw-15">
+                                    <div [tooltip]="service.name">
+                                        {{service.name}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="service.throughput">{{service.throughput}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="service.parentAppAvailability">{{service.parentAppAvailability}}
+                                    </div>
+                                </td>
+                                <td class="tdw-12">
+                                    <div [tooltip]="service.latency">{{service.latency}}</div>
+                                </td>
+                                <td class="w-12">
+                                    <span [ngClass]="service.icon" [tooltip]="service.tooltipMessage"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteriaForServicesOverview.pageNo"
+                        [pageSize]="currentCriteriaForServicesOverview.pageSize"
+                        [totalCount]="countForServicesOverview">
+                    </table-entries>
+                    <table-pager *ngIf="serviceViewData.length" [pageNo]="currentCriteriaForServicesOverview.pageNo"
+                        [pageSize]="currentCriteriaForServicesOverview.pageSize" [totalCount]="countForServicesOverview"
+                        (pageChange)="pageChangeForServicesOverview($event)"></table-pager>
+                    <div class="text-center text-muted py-4" *ngIf="!serviceViewData.length">No records to display</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <div class="row" style="display: block">
+        <div class="col-12">
+            <div class="card round-edge mb-2">
+                <div class="card-header bg-transparent font-500 font-lg p-2">
+                    Components Overview
+                </div>
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center">
+                        <div class="card round-edge mb-2 mr-2 py-2">
+                            <div class="card-body d-flex py-1 align-items-center">
+                                <span class="font-500 font-ml mr-2">Avg. Component Health</span>
+                                <span class="text-primary font-lg">{{componentsOverviewWidgetData?.healthAvg}}</span>
+                            </div>
+                        </div>
+                        <div class="card round-edge mb-2 mr-2 py-2 align-items-center">
+                            <div class="card-body d-flex py-1">
+                                <span class="font-500 font-ml mr-2">Avg. Duration</span>
+                                <span
+                                    class="text-primary font-lg">{{componentsOverviewWidgetData?.durationAvg}}ms</span>
+                            </div>
+                        </div>
+                        <div class="card round-edge mb-2 py-2 align-items-center">
+                            <div class="card-body d-flex py-1">
+                                <span class="font-500 font-ml mr-2">Avg. Response Time</span>
+                                <span class="text-primary font-lg">{{componentsOverviewWidgetData?.responseTimeAvg}}ms
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex">
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="componentsOverviewWidgetData.healthLoader"></app-spinner>
+
+                            <ng-container *ngIf="componentsOverviewWidgetData?.healthChartData && showDoughnutChart">
+                                <div echarts [options]="componentsOverviewWidgetData?.healthChartData?.options"
+                                    [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!componentsOverviewWidgetData.healthChartData || !showDoughnutChart"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 300px;">No data available.</div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="componentsOverviewWidgetData.durationLoader"></app-spinner>
+                            <ng-container *ngIf="componentsOverviewWidgetData?.durationChartData">
+                                <div echarts [options]="componentsOverviewWidgetData?.durationChartData?.options"
+                                    [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!componentsOverviewWidgetData.durationChartData"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 300px;">No data available.</div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="componentsOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <ng-container *ngIf="componentsOverviewWidgetData?.responseTimeChartData">
+                                <div echarts [options]="componentsOverviewWidgetData?.responseTimeChartData?.options"
+                                    [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!componentsOverviewWidgetData.responseTimeChartData"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 300px;">No data available.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <!-- Process Overview -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card round-edge mb-2">
+                <div class="card-header bg-transparent font-500 font-lg p-2">
+                    Process Overview
+                </div>
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center">
+                        <div class="card round-edge mb-2 mr-2 py-2">
+                            <div class="card-body d-flex align-items-center py-1">
+                                <span class="font-500 font-ml mr-2">Avg. Throughput</span>
+                                <span
+                                    class="text-primary font-lg ">{{processOverviewWidgetData?.throughputAvg}}Req/min</span>
+                            </div>
+                        </div>
+                        <div class="card round-edge mb-2 mr-2 py-2">
+                            <div class="card-body d-flex align-items-center py-1">
+                                <span class="font-500 font-ml mr-2">Avg. Availability</span>
+                                <span
+                                    class="text-primary font-lg">{{processOverviewWidgetData?.availabilityAvg}}ms</span>
+                            </div>
+                        </div>
+                        <div class="card round-edge mb-2 mr-2">
+                            <div class="card-body d-flex align-items-center py-1">
+                                <span class="font-500 font-ml mr-2">Avg. Response Time</span>
+                                <span
+                                    class="text-primary font-lg">{{processOverviewWidgetData?.responseTimeAvg}}ms</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex">
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="processOverviewWidgetData.throughputLoader"></app-spinner>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="processOverviewWidgetData?.throughputChartData">
+                                    <div echarts [options]="processOverviewWidgetData?.throughputChartData?.options"
+                                        [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!processOverviewWidgetData.throughputChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 300px;">No data available.</div>
+                            </div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="processOverviewWidgetData.availabilityLoader"></app-spinner>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="processOverviewWidgetData?.availabilityChartData">
+                                    <div echarts [options]="processOverviewWidgetData?.availabilityChartData?.options"
+                                        [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!processOverviewWidgetData.availabilityChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 300px;">No data available.</div>
+                            </div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="processOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="processOverviewWidgetData?.responseTimeChartData">
+                                    <div echarts [options]="processOverviewWidgetData?.responseTimeChartData?.options"
+                                        [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                    </div>
+                                </ng-container>
+                                <div *ngIf="!processOverviewWidgetData.responseTimeChartData"
+                                    class="d-flex justify-content-center align-items-center"
+                                    style="width: 100%; height: 300px;">No data available.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Data & Messaging Service Overview -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card round-edge mb-2">
+                <div class="card-header bg-transparent font-500 font-lg p-2">
+                    Data & Messaging Service Overview
+                </div>
+                <div class="card-body">
+                    <div class="row d-flex justify-content-center">
+                        <div class="card round-edge mb-2 mr-2">
+                            <div class="card-body d-flex align-items-center py-2">
+                                <span class="font-500 font-ml mr-2 py-1">Avg. Latency</span>
+                                <span class="text-primary font-lg">{{databaseOverviewWidgetData?.latencyAvg}}ms</span>
+                            </div>
+                        </div>
+                        <div class="card round-edge mb-2  mr-2">
+                            <div class="card-body d-flex align-items-center py-2">
+                                <span class="font-500 font-ml mr-2 py-1">Avg. Response Time</span>
+                                <span class="text-primary font-lg">{{databaseOverviewWidgetData?.responseTimeAvg}}ms
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card round-edge mb-2  mr-2">
+                            <div class="card-body d-flex align-items-center py-2">
+                                <span class="font-500 font-ml mr-2 py-1">Avg. Availability</span>
+                                <span
+                                    class="text-primary font-lg">{{databaseOverviewWidgetData?.availabilityAvg}}ms</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex">
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="databaseOverviewWidgetData.latencyLoader"></app-spinner>
+                            <ng-container *ngIf="databaseOverviewWidgetData?.latencyChartData">
+                                <div echarts [options]="databaseOverviewWidgetData?.latencyChartData?.options"
+                                    [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!databaseOverviewWidgetData.latencyChartData"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 300px;">No data available.</div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="databaseOverviewWidgetData.responseTimeLoader"></app-spinner>
+                            <ng-container *ngIf="databaseOverviewWidgetData?.responseTimeChartData">
+                                <div echarts [options]="databaseOverviewWidgetData?.responseTimeChartData?.options"
+                                    [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!databaseOverviewWidgetData.responseTimeChartData"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 300px;">No data available.</div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <app-spinner [name]="databaseOverviewWidgetData.availabilityLoader"></app-spinner>
+                            <ng-container *ngIf="databaseOverviewWidgetData?.availabilityChartData">
+                                <div echarts [options]="databaseOverviewWidgetData?.availabilityChartData?.options"
+                                    [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                </div>
+                            </ng-container>
+                            <div *ngIf="!databaseOverviewWidgetData.availabilityChartData"
+                                class="d-flex justify-content-center align-items-center"
+                                style="width: 100%; height: 300px;">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Host Overview -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card round-edge mb-2">
+                <div class="card-header bg-transparent font-500 font-lg p-2">
+                    Host Overview
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3 px-1">
+                            <div class="card mb-2 round-edge py-2">
+                                <div class="card-body d-flex justify-content-between align-items-center py-1">
+                                    <span class="font-500 font-ml">Avg. CPU Utilization</span>
+                                    <span class="text-primary">{{hostOverviewWidgetData?.cpuUtilizationAvg}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 px-1">
+                            <div class="card mb-2 round-edge py-2">
+                                <div class="card-body d-flex justify-content-between align-items-center py-1">
+                                    <span class="font-500 font-ml">Avg. Memory Usage</span>
+                                    <span class="text-primary font-lg">{{hostOverviewWidgetData?.memoryUsageAvg}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 px-1">
+                            <div class="card mb-2 round-edge py-2">
+                                <div class="card-body d-flex justify-content-between align-items-center py-1">
+                                    <span class="font-500 font-ml">Avg. Disk I/O</span>
+                                    <span
+                                        class="text-primary font-lg">{{hostOverviewWidgetData?.diskInputOutputTimeAvg}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 px-1">
+                            <div class="card mb-2 round-edge py-2">
+                                <div class="card-body d-flex justify-content-between align-items-center py-1">
+                                    <span class="font-500 font-ml">Avg. System Load</span>
+                                    <span
+                                        class="text-primary font-lg">{{hostOverviewWidgetData?.systemLoadTimeAvg}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex">
+                        <div class="col-6 px-1 mb-2">
+                            <div class="card round-edge equalize-card">
+                                <app-spinner [name]="hostOverviewWidgetData.cpuUtilizationLoader"></app-spinner>
+                                <div class="card-header bg-transparent font-500 font-lg">CPU Utilization</div>
+                                <div class="card-body p-0">
+                                    <ng-container *ngIf="hostOverviewWidgetData?.cpuUtilizationChartData">
+                                        <div echarts
+                                            [options]="hostOverviewWidgetData?.cpuUtilizationChartData?.options"
+                                            [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                        </div>
+                                    </ng-container>
+                                    <div *ngIf="!hostOverviewWidgetData.cpuUtilizationChartData"
+                                        class="d-flex justify-content-center align-items-center"
+                                        style="width: 100%; height: 300px;">No data available.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 px-1 mb-2">
+                            <div class="card round-edge equalize-card">
+                                <app-spinner [name]="hostOverviewWidgetData.memoryUsageLoader"></app-spinner>
+                                <div class="card-header bg-transparent font-500 font-lg">Memory Usage</div>
+                                <div class="card-body p-0">
+                                    <ng-container *ngIf="hostOverviewWidgetData?.memoryUsageChartData">
+                                        <div echarts [options]="hostOverviewWidgetData?.memoryUsageChartData?.options"
+                                            [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                        </div>
+                                    </ng-container>
+                                    <div *ngIf="!hostOverviewWidgetData.memoryUsageChartData"
+                                        class="d-flex justify-content-center align-items-center"
+                                        style="width: 100%; height: 300px;">No data available.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 px-1">
+                            <div class="card round-edge equalize-card">
+                                <app-spinner [name]="hostOverviewWidgetData.diskInputOutputTimeLoader"></app-spinner>
+                                <div class="card-header bg-transparent font-500 font-lg">Disk I/O</div>
+                                <div class="card-body p-0">
+                                    <ng-container *ngIf="hostOverviewWidgetData?.diskInputOutputTimeChartData">
+                                        <div echarts
+                                            [options]="hostOverviewWidgetData?.diskInputOutputTimeChartData?.options"
+                                            [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                        </div>
+                                    </ng-container>
+                                    <div *ngIf="!hostOverviewWidgetData.diskInputOutputTimeChartData"
+                                        class="d-flex justify-content-center align-items-center"
+                                        style="width: 100%; height: 300px;">No data available.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 px-1">
+                            <div class="card round-edge equalize-card">
+                                <app-spinner [name]="hostOverviewWidgetData.systemLoadTimeLoader"></app-spinner>
+                                <div class="card-header bg-transparent font-500 font-lg">System Load Average</div>
+                                <div class="card-body p-0">
+                                    <ng-container *ngIf="hostOverviewWidgetData?.systemLoadTimeChartData">
+                                        <div echarts
+                                            [options]="hostOverviewWidgetData?.systemLoadTimeChartData?.options"
+                                            [defaultHeight]="300" style="width: 100%; height: 300px;">
+                                        </div>
+                                    </ng-container>
+                                    <div *ngIf="!hostOverviewWidgetData.systemLoadTimeChartData"
+                                        class="d-flex justify-content-center align-items-center"
+                                        style="width: 100%; height: 300px;">No data available.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- physical and cloud -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card round-edge mb-0">
+                <app-spinner [name]="'privateCloudWidgetLoader'"></app-spinner>
+                <div class="card-header bg-transparent font-500 font-lg">Physical And Cloud Infrastructure</div>
+                <div class="card-body" style="min-height: 200px;">
+                    <div class="row" *ngFor="let pcData of pcFastData">
+                        <ng-container
+                            *ngIf="pcData.platfromType == platformMapping.VMWARE_TYPE || pcData.platfromType == platformMapping.UNITED_PRIVATE_CLOUD_VCENTER">
+                            <div class="col-12">
+                                <private-cloud-widget-clusters [showCost]='false'
+                                    [pcData]="pcData"></private-cloud-widget-clusters>
+                            </div>
+                        </ng-container>
+                        <ng-container
+                            *ngIf="pcData.platfromType !== platformMapping.VMWARE_TYPE && pcData.platfromType !== platformMapping.UNITED_PRIVATE_CLOUD_VCENTER">
+                            <div class="col-12">
+                                <private-cloud-widget [pcData]="pcData"></private-cloud-widget>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <ng-container *ngIf="!pcFastData || pcFastData.length == 0">
+                        <div class="d-flex justify-content-center align-items-center py-5">No data available.</div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 mb-2">    
+    <div class="row">
+        <div class="col-12">
+            <div class="card round-edge mb-0">
+                <app-spinner [name]="alertsLoader"></app-spinner>
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                    <div class="d-flex justify-content-center align-items-center font-500">
+                        <span class="badge badge-secondary font-sm">{{count}}</span>
+                        <span class="ml-1 font-lg">Top 10 Critical Alerts</span>
+                    </div>
+                </div>
+                <div class="card-body py-2">
+                    <div class="row mx-0 d-flex justify-content-between align-items-center py-2">
+                        <div class="w-25">
+                            <search-box [searchValue]="currentCriteria.searchValue"
+                                (searched)="onSearched($event)"></search-box>
+                        </div>
+                        <div class="d-flex">
+                            <div class="mt-2">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-sm text-left">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Id</th>
+                                <th>Device Name</th>
+                                <th>Status</th>
+                                <th>Description</th>
+                                <th>Source</th>
+                                <th>Acknowledged</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let alerts of alertsViewData" truncateText>
+                                <td class="tdw-15">
+                                    <div [tooltip]="alerts.id">
+                                        {{alerts.id}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="alerts.deviceName">{{alerts.deviceName}}</div>
+                                </td>
+                                <td class="w-12">
+                                    <span [ngClass]="alerts.icon" [tooltip]="alerts.tooltipMessage">
+                                    </span>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="alerts.description">{{alerts.description}}</div>
+                                </td>
+                                <td class="tdw-12">
+                                    <div [tooltip]="alerts.source">{{alerts.source}}</div>
+                                </td>
+                                <td class="tdw-12">
+                                    <div [tooltip]="alerts.isAck">{{alerts.isAck}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="count">
+                    </table-entries>
+                    <table-pager *ngIf="alertsViewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <div class="text-center text-muted py-4" *ngIf="!alertsViewData.length">No records to display</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

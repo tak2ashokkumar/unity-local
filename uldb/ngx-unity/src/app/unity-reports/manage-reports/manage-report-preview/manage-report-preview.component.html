@@ -1,0 +1,62 @@
+<div class="card round-edge">
+    <div class="card-header bg-white p-1">
+        <div class="row p-0">
+            <div class="col-3">
+                <div class="py-1 ml-3">
+                    <span>Preview Report</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="pull-right">
+                    <button class="action-icons fas fa-download font-sm d-inline" tooltip="Download"
+                        (click)="downloadFile()" accessControl moduleName="Unity Report"
+                        accessType="Manage Unity Report" elementType="actionbtn"></button>
+                    <a class="nav-link py-1 text-right text-warning d-inline" (click)="goBack()">
+                        <i class="fa fa-arrow-left">&nbsp;</i>
+                        <span>Back to Manage Reports</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <ng-container [ngSwitch]="feature">
+            <ng-container *ngSwitchCase="'datacenter'">
+                <datacenter-report-preview [reportId]="reportId"></datacenter-report-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'private'">
+                <private-report-preview [reportId]="reportId"></private-report-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'public'">
+                <public-report-preview [reportId]="reportId"></public-report-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'ITSM'">
+                <itsm-report-preview [reportId]="reportId"></itsm-report-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'events'">
+                <event-mgmt-report-preview [reportId]="reportId"></event-mgmt-report-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'sustainability'">
+                <sustainability-reports-preview [reportId]="reportId"></sustainability-reports-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Cloud Inventory'">
+                <cloud-inventory-preview [reportId]="reportId"></cloud-inventory-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'DC Inventory'">
+                <dc-inventory-preview [reportId]="reportId"></dc-inventory-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Cost Analysis'">
+                <cost-analysis-preview [reportId]="reportId"></cost-analysis-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Performance'">
+                <performance-report-preview [reportId]="reportId"></performance-report-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'DevOps Automation'">
+                <cloud-inventory-preview [reportId]="reportId"></cloud-inventory-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'UnityOne ITSM'">
+                <cloud-inventory-preview [reportId]="reportId"></cloud-inventory-preview>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>

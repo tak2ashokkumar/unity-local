@@ -1,0 +1,148 @@
+<div class="row mb-2">
+    <div class="col-3 pr-1">
+        <div class="card rounded-edge mb-0">
+            <div class="card-body">
+                <div class="font-lg font-500">Total Operational Spend</div>
+                <div class="d-flex align-items-baseline">
+                    <div class="text-primary font-lg">$39,516</div>
+                    <div class="text-success">15%</div>
+                    <div class="text-muted">since last month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 px-1">
+        <div class="card rounded-edge mb-0">
+            <div class="card-body">
+                <div class="font-lg font-500">Shared vs Dedicated Allocation</div>
+                <div class="d-flex align-items-baseline">
+                    <div><span class="text-primary font-lg">60%</span> Shared</div>/
+                    <div><span class="text-primary font-lg">40%</span> Dedicated</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 px-1">
+        <div class="card rounded-edge mb-0">
+            <div class="card-body">
+                <div class="font-lg font-500">Tools in Use</div>
+                <div class="d-flex align-items-baseline">
+                    <div><span class="text-primary font-lg">10%</span></div>
+                    <div><span class="text-success">11%</span><span class="text-muted">since last month</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pl-1">
+        <div class="card rounded-edge mb-0">
+            <div class="card-body">
+                <div class="font-lg font-500">Tools Exceeding (>50%)</div>
+                <div class="d-flex align-items-baseline">
+                    <div>2</div>Tools
+                    <div class="text-success">5%</div><span class="text-muted">since last month</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-5 pr-1">
+        <div class="card equalize-card rounded-edge">
+            <div class="card-header bg-transparent font-lg font-500">
+                Spend by Component Type
+            </div>
+            <div class="card-body">
+                <ng-container *ngIf="infraCostChartViewData">
+                    <div echarts [options]="infraCostChartViewData.options"
+                        [extentions]="infraCostChartViewData.extensions" [defaultHeight]="260"></div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="col-7 pl-1">
+        <div class="card equalize-card rounded-edge">
+            <div class="card-header bg-transparent font-lg font-500 ">Budget vs Spend Analysis</div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Device Name</th>
+                            <th>Budget</th>
+                            <th>Actual Spend</th>
+                            <th>Used</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr setTableColumnWidth>
+                            <td>abc</td>
+                            <td class="text-truncate">asdf</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-transparent font-lg font-500">Detail View</div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Device Name</th>
+                            <th>Tools</th>
+                            <th>Component Type</th>
+                            <th>Applications</th>
+                            <th>Metric Tracked</th>
+                            <th>Rate Value</th>
+                            <th>Unit</th>
+                            <th>Cost</th>
+                            <th>Budget</th>
+                            <th>Source System</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr setTableColumnWidth>
+                            <td>abc</td>
+                            <td class="text-truncate">asdf</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                            <td>ad</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

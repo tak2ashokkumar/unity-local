@@ -1,0 +1,9 @@
+.cabinet-row {
+  display: flex;
+  flex-wrap: wrap;
+  .cabinet-col {
+    flex: 0 0 25%;
+    max-width: 25%;
+    padding: 0 5px;
+  }
+}

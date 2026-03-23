@@ -1,0 +1,144 @@
+<div class="card">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+        <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{viewData.length}}</span>
+            <span class="ml-1 font-lg">Ports</span>
+        </div>
+        <div class="d-flex justify-content-end align-items-center">
+            <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="addOrEditPort()"
+                accessControl moduleName="UnityConnect" accessType="Manage UnityConnect" elementType="btn">
+                <span class="fas fa-plus"></span>
+                <span class="font-xs-sm mx-1">Port</span>
+            </button>
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm text-left">
+            <thead class="bg-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Port</th>
+                    <th>Traffic</th>
+                    <th>Speed</th>
+                    <th>MAC Address</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of viewData">
+                    <td>{{view.mappedName}}</td>
+                    <td>{{view.portName}}</td>
+                    <td>
+                        <p *ngIf="view.bitsSent" class="mb-0">
+                            <i class="fa fa-arrow-circle-up"></i> {{view.bitsSent}}
+                        </p>
+                        <p *ngIf="view.bitsReceived" class="mb-0">
+                            <i class="fa fa-arrow-circle-down"></i> {{view.bitsReceived}}
+                        </p>
+                    </td>
+                    <td>{{view.speed}}</td>
+                    <td>{{view.macAddress}}</td>
+                    <td class="align-middle">
+                        <!-- <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
+                            [tooltip]="'Stats'" accessControl moduleName="UnityConnect"
+                            accessType="Manage UnityConnect" elementType="actionbtn">
+                        </button> -->
+                        <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" tooltip="Switch Statistics"
+                            (click)="goToGraph(view)" accessControl moduleName="UnityConnect"
+                            accessType="Manage UnityConnect" elementType="actionbtn"></button>
+                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" (click)="deletePort(view)"
+                            [tooltip]="'Delete'" accessControl moduleName="UnityConnect"
+                            accessType="Manage UnityConnect" elementType="actionbtn">
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No records to display</div>
+    </div>
+</div>
+
+<ng-template #portFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Port
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="portFormModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="portForm" [formGroup]="portForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label class="font-col-form-label" for="device_type">Device Type<em>*</em></label>
+                        <select id="device_type" class="form-control" formControlName="device_type"
+                            [class.is-invalid]="portFormErrors.device_type">
+                            <option value="" disabled>Select Device Type</option>
+                            <option *ngFor="let type of deviceTypes" [ngValue]="type"> {{type.displayName}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="portFormErrors.device_type">{{portFormErrors.device_type}}
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="font-col-form-label" for="device">Device<em>*</em></label>
+                        <select id="device" class="form-control" formControlName="device"
+                            [class.is-invalid]="portFormErrors.device">
+                            <option value="" disabled>Select Device</option>
+                            <option *ngFor="let device of devices" [ngValue]="device"> {{device.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="portFormErrors.device">{{portFormErrors.device}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label">Port Name<em>*</em></label>
+                        <input id="mapped_name" class="form-control" type="text" formControlName="mapped_name"
+                            [class.is-invalid]="portFormErrors.mapped_name">
+                        <div class="invalid-feedback" *ngIf="portFormErrors.mapped_name">{{portFormErrors.mapped_name}}
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="font-col-form-label" for="port">Port<em>*</em></label>
+                        <select id="port" class="form-control" formControlName="port"
+                            [class.is-invalid]="portFormErrors.port">
+                            <option value="" disabled>Select Port</option>
+                            <option *ngFor="let port of devicePorts" [ngValue]="port"> {{port.port_name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="portFormErrors.port">{{portFormErrors.port}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmAddOrEditPort()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="portFormModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDeleteRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Port will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

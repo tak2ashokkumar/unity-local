@@ -1,0 +1,65 @@
+
+
+<div ng-if="!loaded">
+  <h4><span class="fa fa-spinner spinning"></span> Loading...</h4>
+</div>
+
+<div ng-if="model.results.length > 0">
+  <table class="table">
+    <thead>
+    <tr>
+      <th class="{{ row.col_class }}" ng-repeat="row in rows">{{ row.description }}</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr ng-repeat="result in model.results"
+        ng-click="select(result, $index)"
+        ng-class="{'active success': result === selection.selected}">
+      <td ng-repeat="row in rows">
+        <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+        <div ng-if="row.opaque === 'stringTransform'">
+          {{ row.read(result) }}
+        </div>
+        <div ng-if="row.opaque === 'link'">
+          <a href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+        </div>
+        <div ng-if="row.opaque === 'string'">
+          {{ row.read(result).innerText }}        </div>
+      </td>
+
+    </tr>
+    </tbody>
+  </table>
+
+  <uib-pagination total-items="model.count" items-per-page="pageSize"
+                  ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+  <div ng-if="totals === true" ng-controller="TotalController">
+    <div class="row">
+      <div class="col-sm-12 col-md-12 col-lg-6">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            Totals (all pages)
+          </div>
+          <div class="panel-body">
+            <table class="table table-striped">
+              <tbody>
+              <tr ng-repeat="col in totalCols">
+                <td class="col-md-4">
+                  <div>{{ col.description }}</div>
+                </td>
+                <td>
+                  <div>{{ col.payload() }}</div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4 ng-if="loaded && model.results.length === 0">There are no {{ title.plural }} associated with this account.</h4>

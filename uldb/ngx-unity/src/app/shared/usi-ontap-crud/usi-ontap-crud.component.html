@@ -1,0 +1,124 @@
+<ng-template #eventTypeKeywordRef>
+    <div class="card mb-0">
+        <div class="card-header p-1">
+            <table-search-box [searchValue]="searchValue" (searched)="onSearched($event)">
+            </table-search-box>
+        </div>
+        <div class="card-body px-2 py-1">
+            <div class="mb-1 pointer-link" *ngFor="let tmpl of filteredTemplates; let i = index"
+                (click)="selectTemplate(i)">
+                <span class="fas fa-check text-success"
+                    [style.visibility]="tmpl.isSelected ? 'visible' : 'hidden'"></span>
+                <span class="ml-2">{{tmpl.template_name}}</span>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #create>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{actionMessage}} Ontap Cluster
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="form">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label for="name">Name<em>*</em></label>
+                        <input class="form-control" id="name" formControlName="name" type="text" placeholder="Name"
+                            [ngClass]="{'is-invalid' : formErrors.name}">
+                        <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="host_url">Host URL<em>*</em></label>
+                        <input class="form-control" id="host_url" formControlName="host_url" type="text"
+                            placeholder="Host URL" [ngClass]="{'is-invalid' : formErrors.host_url}">
+                        <div class="invalid-feedback" *ngIf="formErrors.host_url">{{formErrors.host_url}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="username">Username<em>*</em></label>
+                        <input class="form-control" id="username" formControlName="username" type="text"
+                            placeholder="Username" [ngClass]="{'is-invalid' : formErrors.username}">
+                        <div class="invalid-feedback" *ngIf="formErrors.username">{{formErrors.username}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="password">Password<em>*</em></label>
+                        <input class="form-control" id="password" formControlName="password" type="password"
+                            placeholder="Password" [ngClass]="{'is-invalid' : formErrors.password}">
+                        <div class="invalid-feedback" *ngIf="formErrors.password">{{formErrors.password}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="port">Port</label>
+                        <input class="form-control" id="port" formControlName="port" type="number" placeholder="Port"
+                            [ngClass]="{'is-invalid' : formErrors.port}">
+                        <div class="invalid-feedback" *ngIf="formErrors.port">{{formErrors.port}}</div>
+                    </div>
+                    <div class="form-group col-6" formGroupName="datacenter">
+                        <label class="form-col-form-label" for="dcId">Datacenter<em>*</em></label>
+                        <select id="dcId" class="form-control" formControlName="uuid"
+                            [class.is-invalid]="formErrors.datacenter.uuid">
+                            <option value="" disabled>Select Datacenter</option>
+                            <option *ngFor="let dc of datacenters" [value]="dc.uuid">{{dc.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.datacenter.uuid">{{formErrors.datacenter.uuid}}
+                        </div>
+                    </div>
+                    <!-- <div class="form-group col-12">
+                        <input id="monitor" class="form-check-form-input" type="checkbox" formControlName="monitor">
+                        <label for="monitor" class="form-col-form-label ml-1">
+                            <span class="checkbox-text">Activate Monitoring</span>
+                        </label>
+                    </div> -->
+                    <div class="form-group col-6" formGroupName="collector">
+                        <label class="font-col-form-label" for="collectoruuid">Collector<em>*</em></label>
+                        <select id="collectoruuid" class="form-control" formControlName="uuid"
+                            [class.is-invalid]="formErrors.collector.uuid">
+                            <option value="" disabled>Select Collector</option>
+                            <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="formErrors.collector.uuid">{{formErrors.collector.uuid}}</div>
+                    </div>
+                    <div class="form-group col-12">
+                        <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+                            <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+                            </tag-input-dropdown>
+                        </tag-input>
+                    </div>
+                    <div class="form-group col-12" *ngIf="isTenantOrg && form.controls.monitor.value">
+                        <label class="form-col-form-label">Templates</label>
+                        <span class="text-danger ml-2" *ngIf="formErrors.mtp_templates">{{formErrors.mtp_templates}}
+                        </span>
+                        <div class="card">
+                            <div class="card-body pb-5">
+                                <span *ngIf="selectedTemplates.length">
+                                    <span *ngFor="let tmpl of selectedTemplates; let i = index;"
+                                        class="badge badge-pill badge-secondary font-xs py-2 mb-2 mr-2">
+                                        {{tmpl.template_name}}
+                                        <span class="fas fa-times pointer-link pl-1"
+                                            (click)="unSelectTemplate(i)"></span>
+                                    </span>
+                                </span>
+                                <button class="action-icons fas fa-plus" containerClass="modalPopover"
+                                    [popover]="eventTypeKeywordRef" placement="bottom" container="body"
+                                    [outsideClick]="true" (onHidden)="updateSelectedTemplates()"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" (click)="onSubmit()" type="button">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,58 @@
+<form class="form" [formGroup]="awsForm" *ngIf="awsForm">
+    <div class="row">
+        <div class="form-group"
+            [ngClass]="{'col-6': !awsForm.contains('new_account_name'), 'col-2': awsForm.contains('new_account_name')}">
+            <label for="account_name">Account Name<em>*</em></label>
+            <select id="account_name" class="form-control" formControlName="account_name"
+                [ngClass]="{'is-invalid' : formErrors.account_name}"
+                (change)="onAccountNameChange($event.target.value)">
+                <option [value]="''" disabled>Select Account</option>
+                <option [value]="account.accountName" *ngFor="let account of accounts">{{account.accountName}}</option>
+                <option [value]="'newaccount'">Add New Account</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="formErrors.account_name">{{formErrors.account_name}}</div>
+        </div>
+        <div class="form-group col-4" *ngIf="awsForm.contains('new_account_name')">
+            <label for="account_id">New Account Name<em>*</em></label>
+            <input class="form-control" id="account_name" formControlName="new_account_name" type="text"
+                placeholder="Account Name" [ngClass]="{'is-invalid' : formErrors.new_account_name}">
+            <div class="invalid-feedback" *ngIf="formErrors.new_account_name">{{formErrors.new_account_name}}</div>
+        </div>
+
+        <div class="form-group"
+            [ngClass]="{'col-6': !awsForm.contains('new_account_id'), 'col-2': awsForm.contains('new_account_id')}">
+            <label for="account_name">Account ID<em>*</em></label>
+            <select id="account_name" class="form-control" formControlName="account_id"
+                [ngClass]="{'is-invalid' : formErrors.account_id}">
+                <option [value]="''" disabled>Select Account ID</option>
+                <option *ngFor="let accountId of accountIds" [value]="accountId">{{accountId}}</option>
+                <option [value]="'newaccountid'" placeholder="Add New Account ID">Add New Account ID</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="formErrors.account_id">{{formErrors.account_id}}</div>
+        </div>
+
+        <div class="form-group col-4" *ngIf="awsForm.contains('new_account_id')">
+            <label for="account_id">New Account ID<em>*</em></label>
+            <input class="form-control" id="account_id" formControlName="new_account_id" type="text"
+                placeholder="Account Id" [ngClass]="{'is-invalid' : formErrors.new_account_id}">
+            <div class="invalid-feedback" *ngIf="formErrors.new_account_id">{{formErrors.new_account_id}}</div>
+        </div>
+
+        <div class="form-group col-6">
+            <label for="description">Desciption</label>
+            <input class="form-control" id="description" formControlName="description" type="text"
+                placeholder="Enter Description">
+        </div>
+        <div class="form-group col-6 mt-4">
+            <input type="file" accept=".csv" class="form-control" #file hidden
+                [ngClass]="{'is-invalid' : formErrors.aws_file}" (change)="onFileChange($event.target.files)">
+
+            <button class="btn btn-brand btn-lg btn-light" type="button" (click)="file.click()">
+                <span class="font-sm">Select File to Upload</span>
+                <i class="fa fa-upload pull-right bg-warning ml-3"></i>
+            </button>
+            <span class="d-block text-wrap mt-2">{{uploadedFileName}}</span>
+            <div class="invalid-feedback" *ngIf="formErrors.aws_file">{{formErrors.aws_file}}</div>
+        </div>
+    </div>
+</form>

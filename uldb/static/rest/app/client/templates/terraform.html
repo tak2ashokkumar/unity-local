@@ -1,0 +1,102 @@
+<style type="text/css">
+  /*.content-area-inside  { background: #fff }*/
+</style>
+<loading loader="{{loader}}"></loading>
+
+
+<div class="row page_wrapper" ng-if="!showConsole">
+  <section id="no-more-tables">
+    <div ng-if="terraform_vms !== undefined">
+      <table class="Summary-box table table-condensed table-hover" ng-if="terraform_vms.length > 0">
+        <thead>
+          <tr>
+            <th ng-repeat="row in tf_headers">
+              <div>{{ row.title }}</div>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+        <tr ng-repeat="result in terraform_vms | filter: searchKeyword as filtered">
+            <td ng-repeat="row_data in tf_headers" ng-class="{'width12p' :(row_data.key == 'actions')}">
+              <span ng-if="row_data.key == 'cloud'">
+                  {{ result[row_data.key].name}}
+                </span>
+                <span ng-if="row_data.key == 'created_at'">
+                  {{ result[row_data.key] | unityDate : $root.users_timezone}}
+                </span>
+                <span ng-if="row_data.key == 'status'">
+                  <device-up ng-if="(result[row_data.key] | powerState) === 'On'"></device-up>
+                  <device-down ng-if="(result[row_data.key] | powerState) === 'Off'"></device-down>
+                  <span ng-if="((result[row_data.key] | powerState) !== 'Off') && ((result[row_data.key] | powerState) !== 'On')">
+                    N/A
+                  </span>
+                </span>
+                <span ng-if="row_data.key == 'size'">
+                    {{(result[row_data.key]/(1024*1024))|number: 1}}
+                </span>
+                <span
+                    ng-if="row_data.key != 'created_at' && row_data.key != 'actions' && row_data.key != 'cloud' && row_data.key != 'status'">
+                  {{ result[row_data.key]}}
+                </span>
+                <span ng-if="row_data.key == 'actions'">
+                    <div class="action-icons action-icons-div">
+                      <span ng-if="(result.status)">
+
+                        <span tooltip-class="customClass" uib-tooltip=" Open in same tab ">
+                            <a ng-click="console_terraform(result.instance_id)">
+                              <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                            </a>
+                        </span>
+                        <span tooltip-class="customClass"  uib-tooltip="Open in new tab ">
+                            <a href="/vm-console-client#/services/terraform/{{result.instance_id}}/" target="_blank">
+                              <i class="fa fa-external-link" aria-hidden="true"></i>
+                            </a>
+                        </span>
+                      </span>
+
+                      <span ng-if="(!result.status)">
+                        <span tooltip-class="customClass" uib-tooltip="VM is Powered Off">
+                            <a ng-click="" ng-class="{'fa-disabled': !result.status}">
+                              <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': !result.status}"></i>
+                            </a>
+                        </span>
+                        <span tooltip-class="customClass" uib-tooltip="VM is Powered Off">
+                            <a href="" target="_blank" ng-class="{'fa-disabled': !result.status}">
+                              <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': !result.status }"></i>
+                            </a>
+                        </span>
+                      </span>
+
+                      <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                        <a ng-click="manage_request_terraform(result.vm_name, 'Terraform', result)">
+                          <i class="fa fa-ticket" aria-hidden="true"></i>
+                        </a>
+                      </span>
+                   </div>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+      </table>
+      <div ng-if="terraform_vms.length === 0" class="content-wrapper">
+        <div class="no-record no-record-warning">
+          <span class="no-record-icon fa fa-info-circle"></span>
+          <span class="no-record-text">Terraform is not activated. Please 
+            <span tooltip-class="customClass">
+              <a ng-click="create_terraform_request()" style="color: #378ad8 !important; cursor:pointer;">
+                click here 
+              </a>
+            </span>
+              to contact administrator for activation.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="row page_wrapper" ng-if="showConsole">
+  <span id="vm_error"  style="color:red"></span>
+  
+  <div id="terminal-container" style="position:absolute;width:100%;height:100%;top:0;left:0"><span class="fa fa-times-circle pull-right boxclose" ng-click="closeVM()"></span></div>
+</div>

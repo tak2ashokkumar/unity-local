@@ -1,0 +1,129 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h3>{{ vdcresult.name }}</h3>
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="Virtual Datacenter Details"><detailtable cols="vdccols" result="vdcresult"></detailtable></panelhalf>
+  </div>
+  
+</div>
+
+<div class="row">
+  <div class="col-sm-4 col-md-4 col-lg-4">
+    <panelhalf heading="Servers">
+      <table class="table table-striped" ng-if="serveravailable">
+        <thead>
+        <tr>         
+          <th>Name</th>         
+           
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="sr in serverdet">       
+          <th><a href="" class="serversysname" ng-click="ShowInstanceDetails(sr.id)">{{ sr.instance_name }}</a></th>
+        </tr>
+        </tbody>
+      </table>
+      <div ng-if="serveravailable == false">No Data Available </div>
+    </panelhalf>
+  </div>
+
+  <div class="col-sm-4 col-md-4 col-lg-4">
+    <panelhalf heading="SANs">
+      <table class="table table-striped" ng-if="sanavailable">
+        <thead>
+        <tr>         
+          <th>Name</th>         
+          
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="sr in sanserverdet">       
+          <th><a href="" class="serversysname" ng-click="ShowInstanceDetails(sr.id)">{{ sr.instance_name }}</a></th>  	 
+        </tr>
+        </tbody>
+      </table>
+      <div ng-if="sanavailable == false">No Data Available </div>
+    </panelhalf>
+  </div>
+
+  <div class="col-sm-4 col-md-4 col-lg-4">
+    <panelhalf heading="Switches">
+      <table class="table table-striped" ng-if="switchavailable">
+        <thead>
+        <tr>         
+	  <th>Name</th> 
+	       
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="sw in switchdet">   	   
+	  <th><a href="" class="serversysname" ng-click="ShowSwitchDetails(sw.id)">{{ sw.name }}</a></th>         
+	  
+        </tr>
+        </tbody>
+      </table>
+      <div ng-if="switchavailable == false">No Data Available </div>
+    </panelhalf>
+  </div>
+
+ 
+</div>
+
+
+
+
+
+<div class="row">
+   <div class="col-sm-6 col-md-6 col-lg-6">
+    <panelhalf heading="Firewalls">
+      <table class="table table-striped" ng-if="firewallavailable">
+        <thead>
+        <tr>
+          <th>Name</th>
+          
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="fw in firewalldet">
+          <th><a href="" class="serversysname" ng-click="ShowFirewallDetails(fw.id)">{{ fw.name }}</a></th>
+          
+        </tr>
+        </tbody>
+      </table>
+      <div ng-if="firewallavailable == false">No Data Available </div>
+    </panelhalf>
+  </div>
+
+  <div class="col-sm-6 col-md-6 col-lg-6">
+    <panelhalf heading="Loadbalancers">
+      <table class="table table-striped" ng-if="loadbalanceravailable">
+        <thead>
+        <tr>
+          <th>Name</th>
+         
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="lb in loadbalancerdet">
+          <th><a href="" class="serversysname" ng-click="ShowLoadbalancerDetails(lb.id)">{{ lb.name }}</a></th>         
+        </tr>
+        </tbody>
+      </table>
+      <div ng-if="loadbalanceravailable == false">No Data Available </div>
+    </panelhalf>
+  </div>
+</div>
+
+
+

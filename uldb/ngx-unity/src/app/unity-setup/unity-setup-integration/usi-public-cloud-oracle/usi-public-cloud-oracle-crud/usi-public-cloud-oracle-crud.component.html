@@ -1,0 +1,452 @@
+<!-- <div class="container-fluid mt-4">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <span class="font-lg font-500">Integration</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'credentialForm'"
+                                        (click)="manageActiveForm('credentialForm')">
+                                        <span class="fas fa-cog font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Add Credentials</label>
+                                </div>
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'filterForm'"
+                                        (click)="manageActiveForm('filterForm')">
+                                        <span class="fas fa-clipboard-list font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Filters</label>
+                                </div>
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'scheduleForm'"
+                                        (click)="manageActiveForm('scheduleForm')">
+                                        <span class="fas fa-clock font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Scheduled Discovery</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 divider-wrap">
+                                <hr class="divider-line w-85 ml-0">
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col">
+                                <ng-container [ngSwitch]="activeForm">
+                                    <ng-container *ngSwitchCase="'credentialForm'">
+                                        <ng-container *ngTemplateOutlet="credentialFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'filterForm'">
+                                        <ng-container *ngTemplateOutlet="filterFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'scheduleForm'">
+                                        <ng-container *ngTemplateOutlet="scheduleFormRef"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- <ng-template #credentialFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="credentialForm" [formGroup]="credentialForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="name" class="form-col-form-label">Account Name<em>*</em></label>
+                                <input id="name" class="form-control" type="text" formControlName="name"
+                                    placeholder="Enter Account Name" [class.is-invalid]="credentialFormErrors.name">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.name">
+                                    {{credentialFormErrors.name}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="user_ocid" class="form-col-form-label">User
+                                    ID<em>*</em></label>
+                                <input id="user_ocid" class="form-control" type="text" formControlName="user_ocid"
+                                    placeholder="Enter User ID" [class.is-invalid]="credentialFormErrors.user_ocid">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.user_ocid">
+                                    {{credentialFormErrors.user_ocid}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="tenancy_ocid" class="form-col-form-label">Tenancy
+                                    ID<em>*</em></label>
+                                <input id="tenancy_ocid" class="form-control" type="text" formControlName="tenancy_ocid"
+                                    placeholder="Enter Tenancy ID"
+                                    [class.is-invalid]="credentialFormErrors.tenancy_ocid">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.tenancy_ocid">
+                                    {{credentialFormErrors.tenancy_ocid}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="region" class="form-col-form-label">Region<em>*</em></label>
+                                <multiselect-dropdown [options]="regions" [settings]="regionSettings"
+                                    class="form-control p-0" style="height:auto;" formControlName="region"
+                                    [ngClass]="{'is-invalid' : credentialFormErrors.region}"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.region">
+                                    {{credentialFormErrors.region}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="fingerprint" class="form-col-form-label">Fingerprint<em>*</em></label>
+                                <input id="fingerprint" class="form-control" type="text" formControlName="fingerprint"
+                                    placeholder="Enter Fingerprint"
+                                    [class.is-invalid]="credentialFormErrors.fingerprint">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.fingerprint">
+                                    {{credentialFormErrors.fingerprint}}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="col-3 col-form-label" for="file-pem-input">Private
+                                        Key<em>*</em></label>
+                                    <input class="form-control" id="file-pem-input" name="file-pem-input" type="file"
+                                        accept=".pem" [ngClass]="{'is-invalid' : credentialFormErrors.key_content}"
+                                        (change)="handlePrivateKeyInput($event.target.files)">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.key_content">
+                                        {{credentialFormErrors.key_content}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitCredentialForm()">Next</button>
+        </div>
+    </div>
+</ng-template> -->
+
+<!-- <ng-template #filterFormRef>
+    <div class="card border-0">
+        <div class="card-body text-black">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="filterForm" [formGroup]="filterForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="discover_services" class="form-col-form-label">Oracle Resource
+                                    Services<em>*</em></label>
+                                <select id="discover_services" class="form-control" formControlName="discover_services"
+                                    [class.is-invalid]="filterFormErrors.discover_services">
+                                    <option value="" disabled>Select</option>
+                                    <option value="All">All</option>
+                                    <option value="Custom">Custom</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="filterFormErrors.discover_services">
+                                    {{filterFormErrors.discover_services}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="services" class="form-col-form-label">
+                                    <span>Services</span>
+                                    <ng-container
+                                        *ngIf="filterForm.get('discover_services').value == 'Custom'"><em>*</em></ng-container>
+                                </label>
+                                <multiselect-dropdown id="services" [options]="services" [settings]="serviceSettings"
+                                    class="form-control p-0" style="height:auto;" formControlName="services"
+                                    [ngClass]="{'is-invalid' : filterFormErrors.services}"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="filterFormErrors.services">
+                                    {{filterFormErrors.services}}</div>
+                            </div>
+                            <div class="col-3 form-group">
+                                <input id="is_managed" class="ut-checkbox" type="checkbox" formControlName="is_managed">
+                                <label class="primary" for="is_managed">Manage</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitFilterForm()">Next</button>
+        </div>
+    </div>
+</ng-template> -->
+
+<!-- <ng-template #scheduleFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <unity-schedule></unity-schedule>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(false)">Save</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(true)">Save & Run</button>
+        </div>
+    </div>
+</ng-template> -->
+
+
+<div class="container-fluid mt-4">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <span class="font-lg font-500">Integration</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'credentialForm'"
+                                        (click)="manageActiveForm('credentialForm')">
+                                        <span class="fas fa-cog font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Add Credentials</label>
+                                </div>
+                                <div *ngIf="credentialForm">
+                                    <div class="d-flex flex-column align-items-center step"
+                                        *ngIf="credentialForm.value.discover_resources">
+                                        <span class="badge icon-wrap pointer-link"
+                                            [class.active]="activeForm == 'filterForm'"
+                                            (click)="manageActiveForm('filterForm')">
+                                            <span class="fas fa-clipboard-list font-xl"></span>
+                                        </span>
+                                        <label class="mt-1 font-md">Filters</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'scheduleForm'"
+                                        (click)="manageActiveForm('scheduleForm')">
+                                        <span class="fas fa-clock font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Scheduled Discovery</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 divider-wrap">
+                                <hr class="divider-line w-85 ml-0">
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col">
+                                <ng-container [ngSwitch]="activeForm">
+                                    <ng-container *ngSwitchCase="'credentialForm'">
+                                        <ng-container *ngTemplateOutlet="credentialFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'filterForm'">
+                                        <ng-container *ngTemplateOutlet="filterFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'scheduleForm'">
+                                        <ng-container *ngTemplateOutlet="scheduleFormRef"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #credentialFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <form *ngIf="credentialForm" [formGroup]="credentialForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="name" class="form-col-form-label">Account Name<em>*</em></label>
+                                <input id="name" class="form-control" type="text" formControlName="name"
+                                    placeholder="Enter Account Name" [class.is-invalid]="credentialFormErrors.name">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.name">
+                                    {{credentialFormErrors.name}}</div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col d-flex align-items-center justify-content-start">
+                                <div class="w-25">
+                                    <input id="discover_resources" class="ut-checkbox" type="checkbox"
+                                        formControlName="discover_resources">
+                                    <label for="discover_resources" class="primary mb-0">Discover Resources</label>
+                                </div>
+                                <div class="w-25">
+                                    <input id="discover_dependency" class="ut-checkbox" type="checkbox"
+                                        formControlName="discover_dependency">
+                                    <label for="discover_dependency" class="primary mb-0">Discover Topology</label>
+                                </div>
+                                <div class="w-22">
+                                    <input id="is_managed" class="ut-checkbox" type="checkbox"
+                                        formControlName="is_managed">
+                                    <label for="is_managed" class="primary mb-0">Manage Account</label>
+                                </div>
+                                <div class="w-20">
+                                    <input id="cost_analysis" class="ut-checkbox" type="checkbox"
+                                        formControlName="cost_analysis">
+                                    <label for="cost_analysis" class="primary mb-0">Cost Analysis</label>
+                                </div>
+                                <div class="w-22">
+                                    <input id="ingest_event" class="ut-checkbox" type="checkbox"
+                                        formControlName="ingest_event">
+                                    <label for="ingest_event" class="primary mb-0">Event Ingestion</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border round-edge p-4 position-relative mt-2 mx-0"
+                            *ngIf="credentialForm.get('discover_resources').value">
+                            <div class="pb-2 mb-3 bg-white position-absolute section-name">Discover Resources
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="user_ocid" class="form-col-form-label">User
+                                    ID<em>*</em></label>
+                                <input id="user_ocid" class="form-control" type="text" formControlName="user_ocid"
+                                    placeholder="Enter User ID" [class.is-invalid]="credentialFormErrors.user_ocid">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.user_ocid">
+                                    {{credentialFormErrors.user_ocid}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="tenancy_ocid" class="form-col-form-label">Tenancy
+                                    ID<em>*</em></label>
+                                <input id="tenancy_ocid" class="form-control" type="text" formControlName="tenancy_ocid"
+                                    placeholder="Enter Tenancy ID"
+                                    [class.is-invalid]="credentialFormErrors.tenancy_ocid">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.tenancy_ocid">
+                                    {{credentialFormErrors.tenancy_ocid}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="region" class="form-col-form-label">Region<em>*</em></label>
+                                <multiselect-dropdown [options]="regions" [settings]="regionSettings"
+                                    class="form-control p-0" style="height:auto;" formControlName="region"
+                                    [ngClass]="{'is-invalid' : credentialFormErrors.region}"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.region">
+                                    {{credentialFormErrors.region}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="fingerprint" class="form-col-form-label">Fingerprint<em>*</em></label>
+                                <input id="fingerprint" class="form-control" type="text" formControlName="fingerprint"
+                                    placeholder="Enter Fingerprint"
+                                    [class.is-invalid]="credentialFormErrors.fingerprint">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.fingerprint">
+                                    {{credentialFormErrors.fingerprint}}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label class="col-3 col-form-label" for="file-pem-input">Private
+                                        Key<em>*</em></label>
+                                    <input class="form-control" id="file-pem-input" name="file-pem-input" type="file"
+                                        accept=".pem" [ngClass]="{'is-invalid' : credentialFormErrors.key_content}"
+                                        (change)="handlePrivateKeyInput($event.target.files)">
+                                    <div class="invalid-feedback" *ngIf="credentialFormErrors.key_content">
+                                        {{credentialFormErrors.key_content}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <usi-event-ingestion-crud [paramList]="paramList" [instance]="instance"
+                            [eventIngestionCheck]="credentialForm.get('ingest_event').value" [eventAttribute]="'Oracle'"
+                            [defaultEventIngestionValues]="defaultEventIngestionValues"
+                            (formUpdate)="onFormUpdate($event)"></usi-event-ingestion-crud>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button"
+                (click)="onSubmitCredentialForm()">{{credFormButtonName}}</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #filterFormRef>
+    <div class="card border-0">
+        <div class="card-body text-black">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="filterForm" [formGroup]="filterForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row mx-0">
+                            <div class="col-6 form-group">
+                                <label for="discover_services" class="form-col-form-label">Oracle Resource
+                                    Services<em>*</em></label>
+                                <select id="discover_services" class="form-control" formControlName="discover_services"
+                                    [class.is-invalid]="filterFormErrors.discover_services">
+                                    <option value="" disabled>Select</option>
+                                    <option value="All">All</option>
+                                    <option value="Custom">Custom</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="filterFormErrors.discover_services">
+                                    {{filterFormErrors.discover_services}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="services" class="form-col-form-label">
+                                    <span>Services</span>
+                                    <ng-container
+                                        *ngIf="filterForm.get('discover_services').value == 'Custom'"><em>*</em></ng-container>
+                                </label>
+                                <multiselect-dropdown id="services" [options]="services" [settings]="serviceSettings"
+                                    class="form-control p-0" style="height:auto;" formControlName="services"
+                                    [ngClass]="{'is-invalid' : filterFormErrors.services}"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="filterFormErrors.services">
+                                    {{filterFormErrors.services}}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitFilterForm()">Next</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <unity-schedule></unity-schedule>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(false)">Save</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(true)">Save & Run</button>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,177 @@
+<style type="text/css">
+    .uibtab-header{
+        font-size: 16px;
+    }
+    .centertext{
+        text-align: center;
+    }
+    .text14px{
+        font-size: 14px;
+    }
+
+</style>
+<div class="modal-header">
+    <h3 class="modal-title">Activate Monitoring for devices </h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <!-- Tabs start -->
+        <uib-tabset active="activeJustified" justified="true">
+            <!-- VMWare VM Monitoring tab container div -->
+            <uib-tab index="0" classes="uibtab-header">
+                <uib-tab-heading>
+                <h2  style="font-size:18px"><b>VM Monitoring</b></h2>
+                </uib-tab-heading>
+                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+                     <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingright centertext">
+                         <span style="font-size:15px;"> Select VM Type to update:</span>
+                     </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingright">
+                        <select name="cloud" id="cloud" ng-options="cloud as cloud for cloud in cloud_type_list" ng-model="cloud_type">
+                            <option value="" disabled>Select VM type</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+                 </div>
+                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingright">
+                        <div class="row middle-wrapper">
+                            <div class="row cardbox-header text14px"> VM List  </div>
+                            <div class="row Dashwrap">
+                                <h2 style="font-size:15px"> Download VM List to update monitoring details</h2>
+                            </div>
+                            <div class="row Dashwrap">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                    <div class="form-group">
+                                        <a href="/customer/enable_vm_monitoring/?cloud_type={{ cloud_type }}" >
+                                           <button class="btn btn-default" type="button" ng-disabled="!cloud_type">Download Now</button>
+                                       </a>
+                                   </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 paddingright">
+                        <div class="row middle-wrapper">
+                            <div class="row cardbox-header text14px">Upload Sheet</div>
+                            <form role="form" name="vm_form">
+                                <div class="row Dashwrap">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="form-group">
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn"
+                                                style="pointer-events:none;">Select File </button>
+                                                <button type="button" class="btn btn-primary"
+                                                ngf-select ng-model="vm_file" ngf-model-invalid="errorFile"
+                                                name="vm_file" required ngf-max-size="1MB">
+                                                    <i class="fa fa-upload"></i>
+                                                </button>
+                                                <span ng-if="vm_form.vm_file.$valid"> &nbsp; &nbsp; {{vm_file.name}} </span>
+                                                <span ng-if="vm_form.vm_file.$error.maxSize">
+                                                    &nbsp; &nbsp; File too large [Uploaded {{errorFile.size / 1000000 | number : 1}}MB : Max allowed 1MB]
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row Dashwrap">
+                                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-default" ng-disabled="!cloud_type || !vm_form.vm_file.$valid || vm_form.vm_file.$error.maxSize" ng-click="update_vms(vm_file, cloud_type)" type="submit"> Upload </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </uib-tab>
+            <!-- Other Devices Tab Monitoring Container div -->
+            <uib-tab index="1" classes="uibtab-header">
+                <uib-tab-heading>
+                    <h2 style="font-size:18px"><b>Device Monitoring</b></h2>
+                </uib-tab-heading>
+                <div>
+                    <div class="col-xs-12 content-wrapper" ng-if="!user_obj.onb_status.monitoring_start">
+                        <p style="font-size : 15px;text-align:center"> 
+                            <!-- Activating Managenment Console for a device requires management IP of the device. <br>
+                            So Please make sure to provide Management Ip's for all the devices onboarded.<br><br> -->
+                            Click on the button below to activate monitoring for onboarded devices.
+                        </p>
+                        <div class="col-xs-5"></div>
+                            <div class="col-xs-2"><button class="btn btn-default" ng-click="activate_monitoring()" style="margin-top:20px;"> Activate </button></div>
+                        <div class="col-xs-5"></div>
+                    </div>
+
+                    <div class="col-xs-12" style="text-align : center" ng-if="user_obj.onb_status.monitoring_start && !user_obj.onb_status.monitoring_error && !user_obj.onb_status.monitoring_end">
+                        <!-- Connectivity Status show modal -->
+                        <span class="badge warning_badge"> 
+                            <i class="fa fa-exclamation-triangle"></i>
+                        </span> 
+                        <p class="content-wrapper" style="font-size : 15px;text-align:center"> 
+                            Monitoring configuration is in progress. <br> 
+                            Please wait untill it gets completed. <br>
+                            <!-- Contact our team to clarify Your queries -->
+                        </p>
+                    </div>
+
+                    <div class="col-xs-12" style="text-align : center" ng-if="user_obj.onb_status.monitoring_error">
+                        <!-- Connectivity Status show modal -->
+                        <span class="badge error_badge"> 
+                            <i class="fa fa-close"></i>
+                        </span> 
+                        <p class="content-wrapper" style="font-size : 15px;margin-bottom:0px; padding-top:10px !important; padding-bottom:0px !important;"> 
+                            We encountered issues while activating monitoring for below specified devices. Please try again or contact support.
+                        </p>
+
+                        <div class="row content-wrapper">
+                            <table class="table table-bordered table-condensed" >
+                                <thead>
+                                    <tr>
+                                        <th> Device type </th>
+                                        <th class="text-center"> Devices </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(device_type, devices) in monit_failed_devices">
+                                        <td  style="text-transform:capitalize;"> {{device_type}} </td>
+                                        <td>
+                                            <span ng-repeat="device in devices">&nbsp; {{device}},</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row content-wrapper" style="text-align : center">
+                            <div class="col-xs-5"></div>
+                                <div class="col-xs-2"><button class="btn btn-default pull-left" ng-click="activate_monitoring()" style="margin-top:20px;"> Try again </button></div>
+                            <div class="col-xs-5"></div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12" style="text-align : center" ng-if="(monit_failed_devices.length===0)">
+                        <!-- Connectivity Status show modal -->
+                        <span class="badge success_badge"> 
+                            <i class="fa fa-check"></i>
+                        </span> 
+                        <p class="content-wrapper" style="font-size : 14px;"> 
+                            Activated Monitoring for all the onboared devices. 
+                        </p>
+                    </div>
+                </div>
+            </uib-tab>
+         </uib-tabset>
+         <!-- Tabs end -->
+    </div>
+</div>
+<div class="modal-footer modal-buttons">
+    <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+      Close
+    </button>
+    <!-- <button type="submit" class="btn btn-default" ng-click="create(request)">
+      Next
+    </button> -->
+</div>

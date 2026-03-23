@@ -1,0 +1,100 @@
+@import "variables";
+// .table.scan-op tr > th,
+// .table.scan-op tr > td {
+//   white-space: nowrap;
+// }
+
+// .table.scan-op th:last-child,
+// .table.scan-op td:last-child {
+//   position: sticky;
+//   right: 0;
+//   background-color: #e4e8eb;
+// }
+
+// .tableFixHead thead th {
+//   position: sticky;
+//   top: 0;
+//   z-index: 1;
+//   background-color: #fff;
+// }
+
+.newRowColor {
+  background-color: #E5F6EF;
+}
+
+.deletedRowColor {
+  background-color: #FFF1F1;
+}
+
+.labelColor {
+  color: #5c6873;
+}
+
+.subHeaderFont {
+  font-weight: 500;
+}
+
+/* Base button styles */
+.boarding-icon {
+  padding: 5px 9px 5px 9px;
+  border-radius: 50%;
+  background-color: white;
+  color: $primary; /* Default text-primary color */
+  border: 1px solid $gray-300;
+  color: $primary;
+  transition: all 0.3s ease;
+}
+
+.boarding-icon:hover {
+  background-color: $primary;
+  color: white;
+}
+
+/* State 1: Not onboarded (text-danger state) */
+.boarding-icon.not-onboard {
+  color: $danger;
+  border: 1px solid $gray-300;
+}
+
+.boarding-icon.not-onboard:hover {
+  background-color: $danger;
+  color: white;
+}
+
+/* State 2: Onboarding in progress (spinner) */
+.boarding-icon.loading {
+  color: secondary; /* Could be text-primary or any other color you prefer for loading */
+  border: 1px solid secondary;
+}
+
+.boarding-icon.loading:hover {
+  background-color: secondary;
+  color: white;
+}
+
+/* State 3: Onboarded (text-success state) */
+.boarding-icon.onboarded {
+  color: $success-500;
+  border: 1px solid $gray-300;
+}
+
+.boarding-icon.onboarded:hover {
+  background-color: $success-500;
+  color: white;
+}
+
+.boarding-icon:focus {
+  outline: none;
+  border: none;
+}
+
+/* State 4: Pending onboarding (text-primary state) */
+// .boarding-icon.pending {
+//   color: $primary;
+//   border: 1px solid $gray-300;
+// }
+
+// .boarding-icon.pending:hover {
+//   background-color: $primary;
+//   color: white;
+// }

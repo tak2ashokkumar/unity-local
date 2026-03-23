@@ -1,0 +1,47 @@
+<div class="card">
+  <app-spinner [name]="'swdetails'"></app-spinner>
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title ">
+    <h4 class="card-title font-lg">Details</h4>
+  </div>
+  <div class="card-body pt-0">
+    <div class="row align-items">
+      <div class="col">
+        <table class="table table-responsive-sm">
+          <tbody>
+            <tr>
+              <td>Hardware</td>
+              <td>{{data?.hardware}}</td>
+            </tr>
+            <tr>
+              <td>Operating system</td>
+              <td>{{data?.os}}</td>
+            </tr>
+            <tr>
+              <td>System name</td>
+              <td>{{data?.sysName}}</td>
+            </tr>
+            <tr>
+              <td>Contact</td>
+              <td>{{data?.sysContact}}</td>
+            </tr>
+            <tr>
+              <td>Location</td>
+              <td>{{data?.location}}</td>
+            </tr>
+            <tr>
+              <td>Uptime</td>
+              <td [ngClass]="{'text-danger':data?.status == '0'}"><span *ngIf="data?.status == '0'">Down </span>{{data?.uptime
+                | SecToDays}}</td>
+            </tr>
+            <tr>
+              <td>Last reboot</td>
+              <td>
+                {{data?.last_rebooted | date:'MMM d, y, h:mm:ss a zzzz'}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

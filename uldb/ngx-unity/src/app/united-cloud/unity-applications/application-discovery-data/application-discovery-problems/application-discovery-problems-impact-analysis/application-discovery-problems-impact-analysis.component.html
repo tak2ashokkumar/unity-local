@@ -1,0 +1,155 @@
+<div class="container-fluid px-2" *ngIf="impactAnalysisViewData">
+
+    <!-- ================= SUMMARY ================= -->
+    <div class="mb-3">
+
+        <div class="d-flex mb-2">
+            <span class="text-muted me-2">Affected Frontends : </span>
+            <span class="font-500">
+                {{ impactAnalysisViewData?.summary?.affectedFrontend }}
+            </span>
+        </div>
+
+        <div class="d-flex mb-2 align-items-center flex-wrap position-relative">
+            <span class="text-muted me-2">Affected Services:</span>
+
+            <ng-container *ngIf="impactAnalysisViewData?.summary?.affectedServices as services">
+
+                <!-- first 4 pills -->
+                <span *ngFor="let service of services.slice(0, 4)"
+                    class="badge rounded-pill bg-light text-dark me-1 mb-1">
+                    {{ service }}
+                </span>
+
+                <!-- +N -->
+                <span *ngIf="services.length > 4" class="badge rounded-pill bg-secondary mb-1 cursor-pointer"
+                    (click)="toggleMore('services', services.slice(4))">
+                    +{{ services.length - 4 }}
+                </span>
+
+                <!-- popup -->
+                <div *ngIf="showMorePopup && activeMoreType === 'services'" class="more-popup">
+                    <span *ngFor="let item of moreItems" class="badge rounded-pill bg-light text-dark me-1 mb-1">
+                        {{ item }}
+                    </span>
+                </div>
+
+            </ng-container>
+        </div>
+
+
+        <div class="d-flex mb-2 align-items-center flex-wrap position-relative">
+            <span class="text-muted me-2">Affected Infrastructure:</span>
+
+            <ng-container *ngIf="impactAnalysisViewData?.summary?.affectedInfrastructure as infra">
+
+                <span *ngFor="let item of infra.slice(0, 4)" class="badge rounded-pill bg-light text-dark me-1 mb-1">
+                    {{ item }}
+                </span>
+
+                <span *ngIf="infra.length > 4" class="badge rounded-pill bg-secondary mb-1 cursor-pointer"
+                    (click)="toggleMore('infra', infra.slice(4))">
+                    +{{ infra.length - 4 }}
+                </span>
+
+                <div *ngIf="showMorePopup && activeMoreType === 'infra'" class="more-popup">
+                    <span *ngFor="let item of moreItems" class="badge rounded-pill bg-light text-dark me-1 mb-1">
+                        {{ item }}
+                    </span>
+                </div>
+
+            </ng-container>
+        </div>
+
+
+        <div class="d-flex mb-2">
+            <span class="text-muted me-2">Affected Users:</span>
+            <span class="fw-medium">
+                {{ impactAnalysisViewData?.summary?.affectedUsers }}
+            </span>
+        </div>
+
+        <div class="d-flex mb-2">
+            <span class="text-muted me-2">Affected Sessions:</span>
+            <span class="fw-medium">
+                {{ impactAnalysisViewData?.summary?.affectedSessions }}
+            </span>
+        </div>
+
+        <div class="d-flex">
+            <span class="text-muted me-2">Events:</span>
+            <span class="fw-medium">
+                {{ impactAnalysisViewData?.summary?.events }}
+            </span>
+        </div>
+
+    </div>
+
+    <!-- ================= BLAST ANALYSIS ================= -->
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Blast Analysis</span>
+
+            <div>
+                <span class="font-500">Severity : </span>
+                <span class="badge"
+                    [ngClass]="getSeverityClass(impactAnalysisViewData?.aiBlastRadiusSummary?.blastRadiusSeverity)">
+                    {{ impactAnalysisViewData?.aiBlastRadiusSummary?.blastRadiusSeverity }}
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <p class="mb-0">
+                {{ impactAnalysisViewData?.aiBlastRadiusSummary?.impactSummary }}
+            </p>
+        </div>
+    </div>
+
+    <!-- ================= AFFECTED BUSINESS SERVICES ================= -->
+    <div class="card mb-3">
+        <div class="card-header d-flex align-items-center gap-2">
+            <span class="badge bg-secondary">
+                {{ impactAnalysisViewData?.businessServiceImpact?.affectedBusinessServices?.length }}
+            </span>
+            <span class="fw-semibold">Affected Business Services</span>
+        </div>
+
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center"
+                *ngFor="let service of impactAnalysisViewData?.businessServiceImpact?.affectedBusinessServices">
+
+                <span>{{ service }}</span>
+
+                <span class="badge"
+                    [ngClass]="getSeverityClass(impactAnalysisViewData?.aiBlastRadiusSummary?.blastRadiusSeverity)">
+                    {{ impactAnalysisViewData?.aiBlastRadiusSummary?.blastRadiusSeverity }}
+                </span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ================= ESTIMATED BUSINESS IMPACT ================= -->
+    <div class="card">
+        <div class="card-header d-flex align-items-center gap-2">
+            <span class="badge bg-secondary">
+                {{ impactAnalysisViewData?.businessServiceImpact?.businessImpact?.length }}
+            </span>
+            <span class="fw-semibold">Estimated Business Impact</span>
+        </div>
+
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center"
+                *ngFor="let impact of impactAnalysisViewData?.businessServiceImpact?.businessImpact">
+
+                <span>{{ impact }}</span>
+
+                <span class="badge"
+                    [ngClass]="getSeverityClass(impactAnalysisViewData?.aiBlastRadiusSummary?.blastRadiusSeverity)">
+                    {{ impactAnalysisViewData?.aiBlastRadiusSummary?.blastRadiusSeverity }}
+                </span>
+            </li>
+        </ul>
+    </div>
+
+</div>

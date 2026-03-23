@@ -1,0 +1,176 @@
+<form *ngIf="ticketForm" [formGroup]="ticketForm">
+    <div class="form-group">
+        <div class="row">
+            <div [ngClass]="metadata.type ? 'col-6' : 'col-4'">
+                <label for="project">Project<em>*</em></label>
+                <select class="form-control text-capitalize" id="project" name="project" formControlName="project"
+                    [ngClass]="{'is-invalid' : formErrors.project}">
+                    <option [value]="null" disabled>Select Project</option>
+                    <option [ngValue]="project" *ngFor="let project of projects">
+                        {{project.project_name}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.type">{{formErrors.type}}</div>
+            </div>
+            <div class="col-4" *ngIf="!metadata.type">
+                <label for="issuetype">Issue Type<em>*</em></label>
+                <select class="form-control text-capitalize" id="issuetype" name="issuetype" formControlName="issuetype"
+                    [ngClass]="{'is-invalid' : formErrors.issuetype}">
+                    <option [value]="null" disabled>Select Ticket Type</option>
+                    <option [value]="ticketType.id" *ngFor="let ticketType of ticketTypeList">
+                        {{getReadableTicketType(ticketType.name)}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.type">{{formErrors.type}}</div>
+            </div>
+            <div [ngClass]="metadata.type ? 'col-6' : 'col-4'">
+                <label for="request_type">Request Type<em>*</em></label>
+                <select class="form-control text-capitalize" id="request_type" name="request_type"
+                    formControlName="request_type" [ngClass]="{'is-invalid' : formErrors.request_type}">
+                    <option [value]="null" disabled>Select Priority</option>
+                    <option [value]="rt.id" *ngFor="let rt of requestTypes">{{rt.name}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="formErrors.request_type">{{formErrors.request_type}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="subject">Subject<em>*</em></label>
+        <input class="form-control" id="subject" type="text" formControlName="subject" placeholder="Subject"
+            [ngClass]="{'is-invalid' : formErrors.subject}">
+        <div class="invalid-feedback" *ngIf="formErrors.subject">{{formErrors.subject}}</div>
+    </div>
+    <div class="form-group">
+        <label for="collaborators">CC</label>
+        <input class="form-control" id="cc" type="text" formControlName="collaborators" placeholder="example@unity.com"
+            [ngClass]="{'is-invalid' : formErrors.collaborators}">
+    </div>
+    <div class="form-group">
+        <label for="priority">Priority<em>*</em></label>
+        <select class="form-control text-capitalize" id="priority" name="priority" formControlName="priority"
+            [ngClass]="{'is-invalid' : formErrors.priority}">
+            <option [value]="null" disabled>Select Priority</option>
+            <option [value]="prt.id" *ngFor="let prt of ticketPriorityList">{{prt.name}}</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="formErrors.priority">{{formErrors.priority}}</div>
+    </div>
+    <div class="form-group" *ngIf="showSvcCategory">
+        <label for="service">Category</label>
+        <select class="form-control text-capitalize" id="category" name="category"
+            (change)="serviceCategorySelected($event)">
+            <option [value]="null">Select Category</option>
+            <option *ngFor="let cat of svcCategories" [value]="cat">{{cat}}</option>
+        </select>
+    </div>
+    <div class="form-group" *ngIf="svcCatalog.length">
+        <div class="row">
+            <div [ngClass]="svcCatalogTerms.length ? 'col-6' : 'col-12'">
+                <label for="service">Service</label>
+                <select class="form-control text-capitalize" id="service" name="service"
+                    (change)="serviceCatalogSelected($event)">
+                    <option [value]="''">Select Service</option>
+                    <option *ngFor="let svc of svcCatalog" [value]="svc.description">{{svc.description}}</option>
+                </select>
+            </div>
+            <div class="col-3" *ngIf="svcCatalogTerms.length">
+                <label for="serviceTerm">Term</label>
+                <select class="form-control text-capitalize" id="serviceTerm" name="serviceTerm"
+                    (change)="serviceCatalogTermSelected($event)">
+                    <option *ngFor="let term of svcCatalogTerms" [selected]="selectedTerm.id == term.id"
+                        [value]="term.name">{{term.displayName}}</option>
+                </select>
+            </div>
+            <div class="col-3" *ngIf="svcCatalogTerms.length">
+                <label for="serviceTermCharge">Charge</label>
+                <input class="form-control" id="serviceTermCharge" type="text" [value]="selectedTerm.charge" readonly
+                    disabled>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" *ngIf="ticketForm.controls.description">
+        <label for="description">Description<em>*</em></label>
+        <textarea class="form-control" id="description" name="description" rows="5" formControlName="description"
+            [ngClass]="{'is-invalid' : formErrors.description}" placeholder="Describe your issue here"></textarea>
+        <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}</div>
+    </div>
+    <div class="form-group" *ngIf="ticketForm.controls.weburl">
+        <label for="weburl">Web URL<em>*</em></label>
+        <input trpe=text id="weburl" name="weburl" formControlName="weburl" class="form-control"
+            [ngClass]="{'is-invalid' : formErrors.weburl}">
+        <div class="invalid-feedback" *ngIf="formErrors.weburl">{{formErrors.weburl}}</div>
+    </div>
+    <ng-container *ngIf="requestTypeFields.length">
+        <ng-container *ngTemplateOutlet="requestTypeFieldsRef;"></ng-container>
+    </ng-container>
+    <div class="form-group" *ngIf="metadata.metadata">
+        <label for="metadata">Metadata (Uneditable)</label>
+        <textarea class="form-control" id="metadata" name="metadata" formControlName="metadata" readonly></textarea>
+    </div>
+</form>
+
+
+<ng-template #requestTypeFieldsRef>
+    <form *ngIf="customFieldsForm" [formGroup]="customFieldsForm">
+        <div class="row">
+            <ng-container *ngFor="let field of requestTypeFields">
+                <ng-container *ngIf="field.fieldType == 'select'">
+                    <div class="form-group col-6">
+                        <label for="{{field.fieldId}}">{{field.name}}<em *ngIf="field.required">*</em></label>
+                        <select id="{{field.fieldId}}" class="form-control text-capitalize" name="{{field.fieldId}}"
+                            formControlName="{{field.fieldId}}"
+                            [ngClass]="{'is-invalid' : customFieldsFormErrors[field.fieldId]}">
+                            <option [ngValue]="item" *ngFor="let item of field.validValues">{{item.label}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="customFieldsFormErrors[field.fieldId]">
+                            {{customFieldsFormErrors[field.fieldId]}}</div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="field.fieldType == 'string'">
+                    <div class="form-group col-6">
+                        <label for="{{field.fieldId}}">{{field.name}}<em *ngIf="field.required">*</em></label>
+                        <input id="{{field.fieldId}}" class="form-control" type="text"
+                            formControlName="{{field.fieldId}}"
+                            [ngClass]="{'is-invalid' : customFieldsFormErrors[field.fieldId]}">
+                        <div class="invalid-feedback" *ngIf="customFieldsFormErrors[field.fieldId]">
+                            {{customFieldsFormErrors[field.fieldId]}}</div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="field.fieldType == 'datetime'">
+                    <div class="form-group col-6">
+                        <label>{{field.name}}<em *ngIf="field.required">*</em></label>
+                        <owl-date-time #dateRef [hour12Timer]="true"></owl-date-time>
+                        <input name="{{field.fieldId}}" class="form-control rounded-left" type="text"
+                            formControlName="{{field.fieldId}}" [owlDateTimeTrigger]="dateRef" [owlDateTime]="dateRef">
+                    </div>
+                </ng-container>
+            </ng-container>
+
+            <ng-container *ngFor="let field of requestTypeFields">
+                <ng-container *ngIf="field.fieldType == 'textarea'">
+                    <div class="form-group col-12">
+                        <label for="{{field.fieldId}}">{{field.name}}<em *ngIf="field.required">*</em></label>
+                        <textarea class="form-control" id="{{field.fieldId}}" name="{{field.fieldId}}" rows="3"
+                            formControlName="{{field.fieldId}}"
+                            [ngClass]="{'is-invalid' : customFieldsFormErrors[field.fieldId]}"></textarea>
+                        <div class="invalid-feedback" *ngIf="customFieldsFormErrors[field.fieldId]">
+                            {{customFieldsFormErrors[field.fieldId]}}</div>
+                    </div>
+                </ng-container>
+            </ng-container>
+
+            <ng-container *ngFor="let field of requestTypeFields">
+                <ng-container *ngIf="field.fieldType == 'cmdb-object-cftype'">
+                    <div class="form-group col-6">
+                        <label for="{{field.fieldId}}">{{field.name}}<em *ngIf="field.required">*</em></label>
+                        <select class="form-control text-capitalize" id="{{field.fieldId}}" name="{{field.fieldId}}"
+                            formControlName="{{field.fieldId}}"
+                            [ngClass]="{'is-invalid' : customFieldsFormErrors[field.fieldId]}">
+                            <option [value]="null" disabled>Select {{field.name}}</option>
+                            <option [ngValue]="item" *ngFor="let item of field.validValues">{{item.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="customFieldsFormErrors[field.fieldId]">
+                            {{customFieldsFormErrors[field.fieldId]}}</div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+    </form>
+</ng-template>

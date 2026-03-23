@@ -1,0 +1,125 @@
+<div class="row">
+    <div class="col-12">
+      <div class="card rounded-0">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+          <div class="d-flex justify-content-center align-items-center font-500">
+            <span class="badge badge-secondary font-sm">{{filteredViewData?.appMetricEnabledList?.length}}</span>
+            <span class="ml-1 font-lg">Graphs</span>
+          </div>
+          <div class="w-30">
+            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+          </div>
+          <div class="d-flex justify-content-end align-items-center">
+            <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="addGraph()">
+              <span class="fas fa-plus"></span>
+              <span class="font-xs-sm mx-1">Graph</span>
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm text-left">
+            <thead class="bg-light">
+              <tr>
+                <th>Graph Name</th>
+                <!-- <th>Graph Type</th>
+                <th>Actions</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let view of filteredViewData?.appMetricEnabledList; let i = index">
+                <td>{{view}}</td>
+                <!-- <td>{{view.graphType}}</td> -->
+                <!-- <td class="action-icons-column">
+                  <button class="action-icons mt-1 fas fa-pencil-alt font-sm" tooltip="Edit" (click)="editGraph(view)"
+                    [tooltip]="view.editBtnTooltipMsg" [ngClass]="{'action-icons-disabled': !view.canEdit}" accessControl
+                    moduleName="Monitoring" accessType="Manage Monitoring" elementType="actionbtn"></button>
+                  <button class="action-icons mt-1 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                    (click)="deleteGraph(view)" [tooltip]="view.deleteBtnTooltipMsg"
+                    [ngClass]="{'action-icons-disabled': !view.canDelete}" accessControl moduleName="Monitoring"
+                    accessType="Manage Monitoring" elementType="actionbtn"></button>
+                  <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                    tooltip="Manage by creating support ticket" (click)="createTicket(view)"></button>
+                </td> -->
+              </tr>
+            </tbody>
+          </table>
+          <div class="text-center text-muted py-4" *ngIf="!filteredViewData?.appMetricEnabledList?.length">No Graphs were found.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  <ng-template #graphFormRef>
+    <div class="card mb-0">
+      <div class="card-header">
+        {{action}} Graph
+        <div class="card-header-actions">
+          <a class="card-header-action btn-close" (click)="graphModelRef.hide()">
+            <i class="fas fa-times"></i>
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        <form *ngIf="graphForm" [formGroup]="graphForm">
+          <div class="form-group">
+            <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+          </div>
+          <div class="row">
+            <div class="form-group col-12">
+              <label class="form-col-form-label" for="name">Graph Name<em>*</em></label>
+              <input id="name" class="form-control" type="text" formControlName="name"
+                [class.is-invalid]="graphFormErrors.name">
+              <div class="invalid-feedback" *ngIf="graphFormErrors.name">{{graphFormErrors.name}}</div>
+            </div>
+            <!-- <div class="form-group col-12">
+              <label class="font-col-form-label" for="graph_type">Graph Type<em>*</em></label>
+              <select id="graph_type" class="form-control" formControlName="graph_type"
+                [class.is-invalid]="graphFormErrors.graph_type">
+                <option value="" disabled>Select Graph Type</option>
+                <option value="normal">Normal(Default)</option>
+                <option value="stacked">Stacked</option>
+                <option value="pie">Pie</option>
+                <option value="exploded">Exploded</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="graphFormErrors.graph_type">{{graphFormErrors.graph_type}}</div>
+            </div> -->
+            <div class="form-group col-12">
+              <label class="form-col-form-label">Items<em>*</em></label>
+              <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                [tooltip]="'Maximim of 10 items can be selected for a graph'"></i>
+              <multiselect-dropdown [options]="graphItems" [settings]="itemSettings" class="form-control p-0"
+                style="height:auto;" formControlName="metric_names"
+                [ngClass]="{'is-invalid' : graphFormErrors.metric_names}"></multiselect-dropdown>
+              <div class="invalid-feedback" *ngIf="graphFormErrors.metric_names">{{graphFormErrors.metric_names}}</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmCreate()">Submit</button>
+        <button class="btn btn-sm btn-danger pull-right" (click)="graphModelRef.hide()" type="button">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+  
+  <!-- <ng-template #confirmdelete>
+    <div class="card mb-0">
+      <div class="card-header">
+        Confirm Delete
+        <div class="card-header-actions">
+          <a class="card-header-action btn-close" (click)="confirmGraphDeleteModalRef.hide()">
+            <i class="fas fa-times"></i>
+          </a>
+        </div>
+      </div>
+      <div class="card-body">
+        This Graph will be deleted. Are you sure you want to delete?
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+        <button class="btn btn-sm btn-danger pull-right" (click)="confirmGraphDeleteModalRef.hide()"
+          type="button">No</button>
+      </div>
+    </div>
+  </ng-template> -->

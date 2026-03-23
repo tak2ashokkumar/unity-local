@@ -1,0 +1,113 @@
+<div class="card mb-2">
+    <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1 px-2">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-wrench text-primary step-icon rounded-circle pt-2 pl-2 mr-2"></i>
+            <div class="font-500">Remediation Script</div>
+        </div>
+        <button type="button" class="btn p-0 border-0 bg-transparent shadow-none text-muted"
+            [tooltip]="isRemediationFixOpen ? 'Minimize' : 'Expand'" (click)="toggleRemediationFix()"
+            [attr.aria-expanded]="isRemediationFixOpen">
+            <i class="fas fa-lg" [ngClass]="isRemediationFixOpen ? 'fa-chevron-up' : 'fa-chevron-down'">
+            </i>
+        </button>
+    </div>
+
+    <div class="card-body" [collapse]="!isRemediationFixOpen">
+        <ng-container *ngIf="remediationScriptViewData">
+            <div *ngIf="!remediationScriptViewData?.isrecommendedActionsKeyPresent">
+                <span class="font-sm-xs text-muted">Remediation Script: </span> <span
+                    class="font-sm-xs font-500">{{remediationScriptViewData?.remediationScript || 'NA'}}</span>
+            </div>
+            <div>
+                <span class="font-sm-xs text-muted">Target Device: </span> <span
+                    class="font-sm-xs font-500">{{remediationScriptViewData?.targetDevice || 'NA'}}</span>
+            </div>
+            <ng-container *ngIf="!remediationScriptViewData?.isrecommendedActionsKeyPresent">
+                <div class="card mt-3">
+                    <div class="card-header bg-white py-1">
+                        <div class="row">
+                            <span class="font-lg font-500 text-truncate ml-2">Actions</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0" *ngIf="remediationScriptViewData?.actions?.length">
+                            <li *ngFor="let action of remediationScriptViewData?.actions">
+                                {{ action }}</li>
+                        </ul>
+                        <div *ngIf="!remediationScriptViewData?.actions?.length">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-header bg-white py-1">
+                        <div class="row">
+                            <span class="font-lg font-500 text-truncate ml-2">Risks</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0" *ngIf="remediationScriptViewData?.risks?.length">
+                            <li *ngFor="let risk of remediationScriptViewData?.risks">
+                                {{ risk }}</li>
+                        </ul>
+                        <div *ngIf="!remediationScriptViewData?.risks?.length">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-header bg-white py-1">
+                        <div class="row">
+                            <span class="font-lg font-500 text-truncate ml-2">Pre Conditions</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0" *ngIf="remediationScriptViewData?.preConditions?.length">
+                            <li *ngFor="let preCondition of remediationScriptViewData?.preConditions">
+                                {{ preCondition }}</li>
+                        </ul>
+                        <div *ngIf="!remediationScriptViewData?.preConditions?.length">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-3">
+                    <div class="card-header bg-white py-1">
+                        <div class="row">
+                            <span class="font-lg font-500 text-truncate ml-2">Post Conditions</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0" *ngIf="remediationScriptViewData?.postConditions?.length">
+                            <li *ngFor="let postCondition of remediationScriptViewData?.postConditions">
+                                {{ postCondition }}</li>
+                        </ul>
+                        <div *ngIf="!remediationScriptViewData?.postConditions?.length">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="remediationScriptViewData?.isrecommendedActionsKeyPresent">
+                <div class="card mt-3">
+                    <div class="card-header bg-white py-1">
+                        <div class="row">
+                            <span class="font-lg font-500 text-truncate ml-2">Recommended Actions</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <markdown [data]="remediationScriptViewData.recommendedActions"></markdown>
+                        <div *ngIf="!remediationScriptViewData?.recommendedActions">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+
+        </ng-container>
+        <ng-container *ngIf="!remediationScriptViewData">
+            <div class="text-center text-muted py-5">No Remediation Script data found.</div>
+        </ng-container>
+    </div>
+</div>

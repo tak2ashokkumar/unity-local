@@ -1,0 +1,74 @@
+<div class="page_wrapper" style="float:left">
+  <loading object="{{cloud_controllers}}"></loading>
+  <div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+        <form class="navbar-form">
+          <div class="form-group">
+            <input class="form-control" type="text" ng-model="searchkey" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}" ng-change="getSearchResults()">
+            <button class="btn btn-search" type="submit" style="top: 4px;">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+          <div class="action-bar pull-right">
+              <span class="count">{{cloud_controllers.count}}</span>
+              <span class="count-text"> Cloud Controllers</span>
+          </div>
+      </div>
+    </div>
+
+    <div ng-if="cloud_controllers.results.length > 0">
+      <div infinite-scroll='loadPageData()' infinite-scroll-disabled='!openstack_loaded'>
+        <table class="table">
+          <thead class="cf">
+            <tr>
+              <tr>
+                  <th>Name</th>
+                  <th>Virtualization Platform</th>
+                  <th>Hypervisors</th>
+                  <!-- <th>Virtual Machines</th> -->
+                  <!-- <th>Network Devices</th> -->
+                  <th>Manage</th>
+              </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="cloud in cloud_controllers.results">
+              <td>
+                <a href="#/pc_clouds/{{ cloud.uuid }}/virtual_machines" ng-if="data_availabe">{{ cloud.name }}</a>
+                <span ng-if="!data_availabe">{{ cloud.name }}</span>
+              </td>
+                <td>{{ cloud.platform_type }}</td>
+              <td class="numeric">
+                {{ cloud.hypervisors.length || 0 }}
+              </td>
+              <!-- <td>
+                <i class="fa-object-group fa fa-fw fa-lg blue"></i>{{ vm_summary_count || 0 }}
+              </td> -->
+              <td>
+                <div class="action-icons" ng-init="get_cloud_proxy_link(cloud)">
+                    <a tooltip-class="customClass"  uib-tooltip="{{ cloud.proxy_platform_link ? 'Manage in Same Tab' : 'Non Manageable Controller' }}" ng-href="{{ cloud.proxy_platform_link }}">
+                      <span class="fa fa-external-link-square" ng-class="{'fa-disabled': !cloud.proxy_platform_link}"></span>
+                    </a>
+                    <a tooltip-class="customClass" uib-tooltip="{{ cloud.proxy_link_cloud ? 'Manage in New Tab' : 'Non Manageable Controller' }}" ng-click="update_activity_log_entry(cloud)" ng-href="{{ cloud.proxy_link_cloud }}" target="_blank">
+                      <span class="fa fa-external-link" ng-class="{'fa-disabled': !cloud.proxy_link_cloud}"></span>
+                    </a>
+                    <a tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" ng-click="manage_request_cloud(cloud)" class="fa fa-ticket blue-text">
+                    </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div ng-if="cloud_controllers.results.length === 0" class="content-wrapper ">
+      <div class="margin_top85px">
+        <no-records-found message="No Cloud controllers to display"></no-records-found>
+      </div>
+    </div>
+  </div>
+</div>

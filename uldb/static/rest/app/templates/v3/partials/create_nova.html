@@ -1,0 +1,93 @@
+<style>
+.ipfield{
+	width: 92px;
+	margin-top: -5px;
+	text-align: center;
+}
+</style>
+<form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength" >
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Controller Name*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" maxlength="128" type="text" required="" value=""  ng-model="obj.adapter_name" >
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['adapter_nameerr']">{{ obj['adapter_nameMsg'] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Controller IP*</label>
+        </span>
+        <div class="col-sm-9 ng-scope" >
+            <div class="">
+                <input type="text" id="ip_field_1"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,'ip_field_2'); return false;" class="ipfield" ng-model="obj.ip" >.
+                <input type="text" id="ip_field_2"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,'ip_field_3'); return false;" class="ipfield" ng-model="obj.ip2">.
+                <input type="text" id="ip_field_3"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,'ip_field_4'); return false;" class="ipfield" ng-model="obj.ip3">.
+                <input type="text" id="ip_field_4"  maxlength="3" onkeyup="set_ipval_autofocus(this.id,''); return false;" class="ipfield" ng-model="obj.ip4">
+            </div>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['iperr'] || obj['ip2err'] || obj['ip3err'] || obj['ip4err']">Controller IP is required</label>
+        </div>
+    </div>
+    <!--<div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Port</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty " type="text" id="port" onkeyup="return isNumberKey(this.id)" ng-model="obj.port" placeholder="443" value="" >
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['porterr']">{{ obj['portMsg'] }}</label>
+        </div>
+    </div>-->
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Location*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+              <select ng-options="row.label for row in rows track by row.name" class="form-control" ng-model="obj.loaction_id">
+                <option>-- select location --</option>
+              </select>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['loaction_iderr']">{{ obj['loaction_idMsg'] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">User Name*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" maxlength="32" required="" value="" ng-model="obj.user_name">
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['user_nameerr']">{{ obj['user_nameMsg'] }}</label>
+        </div>
+    </div>
+     <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Password*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" maxlength="32" type="password" required="" value="" id="password" ng-model="obj.password" >
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['passworderr']">{{ obj['passwordMsg'] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Admin Project*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" maxlength="128" type="text" required="" value=""  ng-model="obj.tenant_name" >
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['tenant_nameerr']">{{ obj['tenant_nameMsg'] }}</label>
+        </div>
+    </div>
+</form>

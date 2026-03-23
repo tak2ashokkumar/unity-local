@@ -1,0 +1,52 @@
+
+<alerts></alerts>
+
+<h3>Proxies</h3>
+<table class="table table-condensed" ng-if="proxy_link(cloud)">
+  <thead>
+  <tr>
+    <td>Link</td>
+    <td><a href="{{ proxy_link(cloud).proxy_url }}">{{ proxy_link(cloud).proxy_url }}</a></td>
+    <td>
+      <div class="btn-group">
+        <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu action-button">
+          <li><a href ng-click="ctrl.edit(result, $index)">Disassociate Management Interface</a></li>
+        </ul>
+      </div>
+    </td>
+  </tr>
+  </thead>
+</table>
+
+
+<h3>VMware vSphere Access</h3>
+
+<table class="table">
+  <thead>
+  <tr>
+    <th>Hostname</th>
+    <th>Username</th>
+    <th>Created</th>
+    <th>Updated</th>
+    <th>Test</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="p in cloud.vcenters">
+    <td>{{ p.hostname }}</td>
+    <td>{{ p.username }}</td>
+    <td>{{ p.created_at | date: 'medium' }}</td>
+    <td>{{ p.updated_at | date: 'medium' }}</td>
+    <td><button class="btn btn-default"
+                ng-click="testVcenter(cloud)">Test</button></td>
+  </tr>
+  </tbody>
+</table>
+
+<button class="btn btn-primary" ng-click="addVsphereAccess(cloud)">Add vSphere Access</button>
+
+

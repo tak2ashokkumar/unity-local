@@ -1,0 +1,33 @@
+
+<form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength">
+    <div class="form-group ng-scope">
+        <label class="col-sm-3 control-label ng-binding" for="blockName">Instance Id</label>
+        <div class="col-sm-9 ng-scope">
+            <label for="blockName">{{obj.instance_id}}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <label class="col-sm-3 control-label ng-binding" for="blockName">Network Interface*</label>
+        <div class="col-sm-9 ng-scope">
+            <select ng-if="rows5.network_interface_list == ''" ng-options="row.network_interface_id as row.network_interface_id+'('+row.availability_zone+')' for row in rows5.network_interface_list" class="form-control" ng-model="obj.network_interface_id" disabled>
+                <option selected="selected" value="">-- no network interface present --</option>
+            </select>
+            <select ng-if="rows5.network_interface_list != ''" ng-options="row.network_interface_id as row.network_interface_id+'('+row.availability_zone+')' for row in rows5.network_interface_list" class="form-control" ng-model="obj.network_interface_id">
+                <option selected="selected" value="">-- select network interface --</option>
+            </select>
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['network_interface_iderr']">{{ obj['network_interface_idMsg'] }}</label>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <label class="col-sm-3 control-label ng-binding" for="blockName">Device Index *</label>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="number" min="1" required="" value="" ng-model="obj.device_index">
+        </div>
+        <div class="col-sm-9" style="float: right;">
+            <label class="errormsg" ng-if="obj['device_indexerr']">{{ obj['device_indexMsg'] }}</label>
+        </div>
+    </div>
+</form>
+    

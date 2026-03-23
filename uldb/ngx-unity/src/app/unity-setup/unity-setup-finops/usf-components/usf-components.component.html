@@ -1,0 +1,1013 @@
+<form *ngIf="form" [formGroup]="form">
+    <!-- <div class="bordered-container row mb-3 mt-3">
+        <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+            <div class="pb-2 mb-3 bg-white position-absolute section-name">Compute</div> -->
+    <div class="row py-3">
+        <label class="col-2  col-form-label-sm text-right mb-0">Category :</label>
+        <div class="col d-flex">
+            <div class="mr-2 pt-1 d-flex" *ngFor="let category of categories" style="cursor: pointer;"
+                (click)="manageCategory(category)">
+                <span>
+                    <i *ngIf="!category.isSelected" class="far fa-square pt-1 fa-lg text-muted"></i>
+                    <i *ngIf="category.isSelected" class="fas fa-check-square pt-1 fa-lg text-primary"></i>
+                </span>
+                <span class="ml-1 mr-1 font-sm-xs text-muted">{{category.name}}</span>
+            </div>
+        </div>
+    </div>
+    <ng-container *ngIf="form.get('cpu')" formGroupName="cpu">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">CPU</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.cpu ? 'Expand' : 'Minimize'" [attr.aria-expanded]="!sectionStates.cpu"
+                    (click)="toggleSection('cpu')"></button>
+                <div [collapse]="sectionStates.cpu" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="cpu_count" class="col-4 col-form-label-sm text-right">Count<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm" id="cpu_count"
+                                        formControlName="cpu_count" [class.is-invalid]="formErrors.cpu.cpu_count"
+                                        placeholder="Enter CPU Count">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.cpu.cpu_count">
+                                        {{formErrors.cpu.cpu_count}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="cpu_type" class="col-4 col-form-label-sm text-right">Type<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.cpu_type" formControlName="cpu_type"
+                                        [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                                        [addTag]="addCustomValue('cpu_type')"
+                                        [class.is-invalid]="formErrors.cpu.cpu_type"
+                                        placeholder="Select CPU Type"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left" *ngIf="formErrors.cpu.cpu_type">
+                                        {{formErrors.cpu.cpu_type}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="cpu_metric_type" class="col-4 col-form-label-sm text-right">Metric
+                                    Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select name="cpu_metric_type" class="form-control form-control-sm"
+                                        id="cpu_metric_type" formControlName="cpu_metric_type"
+                                        [class.is-invalid]="formErrors.cpu.cpu_metric_type">
+                                        <option value="" disabled>Select CPU Metric Type</option>
+                                        <option value="Vcpu Hours">vCPU Hours</option>
+                                        <option value="Count">Count</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.cpu.cpu_metric_type">
+                                        {{formErrors.cpu.cpu_metric_type}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="cpu_metric_unit" class="col-4 col-form-label-sm text-right">Metric
+                                    Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select name="cpu_metric_unit" class="form-control form-control-sm"
+                                        id="cpu_metric_unit" formControlName="cpu_metric_unit"
+                                        [class.is-invalid]="formErrors.cpu.cpu_metric_unit">
+                                        <option value="" disabled>Select CPU Metric Unit</option>
+                                        <option value="Vcpu">vCPU</option>
+                                        <option value="Count">Count</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.cpu.cpu_metric_unit">
+                                        {{formErrors.cpu.cpu_metric_unit}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="cpu_rate_value" class="col-4 col-form-label-sm text-right">Rate
+                                    Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                        id="cpu_rate_value" formControlName="cpu_rate_value"
+                                        [class.is-invalid]="formErrors.cpu.cpu_rate_value"
+                                        placeholder="Enter CPU Rate Value">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.cpu.cpu_rate_value">
+                                        {{formErrors.cpu.cpu_rate_value}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="cpu_rate_frequency" class="col-4 col-form-label-sm text-right">Rate
+                                    Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select name="cpu_rate_frequency" class="form-control form-control-sm"
+                                        id="cpu_rate_frequency" formControlName="cpu_rate_frequency"
+                                        [class.is-invalid]="formErrors.cpu.cpu_rate_frequency">
+                                        <option value="" disabled>Select CPU Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.cpu.cpu_rate_frequency">
+                                        {{formErrors.cpu.cpu_rate_frequency}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('ram')" formGroupName="ram">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">RAM</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.ram ? 'Expand' : 'Minimize'" [attr.aria-expanded]="!sectionStates.ram"
+                    (click)="toggleSection('ram')"></button>
+                <div [collapse]="sectionStates.ram" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="ram_size" class="col-4 col-form-label-sm text-right">RAM Size(GB)<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm" id="ram_size"
+                                        formControlName="ram_size" [class.is-invalid]="formErrors.ram.ram_size"
+                                        placeholder="Enter RAM Size(GB)">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.ram.ram_size">
+                                        {{formErrors.ram.ram_size}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="ram_metric_type" class="col-4 col-form-label-sm text-right">Metric
+                                    Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select name="ram_metric_type" class="form-control form-control-sm"
+                                        id="ram_metric_type" formControlName="ram_metric_type"
+                                        [class.is-invalid]="formErrors.ram.ram_metric_type">
+                                        <option value="" disabled>Select RAM Metric Type</option>
+                                        <option value="Actual RAM Usage">Actual RAM Usage</option>
+                                        <option value="Total RAM allocated">Total RAM Allocated</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.ram.ram_metric_type">
+                                        {{formErrors.ram.ram_metric_type}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="ram_metric_unit" class="col-4 col-form-label-sm text-right">Metric
+                                    Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select name="ram_metric_unit" class="form-control form-control-sm"
+                                        id="ram_metric_unit" formControlName="ram_metric_unit"
+                                        [class.is-invalid]="formErrors.ram.ram_metric_unit">
+                                        <option value="" disabled>Select RAM Metric Unit</option>
+                                        <option value="GB">GB</option>
+                                        <!-- <option value="TB">TB</option> -->
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.ram.ram_metric_unit">
+                                        {{formErrors.ram.ram_metric_unit}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="ram_rate_value" class="col-4 col-form-label-sm text-right">Rate
+                                    Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                        id="ram_rate_value" formControlName="ram_rate_value"
+                                        [class.is-invalid]="formErrors.ram.ram_rate_value"
+                                        placeholder="Enter RAM Rate Value">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.ram.ram_rate_value">
+                                        {{formErrors.ram.ram_rate_value}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="ram_rate_frequency" class="col-4 col-form-label-sm text-right">Rate
+                                    Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select name="ram_rate_frequency" class="form-control form-control-sm"
+                                        id="ram_rate_frequency" formControlName="ram_rate_frequency"
+                                        [class.is-invalid]="formErrors.ram.ram_rate_frequency">
+                                        <option value="" disabled>Select RAM Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.ram.ram_rate_frequency">
+                                        {{formErrors.ram.ram_rate_frequency}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('storage')" formGroupName="storage">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Storage</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.storage ? 'Expand' : 'Minimize'"
+                    [attr.aria-expanded]="!sectionStates.storage" (click)="toggleSection('storage')"></button>
+                <div [collapse]="sectionStates.storage" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="storage_count" class="col-4 col-form-label-sm text-right">Count<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm" id="storage_count"
+                                        formControlName="storage_count"
+                                        [class.is-invalid]="formErrors.storage.storage_count"
+                                        placeholder="Enter Storage Count">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.storage.storage_count">
+                                        {{formErrors.storage.storage_count}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="storage_allocated_capacity"
+                                    class="col-4 col-form-label-sm text-right">Allocated
+                                    Capacity(GB)<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                        id="storage_allocated_capacity" formControlName="storage_allocated_capacity"
+                                        [class.is-invalid]="formErrors.storage.storage_allocated_capacity"
+                                        placeholder="Enter Allocated Capacity(GB)">
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.storage.storage_allocated_capacity">
+                                        {{formErrors.storage.storage_allocated_capacity}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="storage_type"
+                                    class="col-4 col-form-label-sm text-right">Type<em>*</em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.storage_type" formControlName="storage_type"
+                                        [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                                        [addTag]="addCustomValue('storage_type')"
+                                        [class.is-invalid]="formErrors.storage.storage_type"
+                                        placeholder="Select Storage Type"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.storage.storage_type">
+                                        {{formErrors.storage.storage_type}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="storage_rate_value" class="col-4 col-form-label-sm text-right">Rate
+                                    Value<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                        id="storage_rate_value" formControlName="storage_rate_value"
+                                        [class.is-invalid]="formErrors.storage.storage_rate_value"
+                                        placeholder="Enter Storage Rate Value">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.storage.storage_rate_value">
+                                        {{formErrors.storage.storage_rate_value}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="storage_rate_frequency" class="col-4 col-form-label-sm text-right">Rate
+                                    Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select name="storage_rate_frequency" class="form-control form-control-sm"
+                                        id="storage_rate_frequency" formControlName="storage_rate_frequency"
+                                        [class.is-invalid]="formErrors.storage.storage_rate_frequency">
+                                        <option value="" disabled>Select Storage Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.storage.storage_rate_frequency">
+                                        {{formErrors.storage.storage_rate_frequency}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('network')" formGroupName="network">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Network</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.network ? 'Expand' : 'Minimize'"
+                    [attr.aria-expanded]="!sectionStates.network" (click)="toggleSection('network')"></button>
+                <div [collapse]="sectionStates.network" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_type" class="col-4 col-form-label-sm text-right">Network
+                                    Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="network_type"
+                                        formControlName="network_type"
+                                        [class.is-invalid]="formErrors.network.network_type">
+                                        <option value="" disabled>Select Network Type</option>
+                                        <option value="LAN">LAN</option>
+                                        <option value="WAN">WAN</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.network.network_type">
+                                        {{formErrors.network.network_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_resource_type" class="col-4 col-form-label-sm text-right">Resource
+                                    Type :</label>
+                                <div class="col-6">
+                                    <ng-select [items]="networkResourceTypes" formControlName="network_resource_type"
+                                        [multiple]="true" [closeOnSelect]="true" [hideSelected]="false" [addTag]="false"
+                                        [class.is-invalid]="formErrors.network.network_resource_type"
+                                        placeholder="Select Network Resource Type"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.network.network_resource_type">
+                                        {{formErrors.network.network_resource_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_dns_metric_type" class="col-4 col-form-label-sm text-right">DNS
+                                    Metric
+                                    Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="network_dns_metric_type"
+                                        formControlName="network_dns_metric_type"
+                                        [class.is-invalid]="formErrors.network.network_dns_metric_type">
+                                        <option value="" disabled>Select DNS Metric Type</option>
+                                        <option value="IP Blocks Allocated">IP Blocks Allocated</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_dns_metric_type">
+                                        {{formErrors.network.network_dns_metric_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_dns_metric_unit" class="col-4 col-form-label-sm text-right">DNS
+                                    Metric
+                                    Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="network_dns_metric_unit"
+                                        formControlName="network_dns_metric_unit"
+                                        [class.is-invalid]="formErrors.network.network_dns_metric_unit">
+                                        <option value="" disabled>Select DNS Metric Unit</option>
+                                        <option value="Count">Count</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_dns_metric_unit">
+                                        {{formErrors.network.network_dns_metric_unit}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_dns_rate_value" class="col-4 col-form-label-sm text-right">DNS Rate
+                                    Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm" min="0"
+                                        id="network_dns_rate_value" formControlName="network_dns_rate_value"
+                                        [class.is-invalid]="formErrors.network.network_dns_rate_value"
+                                        placeholder="Enter DNS Rate Value">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_dns_rate_value">
+                                        {{formErrors.network.network_dns_rate_value}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_dns_rate_frequency" class="col-4 col-form-label-sm text-right">DNS
+                                    Rate
+                                    Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="network_dns_rate_frequency"
+                                        formControlName="network_dns_rate_frequency"
+                                        [class.is-invalid]="formErrors.network.network_dns_rate_frequency">
+                                        <option value="" disabled>Select DNS Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_dns_rate_frequency">
+                                        {{formErrors.network.network_dns_rate_frequency}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_port_metric_type" class="col-4 col-form-label-sm text-right">PORT
+                                    Metric
+                                    Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="network_port_metric_type"
+                                        formControlName="network_port_metric_type"
+                                        [class.is-invalid]="formErrors.network.network_port_metric_type">
+                                        <option value="" disabled>Select Port Metric Type</option>
+                                        <option value="Port Utilization">Port Utilization</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_port_metric_type">
+                                        {{formErrors.network.network_port_metric_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_port_metric_unit" class="col-4 col-form-label-sm text-right">PORT
+                                    Metric
+                                    Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="network_port_metric_unit"
+                                        formControlName="network_port_metric_unit"
+                                        [class.is-invalid]="formErrors.network.network_port_metric_unit">
+                                        <option value="" disabled>Select Port Metric Unit</option>
+                                        <option value="MBPS">MBPS</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_port_metric_unit">
+                                        {{formErrors.network.network_port_metric_unit}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_port_rate_value" class="col-4 col-form-label-sm text-right">PORT
+                                    Rate
+                                    Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm" min="0"
+                                        id="network_port_rate_value" formControlName="network_port_rate_value"
+                                        [class.is-invalid]="formErrors.network.network_port_rate_value"
+                                        placeholder="Enter Port Rate Value">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_port_rate_value">
+                                        {{formErrors.network.network_port_rate_value}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="network_port_rate_frequency" class="col-4 col-form-label-sm text-right">PORT
+                                    Rate Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="network_port_rate_frequency"
+                                        formControlName="network_port_rate_frequency"
+                                        [class.is-invalid]="formErrors.network.network_port_rate_frequency">
+                                        <option value="" disabled>Select Port Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.network.network_port_rate_frequency">
+                                        {{formErrors.network.network_port_rate_frequency}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('backup')" formGroupName="backup">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Backup</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.backup ? 'Expand' : 'Minimize'"
+                    [attr.aria-expanded]="!sectionStates.backup" (click)="toggleSection('backup')"> </button>
+                <div [collapse]="sectionStates.backup" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="backup_type" class="col-4 col-form-label-sm text-right">Type<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.backup_type" formControlName="backup_type"
+                                        [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                                        [addTag]="addCustomValue('backup_type')"
+                                        [class.is-invalid]="formErrors.backup.backup_type"
+                                        placeholder="Select Backup Type"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.backup.backup_type">
+                                        {{formErrors.backup.backup_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="backup_metric_type" class="col-4 col-form-label-sm text-right">Metric
+                                    Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.backup_metric_type"
+                                        formControlName="backup_metric_type" [multiple]="false" [closeOnSelect]="true"
+                                        [hideSelected]="false" [addTag]="addCustomValue('backup_metric_type')"
+                                        [class.is-invalid]="formErrors.backup.backup_metric_type"
+                                        placeholder="Select Backup Metric Type"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.backup.backup_metric_type">
+                                        {{formErrors.backup.backup_metric_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="backup_metric_unit" class="col-4 col-form-label-sm text-right">Metric
+                                    Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.backup_metric_unit"
+                                        formControlName="backup_metric_unit" [multiple]="false" [closeOnSelect]="true"
+                                        [hideSelected]="false" [addTag]="addCustomValue('backup_metric_unit')"
+                                        [class.is-invalid]="formErrors.backup.backup_metric_unit"
+                                        placeholder="Select Backup Metric Unit"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.backup.backup_metric_unit">
+                                        {{formErrors.backup.backup_metric_unit}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="backup_rate_value" class="col-4 col-form-label-sm text-right">Rate
+                                    Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                        id="backup_rate_value" formControlName="backup_rate_value"
+                                        [class.is-invalid]="formErrors.backup.backup_rate_value"
+                                        placeholder="Enter Backup Rate Value">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.backup.backup_rate_value">
+                                        {{formErrors.backup.backup_rate_value}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="backup_rate_frequency" class="col-4 col-form-label-sm text-right">Rate
+                                    Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="backup_rate_frequency"
+                                        formControlName="backup_rate_frequency"
+                                        [class.is-invalid]="formErrors.backup.backup_rate_frequency">
+                                        <option value="" disabled>Select Backup Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.backup.backup_rate_frequency">
+                                        {{formErrors.backup.backup_rate_frequency}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('os')" formGroupName="os">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Operating System</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.os ? 'Expand' : 'Minimize'" [attr.aria-expanded]="!sectionStates.os"
+                    (click)="toggleSection('os')"></button>
+                <div [collapse]="sectionStates.os" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_type" class="col-4 col-form-label-sm text-right">Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.os_type" formControlName="os_type"
+                                        [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                                        [addTag]="addCustomValue('os_type')" [class.is-invalid]="formErrors.os.os_type"
+                                        placeholder="Select OS Type"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left" *ngIf="formErrors.os.os_type">
+                                        {{formErrors.os.os_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_vendor" class="col-4 col-form-label-sm text-right">Vendor<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.os_vendor" formControlName="os_vendor"
+                                        [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                                        [addTag]="addCustomValue('os_vendor')"
+                                        [class.is-invalid]="formErrors.os.os_vendor"
+                                        placeholder="Select OS Vendor"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left" *ngIf="formErrors.os.os_vendor">
+                                        {{formErrors.os.os_vendor}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_distribution"
+                                    class="col-4 col-form-label-sm text-right">Distribution<em>*
+                                    </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.os_distribution" formControlName="os_distribution"
+                                        [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                                        [addTag]="addCustomValue('os_distribution')"
+                                        [class.is-invalid]="formErrors.os.os_distribution"
+                                        placeholder="Select OS Distribution"></ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.os.os_distribution">
+                                        {{formErrors.os.os_distribution}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_support_contract" class="col-4 col-form-label-sm text-right">Support
+                                    Contract<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="os_support_contract"
+                                        formControlName="os_support_contract"
+                                        [class.is-invalid]="formErrors.os.os_support_contract">
+                                        <option value="" disabled>Select OS Support Contract</option>
+                                        <option value="Basic">Basic</option>
+                                        <option value="Standard">Standard</option>
+                                        <option value="Premium">Premium</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.os.os_support_contract">
+                                        {{formErrors.os.os_support_contract}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_metric_type" class="col-4 col-form-label-sm text-right">Metric
+                                    Type<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="os_metric_type"
+                                        formControlName="os_metric_type"
+                                        [class.is-invalid]="formErrors.os.os_metric_type">
+                                        <option value="" disabled>Select OS Metric Type</option>
+                                        <option value="License">License</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.os.os_metric_type">
+                                        {{formErrors.os.os_metric_type}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_metric_unit" class="col-4 col-form-label-sm text-right">Metric
+                                    Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="os_metric_unit"
+                                        formControlName="os_metric_unit"
+                                        [class.is-invalid]="formErrors.os.os_metric_unit">
+                                        <option value="" disabled>Select OS Metric Unit</option>
+                                        <option value="Count">Count</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.os.os_metric_unit">
+                                        {{formErrors.os.os_metric_unit}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_rate_value" class="col-4 col-form-label-sm text-right">Rate
+                                    Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm" id="os_rate_value"
+                                        formControlName="os_rate_value" [class.is-invalid]="formErrors.os.os_rate_value"
+                                        placeholder="Enter OS Rate Value">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.os.os_rate_value">
+                                        {{formErrors.os.os_rate_value}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="os_rate_frequency" class="col-4 col-form-label-sm text-right">Rate
+                                    Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="os_rate_frequency"
+                                        formControlName="os_rate_frequency"
+                                        [class.is-invalid]="formErrors.os.os_rate_frequency">
+                                        <option value="" disabled>Select OS Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.os.os_rate_frequency">
+                                        {{formErrors.os.os_rate_frequency}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('operational')" formGroupName="operational">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Operational Components</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.operational ? 'Expand' : 'Minimize'"
+                    [attr.aria-expanded]="!sectionStates.operational" (click)="toggleSection('operational')">
+                </button>
+                <div [collapse]="sectionStates.operational" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="operational_usage_metric" class="col-4 col-form-label-sm text-right">Usage
+                                    Metric<em>* </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.operational_usage_metric"
+                                        formControlName="operational_usage_metric" [multiple]="false"
+                                        [closeOnSelect]="true" [hideSelected]="false" [addTag]="true"
+                                        [class.is-invalid]="formErrors.operational.operational_usage_metric"
+                                        placeholder="Select Operational Usage Metric">
+                                    </ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.operational.operational_usage_metric">
+                                        {{formErrors.operational.operational_usage_metric}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="operational_metric_unit" class="col-4 col-form-label-sm text-right">
+                                    Metric Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.operational_metric_unit"
+                                        formControlName="operational_metric_unit" [multiple]="false"
+                                        [closeOnSelect]="true" [hideSelected]="false" [addTag]="true"
+                                        [class.is-invalid]="formErrors.operational.operational_metric_unit"
+                                        placeholder="Select Operational Metric Unit">
+                                    </ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.operational.operational_metric_unit">
+                                        {{formErrors.operational.operational_metric_unit}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="operational_rate_value" class="col-4 col-form-label-sm text-right">
+                                    Rate Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                        id="operational_rate_value" formControlName="operational_rate_value"
+                                        [class.is-invalid]="formErrors.operational.operational_rate_value"
+                                        placeholder="Enter Operational Rate Value">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.operational.operational_rate_value">
+                                        {{formErrors.operational.operational_rate_value}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="operational_rate_frequency" class="col-4 col-form-label-sm text-right">
+                                    Rate Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="operational_rate_frequency"
+                                        formControlName="operational_rate_frequency"
+                                        [class.is-invalid]="formErrors.operational.operational_rate_frequency">
+                                        <option value="" disabled>Select Operational Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.operational.operational_rate_frequency">
+                                        {{formErrors.operational.operational_rate_frequency}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('fixed')" formGroupName="fixed">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Fixed Components</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.fixed ? 'Expand' : 'Minimize'" [attr.aria-expanded]="!sectionStates.fixed"
+                    (click)="toggleSection('fixed')"></button>
+                <div [collapse]="sectionStates.fixed" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="fixed_usage_metric" class="col-4 col-form-label-sm text-right">Usage
+                                    Metric<em>* </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.fixed_usage_metric"
+                                        formControlName="fixed_usage_metric" [multiple]="false" [closeOnSelect]="true"
+                                        [hideSelected]="false" [addTag]="true"
+                                        [class.is-invalid]="formErrors.fixed.fixed_usage_metric"
+                                        placeholder="Select Fixed Usage Metric">
+                                    </ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.fixed.fixed_usage_metric">
+                                        {{formErrors.fixed.fixed_usage_metric}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="fixed_metric_unit" class="col-4 col-form-label-sm text-right">Metric
+                                    Unit<em>* </em>:</label>
+                                <div class="col-6">
+                                    <ng-select [items]="dropdownData?.fixed_metric_unit"
+                                        formControlName="fixed_metric_unit" [multiple]="false" [closeOnSelect]="true"
+                                        [hideSelected]="false" [addTag]="true"
+                                        [class.is-invalid]="formErrors.fixed.fixed_metric_unit"
+                                        placeholder="Select Fixed Metric Unit">
+                                    </ng-select>
+                                    <div class="text-danger font-xs mt-1 text-left"
+                                        *ngIf="formErrors.fixed.fixed_metric_unit">
+                                        {{formErrors.fixed.fixed_metric_unit}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="fixed_rate_value" class="col-4 col-form-label-sm text-right">Rate
+                                    Value<em>* </em>:</label>
+                                <div class="col-6">
+                                    <input type="number" min="0" class="form-control form-control-sm"
+                                        id="fixed_rate_value" formControlName="fixed_rate_value"
+                                        [class.is-invalid]="formErrors.fixed.fixed_rate_value"
+                                        placeholder="Enter Fixed Rate Value">
+                                    <div class="invalid-feedback text-left" *ngIf="formErrors.fixed.fixed_rate_value">
+                                        {{formErrors.fixed.fixed_rate_value}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="fixed_rate_frequency" class="col-4 col-form-label-sm text-right">Rate
+                                    Frequency<em>* </em>:</label>
+                                <div class="col-6">
+                                    <select class="form-control form-control-sm" id="fixed_rate_frequency"
+                                        formControlName="fixed_rate_frequency"
+                                        [class.is-invalid]="formErrors.fixed.fixed_rate_frequency">
+                                        <option value="" disabled>Select Fixed Rate Frequency</option>
+                                        <option value="Hourly">Hourly</option>
+                                        <option value="Daily">Daily</option>
+                                        <option value="Monthly">Monthly</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="formErrors.fixed.fixed_rate_frequency">
+                                        {{formErrors.fixed.fixed_rate_frequency}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="form.get('management')" formGroupName="management">
+        <div class="bordered-container row mb-3 mt-3">
+            <div class="col-12 border rounded position-relative mr-3 mb-4 p-4">
+                <div class="pb-2 mb-3 bg-white position-absolute section-name">Management</div>
+                <button class="action-icons fa fa-angle-down section-name-two"
+                    [tooltip]="sectionStates.management ? 'Expand' : 'Minimize'"
+                    [attr.aria-expanded]="!sectionStates.management" (click)="toggleSection('management')"></button>
+                <div [collapse]="sectionStates.management" [isAnimated]="true">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="form-group row">
+                                <label for="management_tools" class="col-4 col-form-label-sm text-right">Management
+                                    Tools</label>
+                                <div class="col-8">
+                                    <ng-select [items]="managementToolsList" formControlName="management_tools"
+                                        [multiple]="true" [closeOnSelect]="true" [hideSelected]="false" [addTag]="false"
+                                        placeholder="Select Management Tools"></ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="form.get('management.details')" formArrayName="details">
+                        <div *ngFor="let control of detailsArray.controls; let i = index" [formGroupName]="i"
+                            class="row form-group justify-content-between">
+
+                            <div class="col-4">
+                                <div class="row">
+                                    <label class="col-4 col-form-label-sm text-right">Name</label>
+                                    <input type="text" class="col-8 form-control form-control-sm" formControlName="name"
+                                        readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="row">
+                                    <label class="col-4 col-form-label-sm text-right">Metric</label>
+                                    <input type="text" class="col-8 form-control form-control-sm"
+                                        formControlName="metric" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <div class="row">
+                                    <label class="col-4 col-form-label-sm text-right">Rate</label>
+                                    <input type="number" class="col-8 form-control form-control-sm"
+                                        formControlName="rate">
+                                </div>
+                            </div>
+
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+</form>

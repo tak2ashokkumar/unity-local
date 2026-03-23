@@ -1,0 +1,137 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-0 border-top-0">
+            <div class="card-header bg-transparent border-bottom-0 mt-3">
+                <div class="row">
+                    <div class="col-3">
+                        <table-search-box (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col ">
+                        <a class="py-0 float-right ml-2 text-warning" (click)="goToSummary()"><i
+                                class="fa fa-arrow-left">&nbsp;</i>To Content Library</a>
+                        <span class="ml-2 text-muted font-sm float-right align-middle"><span
+                                class="badge badge-pill badge-secondary">{{filteredViewData.length}}</span>&nbsp;Files</span>
+                        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)">
+                        </data-refresh-btn>
+                        <table-page-size [currentPageSize]="currentCriteria.pageSize"
+                            [totalCount]="filteredViewData.length" (pageSizeChange)="pageSizeChange($event)">
+                        </table-page-size>
+                        <button class="btn btn-pill btn-warning pull-right btn-sm mr-2" type="button"
+                            (click)="uploadFile()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="btn">Upload</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table text-left" sortableTable (sorted)="onSorted($event)"
+                    *ngIf="filteredViewData.length">
+                    <thead>
+                        <tr>
+                            <th sortable-column="name">Name</th>
+                            <th sortable-column="fileSize">Size</th>
+                            <th sortable-column="type">Type</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of pagedviewData" setTableColumnWidth>
+                            <td>
+                                <div [tooltip]="view.name">{{view.name}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.fileSize">{{view.fileSize}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.type">{{view.type}}</div>
+                            </td>
+                            <td class="action-icons-column">
+                                <button class="action-icons mt-1 mb-2 far fa-trash-alt font-sm"
+                                    (click)="deteleFile(view)" tooltip="Delete" container="body" accessControl
+                                    moduleName="Private Cloud" accessType="Manage Private Cloud"
+                                    elementType="actionbtn"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="filteredViewData.length"></table-entries>
+                <table-pager *ngIf="filteredViewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted" *ngIf="!filteredViewData.length">No associated libraries were found.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #uploadFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Upload File
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="uploadModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="uploadForm" [formGroup]="uploadForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label">Upload<em>*</em></label><i
+                            class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                            [tooltip]="'Files can be .ova, .ovf, .vmdk, .iso etc.'"></i>
+                        <input type="file" #file hidden (change)="detectFileChange($event.target.files)">
+                        <div class="input-group">
+                            <input class="form-control" type="text" placeholder="Upload File" formControlName="item"
+                                [ngClass]="{'is-invalid' : uploadFormErrors.item}">
+                            <span class="input-group-append">
+                                <button class="btn btn-warning" type="button" (click)="file.click()">Browse</button>
+                            </span>
+                            <div class="invalid-feedback" *ngIf="uploadFormErrors.item">
+                                {{uploadFormErrors.item}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label class="form-col-form-label" for="item_name">File Name<em>*</em></label>
+                        <input id="item_name" class="form-control" type="text" formControlName="item_name"
+                            [ngClass]="{'is-invalid' : uploadFormErrors.item_name}">
+                        <div class="invalid-feedback" *ngIf="uploadFormErrors.item_name">{{uploadFormErrors.item_name}}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmUploadFile()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="uploadModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This file will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteFile()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

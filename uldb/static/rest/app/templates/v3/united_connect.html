@@ -1,0 +1,108 @@
+<alerts></alerts>
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+
+<script type="text/ng-template" id="portlist.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+
+    <div>
+        <span ng-if="!megaport_list">
+          <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+        </span>
+        <table class="display" cellspacing="0" width="100%" ng-if="megaport_list.length != 0">
+          <tr>
+            <td>
+
+              <table class="table table-condensed">
+                <thead>
+                <tr>
+                  <th class="col-lg-1">Label</th>
+                  <th class="col-lg-2">Product UId</th>
+                  <th class="col-lg-1">Location</th>
+                  <th class="col-lg-1">Speed (Mbps)</th>
+                  <th class="col-lg-1">Terms (Month)</th>
+                  <th class="col-lg-1">Visibility</th>
+                  <th class="col-lg-1">Market</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="megaport in megaport_list">
+                  <td>{{ megaport.label }}</td>
+                  <td>{{ megaport.product_uid }}</td>
+                  <td>{{ megaport.location }}</td>
+                  <td>{{ megaport.speed }}</td>
+                  <td>{{ megaport.duration }}</td>
+                  <td>{{ megaport.visibility }}</td>
+                  <td>{{ megaport.market }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <span ng-if="megaport_list.length == 0">
+          <h3 class="align-center">No records to display</h3>
+        </span>
+    </div>
+</script>
+<script type="text/ng-template" id="vxclist.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+
+    <div>
+        <span ng-if="!vxc_list">
+          <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+        </span>
+        <table class="display" cellspacing="0" width="100%" ng-if="vxc_list.length != 0">
+          <tr>
+            <td>
+
+              <table class="table table-condensed">
+                <thead>
+                <tr>
+                  <th class="col-lg-1">Label</th>
+                  <th class="col-lg-1">Type</th>
+                  <th class="col-lg-1">Parent Port</th>
+                  <th class="col-lg-2">Target Port UID</th>
+                  <th class="col-lg-2">Target Port Label</th>
+                  <th class="col-lg-1">Rate Limit</th>
+                  <th class="col-lg-1">aLAN</th>
+                  <th class="col-lg-1">bLAN</th>
+                  <th class="col-lg-1">Customer</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="vxc in vxc_list">
+                  <td>{{ vxc.label }}</td>
+                  <td>{{ vxc.connection_type }}</td>
+                  <td>{{ vxc.port_name }}</td>
+                  <td>{{ vxc.target_port_uid }}</td>
+                  <td>{{ vxc.target_port_label }}</td>
+                  <td>{{ vxc.speed_limit }}</td>
+                  <td>{{ vxc.aend_vlan }}</td>
+                  <td>{{ vxc.bend_vlan }}</td>
+                  <td>{{ vxc.customer_name }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <span ng-if="vxc_list.length == 0">
+          <h3 class="align-center">No records to display</h3>
+        </span>
+    </div>
+</script>

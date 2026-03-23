@@ -1,0 +1,26 @@
+@import "variables";
+
+.test-result-action-icons {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid $secondary;
+    background: $white;
+    cursor: pointer;
+    outline: none;
+    &.test-success{
+        color: $success;
+    }
+    &.test-fail{
+        color: $danger;
+    }
+}
+
+.test-result-action-icons-disabled {
+    color: $secondary !important;
+    &:hover,
+    &:focus {
+        background: $white !important;
+        color: $secondary !important;
+    }
+}

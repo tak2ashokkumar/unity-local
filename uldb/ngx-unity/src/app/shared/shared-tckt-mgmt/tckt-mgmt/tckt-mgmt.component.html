@@ -1,0 +1,225 @@
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="row ticket-row">
+          <div class="col-4">
+            <h4 class="font-lg">Open/Pending Tickets by Priority</h4>
+            <div class="vertical-align" *ngIf="openTicketsChartLoading">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div style="display:flex; flex-direction:column" *ngIf="!openTicketsChartLoading && openTicketsChartData">
+              <div style="flex-grow:1; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="openTicketsChartOptions" [data]="openTicketsChartData" [colors]="openTicketsChartColor"
+                  [labels]="openTicketsChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="vertical-align" *ngIf="!openTicketsChartLoading && !openTicketsChartData">
+              <span class="text-center text-muted ">No open tickets found.</span>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <h4 class="font-lg">Tickets by Status</h4>
+            <div class="vertical-align" *ngIf="ticketsByStatusChartLoading">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div style="display:flex; flex-direction:column" *ngIf="!ticketsByStatusChartLoading && ticketsByStatusChartData">
+              <div style="flex-grow:1; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="ticketsByStatusChartOptions" [data]="ticketsByStatusChartData" [colors]="ticketsByStatusChartColor"
+                  [labels]="ticketsByStatusChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="vertical-align" *ngIf="!ticketsByStatusChartLoading && !ticketsByStatusChartData">
+              <span class="text-center text-muted ">No Tickets Found.</span>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <h4 class="font-lg">Solved by Response Time</h4>
+            <div class="vertical-align" *ngIf="solvedByResponseChartLoading">
+              <i class="fa fa-spinner fa-spin fa-2x"></i>
+            </div>
+            <div style="display:flex; flex-direction:column" *ngIf="!solvedByResponseChartLoading && solvedByResponseChartData">
+              <div style="flex-grow:1; position:relative">
+                <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                  [options]="solvedByResponseChartOptions" [data]="solvedByResponseChartData" [colors]="solvedByResponseChartColor"
+                  [labels]="solvedByResponseChartLabels"></canvas>
+              </div>
+            </div>
+            <div class="vertical-align" *ngIf="!solvedByResponseChartLoading && !solvedByResponseChartData">
+              <span class="text-center text-muted ">No Tickets Found.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header text-center">
+        <div class="row mb-2">
+          <div class="col-9">
+            <form *ngIf="filterForm" [formGroup]="filterForm">
+              <div class="row">
+                <div class="col-3">
+                  <div class="form-group row">
+                    <label for="search" class="col-4 col-form-label col-form-label-sm text-right px-0">Search&nbsp;:&nbsp;</label>
+                    <div class="col-8 px-0">
+                      <input type="text" class="form-control form-control-sm" formControlName="search" id="search"
+                        placeholder="Enter Keyword">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group row">
+                    <label for="datecreated" class="col-3 col-form-label col-form-label-sm text-right px-0">Date
+                      Created&nbsp;:&nbsp;</label>
+                    <div class="col-9 px-0">
+                      <!-- <input type="text" class="form-control form-control-sm" id="datecreated"> -->
+                      <div class="input-group-append " [owlDateTimeTrigger]="from">
+                      </div>
+                      <owl-date-time #from [hour12Timer]="true" [pickerType]="'calendar'"></owl-date-time>
+                      <input class="form-control rounded-left text-center" [owlDateTimeTrigger]="from" [owlDateTime]="from"
+                        type="text" formControlName="dateRange" [max]="maxDate" [selectMode]="'range'" (dateTimeInput)="onDateChanged()">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="form-group row">
+                    <label for="status" class="col-sm-4 col-form-label col-form-label-sm text-right px-0">Status&nbsp;:&nbsp;</label>
+                    <div class="col-8">
+                      <select class="form-control form-control-sm" id="status" formControlName="status">
+                        <option [value]="'open'"> Open/New </option>
+                        <option [value]="'pending'"> Pending </option>
+                        <option [value]="'solved'"> Solved </option>
+                        <option [value]="'closed'"> Closed </option>
+                        <option [value]="''"> All </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3">
+                  <div class="form-group row">
+                    <label for="priority" class="col-4 col-form-label col-form-label-sm text-right px-0">Priority&nbsp;:&nbsp;</label>
+                    <div class="col-8 px-0">
+                      <select class="form-control form-control-sm" id="priority" formControlName="priority">
+                        <option [value]="''">All</option>
+                        <option [value]="PriorityEnum.LOW">{{PriorityEnum.LOW}}</option>
+                        <option [value]="PriorityEnum.NORMAL">{{PriorityEnum.NORMAL}}</option>
+                        <option [value]="PriorityEnum.HIGH">{{PriorityEnum.HIGH}}</option>
+                        <option [value]="PriorityEnum.URGENT">{{PriorityEnum.URGENT}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="form-group row">
+                    <label for="tickets_for" class="col-3 col-form-label col-form-label-sm text-right px-0">Display/Show&nbsp;:&nbsp;</label>
+                    <div class="col-9 px-0">
+                      <select class="form-control form-control-sm" id="tickets_for" formControlName="tickets_for">
+                        <option [value]="'all_tickets'"> All Tickets </option>
+                        <option [value]="'my_tickets'"> My Tickets </option>
+                        <option [value]="'assigned_to_me'"> Tickets Assigned to me </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-3">
+                  <div class="form-group row">
+                    <div class="col">
+                      <button class="btn btn-sm btn-pill btn-warning pull-right" type="button" (click)="filterTickets()">Filter
+                        Tickets</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-3 border-left">
+            <table class="h-100 w-100">
+              <tbody>
+                <tr>
+                  <td class="align-bottom">
+                    <span class="text-muted pull-right font-sm mt-1 ml-2"><span class="badge badge-pill badge-secondary">{{count}}</span>&nbsp;Tickets</span>
+                    <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+                    <button class="ml-2 btn btn-sm btn-pill btn-warning pull-right" type="button" (click)="createTicket()"
+                      *ngIf="hideCreateForAllTickets()" [disabled]="createButtonDisabled" [tooltip]="createButtonTooltipMessage"
+                      container="body">Create
+                      Ticket</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table text-left" sortableTable (sorted)="onSorted($event)">
+          <thead class="">
+            <tr>
+              <th>Ticket ID</th>
+              <th class="ticket-subject">Subject</th>
+              <th sortable-column="status">Status</th>
+              <th sortable-column="priority">Priority</th>
+              <th sortable-column="created_at">Created On</th>
+              <th>Acknowledged On</th>
+              <th>Resolved On</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ticket of viewData" setTableColumnWidth>
+              <td>
+                <a class="btn btn-link text-decoration-none p-0 table-column-btn" [routerLink]="ticket.detailsUrl"
+                  [tooltip]="ticket.id">{{ticket.id}}</a></td>
+              <td>
+                <div [tooltip]="ticket.subject">{{ticket.subject}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.status">{{ticket.status}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.priority">{{ticket.priority}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.created_at">{{ticket.created_at}}</div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.assignedOn">
+                  <span *ngIf="ticket.metricsAvailable" [tooltip]="ticket.assignedOn">{{ticket.assignedOn}}</span>
+                  <span *ngIf="!ticket.metricsAvailable">
+                    <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div [tooltip]="ticket.resolvedOn">
+                  <span *ngIf="ticket.metricsAvailable">{{ticket.resolvedOn}}</span>
+                  <span *ngIf="!ticket.metricsAvailable">
+                    <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div class="text-center text-muted" *ngIf="!viewData.length">No Tickets To Display.</div>
+      </div>
+    </div>
+  </div>
+</div>

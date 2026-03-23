@@ -1,0 +1,54 @@
+<tab heading="maintaince_schedules">
+    <div class="panel panel-default" ng-controller="UladminController">
+        <div class="panel-heading">
+            <div class="col-md-8 pinnewcustitle">
+                <i class="fa fa-clock-o fa-fw"></i>{{heading}}
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-hover">
+                <tbody>
+                <tr>
+                    <td> Usage</td>
+                    <td><div><b></b>{{ licenses.data.usage }}</div></td>
+                </tr>
+                <tr>
+                    <td> Product</td>
+                    <td><div>{{ licenses.data.product }}</div></td>
+                </tr>
+                <tr>
+                    <td> Expiration Date</td>
+                    <td><div>{{ licenses.data.expiration_date }}</div></td>
+                </tr>
+                <tr>
+                    <td> Remaining Time</td>
+                    <td><div>{{ licenses.data.remaining_time }}</div></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</tab>
+<tab>
+    <div class="col-sm-12 panelbodyborder box-container" ng-controller="UladminController">
+        <div class="row">
+            <div class="col-sm-7 pull-left">
+                <h4>Version Information</h4>
+            </div>
+        </div>
+        <table class="table table-hover">
+            <tbody>
+            <tr>
+            <tr>
+                <td> Version</td>
+                <td><div>{{ licenses.data.version }}</div></td>
+            </tr>
+            <tr>
+                <td> Build</td>
+                <td><div>{{ licenses.data.build }}</div></td>
+            </tr>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</tab>

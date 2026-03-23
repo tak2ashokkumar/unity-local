@@ -1,0 +1,45 @@
+
+<!-- <no-records-found message=" Coming Soon...."></no-records-found> -->
+
+
+<!-- <div class="row" id="pdf"  style="padding:20px; height : 2600px; margin-bottom : 30px;">
+  <object width="100%" height="98%" type="application/pdf" data="../../../../static/pdf/Unity_Release_Notes.pdf?#zoom=110&navpanes=0&statusbar=0 ">
+  </object>
+</div> -->
+
+<!-- <div class="row" id="pdf"  style="padding:20px; height : 2600px; margin-bottom : 30px">
+	<iframe  width="100%" height="100%" src="../../../../static/pdf/Unity_Releae_Notes_v1.0.pdf?#zoom=150"></iframe>
+</div>
+
+
+<div class="row" id="pdf"  style="padding:20px; height : 2600px; margin-bottom : 30px">
+	<embed src="../../../../static/pdf/Unity_Release_Notes_v1.0.pdf?#view=fitW" width="100%" height="100%">
+</div> -->
+<div class="page_wrapper" style="float:left">
+
+	<div class="row" id="pdf" ng-if="(active_release_url.length !== 0)">
+		<iframe id="frame"
+		ng-src="{{active_release_url}}" style="width : 100%; height : 100%;" frameborder="0"></iframe>
+
+	</div>
+
+	<div class="row" ng-if="(active_release_url && active_release_url.length == 0)" style="padding : 20px;">
+		<no-records-found message="No release document available currently."></no-records-found>
+	</div>
+
+</div>
+<!-- <div class="pdf-wrapper">
+	<pdf-viewer url="../../../../static/pdf/Unity_Release_Notes.pdf" class="dark-border"></pdf-viewer>
+</div> -->
+
+<style>
+	#pdf { 
+		width: 100%;
+		height: 2400px; 
+		margin-bottom : 30px;
+	}
+	canvas {
+		display: block !important;
+	}
+</style>
+

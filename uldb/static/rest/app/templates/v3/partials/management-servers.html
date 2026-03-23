@@ -1,0 +1,53 @@
+<tab heading="maintaince_schedules">
+    <div class="panel panel-default" ng-controller="UladminController">
+        <div class="panel-heading">
+            <div class="col-md-8 pinnewcustitle">
+                <i class="fa fa-clock-o fa-fw"></i>{{heading}}
+            </div>
+            <div class="col-md-4 pinnewcus">
+                <input type="text" id="orgName" class="form-control custom_search_field" ng-model="server.customer"
+                       placeholder="Search...">
+            </div>
+        </div>
+        <div class="panel-body">
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th ng-repeat="row in servers.vm_servers.headers">
+                            <div ng-if="row.hide === undefined">{{ row | uppercase }}</div>
+                        </th>
+                        <th>
+                            Options
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in servers.vm_servers.info">
+                        <td><div>{{ row.name }}</div></td>
+                        <td><div>{{ row.server_name }}</div></td>
+                        <td><div>{{ row.data_center_name }}</div></td>
+                        <td><div>{{ row.host_name }}</div></td>
+                        <td><div>{{ row.vm_name }}</div></td>
+                        <td><div>{{ row.data_stores }}</div></td>
+                        <td>
+                            <div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                        Actions <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu action-button">
+                                        <li><a href="#">Edit Info</a></li>
+                                        <li><a href="#">Remove</a></li>
+                                        <li><a href="#/vmware">Show Inventory</a></li>
+                                        <li><a href="#">New Datacenter</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</tab>

@@ -1,0 +1,82 @@
+<ng-template #deviceFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Virtual Machine
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deviceFormModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="deviceForm" [formGroup]="deviceForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label" for="name">Name<em>*</em></label>
+                        <input id="name" class="form-control" type="text" formControlName="name" [ngClass]="{'is-invalid' : deviceFormErrors.name}">
+                        <div class="invalid-feedback" *ngIf="deviceFormErrors.name">{{deviceFormErrors.name}}
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label class="form-col-form-label" for="management_ip">Management IP</label>
+                        <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                            [tooltip]="'IP Address for SSH/RDP Access'"></i>
+                        <input id="management_ip" class="form-control" type="text" formControlName="management_ip"
+                            [ngClass]="{'is-invalid' : deviceFormErrors.management_ip}">
+                        <div class="invalid-feedback" *ngIf="deviceFormErrors.management_ip">
+                            {{deviceFormErrors.management_ip}}</div>
+                    </div>
+                    <div class="form-group col-6" formGroupName="os">
+                        <label class="font-col-form-label" for="osid">OS</label>
+                        <select id="osid" class="form-control" formControlName="id" [ngClass]="{'is-invalid' : deviceFormErrors.os.id}">
+                            <option value="" disabled>Select Operating System</option>
+                            <option *ngFor="let os of operatingSystems" [value]="os.id">
+                                {{os.full_name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="deviceFormErrors.os.id">{{deviceFormErrors.os.id}}
+                        </div>
+                    </div>
+                    <div *ngIf="deviceForm.get('collector')" class="form-group col-6" formGroupName="collector">
+                        <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+                        <select id="collectoruuid" class="form-control" formControlName="uuid"
+                            [class.is-invalid]="deviceFormErrors.collector.uuid">
+                            <option value="" disabled>Select Collector</option>
+                            <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="deviceFormErrors.collector.uuid">{{deviceFormErrors.collector.uuid}}</div>
+                    </div>
+                    <unity-devices-custom-attributes-crud [deviceType]="deviceType" [deviceAttrs]="deviceForm?.get('custom_attribute_data')?.value" class="w-100"></unity-devices-custom-attributes-crud>
+                </div>
+            </form>
+
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDeviceAddOrEdit()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deviceFormModelRef.hide()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDeleteRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeviceDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Virtual Machine will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDeviceDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeviceDeleteModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

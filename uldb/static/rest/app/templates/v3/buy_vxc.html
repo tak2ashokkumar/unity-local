@@ -1,0 +1,255 @@
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in vxc_tabs" index="$index" heading="{{ tab.name }}" ng-click="updateVXCTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+<script type="text/ng-template" id="privatevxc.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+    <div style="clear:both">
+    <span ng-if="show_loader==true">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader" style="z-index: 1000;">
+    </span>
+    <form class="form-horizontal">
+        <div class="form-group" ng-repeat="row in private_vxc_rows">
+            <div ng-if="row.required">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">{{ row.description }}*</label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'text' && row.name!='customer') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+                </div>
+
+                <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                    <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" private_vxc_rows="4" maxlength="128" cols="40" required></textarea>
+                </div>
+                <div class="col-sm-9" ng-if="(row.type == 'select' && row.name == 'parent_port' )">
+                    <select ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-change="load_target_port(obj[row.name])" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" ng-if="(row.type == 'select' && row.name != 'parent_port' )">
+                    <select ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'multiselect' ">
+                    <select multiple="multiple"  ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+            <div ng-if="!row.required">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}">
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                    <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" private_vxc_rows="4" maxlength="128" cols="40"></textarea>
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                    <select ng-options="option for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]">
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+        </div>
+        <!--<button class="btn btn-success" ng-click="buy_port()">Save</button>-->
+        <div class="form-group">
+            <span>
+                <label for="blockName" class="col-sm-3 control-label">Target Port*</label>
+            </span>
+            <div class="col-sm-9">
+                <select ng-options="option.long for option in target_port_options track by option.short" class="form-control" ng-model="obj['target_port']" required>
+                    <option value="">-- Select target port --</option>
+                </select>
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-primary" type="button" ng-click="buy_vxc(obj, 'Private')">Buy</button>
+</div>
+</script>
+<script type="text/ng-template" id="awsvxc.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+    <div style="clear:both">
+    <span ng-if="show_loader==true">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader" style="z-index: 1000;">
+    </span>
+    <form class="form-horizontal">
+        <div class="form-group" ng-repeat="row in aws_vxc_rows">
+            <div ng-if="row.required">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">{{ row.description }}*</label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'date' && row.name=='start_date')">
+                    <div class="input-group date">
+                        <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                    </div>
+                    <datetimepicker data-ng-model="obj[row.name]"
+                            data-datetimepicker-config="{ dropdownSelector: '#dropdownStart', renderOn: 'end-date-changed' }"
+                            data-on-set-time="startDateOnSetTime()"
+                            data-before-render="startDateBeforeRender($dates)"></datetimepicker>
+                </div>
+
+                <div class="col-sm-9" ng-if="(row.type == 'text' && row.name!='customer') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')|| (row.type == 'password')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+                </div>
+
+                <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                    <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" aws_vxc_rows="4" maxlength="128" cols="40" required></textarea>
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                    <select ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'multiselect' ">
+                    <select multiple="multiple"  ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+            <div ng-if="!row.required">
+                <div ng-if="row.depends == undefined">
+                    <span ng-if= "row.type != 'hidden'">
+                        <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                    </span>
+                    <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                        <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}">
+                    </div>
+                    <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                        <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" aws_vxc_rows="4" maxlength="128" cols="40"></textarea>
+                    </div>
+                    <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                        <select ng-options="option for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]">
+                            <option value="">-- Select {{ row.description | lowercase }} --</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-9" style="float: right;">
+                        <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                    </div>
+                </div>
+                <div ng-if="row.depends != undefined">
+                    <div ng-if="row.depends">
+                        <span ng-if= "row.type != 'hidden'">
+                            <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                        </span>
+                        <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                            <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" maxlength="128" value="{{row.value}}">
+                        </div>
+                        <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                            <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" aws_vxc_rows="4" maxlength="128" cols="40"></textarea>
+                        </div>
+                        <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                            <select ng-options="option for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]">
+                                <option value="">-- Select {{ row.description | lowercase }} --</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-9" style="float: right;">
+                            <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-primary" type="button" ng-click="buy_vxc(obj, 'AWS')" ng-disabled="disableButton">Buy</button>
+</div>
+</script>
+<script type="text/ng-template" id="azurevxc.html">
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+    <alerts></alerts>
+    <div style="clear:both">
+    <span ng-if="show_loader==true">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader" style="z-index: 1000;">
+    </span>
+    <form class="form-horizontal">
+        <div class="form-group" ng-repeat="row in azure_vxc_rows">
+            <div ng-if="row.required">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">{{ row.description }}*</label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'text' && row.name!='service_key') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+                </div>
+                <div class="col-sm-9" ng-if="(row.type == 'text' && row.name =='service_key')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" ng-blur="azure_target_port(obj[row.name])" value="{{row.value}}" required>
+                </div>
+
+                <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                    <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" azure_vxc_rows="4" maxlength="128" cols="40" required></textarea>
+                </div>
+                <div class="col-sm-9" ng-if="(row.type == 'select')">
+                    <select ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'multiselect' ">
+                    <select multiple="multiple"  ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+            <div ng-if="!row.required">
+                <span ng-if= "row.type != 'hidden'">
+                    <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+                </span>
+                <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')">
+                    <input type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}">
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'textarea' ">
+                    <textarea type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" azure_vxc_rows="4" maxlength="128" cols="40"></textarea>
+                </div>
+                <div class="col-sm-9" ng-if=" row.type == 'select' ">
+                    <select ng-options="option for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]">
+                        <option value="">-- Select {{ row.description | lowercase }} --</option>
+                    </select>
+                </div>
+                <div class="col-sm-9" style="float: right;">
+                    <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <span>
+                <label for="blockName" class="col-sm-3 control-label">Target Port*</label>
+            </span>
+            <div class="col-sm-9">
+                <select ng-options="option.long for option in target_azure_list track by option.short" class="form-control" ng-model="obj['target_cloud']" required>
+                    <option value="">-- Select target port --</option>
+                </select>
+            </div>
+        </div>
+    </form>
+    <button class="btn btn-primary" type="button" ng-click="buy_vxc(obj, 'Azure')" ng-disabled="disableButton">Buy</button>
+</div>
+</script>

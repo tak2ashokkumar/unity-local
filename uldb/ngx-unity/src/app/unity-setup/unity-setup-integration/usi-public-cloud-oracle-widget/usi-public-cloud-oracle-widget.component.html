@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'OCI'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addAccount()"
+    (viewButtonClick)="viewOracleAccount()" [moduleName]="'Public Cloud'" [addAccessType]="'Manage Public Cloud'"
+    [viewAccessType]="'View Public Cloud'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<public-cloud-oci-crud (onCrud)="onCrud($event)"></public-cloud-oci-crud>

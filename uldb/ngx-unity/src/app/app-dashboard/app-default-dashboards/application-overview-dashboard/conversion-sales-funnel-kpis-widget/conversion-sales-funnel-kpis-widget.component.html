@@ -1,0 +1,81 @@
+<div class="card round-edge equalize-card">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+        <span class="font-lg font-500">Conversion & Sales Funnel KPIs</span>
+    </div>
+    <div class="card-body px-2" style="min-height:400px;max-height:641px;overflow-y: auto;overflow-x: hidden;">
+        <div class="row mx-0">
+            <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <div class="card equalize-card border-0">
+                    <app-spinner [name]="checkoutAbondanRateWidgetViewData?.loader"></app-spinner>
+                    <div class="card-body p-0 d-flex flex-column justify-content-around">
+                        <ng-container *ngIf="checkoutAbondanRateWidgetViewData?.chartData">
+                            <div echarts [options]="checkoutAbondanRateWidgetViewData?.chartData?.options"
+                                [extentions]="checkoutAbondanRateWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300"></div>
+                        </ng-container>
+                        <ng-container *ngIf="!checkoutAbondanRateWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No checkout Abondan Rate data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <div class="card equalize-card border-0">
+                    <app-spinner [name]="conversionRateWidgetViewData?.loader"></app-spinner>
+                    <div class="card-body p-0 d-flex flex-column justify-content-around">
+                        <ng-container *ngIf="conversionRateWidgetViewData?.chartData">
+                            <div echarts [options]="conversionRateWidgetViewData?.chartData?.options"
+                                [extentions]="conversionRateWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300">
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!conversionRateWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No conversion Rate data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <div class="card equalize-card border-0">
+                    <app-spinner [name]="orderPlcedWidgetViewData?.loader"></app-spinner>
+                    <div class="card-body p-0 d-flex flex-column justify-content-around">
+                        <ng-container *ngIf="orderPlcedWidgetViewData?.chartData">
+                            <div echarts [options]="orderPlcedWidgetViewData?.chartData?.options"
+                                [extentions]="orderPlcedWidgetViewData?.chartData?.extensions" [defaultHeight]="300">
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!orderPlcedWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No Orders Placed data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mx-0 mt-2">
+            <div class="col-12 px-2 d-flex justify-content-center"
+                style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <div class="card equalize-card border-0 flex-grow-1">
+                    <app-spinner [name]="newVsReturningCustomersWidgetViewData?.loader"></app-spinner>
+                    <div class="card-body p-0 d-flex flex-column justify-content-around">
+                        <ng-container *ngIf="newVsReturningCustomersWidgetViewData?.chartData">
+                            <div echarts [options]="newVsReturningCustomersWidgetViewData?.chartData?.options"
+                                [extentions]="newVsReturningCustomersWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300"></div>
+                        </ng-container>
+                        <ng-container *ngIf="!newVsReturningCustomersWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No New vs Returning Customers data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

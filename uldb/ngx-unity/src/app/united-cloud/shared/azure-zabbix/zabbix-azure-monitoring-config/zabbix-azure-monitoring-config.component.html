@@ -1,0 +1,89 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-0">
+            <div class="card-body">
+                <form [formGroup]="form" *ngIf="form">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label">Client ID<em>*</em></label>
+                            <input id="client_id" class="form-control" formControlName="client_id" type="text"
+                                [class.is-invalid]="formErrors.client_id">
+                            <div class="invalid-feedback" *ngIf="formErrors.client_id">
+                                {{formErrors.client_id}}</div>
+                        </div>
+
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label">Tenant ID<em>*</em></label>
+                            <input id="tenant_id" class="form-control" formControlName="tenant_id" type="text"
+                                [class.is-invalid]="formErrors.tenant_id">
+                            <div class="invalid-feedback" *ngIf="formErrors.tenant_id">
+                                {{formErrors.tenant_id}}</div>
+                        </div>
+
+                        <div class="form-group col-4">
+                            <label class="form-col-form-label">Client Secret<em>*</em></label>
+                            <input id="client_secret" class="form-control" formControlName="client_secret"
+                                type="password" [class.is-invalid]="formErrors.client_secret">
+                            <div class="invalid-feedback" *ngIf="formErrors.client_secret">
+                                {{formErrors.client_secret}}</div>
+                        </div>
+
+                        <div class="form-group col-4" formGroupName="collector">
+                            <label class="font-col-form-label" for="collectoruuid">Collector<em>*</em></label>
+                            <select id="collectoruuid" class="form-control" formControlName="uuid"
+                                [class.is-invalid]="formErrors.collector.uuid">
+                                <option value="" disabled>Select Collector</option>
+                                <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.collector.uuid">{{formErrors.collector.uuid}}</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <button class="btn btn-sm btn-success pull-right ml-1" type="button" [disabled]="form && form.pristine"
+                    (click)="confirmMonitoringConfig()" accessControl moduleName="Monitoring"
+                    accessType="Manage Monitoring" elementType="btn">Activate Monitoring</button>
+
+                <button class="btn btn-sm btn-warning pull-right ml-1" type="button" *ngIf="monitoringDetails"
+                    [disabled]="form && form.pristine" (click)="buildForm()">Reset</button>
+
+                <button class="btn btn-sm btn-danger pull-right ml-1" type="button" (click)="deleteMonitoringConfig()"
+                    *ngIf="monitoringDetails" accessControl moduleName="Monitoring" accessType="Manage Monitoring"
+                    elementType="btn">Delete</button>
+
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="toggleMonitoring()"
+                    *ngIf="monitoring && monitoring.configured && !monitoring.enabled" accessControl
+                    moduleName="Monitoring" accessType="Manage Monitoring" elementType="btn">Enable</button>
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="toggleMonitoring()"
+                    *ngIf="monitoring && monitoring.configured && monitoring.enabled" accessControl
+                    moduleName="Monitoring" accessType="Manage Monitoring" elementType="btn">Disable</button>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This monitoring configuration will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteConfig()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,131 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <span class="font-lg font-500">{{actionMessage}}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'credentialForm'"
+                                        (click)="manageActiveForm('credentialForm')">
+                                        <span class="fas fa-cog font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Add Credentials</label>
+                                </div>
+                                <div class="d-flex flex-column align-items-center step">
+                                    <span class="badge icon-wrap pointer-link"
+                                        [class.active]="activeForm == 'scheduleForm'"
+                                        (click)="manageActiveForm('scheduleForm')">
+                                        <span class="fas fa-clock font-xl"></span>
+                                    </span>
+                                    <label class="mt-1 font-md">Scheduled Discovery</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 offset-4 divider-wrap">
+                                <hr class="divider-line w-85 ml-0">
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col">
+                                <ng-container [ngSwitch]="activeForm">
+                                    <ng-container *ngSwitchCase="'credentialForm'">
+                                        <ng-container *ngTemplateOutlet="credentialFormRef"></ng-container>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'scheduleForm'">
+                                        <ng-container *ngTemplateOutlet="scheduleFormRef"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #credentialFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-8 offset-2">
+                    <form *ngIf="credentialForm" [formGroup]="credentialForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="ldap_url" class="form-col-form-label">LDAP Url<em>*</em></label>
+                                <input class="form-control" id="ldap_url" formControlName="ldap_url" type="text"
+                                    placeholder="LDAP Url" [ngClass]="{'is-invalid' : credentialFormErrors.ldap_url}">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.ldap_url">
+                                    {{credentialFormErrors.ldap_url}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="ldap_port" class="form-col-form-label">LDAP Port<em>*</em></label>
+                                <input class="form-control" id="ldap_port" formControlName="ldap_port" type="number"
+                                    placeholder="LDAP Port" [ngClass]="{'is-invalid' : credentialFormErrors.ldap_port}">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.ldap_port">
+                                    {{credentialFormErrors.ldap_port}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="username" class="form-col-form-label">Username<em>*</em></label>
+                                <input class="form-control" id="username" type="text" placeholder="Username"
+                                    [ngClass]="{'is-invalid' : credentialFormErrors.username}"
+                                    formControlName="username">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.username">
+                                    {{credentialFormErrors.username}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="password" class="form-col-form-label">Password<em>*</em></label>
+                                <input class="form-control" id="password" type="password" placeholder="Password"
+                                    [ngClass]="{'is-invalid' : credentialFormErrors.password}"
+                                    formControlName="password">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.password">
+                                    {{credentialFormErrors.password}}</div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="dc" class="form-col-form-label">Domain Name<em>*</em></label>
+                                <input class="form-control" id="dc" type="text" placeholder="Domain Name"
+                                    [ngClass]="{'is-invalid' : credentialFormErrors.dc}" formControlName="dc">
+                                <div class="invalid-feedback" *ngIf="credentialFormErrors.dc">
+                                    {{credentialFormErrors.dc}}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitCredentialForm()">Next</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleFormRef>
+    <div class="card border-0">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-10 offset-1">
+                    <div class="form-group" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials">{{nonFieldErr}}</div>
+                    </div>
+                    <unity-schedule></unity-schedule>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(false)">Save</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmitScheduleForm(true)">Save & Run</button>
+        </div>
+    </div>
+</ng-template>

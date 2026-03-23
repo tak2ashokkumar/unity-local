@@ -1,0 +1,48 @@
+<div class="pt-3 px-3">
+  <div class="form-group row">
+    <label class="col-md-3 col-form-label" for="select1">Select VM Type to update:</label>
+    <div class="col-md-9">
+      <select class="form-control" id="select1" name="select1" [(ngModel)]="selectedCloudType">
+        <option [value]="''">Please Select</option>
+        <option [value]="cloud" *ngFor="let cloud of clouds">{{cloud}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <div class="card equalize-card">
+        <div class="card-header">VM List</div>
+        <div class="card-body">
+          <span class="text-muted mb-2">Download VM List to update monitoring details</span>
+        </div>
+        <div class="card-footer border-0 bg-transparent">
+          <a href="customer/enable_vm_monitoring/?cloud_type={{selectedCloudType}}" #downLoadFile hidden></a>
+          <button #submitButton class="btn btn-warning btn-sm btn-pill pull-right" [class.disabled]="!selectedCloudType"
+            (click)="selectedCloudType && downLoadFile.click()"
+            [tooltip]="selectedCloudType ? '' : 'Please select cloud type'" container="body">Download
+            Now</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card equalize-card">
+        <div class="card-header">Upload Sheet</div>
+        <div class="card-body">
+          <input type="file" #file hidden accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            (change)="detectFiles($event.target.files)">
+          <button class="btn btn-brand btn-lg btn-light" type="button" (click)="file.click()">
+            <span class="mr-4 font-sm">Select File</span>
+            <i class="fa fa-upload pull-right bg-warning"></i>
+          </button>
+          <span *ngIf="fileToUpload" class="btn btn-primary mt-2 btn-sm">{{fileToUpload.name}}</span>
+          <small *ngIf="invalidFileSize" class="font-sm text-danger">{{invalidFileSize}}</small>
+        </div>
+        <div class="card-footer border-0 bg-transparent">
+          <button type="button" class="btn btn-warning btn-sm btn-pill pull-right"
+            [class.disabled]="!(selectedCloudType && fileToUpload)" (click)="selectedCloudType && fileToUpload && uploadFile()"
+            [tooltip]="selectedCloudType ? '' : 'Please select cloud type'" container="body">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

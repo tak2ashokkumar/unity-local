@@ -1,0 +1,315 @@
+<ng-template [ngIf]="showBriefInfo" [ngIfElse]="deviceCompleteInfo">
+  <div class="col-12">
+    <div class="card mb-2">
+      <div class="card-header font-weight-bold px-2">
+        <span> {{deviceInfo.displayType}}: {{deviceInfo.name}}</span>
+        <ng-container *ngTemplateOutlet="deviceStatus"></ng-container>
+      </div>
+      <div class="card-header px-2 py-1" *ngIf="!deviceInfo.isOtherDevice && !deviceInfo.isPanelDevice">
+        <div class="w-100">
+          <ng-container *ngTemplateOutlet="infoActions"></ng-container>
+        </div>
+      </div>
+      <div class="card-body pt-2 pb-1 px-2">
+        <div class="row">
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1" *ngIf="deviceInfo.isPDU">
+              <small class="text-muted">Sockets</small>
+              <br>
+              <span class="info-value"> {{deviceInfo.sockets || 'NA'}}</span>
+            </div>
+            <div class="callout callout-warning mt-2 mb-1" *ngIf="!deviceInfo.isPDU">
+              <small class="text-muted">Manufacturer</small>
+              <br>
+              <span class="info-value"> {{deviceInfo.manufacturer || 'NA'}}</span>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1" *ngIf="deviceInfo.isHypervisor">
+              <small class="text-muted">Virtualization Type</small>
+              <br>
+              <span class="info-value"> {{deviceInfo.virtualizationType || 'NA'}}</span>
+            </div>
+            <div class="callout callout-warning mt-2 mb-1" *ngIf="!deviceInfo.isHypervisor">
+              <small class="text-muted">Management IP</small>
+              <br>
+              <span class="info-value"> {{deviceInfo.managementIP || 'NA'}}</span>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted" *ngIf="deviceInfo.isPDU">Current</small>
+              <small class="text-muted" *ngIf="!deviceInfo.isPDU">Temperature</small>
+              <br>
+              <span class="info-value" *ngIf="deviceInfo.sensor"> {{deviceInfo.sensor.sensorValue}}
+                <span [innerHtml]="deviceInfo.sensor.sensorUnit"></span>
+              </span>
+              <span class="info-value" *ngIf="!deviceInfo.sensor"> N/A </span>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Up Time</small>
+              <br>
+              <span class="info-value"
+                *ngIf="deviceInfo?.status.uptime && deviceInfo?.status.uptime != '0'">{{deviceInfo?.status.uptime
+                | SecToDays}}</span>
+              <span class="info-value"
+                *ngIf="!deviceInfo?.status.uptime || deviceInfo?.status.uptime == '0'">{{'NA'}}</span>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Last Rebooted </small>
+              <br>
+              <span class="info-value"
+                *ngIf="deviceInfo?.status.lastRebooted && deviceInfo?.status.lastRebooted != '0'">{{(deviceInfo?.status.lastRebooted
+                | date:'MMM d, y, h:mm:ss a')}}</span>
+              <span class="info-value"
+                *ngIf="!deviceInfo?.status.lastRebooted || deviceInfo?.status.lastRebooted == '0'">{{
+                'NA'}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="!deviceInfo.isPDU && connectedPDUs.length">
+          <div class="col-12 mt-2" *ngFor="let pdu of connectedPDUs">
+            <div class="alert alert-secondary d-flex align-items-center border mb-0 p-1" role="alert">
+              <div class="w-60 text-left">
+                <div class="text-value text-warning text-truncate">
+                  <span class="small text-uppercase font-weight-bold" [tooltip]="pdu.pduName" container="body">
+                    <i class="fa fa-plug pdus"></i> &nbsp; {{pdu.pduName}}
+                  </span>
+                </div>
+                <div class="text-muted font-weight-bold text-truncate small">
+                  Outlets Connected :
+                  <span *ngFor="let socket of pdu.sockets; let last = last" [tooltip]="pdu.sockets" container="body">
+                    {{socket}} <span *ngIf="!last">,</span>&nbsp;
+                  </span>
+                </div>
+              </div>
+              <div class="w-40 text-right">
+                <button *ngIf="pdu.pduRecycle" class="action-icons ml-0 mb-0 fa fa-recycle font-sm"
+                  (click)="recyclePDUSockets(pdu)" [tooltip]="pdu.pduRecycle.tooltipText"
+                  [class.action-icons-disabled]="!pdu.pduRecycle.tooltipText" container="body" accessControl
+                  moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn"></button>
+                <button *ngIf="pdu.observiumStats" class="action-icons ml-1 mb-0 fas fa-chart-line font-sm  pull-right"
+                  (click)="goToPDUStats(pdu)" [class.action-icons-disabled]="!pdu.observiumStats.isEnabled"
+                  [tooltip]="pdu.observiumStats.tooltipText" container="body" accessControl moduleName="Monitoring"
+                  accessType="View Monitoring" elementType="actionbtn"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #deviceCompleteInfo>
+  <div class="col-12">
+    <div class="card mb-2">
+      <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+        <div class="w-65 py-1">
+          <span> {{deviceInfo.displayType}}: {{deviceInfo.name}}</span>
+          <span *ngIf="deviceInfo.model"> &nbsp; ({{deviceInfo.model}})</span>
+          <ng-container *ngTemplateOutlet="deviceStatus"></ng-container>
+        </div>
+        <div class="w-35">
+          <ng-container *ngTemplateOutlet="infoActions"></ng-container>
+        </div>
+      </div>
+      <div class="card-body pt-2 pb-1 px-2">
+        <div class="row" *ngIf="!deviceInfo.isServer">
+          <div [ngClass]="deviceInfo.isPDU ? 'col-4' : 'col-6'">
+            <span class="w-100 d-inline-block text-truncate">
+              <strong> Manufacturer : &nbsp;&nbsp; </strong>
+              <span>{{deviceInfo.manufacturer || 'NA'}}</span>
+            </span>
+          </div>
+          <div class="col-4" *ngIf="deviceInfo.isPDU">
+            <strong> Sockets : &nbsp;&nbsp; </strong>
+            <span>{{deviceInfo.sockets || 'NA'}}</span>
+          </div>
+          <div [ngClass]="deviceInfo.isPDU ? 'col-4' : 'col-6'">
+            <strong> Management IP : &nbsp;&nbsp; </strong>
+            <span>{{deviceInfo.managementIP || 'NA'}}</span>
+          </div>
+        </div>
+        <div class="row" *ngIf="deviceInfo.isServer">
+          <div class="col-4">
+            <strong> Manufacturer : &nbsp;&nbsp; </strong>
+            <span>{{deviceInfo.manufacturer || 'NA'}}</span>
+          </div>
+          <div class="col-4">
+            <strong> OS : &nbsp;&nbsp; </strong>
+            <span>{{deviceInfo.os || 'NA'}}</span>
+          </div>
+          <div class="col-4" *ngIf="deviceInfo.isHypervisor">
+            <strong> Virtualization Type : &nbsp;&nbsp; </strong>
+            <span>{{deviceInfo.virtualizationType || 'NA'}}</span>
+          </div>
+          <div class="col-4" *ngIf="!deviceInfo.isHypervisor">
+            <strong> Management IP : &nbsp;&nbsp; </strong>
+            <span>{{deviceInfo.managementIP || 'NA'}}</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-4">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted" *ngIf="deviceInfo.isPDU">Current</small>
+              <small class="text-muted" *ngIf="!deviceInfo.isPDU">Temperature</small>
+              <br>
+              <span class="info-value" *ngIf="deviceInfo.sensor"> {{deviceInfo.sensor.sensorValue}}
+                <span [innerHtml]="deviceInfo.sensor.sensorUnit"></span>
+              </span>
+              <span class="info-value" *ngIf="!deviceInfo.sensor"> N/A </span>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Up Time</small>
+              <br>
+              <!-- <span class="info-value">{{(deviceInfo?.status.uptime | SecToDays) || 'NA'}}</span> -->
+              <span class="info-value"
+                *ngIf="deviceInfo?.status.uptime && deviceInfo?.status.uptime != '0'">{{deviceInfo?.status.uptime
+                | SecToDays}}</span>
+              <span class="info-value"
+                *ngIf="!deviceInfo?.status.uptime || deviceInfo?.status.uptime == '0'">{{'NA'}}</span>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="callout callout-warning mt-2 mb-1">
+              <small class="text-muted">Last Rebooted </small>
+              <br>
+              <!-- <span class="info-value">{{(deviceInfo?.status.lastRebooted | date:'MMM d, y, h:mm:ss a') || 'NA'}}</span> -->
+              <span class="info-value"
+                *ngIf="deviceInfo?.status.lastRebooted && deviceInfo?.status.lastRebooted != '0'">{{(deviceInfo?.status.lastRebooted
+                | date:'MMM d, y, h:mm:ss a')}}</span>
+              <span class="info-value"
+                *ngIf="!deviceInfo?.status.lastRebooted || deviceInfo?.status.lastRebooted == '0'">{{
+                'NA'}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="!deviceInfo.isPDU && connectedPDUs.length">
+          <div class="col-4 mt-2" *ngFor="let pdu of connectedPDUs">
+            <div class="alert alert-secondary d-flex align-items-center border mb-0 p-1" role="alert">
+              <div class="w-50 text-left">
+                <div class="text-value text-warning text-truncate">
+                  <span class="small text-uppercase font-weight-bold" [tooltip]="pdu.pduName" container="body">
+                    <i class="fa fa-plug pdus"></i> &nbsp; {{pdu.pduName}}
+                  </span>
+                </div>
+                <div class="text-muted font-weight-bold text-truncate small">
+                  Outlets Connected :
+                  <span *ngFor="let socket of pdu.sockets; let last = last" [tooltip]="pdu.sockets" container="body">
+                    {{socket}} <span *ngIf="!last">,</span>&nbsp;
+                  </span>
+                </div>
+              </div>
+              <div class="w-50 text-right">
+                <button *ngIf="pdu.pduRecycle" class="action-icons ml-0 mb-0 fa fa-recycle font-sm"
+                  (click)="recyclePDUSockets(pdu)" [tooltip]="pdu.pduRecycle.tooltipText"
+                  [class.action-icons-disabled]="!pdu.pduRecycle.tooltipText" container="body" accessControl
+                  moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn"></button>
+                <button *ngIf="pdu.observiumStats" class="action-icons ml-1 mb-0 fas fa-chart-line font-sm  pull-right"
+                  (click)="goToPDUStats(pdu)" container="body"
+                  [class.action-icons-disabled]="!pdu.observiumStats.isEnabled"
+                  [tooltip]="pdu.observiumStats.tooltipText" accessControl moduleName="Monitoring"
+                  accessType="View Monitoring" elementType="actionbtn"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deviceStatus>
+  <ng-container *ngIf="!deviceInfo.isPanelDevice">
+    <span class="ml-2" *ngIf="!deviceInfo.isOtherDevice">
+      <shared-device-status [status]="deviceInfo.status.status" class="small-icon"></shared-device-status>
+    </span>
+    <span class="ml-2" *ngIf="deviceInfo.isOtherDevice">
+      <span *ngIf="!deviceInfo.status"><i class="fa fa-spinner fa-spin"></i></span>
+      <span *ngIf="deviceInfo.status" class="text-capitalize status-icon">
+        <i *ngIf="deviceInfo.status.status=='up' || deviceInfo.status.status=='down'" class="fa fa-circle"
+          [tooltip]="deviceInfo.status"
+          [ngClass]="deviceInfo.status.status==='up'?'text-success':'text-danger'">&nbsp;</i>
+        <i *ngIf="deviceInfo.status.status == 'paused'" class="fa fa-pause-circle text-warning"
+          [tooltip]="deviceInfo.status"></i>
+        <i *ngIf="deviceInfo.status.status=='not checked yet' || deviceInfo.status.status=='seems down'"
+          class="fa fa-exclamation-circle text-warning" [tooltip]="deviceInfo.status"></i>
+        <i *ngIf="deviceInfo.status.status=='Not Configured'" class="fa fa-exclamation-circle text-warning"
+          [tooltip]="deviceInfo.status"></i>
+      </span>
+    </span>
+  </ng-container>
+</ng-template>
+
+<ng-template #infoActions>
+  <button *ngIf="!deviceInfo.isPanelDevice && !deviceInfo.isOtherDevice"
+    class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1 pull-right " (click)="createTicket()"
+    tooltip="Manage by creating support ticket" container="body"></button>
+
+  <button *ngIf="deviceInfo.monitoringStatus" class="action-icons mb-0 fas fa-chart-line font-sm ml-1 pull-right"
+    (click)="goToStats()" [class.action-icons-disabled]="!deviceInfo.monitoringStatus.isEnabled" contaner="body"
+    [tooltip]="deviceInfo.monitoringStatus.tooltipText" accessControl moduleName="Monitoring"
+    accessType="View Monitoring" elementType="actionbtn"></button>
+
+  <button *ngIf="deviceInfo.sshNewTab" class="action-icons fas fa-external-link-alt font-sm ml-1 pull-right "
+    (click)="consoleNewTab()" [class.action-icons-disabled]="!deviceInfo.sshNewTab.isEnabled"
+    [tooltip]="deviceInfo.sshNewTab.tooltipText" container="body" accessControl moduleName="Datacenter"
+    accessType="Remote Management" elementType="actionbtn"></button>
+
+  <button *ngIf="deviceInfo.sshSameTab" class="action-icons fas fa-external-link-square-alt font-sm ml-1 pull-right"
+    (click)="consoleSameTab()" [class.action-icons-disabled]="!deviceInfo.sshSameTab.isEnabled"
+    [tooltip]="deviceInfo.sshSameTab.tooltipText" container="body" accessControl moduleName="Datacenter"
+    accessType="Remote Management" elementType="actionbtn"></button>
+
+  <button *ngIf="deviceInfo.blinker" class="action-icons far fa-lightbulb font-sm ml-1 pull-right "
+    (click)="showIPMIAuthModal()" [class.action-icons-disabled]="!deviceInfo.blinker.isEnabled"
+    [tooltip]="deviceInfo.blinker.tooltipText" container="body" [class.blinking]="isBlinking" accessControl
+    moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn"></button>
+
+  <button *ngIf="deviceInfo.recycle" class="action-icons fa fa-recycle font-sm ml-1 pull-right" (click)="recyclePDU()"
+    [tooltip]="deviceInfo.recycle.tooltipText" [class.action-icons-disabled]="!deviceInfo.recycle.tooltipText"
+    container="body" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+    elementType="actionbtn"></button>
+
+</ng-template>
+
+<ng-template #IPMIAuth>
+  <div class="card mb-0">
+    <div class="card-header">
+      Please provide credentials to this server.
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <label class="text-danger">*Only authorized users are allowed to perform this action. Please provide your
+        credentials.</label>
+      <form [formGroup]="IPMIAuthForm">
+        <div class="form-group">
+          <label for="ipmi_username">Username<em>*</em></label>
+          <input class="form-control" id="ipmi_username" formControlName="username" type="text" placeholder="Username">
+          <div class="invalid-feedback" *ngIf="formErrors.username">{{formErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label for="model">Password<em>*</em></label>
+          <input class="form-control" type="password" id="ipmi_password" formControlName="password"
+            placeholder="Password" [ngClass]="{'is-invalid' : formErrors.password}">
+          <div class="invalid-feedback" *ngIf="formErrors.password">{{formErrors.password}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" (click)="onSubmit()" type="button">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

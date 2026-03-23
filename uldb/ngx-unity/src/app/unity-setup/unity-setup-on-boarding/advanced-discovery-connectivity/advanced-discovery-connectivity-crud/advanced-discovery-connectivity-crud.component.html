@@ -1,0 +1,124 @@
+<ng-template #addEditTemplate>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Collector
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="closeAddModal()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="agentForm" [formGroup]="agentForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="name">Name<em>*</em></label>
+                    <input class="form-control" formControlName="name" type="text" placeholder="Name"
+                        [ngClass]="{'is-invalid' : formErrors.name}">
+                    <small class="text-danger" *ngIf="formErrors.name">{{formErrors.name}}</small>
+                </div>
+                <div class="form-group" *ngIf="agentForm.controls.host_name">
+                    <label for="host_name">Host Name</label>
+                    <input class="form-control" formControlName="host_name" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="ip_address">IP Address<em>*</em></label>
+                    <input class="form-control" formControlName="ip_address" type="text" placeholder="IP Address"
+                        [ngClass]="{'is-invalid' : formErrors.ip_address}">
+                    <small class="text-danger" *ngIf="formErrors.ip_address">{{formErrors.ip_address}}</small>
+                </div>
+                <div class="form-group">
+                    <label for="ssh_port">SSH Port</label>
+                    <input class="form-control" formControlName="ssh_port" type="text"
+                        placeholder="Default SSH Port : 22" [ngClass]="{'is-invalid' : formErrors.ssh_port}">
+                    <small class="text-danger" *ngIf="formErrors.ssh_port">{{formErrors.ssh_port}}</small>
+                </div>
+                <div class="form-group">
+                    <label for="snmp_community">SNMP Community</label>
+                    <input class="form-control" formControlName="snmp_community" type="text"
+                        placeholder="SNMP Community" [ngClass]="{'is-invalid' : formErrors.snmp_community}">
+                    <small class="text-danger" *ngIf="formErrors.snmp_community">{{formErrors.snmp_community}}</small>
+                </div>
+                <div class="form-group">
+                    <label for="ssh_username">SSH Username<em>*</em></label>
+                    <input class="form-control" formControlName="ssh_username" type="text" placeholder="SSH Username"
+                        [ngClass]="{'is-invalid' : formErrors.ssh_username}">
+                    <small class="text-danger" *ngIf="formErrors.ssh_username">{{formErrors.ssh_username}}</small>
+                </div>
+                <div class="form-group form-check form-check-inline" *ngIf="action=='Edit'">
+                    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" [(ngModel)]="resetPassword"
+                        (click)="toggleResetPasswordField()" [ngModelOptions]="{standalone: true}">
+                    <label class="form-check-label" for="inlineCheckbox1">Reset Password</label>
+                </div>
+                
+                <ng-container *ngIf="resetPassword">
+                    <div class="form-group row">
+                        <div class="col-3 col-form-label">
+                            <div class="form-check form-check-inline mr-1"><input type="radio" formControlName="ssh_authtype"
+                                    [value]="'password'" class="form-check-input">
+                                <label class="form-check-label">Password</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-form-label">
+                            <div class="form-check form-check-inline mr-1"><input type="radio" formControlName="ssh_authtype" [value]="'pkey'"
+                                    class="form-check-input">
+                                <label class="form-check-label">Private Key</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="agentForm.controls.ssh_password">
+                        <label class="form-col-form-label" for="ssh_password">SSH Password<em>*</em></label>
+                        <input class="form-control" id="ssh_password" type="password" formControlName="ssh_password"
+                            placeholder="SSH Password" [ngClass]="{'is-invalid' : formErrors.ssh_password}">
+                        <small class="text-danger" *ngIf="formErrors.ssh_password">{{formErrors.ssh_password}}</small>
+                    </div>
+                    <div class="form-group" *ngIf="agentForm.controls.sudo_password">
+                        <label class="form-col-form-label" for="sudo_password">Sudo Password<em>*</em></label>
+                        <input class="form-control" id="sudo_password" type="password" formControlName="sudo_password"
+                            placeholder="Sudo Password" [ngClass]="{'is-invalid' : formErrors.sudo_password}">
+                        <small class="text-danger" *ngIf="formErrors.sudo_password">{{formErrors.sudo_password}}</small>
+                    </div>
+                </ng-container>
+            </form>
+            <ng-container *ngIf="resetPassword">
+                <form *ngIf="privateKeyForm" [formGroup]="privateKeyForm">
+                    <div class="form-group">
+                        <label class="form-col-form-label" for="file-pem-input">Private Key<em>*</em></label>
+                        <input class="form-control" id="file-pem-input" name="file-pem-input" type="file" accept=".pem"
+                            [ngClass]="{'is-invalid' : privateKeyFormErrors.pkey}"
+                            (change)="handlePrivateKeyInput($event.target.files)">
+                        <div class="invalid-feedback" *ngIf="privateKeyFormErrors.pkey">{{privateKeyFormErrors.pkey}}</div>
+                    </div>
+                </form>
+            </ng-container>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="submitAgentForm()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="closeAddModal()" type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Collector Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Deleting Collector will disable Management & Monitoring for all your devices from UNITY. Are you sure to
+            continue?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>

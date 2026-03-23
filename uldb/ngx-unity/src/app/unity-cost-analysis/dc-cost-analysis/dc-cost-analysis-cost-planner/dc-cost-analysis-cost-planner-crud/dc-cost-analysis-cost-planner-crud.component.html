@@ -1,0 +1,325 @@
+<div class="container-fluid mt-3">
+    <div class="card round-edge">
+        <div class="card-header d-flex justify-content-between align-items-center px-2 py-1 bg-white">
+            <div class="py-1">
+                <span class="font-500">Create Cost Planner</span>
+            </div>
+            <div class="text-warning">
+                <a class="nav-link py-0 " (click)="goBack()">
+                    <i class="fa fa-arrow-left">&nbsp;</i>
+                    <span>To Cost Planner</span>
+                </a>
+            </div>
+        </div>
+        <div class="card-body pt-1">
+            <form *ngIf="plannerForm" [formGroup]="plannerForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-3 form-group">
+                        <label class="form-col-form-label">Name<em>*</em></label>
+                        <input id="name" class="form-control" type="text" formControlName="name"
+                            [class.is-invalid]="plannerFormErrors.name">
+                        <div class="invalid-feedback" *ngIf="plannerFormErrors.name">{{plannerFormErrors.name}}
+                        </div>
+                    </div>
+                    <div class="col-3 form-group">
+                        <label class="form-col-form-label">Description<em>*</em></label>
+                        <input id="description" class="form-control" type="text" formControlName="description"
+                            [class.is-invalid]="plannerFormErrors.description">
+                        <div class="invalid-feedback" *ngIf="plannerFormErrors.description">
+                            {{plannerFormErrors.description}}
+                        </div>
+                    </div>
+                    <div class="col-3 form-group">
+                        <label class="form-col-form-label">Datacenter<em>*</em></label>
+                        <multiselect-dropdown [options]="datacenters" [settings]="datacenterListSettings"
+                            class="form-control p-0" style="height:auto;" formControlName="datacenter"
+                            [ngClass]="{'is-invalid' : plannerFormErrors.datacenter}"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="plannerFormErrors.datacenter">
+                            {{plannerFormErrors.datacenter}}
+                        </div>
+                    </div>
+                    <div class="col-3 form-group">
+                        <label for="annual_escalation">Annual Escalation</label>
+                        <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                            [tooltip]="'Percentage of escalation per year'"></i>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-white rounded-left">
+                                    <i class="fas fa-percentage"></i>
+                                </span>
+                            </div>
+                            <input class="form-control" id="annual_escalation" type="number"
+                                formControlName="annual_escalation" max="100"
+                                [ngClass]="{'is-invalid' : plannerFormErrors.annual_escalation}">
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="plannerFormErrors.annual_escalation">
+                            {{plannerFormErrors.annual_escalation}}</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="ml-2 mr-3 col border rounded p-4 position-relative">
+                        <div class="pb-2 mb-3 bg-white position-absolute section-name">Contract</div>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label class="form-col-form-label" for="contract_start_date">Contract Start
+                                    Date<em>*</em></label>
+                                <div class="input-group">
+                                    <owl-date-time #contractStartDate [pickerType]="'calendar'"></owl-date-time>
+                                    <div class="input-group-prepend" [owlDateTimeTrigger]="contractStartDate">
+                                        <span class="input-group-text bg-white rounded-left">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input class="form-control rounded-right" formControlName="contract_start_date"
+                                        [ngClass]="{'is-invalid' : plannerFormErrors.contract_start_date}"
+                                        [owlDateTimeTrigger]="contractStartDate" [owlDateTime]="contractStartDate"
+                                        [max]="plannerForm.controls.contract_end_date.value" type="text"
+                                        name="contract_start_date">
+                                    <div class="invalid-feedback" *ngIf="plannerFormErrors.contract_start_date">
+                                        {{plannerFormErrors.contract_start_date}}</div>
+                                </div>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label class="form-col-form-label" for="contract_end_date">Contract End
+                                    Date<em>*
+                                    </em></label>
+                                <div class="input-group">
+                                    <owl-date-time #contractEndDate [pickerType]="'calendar'"></owl-date-time>
+                                    <div class="input-group-prepend " [owlDateTimeTrigger]="contractEndDate">
+                                        <span class="input-group-text bg-white rounded-left">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input class="form-control rounded-right" formControlName="contract_end_date"
+                                        [ngClass]="{'is-invalid' : plannerFormErrors.contract_start_date}"
+                                        [owlDateTimeTrigger]="contractEndDate" [owlDateTime]="contractEndDate"
+                                        [min]="plannerForm.controls.contract_start_date.value" type="text"
+                                        name="contract_end_date">
+                                    <div class="invalid-feedback" *ngIf="plannerFormErrors.contract_end_date">
+                                        {{plannerFormErrors.contract_end_date}}</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ml-2 mr-3 col border rounded p-4 position-relative">
+                        <div class="pb-2 mb-3 bg-white position-absolute section-name">Cabinet</div>
+                        <div class="row">
+                            <div class="col" formArrayName="cabinet"
+                                *ngFor="let cabinetEntity of plannerForm.controls.cabinet.controls; let i = index;">
+                                <div [formGroupName]="i">
+                                    <div class="row">
+                                        <div class="col form-group">
+                                            <label class="form-col-form-label">Cabinet Type<em>*</em></label>
+                                            <select id="entity_type-{{i}}" class="form-control" type="text"
+                                                formControlName="entity_type"
+                                                [class.is-invalid]="plannerFormErrors.cabinet[i].entity_type">
+                                                <option [value]="''" disabled>Select Type</option>
+                                                <option [value]="'Half Cabinet'">Half Cabinet</option>
+                                                <option [value]="'Full Cabinet'">Full Cabinet</option>
+                                                <option [value]="'One Unit'">One Unit</option>
+                                            </select>
+                                            <div class="invalid-feedback"
+                                                *ngIf="plannerFormErrors.cabinet[i].entity_type">
+                                                {{plannerFormErrors.cabinet[i].entity_type}}</div>
+                                        </div>
+                                        <div class="col form-group">
+                                            <label for="unit_cost">Unit Cost<em>* </em></label>
+                                            <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                                containerClass="info-multi-line" [tooltip]="'Cost per month'"></i>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-white rounded-left">
+                                                        <i class="fas fa-dollar-sign"></i>
+                                                    </span>
+                                                </div>
+                                                <input class="form-control" id="unit_cost-{{i}}" type="number"
+                                                    formControlName="unit_cost" min="0"
+                                                    [ngClass]="{'is-invalid' : plannerFormErrors.cabinet[i].unit_cost}">
+                                            </div>
+                                            <div class="invalid-feedback d-block"
+                                                *ngIf="plannerFormErrors.cabinet[i].unit_cost">
+                                                {{plannerFormErrors.cabinet[i].unit_cost}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="row mb-4">
+                            <div class="col-6" formArrayName="bandwidth"
+                                *ngFor="let bandwidthEntity of plannerForm.controls.bandwidth.controls; let i = index;">
+                                <div [formGroupName]="i">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label class="form-col-form-label">Bandwidth Type<em>*</em></label>
+                                            <select id="entity_type-{{i}}" class="form-control" type="text"
+                                                formControlName="entity_type"
+                                                [class.is-invalid]="plannerFormErrors.bandwidth[i].entity_type">
+                                                <option [value]="''" disabled>Select Type</option>
+                                                <option [value]="'Type A'">Type A</option>
+                                            </select>
+                                            <div class="invalid-feedback"
+                                                *ngIf="plannerFormErrors.bandwidth[i].entity_type">
+                                                {{plannerFormErrors.bandwidth[i].entity_type}}</div>
+                                        </div>
+                                        <div class="col">
+                                            <label for="unit_cost">Unit Cost<em>*</em></label>
+                                            <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                                containerClass="info-multi-line" [tooltip]="'Cost per month'"></i>
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text bg-white rounded-left">
+                                                        <i class="fas fa-dollar-sign"></i>
+                                                    </span>
+                                                </div>
+                                                <input class="form-control" id="unit_cost-{{i}}" type="number"
+                                                    formControlName="unit_cost" min="0"
+                                                    [ngClass]="{'is-invalid' : plannerFormErrors.bandwidth[i].unit_cost}">
+                                            </div>
+                                            <div class="invalid-feedback d-block"
+                                                *ngIf="plannerFormErrors.bandwidth[i].unit_cost">
+                                                {{plannerFormErrors.bandwidth[i].unit_cost}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6" formArrayName="ipv4"
+                                *ngFor="let ipv4Entity of plannerForm.controls.ipv4.controls; let i = index;">
+                                <div [formGroupName]="i">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label class="form-col-form-label">IPV4 Space<em>*</em></label>
+                                            <select id="entity_type-{{i}}" class="form-control" type="text"
+                                                formControlName="entity_type"
+                                                [class.is-invalid]="plannerFormErrors.ipv4[i].entity_type">
+                                                <option [value]="''" disabled>Select Type</option>
+                                                <option [value]="'Type A'">Type A</option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="plannerFormErrors.ipv4[i].entity_type">
+                                                {{plannerFormErrors.ipv4[i].entity_type}}</div>
+                                        </div>
+                                        <div class="col">
+                                            <label for="unit_cost">Unit Cost<em>*</em></label>
+                                            <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                                containerClass="info-multi-line" [tooltip]="'Cost per month'"></i>
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text bg-white rounded-left">
+                                                        <i class="fas fa-dollar-sign"></i>
+                                                    </span>
+                                                </div>
+                                                <input class="form-control" id="unit_cost-{{i}}" type="number"
+                                                    formControlName="unit_cost" min="0"
+                                                    [ngClass]="{'is-invalid' : plannerFormErrors.ipv4[i].unit_cost}">
+                                            </div>
+                                            <div class="invalid-feedback d-block"
+                                                *ngIf="plannerFormErrors.ipv4[i].unit_cost">
+                                                {{plannerFormErrors.ipv4[i].unit_cost}}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                <div class="ml-0 mr-0 row border rounded p-4 position-relative">
+                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Power</div>
+                    <div class="col" formArrayName="power">
+                        <ng-container
+                            *ngFor="let powerEntity of plannerForm.controls.power.controls; let i = index; let first = first; let last = last;">
+                            <div class="row">
+                                <div class="col">
+                                    <div [formGroupName]="i" class="mb-4">
+                                        <div class="row d-flex justify-content-start">
+                                            <div class="col-3 form-group">
+                                                <label class="form-col-form-label">Power Type<em>*</em></label>
+                                                <select id="entity_type-{{i}}" class="form-control" type="text"
+                                                    formControlName="entity_type"
+                                                    [class.is-invalid]="plannerFormErrors.power[i].entity_type">
+                                                    <option [value]="''" disabled>Select Type</option>
+                                                    <option *ngFor="let c of powercircuits" [value]="c.name">
+                                                        {{c.full_name}}</option>
+                                                </select>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="plannerFormErrors.power[i].entity_type">
+                                                    {{plannerFormErrors.power[i].entity_type}}</div>
+                                            </div>
+                                            <div class="col-3 form-group mr-3">
+                                                <label for="unit_cost">Unit Cost<em>*</em></label>
+                                                <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                                    containerClass="info-multi-line" [tooltip]="'Cost per month'"></i>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text bg-white rounded-left">
+                                                            <i class="fas fa-dollar-sign"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input class="form-control" id="unit_cost-{{i}}" type="number"
+                                                        formControlName="unit_cost" min="0"
+                                                        [ngClass]="{'is-invalid' : plannerFormErrors.power[i].unit_cost}">
+                                                </div>
+                                                <div class="invalid-feedback d-block"
+                                                    *ngIf="plannerFormErrors.power[i].unit_cost">
+                                                    {{plannerFormErrors.power[i].unit_cost}}</div>
+                                            </div>
+                                            <div class="d-flex align-items-center mt-1 mr-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        formControlName="pdu_redundant_flag">
+                                                    <label class="form-check-label" for="pdu_redundant_flag">
+                                                        Redundant Power
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <ngContainer class="col-3 form-group pl-1"
+                                                *ngIf="plannerForm.get('power').controls[i].get('pdu_redundant_flag').value">
+                                                <label for="unit_cost">Unit Cost</label>
+                                                <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                                    containerClass="info-multi-line" [tooltip]="'Cost per month'"></i>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text bg-white rounded-left">
+                                                            <i class="fas fa-dollar-sign"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input class="form-control" id="pdu_redundant_cost-{{i}}"
+                                                        type="number" formControlName="pdu_redundant_cost" min="0"
+                                                        [ngClass]="{'is-invalid' : plannerFormErrors.power[i].pdu_redundant_cost}">
+                                                </div>
+                                                <div class="invalid-feedback d-block"
+                                                    *ngIf="plannerFormErrors.power[i].pdu_redundant_cost">
+                                                    {{plannerFormErrors.power[i].pdu_redundant_cost}}</div>
+                                            </ngContainer>
+                                            <div class="col-1 form-group mt-4">
+                                                <span class="form-control border-0 p-0">
+                                                    <button tooltip="Remove Condition"
+                                                        *ngIf="plannerForm.controls.power.controls.length > 1"
+                                                        class="action-icons mb-0 fas fa-minus font-sm ml-1"
+                                                        (click)="removePowerEntity(i)"></button>
+                                                    <button tooltip="Add Condition" *ngIf="last"
+                                                        class="action-icons mb-0 fas fa-plus font-sm ml-1"
+                                                        (click)="addPowerEntity(i)"></button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer d-flex justify-content-center bg-white border-top-0 mb-2">
+            <button class="btn btn-md btn-outline-danger" type="button" (click)="reset()">Reset</button>
+            <button class="btn btn-md btn-success ml-3" type="button" (click)="onSubmitPlannerForm()"
+                *ngIf="!pId">Create</button>
+            <button class="btn btn-md btn-success ml-3" type="button" (click)="onSubmitPlannerForm()"
+                *ngIf="pId">Update</button>
+        </div>
+    </div>
+</div>

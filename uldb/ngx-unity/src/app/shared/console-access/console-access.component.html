@@ -1,0 +1,2 @@
+<app-xterm *ngIf="!this.termData && !closed"></app-xterm>
+<app-xterm [input]="termData" *ngIf="this.termData && !closed"></app-xterm>

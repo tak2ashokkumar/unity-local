@@ -1,0 +1,47 @@
+<table class="table text-left mt-0 pt-0" *ngIf="viewData.length">
+  <thead>
+    <tr>
+      <th>Ticket Number</th>
+      <th>Type</th>
+      <th>Title</th>
+      <th>Status</th>
+      <th>Status Reason</th>
+      <th>Priority</th>
+      <th>Created On</th>
+      <th>Updated On</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let view of viewData" setTableColumnWidth>
+      <td>
+        <a class="text-primary" [tooltip]="view.ticketNumber">{{view.ticketNumber}}</a>
+      </td>
+      <td>
+        <div [tooltip]="view.ticketType">{{view.ticketType}}</div>
+      </td>
+      <td>
+        <div [tooltip]="view.title">{{view.title}}</div>
+      </td>
+      <td>
+        <div [tooltip]="view.status">{{view.status}}</div>
+      </td>
+      <td>
+        <div [tooltip]="view.statusReason">{{view.statusReason}}</div>
+      </td>
+      <td>
+        <div [tooltip]="view.priority">{{view.priority}}</div>
+      </td>
+      <td>
+        <div [tooltip]="view.openedAt">{{view.openedAt}}</div>
+      </td>
+      <td>
+        <div [tooltip]="view.updatedOn">{{view.updatedOn}}</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+  [totalCount]="count"></table-entries>
+<table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+  [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+<div class="text-center text-muted" *ngIf="!viewData.length">No Data to display.</div>

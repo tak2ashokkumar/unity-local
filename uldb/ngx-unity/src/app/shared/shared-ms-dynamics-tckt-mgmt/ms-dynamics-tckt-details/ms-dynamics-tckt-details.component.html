@@ -1,0 +1,374 @@
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-10">
+            <p>For urgent support requests, please contact us via :</p>
+          </div>
+          <div class="col-2">
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+            <a class="d-table text-warning pull-right ml-2" (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>Go
+              Back</a>
+          </div>
+          <div class="col-4">
+            <i class="far fa-envelope fa-lg text-success">&nbsp;</i>Email&nbsp;:&nbsp;<a
+              href="mailto:support@unityonecloud.com" class="text-decoration-none">support@unityonecloud.com</a>
+          </div>
+          <div class="col-8">
+            <i class="fa fa-phone fa-lg text-success">&nbsp;</i>Phone&nbsp;:&nbsp;<span
+              class="pr-2 border-right">1-415-349-2102</span>
+            <span class="pl-2">Toll-free&nbsp;:&nbsp;1-888-853-7733</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header bg-transparent ml-0 card-title font-lg">
+        <div class="row">
+          <div class="col-12 font-sm mb-1">
+            <span *ngIf="details.ticketType">
+              <span class="text-primary fa-sm"> <i class="fas fa-angle-double-left"></i> </span>
+              <span class="mx-2 text-muted font-weight-bold">{{details.ticketType}}</span>
+              <span class="text-primary fa-sm"> <i class="fas fa-angle-double-right"></i> </span>
+            </span>
+            <span *ngIf="details.ticketNumber" class="ml-4" tooltip="Ticket Number">
+              <span class="text-primary"> <i class="fas fa-ticket-alt"></i> </span>
+              <span class="ml-2 text-muted">{{details.ticketNumber}}</span>
+            </span>
+            <span *ngIf="details.ticketOwner" class="ml-4" tooltip="Owner">
+              <span class="text-primary"> <i class="far fa-user"></i> </span>
+              <span class="ml-2 text-muted">{{details.ticketOwner}}</span>
+            </span>
+            <span class="float-right text-muted">{{details.openedAt}}</span>
+          </div>
+          <div class="col-12">
+            <h4 class="card-title d-inline font-lg mb-0"> {{details.title}}
+            </h4>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-3">
+            Status - <small class="text-muted">{{details.status || 'N/A'}}</small>
+          </div>
+          <div class="col-3">
+            Status Reason - <small class="text-muted">{{details.statusReason || 'N/A'}}</small>
+          </div>
+          <div class="col-3">
+            Priority - <small class="text-muted">{{details.priority || 'N/A'}}</small>
+          </div>
+          <!-- <div class="col-3" *ngIf="details">
+            <form class="form-inline">
+              <div class="form-group row">
+                <label class="mr-2" for="priority">Priority</label>
+                <select class="form-control form-control-sm" id="priority" name="priority" [(ngModel)]="details.priority"
+                  (change)="changePriority($event.target.value)" [disabled]="!isAuthorised || details.status!='Active'">
+                  <option [value]="null" disabled>Select Priority</option>
+                  <option [value]="'Critical'">Critical</option>
+                  <option [value]="'High'">High</option>
+                  <option [value]="'Normal'">Normal</option>
+                  <option [value]="'Low'">Low</option>
+                </select>
+              </div>
+            </form>
+          </div> -->
+          <div class="col-3">
+            <button class="btn btn-sm btn-success float-right ml-1" type="button" (click)="resolve()"
+              *ngIf="details.status=='Active'" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+              elementType="btn">Resolve</button>
+            <button class="btn btn-sm btn-danger float-right" type="button" (click)="cancel()"
+              *ngIf="details.status=='Active'" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+              elementType="btn">Cancel</button>
+            <button class="btn btn-sm btn-warning float-right" type="button" (click)="reactivate()"
+              *ngIf="details.status!='Active'" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+              elementType="btn">Reactivate</button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12" [innerHTML]="details.description" style="min-height:20vh;" accessControl
+            moduleName="AIML Event Management" accessType="Manage AIML Event Management" elementType="div"></div>
+          <!-- <div *ngIf="!details.description" class="col-12" style="min-height:20vh;">
+            <coming-soon [message]="'Description not provided with ticket.'"></coming-soon>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <app-spinner [name]="'timeline'"></app-spinner>
+      <div class="card-header bg-transparent">
+        <strong>Timeline</strong>
+        <button type="button" class="btn btn-sm btn-outline-primary float-right border" (click)="reply()"
+          [disabled]="details.status!='Active'" accessControl moduleName="Ticket Management" accessType="Manage Tickets"
+          elementType="btn">
+          <i class="fas fa-reply mr-1"></i> Reply
+        </button>
+      </div>
+      <div class="card-body py-2">
+        <div class="row border-bottom" *ngIf="noteForm">
+          <div class="col-12 mb-2">
+            <form [formGroup]="noteForm">
+              <div class="form-group">
+                <input class="form-control" id="subject" type="text" formControlName="subject" placeholder="Title"
+                  [ngClass]="{'is-invalid' : noteFormErrors.subject}">
+                <div class="invalid-feedback" *ngIf="noteFormErrors.subject">{{noteFormErrors.subject}}</div>
+              </div>
+              <div class="form-group">
+                <textarea class="form-control" id="description" name="description" rows="5"
+                  formControlName="description" [ngClass]="{'is-invalid' : noteFormErrors.description}"
+                  placeholder="Enter text..."></textarea>
+                <div class="invalid-feedback" *ngIf="noteFormErrors.description">{{noteFormErrors.description}}</div>
+              </div>
+              <form [formGroup]="attachmentForm">
+                <div class="form-group row"><label class="col-2 col-form-label" for="file-multiple-input">Attachments :
+                  </label>
+                  <div class="col-10">
+                    <input id="file-multiple-input" multiple name="file-multiple-input" type="file"
+                      onclick="this.value = null" (change)="detectFiles($event.target.files)">
+                  </div>
+                </div>
+                <span *ngFor="let attachment of attachments">
+                  <span class="btn btn-primary mb-1 mr-1 btn-sm">{{attachment}}&nbsp;<i class="fas fa-times"
+                      (click)="removeFiles(attachment)"></i></span>
+                </span>
+              </form>
+              <div class="form-group form-actions">
+                <button class="btn btn-sm btn-success float-right ml-1" type="button" (click)="onSubmit()">Post</button>
+                <button class="btn btn-sm btn-danger float-right" type="button"
+                  (click)="cancelComment()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="row py-2" *ngFor="let view of timeline; let last = last" [ngClass]="{'border-bottom':!last}">
+              <ng-container [ngSwitch]="view.type">
+                <ng-container *ngSwitchCase="timelineTypes.EMAIL">
+                  <ng-container *ngTemplateOutlet="timelineEmail; context: { $implicit: view }"></ng-container>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="timelineTypes.TASK">
+                  <ng-container *ngTemplateOutlet="timelineTask; context: { $implicit: view }"></ng-container>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="timelineTypes.NOTE">
+                  <ng-container *ngTemplateOutlet="timelineNote; context: { $implicit: view }"></ng-container>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="timelineTypes.CASE">
+                  <ng-container *ngTemplateOutlet="timelineCase; context: { $implicit: view }"></ng-container>
+                </ng-container>
+
+                <ng-container *ngSwitchCase="timelineTypes.POST">
+                  <ng-container *ngTemplateOutlet="timelinePost; context: { $implicit: view }"></ng-container>
+                </ng-container>
+              </ng-container>
+            </div>
+            <div class="text-center text-muted my-5" *ngIf="!timeline.length">No Notes available for ticket.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #timelineEmail let-view>
+  <div class="col-12 nopointerevents">
+    <i class="far fa-envelope fa-lg text-success"></i>
+    <strong class="card-title mb-0 ml-1">Email from : </strong>
+    <a class="text-decoration-none text-primary ml-1"><i class="far fa-user"></i>&nbsp;&nbsp;{{view.senderMail}}</a>
+    <span class="badge badge-pill badge-secondary px-2 py-1 ml-2">{{view.state}}</span>
+    <small class="text-muted font-sm float-right">{{view.modifiedOn}}</small>
+  </div>
+  <div class="col-12 nopointerevents">
+    <strong class="card-title mb-0">{{view.subject}}</strong>
+  </div>
+  <div class="col-12 mt-2 nopointerevents" [innerHTML]="view.description"></div>
+</ng-template>
+
+<ng-template #timelineTask let-view>
+  <div class="col-12 nopointerevents">
+    <i class="fas fa-file-alt text-success"></i>
+    <strong class="card-title mb-0 ml-1">Task modified by : </strong>
+    <a class="text-decoration-none text-primary ml-1"><i class="far fa-user"></i>&nbsp;&nbsp;{{view.modifiedBy}}</a>
+    <span class="badge badge-pill badge-secondary px-2 py-1 ml-2">{{view.state}}</span>
+    <small class="text-muted font-sm float-right">{{view.modifiedOn}}</small>
+  </div>
+  <div class="col-12 nopointerevents">
+    <strong class="card-title mb-0">{{view.subject}}</strong>
+  </div>
+  <div class="col-12 mt-2 nopointerevents" [innerHTML]="view.description"></div>
+</ng-template>
+
+<ng-template #timelineNote let-view>
+  <div class="col-12 nopointerevents">
+    <i class="fas fa-clipboard-list fa-lg text-success"></i>
+    <strong class="card-title mb-0 ml-1">Note by : </strong>
+    <a class="text-decoration-none text-primary ml-1"><i class="far fa-user"></i>&nbsp;&nbsp;{{view.modifiedBy}}</a>
+    <small class="text-muted font-sm float-right">{{view.modifiedOn}}</small>
+  </div>
+  <div class="col-12 nopointerevents">
+    <strong class="card-title mb-0">{{view.subject}}</strong>
+  </div>
+  <div class="col-12 mt-2 nopointerevents" [innerHTML]="view.description"></div>
+  <div class="col-12 mt-2" *ngIf="view.isDocument && view.fileUrl">
+    <a (click)="downloadAttachment(view)" class="btn btn-sm btn-primary mb-1 mr-1 text-white">{{view.fileName}}&nbsp;<i
+        class="fa fa-download"></i></a>
+  </div>
+</ng-template>
+
+<ng-template #timelineCase let-view>
+  <div class="col-12 nopointerevents">
+    <i class="fas fa-user-astronaut fa-lg text-success"></i>
+    <strong class="card-title mb-0 ml-1">Case Resolution from : </strong>
+    <a class="text-decoration-none text-primary ml-1"><i class="far fa-user"></i>&nbsp;&nbsp;{{view.modifiedBy}}</a>
+    <small class="text-muted font-sm float-right">{{view.modifiedOn}}</small>
+  </div>
+  <div class="col-12 nopointerevents">
+    <strong class="card-title mb-0">{{view.subject}}</strong>
+  </div>
+  <div class="col-12 mt-2 nopointerevents" [innerHTML]="view.description"></div>
+</ng-template>
+
+<ng-template #timelinePost let-view>
+  <div class="col-12 nopointerevents">
+    <i class="far fa-comments fa-lg text-success"></i>
+    <strong class="card-title mb-0 ml-1">Post by : </strong>
+    <a class="text-decoration-none text-primary ml-1"><i class="far fa-user"></i>&nbsp;&nbsp;{{view.modifiedBy}}</a>
+    <small class="text-muted font-sm float-right">{{view.modifiedOn}}</small>
+  </div>
+  <div class="col-12 mt-2 nopointerevents" [innerHTML]="view.text"></div>
+</ng-template>
+
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Change Priority
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cancelConfirm()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure to change the Ticket priority from <b>{{currentPriority}}</b> to <b>{{details.priority}}</b> ?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmChange()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="cancelConfirm()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmReactivate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Reactivate
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure to reactivate ticket?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmReactivateSubmit()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #resolveRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Resolve Ticket
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="resolveForm" [formGroup]="resolveForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-12">
+            <label class="form-col-form-label">Resolution Type<em>*</em></label>
+            <select id="resolution_type" class="form-control" formControlName="resolution_type"
+              [class.is-invalid]="resolveFormErrors.resolution_type">
+              <option value="" disabled>Select Type</option>
+              <option [value]="resolution.value" *ngFor="let resolution of resolutionTypeList">
+                {{resolution.display_name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="resolveFormErrors.resolution_type">
+              {{resolveFormErrors.resolution_type}}</div>
+          </div>
+
+          <div class="form-group col-12">
+            <label class="form-col-form-label">Resolution<em>*</em></label>
+            <textarea id="resolution" class="form-control" type="text" formControlName="resolution"
+              [class.is-invalid]="resolveFormErrors.resolution"></textarea>
+            <div class="invalid-feedback" *ngIf="resolveFormErrors.resolution">{{resolveFormErrors.resolution}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onResolveSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #cancelRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Cancel Ticket
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="cancelForm" [formGroup]="cancelForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-12">
+            <label class="form-col-form-label">Status<em>*</em></label>
+            <select id="cancel_status" class="form-control" formControlName="cancel_status"
+              [class.is-invalid]="cancelFormErrors.cancel_status">
+              <option value="''" disabled>Select Status</option>
+              <option [value]="status.value" *ngFor="let status of  statusList">{{status.display_name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="cancelFormErrors.cancel_status">
+              {{cancelFormErrors.cancel_status}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onCancelSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

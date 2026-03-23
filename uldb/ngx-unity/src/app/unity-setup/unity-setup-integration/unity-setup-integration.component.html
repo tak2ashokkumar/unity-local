@@ -1,0 +1,195 @@
+<!-- <div class="row">
+  <div class="col-4 pr-0">
+    <app-main-tab [tabItems]="tabItems"></app-main-tab>
+  </div>
+  <div class="col-8">
+    <div class="row bg-white justify-content-end">
+      <div class="col-3 pr-4 my-2">
+        <multiselect-dropdown class="form-control form-control-sm p-0" style="height:auto;"
+          [settings]="categorySettings" [options]="categories" [(ngModel)]="selectedCategories"
+          [texts]="categoryTexts"></multiselect-dropdown>
+      </div>
+    </div>
+  </div>
+</div> -->
+<app-main-tab [tabItems]="tabItems"></app-main-tab>
+
+<div class="container-fluid mb-3">
+  <div class="animated fadeIn">
+    <ng-container *ngIf="selectedCategories.includes('ITSM')">
+      <usi-itsm></usi-itsm>
+    </ng-container>
+    <!-- <h5>ITSM</h5>
+    <div class="row">
+      <div class="col-3">
+        <usi-servicenow-widget></usi-servicenow-widget>
+      </div>
+
+      <div class="col-3">
+        <usi-ms-dynamics-crm-widget></usi-ms-dynamics-crm-widget>
+      </div>
+
+      <div class="col-3">
+        <usi-jira-widget></usi-jira-widget>
+      </div>
+
+      <div class="col-3">
+        <usi-bmc-helix-widget></usi-bmc-helix-widget>
+      </div>
+
+      <div class="col-3 mt-3">
+        <usi-manage-engine-widget></usi-manage-engine-widget>
+      </div>
+    </div> -->
+
+    <ng-container *ngIf="selectedCategories.includes('Public Clouds')">
+      <usi-public-cloud></usi-public-cloud>
+    </ng-container>
+    <!-- <h5 class="mt-4">Public Cloud</h5>
+    <div class="row">
+      <div class="col-3">
+        <usi-public-cloud-azure-widget></usi-public-cloud-azure-widget>
+      </div>
+
+      <div class="col-3">
+        <usi-public-cloud-aws-widget></usi-public-cloud-aws-widget>
+      </div>
+
+      <div class="col-3">
+        <usi-public-cloud-gcp-widget></usi-public-cloud-gcp-widget>
+      </div>
+
+      <div class="col-3">
+        <usi-public-cloud-oracle-widget></usi-public-cloud-oracle-widget>
+      </div>
+    </div> -->
+
+    <ng-container *ngIf="selectedCategories.includes('Private Clouds')">
+      <h5>Private Cloud</h5>
+      <!-- <ng-container *ngFor="let element of privateClouds; let i = index">
+        <div class="row" *ngIf="i % 4 == 0" [ngClass]="{ 'mb-3': i + 4 <= privateClouds.length }">
+          <div class="col-3" *ngFor="let pc of privateClouds.slice(i, i + 4)">
+            <usi-pc-crud [pcMetaData]="pc"></usi-pc-crud>
+          </div>
+        </div>
+      </ng-container> -->
+      <div class="row mb-4">
+        <div class="col">
+          <usi-pc-integration-widget></usi-pc-integration-widget>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCategories.includes('LDAP')">
+      <h5>LDAP</h5>
+      <div class="row mb-4">
+        <div class="col-3">
+          <usi-ldap-widget></usi-ldap-widget>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCategories.includes('Storage')">
+      <!-- <h5>Storage</h5>
+      <div class="row mb-4">
+        <div class="col-3">
+          <usi-ontap-widget></usi-ontap-widget>
+        </div>
+      </div> -->
+      <usi-storage></usi-storage>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCategories.includes('Import Data')">
+      <h5>Import Data From External File</h5>
+      <div class="row mb-4">
+        <div class="col-3">
+          <usi-import-data-widget></usi-import-data-widget>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCategories.includes('Event Ingestion')">
+      <usi-ingest-event></usi-ingest-event>
+    </ng-container>
+    <!-- <h5 class="mt-4">Event Ingestion</h5>
+    <div class="row">
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-nagios-widget></usi-event-ingestion-nagios-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-azure-widget></usi-event-ingestion-azure-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-zabbix-widget></usi-event-ingestion-zabbix-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-gcp-widget></usi-event-ingestion-gcp-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-aws-widget></usi-event-ingestion-aws-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-oci-widget></usi-event-ingestion-oci-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-opsramp-widget></usi-event-ingestion-opsramp-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-app-dynamics-widget></usi-event-ingestion-app-dynamics-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-solarwinds-widgets></usi-event-ingestion-solarwinds-widgets>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-logic-monitor-widget></usi-event-ingestion-logic-monitor-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-dynatrace-widget></usi-event-ingestion-dynatrace-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-new-relic-widget></usi-event-ingestion-new-relic-widget>
+      </div>
+
+      <div class="col-3 mb-3">
+        <usi-event-ingestion-custom></usi-event-ingestion-custom>
+      </div>
+    </div> -->
+
+    <ng-container *ngIf="selectedCategories.includes('Workflow')">
+      <h5>Workflow</h5>
+      <div class="row">
+        <div class="col-3">
+          <usi-workflow-integration-widget></usi-workflow-integration-widget>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCategories.includes('Network Controllers')">
+      <usi-network-controllers></usi-network-controllers>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCategories.includes('Vaults')">
+      <h5>Vaults</h5>
+      <div class="row">
+        <div class="col-3">
+          <usi-vaults></usi-vaults>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="selectedCategories.includes('Others')">
+      <usi-others></usi-others>
+    </ng-container>
+  </div>
+</div>

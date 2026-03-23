@@ -1,0 +1,201 @@
+<h5>ITSM</h5>
+<div class="row mb-4">
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="itsm.serviceNow.imageURL" class="w-100" [alt]="'ServiceNow'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="itsm.serviceNow.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{itsm.serviceNow.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="itsm.serviceNow.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="serviceNow()" accessControl
+                                [moduleName]="'Ticket Management'" [accessType]="'View Tickets'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addServiceNow()" accessControl [moduleName]="'Ticket Management'"
+                            [accessType]="'Manage Tickets'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="itsm.crm.imageURL" class="w-100" [alt]="'Dynamic CRM'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="itsm.crm.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{itsm.crm.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="itsm.crm.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="msDynamics365()" accessControl
+                                [moduleName]="'Ticket Management'" [accessType]="'View Tickets'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addMsDynamics365()" accessControl [moduleName]="'Ticket Management'"
+                            [accessType]="'Manage Tickets'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="itsm.jira.imageURL" class="w-100" [alt]="'JIRA'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="itsm.jira.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{itsm.jira.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="itsm.jira.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="jira()" accessControl
+                                [moduleName]="'Ticket Management'" [accessType]="'View Tickets'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addJira()" accessControl [moduleName]="'Ticket Management'"
+                            [accessType]="'Manage Tickets'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="itsm.bmcHelix.imageURL" class="w-100" [alt]="'BMC Helix'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="itsm.bmcHelix.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{itsm.bmcHelix.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="itsm.bmcHelix.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewBmcHelixInstances()" accessControl
+                                [moduleName]="'Ticket Management'" [accessType]="'View Tickets'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addBmcHelixInstance()" accessControl [moduleName]="'Ticket Management'"
+                            [accessType]="'Manage Tickets'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mt-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="itsm.manageEngine.imageURL" class="w-100" [alt]="'Manage Engine'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="itsm.manageEngine.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{itsm.manageEngine.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="itsm.manageEngine.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewManageEngineInstances()" accessControl
+                                [moduleName]="'Ticket Management'" [accessType]="'View Tickets'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addManageEngineInstance()" accessControl [moduleName]="'Ticket Management'"
+                            [accessType]="'Manage Tickets'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 mt-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="itsm.unityOneITSM.imageURL" class="w-100" [alt]="'UnityOne ITSM'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="itsm.unityOneITSM.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{itsm.unityOneITSM.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="itsm.unityOneITSM.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="viewUnityOneItsmInstances()" accessControl
+                                [moduleName]="'Ticket Management'" [accessType]="'View Tickets'"
+                                [elementType]="'actionbtn'">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="addUnityOneItsmInstance()" accessControl [moduleName]="'Ticket Management'"
+                            [accessType]="'Manage Tickets'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+<div class="page_wrapper" style="float:left">
+  <loading object="{{snapshot_result}}"></loading>
+  <loading loader="{{loader}}"></loading>
+  <div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+          <form class="navbar-form">
+              <div class="form-group">
+                  <input class="form-control" type="text" ng-model="searchKeyword" ng-change="getSearchResults(searchKeyword)" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}">
+                  <button class="btn btn-search" type="submit" style="top: 4px;">
+                      <i class="fa fa-search"></i>
+                  </button>
+              </div>
+          </form>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+          <div class="action-bar pull-right">
+              <span class="count">{{model_count}}</span>
+              <span class="count-text"> Snapshots</span>
+          </div>
+      </div>
+    </div>
+    <section id="no-more-tables" class="margintop20 middle-wrapper" ng-if="snapshot_result.length > 0">
+      <div infinite-scroll='loadPageData()' infinite-scroll-disabled='!snapshot_loaded'>
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="{{ row.col_class }}" ng-repeat="row in gcp_rows" custom-sort sortdisabled= "{{row.is_sort_disabled}}" order="{{ row.name }}" sort="sort">{{ row.description }}</th>
+            <th> Actions </th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="result in snapshot_result | filter: gcpSearch as filtered"
+              ng-class="{'active success': result === selection.selected}">
+              <td>
+                  {{result.name}}
+              </td>
+              <!-- Power status column start-->
+              <td>
+                <span ng-if="result.status == 'READY'">
+                  <device-up></device-up>
+                </span>
+
+                <span ng-if="result.status != 'READY'">
+                  <device-down></device-down>
+                </span>
+              </td>
+              <!-- Power status column end -->
+
+            <td class="normal">{{result.storage_bytes | Filesize}}</td>
+            <td class="normal">{{result.source_vm_disk}}</td>
+            <td class="normal">{{result.disk_size_gb}} GB</td>
+            <td class="normal">{{result.storage_location}}</td>
+            <td class="normal">{{result.creation_timestamp | unityDate}}</td>
+            <td>
+              <div class="action-icons">
+              
+                <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                    <a ng-click="manage_request_vm(result.name, 'GCP Snapshots', result)" href="">
+                        <i class="fa fa-ticket" aria-hidden="true"></i>
+                    </a>
+                </span>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <div ng-if="snapshot_loaded && snapshot_result.length === 0" class="content-wrapper  ">
+    <div class="margin_top85px">
+      <no-records-found message="No GCP Snapshots to display"></no-records-found>
+    </div>
+  </div>
+</div>

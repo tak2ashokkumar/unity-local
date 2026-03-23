@@ -1,0 +1,10 @@
+<form class="form-horizontal">
+    <div class="form-group" ng-repeat="row in rows" ng-if="row.required">
+        <span ng-if= "row.type != 'hidden'">
+            <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+        </span>
+        <div class="col-sm-9">
+            <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" required>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,37 @@
+<div class="onb-wrap mb-2">
+  <div class="onb-links">
+    <button class="btn" [ngClass]="viewData.monitoringBtnClass" type="button" (click)="monitor()" [disabled]="!viewData.monitoringBtnEnabled"><i
+        class="fas fa-chart-line"></i></button>
+  </div>
+</div>
+
+<ng-template #template>
+  <div class="card mb-0 border-0">
+    <div class="card-header">
+      <span class="h6">Activate Monitoring for devices</span>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="templateModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <ul class="nav nav-tabs border-0 nav-justified" role="tablist">
+        <li class="nav-item font-weight-bolder" [class.active]="selectedTab=='vm-monitoring'" (click)="selectTab('vm-monitoring')">
+          <a class="nav-link border-0 h6 mb-0">VM Monitoring</a>
+        </li>
+        <li class="nav-item" [class.active]="selectedTab=='device-monitoring'" (click)="selectTab('device-monitoring')">
+          <a class="nav-link border-0 h6 mb-0">Device Monitoring</a>
+        </li>
+      </ul>
+      <div [ngSwitch]="selectedTab">
+        <on-boarding-vm-monitoring *ngSwitchCase="'vm-monitoring'" (emitToParent)="emitEvent()"></on-boarding-vm-monitoring>
+        <on-boarding-device-monitoring *ngSwitchCase="'device-monitoring'" (emitTaskId)="pollForTask($event)"
+          [onbDetails]="onbDetails"></on-boarding-device-monitoring>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" type="button" (click)="templateModalRef.hide()">Close</button>
+    </div>
+  </div>
+</ng-template>

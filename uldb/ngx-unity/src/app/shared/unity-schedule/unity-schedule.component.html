@@ -1,0 +1,306 @@
+<form *ngIf="form" [formGroup]="form">
+    <div class="row mx-0 d-flex align-items-center">
+        <div class="col-2-w text-right pr-0">Schedule <em>*</em> : </div>
+        <div class="col-8-w px-2">
+            <div class="d-inline-block">
+                <ul class="d-flex px-0 mb-0">
+                    <li>
+                        <label class="pointer-link px-4" [class.active]="form.get('schedule_type').value=='none'">
+                            <input type="radio" formControlName="schedule_type" [value]="'none'">
+                            <span class="font-sm mr-2">None</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link px-4" [class.active]="form.get('schedule_type').value=='hourly'">
+                            <input type="radio" formControlName="schedule_type" [value]="'hourly'">
+                            <span class="font-sm mr-2">Hourly</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link px-4" [class.active]="form.get('schedule_type').value=='daily'">
+                            <input type="radio" formControlName="schedule_type" [value]="'daily'">
+                            <span class="font-sm mr-2">Daily</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link px-4" [class.active]="form.get('schedule_type').value=='weekly'">
+                            <input type="radio" formControlName="schedule_type" [value]="'weekly'">
+                            <span class="font-sm mr-2">Weekly</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link px-4" [class.active]="form.get('schedule_type').value=='monthly'">
+                            <input type="radio" formControlName="schedule_type" [value]="'monthly'">
+                            <span class="font-sm mr-2">Monthly</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mx-0 d-flex align-items-center mt-4" *ngIf="form.controls.start_date">
+        <div class="col-2-w text-right pr-0">Range of Recurrence <em>*</em> : </div>
+        <div class="col-10-w d-flex align-items-center px-2">
+            <div class="form-group col-5-w pr-3">
+                <label for="start_date" class="mb-0 font-sm">Start Date <em>*</em></label>
+                <div class="input-group">
+                    <owl-date-time #startDate [pickerType]="'calendar'"
+                        [scrollStrategy]="scrollStrategy"></owl-date-time>
+                    <input class="form-control rounded-left" name="start_date" formControlName="start_date"
+                        [owlDateTimeTrigger]="startDate" [owlDateTime]="startDate" [max]="form.get('end_date').value"
+                        type="text" placeholder="Date" [class.is-invalid]="formErrors.start_date">
+                    <div class="input-group-append" [owlDateTimeTrigger]="startDate">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-calendar-alt"></i>
+                        </span>
+                    </div>
+                    <div class="invalid-feedback" *ngIf="formErrors.start_date">{{formErrors.start_date}}</div>
+                </div>
+            </div>
+            <div class="form-group col-7-w pl-3">
+                <label for="end_date_status" class="mb-0 font-sm">End Date <em>*</em></label>
+                <div class="d-flex align-items-center">
+                    <div class="justify-content-between">
+                        <div class="form-check d-inline pr-2">
+                            <input class="form-check-input form-check-inline pr-0" type="radio" id="never"
+                                name="end_date_status" formControlName="end_date_status" value="never">
+                            <label class="form-check-label" for="never">Never</label>
+                        </div>
+                        <div class="form-check d-inline">
+                            <input class="form-check-input form-check-inline" type="radio" id="on"
+                                name="end_date_status" formControlName="end_date_status" value="on">
+                            <label class="form-check-label" for="on">On</label>
+                        </div>
+                    </div>
+                    <div class="col-8-w input-group pl-2">
+                        <owl-date-time #endDate [pickerType]="'calendar'"
+                            [scrollStrategy]="scrollStrategy"></owl-date-time>
+                        <input class="form-control rounded-left pr-0" name="end_date" formControlName="end_date"
+                            [owlDateTimeTrigger]="endDate" [owlDateTime]="endDate" [min]="form.get('start_date').value"
+                            type="text" placeholder="Date" [class.is-invalid]="formErrors.end_date">
+                        <div class="input-group-append" [owlDateTimeTrigger]="endDate">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <div class="invalid-feedback" *ngIf="formErrors.end_date">
+                            {{formErrors.end_date}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mx-0 d-flex align-items-center mt-2" formGroupName="hourly" *ngIf="form.controls.hourly">
+        <div class="col-10 offset-2">
+            <div class="d-flex align-items-center">
+                <div>Every</div>
+                <div class="d-flex align-items-center px-3">
+                    <div class="form-group mb-0">
+                        <input class="form-control" type="number" min="0" max="23" placeholder="Hr"
+                            formControlName="hours_interval" [class.is-invalid]="formErrors.hourly.hours_interval">
+                        <div class="invalid-feedback d-block" *ngIf="formErrors.hourly.hours_interval">
+                            {{formErrors.hourly.hours_interval}}</div>
+                    </div>
+                    <div class="ml-2">Hours<em>*</em></div>
+                </div>
+                <div class="d-flex align-items-center px-3">
+                    <div class="form-group mb-0">
+                        <input class="form-control" type="number" min="0" max="59" placeholder="Mins"
+                            formControlName="minutes_interval" [class.is-invalid]="formErrors.hourly.minutes_interval">
+                        <small class="invalid-feedback d-block" *ngIf="formErrors.hourly.minutes_interval">
+                            {{formErrors.hourly.minutes_interval}}</small>
+                    </div>
+                    <div class="ml-2">Mins<em>*</em></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mx-0 d-flex align-items-center mt-2" formGroupName="daily" *ngIf="form.controls.daily">
+        <div class="col-10 offset-2">
+            <div class="d-flex align-items-center">
+                <div>Every</div>
+                <div class="d-flex align-items-center px-2 w-20">
+                    <div class="form-group w-70 mb-0">
+                        <input class="form-control" type="number" min="1" placeholder="Day(s)"
+                            formControlName="days_interval" [class.is-invalid]="formErrors.daily.days_interval">
+                        <div class="invalid-feedback d-block" *ngIf="formErrors.daily.days_interval">
+                            {{formErrors.daily.days_interval}}</div>
+                    </div>
+                    <div class="ml-2">Day(s)<em>*</em></div>
+                </div>
+                <div class="col-3-w d-flex align-items-center px-2">
+                    <div class="mr-3">at<em>*</em></div>
+                    <div class="input-group">
+                        <owl-date-time #at [pickerType]="'timer'" [scrollStrategy]="scrollStrategy"></owl-date-time>
+                        <input class="form-control rounded-left" name="at" formControlName="at"
+                            [owlDateTimeTrigger]="at" [owlDateTime]="at" type="text"
+                            [class.is-invalid]="formErrors.daily.at">
+                        <div class="input-group-append " [owlDateTimeTrigger]="at">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                        </div>
+                        <div class="invalid-feedback" *ngIf="formErrors.daily.at">{{formErrors.daily.at}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mx-0 d-flex align-items-center mt-2" formGroupName="weekly" *ngIf="form.controls.weekly">
+        <div class="col-10 offset-2">
+            <div class="d-flex align-items-center">
+                <div>Every</div>
+                <div class="col-4-w px-2">
+                    <multiselect-dropdown class="form-control p-0" style="height:auto;" [settings]="weekdaySettings"
+                        [texts]="weekdayTexts" [options]="weekdayOptions" formControlName="week_days"
+                        [class.is-invalid]="formErrors.weekly.week_days"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="formErrors.weekly.week_days">
+                        {{formErrors.weekly.week_days}}</div>
+                </div>
+                <div class="col-3-w d-flex align-items-center px-2">
+                    <div class="mr-3">at<em>*</em></div>
+                    <div class="input-group">
+                        <owl-date-time #at [pickerType]="'timer'" [scrollStrategy]="scrollStrategy"></owl-date-time>
+                        <input class="form-control rounded-left" name="at" formControlName="at"
+                            [owlDateTimeTrigger]="at" [owlDateTime]="at" type="text"
+                            [class.is-invalid]="formErrors.weekly.at">
+                        <div class="input-group-append " [owlDateTimeTrigger]="at">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-clock"></i>
+                            </span>
+                        </div>
+                        <div class="invalid-feedback" *ngIf="formErrors.weekly.at">{{formErrors.weekly.at}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mx-0 d-flex align-items-center mt-2" formGroupName="monthly" *ngIf="form.controls.monthly">
+        <div class="col-10 offset-2">
+            <div class="d-flex flex-column">
+                <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center pr-2">
+                        <input type="radio" name="monthly_type" formControlName="monthly_type" value="by_days">
+                    </div>
+                    <div class="d-flex col-3-w align-items-center">
+                        <div class="mr-3">Day<em>*</em></div>
+                        <div class="col-10-w px-2">
+                            <multiselect-dropdown class="form-control p-0" style="height:auto;" [settings]="daySettings"
+                                [texts]="dayTexts" [options]="dayOptions" formControlName="days"
+                                [class.is-invalid]="formErrors.monthly.days"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.monthly.days">
+                                {{formErrors.monthly.days}}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex col-4-w align-items-center">
+                        <div class="mr-3">of<em>*</em></div>
+                        <div class="col-10-w px-2">
+                            <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                [settings]="monthSettings" [texts]="monthTexts" [options]="monthOptions"
+                                formControlName="months"
+                                [class.is-invalid]="formErrors.monthly.months"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.monthly.months">
+                                {{formErrors.monthly.months}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mt-3">
+                    <div class="d-flex align-items-center pr-2">
+                        <input type="radio" name="monthly_type" formControlName="monthly_type" value="by_week_days">
+                    </div>
+                    <div class="d-flex col-6-w justify-content-between align-items-center">
+                        <div class="mr-2">Every</div>
+                        <div class="col-5-w">
+                            <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                [settings]="weekSettings" [texts]="weekTexts" [options]="weekOptions"
+                                formControlName="weeks"
+                                [class.is-invalid]="formErrors.monthly.weeks"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.monthly.weeks">
+                                {{formErrors.monthly.weeks}}</div>
+                        </div>
+                        <div class="col-5-w">
+                            <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                [settings]="weekdaySettings" [texts]="weekdayTexts" [options]="weekdayOptions"
+                                formControlName="week_days"
+                                [class.is-invalid]="formErrors.monthly.week_days"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.monthly.week_days">
+                                {{formErrors.monthly.week_days}}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex col-3-w justify-content-between align-items-center pl-2">
+                        <div class="mr-2">of<em>*</em></div>
+                        <div class="col-10-w">
+                            <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                [settings]="monthSettings" [texts]="monthTexts" [options]="monthOptions"
+                                formControlName="every_months"
+                                [class.is-invalid]="formErrors.monthly.every_months"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.monthly.every_months">
+                                {{formErrors.monthly.every_months}}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex col-3-w justify-content-between align-items-center pl-2">
+                        <div class="mr-2">at<em>*</em></div>
+                        <div class="col-10-w">
+                            <div class="input-group">
+                                <owl-date-time #at [pickerType]="'timer'"
+                                    [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                <input class="form-control rounded-left" name="at" formControlName="at"
+                                    [owlDateTimeTrigger]="at" [owlDateTime]="at" type="text"
+                                    [class.is-invalid]="formErrors.monthly.at">
+                                <div class="input-group-append " [owlDateTimeTrigger]="at">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-clock"></i>
+                                    </span>
+                                </div>
+                                <div class="invalid-feedback" *ngIf="formErrors.monthly.at">
+                                    {{formErrors.monthly.at}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form *ngIf="notificationForm" [formGroup]="notificationForm">
+    <div class="row mx-0 d-flex align-items-center mt-5">
+        <div class="col-2-w text-right pr-0">Notification <em>*</em> : </div>
+        <div class="col-8-w px-2">
+            <div class="row">
+                <div class="col-3 pointer-link">
+                    <input class="ut-checkbox" type="checkbox" id="notify-failure"
+                        formControlName="sync_failure_notify">
+                    <label for="notify-failure" class="primary permission-name-text-shadow mb-0">
+                        Failure
+                    </label>
+                </div>
+                <div class="col-3 pointer-link">
+                    <input class="ut-checkbox" type="checkbox" id="notify-success"
+                        formControlName="sync_success_notify">
+                    <label for="notify-success" class="primary permission-name-text-shadow mb-0">
+                        Success
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mx-0 d-flex align-items-center mt-3">
+        <div class="col-2-w text-right pr-0">User Groups : </div>
+        <div class="col-6-w px-2">
+            <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                class="form-control form-control-sm p-0" [texts]="userGroupTexts" style="height:auto;"
+                formControlName="email_notify_groups"></multiselect-dropdown>
+        </div>
+    </div>
+    <div class="row mx-0 d-flex align-items-center mt-3 mb-5">
+        <div class="col-2-w text-right pr-0">Users : </div>
+        <div class="col-6-w px-2">
+            <multiselect-dropdown [options]="userList" [settings]="userListSettings"
+                class="form-control form-control-sm p-0" style="height:auto;"
+                formControlName="email_notify_users"></multiselect-dropdown>
+        </div>
+    </div>
+</form>

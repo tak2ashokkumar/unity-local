@@ -1,0 +1,286 @@
+#toolbar-administration #toolbar-bar {
+  z-index: 9999;
+}
+.navbar-fixed-top {
+  top: initial;
+}
+.signflow-search-box form input[type="search"] {
+  width: 100% !important;
+  max-width: 1140px;
+  margin: auto;
+  border-color: #eaeaea;
+  background-color: white;
+  display: block;
+}
+.signflow-search-flex {
+  display: inline-flex;
+}
+.signflow-search-header-box {
+  display: inline-flex;
+}
+.signflow-search-header-box input[type="submit"] {
+  border: none !important;
+  background: none !important;
+  font-weight: 400;
+  font-size: 13px;
+}
+.signflow-search-header-box input[type="submit"]:hover {
+  background: none !important;
+}
+.signflow-search-header-side {
+  display: inline-flex;
+}
+.signflow-search-header-side input[type="submit"] {
+  border: none !important;
+  background: none !important;
+  font-weight: 400;
+  font-size: 13px;
+}
+.signflow-search-header-side input[type="submit"]:hover {
+  background: none !important;
+}
+.signflow-search-header-side input[type="search"] {
+  width: 100% !important;
+  max-width: 1140px;
+  margin: auto;
+  border-color: #eaeaea;
+  background-color: white;
+  display: block;
+}
+.signflow-menu-transparent {
+  top: initial !important;
+}
+.signflow-menu-dp .signflow-dropdown-submenu-right li.dropdown-submenu ul {
+  left: auto !important;
+  right: 100% !important;
+}
+ul.signflow-primary-tabs {
+  display: block;
+}
+ul.signflow-primary-tabs li {
+  display: inline-block;
+  list-style: none;
+}
+ul.signflow-primary-tabs li a.is-active {
+  color: #000;
+}
+.navbar-nav li.dropdown-submenu > ul.dropdown-menu li.dropdown-submenu {
+  width: 190px;
+  min-width: 190px;
+}
+.signflow-categories-sidebar a {
+  position: relative;
+  display: block;
+  padding: 10px 0px;
+  border-bottom: 1px solid #dcdcdc;
+  transition: all 0.3s;
+}
+.signflow-categories-sidebar a:hover {
+  background: none !important;
+  text-decoration: none;
+  color: #555555;
+  padding-left: 5px;
+  transition: all 0.3s;
+}
+.signflow-tags-sidebar a {
+  background-color: #5584ff;
+  padding: 5px 15px;
+  color: white !important;
+  margin: 0 8px 8px 0;
+  white-space: nowrap;
+  float: left;
+  border-radius: 3px;
+}
+.signflow-tags-sidebar a:hover {
+  opacity: 0.7;
+}
+.signflow-search-sidebar.input-group {
+  display: block;
+}
+.signflow-search-sidebar form {
+  display: table;
+}
+.signflow-search-sidebar form input[type="submit"] {
+  border-color: #0e1a35;
+  background-color: #0e1a35;
+  z-index: 2;
+  font-weight: 400;
+  font-size: 13px;
+  padding: 7px 12px 7px 12px;
+  margin-left: -1px;
+}
+.signflow-comment-item img {
+  float: left;
+}
+.signflow-comment-item ul.links.inline {
+  display: block;
+  padding: 0;
+}
+.signflow-comment-item ul.links.inline li {
+  list-style: none;
+  display: inline-block;
+  margin-right: 5px;
+}
+.signflow-comment-item ul.links.inline li a {
+  background-color: #5584ff;
+  padding: 5px 15px;
+  color: white !important;
+  white-space: nowrap;
+  float: left;
+  border-radius: 3px;
+}
+.signflow-comment-item ul.links.inline li a:hover {
+  opacity: 0.7;
+}
+.signflow-name span.signflow-name-comment-item {
+  font-weight: 500;
+  color: #0e1a35;
+  font-size: 15px;
+  padding: 0;
+}
+.signflow-name span.signflow-name-comment-item a {
+  color: #0e1a35;
+}
+.signflow-name span.signflow-name-comment-item span {
+  font-weight: 500;
+  color: #0e1a35;
+  font-size: 15px;
+  padding: 0;
+}
+.indented {
+  padding-left: 10%;
+}
+.signflow-page-blogs-list .signflow-blog-list-item:nth-of-type(2n + 1) {
+  clear: both;
+}
+.signflow-page-blogs-list .signflow-blog-list-item {
+  padding: 20px;
+}
+.signflow-form-box label {
+  font-weight: 400;
+  margin-bottom: 3px;
+  letter-spacing: 0.5px;
+}
+.signflow-text-1 {
+  color: #fafafa !important;
+  padding: 0;
+  font-weight: 600;
+  display: block;
+  position: relative;
+  margin: 0;
+  margin-bottom: 10px !important;
+  vertical-align: middle;
+}
+.bg-color .signflow-text-1 {
+  color: #fafafa !important;
+}
+.signflow-text-2 {
+  padding-bottom: 10px;
+  vertical-align: middle;
+  display: block;
+  margin: 0;
+  font-weight: 600;
+  position: relative;
+}
+.signflow-text-3 {
+  margin-bottom: 10px;
+  padding-left: 15px;
+  vertical-align: middle;
+  display: block;
+  margin: 0;
+  font-weight: 600;
+  position: relative;
+}
+.signflow-page-user {
+  background-color: #f4f9fe;
+}
+.signflow-page-user .signflow-pd-80 {
+  padding-top: 80px !important;
+}
+.signflow-page-user ul.signflow-primary-tabs {
+  display: block;
+  padding: 0;
+}
+.signflow-page-user ul.signflow-primary-tabs li {
+  display: inline-block;
+  list-style: none;
+}
+.signflow-page-user ul.signflow-primary-tabs li a {
+  background-color: #5584ff;
+  padding: 5px 15px;
+  color: white !important;
+  margin: 0 8px 8px 0;
+  white-space: nowrap;
+  float: left;
+  border-radius: 3px;
+}
+.signflow-page-user ul.signflow-primary-tabs li a:hover {
+  opacity: 0.7;
+}
+.signflow-page-user ul.signflow-primary-tabs li a.is-active {
+  opacity: 0.7;
+}
+.signflow-page-search label {
+  font-weight: 400;
+}
+.signflow-page-search ul.signflow-primary-tabs {
+  display: block;
+  padding: 0;
+}
+.signflow-page-search ul.signflow-primary-tabs li {
+  display: inline-block;
+  list-style: none;
+}
+.signflow-page-search ul.signflow-primary-tabs li a {
+  background-color: #5584ff;
+  padding: 5px 15px;
+  color: white !important;
+  margin: 0 8px 8px 0;
+  white-space: nowrap;
+  float: left;
+  border-radius: 3px;
+}
+.signflow-page-search ul.signflow-primary-tabs li a:hover {
+  opacity: 0.7;
+}
+.signflow-page-search ul.signflow-primary-tabs li a.is-active {
+  opacity: 0.7;
+}
+.signflow-page-search form legend span.fieldset-legend {
+  text-transform: uppercase;
+  font-weight: normal;
+  font-size: 16px;
+  color: #000;
+}
+.signflow-page-search fieldset {
+  border: 1px solid #c0c0c0;
+  margin-bottom: 10px;
+  padding: 0.35em 0.625em 0.75em;
+}
+.signflow-page-search fieldset legend {
+  text-transform: uppercase;
+  width: auto;
+  border-bottom: 0px;
+}
+.signflow-page-search ol > li {
+  border-bottom: 1px solid #cccccc;
+  margin-bottom: 20px;
+}
+.signflow-page-search form + h2 {
+  font-size: 30px;
+}
+.signflow-page-search ol > li a {
+  font-size: 25px;
+  color: #000;
+}
+.signflow-image {
+  width: 66px !important;
+  height: 66px !important;
+  margin: 0;
+}
+@media (max-width: 992px) {
+  .navbar-nav li.dropdown-submenu > ul.dropdown-menu li.dropdown-submenu {
+    width: auto;
+    min-width: auto;
+  }
+}

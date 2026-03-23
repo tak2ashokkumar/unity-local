@@ -1,0 +1,27 @@
+<div class="modal-header">
+    <h3 class="modal-title">User Details</h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr ng-repeat="col in aws_userdetails_headers">
+                        <td class="col-md-4">
+                            <div>{{ col.title }}</div>
+                        </td>
+                        <td class="col-md-8">
+                            <div><strong>{{ aws_userdetails_list_content[col.key] }}</strong></div>
+                        </td>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-cancel" ng-click="cancel()">Close</button>
+</div>
+

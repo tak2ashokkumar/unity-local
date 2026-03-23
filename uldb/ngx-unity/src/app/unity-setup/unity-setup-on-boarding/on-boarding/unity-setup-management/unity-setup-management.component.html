@@ -1,0 +1,38 @@
+<div class="onb-wrap mb-2">
+  <div class="onb-links">
+    <button class="btn" type="button" [ngClass]="viewData.proxyBtnClass" (click)="manage()" [disabled]="!viewData.managementBtnEnabled"><i
+        class="fas fa-tv"></i></button>
+  </div>
+</div>
+
+<ng-template #template>
+  <div class="modal-content">
+    <div class="modal-header" [ngClass]="viewData.backgroundColor">
+      <div class="icon-box">
+        <i class="fa" [ngClass]="viewData.icon"></i>
+      </div>
+      <button type="button" class="close" data-dismiss="modal" (click)="templateModalRef.hide()" aria-hidden="true">×</button>
+    </div>
+    <div class="modal-body text-center">
+      <div *ngIf="viewData.status=='inprogress'">
+        <p class="text-center mt-3"> Management configuration is in progress. <br>
+          Please wait untill it gets completed. <br></p>
+      </div>
+      <div *ngIf="viewData.status=='iprequired'">
+        <p>Activating Management Console for a device requires management IP of the device.</p>
+        <p>So please make sure that you have provided Management IP's for all the devices onboarded.</p>
+        <button class="btn btn-warning" (click)="activate()"><span>Activate</span></button>
+      </div>
+      <div *ngIf="viewData.status=='error'">
+        <p>We encountered issues while activating management console for devices. <br>
+          Please try again or contact support.</p>
+        <button class="btn btn-warning" (click)="activate()"><span>Try Again</span></button>
+      </div>
+      <div *ngIf="viewData.status=='success'">
+        <p>
+          Management Console access is enabled for all the onboarded devices.
+        </p>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,39 @@
+.activity-box {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-content {
+    padding-left: 4px;
+    font-size: 14px;
+}
+
+.activity-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 400;
+    font-size: 11px;
+    background-color: #fff;
+    color: #000;
+    flex-shrink: 0;
+}
+
+.text-truncate {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
+}

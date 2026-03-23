@@ -1,0 +1,26 @@
+<div class="row">
+    <div class="col-12" *ngIf="privateCloud">
+        <all-devices-firewalls *ngIf="privateCloud.firewall.length"></all-devices-firewalls>
+        <all-devices-loadbalancers *ngIf="privateCloud.load_balancer.length"></all-devices-loadbalancers>
+        <all-devices-switches *ngIf="privateCloud.switch.length"></all-devices-switches>
+        <all-devices-hypervisors *ngIf="privateCloud.hypervisors.length"></all-devices-hypervisors>
+        <all-devices-bms *ngIf="privateCloud.bm_server.length"></all-devices-bms>
+        <all-devices-vms></all-devices-vms>
+        <all-devices-otherdevices *ngIf="privateCloud.customdevice.length"></all-devices-otherdevices>
+    </div>
+    <div class="col-12">
+        <all-devices-containers *ngIf="podsCount"></all-devices-containers>
+        <all-devices-storage *ngIf="storageCount"></all-devices-storage>
+        <all-devices-macmini *ngIf="macDevicesCount"></all-devices-macmini>
+    </div>
+    <div class="col-12" *ngIf="totalDevicesCount">
+        <all-devices-alerts></all-devices-alerts>
+    </div>
+    <div class="col-12" *ngIf="!totalDevicesCount">
+        <div class="card rounded-0 border-top-0">
+            <div class="card-body">
+                <div class="my-4 text-center">No associated devices found.</div>
+            </div>
+        </div>
+    </div>
+</div>

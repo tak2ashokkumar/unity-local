@@ -1,0 +1,2100 @@
+[
+    {
+        "datacenter": "DEFR5-UNITYWITNESS-DC",
+        "host": "10.108.52.11",
+        "network": [
+            "VM Network",
+            "DEFR-ORAEE-DATA--DVUplinks-59341",
+            "DEFR-ORASE-DATA--DVUplinks-59321",
+            "DEFR-DMZ-DATA-VD-DVUplinks-59240",
+            "DEFR-ORASE-SYSTE-DVUplinks-51424",
+            "DPortGroup 1",
+            "Seg-DEFR-VLAN1820-TEST",
+            "DEFR-DMZ-vSphere-vsan",
+            "Seg-DEFR-VLAN3820-TEST",
+            "DEFR-PRD1-System-VC",
+            "DEFR-MGMT-SYSTEM-DVUplinks-1037",
+            "DPortGroup 2",
+            "DEFR-PROD-DATA-V-DVUplinks-4757",
+            "DPortGroup",
+            "Seg-DEFR-VLAN1720-TEST",
+            "DEFR-UNITY-SYSTE-DVUplinks-44477",
+            "DEFR-VLAN3609-HCMP-TOOLS",
+            "DEFR-MGMT-DATA-V-DVUplinks-4754",
+            "DEFR-PRD1-System-Mgmt",
+            "DEFR-DMZ-SYSTEM--DVUplinks-51420",
+            "DEFR-PRD1-System-BKP",
+            "DEFR-PRD1-vSphere-vSAN",
+            "DEFR-MG-vSphere-vSAN",
+            "DEFR-DVPG-NSX-MGMT",
+            "Test",
+            "Seg-DEFR-VLAN3720-TEST",
+            "DEFR-PRD1-vSphere-BKP",
+            "Seg-DEFR-VLAN3609-HCMP-TOOLS",
+            "DEFR-MG-vSphere-BKP",
+            "DEFR-ORAEE-vSphere-vsan",
+            "DEFR-PROD-SYSTEM-DVUplinks-51062",
+            "DEFR-UNITY-vSphere-vsan",
+            "DEFR-PRD1-System-vMotion",
+            "Seg-DEFR-VLAN3608-INFRA-TOOLS",
+            "DEFR-UNITY-DATA--DVUplinks-54801",
+            "DEFR-ORAEE-SYSTE-DVUplinks-51422",
+            "DEFR-ORASE-vSphere-vsan",
+            "DEFR-PROD-vSphere-DVUplinks-1043",
+            "NDFC-MGMT",
+            "NDFC-DATA",
+            "DEFR-MGMT-TOOLS",
+            "SECURITY-MGMT",
+            "DEFR-MGMT-STD-BKP",
+            "DEFR8-NSX-MGMT-02",
+            "DEFR-MG-vSphere-vCenter",
+            "DEFR8-NSX-MGMT-01",
+            "DEFR2-NSX-MGMT-01",
+            "DEFR-MGMT-STORAGE-APP",
+            "Security-Mgmt",
+            "Unity_Collector_414",
+            "VM Network",
+            "VM Network"
+        ],
+        "datastore": [
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51402"
+                ],
+                "name": "def2-oreesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51431'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-oreesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def2-orsesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51418'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-orsesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 2,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "UNITY_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-44504'",
+                "summary": {
+                    "provisioned": "1.4 TB",
+                    "capacity": "14.0 TB",
+                    "freespace": "12.6 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def8-orsesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51416'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-orsesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def2-orsesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51417'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-orsesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51402"
+                ],
+                "name": "def8-oreesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51435'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-oreesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def8-dmzesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51398'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-dmzesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def2-dmzesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51397'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-dmzesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 8,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "PROD01_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-42559'",
+                "summary": {
+                    "provisioned": "29.6 TB",
+                    "capacity": "447.1 TB",
+                    "freespace": "417.5 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def8-dmzesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51399'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-dmzesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def2-dmzesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51396'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-dmzesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def8-orsesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51419'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-orsesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 4,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "MGMT_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-2601'",
+                "summary": {
+                    "provisioned": "8.1 TB",
+                    "capacity": "55.9 TB",
+                    "freespace": "47.8 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 43
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def2-mgmtesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-90'",
+                "summary": {
+                    "provisioned": "19.3 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "746.7 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def2-mgmtesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-1017'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-mgmtesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def8-mgmtesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-87'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def8-mgmtesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-89'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-mgmtesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "L_def2-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44112'",
+                "summary": {
+                    "provisioned": "520.2 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.2 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 1
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "def8-unityesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-44106'",
+                "summary": {
+                    "provisioned": "2.3 GB",
+                    "capacity": "95.2 GB",
+                    "freespace": "92.9 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "VE_def2-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44114'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.7 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "def2-unityesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-44111'",
+                "summary": {
+                    "provisioned": "15.7 GB",
+                    "capacity": "95.2 GB",
+                    "freespace": "79.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "L_def8-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44107'",
+                "summary": {
+                    "provisioned": "521.8 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.2 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "VE_def8-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44109'",
+                "summary": {
+                    "provisioned": "966.0 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "822.2 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx04-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-126'",
+                "summary": {
+                    "provisioned": "51.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "714.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx04.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-1010'",
+                "summary": {
+                    "provisioned": "59.1 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "706.9 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 5
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-122'",
+                "summary": {
+                    "provisioned": "55.3 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "710.7 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx03-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-124'",
+                "summary": {
+                    "provisioned": "24.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "741.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx03.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-125'",
+                "summary": {
+                    "provisioned": "60.6 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "705.4 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx04-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-121'",
+                "summary": {
+                    "provisioned": "31.8 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "734.2 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx04.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx03-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-123'",
+                "summary": {
+                    "provisioned": "24.0 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "742.0 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx03.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-120'",
+                "summary": {
+                    "provisioned": "45.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "720.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            }
+        ],
+        "cluster": [
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "def5-unwtvm01.itc.global.mahle"
+            }
+        ]
+    },
+    {
+        "datacenter": "DEFR5-WITNESS-DC",
+        "host": "10.108.52.11",
+        "network": [
+            "VM Network",
+            "DEFR-ORAEE-DATA--DVUplinks-59341",
+            "DEFR-ORASE-DATA--DVUplinks-59321",
+            "DEFR-DMZ-DATA-VD-DVUplinks-59240",
+            "DEFR-ORASE-SYSTE-DVUplinks-51424",
+            "DPortGroup 1",
+            "Seg-DEFR-VLAN1820-TEST",
+            "DEFR-DMZ-vSphere-vsan",
+            "Seg-DEFR-VLAN3820-TEST",
+            "DEFR-PRD1-System-VC",
+            "DEFR-MGMT-SYSTEM-DVUplinks-1037",
+            "DPortGroup 2",
+            "DEFR-PROD-DATA-V-DVUplinks-4757",
+            "DPortGroup",
+            "Seg-DEFR-VLAN1720-TEST",
+            "DEFR-UNITY-SYSTE-DVUplinks-44477",
+            "DEFR-VLAN3609-HCMP-TOOLS",
+            "DEFR-MGMT-DATA-V-DVUplinks-4754",
+            "DEFR-PRD1-System-Mgmt",
+            "DEFR-DMZ-SYSTEM--DVUplinks-51420",
+            "DEFR-PRD1-System-BKP",
+            "DEFR-PRD1-vSphere-vSAN",
+            "DEFR-MG-vSphere-vSAN",
+            "DEFR-DVPG-NSX-MGMT",
+            "Test",
+            "Seg-DEFR-VLAN3720-TEST",
+            "DEFR-PRD1-vSphere-BKP",
+            "Seg-DEFR-VLAN3609-HCMP-TOOLS",
+            "DEFR-MG-vSphere-BKP",
+            "DEFR-ORAEE-vSphere-vsan",
+            "DEFR-PROD-SYSTEM-DVUplinks-51062",
+            "DEFR-UNITY-vSphere-vsan",
+            "DEFR-PRD1-System-vMotion",
+            "Seg-DEFR-VLAN3608-INFRA-TOOLS",
+            "DEFR-UNITY-DATA--DVUplinks-54801",
+            "DEFR-ORAEE-SYSTE-DVUplinks-51422",
+            "DEFR-ORASE-vSphere-vsan",
+            "DEFR-PROD-vSphere-DVUplinks-1043",
+            "NDFC-MGMT",
+            "NDFC-DATA",
+            "DEFR-MGMT-TOOLS",
+            "SECURITY-MGMT",
+            "DEFR-MGMT-STD-BKP",
+            "DEFR8-NSX-MGMT-02",
+            "DEFR-MG-vSphere-vCenter",
+            "DEFR8-NSX-MGMT-01",
+            "DEFR2-NSX-MGMT-01",
+            "DEFR-MGMT-STORAGE-APP",
+            "Security-Mgmt",
+            "Unity_Collector_414",
+            "VM Network",
+            "VM Network"
+        ],
+        "datastore": [
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51402"
+                ],
+                "name": "def2-oreesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51431'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-oreesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def2-orsesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51418'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-orsesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 2,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "UNITY_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-44504'",
+                "summary": {
+                    "provisioned": "1.4 TB",
+                    "capacity": "14.0 TB",
+                    "freespace": "12.6 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def8-orsesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51416'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-orsesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def2-orsesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51417'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-orsesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51402"
+                ],
+                "name": "def8-oreesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51435'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-oreesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def8-dmzesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51398'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-dmzesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def2-dmzesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51397'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-dmzesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 8,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "PROD01_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-42559'",
+                "summary": {
+                    "provisioned": "29.6 TB",
+                    "capacity": "447.1 TB",
+                    "freespace": "417.5 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def8-dmzesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51399'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-dmzesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def2-dmzesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51396'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-dmzesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def8-orsesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51419'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-orsesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 4,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "MGMT_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-2601'",
+                "summary": {
+                    "provisioned": "8.1 TB",
+                    "capacity": "55.9 TB",
+                    "freespace": "47.8 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 43
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def2-mgmtesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-90'",
+                "summary": {
+                    "provisioned": "19.3 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "746.7 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def2-mgmtesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-1017'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-mgmtesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def8-mgmtesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-87'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def8-mgmtesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-89'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-mgmtesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "L_def2-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44112'",
+                "summary": {
+                    "provisioned": "520.2 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.2 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 1
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "def8-unityesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-44106'",
+                "summary": {
+                    "provisioned": "2.3 GB",
+                    "capacity": "95.2 GB",
+                    "freespace": "92.9 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "VE_def2-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44114'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.7 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "def2-unityesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-44111'",
+                "summary": {
+                    "provisioned": "15.7 GB",
+                    "capacity": "95.2 GB",
+                    "freespace": "79.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "L_def8-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44107'",
+                "summary": {
+                    "provisioned": "521.8 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.2 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "VE_def8-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44109'",
+                "summary": {
+                    "provisioned": "966.0 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "822.2 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx04-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-126'",
+                "summary": {
+                    "provisioned": "51.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "714.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx04.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-1010'",
+                "summary": {
+                    "provisioned": "59.1 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "706.9 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 5
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-122'",
+                "summary": {
+                    "provisioned": "55.3 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "710.7 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx03-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-124'",
+                "summary": {
+                    "provisioned": "24.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "741.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx03.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-125'",
+                "summary": {
+                    "provisioned": "60.6 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "705.4 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx04-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-121'",
+                "summary": {
+                    "provisioned": "31.8 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "734.2 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx04.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx03-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-123'",
+                "summary": {
+                    "provisioned": "24.0 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "742.0 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx03.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-120'",
+                "summary": {
+                    "provisioned": "45.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "720.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            }
+        ],
+        "cluster": [
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "def5-wtvm02.itc.global.mahle"
+            },
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "def5-wtvm01.itc.global.mahle"
+            }
+        ]
+    },
+    {
+        "datacenter": "DEFR-DC",
+        "host": "10.108.52.11",
+        "network": [
+            "VM Network",
+            "DEFR-ORAEE-DATA--DVUplinks-59341",
+            "DEFR-ORASE-DATA--DVUplinks-59321",
+            "DEFR-DMZ-DATA-VD-DVUplinks-59240",
+            "DEFR-ORASE-SYSTE-DVUplinks-51424",
+            "DPortGroup 1",
+            "Seg-DEFR-VLAN1820-TEST",
+            "DEFR-DMZ-vSphere-vsan",
+            "Seg-DEFR-VLAN3820-TEST",
+            "DEFR-PRD1-System-VC",
+            "DEFR-MGMT-SYSTEM-DVUplinks-1037",
+            "DPortGroup 2",
+            "DEFR-PROD-DATA-V-DVUplinks-4757",
+            "DPortGroup",
+            "Seg-DEFR-VLAN1720-TEST",
+            "DEFR-UNITY-SYSTE-DVUplinks-44477",
+            "DEFR-VLAN3609-HCMP-TOOLS",
+            "DEFR-MGMT-DATA-V-DVUplinks-4754",
+            "DEFR-PRD1-System-Mgmt",
+            "DEFR-DMZ-SYSTEM--DVUplinks-51420",
+            "DEFR-PRD1-System-BKP",
+            "DEFR-PRD1-vSphere-vSAN",
+            "DEFR-MG-vSphere-vSAN",
+            "DEFR-DVPG-NSX-MGMT",
+            "Test",
+            "Seg-DEFR-VLAN3720-TEST",
+            "DEFR-PRD1-vSphere-BKP",
+            "Seg-DEFR-VLAN3609-HCMP-TOOLS",
+            "DEFR-MG-vSphere-BKP",
+            "DEFR-ORAEE-vSphere-vsan",
+            "DEFR-PROD-SYSTEM-DVUplinks-51062",
+            "DEFR-UNITY-vSphere-vsan",
+            "DEFR-PRD1-System-vMotion",
+            "Seg-DEFR-VLAN3608-INFRA-TOOLS",
+            "DEFR-UNITY-DATA--DVUplinks-54801",
+            "DEFR-ORAEE-SYSTE-DVUplinks-51422",
+            "DEFR-ORASE-vSphere-vsan",
+            "DEFR-PROD-vSphere-DVUplinks-1043",
+            "NDFC-MGMT",
+            "NDFC-DATA",
+            "DEFR-MGMT-TOOLS",
+            "SECURITY-MGMT",
+            "DEFR-MGMT-STD-BKP",
+            "DEFR8-NSX-MGMT-02",
+            "DEFR-MG-vSphere-vCenter",
+            "DEFR8-NSX-MGMT-01",
+            "DEFR2-NSX-MGMT-01",
+            "DEFR-MGMT-STORAGE-APP",
+            "Security-Mgmt",
+            "Unity_Collector_414",
+            "VM Network",
+            "VM Network"
+        ],
+        "datastore": [
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51402"
+                ],
+                "name": "def2-oreesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51431'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-oreesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def2-orsesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51418'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-orsesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 2,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "UNITY_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-44504'",
+                "summary": {
+                    "provisioned": "1.4 TB",
+                    "capacity": "14.0 TB",
+                    "freespace": "12.6 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def8-orsesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51416'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-orsesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def2-orsesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51417'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-orsesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51402"
+                ],
+                "name": "def8-oreesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51435'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-oreesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def8-dmzesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51398'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-dmzesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def2-dmzesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51397'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-dmzesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 8,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "PROD01_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-42559'",
+                "summary": {
+                    "provisioned": "29.6 TB",
+                    "capacity": "447.1 TB",
+                    "freespace": "417.5 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def8-dmzesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51399'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-dmzesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51382"
+                ],
+                "name": "def2-dmzesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51396'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-dmzesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c51400"
+                ],
+                "name": "def8-orsesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-51419'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-orsesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 4,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "MGMT_vsanDatastore",
+                "ds_obj": "'vim.Datastore:datastore-2601'",
+                "summary": {
+                    "provisioned": "8.1 TB",
+                    "capacity": "55.9 TB",
+                    "freespace": "47.8 TB",
+                    "access": "Multiple hosts",
+                    "unity": false,
+                    "type": "vsan"
+                },
+                "host_name": "def2-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 43
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def2-mgmtesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-90'",
+                "summary": {
+                    "provisioned": "19.3 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "746.7 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def2-mgmtesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-1017'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-mgmtesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def8-mgmtesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-87'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-mgmtesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c9"
+                ],
+                "name": "def8-mgmtesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-89'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "764.6 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-mgmtesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "L_def2-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44112'",
+                "summary": {
+                    "provisioned": "520.2 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.2 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 1
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "def8-unityesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-44106'",
+                "summary": {
+                    "provisioned": "2.3 GB",
+                    "capacity": "95.2 GB",
+                    "freespace": "92.9 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "VE_def2-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44114'",
+                "summary": {
+                    "provisioned": "1.4 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.7 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "def2-unityesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-44111'",
+                "summary": {
+                    "provisioned": "15.7 GB",
+                    "capacity": "95.2 GB",
+                    "freespace": "79.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 0
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "L_def8-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44107'",
+                "summary": {
+                    "provisioned": "521.8 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "1.2 TB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c44098"
+                ],
+                "name": "VE_def8-unityesx01",
+                "ds_obj": "'vim.Datastore:datastore-44109'",
+                "summary": {
+                    "provisioned": "966.0 GB",
+                    "capacity": "1.7 TB",
+                    "freespace": "822.2 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-untyesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24022510",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx04-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-126'",
+                "summary": {
+                    "provisioned": "51.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "714.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx04.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-1010'",
+                "summary": {
+                    "provisioned": "59.1 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "706.9 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 5
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-122'",
+                "summary": {
+                    "provisioned": "55.3 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "710.7 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx03-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-124'",
+                "summary": {
+                    "provisioned": "24.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "741.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx03.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def2-prdesx01-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-125'",
+                "summary": {
+                    "provisioned": "60.6 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "705.4 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def2-prdesx01.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 4
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx04-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-121'",
+                "summary": {
+                    "provisioned": "31.8 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "734.2 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx04.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx03-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-123'",
+                "summary": {
+                    "provisioned": "24.0 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "742.0 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx03.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 3
+            },
+            {
+                "status": "connected",
+                "host_count": 1,
+                "cluster_ids": [
+                    "domain-c42550"
+                ],
+                "name": "def8-prdesx02-OS-DS",
+                "ds_obj": "'vim.Datastore:datastore-120'",
+                "summary": {
+                    "provisioned": "45.5 GB",
+                    "capacity": "766.0 GB",
+                    "freespace": "720.5 GB",
+                    "access": "Single host",
+                    "unity": false,
+                    "type": "VMFS"
+                },
+                "host_name": "def8-prdesx02.itc.global.mahle",
+                "os": "VMware ESXi 8.0.3 build-24280767",
+                "vm_count": 2
+            }
+        ],
+        "cluster": [
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "DEFR-ORAEE"
+            },
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "DEFR-UNITY"
+            },
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "DEFR-ORASE"
+            },
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "DEFR-MGMT"
+            },
+            {
+                "pool_data": [],
+                "hosts": [],
+                "name": "DEFR-DMZ01"
+            },
+            {
+                "pool_data": [],
+                "hosts": [
+                    "ul-sf10-502-lab-esx08.unitedlayer.com",
+                    "ul-sf10-502-lab-esx09.unitedlayer.com",
+                    "ul-sf10-502-lab-esx07.unitedlayer.com",
+                    "ul-sf10-502-lab-esx11.unitedlayer.com",
+                    "ul-sf10-502-lab-esx13.unitedlayer.com",
+                    "ul-sf10-502-lab-esx10.unitedlayer.com"
+                ],
+                "name": "DEFR-PROD01"
+            }
+        ]
+    }
+]

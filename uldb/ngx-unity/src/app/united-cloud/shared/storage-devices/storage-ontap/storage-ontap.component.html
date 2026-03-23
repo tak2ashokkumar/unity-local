@@ -1,0 +1,166 @@
+<div class="row">
+    <div class="col-12" *ngIf="!previousUrl">
+        <div class="d-flex justify-content-between align-items-center tab-content p-2">
+            <div class="d-flex font-xl w-50">
+                <span class="text-muted font-500 text-right">Cluster</span>
+                <span class="w-2 text-center">:</span>
+                <span class="font-500">{{device?.name}}</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <a class="nav-link py-0 text-warning" (click)="goToStorageList()">
+                    <i class="fas fa-reply">&nbsp;</i>
+                    <span>Back</span>
+                </a>
+                <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+            </div>
+        </div>
+    </div>
+    <div class="col-12" [ngClass]="previousUrl ? '' : 'mt-2'">
+        <div class="row mb-2" *ngIf="summaryData">
+            <div class="col">
+                <div class="card round-edge mb-0 pointer-link" (click)="goTo('nodes')">
+                    <app-spinner [name]="'nodeCounts'"></app-spinner>
+                    <div class="card-body d-flex flex-column px-3 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="font-lg">Node</span>
+                            <span class="font-lg-xl text-primary font-500">{{summaryData.nodesCount}}</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-baseline">
+                            <div>
+                                <span class="fas fa-caret-up text-success fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.nodesUp}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-caret-down text-danger fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.nodesDown}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-exclamation-circle text-muted fa-sm"></span>
+                                <span class="font-lg font-500 ml-1">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card round-edge mb-0 pointer-link" (click)="goTo('aggregates')">
+                    <app-spinner [name]="'aggregateCounts'"></app-spinner>
+                    <div class="card-body d-flex flex-column px-3 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="font-lg">Aggregate</span>
+                            <span class="font-lg-xl text-primary font-500">{{summaryData.aggregatesCount}}</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-baseline">
+                            <div>
+                                <span class="fas fa-caret-up text-success fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.aggregatesUp}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-caret-down text-danger fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.aggregatesDown}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-exclamation-circle text-muted fa-sm"></span>
+                                <span class="font-lg font-500 ml-1">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card round-edge mb-0 pointer-link" (click)="goTo('svms')">
+                    <app-spinner [name]="'svmCounts'"></app-spinner>
+                    <div class="card-body d-flex flex-column px-3 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="font-lg">SVM</span>
+                            <span class="font-lg-xl text-primary font-500">{{summaryData.svmsCount}}</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-baseline">
+                            <div>
+                                <span class="fas fa-caret-up text-success fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.svmsUp}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-caret-down text-danger fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.svmsDown}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-exclamation-circle text-muted fa-sm"></span>
+                                <span class="font-lg font-500 ml-1">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card round-edge mb-0 pointer-link" (click)="goTo('volumes')">
+                    <app-spinner [name]="'volumeCounts'"></app-spinner>
+                    <div class="card-body d-flex flex-column px-3 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="font-lg">Volume</span>
+                            <span class="font-lg-xl text-primary font-500">{{summaryData.volumesCount}}</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-baseline">
+                            <div>
+                                <span class="fas fa-caret-up text-success fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.volumesUp}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-caret-down text-danger fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.volumesDown}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-exclamation-circle text-muted fa-sm"></span>
+                                <span class="font-lg font-500 ml-1">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card round-edge mb-0 pointer-link" (click)="goTo('luns')">
+                    <app-spinner [name]="'lunCounts'"></app-spinner>
+                    <div class="card-body d-flex flex-column px-3 py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="font-lg">LUN</span>
+                            <span class="font-lg-xl text-primary font-500">{{summaryData.lunsCount}}</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-baseline">
+                            <div>
+                                <span class="fas fa-caret-up text-success fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.lunsUp}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-caret-down text-danger fa-lg"></span>
+                                <span class="font-lg font-500 ml-1">{{summaryData.lunsDown}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-exclamation-circle text-muted fa-sm"></span>
+                                <span class="font-lg font-500 ml-1">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ng-container [ngTemplateOutlet]='clusterTabBar' *ngIf="previousUrl && !isDetailsPage"></ng-container>
+        <router-outlet></router-outlet>
+    </div>
+</div>
+
+<ng-template #clusterTabBar>
+    <div class="d-flex justify-content-between align-items-center tab-content p-2">
+        <div class="d-flex font-xl w-50">
+            <span class="text-muted font-500 text-right">Cluster</span>
+            <span class="w-2 text-center">:</span>
+            <span class="font-500">{{device?.name}}</span>
+        </div>
+        <div class="d-flex align-items-center">
+            <a class="nav-link py-0 text-warning" (click)="goBack()">
+                <i class="fas fa-reply">&nbsp;</i>
+                <span>Back</span>
+            </a>
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'Dynamic CRM'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addMsDynamics365()"
+    (viewButtonClick)="msDynamics365()" [moduleName]="'Ticket Management'" [addAccessType]="'Manage Tickets'"
+    [viewAccessType]="'View Tickets'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<usi-ms-dynamics-crm-crud (onCrud)="onCrud($event)"></usi-ms-dynamics-crm-crud>

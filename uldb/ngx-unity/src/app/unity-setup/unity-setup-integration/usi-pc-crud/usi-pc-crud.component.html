@@ -1,0 +1,5 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="pcMetaData.altText" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" (addButtonClick)="addCloud()" (viewButtonClick)="viewPvtCloud()">
+</unity-setup-integration-widget>
+
+<pc-crud [isAddorEditEnabled]="false" (onCrud)="onCrud($event)" (modalClosed)="modalClosed()" *ngIf="adding"></pc-crud>

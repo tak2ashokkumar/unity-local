@@ -1,0 +1,24 @@
+<div class="row neg-mt" [ngClass]="{'mb-2':editModeOn}">
+  <div class="col">
+    <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+    <button *ngIf="editModeOn" class="btn btn-sm btn-success pull-right" (click)="addGroup()">Add Group</button>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div *ngIf="groups.length" cdkDropList (cdkDropListDropped)="dropGroup($event)" [cdkDropListData]="groups"
+      [cdkDropListDisabled]="!editModeOn">
+      <div *ngFor="let group of groups" cdkDrag>
+        <device-group [group]="group" [groupIds]="trackIds" [editModeOn]="editModeOn"></device-group>
+      </div>
+    </div>
+  </div>
+</div>
+
+<devices-crud (onGroupAdded)="groupAdded($event)" (onGroupDeleted)="groupDeleted($event)"></devices-crud>
+
+<p class="text-center text-muted pt-5" *ngIf="!groups.length">
+  No groups created yet. <a href="javascript:void(0);" class="pointer-link" (click)="addGroup()" accessControl
+    moduleName="Monitoring" accessType="Manage Monitoring" elementType="div">click here</a> to
+  create
+</p>

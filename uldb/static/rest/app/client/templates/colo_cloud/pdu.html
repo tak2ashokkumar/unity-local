@@ -1,0 +1,163 @@
+<div class="page_wrapper" style="float:left">
+    <!-- <table-search-widget ng-show="pdus !== undefined"></table-search-widget> -->
+    <loading object="{{pdus}}"></loading>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="pdus !== undefined">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table class="table table-condensed table-hover margin0">
+                <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>IP Address</th>
+                      <th>Model</th>
+                      <th>Cabinet</th>
+                      <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="pdu in pdus">
+
+                        <td>
+                            <a tabindex="0" popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                                popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                                ng-init="get_pdu_details(pdu)" ng-click="show_observium_details(pdu)">{{ pdu.name }}</a>
+                        </td>
+
+                        <td>{{pdu.ip_address}}</td>
+                        <td>{{pdu.pdu_model}}</td>
+                        <td>{{pdu.cabinet.name}}</td>
+                        <td>
+                            <div class="action-icons">
+                                <span tooltip-class="customClass" ng-init="apc_pdu_model = pdu.pdu_model.startsWith('AP')" 
+                                uib-tooltip="{{ apc_pdu_model ? 'Recycle' : 'Power cycle option is not supported for this model'}}" >
+                                  <a ng-click="apc_pdu_model?recyclePDUCredentailsModal(pdu):''">
+                                    <i class="fa fa-recycle" ng-class="{'fa-disabled': pdu.recycling || !apc_pdu_model}"></i>
+                                  </a>
+                                </span>
+
+                                <span tooltip-class="customClass" uib-tooltip="Show PDU Info">
+                                    <a ng-click="showDetails(pdu.uuid,'PDU')" class="fa fa-info-circle"></a>
+                                </span>
+
+                                <span tooltip-class="customClass" ng-show="(pdu.observium_details !== null)"
+                                 uib-tooltip="Show PDU Statistics">
+                                    <a ng-click="show_observium_stats(pdu.uuid)"> <i class="fa fa-line-chart"></i> </a>
+                                </span>
+
+                                <span tooltip-class="customClass" ng-show="(pdu.observium_details === null)"
+                                uib-tooltip="{{ $root.monitoring_not_enabled_msg }}">
+                                    <a ng-class="{'fa-disabled': !pdu.observium_details}">
+                                        <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                <span tooltip-class="customClass" uib-tooltip="Configure socket mappings">
+                                    <a ng-click="configureSocketMappings(pdu)"> <i class="fa fa-cog"></i> </a>
+                                </span>
+                                <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                                    <a ng-click="manageByRequest(pdu)" class="fa fa-ticket"></a>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="pdus.length === 0" class="content-wrapper">
+                <no-records-found message="No PDUs to display"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>
+
+<style type="text/css">
+    .popover{
+        width : 28%;
+        max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    }
+</style>
+
+<script type="text/ng-template" id="device_observium_stats.html">
+    <div class="row">
+        <table class="table"  ng-show="pdu_details.device_data">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div>Uptime</div>
+                    </th>
+                    <td class="table_no_top_border">
+                        <div ng-if="pdu_details.device_data.status == 1">{{pdu_details.device_data.uptime | unityObserviumTime}}</div>
+                        <div ng-if="pdu_details.device_data.status == 0">Down {{pdu_details.device_data.uptime | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4">
+                        <div>Last reboot</div>
+                    </th>
+                    <td>
+                        <div>{{pdu_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="angular.isDefined(pdu_details) && (pdu_details === null)" style="padding : 20px">
+            <p>{{ $root.monitoring_not_enabled_msg }}</p>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="recyclePDUCredentails.html">
+<div class="modal-content">
+  <form role="form" name="modalform">
+    <div class="modal-header" style="text-align: center;">
+      <h4 class="modal-title">Please provide credentials to recycle this PDU.</h4>
+    </div>
+    <div class="modal-body" style="padding:20px 40px;">
+      <div class="modal-form" >
+        <label style="color: red;" ng-if="!pduErrMsg">*Only authorized users are allowed to perform this action. Please provide your credentials.</label>
+        <label style="color: red;" ng-if="pduErrMsg">*{{pduErrMsg}}</label>
+
+        <div class="form-group" ng-if="errorMsg">
+          <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="paddingR">
+            <div class="form-group">
+              <label for="pdu_username">
+              Username*
+              </label>
+              <span class="errormsg" ng-if="pduUsernameErrMsg">{{pduUsernameErrMsg}}</span>
+              <div>
+                <input type="text"
+                  class="form-control" placeholder="Username" ng-model="pdu_username"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="pdu_password">
+              Password*
+              </label>
+              <span class="errormsg" ng-if="pduPasswordErrMsg">{{pduPasswordErrMsg}}</span>
+              <div>
+                <input
+                  type="password"
+                  class="form-control"
+                  ng-model="pdu_password"
+                  placeholder="Password"
+                  ng-class="{'has-error_inputbox': pduPasswordErr}" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer modal-buttons">
+      <div class="modal-footer modal-buttons">
+        <button type="button" class="btn btn-cancel" ng-click="close()">
+        Cancel
+        </button>
+        <button type="submit" class="btn btn-default" ng-click="recyclePDU(pdu_username, pdu_password)">
+        Submit
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+</script>

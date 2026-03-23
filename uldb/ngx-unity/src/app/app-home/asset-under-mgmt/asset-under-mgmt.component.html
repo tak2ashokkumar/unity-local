@@ -1,0 +1,210 @@
+<div class="card equalize-card" [widgetLazyLoader]="{ttw:500}" (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="'assets'"></app-spinner>
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title ">
+    <div class="row">
+      <div class="col-7">
+        <a class="d-block text-truncate font-lg text-dark text-decoration-none h4" *ngIf="assetsViewData"
+          (click)="goTo(assetsViewData.drillDownLink)">Devices
+          under Management - {{assetsViewData.totalCount}}</a>
+      </div>
+      <div class="col-5 pr-0 text-truncate">
+        <form  *ngIf="form" [formGroup]="form">
+          <multiselect-dropdown class="form-control p-0" formControlName="datacenters" [settings]="dcSettings" [texts]="dcSelectionTexts" [options]="dcOptions" (dropdownClosed)="onFilterChanged()"></multiselect-dropdown>
+        </form>
+      </div>
+    </div>
+    <div class="d-flex">
+      <small class="progress-legend"><span class="badge badge-success badge-pill">&nbsp;</span> Up</small>
+        <small class="progress-legend pl-1">&nbsp;<span class="badge badge-danger badge-pill">&nbsp;</span> Down</small>
+        <small class="progress-legend pl-1">&nbsp;<span class="badge badge-secondary badge-pill">&nbsp;</span> Unknown</small>
+    </div>
+  </div>
+  <div class="card-body pt-0" *ngIf="assetsViewData">
+    <div class="row">
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+              <i class="fa fa-cube cabinets"></i>
+              <span class="assets-bar-count"> {{assetsViewData.cabinet.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.cabinet.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.cabinet"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate">
+              <i class="fa fa-plug pdus"></i>
+              <span class="assets-bar-count"> {{assetsViewData.PDU.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.PDU.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.PDU"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.storage_device.drillDownLink)">
+              <i class="fas fa-hdd storage"></i>
+              <span class="assets-bar-count"> {{assetsViewData.storage_device.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.storage_device.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.storage_device"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.bm_server.drillDownLink)">
+              <i class="fa fa-laptop bms"></i>
+              <span class="assets-bar-count"> {{assetsViewData.bm_server.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.bm_server.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.bm_server"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.VM.drillDownLink)">
+              <i class="fa fa-object-group vms"></i>
+              <span class="assets-bar-count"> {{assetsViewData.VM.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.VM.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.VM"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.pod.drillDownLink)">
+              <i class="fa cfa-kubernetes"></i>
+              <span class="assets-bar-count"> {{assetsViewData.pod.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.pod.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.pod"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.firewall.drillDownLink)">
+              <i class="fa fa-fire firewalls"></i>
+              <span class="assets-bar-count"> {{assetsViewData.firewall.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.firewall.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.firewall"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.switch.drillDownLink)">
+              <i class="fa fa-sitemap switches"></i>
+              <span class="assets-bar-count"> {{assetsViewData.switch.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.switch.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.switch"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.load_balancer.drillDownLink)">
+              <i class="fa fa-balance-scale lbs"></i>
+              <span class="assets-bar-count"> {{assetsViewData.load_balancer.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.load_balancer.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.load_balancer"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-4 text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.mac_device.drillDownLink)">
+              <i class="fab fa-apple fa-lg"></i>
+              <span class="assets-bar-count"> {{assetsViewData.mac_device.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.mac_device.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.mac_device"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col-4 text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.hypervisor?.drillDownLink)">
+              <i class="fas fa-server fa-lg text-info"></i>
+              <span class="assets-bar-count"> {{assetsViewData.hypervisor?.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.hypervisor?.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.hypervisor"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+      <div class="col-4 text-truncate">
+        <div class="row">
+          <div class="col-12">
+            <a class="d-block text-decoration-none text-dark text-center mb-1 text-truncate"
+              (click)="goTo(assetsViewData.database?.drillDownLink)">
+              <i class="fas fa-database text-primary"></i>
+              <span class="assets-bar-count"> {{assetsViewData.database?.count}} </span>
+              <span class="assets-bar-label"> {{assetsViewData.database?.displayName}}</span>
+            </a>
+          </div>
+          <div class="col-12">
+            <assets-mgmt-bars [barData]="assetsViewData.database"></assets-mgmt-bars>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

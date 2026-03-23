@@ -1,0 +1,134 @@
+<ng-template #dbFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Database Server
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="dbModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="dbForm" [formGroup]="dbForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-4 mb-0">
+            <label class="font-col-form-label" for="server_type">Server Type<em>*</em></label>
+            <select id="server_type" class="form-control" formControlName="server_type" [class.is-invalid]="dbFormErrors.server_type">
+              <option value="" disabled>Select Server Type</option>
+              <option value="VMS">Virtual Machine</option>
+              <option value="BMS">Bare Metal</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="dbFormErrors.server_type">{{dbFormErrors.server_type}}</div>
+          </div>
+          <div class="form-group col-4 mb-0" *ngIf="dbForm.controls.private_cloud">
+            <label class="font-col-form-label" for="private_cloud">Private Cloud<em>*</em></label>
+            <select id="private_cloud" class="form-control" formControlName="private_cloud" [class.is-invalid]="dbFormErrors.private_cloud">
+              <option value="" disabled>Select Private Cloud</option>
+              <option *ngFor="let cloud of privateClouds" [value]="cloud.id">{{cloud.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="dbFormErrors.private_cloud">{{dbFormErrors.private_cloud}}</div>
+          </div>
+          <div class="form-group col-4 mb-0" *ngIf="dbForm.controls.vm">
+            <label class="font-col-form-label" for="vm">Virtual Machines<em>*</em></label>
+            <select id="vm" class="form-control" formControlName="vm" [class.is-invalid]="dbFormErrors.vm">
+              <option value="" disabled>Select Virtual Machine</option>
+              <option *ngFor="let vm of vms" [value]="vm.id" [selected]="dbForm.controls.vm.value==vm.id">{{vm.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="dbFormErrors.vm">{{dbFormErrors.vm}}</div>
+          </div>
+          <div class="form-group col-4 mb-0" *ngIf="dbForm.controls.bm_server">
+            <label class="font-col-form-label" for="bm_server">Bare Metal<em>*</em></label>
+            <select id="bm_server" class="form-control" formControlName="bm_server" [class.is-invalid]="dbFormErrors.bm_server">
+              <option value="" disabled>Select Baremetal Server</option>
+              <option *ngFor="let bm of bmServers" [value]="bm.id">{{bm.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="dbFormErrors.bm_server">{{dbFormErrors.bm_server}}</div>
+          </div>
+        </div>
+        <hr>
+        <div class="row mt-5">
+          <div class="form-group col-4">
+            <label class="form-col-form-label" for="db_instance_name">Database Instance Name<em>*</em></label>
+            <input id="db_instance_name" class="form-control" type="text" formControlName="db_instance_name"
+              [class.is-invalid]="dbFormErrors.db_instance_name">
+            <div class="invalid-feedback" *ngIf="dbFormErrors.db_instance_name">{{dbFormErrors.db_instance_name}}</div>
+          </div>
+          <div class="form-group col-4">
+            <label class="font-col-form-label" for="db_type">Database Type<em>*</em></label>
+            <select id="db_type" class="form-control" formControlName="db_type" [class.is-invalid]="dbFormErrors.db_type">
+              <option value="" disabled>Select Database Type</option>
+              <option *ngFor="let type of dbTypes" [value]="type.id">{{type.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="dbFormErrors.db_type">{{dbFormErrors.db_type}}</div>
+          </div>
+          <div class="form-group col-4">
+            <label class="form-col-form-label" for="port">Port<em>*</em></label>
+            <input id="port" class="form-control" type="text" formControlName="port" [class.is-invalid]="dbFormErrors.port">
+            <div class="invalid-feedback" *ngIf="dbFormErrors.port">{{dbFormErrors.port}}</div>
+          </div>
+
+          <div class="form-group col-4">
+            <label class="form-col-form-label" for="life_cycle_stage">Life Cycle Stage</label>
+            <select class="form-control" id="life_cycle_stage" formControlName="life_cycle_stage"
+              [ngClass]="{'is-invalid' : dbFormErrors.life_cycle_stage}">
+              <option [value]="''" disabled>Select Life Cycle Stage</option>
+              <option *ngFor="let stage of lifeCycleStageOptions" [value]="stage"> {{stage}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="dbFormErrors.life_cycle_stage">
+              {{dbFormErrors.life_cycle_stage}}</div>
+          </div>
+          <div class="form-group col-4">
+            <label class="form-col-form-label" for="life_cycle_stage_status">Life Cycle Stage Status</label>
+            <select class="form-control" id="life_cycle_stage_status" formControlName="life_cycle_stage_status"
+              [ngClass]="{'is-invalid' : dbFormErrors.life_cycle_stage_status}">
+              <option [value]="''" disabled>Select Life Cycle Stage Status</option>
+              <option *ngFor="let status of lifeCycleStageStatusOptions" [value]="status"> {{status}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="dbFormErrors.life_cycle_stage_status">
+              {{dbFormErrors.life_cycle_stage_status}}</div>
+          </div>
+
+        </div>
+
+        <div class="row mt-2">
+          <div class="form-group col-12">
+            <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+              <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+              </tag-input-dropdown>
+            </tag-input>
+          </div>
+        </div>
+        <div class="mt-2">
+          <unity-devices-custom-attributes-crud [deviceType]="deviceType" [deviceAttrs]="dbForm?.get('custom_attribute_data')?.value" class="w-100"></unity-devices-custom-attributes-crud>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDBCreate()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="dbModelRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmDBDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This Database will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDBDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmDBDeleteModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

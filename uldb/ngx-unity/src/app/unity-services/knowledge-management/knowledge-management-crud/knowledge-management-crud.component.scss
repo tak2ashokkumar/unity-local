@@ -1,0 +1,80 @@
+::ng-deep ngx-file-drop {
+  display: block;
+  width: 100%;
+  height: calc(1.5em + 2px + 0.75rem)px !important;
+  min-height: 35px !important;
+}
+
+::ng-deep ngx-file-drop .ngx-file-drop__content {
+  height: 100% !important;
+  width: 100%;
+}
+
+::ng-deep ngx-file-drop .ngx-file-drop__drop-zone {
+  box-shadow: none !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgb(200, 206, 211) !important;
+  border-image: initial !important;
+  outline: -webkit-focus-ring-color auto 0px !important;
+  border-radius: 0.25rem !important;
+  background: transparent;
+  width: 100%;
+  height: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+::ng-deep ngx-file-drop.is-invalid .ngx-file-drop__drop-zone {
+  border-color: #dc3545 !important;
+}
+
+::ng-deep ngx-file-drop .ngx-file-drop__drop-zone.is-dragover {
+  border-color: #555 !important;
+  background: #f0f0f0;
+}
+
+.browse {
+  color: #378ad8;
+  background-color: #d8ecff;
+  cursor: pointer;
+  border-radius: 0.25rem !important;
+}
+
+.text-wq {
+  color: rgb(92, 104, 115);
+  font-size: 0.875rem;
+  font-weight: 400;
+  padding: 0.375rem 0.75rem;
+}
+
+.file {
+  color: #378ad8;
+  background-color: #d8ecff;
+  border-radius: 0.25rem !important;
+}
+
+::ng-deep .ng-select .ng-select-container,
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  // min-height: calc(1.5em + 0.6rem + 2px) !important;
+  // font-size: 0.76rem;
+  font-weight: 400;
+  color: #5c6873;
+}
+
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  // height: calc(1.5em + 0.6rem + 2px) !important;
+  // font-size: 0.76rem !important;
+  font-weight: 400;
+  color: #5c6873;
+}
+
+::ng-deep ng-select.is-invalid .ng-select-container {
+  border: 1px solid #cc0000 !important;
+}
+
+::ng-deep .ng-select .ng-select-container .ng-value-container .ng-placeholder {
+  color: #5c6873 !important;
+}

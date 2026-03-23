@@ -1,0 +1,110 @@
+<div class="row">
+  <div class="col">
+    <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+  </div>
+</div>
+<div class="row mb-4" *ngFor="let bill of bills">
+  <div class="col-12">
+    <h5>{{bill.billName}}</h5>
+  </div>
+  <div class="col-6">
+    <div class="card equalize-card">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-3 font-weight-bold">Type</div>
+          <div class="col-3 font-weight-bold">Allowed</div>
+          <div class="col-3 font-weight-bold">Used</div>
+          <div class="col-3 font-weight-bold">Overusage</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-3">
+            <button class="btn btn-block btn-dark h6 nopointerevents">CDR/95th %</button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-block btn-success nopointerevents">{{bill.cdr}}Mbps</button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-block btn-warning nopointerevents">{{bill.rate95th}}Mbps</button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-block nopointerevents {{bill.overUsageClass}}">{{bill.overUsage}}Mbps</button>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-3 offset-3 h6">Inbound</div>
+          <div class="col-3 h6">Outbound</div>
+          <div class="col-3 h6">Used</div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-3 h6">95th Percentile</div>
+          <div class="col-3">
+            <button class="btn btn-block btn-success nopointerevents">{{bill.rate95thIn}}Mbps</button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-block btn-info nopointerevents">{{bill.rate95thOut}}Mbps</button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-block btn-dark" disabled>{{bill.rate95th}}Mbps</button>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-3 h6">Average</div>
+          <div class="col-3">
+            <button class="btn btn-block btn-success nopointerevents">{{bill.rateAverageIn}}Mbps</button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-block btn-info nopointerevents">{{bill.rateAverageOut}}Mbps</button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-block btn-dark" disabled>{{bill.rateAverage}}Mbps</button>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="progress bg-secondary" style="height: 20px;">
+              <div class="progress-bar {{bill.overUsedPercentClass}}" role="progressbar" aria-valuemin="0"
+                [style.width]="bill.overUsedPercent" aria-valuemax="100">{{bill.overUsedPercent}}</div>
+              <div class="progress-bar bg-warning" role="progressbar" aria-valuemin="0" [style.width]="bill.unUsedPercent"
+                aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6">
+    <div class="card equalize-card">
+      <div class="card-header font-weight-bold">Billing Information</div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-5 h6">Billing Period</div>
+          <div class="col-7">{{bill.billingPeriod}}</div>
+        </div>
+        <div class="row mt-5">
+          <div class="col-5 h6">Bill Last Calculated</div>
+          <div class="col-7">{{bill.billLastCalculatedOn}}</div>
+        </div>
+        <div class="row mt-5">
+          <div class="col-5 h6">Estimated Billing Fee*</div>
+          <div class="col-7">${{bill.billingFees}}</div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-12">
+            <small class="text-muted font-italic">*Actual overage fee may vary based on the contract.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="text-center text-muted pt-5" *ngIf="!bills.length">
+  No billing information available
+</p>

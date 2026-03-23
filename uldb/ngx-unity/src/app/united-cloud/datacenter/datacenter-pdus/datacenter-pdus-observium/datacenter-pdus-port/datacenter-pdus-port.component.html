@@ -1,0 +1,61 @@
+<div class="card text-center">
+  <div class="card-header ">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item">
+        <a class="nav-link text-warning font-lg border-0">PDU Ports</a>
+      </li>
+    </ul>
+  </div>
+  <div class="card border-0 rounded-0 p-0 mb-0">
+    <app-spinner [name]="'pduports'"></app-spinner>
+    <table class="table text-left">
+      <thead class="">
+        <tr>
+          <th>Port</th>
+          <th></th>
+          <th>Traffic</th>
+          <th>Speed</th>
+          <th>MAC Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let port of ports | keyvalue">
+          <td class="align-middle">
+            <p class="mb-0" *ngIf="port.value.entity_name">{{port.value.entity_name}}</p>
+            <p class="mb-0" *ngIf="port.value.entity_descr">{{port.value.entity_descr}}</p>
+            <p *ngFor="let address of port.value.addresses" class="mb-0">{{address.ipv4_network}}</p>
+          </td>
+          <td>
+            <p class="mb-0" *ngFor="let graphs of port.value.graph | keyvalue">
+              <img [src]="'data:image/png;base64,'+graphs.value">
+            </p>
+          </td>
+          <td class="align-middle">
+            <p *ngIf="port.value.in_rate" class="mb-0" [style]="sanitizer.bypassSecurityTrustStyle(port.value.bps_in_style)">
+              <i class="fa fa-arrow-circle-down"></i> {{port.value.in_rate | bandwidth}}</p>
+            <p *ngIf="port.value.out_rate" class="mb-0" [style]="sanitizer.bypassSecurityTrustStyle(port.value.bps_out_style)">
+              <i class="fa fa-arrow-circle-up"></i> {{port.value.out_rate | bandwidth}}</p>
+            <p *ngIf="port.value.ifInUcastPkts_rate" class="mb-0" [style]="sanitizer.bypassSecurityTrustStyle(port.value.pps_in_style)">
+              <i class="fa fa-arrow-circle-down"></i> {{port.value.ifInUcastPkts_rate}}pps</p>
+            <p *ngIf="port.value.ifOutUcastPkts_rate" class="mb-0" [style]="sanitizer.bypassSecurityTrustStyle(port.value.pps_out_style)">
+              <i class="fa fa-arrow-circle-up"></i> {{port.value.ifOutUcastPkts_rate}}pps</p>
+          </td>
+          <td class="align-middle">
+            <p class="mb-0">{{port.value.human_type}}</p>
+            <p class="mb-0">{{port.value.human_speed}}</p>
+            <p class="mb-0" *ngIf="port.value.ifMtu">MTU {{port.value.ifMtu}}</p>
+          </td>
+          <td class="align-middle">
+            <p class="mb-0">{{port.value.human_mac}}</p>
+            <p class="mb-0">{{port.value.ifLastChange}}</p>
+          </td>
+          <td class="align-middle">
+            <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(port)" [tooltip]="'Stats'">
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-center text-muted mb-2" *ngIf="!ports">No Ports to display.</div>
+  </div>
+</div>

@@ -1,0 +1,80 @@
+<div class="alert alert-info" role="alert" ng-if="showmessage == true" ng-click="closeAlert()">{{ alertMsg }}</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Manage Account
+      </div>
+      <div class="panel-body">
+        <table class="table table-hover">
+
+          <thead>
+          <tr>
+            <td class="col-sm-4">Two-Factor Authentication</td>
+            <td class="col-sm-4">{{ has_two_factor ? 'Enabled' : 'Disabled' }}</td>
+            <td class="col-sm-4">
+              <button ng-if="has_two_factor" class="btn btn-danger" ng-click="enableTwoFactor()">Disable</button>
+              <button ng-if="!has_two_factor" class="btn btn-success" ng-click="enableTwoFactor()">Enable</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Email Address</td>
+            <td>{{ email }}</td>
+            <td></td>
+          </tr>
+
+          <tr>
+            <td>Password Management</td>
+            <td><button class="btn btn-success" ng-click="changePassword()">Change Password</td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="Organization Profile">
+      <detailtable cols="orgprofilecols" result="orgprofileresult"></detailtable>
+    </panelhalf>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <panelhalf heading="Access List">
+      <ul style="line-height: 38px;">
+        <li ng-repeat="acclist in accessresult">{{ acclist.description }}</li>
+      </ul>
+    </panelhalf>
+  </div>
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <panelhalf heading="Recent Activity">
+      <detailtable cols="recentactivitycols" result="recentactivityresult"></detailtable>
+    </panelhalf>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="otpModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Add Time-based OTP Device</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <p>Click <strong>Continue</strong> to configure two-factor authentication.</p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="enable()">
+      Continue
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+  </div>
+</script>

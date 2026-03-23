@@ -1,0 +1,19 @@
+<!-- <div class="pb-3">
+    <unity-rounded-tab [tabItems]="tabItems">
+    </unity-rounded-tab>
+</div>
+<router-outlet></router-outlet> -->
+
+<app-main-tab [tabItems]="tabItems">
+  <ng-template>
+    <div class="p-2">
+      <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+          class="fa fa-arrow-left"></i></button>
+    </div>
+  </ng-template>
+</app-main-tab>
+<div class="container-fluid pt-0">
+  <div class="animated fadeIn">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -1,0 +1,1710 @@
+<ng-template #addVMRef>
+    <div class="card mb-0 set-min-height">
+        <div class="card-header">
+            Add VM
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="addVmModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body" id="add-vm-card">
+            <div class="row">
+                <div class="col-12" id="step-col">
+                    <div class="card text-center mb-0">
+                        <div class="card-body">
+                            <ol class="step-indicator" [perfectScrollbar]>
+                                <li *ngFor="let step of steps; let i = index;" [class.active]="isActive(i)"
+                                    [ngClass]="{'complete' : step.visited}">
+                                    <div class="step">
+                                        <i class="step-icon" [ngClass]="step.icon"></i>
+                                    </div>
+                                    <div class="caption hidden-xs hidden-sm pb-0">
+                                        <span>{{step.stepName}}</span>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12" id="container-col">
+                    <div class="card border-0 mb-0" style="height: 100%;">
+                        <div class="card-body">
+                            <ng-container [ngSwitch]="steps[currentActiveIndex].stepName">
+                                <ng-container *ngSwitchCase="ADD_VM_STEPS.CREATION_TYPE">
+                                    <ng-container *ngTemplateOutlet="CREATION_TYPE"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="ADD_VM_STEPS.NAME_AND_FOLDER">
+                                    <ng-container *ngTemplateOutlet="NAME_AND_FOLDER"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="ADD_VM_STEPS.COMPUTE_RESOURCE">
+                                    <ng-container *ngTemplateOutlet="COMPUTE_RESOURCE"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="ADD_VM_STEPS.STORAGE">
+                                    <ng-container *ngTemplateOutlet="STORAGE"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="ADD_VM_STEPS.GUEST_OS">
+                                    <ng-container *ngTemplateOutlet="GUEST_OS"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="ADD_VM_STEPS.HARDWARE">
+                                    <ng-container *ngTemplateOutlet="HARDWARE"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="ADD_VM_STEPS.SUMMARY">
+                                    <ng-container *ngTemplateOutlet="SUMMARY"></ng-container>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="next()"
+                *ngIf="currentActiveIndex != (steps.length - 1)">Next</button>
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submit()"
+                *ngIf="currentActiveIndex == (steps.length - 1)">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right ml-1" type="button" *ngIf="currentActiveIndex"
+                (click)="back()">Back</button>
+            <button class="btn btn-sm btn-outline-danger pull-right" (click)="addVmModelRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #recursiveListTmpl let-list="list" let-action="action">
+    <ul id="myUL">
+        <li *ngFor="let node of list">
+            <span style="display: block;" class="pl-2 pointer-link" (click)="action(node)"
+                [ngClass]="{'highlight-node':node.isSelected}">
+                <span [ngClass]="node.getIcon()" style="cursor:pointer;"></span>
+                <span (click)="node.toggle()">{{ node.name }}</span>
+            </span>
+            <ul *ngIf="node.children && node.children.length > 0" [ngClass]="{'d-none':!node.isOpened}">
+                <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: node.children, action:action }">
+                </ng-container>
+            </ul>
+        </li>
+    </ul>
+</ng-template>
+
+
+<ng-template #CREATION_TYPE>
+    <div class="row">
+        <div class="form-group col-6">
+            <label class="form-col-form-label">How would you like to create a virtual machine?</label>
+            <select class="form-control" [(ngModel)]="mainData[ADD_VM_STEPS.CREATION_TYPE].creation_type"
+                (ngModelChange)="vmsAddSvc.isValidStep(ADD_VM_STEPS.CREATION_TYPE, mainData)"
+                [class.is-invalid]="mainData[ADD_VM_STEPS.CREATION_TYPE].error">
+                <option [value]="''" [disabled]>Select option</option>
+                <option [value]="'create_new'">Create a new VM</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="mainData[ADD_VM_STEPS.CREATION_TYPE].error">
+                {{mainData[ADD_VM_STEPS.CREATION_TYPE].error}}</div>
+        </div>
+    </div>
+    <label class="text-muted" style="bottom: 0;">Note: This option guides you through creating a new
+        virtual machine. You will be able to customize processors, memory, network connections and storage. You will
+        need
+        to install a guest operating system after creation</label>
+</ng-template>
+
+<ng-template #NAME_AND_FOLDER>
+    <div class="row">
+        <div class="form-group col-12">
+            <label class="form-col-form-label" for="name">VM Name<em>*</em></label>
+            <input id="name" class="form-control" type="text" [(ngModel)]="mainData[ADD_VM_STEPS.NAME_AND_FOLDER].name"
+                (ngModelChange)="vmsAddSvc.validateName(mainData[ADD_VM_STEPS.NAME_AND_FOLDER])"
+                [class.is-invalid]="mainData[ADD_VM_STEPS.NAME_AND_FOLDER].nameError">
+            <div class="invalid-feedback" *ngIf="mainData[ADD_VM_STEPS.NAME_AND_FOLDER].nameError">
+                {{mainData[ADD_VM_STEPS.NAME_AND_FOLDER].nameError}}</div>
+        </div>
+        <div class="form-group col-12">
+            <label class="form-col-form-label">Select location for the VM</label>
+            <div style="height: 150px; overflow: auto;" class="border rounded"
+                [class.is-invalid]="mainData[ADD_VM_STEPS.NAME_AND_FOLDER].destinationError">
+                <ng-container *ngTemplateOutlet="recursiveListTmpl; context:nameAndFolderCtx">
+                </ng-container>
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="mainData[ADD_VM_STEPS.NAME_AND_FOLDER].destinationError">
+                {{mainData[ADD_VM_STEPS.NAME_AND_FOLDER].destinationError}}</div>
+        </div>
+    </div>
+    <!-- <div class="invalid-feedback" *ngIf="loadBalancerErrors.name">{{loadBalancerErrors.name}}</div> -->
+</ng-template>
+
+<ng-template #COMPUTE_RESOURCE>
+    <div class="row">
+        <div class="form-group col-12">
+            <label class="form-col-form-label">Select the destination compute resource for this operation</label>
+            <div style="min-height: 150px;max-height: 100%; overflow: auto;" class="border rounded"
+                [class.is-invalid]="mainData[ADD_VM_STEPS.COMPUTE_RESOURCE].computeResourceError">
+                <ng-container *ngTemplateOutlet="recursiveListTmpl; context:computeResourceCtx">
+                </ng-container>
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="mainData[ADD_VM_STEPS.COMPUTE_RESOURCE].computeResourceError">
+                {{mainData[ADD_VM_STEPS.COMPUTE_RESOURCE].computeResourceError}}</div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #STORAGE>
+    <div class="row">
+        <div class="form-group col-12">
+            <label class="form-col-form-label">Select the storage for configuration and hard disk files</label>
+            <table class="table text-left border border-top-0 mb-0">
+                <thead>
+                    <tr>
+                        <th>
+                        </th>
+                        <th>Name</th>
+                        <th>Capacity</th>
+                        <th>Provisioned</th>
+                        <th>Free</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let stg of storage;let i = index" (click)="$event.stopPropagation();selectStorage(stg)"
+                        class="pointer-link">
+                        <td class="bg-white" style="width: 15px;">
+                            <i class="far" [ngClass]="stg.isSelected ? 'fa-check-circle':'fa-circle'">
+                            </i>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.name}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary?.capacity?.value}} {{stg.summary?.capacity?.unit}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary?.provisioned?.value}} {{stg.summary?.provisioned?.unit}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary?.freespace?.value}} {{stg.summary?.freespace?.unit}}
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                {{stg.summary.type}}
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="invalid-feedback d-block" *ngIf="mainData[ADD_VM_STEPS.STORAGE].storageError">
+                {{mainData[ADD_VM_STEPS.STORAGE].storageError}}</div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #GUEST_OS>
+    <div class="row">
+        <div class="col-12">
+            <label class="d-block">Choose the guest OS that will be installed on virtual machine</label>
+            <label class="font-weight-light">Identifying the guest OS here allows the wizard to provide the appropritate
+                default for the
+                OS installation</label>
+        </div>
+        <div class="form-group col-4">
+            <label class="form-col-form-label">Guest OS</label>
+            <select class="form-control" [(ngModel)]="mainData[ADD_VM_STEPS.GUEST_OS].guestOS"
+                (ngModelChange)="mainData[ADD_VM_STEPS.GUEST_OS].guestOs=''">
+                <option [value]="'windows'">Windows</option>
+                <option [value]="'Linux'">Linux</option>
+                <option [value]="'other'">Other</option>
+            </select>
+            <!-- <div class="invalid-feedback" *ngIf="loadBalancerErrors.name">{{loadBalancerErrors.name}}</div> -->
+        </div>
+        <div class="form-group col-8">
+            <label class="form-col-form-label">Guest OS Version</label>
+            <select class="form-control" [(ngModel)]="mainData[ADD_VM_STEPS.GUEST_OS].guestOSVersion"
+                [class.is-invalid]="mainData[ADD_VM_STEPS.GUEST_OS].guestOSVersionError"
+                (ngModelChange)="vmsAddSvc.isValidStep(ADD_VM_STEPS.GUEST_OS, mainData)">
+                <option [value]="''" [disabled]>Select option</option>
+                <ng-container [ngSwitch]="mainData[ADD_VM_STEPS.GUEST_OS].guestOS">
+                    <ng-container *ngSwitchCase="'windows'">
+                        <ng-container *ngTemplateOutlet="WINDOWS_OS"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Linux'">
+                        <ng-container *ngTemplateOutlet="LINUX_OS"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'other'">
+                        <ng-container *ngTemplateOutlet="OTHERS_OS"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </select>
+            <div class="invalid-feedback" *ngIf="mainData[ADD_VM_STEPS.GUEST_OS].guestOSVersionError">
+                {{mainData[ADD_VM_STEPS.GUEST_OS].guestOSVersionError}}</div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #HARDWARE>
+    <div class="row">
+        <div class="col-10">
+            <label class="d-block">Configure the virtual machine hardware </label>
+        </div>
+        <div class="col-2">
+            <div class="btn-group float-right pb-2" dropdown placement="bottom right">
+                <button id="button-alignment" dropdownToggle type="button"
+                    class="btn btn-primary btn-sm dropdown-toggle" aria-controls="dropdown-alignment">
+                    Add New Device <span class="caret"></span>
+                </button>
+                <ul id="dropdown-alignment" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu"
+                    aria-labelledby="button-alignment">
+                    <li role="menuitem"><a class="dropdown-item" (click)="addNewHardDisk()">Hard Disk</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addNewNetwork()">Network Adapter</a></li>
+
+                    <li role="menuitem"><a class="dropdown-item" (click)="addNVMeController()">NVMe Controller</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addSataContoller()">SATA Controller</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addScsiContoller()">SCSI Controller</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addUSBController()">USB Controller</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="hardware-wrapper">
+        <div class="row">
+            <div class="col-12">
+                <div class="float-left w-100 row-item border">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">CPU</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm col-2"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].cpu">
+                                    <option [value]="i+1" *ngFor="let e of [].constructor(32); let i = index;">{{i+1}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="mainData[ADD_VM_STEPS.HARDWARE].cpuExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="mainData[ADD_VM_STEPS.HARDWARE].cpuExpand =! mainData[ADD_VM_STEPS.HARDWARE].cpuExpand"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2"
+                            [ngClass]="mainData[ADD_VM_STEPS.HARDWARE].cpuExpand ? 'd-block' : 'd-none'">
+                            <div class="form-check checkbox">
+                                <input class="form-check-input" type="checkbox"
+                                    [checked]="mainData[ADD_VM_STEPS.HARDWARE].cpuHotAdd"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].cpuHotAdd">
+                                <label class="form-check-label">Add Hot CPU</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">Memory (in MB) </label>
+                        <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                            [tooltip]="'Minimum 4MB and Maximum 24560GB can be selected'"></i>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <input type="number" max="24560000" min="4"
+                                    class="form-control form-control-sm float-left col-3 mr-3"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].memory"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareMemory(mainData[ADD_VM_STEPS.HARDWARE])"
+                                    [class.is-invalid]="mainData[ADD_VM_STEPS.HARDWARE].memoryError" />
+
+                                <select class="form-control form-control-sm col-2"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].memoryUnit"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareMemory(mainData[ADD_VM_STEPS.HARDWARE])">
+                                    <option [value]="'MB'">MB</option>
+                                    <option [value]="'GB'">GB</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block"
+                                    *ngIf="mainData[ADD_VM_STEPS.HARDWARE].memoryError">
+                                    {{mainData[ADD_VM_STEPS.HARDWARE].memoryError}}</div>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="mainData[ADD_VM_STEPS.HARDWARE].memoryExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="mainData[ADD_VM_STEPS.HARDWARE].memoryExpand =! mainData[ADD_VM_STEPS.HARDWARE].memoryExpand"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2"
+                            [ngClass]="mainData[ADD_VM_STEPS.HARDWARE].memoryExpand ? 'd-block' : 'd-none'">
+                            <div class="form-check checkbox">
+                                <input class="form-check-input" type="checkbox"
+                                    [checked]="mainData[ADD_VM_STEPS.HARDWARE].memoryHotAdd"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].memoryHotAdd">
+                                <label class="form-check-label">Add Hot Memory</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let hd of mainData[ADD_VM_STEPS.HARDWARE].hardDisk;let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">New Hard Disk</label>
+                        <!-- <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                            [tooltip]="'Minimum 1GB and Maximum '+mainData[ADD_VM_STEPS.STORAGE].storage[0]?.summary.freespace+' can be selected'"></i> -->
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <input type="number"
+                                    [max]="mainData[ADD_VM_STEPS.STORAGE].storage[0]?.summary.freespace" min="1"
+                                    class="form-control form-control-sm float-left col-3 mr-3" [(ngModel)]="hd.hardDisk"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareDisk(hd, 
+                                    mainData[ADD_VM_STEPS.STORAGE].storage[0]?.summary)"
+                                    [class.is-invalid]="hd.hardDiskError" />
+                                <select class="form-control form-control-sm  col-2" [(ngModel)]="hd.hardDiskUnit"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareDisk(hd, 
+                                    mainData[ADD_VM_STEPS.STORAGE].storage[0]?.summary)">
+                                    <option [value]="'MB'">MB</option>
+                                    <option [value]="'GB'">GB</option>
+                                    <option [value]="'TB'">TB</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block" *ngIf="hd.hardDiskError">
+                                    {{hd.hardDiskError}}</div>
+                                <div class="invalid-feedback d-inline-block"
+                                    *ngIf="mainData[ADD_VM_STEPS.HARDWARE].hardDiskError">
+                                    {{mainData[ADD_VM_STEPS.HARDWARE].hardDiskError}}</div>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="hd.hardDiskExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="hd.hardDiskExpand =! hd.hardDiskExpand"></i>
+                                <i class="far fa-times-circle float-right m-2" *ngIf="i>0"
+                                    (click)="removeNewHardDisk(i)"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2" [ngClass]="hd.hardDiskExpand ? 'd-block' : 'd-none'">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Maximum Size</label>
+                                        <input type="text" class="form-control form-control-sm float-left w-100"
+                                            [value]="mainData[ADD_VM_STEPS.STORAGE].storage[0]?.summary.freespace"
+                                            disabled />
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left ml-2 mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Disk Provisioning</label>
+                                        <select class="form-control form-control-sm float-left w-100 select-md"
+                                            [(ngModel)]="hd.diskProvision">
+                                            <option [value]="'Thick Provision Lazy Zerored'">Thick Provision Lazy
+                                                Zerored
+                                            </option>
+                                            <option [value]="'Thin Provision'">Thin Provision</option>
+                                            <option [value]="'Thick Provision Eager Zeroed'">Thick Provision Eager
+                                                Zeroed
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left ml-2 mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Virtual Device Node</label>
+                                        <select class="form-control form-control-sm float-left w-100 select-md"
+                                            [(ngModel)]="hd.controller">
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of mainData[ADD_VM_STEPS.HARDWARE].scsiControllers">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of mainData[ADD_VM_STEPS.HARDWARE].sataControllers">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of mainData[ADD_VM_STEPS.HARDWARE].nvmeControllers">
+                                                {{ctrl.label}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12"
+                *ngFor="let scsiCtrl of mainData[ADD_VM_STEPS.HARDWARE].scsiControllers;let i =  index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{scsiCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm select-md" [(ngModel)]="scsiCtrl.value">
+                                    <option [value]="'VirtualLsiLogicSASController'">LSI Logic SAS</option>
+                                    <option [value]="'VirtualBusLogicController'">BusLogic Parallel</option>
+                                    <option [value]="'VirtualLsiLogicController'">LSI Logic Parallel</option>
+                                    <option [value]="'ParaVirtualSCSIController'">VMware Paravirtual</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2" *ngIf="i>0"
+                                    (click)="removeNewScsiContoller(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let nw of mainData[ADD_VM_STEPS.HARDWARE].network; let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">New Network <em>*</em></label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="w-100">
+                                    <select class="form-control form-control-sm float-left select-md"
+                                        [(ngModel)]="nw.network" (ngModelChange)="vmsAddSvc.validateHardwareNetwork(nw)"
+                                        [class.is-invalid]="nw.networkError">
+                                        <option [value]="''" disabled>Please Select</option>
+                                        <option [value]="n" *ngFor="let n of network">{{n}}</option>
+                                    </select>
+                                    <div class="invalid-feedback d-inline-block" *ngIf="nw.networkError">
+                                        {{nw.networkError}}</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2" *ngIf="i>0"
+                                    (click)="removeNewNetwork(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">New CD/DVD Drive</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <select class="form-control form-control-sm float-left select-md"
+                            [ngModel]="mainData[ADD_VM_STEPS.HARDWARE].boot_option"
+                            (ngModelChange)="bootOptionChanged($event)">
+                            <option [value]="''">Select option</option>
+                            <!-- <option [value]="'client'">Client Review</option> -->
+                            <!-- <option [value]="'host'">Host Device</option> -->
+                            <option [value]="'datastore iso'">Datastore ISO File</option>
+                            <option [value]="'content library iso'">Content Library ISO File</option>
+                        </select>
+                        <!-- <div class="form-check float-left ml-3 mt-1">
+                            <input type="checkbox" class="form-check-input" id="checkbox2" />
+                            <label class="form-check-label" for="checkbox2">Connect</label>
+                        </div> -->
+                        <div class="table-wrapper float-left w-100 border mt-2"
+                            *ngIf="mainData[ADD_VM_STEPS.HARDWARE].boot_option == 'datastore iso'">
+                            <div class="table-item float-left border-right w-50">
+                                <div class="heading p-2 float-left w-100 border-bottom">
+                                    <span>Datastores</span>
+                                </div>
+                                <div class="content float-left w-100">
+                                    <ul class="p-0 m-0">
+                                        <li class="px-2 py-1 text-ellipsis" *ngFor="let stg of storage;let i = index"
+                                            (click)="selectStorageForISO(stg.name)"
+                                            [class.highlight-node]="mainData[ADD_VM_STEPS.HARDWARE].iso_storage==stg.name">
+                                            <span class="pointer-link">{{stg.name}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="table-item float-left border-right w-50">
+                                <div class="heading p-2 float-left w-100 border-bottom">
+                                    <span>Content</span>
+                                </div>
+                                <div class="content float-left w-100">
+                                    <ul class="p-0 m-0">
+                                        <li class="px-2 py-1 text-ellipsis" *ngFor="let iso of isoList;let i = index"
+                                            (click)="selectISO(iso.file_path)"
+                                            [class.highlight-node]="mainData[ADD_VM_STEPS.HARDWARE].iso==iso.file_path">
+                                            <span [tooltip]="iso.file_name"
+                                                class="pointer-link">{{iso.file_name}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-wrapper float-left w-100 border mt-2"
+                            *ngIf="mainData[ADD_VM_STEPS.HARDWARE].boot_option == 'content library iso'">
+                            <div class="table-item float-left border-right w-50">
+                                <div class="heading p-2 float-left w-100 border-bottom">
+                                    <span>Datastores</span>
+                                </div>
+                                <div class="content float-left w-100">
+                                    <ul class="p-0 m-0">
+                                        <li class="px-2 py-1 text-ellipsis" *ngFor="let lib of libraries;let i = index"
+                                            (click)="selectLibrariesForISO(lib.libId)"
+                                            [class.highlight-node]="mainData[ADD_VM_STEPS.HARDWARE].library_storage==lib.libId">
+                                            <span class="pointer-link">{{lib.name}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="table-item float-left border-right w-50">
+                                <div class="heading p-2 float-left w-100 border-bottom">
+                                    <span>Content</span>
+                                </div>
+                                <div class="content float-left w-100">
+                                    <ul class="p-0 m-0">
+                                        <li class="px-2 py-1 text-ellipsis" *ngFor="let iso of isoList;let i = index"
+                                            (click)="selectISO(iso.iso_file)"
+                                            [class.highlight-node]="mainData[ADD_VM_STEPS.HARDWARE].iso==iso.iso_file">
+                                            <span [tooltip]="iso.file_name"
+                                                class="pointer-link">{{iso.file_name}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invalid-feedback d-block float-right"
+                            *ngIf="mainData[ADD_VM_STEPS.HARDWARE].isoError">
+                            {{mainData[ADD_VM_STEPS.HARDWARE].isoError}}</div>
+                        <!-- <div class="drag-drop-file float-left w-100 mt-2 border p-2 position-relative">
+                            <input type="file" class="file-upload float-left w-100" />
+                            <span class="float-left w-100 text-center text-secondary">Drag file here or click to
+                                choose</span>
+                        </div>
+                        <div class="selected-file float-left w-100 mt-2 border p-2 position-relative text-center">
+                            <span class="">onboarding_all_device_file</span>
+                            <i class="fas fa-trash-alt text-danger ml-2"></i>
+                            <button class="btn-pill btn-warning ml-2">Upload</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let usbCtrl of mainData[ADD_VM_STEPS.HARDWARE].usbControllers; let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">USB Controller {{i}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm select-md"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].usbControllers[i]"
+                                    (change)="changeUSBController(i)">
+                                    <option [value]="'USB Controller'">USB 2.0
+                                    </option>
+                                    <option [value]="'USB xHCI Controller'">USB 3.1
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2" (click)="removeUSBController(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="float-left w-100 row-item border">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">Video Card</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm col-3"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].vcSettings"
+                                    (ngModelChange)="resetVideoCardSettings()">
+                                    <option [value]="'auto_detect'">Auto Detect</option>
+                                    <option [value]="'custom'">Custom Settings</option>
+                                </select>
+                            </div>
+                            <div class="col" *ngIf="mainData[ADD_VM_STEPS.HARDWARE].vcSettings=='custom'">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="mainData[ADD_VM_STEPS.HARDWARE].vcExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="mainData[ADD_VM_STEPS.HARDWARE].vcExpand =! mainData[ADD_VM_STEPS.HARDWARE].vcExpand"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2"
+                            [ngClass]="mainData[ADD_VM_STEPS.HARDWARE].vcExpand ? 'd-block' : 'd-none'">
+                            <div class="form-group extra-field float-left mb-0">
+                                <label class="form-label float-left w-100 mb-0">Number of Displays<em>*</em></label>
+                                <select class="form-control form-control-sm col-3"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].vcNumDisplay"
+                                    [class.is-invalid]="mainData[ADD_VM_STEPS.HARDWARE].vcNumDisplayErr">
+                                    <option [value]="i+1" *ngFor="let e of [].constructor(10); let i = index;">{{i+1}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block"
+                                    *ngIf="mainData[ADD_VM_STEPS.HARDWARE].vcNumDisplayErr">
+                                    {{mainData[ADD_VM_STEPS.HARDWARE].vcNumDisplayErr}}</div>
+                            </div>
+                            <div class="form-group extra-field float-left ml-2 mb-0">
+                                <label class="form-label float-left w-100 mb-0">Total Video Memory(MB)<em>*</em></label>
+                                <input type="number" class="form-control form-control-sm float-left w-100"
+                                    [(ngModel)]="mainData[ADD_VM_STEPS.HARDWARE].vcRamSize" min="2" max="256"
+                                    [class.is-invalid]="mainData[ADD_VM_STEPS.HARDWARE].vcRamSizeErr" />
+                                <div class="invalid-feedback d-inline-block"
+                                    *ngIf="mainData[ADD_VM_STEPS.HARDWARE].vcRamSizeErr">
+                                    {{mainData[ADD_VM_STEPS.HARDWARE].vcRamSizeErr}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let nvmeCtrl of mainData[ADD_VM_STEPS.HARDWARE].nvmeControllers">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{nvmeCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                {{nvmeCtrl.value}}
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2" (click)="removeNVMeController(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let sataCtrl of mainData[ADD_VM_STEPS.HARDWARE].sataControllers;let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{sataCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                {{sataCtrl.value}}
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2" *ngIf="i>0"
+                                    (click)="removeSataContoller(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #SUMMARY>
+    <label class="d-block">Click submit to start creation</label>
+    <div class="hardware-wrapper">
+        <table class="summary-table w-100 table table-bordered">
+            <tbody>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Virtual machine name</td>
+                    <td>{{mainData[ADD_VM_STEPS.NAME_AND_FOLDER].name}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Folder</td>
+                    <td>{{mainData[ADD_VM_STEPS.NAME_AND_FOLDER].destination}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Resource pool</td>
+                    <td>{{mainData[ADD_VM_STEPS.COMPUTE_RESOURCE].computeResource}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Data store</td>
+                    <td>{{mainData[ADD_VM_STEPS.STORAGE].storage[0].name}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Guest OS name</td>
+                    <td>{{mainData[ADD_VM_STEPS.GUEST_OS].guestOSVersion}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">CPUs</td>
+                    <td>{{mainData[ADD_VM_STEPS.HARDWARE].cpu}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Memory</td>
+                    <td>{{mainData[ADD_VM_STEPS.HARDWARE].memory}} {{mainData[ADD_VM_STEPS.HARDWARE].memoryUnit}}</td>
+                </tr>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">NICs</td>
+                    <td>{{mainData[ADD_VM_STEPS.HARDWARE].network.length}}</td>
+                </tr>
+                <tr *ngFor="let nw of mainData[ADD_VM_STEPS.HARDWARE].network;let i = index">
+                    <td class="w-35 bg-gray-200 h6">NIC network {{i+1}}</td>
+                    <td>{{nw.network}}</td>
+                </tr>
+                <tr *ngFor="let ctrl of mainData[ADD_VM_STEPS.HARDWARE].scsiControllers;">
+                    <td class="w-35 bg-gray-200 h6">{{ctrl.label}}</td>
+                    <td>{{ctrl.value}}</td>
+                </tr>
+                <tr *ngFor="let ctrl of mainData[ADD_VM_STEPS.HARDWARE].sataControllers;">
+                    <td class="w-35 bg-gray-200 h6">{{ctrl.label}}</td>
+                    <td>{{ctrl.value}}</td>
+                </tr>
+                <tr *ngFor="let ctrl of mainData[ADD_VM_STEPS.HARDWARE].nvmeControllers;">
+                    <td class="w-35 bg-gray-200 h6">{{ctrl.label}}</td>
+                    <td>{{ctrl.value}}</td>
+                </tr>
+                <tr *ngFor="let ctrl of mainData[ADD_VM_STEPS.HARDWARE].usbControllers;">
+                    <td class="w-35 bg-gray-200 h6">{{ctrl}}</td>
+                    <td *ngIf="ctrl=='USB Controller'">USB 2.0</td>
+                    <td *ngIf="ctrl=='USB xHCI Controller'">USB 3.1</td>
+                </tr>
+                <ng-container *ngFor="let hd of mainData[ADD_VM_STEPS.HARDWARE].hardDisk; let i = index;">
+                    <tr>
+                        <td class="w-35 bg-gray-200 h6">Create hard disk {{i+1}}</td>
+                        <td>New virtual disk</td>
+                    </tr>
+                    <tr>
+                        <td class="w-35 pl-5 bg-gray-200 h6">Capacity</td>
+                        <td>{{mainData[ADD_VM_STEPS.STORAGE].storage[0].summary.capacity.value}} {{mainData[ADD_VM_STEPS.STORAGE].storage[0].summary.capacity.unit}}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-35 pl-5 bg-gray-200 h6">Configured</td>
+                        <td>{{hd.hardDisk}} {{hd.hardDiskUnit}}</td>
+                    </tr>
+                    <tr>
+                        <td class="w-35 pl-5 bg-gray-200 h6">Data store</td>
+                        <td>{{mainData[ADD_VM_STEPS.STORAGE].storage[0].name}}</td>
+                    </tr>
+                </ng-container>
+                <tr>
+                    <td class="w-35 bg-gray-200 h6">Video Card</td>
+                    <td class="text-capitalize">{{mainData[ADD_VM_STEPS.HARDWARE].vcSettings}}</td>
+                </tr>
+                <tr *ngIf="mainData[ADD_VM_STEPS.HARDWARE].vcSettings == 'custom'">
+                    <td class="w-35 pl-5 bg-gray-200 h6">Number of Display</td>
+                    <td>{{mainData[ADD_VM_STEPS.HARDWARE].vcNumDisplay}}</td>
+                </tr>
+                <tr *ngIf="mainData[ADD_VM_STEPS.HARDWARE].vcSettings == 'custom'">
+                    <td class="w-35 pl-5 bg-gray-200 h6">Total Video Memory</td>
+                    <td>{{mainData[ADD_VM_STEPS.HARDWARE].vcRamSize}} MB</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<ng-template #WINDOWS_OS>
+    <option label="Microsoft Windows Server 2019 (64-bit)" [value]="'windows2019srv_64Guest'">Microsoft
+        Windows Server 2019 (64-bit)</option>
+    <option label="Microsoft Windows Server 2016 (64-bit)" [value]="'windows9Server64Guest'">Microsoft
+        Windows Server 2016 (64-bit)</option>
+    <option label="Microsoft Windows Server 2012 (64-bit)" [value]="'windows8Server64Guest'" selected="selected">
+        Microsoft
+        Windows Server 2012 (64-bit)</option>
+    <option label="Microsoft Windows Server 2008 R2 (64-bit)" [value]="'windows7Server64Guest'">Microsoft
+        Windows Server 2008 R2 (64-bit)</option>
+    <option label="Microsoft Windows Server 2008 (64-bit)" [value]="'winLonghorn64Guest'">Microsoft Windows
+        Server 2008 (64-bit)</option>
+    <option label="Microsoft Windows Server 2008 (32-bit)" [value]="'winLonghornGuest'">Microsoft Windows
+        Server 2008 (32-bit)</option>
+    <option label="Microsoft Windows Server 2003 (64-bit)" [value]="'winNetEnterprise64Guest'">Microsoft
+        Windows Server 2003 (64-bit)</option>
+    <option label="Microsoft Windows Server 2003 (32-bit)" [value]="'winNetEnterpriseGuest'">Microsoft
+        Windows Server 2003 (32-bit)</option>
+    <option label="Microsoft Windows 10 (64-bit)" [value]="'windows9_64Guest'">Microsoft Windows 10 (64-bit)
+    </option>
+    <option label="Microsoft Windows 10 (32-bit)" [value]="'windows9Guest'">Microsoft Windows 10 (32-bit)
+    </option>
+    <option label="Microsoft Windows 8.x (64-bit)" [value]="'windows8_64Guest'">Microsoft Windows 8.x
+        (64-bit)</option>
+    <option label="Microsoft Windows 8.x (32-bit)" [value]="'windows8Guest'">Microsoft Windows 8.x (32-bit)
+    </option>
+    <option label="Microsoft Windows 7 (64-bit)" [value]="'windows7_64Guest'">Microsoft Windows 7 (64-bit)
+    </option>
+    <option label="Microsoft Windows 7 (32-bit)" [value]="'windows7Guest'">Microsoft Windows 7 (32-bit)
+    </option>
+    <option label="Microsoft Windows Vista (64-bit)" [value]="'winVista64Guest'">Microsoft Windows Vista
+        (64-bit)</option>
+    <option label="Microsoft Windows Vista (32-bit)" [value]="'winVistaGuest'">Microsoft Windows Vista
+        (32-bit)</option>
+    <option label="Microsoft Windows XP Professional (64-bit)" [value]="'winXPPro64Guest'">Microsoft
+        Windows XP Professional (64-bit)</option>
+    <option label="Microsoft Windows XP Professional (32-bit)" [value]="'winXPProGuest'">Microsoft Windows
+        XP Professional (32-bit)</option>
+    <option label="Microsoft Windows 2000" [value]="'win2000AdvServGuest'">Microsoft Windows 2000</option>
+    <option label="Microsoft Windows NT" [value]="'winNTGuest'">Microsoft Windows NT</option>
+    <option label="Microsoft Windows 98" [value]="'win98Guest'">Microsoft Windows 98</option>
+    <option label="Microsoft Windows 95" [value]="'win95Guest'">Microsoft Windows 95</option>
+    <option label="Microsoft Windows 3.1" [value]="'win31Guest'">Microsoft Windows 3.1</option>
+    <option label="Microsoft MS-DOS" [value]="'dosGuest'">Microsoft MS-DOS</option>
+</ng-template>
+<ng-template #LINUX_OS>
+    <option label="Amazon Linux 2 (64-bit)" [value]="'amazonlinux2_64Guest'">Amazon Linux 2 (64-bit)
+    </option>
+    <option label="VMware Photon OS (64-bit)" [value]="'vmwarePhoton64Guest'">VMware Photon OS (64-bit)
+    </option>
+    <option label="Red Hat Enterprise Linux 8 (64-bit)" [value]="'rhel8_64Guest'">Red Hat Enterprise Linux
+        8 (64-bit)</option>
+    <option label="Red Hat Enterprise Linux 7 (64-bit)" [value]="'rhel7_64Guest'">Red Hat Enterprise Linux
+        7 (64-bit)</option>
+    <option label="Red Hat Enterprise Linux 6 (64-bit)" [value]="'rhel6_64Guest'">Red Hat Enterprise Linux
+        6 (64-bit)</option>
+    <option label="Red Hat Enterprise Linux 6 (32-bit)" [value]="'rhel6Guest'">Red Hat Enterprise Linux 6
+        (32-bit)</option>
+    <option label="Red Hat Enterprise Linux 5 (64-bit)" [value]="'rhel5_64Guest'">Red Hat Enterprise Linux
+        5 (64-bit)</option>
+    <option label="Red Hat Enterprise Linux 5 (32-bit)" [value]="'rhel5Guest'">Red Hat Enterprise Linux 5
+        (32-bit)</option>
+    <option label="Red Hat Enterprise Linux 4 (64-bit)" [value]="'rhel4_64Guest'">Red Hat Enterprise Linux
+        4 (64-bit)</option>
+    <option label="Red Hat Enterprise Linux 4 (32-bit)" [value]="'rhel4Guest'">Red Hat Enterprise Linux 4
+        (32-bit)</option>
+    <option label="Red Hat Enterprise Linux 3 (64-bit)" [value]="'rhel3_64Guest'">Red Hat Enterprise Linux
+        3 (64-bit)</option>
+    <option label="Red Hat Enterprise Linux 3 (32-bit)" [value]="'rhel3Guest'">Red Hat Enterprise Linux 3
+        (32-bit)</option>
+    <option label="Red Hat Enterprise Linux 2.1" [value]="'rhel2Guest'">Red Hat Enterprise Linux 2.1
+    </option>
+    <option label="SUSE Linux Enterprise 15 (64-bit)" [value]="'sles15_64Guest'">SUSE Linux Enterprise 15
+        (64-bit)</option>
+    <option label="SUSE Linux Enterprise 12 (64-bit)" [value]="'sles12_64Guest'">SUSE Linux Enterprise 12
+        (64-bit)</option>
+    <option label="SUSE Linux Enterprise 11 (64-bit)" [value]="'sles11_64Guest'">SUSE Linux Enterprise 11
+        (64-bit)</option>
+    <option label="SUSE Linux Enterprise 11 (32-bit)" [value]="'sles11Guest'">SUSE Linux Enterprise 11
+        (32-bit)</option>
+    <option label="SUSE Linux Enterprise 10 (64-bit)" [value]="'sles10_64Guest'">SUSE Linux Enterprise 10
+        (64-bit)</option>
+    <option label="SUSE Linux Enterprise 10 (32-bit)" [value]="'sles10Guest'">SUSE Linux Enterprise 10
+        (32-bit)</option>
+    <option label="SUSE Linux Enterprise 8/9 (64-bit)" [value]="'sles64Guest'">SUSE Linux Enterprise 8/9
+        (64-bit)</option>
+    <option label="SUSE Linux Enterprise 8/9 (32-bit)" [value]="'slesGuest'">SUSE Linux Enterprise 8/9
+        (32-bit)</option>
+    <option label="CentOS 8 (64-bit)" [value]="'centos8_64Guest'">CentOS 8 (64-bit)</option>
+    <option label="CentOS 7 (64-bit)" [value]="'centos7_64Guest'">CentOS 7 (64-bit)</option>
+    <option label="CentOS 6 (64-bit)" [value]="'centos6_64Guest'">CentOS 6 (64-bit)</option>
+    <option label="CentOS 6 (32-bit)" [value]="'centos6Guest'">CentOS 6 (32-bit)</option>
+    <option label="CentOS 4/5 (64-bit)" [value]="'centos64Guest'">CentOS 4/5 (64-bit)</option>
+    <option label="CentOS 4/5 (32-bit)" [value]="'centosGuest'">CentOS 4/5 (32-bit)</option>
+    <option label="Debian GNU/Linux 11 (64-bit)" [value]="'debian11_64Guest'">Debian GNU/Linux 11 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 11 (32-bit)" [value]="'debian11Guest'">Debian GNU/Linux 11 (32-bit)
+    </option>
+    <option label="Debian GNU/Linux 10 (64-bit)" [value]="'debian10_64Guest'">Debian GNU/Linux 10 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 10 (32-bit)" [value]="'debian10Guest'">Debian GNU/Linux 10 (32-bit)
+    </option>
+    <option label="Debian GNU/Linux 9 (64-bit)" [value]="'debian9_64Guest'">Debian GNU/Linux 9 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 9 (32-bit)" [value]="'debian9Guest'">Debian GNU/Linux 9 (32-bit)
+    </option>
+    <option label="Debian GNU/Linux 8 (64-bit)" [value]="'debian8_64Guest'">Debian GNU/Linux 8 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 8 (32-bit)" [value]="'debian8Guest'">Debian GNU/Linux 8 (32-bit)
+    </option>
+    <option label="Debian GNU/Linux 7 (64-bit)" [value]="'debian7_64Guest'">Debian GNU/Linux 7 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 7 (32-bit)" [value]="'debian7Guest'">Debian GNU/Linux 7 (32-bit)
+    </option>
+    <option label="Debian GNU/Linux 6 (64-bit)" [value]="'debian6_64Guest'">Debian GNU/Linux 6 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 6 (32-bit)" [value]="'debian6Guest'">Debian GNU/Linux 6 (32-bit)
+    </option>
+    <option label="Debian GNU/Linux 5 (64-bit)" [value]="'debian5_64Guest'">Debian GNU/Linux 5 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 5 (32-bit)" [value]="'debian5Guest'">Debian GNU/Linux 5 (32-bit)
+    </option>
+    <option label="Debian GNU/Linux 4 (64-bit)" [value]="'debian4_64Guest'">Debian GNU/Linux 4 (64-bit)
+    </option>
+    <option label="Debian GNU/Linux 4 (32-bit)" [value]="'debian4Guest'">Debian GNU/Linux 4 (32-bit)
+    </option>
+    <option label="SUSE openSUSE (64-bit)" [value]="'opensuse64Guest'">SUSE openSUSE (64-bit)</option>
+    <option label="SUSE openSUSE (32-bit)" [value]="'opensuseGuest'">SUSE openSUSE (32-bit)</option>
+    <option label="Asianux 8 (64-bit)" [value]="'asianux8_64Guest'">Asianux 8 (64-bit)</option>
+    <option label="Asianux 7 (64-bit)" [value]="'asianux7_64Guest'">Asianux 7 (64-bit)</option>
+    <option label="Asianux 4 (64-bit)" [value]="'asianux4_64Guest'">Asianux 4 (64-bit)</option>
+    <option label="Asianux 4 (32-bit)" [value]="'asianux4Guest'">Asianux 4 (32-bit)</option>
+    <option label="Asianux 3 (64-bit)" [value]="'asianux3_64Guest'">Asianux 3 (64-bit)</option>
+    <option label="Asianux 3 (32-bit)" [value]="'asianux3Guest'">Asianux 3 (32-bit)</option>
+    <option label="Red Hat Fedora (64-bit)" [value]="'fedora64Guest'">Red Hat Fedora (64-bit)</option>
+    <option label="Red Hat Fedora (32-bit)" [value]="'fedoraGuest'">Red Hat Fedora (32-bit)</option>
+    <option label="Oracle Linux 8 (64-bit)" [value]="'oracleLinux8_64Guest'">Oracle Linux 8 (64-bit)
+    </option>
+    <option label="Oracle Linux 7 (64-bit)" [value]="'oracleLinux7_64Guest'">Oracle Linux 7 (64-bit)
+    </option>
+    <option label="Oracle Linux 6 (64-bit)" [value]="'oracleLinux6_64Guest'">Oracle Linux 6 (64-bit)
+    </option>
+    <option label="Oracle Linux 6 (32-bit)" [value]="'oracleLinux6Guest'">Oracle Linux 6 (32-bit)</option>
+    <option label="Oracle Linux 4/5 (64-bit)" [value]="'oracleLinux64Guest'">Oracle Linux 4/5 (64-bit)
+    </option>
+    <option label="Oracle Linux 4/5 (32-bit)" [value]="'oracleLinuxGuest'">Oracle Linux 4/5 (32-bit)
+    </option>
+    <option label="Ubuntu Linux (64-bit)" [value]="'ubuntu64Guest'">Ubuntu Linux (64-bit)</option>
+    <option label="Ubuntu Linux (32-bit)" [value]="'ubuntuGuest'">Ubuntu Linux (32-bit)</option>
+    <option label="CoreOS Linux (64-bit)" [value]="'coreos64Guest'">CoreOS Linux (64-bit)</option>
+    <option label="Other 5.x or later Linux (64-bit)" [value]="'other5xLinux64Guest'">Other 5.x or later
+        Linux (64-bit)</option>
+    <option label="Other 5.x or later Linux (32-bit)" [value]="'other5xLinuxGuest'">Other 5.x or later
+        Linux (32-bit)</option>
+    <option label="Other 4.x Linux (64-bit)" [value]="'other4xLinux64Guest'">Other 4.x Linux (64-bit)
+    </option>
+    <option label="Other 4.x Linux (32-bit)" [value]="'other4xLinuxGuest'">Other 4.x Linux (32-bit)
+    </option>
+    <option label="Other 3.x Linux (64-bit)" [value]="'other3xLinux64Guest'">Other 3.x Linux (64-bit)
+    </option>
+    <option label="Other 3.x Linux (32-bit)" [value]="'other3xLinuxGuest'">Other 3.x Linux (32-bit)
+    </option>
+    <option label="Other 2.6.x Linux (64-bit)" [value]="'other26xLinux64Guest'">Other 2.6.x Linux (64-bit)
+    </option>
+    <option label="Other 2.6.x Linux (32-bit)" [value]="'other26xLinuxGuest'">Other 2.6.x Linux (32-bit)
+    </option>
+    <option label="Other 2.4.x Linux (64-bit)" [value]="'other24xLinux64Guest'">Other 2.4.x Linux (64-bit)
+    </option>
+    <option label="Other 2.4.x Linux (32-bit)" [value]="'other24xLinuxGuest'">Other 2.4.x Linux (32-bit)
+    </option>
+    <option label="Other Linux (64-bit)" [value]="'otherLinux64Guest'">Other Linux (64-bit)</option>
+    <option label="Other Linux (32-bit)" [value]="'otherLinuxGuest'">Other Linux (32-bit)</option>
+</ng-template>
+
+<ng-template #OTHERS_OS>
+    <option label="Apple macOS 11 (64-bit)" [value]="'darwin20_64Guest'">Apple macOS 11 (64-bit)</option>
+    <option label="Apple macOS 10.15 (64-bit)" [value]="'darwin19_64Guest'">Apple macOS 10.15 (64-bit)
+    </option>
+    <option label="Apple macOS 10.14 (64-bit)" [value]="'darwin18_64Guest'">Apple macOS 10.14 (64-bit)
+    </option>
+    <option label="Apple macOS 10.13 (64-bit)" [value]="'darwin17_64Guest'">Apple macOS 10.13 (64-bit)
+    </option>
+    <option label="Apple macOS 10.12 (64-bit)" [value]="'darwin16_64Guest'">Apple macOS 10.12 (64-bit)
+    </option>
+    <option label="Apple Mac OS X 10.11 (64-bit)" [value]="'darwin15_64Guest'">Apple Mac OS X 10.11
+        (64-bit)</option>
+    <option label="Apple Mac OS X 10.10 (64-bit)" [value]="'darwin14_64Guest'">Apple Mac OS X 10.10
+        (64-bit)</option>
+    <option label="FreeBSD 13 or later versions (64-bit)" [value]="'freebsd13_64Guest'">FreeBSD 13 or later
+        versions (64-bit)</option>
+    <option label="FreeBSD 13 or later versions (32-bit)" [value]="'freebsd13Guest'">FreeBSD 13 or later
+        versions (32-bit)</option>
+    <option label="FreeBSD 12 (64-bit)" [value]="'freebsd12_64Guest'">FreeBSD 12 (64-bit)</option>
+    <option label="FreeBSD 12 (32-bit)" [value]="'freebsd12Guest'">FreeBSD 12 (32-bit)</option>
+    <option label="FreeBSD 11 (64-bit)" [value]="'freebsd11_64Guest'">FreeBSD 11 (64-bit)</option>
+    <option label="FreeBSD 11 (32-bit)" [value]="'freebsd11Guest'">FreeBSD 11 (32-bit)</option>
+    <option label="FreeBSD Pre-11 versions (64-bit)" [value]="'freebsd64Guest'">FreeBSD Pre-11 versions
+        (64-bit)</option>
+    <option label="FreeBSD Pre-11 versions (32-bit)" [value]="'freebsdGuest'">FreeBSD Pre-11 versions
+        (32-bit)</option>
+    <option label="IBM OS/2" [value]="'os2Guest'">IBM OS/2</option>
+    <option label="Novell NetWare 6.x" [value]="'netware6Guest'">Novell NetWare 6.x</option>
+    <option label="Novell NetWare 5.1" [value]="'netware5Guest'">Novell NetWare 5.1</option>
+    <option label="Oracle Solaris 11 (64-bit)" [value]="'solaris11_64Guest'">Oracle Solaris 11 (64-bit)
+    </option>
+    <option label="Oracle Solaris 10 (64-bit)" [value]="'solaris10_64Guest'">Oracle Solaris 10 (64-bit)
+    </option>
+    <option label="Oracle Solaris 10 (32-bit)" [value]="'solaris10Guest'">Oracle Solaris 10 (32-bit)
+    </option>
+    <option label="Sun Microsystems Solaris 9" [value]="'solaris9Guest'">Sun Microsystems Solaris 9
+    </option>
+    <option label="Sun Microsystems Solaris 8" [value]="'solaris8Guest'">Sun Microsystems Solaris 8
+    </option>
+    <option label="SCO OpenServer 6" [value]="'openServer6Guest'">SCO OpenServer 6</option>
+    <option label="SCO OpenServer 5" [value]="'openServer5Guest'">SCO OpenServer 5</option>
+    <option label="SCO UnixWare 7" [value]="'unixWare7Guest'">SCO UnixWare 7</option>
+    <option label="Serenity Systems eComStation 2" [value]="'eComStation2Guest'">Serenity Systems
+        eComStation 2</option>
+    <option label="Serenity Systems eComStation 1" [value]="'eComStationGuest'">Serenity Systems
+        eComStation 1</option>
+    <option label="Other (64-bit)" [value]="'otherGuest64'">Other (64-bit)</option>
+    <option label="Other (32-bit)" [value]="'otherGuest'">Other (32-bit)</option>
+    <option label="VMware ESXi 6.x" [value]="'vmkernel65Guest'">VMware ESXi 6.x</option>
+    <option label="VMware ESXi 7.0 or later" [value]="'vmkernel7Guest'">VMware ESXi 7.0 or later</option>
+    <option label="VMware ESXi 6.0" [value]="'vmkernel6Guest'">VMware ESXi 6.0</option>
+    <option label="VMware ESXi 5.x" [value]="'vmkernel5Guest'">VMware ESXi 5.x</option>
+    <option label="VMware ESX 4.x" [value]="'vmkernelGuest'">VMware ESX 4.x</option>
+</ng-template>
+
+<ng-template #editVMRef>
+    <div class="card mb-0 set-min-height">
+        <div class="card-header">
+            Edit Settings
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="editVmModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body py-0" id="add-vm-card">
+            <div class="row">
+                <div class="col-12" id="container-col">
+                    <div class="card border-0 mb-0" style="height: 100%;">
+                        <div class="card-body">
+                            <ng-container *ngTemplateOutlet="EDIT_HARDWARE"></ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitEdit()">Submit</button>
+            <button class="btn btn-sm btn-outline-danger pull-right" (click)="editVmModelRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #EDIT_HARDWARE>
+    <div class="row">
+        <div class="col-12">
+            <div class="btn-group float-right pb-2" dropdown placement="bottom right">
+                <button id="button-alignment" dropdownToggle type="button"
+                    class="btn btn-primary btn-sm dropdown-toggle" aria-controls="dropdown-alignment">
+                    Add New Device <span class="caret"></span>
+                </button>
+                <ul id="dropdown-alignment" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu"
+                    aria-labelledby="button-alignment">
+                    <li role="menuitem"><a class="dropdown-item" (click)="addNewHardDiskToEdit()">Hard Disk</a></li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addNewNetworkToEdit()">Network Adapter</a>
+                    </li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addNVMeControllerToEdit()">NVMe Controller</a>
+                    </li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addSataContollerToEdit()">SATA Controller</a>
+                    </li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addScsiContollerToEdit()">SCSI Controller</a>
+                    </li>
+                    <li role="menuitem"><a class="dropdown-item" (click)="addUSBControllerToEdit()">USB Controller</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="hardware-wrapper">
+        <div class="row">
+            <div class="col-12">
+                <div class="float-left w-100 row-item border">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">CPU</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm col-3" [(ngModel)]="editData.cpu"
+                                    [disabled]="!editData.cpuHotAdd">
+                                    <option [value]="i+1" *ngFor="let e of [].constructor(32); let i = index;">{{i+1}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="editData.cpuExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="editData.cpuExpand =! editData.cpuExpand"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2" [ngClass]="editData.cpuExpand ? 'd-block' : 'd-none'">
+                            <div class="form-group extra-field float-left mb-0">
+                                <div class="form-check checkbox">
+                                    <input class="form-check-input" type="checkbox" [checked]="editData.cpuHotAdd"
+                                        [(ngModel)]="editData.cpuHotAdd" [disabled]="!editMetaData.editable">
+                                    <label class="form-check-label">Add Hot CPU</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">Memory</label>
+                        <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                            [tooltip]="'Minimum 4MB and Maximum 24560GB can be selected'"></i>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <input type="number" max="24560000" min="4"
+                                    class="form-control form-control-sm float-left col-3 mr-3"
+                                    [(ngModel)]="editData.memory.memory"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareMemory(editData.memory)"
+                                    [class.is-invalid]="editData.memory.memoryError"
+                                    [disabled]="!editData.memory.memoryHotAdd" />
+
+                                <select class="form-control form-control-sm col-2" [disabled]="!editData.memory.memoryHotAdd"
+                                    [(ngModel)]="editData.memory.memoryUnit"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareMemory(editData.memory)">
+                                    <option [value]="'MB'">MB</option>
+                                    <option [value]="'GB'">GB</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block" *ngIf="editData.memory.memoryError">
+                                    {{editData.memory.memoryError}}</div>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="editData.memory.memoryExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="editData.memory.memoryExpand =! editData.memory.memoryExpand"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2"
+                            [ngClass]="editData.memory.memoryExpand ? 'd-block' : 'd-none'">
+                            <div class="form-check checkbox">
+                                <input class="form-check-input" type="checkbox" [checked]="editData.memory.memoryHotAdd"
+                                    [(ngModel)]="editData.memory.memoryHotAdd" [disabled]="!editMetaData.editable">
+                                <label class="form-check-label">Add Hot Memory</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let hd of editData.hardDisks;let i = index">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{hd.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row" *ngIf="!hd.hardDiskDeleted">
+                            <div class="col-8">
+                                <input type="number" class="form-control form-control-sm float-left col-3 mr-3"
+                                    [(ngModel)]="hd.hardDisk" (ngModelChange)="vmsAddSvc.validateEditHardwareDisk(hd, 
+                                    editData.dataStore?.summary)" [class.is-invalid]="hd.hardDiskError"
+                                    [readonly]="!hd.editable" />
+                                <select class="form-control form-control-sm  col-2" [(ngModel)]="hd.hardDiskUnit"
+                                    (ngModelChange)="vmsAddSvc.validateEditHardwareDisk(hd, editData.dataStore?.summary)"
+                                    [disabled]="!hd.editable">
+                                    <option [value]="'MB'">MB</option>
+                                    <option [value]="'GB'">GB</option>
+                                    <option [value]="'TB'">TB</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block" *ngIf="hd.hardDiskError">
+                                    {{hd.hardDiskError}}</div>
+                                <div class="invalid-feedback d-inline-block" *ngIf="editData.hardDisks.hardDiskError">
+                                    {{editData.hardDisks.hardDiskError}}</div>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="hd.hardDiskExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="hd.hardDiskExpand =! hd.hardDiskExpand"></i>
+                                <i class="far fa-times-circle float-right m-2" (click)="removeOldHardDiskToEdit(i)"></i>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="hd.hardDiskDeleted">
+                            <div class="col-8">
+                                Device will be removed
+                            </div>
+                            <div class="col">
+                                <i class="fas fa-redo fa-flip-horizontal float-right m-2"
+                                    (click)="restoreOldHardDiskToEdit(i)"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2" [ngClass]="hd.hardDiskExpand ? 'd-block' : 'd-none'">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Maximum Size</label>
+                                        <input type="text" class="form-control form-control-sm float-left w-100"
+                                            [value]="editData.dataStore?.summary.freespace" disabled />
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left ml-2 mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Virtual Device Node</label>
+                                        <select class="form-control form-control-sm float-left w-100 select-md"
+                                            [(ngModel)]="hd.controller">
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.oldSCSI_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.newSCSI_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label" *ngFor="let ctrl of editData.SATA_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.newSATA_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label" *ngFor="let ctrl of editData.NVMe_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.newNVMe_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let hd of editData.newHardDisks; let i = index">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">New Hard Disk</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <input type="number" [max]="editData.dataStore?.summary.freespace" min="1"
+                                    class="form-control form-control-sm float-left col-3 mr-3" [(ngModel)]="hd.hardDisk"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareDisk(hd, 
+                                    editData.dataStore?.summary)" [class.is-invalid]="hd.hardDiskError" />
+                                <select class="form-control form-control-sm  col-2" [(ngModel)]="hd.hardDiskUnit"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareDisk(hd, 
+                                    editData.dataStore?.summary)">
+                                    <option [value]="'MB'">MB</option>
+                                    <option [value]="'GB'">GB</option>
+                                    <option [value]="'TB'">TB</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block" *ngIf="hd.hardDiskError">
+                                    {{hd.hardDiskError}}</div>
+                                <div class="invalid-feedback d-inline-block"
+                                    *ngIf="editData.newHardDisks.hardDiskError">
+                                    {{editData.newHardDisks.hardDiskError}}</div>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="hd.hardDiskExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="hd.hardDiskExpand =! hd.hardDiskExpand"></i>
+                                <i class="far fa-times-circle float-right m-2" (click)="removeNewHardDiskToEdit(i)"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2" [ngClass]="hd.hardDiskExpand ? 'd-block' : 'd-none'">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Maximum Size</label>
+                                        <input type="text" class="form-control form-control-sm float-left w-100"
+                                            [value]="editData.dataStore?.summary.freespace" disabled />
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left ml-2 mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Disk Provisioning</label>
+                                        <select class="form-control form-control-sm float-left w-100 select-md"
+                                            [(ngModel)]="hd.diskProvision">
+                                            <option [value]="'Thick Provision Lazy Zerored'">Thick Provision Lazy
+                                                Zerored
+                                            </option>
+                                            <option [value]="'Thin Provision'">Thin Provision</option>
+                                            <option [value]="'Thick Provision Eager Zeroed'">Thick Provision Eager
+                                                Zeroed
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group extra-field float-left ml-2 mb-0">
+                                        <label class="form-label float-left w-100 mb-0">Virtual Device Node</label>
+                                        <select class="form-control form-control-sm float-left w-100 select-md"
+                                            [(ngModel)]="hd.controller">
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.oldSCSI_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.newSCSI_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label" *ngFor="let ctrl of editData.SATA_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.newSATA_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label" *ngFor="let ctrl of editData.NVMe_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                            <option [value]="ctrl.label"
+                                                *ngFor="let ctrl of editData.newNVMe_controller">
+                                                {{ctrl.label}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let scsiCtrl of editData.oldSCSI_controller;let i =  index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{scsiCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm select-md" [(ngModel)]="scsiCtrl.value"
+                                    [disabled]="!editMetaData.editable">
+                                    <option [value]="'VirtualLsiLogicSASController'">LSI Logic SAS</option>
+                                    <option [value]="'VirtualBusLogicController'">BusLogic Parallel</option>
+                                    <option [value]="'VirtualLsiLogicController'">LSI Logic Parallel</option>
+                                    <option [value]="'ParaVirtualSCSIController'">VMware Paravirtual</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let scsiCtrl of editData.newSCSI_controller;let i =  index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{scsiCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm select-md" [(ngModel)]="scsiCtrl.value">
+                                    <option [value]="'VirtualLsiLogicSASController'">LSI Logic SAS</option>
+                                    <option [value]="'VirtualBusLogicController'">BusLogic Parallel</option>
+                                    <option [value]="'VirtualLsiLogicController'">LSI Logic Parallel</option>
+                                    <option [value]="'ParaVirtualSCSIController'">VMware Paravirtual</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2"
+                                    (click)="removeNewScsiContollerToEdit(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let nw of editData.network;let i =  index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{nw.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row" *ngIf="!nw.networkDeleted">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm float-left select-md" [(ngModel)]="nw.value"
+                                    (ngModelChange)="vmsAddSvc.validateHardwareNetwork(nw.value)"
+                                    [class.is-invalid]="nw.networkError">
+                                    <option [value]="''" disabled>Please Select</option>
+                                    <option [value]="n" *ngFor="let n of network">{{n}}</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block" *ngIf="nw.networkError">
+                                    {{nw.networkError}}</div>
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2" (click)="removeOldNetworkToEdit(i)"></i>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="nw.networkDeleted">
+                            <div class="col-8">
+                                Device will be removed
+                            </div>
+                            <div class="col">
+                                <i class="fas fa-redo fa-flip-horizontal float-right m-2"
+                                    (click)="restoreOldNetworkToEdit(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let nw of editData.newNetwork;let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">Network adapter {{editData.network.length + i
+                            +1}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm float-left select-md"
+                                    [(ngModel)]="nw.network" (ngModelChange)="vmsAddSvc.validateHardwareNetwork(nw)"
+                                    [class.is-invalid]="nw.networkError">
+                                    <option [value]="''" disabled>Please Select</option>
+                                    <option [value]="n" *ngFor="let n of network">{{n}}</option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block" *ngIf="nw.networkError">
+                                    {{nw.networkError}}</div>
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2" (click)="removeNewNetworkToEdit(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{editData.cdrom.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row" *ngIf="editData.cdrom.value">
+                            <div class="col-8">
+                                <input type="text" class="form-control form-control-sm float-left mr-3"
+                                    [value]="editData.cdrom.selectedValue" readonly />
+                            </div>
+                            <div class="col-4">
+                                <button class="btn btn-outline-primary btn-sm" type="button"
+                                    *ngIf="!editData.cdrom.changeDrive" (click)="changeEditDrive()">Change</button>
+                                <button class="btn btn-outline-primary btn-sm" type="button"
+                                    *ngIf="editData.cdrom.changeDrive" (click)="cancelEditDrive()">Cancel</button>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2" *ngIf="editData.cdrom.changeDrive">
+                            <div class="col-12">
+                                <select class="form-control form-control-sm float-left select-md"
+                                    [ngModel]="editData.cdrom.boot_option"
+                                    (ngModelChange)="editBootOptionChanged($event)">
+                                    <option [value]="''">Select option</option>
+                                    <option [value]="'datastore iso'">Datastore ISO File</option>
+                                    <option [value]="'content library iso'">Content Library ISO File</option>
+                                </select>
+                                <div class="table-wrapper float-left w-100 border mt-2"
+                                    *ngIf="editData.cdrom.boot_option == 'datastore iso'">
+                                    <div class="table-item float-left border-right w-50">
+                                        <div class="heading p-2 float-left w-100 border-bottom">
+                                            <span>Datastores</span>
+                                        </div>
+                                        <div class="content float-left w-100">
+                                            <ul class="p-0 m-0">
+                                                <li class="px-2 py-1 text-ellipsis"
+                                                    *ngFor="let stg of storage;let i = index"
+                                                    (click)="selectEditStorageForISO(stg.name)"
+                                                    [class.highlight-node]="editData.cdrom.iso_storage==stg.name">
+                                                    <span class="pointer-link">{{stg.name}}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="table-item float-left border-right w-50">
+                                        <div class="heading p-2 float-left w-100 border-bottom">
+                                            <span>Content</span>
+                                        </div>
+                                        <div class="content float-left w-100">
+                                            <ul class="p-0 m-0">
+                                                <li class="px-2 py-1 text-ellipsis"
+                                                    *ngFor="let iso of isoList;let i = index"
+                                                    (click)="selectEditISO(iso.file_path)"
+                                                    [class.highlight-node]="editData.cdrom.iso==iso.file_path">
+                                                    <span [tooltip]="iso.file_name"
+                                                        class="pointer-link">{{iso.file_name}}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-wrapper float-left w-100 border mt-2"
+                                    *ngIf="editData.cdrom.boot_option == 'content library iso'">
+                                    <div class="table-item float-left border-right w-50">
+                                        <div class="heading p-2 float-left w-100 border-bottom">
+                                            <span>Datastores</span>
+                                        </div>
+                                        <div class="content float-left w-100">
+                                            <ul class="p-0 m-0">
+                                                <li class="px-2 py-1 text-ellipsis"
+                                                    *ngFor="let lib of libraries;let i = index"
+                                                    (click)="selectEditLibrariesForISO(lib.libId)"
+                                                    [class.highlight-node]="editData.cdrom.library_storage==lib.libId">
+                                                    <span class="pointer-link">{{lib.name}}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="table-item float-left border-right w-50">
+                                        <div class="heading p-2 float-left w-100 border-bottom">
+                                            <span>Content</span>
+                                        </div>
+                                        <div class="content float-left w-100">
+                                            <ul class="p-0 m-0">
+                                                <li class="px-2 py-1 text-ellipsis"
+                                                    *ngFor="let iso of isoList;let i = index"
+                                                    (click)="selectEditISO(iso.iso_file)"
+                                                    [class.highlight-node]="editData.cdrom.iso==iso.iso_file">
+                                                    <span [tooltip]="iso.file_name"
+                                                        class="pointer-link">{{iso.file_name}}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block float-right" *ngIf="editData.cdrom.isoError">
+                                    {{editData.cdrom.isoError}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngIf="editData.USB_controller">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{editData.USB_controller.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm select-md"
+                                    [(ngModel)]="editData.USB_controller.value" disabled>
+                                    <option [value]="'Auto connect Disabled'">USB 2.0
+                                    </option>
+                                    <option [value]="'USB xHCI controller'">USB 3.1
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngIf="editData.USB_xHCI_controller">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{editData.USB_xHCI_controller.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm select-md"
+                                    [(ngModel)]="editData.USB_xHCI_controller.value" disabled>
+                                    <option [value]="'Auto connect Disabled'">USB 2.0
+                                    </option>
+                                    <option [value]="'USB xHCI controller'">USB 3.1
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let usbCtrl of editData.newUSBController; let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">USB Controller {{i}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm select-md"
+                                    [(ngModel)]="editData.newUSBController[i]" (change)="changeUSBControllerToEdit(i)">
+                                    <option [value]="'USB controller'">USB 2.0
+                                    </option>
+                                    <option [value]="'USB xHCI controller'">USB 3.1
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2"
+                                    (click)="removeUSBControllerToEdit(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="float-left w-100 row-item border">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{editData.video_card.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                <select class="form-control form-control-sm col-3"
+                                    [(ngModel)]="editData.video_card.vcSettings"
+                                    (ngModelChange)="resetEditVideoCardSettings()" [disabled]="!editMetaData.editable">
+                                    <option [value]="'auto_detect'">Auto Detect</option>
+                                    <option [value]="'custom'">Custom</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <i class="fas float-right m-2"
+                                    [ngClass]="editData.video_card.vcExpand ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                    (click)="editData.video_card.vcExpand =! editData.video_card.vcExpand"></i>
+                            </div>
+                        </div>
+                        <div class="float-left w-100 mt-2"
+                            [ngClass]="editData.video_card.vcExpand ? 'd-block' : 'd-none'">
+                            <div class="form-group extra-field float-left mb-0">
+                                <label class="form-label float-left w-100 mb-0">Number of Displays<em>*</em></label>
+                                <select class="form-control form-control-sm col-3"
+                                    [disabled]="!editMetaData.editable || editData.video_card.vcSettings=='auto_detect'"
+                                    [(ngModel)]="editData.video_card.vcNumDisplay"
+                                    [class.is-invalid]="editData.video_card.vcNumDisplayErr">
+                                    <option [value]="i+1" *ngFor="let e of [].constructor(10); let i = index;">{{i+1}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback d-inline-block"
+                                    *ngIf="editData.video_card.vcNumDisplayErr">
+                                    {{editData.video_card.vcNumDisplayErr}}</div>
+                            </div>
+                            <div class="form-group extra-field float-left ml-2 mb-0">
+                                <label class="form-label float-left w-100 mb-0">Total Video Memory<em>*</em></label>
+                                <input type="number" class="form-control form-control-sm float-left w-100"
+                                    [(ngModel)]="editData.video_card.vcRamSize" min="2" max="256"
+                                    [readonly]="!editMetaData.editable || editData.video_card.vcSettings=='auto_detect'"
+                                    [class.is-invalid]="editData.video_card.vcRamSizeErr" />
+                                <div class="invalid-feedback d-inline-block" *ngIf="editData.video_card.vcRamSizeErr">
+                                    {{editData.video_card.vcRamSizeErr}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let nvmeCtrl of editData.NVMe_controller">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{nvmeCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                {{nvmeCtrl.value}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let nvmeCtrl of editData.newNVMe_controller">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{nvmeCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                {{nvmeCtrl.value}}
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2"
+                                    (click)="removeNVMeControllerToEdit(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let sataCtrl of editData.SATA_controller;let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{sataCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                {{sataCtrl.value}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" *ngFor="let sataCtrl of editData.newSATA_controller;let i = index;">
+                <div class="float-left w-100 row-item border border-top-0">
+                    <div class="label-wrapper float-left border-right px-2">
+                        <label class="form-col-form-label mb-0">{{sataCtrl.label}}</label>
+                    </div>
+                    <div class="value-wrapper float-left px-2 py-1">
+                        <div class="row">
+                            <div class="col-8">
+                                {{sataCtrl.value}}
+                            </div>
+                            <div class="col">
+                                <i class="far fa-times-circle float-right m-2"
+                                    (click)="removeSataContollerToEdit(i)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

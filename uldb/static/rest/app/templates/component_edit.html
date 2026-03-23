@@ -1,0 +1,271 @@
+
+   <div class="panel panel-default">
+       <div class="panel-heading">
+		<h4>Edit Component</h4>
+       </div>
+       <div class="panel-body">
+	<!--<form role="form" method="post" id="postform">-->
+	<form role="form"id="postform" action="" method="post">
+            <input type='hidden' name='csrfmiddlewaretoken' id="csrf_token" value={{csrf_token}} />
+         </form>
+         <form role="form" action="" method="post" enctype='application/json'>
+
+	    <div ng-include src="'static/rest/app/templates/generic_modal.html'"></div>
+
+	    <!--- Motherboard -->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">Motherboard </h3>
+		</div>
+
+		<div class="panel-body">
+			<div class="form-inline">
+		   	  <select id="id_motherboard" class="form-control" ng-model="component.motherboard" ng-change="ClearValidation()" 						ng-options="mb as mb.assettag for mb in motherboard track by mb.url" style="width:90%;">
+				<option value="">Please select</option>
+			  </select>
+			  <span class="glyphicon glyphicon-export backtoinventory" ng-if="showrmvmb" ng-click="RemoveMB()" 						 					title="Back to Inventory"></span>
+
+			  <img src="/static/img/icon_addlink.png" width="30" height="30" alt="Add New" class="addnew" value="memory" 					 					title="Add" ng-if="showaddmb" ng-click="AddMB();ctrl.add();"/>
+			</div>
+			<label class="errormsg" ng-if="motherboarderr">{{ motherboardMsg }}</label>
+		</div>
+	    </div>
+
+	    <!--- harddisk --->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">Storage </h3>
+		</div>
+
+		<div class="panel-body">
+			<div class="form-inline">
+			<select id="id_disk" class="form-control" ng-model="component.disks" style="width:90%;"
+			ng-options="dk as dk.serialnumber for dk in avail_disk track by dk.url"  multiple>
+				<!--<option  ng-repeat="u in avail_disk" value="{{u.url}}">{{u.serialnumber}}</option>-->
+			</select>
+			<img src="/static/img/icon_addlink.png" width="30" height="30" alt="Add New" class="addnew" value="disk" 					title="Add" ng-click="showAvailableDisks()"/>
+			<span class="glyphicon glyphicon-export backtoinventory" ng-click="RemoveDisk(component.disks,avail_disk)" title="Back to Inventory"></span>
+			</div>
+			<br>
+			<div class="panel panel-success" ng-if="showdisk">
+				<div class="panel-heading">
+				    <h3 class="panel-title">Add New Disks</h3>
+				</div>
+
+				<div class="panel-body">
+					<div>
+				   	   <select id="id_disk_inv" class="form-control" ng-model="component.Newdisks" style="width:100%;" multiple> 					 				<!--ng-options="dk.url as dk.assettag for dk in disk" style="width:100%;" multiple>-->
+								<option  ng-repeat="u in disk" value="{{u.url}}">{{u.serialnumber}}</option>
+					   </select>
+					</div>
+					<br>
+					<div class="form-inline">
+					   <button type="button" class="btn btn-success" ng-click="AddDisk(component.Newdisks,disk)">Add</button>
+					   <button type="button" class="btn btn-danger" ng-click="CancelDisk()">Cancel</button>
+					</div>
+				</div>
+			</div>
+		   <label class="errormsg" ng-if="diskerr">{{ diskMsg }}</label>
+
+		</div>
+	    </div>
+
+	    <!--- CPU --->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">CPU </h3>
+		</div>
+
+		<div class="panel-body">
+
+			<div class="form-inline">
+			  <select id="id_cpu" class="form-control" ng-model="component.cpu" style="width:90%;"
+				ng-options="cpu as cpu.serialnumber for cpu in avail_cpu track by cpu.url" multiple>
+				<!--<option  ng-repeat="u in avail_cpu" value="{{u.url}}">{{u.serialnumber}}</option>-->
+			   </select>
+			<img src="/static/img/icon_addlink.png" width="30" height="30" alt="Add New" class="addnew" value="cpu" 					 title="Add" ng-click="showAvailableCPU()"/>
+			<span class="glyphicon glyphicon-export backtoinventory" ng-click="RemoveCPU(component.cpu,avail_cpu)" title="Back to Inventory"></span>
+			</div>
+			<br>
+			<div class="panel panel-success" ng-if="showcpu">
+				<div class="panel-heading">
+				    <h3 class="panel-title">Add New CPU</h3>
+				</div>
+
+				<div class="panel-body">
+					<div>
+					   <select id="id_cpu_inv" class="form-control" ng-model="component.Newcpu" 					 		ng-options="cpu.url as cpu.serialnumber for cpu in cpu" style="width:100%;" multiple>
+
+					   </select>
+					</div>
+					<br>
+					<div class="form-inline">
+					   <button type="button" class="btn btn-success" ng-click="AddCPU(component.Newcpu,cpu)">Add</button>
+					   <button type="button" class="btn btn-danger" ng-click="CancelCPU()">Cancel</button>
+					</div>
+				</div>
+			</div>
+		 	<label class="errormsg" ng-if="cpuerr">{{ cpuMsg }}</label>
+		</div>
+	    </div>
+
+	    <!--- Memory --->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">Memory </h3>
+		</div>
+
+		<div class="panel-body">
+		   <div class="form-inline">
+		    <select id="id_memory" class="form-control" ng-model="component.memory" style="width:90%;" 							 			 				ng-options="memory as memory.serialnumber for memory in avail_memory track by memory.url" multiple>
+			<!--<option  ng-repeat="u in avail_memory" value="{{u.url}}">{{u.serialnumber}}</option>-->
+		   </select>
+		    <img src="/static/img/icon_addlink.png" width="30" height="30" alt="Add New" class="addnew" value="memory" 					 title="Add" ng-click="showAvailableMemory()"/>
+		    <span class="glyphicon glyphicon-export backtoinventory" ng-click="RemoveMemory(component.memory,avail_memory)" title="Back to Inventory"></span>
+		   </div>
+		   <br>
+		   <div class="panel panel-success" ng-if="showmemory">
+			<div class="panel-heading">
+			    <h3 class="panel-title">Add New Memory</h3>
+			</div>
+
+			<div class="panel-body">
+			   <div>
+			   <select id="id_memory_inv" class="form-control" ng-model="component.Newmemory" 					 								ng-options="memory.url as memory.serialnumber for memory in memory" style="width:100%;" multiple>
+			   </select>
+			  </div>
+			  <br>
+			<div class="form-inline">
+			   <button type="button" class="btn btn-success" ng-click="AddMemory(component.Newmemory,memory)">Add</button>
+			   <button type="button" class="btn btn-danger" ng-click="CancelMemory()">Cancel</button>
+			</div>
+			</div>
+		  </div>
+		   <label class="errormsg" ng-if="memoryerr">{{ memoryMsg }}</label>
+		</div>
+	    </div>
+
+
+
+	    <!--- NIC External--->
+
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">NIC (External)</h3>
+		</div>
+
+		<div class="panel-body">
+			<div class="form-inline">
+			 <select id="id_nic" class="form-control" ng-model="component.nic" style="width:90%;" 											 				 ng-options="nic as nic.assettag for nic in avail_nic track by nic.url" multiple>
+			 <!--<option  ng-repeat="u in avail_nic" value="{{u.url}}">{{u.assettag}}</option>-->
+		   	 </select>
+			 <img src="/static/img/icon_addlink.png" width="30" height="30" alt="Add New" class="addnew" value="nic" 					 title="Add" ng-click="showAvailableNIC()"/>
+			 <span class="glyphicon glyphicon-export backtoinventory" ng-click="RemoveNIC(component.nic,avail_nic)" title="Back to Inventory"></span>
+		        </div>
+			<br>
+			<div class="panel panel-success" ng-if="shownic">
+				<div class="panel-heading">
+				    <h3 class="panel-title">Add New NIC (External)</h3>
+				</div>
+
+				<div class="panel-body">
+					<div>
+					<select id="id_nic_inv" class="form-control" ng-model="component.Newnic" 					 								ng-options="nic.url as nic.assettag for nic in nic" style="width:100%;" multiple></select>
+					</div>
+					  <br>
+					<div class="form-inline">
+					   <button type="button" class="btn btn-success" ng-click="AddNIC(component.Newnic,nic)">Add</button>
+					   <button type="button" class="btn btn-danger" ng-click="CancelNIC()">Cancel</button>
+					</div>
+
+		   		</div>
+			</div>
+		</div>
+	    </div>
+
+	    <!--- RAID Controller -->
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">RAID Controller</h3>
+		</div>
+
+		<div class="panel-body">
+			<div class="form-inline">
+			<select id="id_raidcontroller" class="form-control" ng-model="component.raid" style="width:90%;" 								 				ng-options="dc as dc.controller for dc in avail_raidController track by dc.url" multiple>
+			<!--<option  ng-repeat="u in avail_raidController" value="{{u.url}}">{{u.controller}}</option>-->
+		   	</select>
+			<img src="/static/img/icon_addlink.png" width="30" height="30" alt="Add New" class="addnew" value="raid" 					 title="Add" ng-click="showAvailableRAID()"/>
+			<span class="glyphicon glyphicon-export backtoinventory" ng-click="RemoveRAID(component.raid,avail_raidController)" title="Back to Inventory"></span>
+		        </div>
+			<br>
+			 <div class="panel panel-success" ng-if="showraid">
+				<div class="panel-heading">
+				    <h3 class="panel-title">Add New RAID Controller</h3>
+				</div>
+
+				<div class="panel-body">
+					<div>
+					<select id="id_raidcontroller_inv" class="form-control" ng-model="component.Newraidcontroller"  				 		ng-options="dc.url as dc.controller for dc in raidController" style="width:100%;" multiple>
+
+		   			</select>
+					</div>
+					  <br>
+					<div class="form-inline">
+					   <button type="button" class="btn btn-success" ng-click="AddRAID(component.Newraidcontroller,raidController)">Add</button>
+					   <button type="button" class="btn btn-danger" ng-click="CancelRAID()">Cancel</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	    </div>
+
+
+	    <!--- IPMI -->
+	    <div class="panel panel-success">
+		<div class="panel-heading">
+		    <h3 class="panel-title">IPMI (External)</h3>
+		</div>
+
+		<div class="panel-body">
+			<div class="form-inline">
+			<select id="id_ipmi" class="form-control" ng-model="component.ipmi" style="width:90%;" 											 				ng-options="ipmi as ipmi.assettag for ipmi in avail_ipmi track by ipmi.url" multiple>
+			<!--<option  ng-repeat="u in avail_ipmi" value="{{u.url}}">{{u.assettag}}</option>-->
+			</select>
+			<img src="/static/img/icon_addlink.png" width="30" height="30" alt="Add New" class="addnew" value="ipmi" 					 title="Add" ng-click="showAvailableIPMI()"/>
+			<span class="glyphicon glyphicon-export backtoinventory" ng-click="RemoveIPMI(component.ipmi,avail_ipmi)" title="Back to Inventory"></span>
+		        </div>
+			<br>
+			 <div class="panel panel-success" ng-if="showipmi">
+				<div class="panel-heading">
+				    <h3 class="panel-title">Add New IPMI (External)</h3>
+				</div>
+
+				<div class="panel-body">
+					<div>
+					<select id="id_ipmi_inv" class="form-control" ng-model="component.Newipmi" 												 						ng-options="ipmi.url as ipmi.assettag for ipmi in ipmi" style="width:100%;" multiple>
+
+		   			</select>
+					</div>
+					  <br>
+					<div class="form-inline">
+					   <button type="button" class="btn btn-success" ng-click="AddIPMI(component.Newipmi,ipmi)">Add</button>
+					   <button type="button" class="btn btn-danger" ng-click="CancelIPMI()">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	    </div>
+
+	   <button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelComponentEdit()">Cancel</button>
+	   <button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveComponentEdit()">Save</button>
+
+	</form>
+      </div>
+
+   </div>
+

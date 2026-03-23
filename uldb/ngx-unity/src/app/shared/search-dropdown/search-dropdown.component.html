@@ -1,0 +1,25 @@
+<div class="dropdown">
+    <button class="dropbtn form-control" (click)="toggleDrop($event)" [ngClass]="{ 'class-invalid': hasError }">
+        <ng-container *ngIf="selectedValue;else staticVal">
+            <!-- <img src="{{selectedValue?.image}}" width="20" height="15"> -->
+            <span class="text-dark">{{selectedValue?.[displayField] || selectedValue}}</span>
+        </ng-container>
+        <ng-template #staticVal>
+            Select {{defaultLabel}}
+        </ng-template>
+        <i class="fas fa-chevron-down fa-xs arrow-down-icon"></i>
+    </button>
+    <div [ngClass]="clickFlag ? 'dropdownClick' : 'dropdown-content'">
+        <div class="search-container" (click)="$event.stopPropagation()">
+            <table-search-box [searchValue]="searchText" (searched)="filterValues($event)">
+            </table-search-box>
+        </div>
+        <div class="options-container">
+            <span class="img-container" *ngFor="let val of filteredValues">
+                <div (click)="selectedDropValue(val)">
+                    <span>{{ val?.[displayField] || val }}</span>
+                </div>
+            </span>
+        </div>
+    </div>
+</div>

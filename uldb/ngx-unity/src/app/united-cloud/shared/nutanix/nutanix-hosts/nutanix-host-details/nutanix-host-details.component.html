@@ -1,0 +1,336 @@
+<div class="row mt-2">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card rounded-0">
+                <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span> Details</span>
+                    </div>
+                    <div class="w-25">
+                        <!-- <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1"
+                            (click)="manageDetailsForm()" [tooltip]="'Edit'" container="body"></button> -->
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="name" class="col-3 col-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="detailFormErrors.name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                        {{detailFormErrors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="host_ip" class="col-3 col-form-label">Host IP</label>
+                                <div class="col-9">
+                                    <input id="host_ip" class="form-control" type="text" formControlName="host_ip"
+                                        [class.is-invalid]="detailFormErrors.hypervisor_ip">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.host_ip">
+                                        {{detailFormErrors.host_ip}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="cvm_ip" class="col-3 col-form-label">CVM IP</label>
+                                <div class="col-9">
+                                    <input id="cvm_ip" class="form-control" type="text" formControlName="cvm_ip"
+                                        [class.is-invalid]="detailFormErrors.cvm_ip">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cvm_ip">
+                                        {{detailFormErrors.cvm_ip}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="memory_capacity" class="col-3 col-form-label">Memory Capacity</label>
+                                <div class="col-9">
+                                    <input id="memory_capacity" class="form-control" type="text"
+                                        formControlName="memory_capacity" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.memory_capacity">
+                                        {{detailFormErrors.memory_capacity}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="cpu_usage" class="col-3 col-form-label">CPU Usage</label>
+                                <div class="col-9">
+                                    <input id="cpu_usage" class="form-control" type="text" formControlName="cpu_usage"
+                                        readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cpu_usage">
+                                        {{detailFormErrors.cpu_usage}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="memory_usage" class="col-3 col-form-label">Memory Usage</label>
+                                <div class="col-9">
+                                    <input id="memory_usage" class="form-control" type="text"
+                                        formControlName="memory_usage" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.memory_usage">
+                                        {{detailFormErrors.memory_usage}}</div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="form-group row" formGroupName="manufacturer">
+                                <label for="manufacturerid" class="col-3 col-form-label">Manufacturer<em>*</em></label>
+                                <div class="col-9">
+                                    <select id="manufacturerid" class="form-control" formControlName="manufacturer_id"
+                                        [class.is-invalid]="detailFormErrors.manufacturer.id">
+                                        <option value="" disabled>Select Manufacturer</option>
+                                        <option *ngFor="let manufacturer of manufacturers" [value]="manufacturer.id">
+                                            {{manufacturer.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.manufacturer.id">
+                                        {{detailFormErrors.manufacturer.id}}</div>
+                                </div>
+                            </div> -->
+
+                            <!-- <div class="form-group row" formGroupName="os">
+                                <label class="col-3 col-form-label" for="osid">OS<em>*</em></label>
+                                <div class="col-9">
+                                    <select id="osid" class="form-control" formControlName="id"
+                                        [class.is-invalid]="detailFormErrors.os.id">
+                                        <option value="" disabled>Select Operating System</option>
+                                        <option *ngFor="let os of operatingSystems" [value]="os.id"> {{os.full_name}}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os.id">
+                                        {{detailFormErrors.os.id}}</div>
+                                </div>
+                            </div> -->
+                            <div class="form-group row">
+                                <label for="sockets" class="col-3 col-form-label">Sockets</label>
+                                <div class="col-9">
+                                    <input id="sockets" class="form-control" type="text" formControlName="sockets"
+                                        [class.is-invalid]="detailFormErrors.sockets">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.sockets">
+                                        {{detailFormErrors.sockets}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="vms" class="col-3 col-form-label">VM's</label>
+                                <div class="col-9">
+                                    <input id="vms" class="form-control" type="text" formControlName="vms"
+                                        [class.is-invalid]="detailFormErrors.sockets">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.vms">
+                                        {{detailFormErrors.vms}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="oplog_disk_pct" class="col-3 col-form-label">Oplog Disk Pct</label>
+                                <div class="col-9">
+                                    <input id="oplog_disk_pct" class="form-control" type="text"
+                                        formControlName="oplog_disk_pct"
+                                        [class.is-invalid]="detailFormErrors.oplog_disk_pct">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.oplog_disk_pct">
+                                        {{detailFormErrors.oplog_disk_pct}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="cpu_cores" class="col-3 col-form-label">CPU Cores</label>
+                                <div class="col-9">
+                                    <input id="cpu_cores" class="form-control" type="text" formControlName="cpu_cores"
+                                        readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cpu_cores">
+                                        {{detailFormErrors.cpu_cores}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="cpu_capacity" class="col-3 col-form-label">CPU Capacity</label>
+                                <div class="col-9">
+                                    <input id="cpu_capacity" class="form-control" type="text"
+                                        formControlName="cpu_capacity"
+                                        [class.is-invalid]="detailFormErrors.cpu_capacity" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cpu_capacity">
+                                        {{detailFormErrors.cpu_capacity}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="used_storage" class="col-3 col-form-label">Total Disk Usage</label>
+                                <div class="col-9">
+                                    <input id="used_storage" class="form-control" type="text"
+                                        formControlName="used_storage"
+                                        [class.is-invalid]="detailFormErrors.used_storage" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.used_storage">
+                                        {{detailFormErrors.used_storage}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="free_storage_pct" class="col-3 col-form-label">Total Free Disk PCT</label>
+                                <div class="col-9">
+                                    <input id="free_storage_pct" class="form-control" type="text"
+                                        formControlName="free_storage_pct"
+                                        [class.is-invalid]="detailFormErrors.free_storage_pct" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.free_storage_pct">
+                                        {{detailFormErrors.free_storage_pct}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="disk_io_bandwidth" class="col-3 col-form-label">Disk IO Bandwidth</label>
+                                <div class="col-9">
+                                    <input id="disk_io_bandwidth" class="form-control" type="text"
+                                        formControlName="disk_io_bandwidth"
+                                        [class.is-invalid]="detailFormErrors.disk_io_bandwidth" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.disk_io_bandwidth">
+                                        {{detailFormErrors.disk_io_bandwidth}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="hypervisor_full_name" class="col-3 col-form-label">Hypervisor Full
+                                    Name</label>
+                                <div class="col-9">
+                                    <input id="hypervisor_full_name" class="form-control" type="text"
+                                        formControlName="hypervisor_full_name"
+                                        [class.is-invalid]="detailFormErrors.hypervisor_full_name">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="detailFormErrors.hypervisor_full_name">
+                                        {{detailFormErrors.hypervisor_full_name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="disk_io_latency" class="col-3 col-form-label">Disk IO Latency</label>
+                                <div class="col-9">
+                                    <input id="disk_io_latency" class="form-control" type="text"
+                                        formControlName="disk_io_latency"
+                                        [class.is-invalid]="detailFormErrors.disk_io_latency">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.disk_io_latency">
+                                        {{detailFormErrors.disk_io_latency}}</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="disk_iops" class="col-3 col-form-label">Disk IOPS</label>
+                                <div class="col-9">
+                                    <input id="disk_iops" class="form-control" type="text" formControlName="disk_iops"
+                                        [class.is-invalid]="detailFormErrors.disk_iops">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.disk_iops">
+                                        {{detailFormErrors.disk_iops}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="hypervisor" class="col-3 col-form-label">Hypervisor</label>
+                                <div class="col-9">
+                                    <input id="hypervisor" class="form-control" type="text" formControlName="hypervisor"
+                                        [class.is-invalid]="detailFormErrors.hypervisor">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.hypervisor">
+                                        {{detailFormErrors.hypervisor}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="host_type" class="col-3 col-form-label">Host Type</label>
+                                <div class="col-9">
+                                    <input id="host_type" class="form-control" type="text" formControlName="host_type"
+                                        [class.is-invalid]="detailFormErrors.host_type">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.host_type">
+                                        {{detailFormErrors.host_type}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="ipmi_ip" class="col-3 col-form-label">IPMI IP</label>
+                                <div class="col-9">
+                                    <input id="ipmi_ip" class="form-control" type="text" formControlName="ipmi_ip"
+                                        [class.is-invalid]="detailFormErrors.ipmi_ip">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.ipmi_ip">
+                                        {{detailFormErrors.ipmi_ip}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="node_serial" class="col-3 col-form-label">Node Serial</label>
+                                <div class="col-9">
+                                    <input id="node_serial" class="form-control" type="text"
+                                        formControlName="node_serial" [class.is-invalid]="detailFormErrors.node_serial">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.node_serial">
+                                        {{detailFormErrors.ipmi_ip}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="block_serial" class="col-3 col-form-label">Block Serial</label>
+                                <div class="col-9">
+                                    <input id="block_serial" class="form-control" type="text"
+                                        formControlName="block_serial"
+                                        [class.is-invalid]="detailFormErrors.block_serial">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.block_serial">
+                                        {{detailFormErrors.block_serial}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="block_model" class="col-3 col-form-label">Block Model</label>
+                                <div class="col-9">
+                                    <input id="block_model" class="form-control" type="text"
+                                        formControlName="block_model" [class.is-invalid]="detailFormErrors.ipmi_ip">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.block_model">
+                                        {{detailFormErrors.block_model}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="storage_capacity" class="col-3 col-form-label">Storage Capacity</label>
+                                <div class="col-9">
+                                    <input id="storage_capacity" class="form-control" type="text"
+                                        formControlName="storage_capacity"
+                                        [class.is-invalid]="detailFormErrors.storage_capacity">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.storage_capacity">
+                                        {{detailFormErrors.storage_capacity}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="disks" class="col-3 col-form-label">Disks</label>
+                                <div class="col-9">
+                                    <input id="disks" class="form-control" type="text" formControlName="disks"
+                                        [class.is-invalid]="detailFormErrors.disks">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.disks">
+                                        {{detailFormErrors.disks}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="cpu_model" class="col-3 col-form-label">CPU Model</label>
+                                <div class="col-9">
+                                    <input id="cpu_model" class="form-control" type="text" formControlName="cpu_model"
+                                        [class.is-invalid]="detailFormErrors.cpu_model">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cpu_model">
+                                        {{detailFormErrors.cpu_model}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="oplog_disk_size" class="col-3 col-form-label">Oplog Disk Size</label>
+                                <div class="col-9">
+                                    <input id="oplog_disk_size" class="form-control" type="text"
+                                        formControlName="oplog_disk_size"
+                                        [class.is-invalid]="detailFormErrors.oplog_disk_size">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.oplog_disk_size">
+                                        {{detailFormErrors.oplog_disk_size}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="monitored" class="col-3 col-form-label">Monitored</label>
+                                <div class="col-9">
+                                    <input id="monitored" class="form-control" type="text" formControlName="monitored"
+                                        [class.is-invalid]="detailFormErrors.monitored">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.monitored">
+                                        {{detailFormErrors.monitored}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="secure_boot_enabled" class="col-3 col-form-label">Secure Boot
+                                    Enabled</label>
+                                <div class="col-9">
+                                    <input id="secure_boot_enabled" class="form-control" type="text"
+                                        formControlName="secure_boot_enabled"
+                                        [class.is-invalid]="detailFormErrors.secure_boot_enabled">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="detailFormErrors.secure_boot_enabled">
+                                        {{detailFormErrors.secure_boot_enabled}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

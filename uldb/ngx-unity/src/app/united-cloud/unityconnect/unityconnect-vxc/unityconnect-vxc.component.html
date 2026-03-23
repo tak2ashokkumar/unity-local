@@ -1,0 +1,135 @@
+<div class="card">
+  <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+    <div class="d-flex justify-content-center align-items-center font-500">
+      <span class="badge badge-secondary font-sm">{{filteredviewData.length}}</span>
+      <span class="ml-1 font-lg">Connection Requests</span>
+    </div>
+    <div class="w-30">
+      <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+    </div>
+    <div class="d-flex justify-content-end align-items-center">
+      <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="buyVxc()" accessControl
+        moduleName="UnityConnect" accessType="Manage UnityConnect" elementType="btn">
+        <span class="fas fa-dollar-sign mx-1"></span>
+        <span class="font-xs-sm mx-1">Buy</span>
+      </button>
+      <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm text-left">
+      <thead class="bg-light">
+        <tr>
+          <th class="border-top-0">Requester</th>
+          <th class="border-top-0">Connection Type</th>
+          <th class="border-top-0">Ticket ID</th>
+          <th class="border-top-0">Ticket Status</th>
+          <th class="border-top-0">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let vxc of filteredviewData | clientSideSearch: currentCriteria.searchValue: fieldsToFilterOn">
+          <td>{{vxc.requesterName}}</td>
+          <td>{{vxc.connectionType}}</td>
+          <td>
+            <a class="btn btn-link text-decoration-none p-0" [routerLink]="vxc.detailsUrl" accessControl
+              moduleName="Ticket Management" accessType="View Tickets" elementType="div">{{vxc.ticketId}}</a>
+          <td>
+            <span *ngIf="!vxc.ticketStatus"><i class="fa fa-spinner fa-spin">&nbsp;</i></span>
+            <span *ngIf="vxc.ticketStatus">{{vxc.ticketStatus}}</span>
+          </td>
+          <td>
+            <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1"
+              (click)="closeVxc(vxc.connectionType, vxc.ticketId)" tooltip="Delete" accessControl
+              moduleName="UnityConnect" accessType="Manage UnityConnect" elementType="actionbtn">
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text-center text-muted py-4" *ngIf="!filteredviewData.length">No records to display.</div>
+  </div>
+</div>
+
+<ng-template #buyVxcTemplate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Connection Request
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="createVxcTicketModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="buyVxcForm">
+        <div class="form-group">
+          <label for="vxcType">Connection Type<em>*</em></label>
+          <select class="form-control" id="vxcType" formControlName="vxcType"
+            [ngClass]="{'is-invalid' : formErrors.vxcType}">
+            <option value="''" disabled> Select Connection Type</option>
+            <option *ngFor="let vxcType of connectionTypes" [value]="vxcType">
+              {{vxcType}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="formErrors.vxcType">{{formErrors.vxcType}}</div>
+        </div>
+        <div class="form-group" *ngIf="buyVxcForm.controls.region">
+          <label for="region">Region<em>*</em></label>
+          <select class="form-control text-capitalize" id="region" formControlName="region"
+            (change)="regionSelected($event)" [ngClass]="{'is-invalid' : formErrors.region}">
+            <option [value]="''" disabled>Select Region</option>
+            <option *ngFor="let svc of cloudRegion" [value]="svc.long">{{svc.long}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="formErrors.region">{{formErrors.region}}</div>
+        </div>
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input class="form-control" id="subject" type="text" formControlName="subject">
+        </div>
+        <div class="form-group">
+          <label for="description">Description<em>*</em></label>
+          <textarea rows="10" class="form-control" id="description" type="text"
+            [ngClass]="{'is-invalid' : formErrors.description}" formControlName="description"></textarea>
+          <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" (click)="createVxcTicket()" type="button">Buy</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="createVxcTicketModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #closeVxcTemplate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Connection Close Request
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeVxcTicketModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="closeVxcForm">
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input class="form-control" id="subject" type="text" formControlName="subject">
+        </div>
+        <div class="form-group">
+          <label for="description">Description<em>*</em></label>
+          <textarea rows="10" class="form-control" id="description" type="text"
+            [ngClass]="{'is-invalid' : formErrors.description}" formControlName="description"></textarea>
+          <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" (click)="closeVxcTicket()" type="button">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="closeVxcTicketModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

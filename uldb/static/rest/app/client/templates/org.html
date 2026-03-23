@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        General Information
+      </div>
+      <div class="panel-body">
+        <table class="table table-hover">
+
+          <thead>
+          <tr>
+            <td class="col-sm-6">Organization Name</td>
+            <td class="col-sm-6">{{ org.name }}</td>
+          </tr>
+          <tr>
+            <td>Email Address</td>
+            <td>{{ org.email }}</td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Mailing Information
+      </div>
+      <div class="panel-body">
+        <table class="table table-hover">
+          <thead>
+          <tr ng-repeat="col in cols">
+            <td class="col-sm-6">{{ col.name }}</td>
+            <td class="col-sm-6">{{ org[col.field] }}</td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Access List
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Last Login</th>
+            <th>Access Types Granted</th>
+            <th>Two-Factor Authentication</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="user in org.users">
+            <td>{{ user.first_name + ' ' + user.last_name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.last_login | date : 'MMMM d, y. h:mm:ss a.' }}</td>
+            <td>{{ transformAccessTypes(user.access_types) }}</td>
+            <td>{{ user.has_two_factor ? 'Enabled': 'Disabled' }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+</div>

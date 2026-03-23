@@ -1,0 +1,346 @@
+<div class="container-fluid mt-4">
+    <div class="animated fadeIn">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+                <span class="font-lg font-500">{{action}} Resource Model</span>
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                        class="fa fa-arrow-left"></i></button>
+            </div>
+            <div class="card-body py-2">
+                <form *ngIf="form" [formGroup]="form">
+                    <div *ngIf="nonFieldErr" class="col-12 form-group offset-1">
+                        <div class="invalid-credentials text-left">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="">
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="name" class="col-2 text-right col-form-label">Name <em>* </em> :</label>
+                            <div class="col-3">
+                                <input id="name" class="form-control" type="text" formControlName="resource_name"
+                                    [class.is-invalid]="formErrors.resource_name" placeholder="Enter Name">
+                                <div class="invalid-feedback" *ngIf="formErrors.resource_name">
+                                    {{formErrors.resource_name}}</div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="cloud_type" class="col-2 text-right col-form-label">Cloud Type <em>* </em>
+                                :</label>
+                            <div class="col-3">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    [options]="cloudTypeList" [settings]="cloudTypeSettings"
+                                    [texts]="cloudTypeSelectionTexts" formControlName="cloud_types"
+                                    [class.is-invalid]="formErrors.cloud_types"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="formErrors.cloud_types">
+                                    {{formErrors.cloud_types}}</div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="cloud_type" class="col-2 text-right col-form-label">Region <em>* </em> :</label>
+                            <div class="col-3">
+                                <multiselect-dropdown [options]="regionData" [settings]="regionSettings"
+                                    [texts]="userSelectionTexts" class="form-control p-0" style="height:auto;"
+                                    formControlName="regions" (dropdownClosed)="onRegionChange()"
+                                    [ngClass]="{'is-invalid' : formErrors.regions}">
+                                </multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="formErrors.regions">{{formErrors.regions}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="cloud_type" class="col-2 text-right col-form-label">Datacenters <em>* </em>
+                                :</label>
+                            <div class="col-3">
+                                <multiselect-dropdown [options]="datacenterList" [settings]="dcSettings"
+                                    [texts]="userSelectionTexts" class="form-control p-0" style="height:auto;"
+                                    formControlName="datacenters" [ngClass]="{'is-invalid' : formErrors.datacenters}">
+                                </multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="formErrors.datacenters">{{formErrors.datacenters}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="cpu_size" class="col-2 text-right col-form-label">CPU <em>* </em> :</label>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="col-2 pl-0">
+                                        <input id="cpu_size" class="form-control" type="number" min="1"
+                                            formControlName="cpu_size" [class.is-invalid]="formErrors.cpu_size"
+                                            placeholder="4">
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center">
+                                        <input id="cpu_customization" class="ut-checkbox" type="checkbox"
+                                            formControlName="cpu_customization">
+                                        <label for="cpu_customization" class="primary mb-0">Allow Customization</label>
+                                        <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1"
+                                            [tooltip]="customHintMsg"></span>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.cpu_size">
+                                    {{formErrors.cpu_size}}</div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="memory_size" class="col-2 text-right col-form-label">Memory <em>* </em>
+                                :</label>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="col-2 pl-0">
+                                        <input id="memory_size" class="form-control" type="number" min="1"
+                                            formControlName="memory_size" [class.is-invalid]="formErrors.memory_size"
+                                            placeholder="2">
+                                    </div>
+                                    <div class="col-2">
+                                        <select id="memory_unit" class="form-control" formControlName="memory_unit"
+                                            [class.is-invalid]="formErrors.memory_unit">
+                                            <!-- <option [value]="''" disabled>Select</option> -->
+                                            <option *ngFor="let unit of storageUnitList" [value]="unit">{{unit}}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="formErrors.memory_unit">
+                                            {{formErrors.memory_unit}}</div>
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center">
+                                        <input id="memory_customization" class="ut-checkbox" type="checkbox"
+                                            formControlName="memory_customization">
+                                        <label for="memory_customization" class="primary mb-0">Allow
+                                            Customization</label>
+                                        <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1"
+                                            [tooltip]="customHintMsg"></span>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.memory_size">
+                                    {{formErrors.memory_size}}</div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="storage_size" class="col-2 text-right col-form-label">Storage(root) <em>* </em>
+                                :</label>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="col-2 pl-0">
+                                        <input id="storage_size" class="form-control" type="text" min="1"
+                                            formControlName="storage_size" [class.is-invalid]="formErrors.storage_size"
+                                            placeholder="256">
+                                    </div>
+                                    <div class="col-2">
+                                        <select id="storage_unit" class="form-control" formControlName="storage_unit"
+                                            [class.is-invalid]="formErrors.storage_unit">
+                                            <!-- <option [value]="''" disabled>Select</option> -->
+                                            <option *ngFor="let unit of storageUnitList" [value]="unit">{{unit}}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="formErrors.storage_unit">
+                                            {{formErrors.storage_unit}}</div>
+                                    </div>
+                                    <div class="col-6 d-flex align-items-center">
+                                        <input id="storage_customization" class="ut-checkbox" type="checkbox"
+                                            formControlName="storage_customization">
+                                        <label for="storage_customization" class="primary mb-0">Allow
+                                            Customization</label>
+                                        <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1"
+                                            [tooltip]="customHintMsg"></span>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.storage_size">
+                                    {{formErrors.storage_size}}</div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="disk_type" class="col-2 text-right col-form-label">Disk Type <em>* </em>
+                                :</label>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="col-2 pl-0">
+                                        <select id="disk_type" class="form-control" type="text"
+                                            formControlName="disk_type" [class.is-invalid]="formErrors.disk_type">
+                                            <option [value]="''" disabled>Select disk</option>
+                                            <option [value]="'HDD'">HDD</option>
+                                            <option [value]="'SSD'">SSD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block" *ngIf="formErrors.disk_type">
+                                    {{formErrors.disk_type}}</div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="storage_size" class="col-2 text-right col-form-label">Allow Multiple Disk
+                                :</label>
+                            <div class="col-6">
+                                <input id="allow_multiple_disk" class="ut-checkbox" type="checkbox"
+                                    formControlName="allow_multiple_disk">
+                                <label for="allow_multiple_disk" class="primary mb-0"></label>
+                                <span class="fas fa-info-circle pointer-link text-info text-info pt-1 pl-1"
+                                    [tooltip]="customHintMsg"></span>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="price_unit" class="col-2 text-right col-form-label">Cost Plan<em>* </em>
+                                :</label>
+                            <div class="col-10 border rounded py-3">
+                                <div class="col-12 d-flex align-items-center pb-3">
+                                    <label for="cost_type" class="col-2 text-right col-form-label">Plan Type <em>* </em>
+                                        :</label>
+                                    <div class="col-3">
+                                        <select id="cost_type" class="form-control" type="text"
+                                            formControlName="cost_type" [class.is-invalid]="formErrors.cost_type"
+                                            (change)="onPlanTypeChange($event)">
+                                            <option [value]="''" disabled>Select Plan Type</option>
+                                            <option *ngFor="let plan of costPlanTypes" [value]="plan">{{plan}}</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="formErrors.cost_type">
+                                            {{formErrors.cost_type}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex align-items-center">
+                                    <label for="cost_plans" class="col-2 text-right col-form-label">Cost Model
+                                        Validation :</label>
+                                    <div *ngIf="planCounts" class="col-4 d-flex" style="gap: 2em">
+                                        <!-- CPU Only -->
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>CPU</span>
+                                            <div class="custom-checkbox">
+                                                <input type="checkbox" disabled />
+                                                <i *ngIf="planCounts['CPU Only'] == 1"
+                                                    class="fas fa-check text-success"></i>
+                                                <i *ngIf="planCounts['CPU Only'] > 1"
+                                                    class="fas fa-times text-danger"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- Memory Only -->
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>Memory</span>
+                                            <div class="custom-checkbox">
+                                                <input type="checkbox" disabled />
+                                                <i *ngIf="planCounts['Memory Only'] == 1"
+                                                    class="fas fa-check text-success"></i>
+                                                <i *ngIf="planCounts['Memory Only'] > 1"
+                                                    class="fas fa-times text-danger"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- Disk Only -->
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span>Disk</span>
+                                            <div class="custom-checkbox">
+                                                <input type="checkbox" disabled />
+                                                <i *ngIf="planCounts['Disk Only'] == 1"
+                                                    class="fas fa-check text-success"></i>
+                                                <i *ngIf="planCounts['Disk Only'] > 1"
+                                                    class="fas fa-times text-danger"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </div>
+
+                                <div class="col-12 d-flex align-items-center">
+                                    <label for="cost_plans" class="col-2 text-right col-form-label">Cost Model <em>*
+                                        </em> :</label>
+                                    <div class="col-5">
+                                        <div class="dropdown border">
+                                            <button class="form-control btn dropdown-toggle col-12" type="button"
+                                                (click)="toggleDropdown($event)">{{ getSelectedText() }}</button>
+                                            <div *ngIf="dropdownOpen" class="dropdown-menu show col-12"
+                                                style="display: block; height: auto; overflow-y: auto; max-height: 200px;">
+                                                <div class="card-header bg-white p-1 dropdown-open" #cusdropdown>
+                                                    <table-search-box [searchValue]="searchValue"
+                                                        (searched)="onSearched($event)">
+                                                    </table-search-box>
+                                                </div>
+                                                <div class="card-body p-0 dropdown-open">
+                                                    <div *ngFor="let cm of costModelOptions"
+                                                        (click)="toggleSelection(cm, $event)"
+                                                        class="dropdown-item p-0 d-flex align-items-center pointer-link"
+                                                        [ngClass]="{'selected': isSelected(cm)}">
+                                                        <div class="p-1 text-center" style="width: 24px;">
+                                                            <span *ngIf="isSelected(cm)"
+                                                                class="fas fa-check text-success"></span>
+                                                        </div>
+                                                        <div class="w-50 py-1 text-truncate" [tooltip]="cm.planName">{{
+                                                            cm.planName }}</div>
+                                                        <div class="w-25 p-1 text-truncate" [tooltip]="cm.planType">{{
+                                                            cm.planType }}</div>
+                                                        <div class="w-22 align-items-baseline d-flex p-1">
+                                                            <span class="">{{ cm.unitCostPrice }}</span>
+                                                            <span class="text-muted font-italic small">/{{ cm.priceUnit
+                                                                }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.cost_plans_list">
+                                            {{formErrors.cost_plans_list}}</div>
+                                        <div class="invalid-feedback d-block"
+                                            *ngIf="action != 'Update' && form.get('cost_type').value && !costModelOptions.length">
+                                            No cost model present for selected region and plan type</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label for="price_unit" class="col-2 text-right col-form-label">Unit Cost <em>* </em>
+                                :</label>
+                            <div class="col-2">
+                                <select id="price_unit" class="form-control" type="text" formControlName="price_unit"
+                                    [class.is-invalid]="formErrors.price_unit">
+                                    <option [value]="''" disabled>Select Price Unit</option>
+                                    <option *ngFor="let price of priceUnitList" [value]="price">{{price}}</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.price_unit">{{formErrors.price_unit}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 form-group d-flex align-items-center">
+                            <label class="col-2 text-right col-form-label">Status <em>* </em> :</label>
+                            <div class="col-3">
+                                <div class="d-inline-block">
+                                    <ul class="d-flex px-0 mb-0">
+                                        <li>
+                                            <label class="pointer-link" [class.active]="form.controls.is_active.value">
+                                                <input type="radio" [value]="true" formControlName="is_active">
+                                                <span class="font-sm mr-2">Enable</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="pointer-link" [class.active]="!form.controls.is_active.value">
+                                                <input type="radio" [value]="false" formControlName="is_active">
+                                                <span class="font-sm mr-2">Disable</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="invalid-feedback col" *ngIf="formErrors.is_active">{{formErrors.is_active}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-center py-2">
+                <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success ml-3" type="button" (click)="onSubmit()" accessControl
+                    moduleName="Cost Plan" accessType="Manage Cost Plan" elementType="actionbtn">{{action}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmUpdate>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>New updates will apply to all associated accounts from today onwards. Are you sure you want to update?
+            </div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="onEditSubmit()">Update</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

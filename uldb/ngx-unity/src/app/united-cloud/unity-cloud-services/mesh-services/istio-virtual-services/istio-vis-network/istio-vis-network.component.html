@@ -1,0 +1,64 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card rounded-0 m-1 mb-0" #hostHeight>
+      <div class="card-header bg-transparent border-bottom-0">
+        <div class="row">
+          <div class="col ">
+            <button type="button" class="close" (click)="goBack()" style="outline:none;">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- <button type="button" class="close" (click)="goBack()" style="outline:none; position: absolute; right: 1rem;">
+            <span>
+                <i class="fa fa-times"></i>
+              </span>
+        </button> -->
+        <div class="graph-container" #visGraph></div>
+        <span [popover]="popTemplate" style="position: absolute;" triggers="" #test #visPop="bs-popover">
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #popTemplate>
+  <div class="p-2" *ngIf="!popOverData.uptime">
+    <div class="row">
+      <div class="col">
+        <i class="fa fa-spinner fa-spin"></i>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="popOverData.uptime && popOverData.uptime!=='0'">
+    <table class="table mb-0">
+      <tr>
+        <td class="border-0">
+          <h6 *ngIf="popOverData.status=='1'">Uptime</h6>
+          <h6 *ngIf="popOverData.status=='0'">Down</h6>
+        </td>
+        <td class="border-0">
+          {{popOverData.uptime | SecToDays}}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h6>Last Reboot</h6>
+        </td>
+        <td>
+          {{popOverData.lastreboot| date:dateFormat:userInfo.userTimeZoneAbbr}}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="p-2" *ngIf="popOverData.uptime && popOverData.uptime=='0'">
+    <div class="row">
+      <div class="col">
+        {{notEnabled}}
+      </div>
+    </div>
+  </div>
+</ng-template>

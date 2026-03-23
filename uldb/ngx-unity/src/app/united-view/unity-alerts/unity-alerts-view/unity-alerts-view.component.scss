@@ -1,0 +1,47 @@
+tr > th,
+tr > td {
+  white-space: nowrap;
+}
+
+// td.auto > div {
+//   min-width: 150px !important;
+//   max-width: 200px !important;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+.sub-record td {
+  border-top: 0px !important;
+  white-space: nowrap;
+  color: gray;
+  padding: 3px !important;
+  padding-top: 0px !important;
+  font-size: 0.75rem !important;
+  text-align: center;
+}
+
+.table th:first-child,
+.table td:first-child {
+  position: sticky;
+  left: 0;
+  white-space: nowrap;
+  background-color: #eff2f5;
+}
+
+.table th:last-child,
+.table td:last-child {
+  position: sticky;
+  right: 0;
+  background-color: #eff2f5;
+}
+
+.blinking {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+

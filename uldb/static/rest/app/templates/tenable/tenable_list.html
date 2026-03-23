@@ -1,0 +1,13 @@
+<generic-panel heading="Tenable SecurityCenter" panel-type="primary">
+  <panel-body><model-results></model-results></panel-body>
+  <panel-footer>
+    <button class="btn btn-primary" ng-click="ctrl.add()">Add</button>
+    <button ng-show="iframe.src !== null" class="btn btn-info" ng-click="clearIframe()">Clear iframe</button>
+  </panel-footer>
+</generic-panel>
+
+<div ng-if="iframe.src !== null" style="height:100%">
+  <iframe class="proxy-iframe" style="height: 100%" src="{{ iframe.src }}"></iframe>
+</div>
+
+<div style="height: 50px;"></div>

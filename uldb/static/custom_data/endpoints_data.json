@@ -1,0 +1,35 @@
+{
+ "headers": ["id", "interface", "region_id", "region", "service_id", "url"],
+ "cloud_type" : "openstack",
+ "info" : [
+                {
+				 "enabled" : true,
+				 "id" : "0649c5be323f4792afbc1efdd480847d",
+				 "interface" : "internal",
+				 "links" : {
+				            "self": "http://localhost:5000/v3/endpoints/0649c5be323f4792afbc1efdd480847d"
+						},
+				 "region" : "RegionOne",
+				 "region_id" : "RegionOne",
+				 "service_id" : "ef6b15e425814dc69d830361baae0e33",
+				 "url" : "http://23.253.211.234:8080/v1/AUTH_$(tenant_id)s"
+				},
+                {
+				 "enabled" : true,
+				 "id" : "0649c5be323f4792afbc1efdd480847d",
+				 "interface" : "internal",
+				 "links" : {
+				            "self": "http://localhost:5000/v3/endpoints/0649c5be323f4792afbc1efdd480847d"
+						},
+				 "region" : "RegionOne",
+				 "region_id" : "RegionOne",
+				 "service_id" : "ef6b15e425814dc69d830361baae0e33",
+				 "url" : "http://23.253.211.234:8080/v1/AUTH_$(tenant_id)s"
+				}
+			],
+ "links" : {
+            "next" : null,
+			"previous" : null,
+			"self" : "http://localhost:5000/v3/endpoints"
+		}
+}

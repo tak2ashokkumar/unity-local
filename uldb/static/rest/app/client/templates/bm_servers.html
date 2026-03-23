@@ -1,0 +1,374 @@
+<loading loader="{{loader}}"></loading>
+<div class="page_wrapper" style="float:left">
+  <div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+        <form class="navbar-form">
+          <div class="form-group">
+            <input class="form-control" type="text" ng-model="searchKeyword" ng-change="getSearchResults(searchKeyword)" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}">
+            <button class="btn btn-search" type="submit" style="top: 4px;">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+          <div class="action-bar pull-right">
+              <span class="count">{{ bm_server_result.count }}</span>
+              <span class="count-text"> Bare Metal Servers</span>
+          </div>
+      </div>
+    </div>
+
+    <div ng-if="bm_server_result.results.length > 0">
+      <div infinite-scroll='loadPageData()'>
+        <table class="table">
+          <thead class="cf">
+            <tr>
+              <th  ng-repeat="row in bm_server_rows" custom-sort order="{{ row.name }}" sortdisabled= "{{row.is_sort_disabled}}" sort="sort">{{ row.description }}</th>
+              <th> Actions </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="(index, bm_server) in bm_server_result.results | filter: searchKeyword as filtered">
+              <td>
+                  <a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                  popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                  ng-init="get_observium_details('bm_server', bm_server.server); get_bm_server_controller_power_stats(bm_server)" ng-click="show_observium_details(bm_server.server)">
+                    {{bm_server.server.name}}
+                  </a>
+              </td>
+              <!-- Power status column start-->
+              <td>
+                <span ng-if="(action_support) && (bm_server.power_on)">
+                  <device-up></device-up>
+                </span>
+
+                <span ng-if="(action_support) && (!bm_server.power_on)">
+                  <device-down></device-down>
+                </span>
+
+                <span ng-if="!(action_support)">
+                  <span ng-if="angular.isObject(bm_server.server.observium_details) && !angular.isDefined(bm_server.server.observium_details.device_data)">
+                      <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+
+                  <span ng-if="!angular.isObject(bm_server.server.observium_details)">
+                    <device-not-configured></device-not-configured>
+                  </span>
+                  <span ng-if="angular.isObject(bm_server.server.observium_details) && angular.isDefined(bm_server.server.observium_details.device_data)"> 
+                      <span ng-if="bm_server.server.observium_details.device_data.status == 1"> 
+                          <device-up></device-up>
+                      </span>
+                      <span ng-if="bm_server.server.observium_details.device_data.status == 0"> 
+                          <device-down></device-down>
+                      </span>
+                  </span>
+                </span>
+              </td>
+              <!-- Power status column end -->
+
+              <td>{{bm_server.os.full_name}}</td>
+              <td>{{bm_server.management_ip}}</td>
+              <td>
+                  <div class="action-icons">
+
+                      <span tooltip-class="customClass" uib-tooltip="{{bm_server.action_message}}">
+                        <a class="fa fa-power-off" ng-click="manage_bmserver_actions(bm_server)"
+                        ng-class="{'poweredOnCss white_text': bm_server.power_on, 'fa-disabled' : (bm_server.action_support === null)}"></a>
+                      </span>
+
+                      <span>
+                        <a class="fa fa-info-circle"  tooltip-class="customClass" uib-tooltip="Server Info"
+                           href="" ng-click="show_full_details(bm_server)"></a>
+                      </span>
+
+                      <span ng-if="bm_server.os.platform_type === 'Linux'" tooltip-class="customClass" uib-tooltip="Open in same tab">
+                        <a ng-click="xtermConsoleSameTab($index, bm_server.uuid, cloud_type)">
+                            <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        </a>
+                      </span>
+
+                      <span ng-if="bm_server.os.platform_type === 'Windows'" tooltip-class="customClass" uib-tooltip="Open in same tab option is not available for windows machines">
+                        <a ng-class="{'fa-disabled': true}">
+                            <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (bm_server.os.platform_type != 'Linux')}"></i>
+                        </a>
+                      </span>
+
+                      <span ng-if="(bm_server.os.platform_type !== 'Windows') && (bm_server.os.platform_type !== 'Linux')" tooltip-class="customClass" uib-tooltip="Open in same tab option is not available">
+                        <a class="disabled">
+                            <i class="fa fa-external-link-square fa-disabled" aria-hidden="true"></i>
+                        </a>
+                      </span>
+
+                      <span ng-if="bm_server.os.platform_type === 'Linux'" tooltip-class="customClass" uib-tooltip="Open in new tab">
+                        <a href="/vm-console-client#/baremetal/webconsole/{{ bm_server.uuid }}/" target="_blank" ng-class="{'fa-disabled': (bm_server.os.platform_type != 'Linux')}">
+                            <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (bm_server.os.platform_type != 'Linux') }"></i>
+                        </a>
+                      </span>
+                      <span ng-if="bm_server.os.platform_type === 'Windows'" tooltip-class="customClass" uib-tooltip="Open in new tab">
+                        <a href="/rdp?ip={{ bm_server.management_ip }}&domain=unitedlayer.com" target="_blank">
+                            <i class="fa fa-external-link" aria-hidden="true"></i>
+                        </a>
+                      </span>
+
+                      <span ng-if="(bm_server.os.platform_type !== 'Windows') && (bm_server.os.platform_type !== 'Linux')" tooltip-class="customClass" uib-tooltip="Open in new tab option is not available">
+                        <a class="disabled">
+                            <i class="fa fa-external-link fa-disabled" aria-hidden="true"></i>
+                        </a>
+                      </span>
+
+                      <span tooltip-class="customClass" uib-tooltip="{{bm_server.server.message}}">
+                          <a ng-click="show_server_statistics(bm_server.server.uuid)" ng-if="bm_server.server.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="bm_server.server.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                      </span>
+
+                      <span tooltip-class="customClass" uib-tooltip="{{bm_server.controller_message}}">
+                          <a ng-click="show_controller_statistics(bm_server.uuid, bm_server.bmc_type)"
+                           ng-if="(bm_server.action_support !== null) && (bm_server.action_support !== 'power_on')">
+                              <i class="fa fa-bolt" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="(bm_server.action_support === null) ||  (bm_server.action_support === 'power_on')">
+                              <i class="fa fa-bolt fa-disabled" aria-hidden="true"></i>
+                          </a>
+                      </span>
+
+                      <span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                           href="" ng-click="manage_request(bm_server.server.name, bm_server)"></a>
+                      </span>
+
+                  </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- <div ng-if="bm_server_result.results.length === 0" class="content-wrapper "> -->
+    <div ng-if="(bm_server_result.results | filter: searchKeyword).length === 0" class="content-wrapper ">
+      <div>
+        <no-records-found message="No Bare Metal servers to display"></no-records-found>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-if="$root.showConsole" class="page_wrapper" style="float:left">
+  <span id="vm_error"  style="color:red"></span>
+
+  <div id="terminal-container" style="position:absolute;width:100%;height:100%;top:0;left:0"><span class="fa fa-times-circle pull-right boxclose" ng-click="closeVM()"></span></div>
+</div>
+
+<style type="text/css">
+    .popover{
+        width : 28%;
+        max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    }
+    #authentication_loader .cg-busy {
+        top : 0px !important;
+        left : 0px !important;
+    }
+</style>
+
+<script type="text/ng-template" id="devicedetailstemplate.html">
+    <div class="row">
+        <table class="table"  ng-show="device_details.device_data">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div>Uptime</div>
+                    </th>
+                    <td class="table_no_top_border">
+                        <div ng-if="device_details.device_data.status == 1">{{device_details.device_data.uptime | unityObserviumTime}}</div>
+                        <div ng-if="device_details.device_data.status == 0">Down {{device_details.device_data.uptime | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4">
+                        <div>Last reboot</div>
+                    </th>
+                    <td>
+                        <div>{{device_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="angular.isDefined(device_details) && (device_details === null)" style="padding : 20px">
+            <p>{{ $root.monitoring_not_enabled_msg }}</p>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="xtermAuthenticate.html">
+  <div class="modal-content">
+    <form role="form" name="modalform">
+      <div class="modal-header">
+          <h4 class="modal-title">Bare Metal Server Authenticate</h4>
+
+      </div>
+      <div class="modal-body" id="authentication_loader" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}" style="padding:20px 40px;">
+          <div class="modal-form" >
+                <div class="form-group" ng-if="errorMsg">
+                  <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+                </div>
+                <div class="form-group" ng-if="disableAccess != undefined">
+                  <label style="color:red" class="col-sm-10">Management IP Address not Assigned.</label>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="disableAccess == undefined">
+                    <div class="paddingR"
+                        ng-class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                        <div class="form-group">
+                          <label for="request.hostname" class="col-sm-2 control-label">
+                            IP Address
+                          </label>
+
+                          <div>
+                             <input type="text"
+                                   class="form-control"
+                                   ng-model="request.hostname"
+                                   placeholder="Hostname" disabled>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.port" class="col-sm-2 control-label">
+                            Port Number
+                          </label>
+
+                          <div>
+                            <input type="number"
+                                   min=0
+                                   class="form-control"
+                                   ng-model="request.port"
+                                   placeholder="Port Number">
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.username">
+                            Username*
+                          </label>
+                          <span class="errormsg" ng-if="loginUsernameErrMsg">{{loginUsernameErrMsg}}</span>
+
+                          <div>
+                            <input type="text"
+                                   class="form-control"
+                                   ng-model="request.username"
+                                   placeholder="Username"
+                                   autofocus
+                                   ng-class="{'has-error_inputbox': loginUsernameErr }" />
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.password">
+                            Password*
+                          </label>
+                          <span class="errormsg" ng-if="loginPasswordErrMsg">{{loginPasswordErrMsg}}</span>
+
+                          <div>
+                            <input type="password"
+                                   class="form-control"
+                                   ng-model="request.password"
+                                   placeholder="Password"
+                                   ng-class="{'has-error_inputbox': loginPasswordErr}" />
+                          </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+      </div>
+      <div class="modal-footer modal-buttons">
+          <div class="modal-footer modal-buttons" ng-if="disableAccess == undefined">
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                Close
+              </button>
+              <button type="submit" class="btn btn-default" ng-click="create(request)">
+                Login
+              </button>
+          </div>
+      </div>
+    </form>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="baremetal_full_details.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Server details</h3>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="col-md-4 table_no_top_border">
+                                <div>Server</div>
+                            </th>
+                            <td class="table_no_top_border">
+                              <div>{{bm_details.server.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Manufacturer</div>
+                            </th>
+                            <td>
+                              <div>{{bm_details.server.manufacturer || 'NA'}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>CPUs</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.num_cpus || 'NA' }}</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Cores</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.num_cores || 'NA' }}</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Memory (GB)</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.memory_mb || 'NA' }}</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Capacity (GB)</div>
+                            </th>
+                            <td>
+                              <div>{{ bm_details.server.capacity_gb || 'NA' }}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+  <div class="modal-footer modal-buttons">
+        <button type="button" class="btn btn-cancel" ng-click="cancel()">
+          Close
+        </button>
+  </div>
+</script>

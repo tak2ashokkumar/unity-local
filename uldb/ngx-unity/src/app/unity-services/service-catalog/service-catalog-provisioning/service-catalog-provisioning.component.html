@@ -1,0 +1,187 @@
+<div class="row" *ngIf="viewSummaryData">
+    <div class="col-3 pr-0">
+        <div class="card mb-2">
+            <div class="card-body p-2">
+                <div>Total Catalogs</div>
+                <div class="text-primary text-value-sm">{{viewSummaryData.total}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pr-0">
+        <div class="card mb-2">
+            <div class="card-body p-2">
+                <div>Orders In-Progress</div>
+                <div class="text-value-sm text-primary"><span
+                        class="fa-info-circle fa-spin fa-spinner fas text-primary mr-2"
+                        tooltip="In Progress"></span>{{viewSummaryData.ordersInProgress}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pr-0">
+        <div class="card mb-2">
+            <div class="card-body p-2">
+                <div>By Catalog Type</div>
+                <div class="col-12 d-flex flex-column px-0">
+                    <div>
+                        <span class="text-muted text-sm mr-2">Workflow :</span>
+                        <span
+                            class="text-primary mr-2 text-value-sm pointer-link">{{viewSummaryData.catalogType.Workflow}}</span>
+                        <span class="border border-secondary mb-5 mr-2"></span>
+                        <span class="text-muted text-sm mr-2">Task :</span>
+                        <span
+                            class="text-primary mr-2 text-value-sm pointer-link">{{viewSummaryData.catalogType.Task}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pr-0">
+        <div class="card mb-2">
+            <div class="card-body p-2">
+                <div>By Cloud</div>
+                <div class="col-12 d-flex flex-row px-0">
+                    <div *ngFor="let view of viewSummaryData.cloud">
+                        <img [src]="view.cloudImage" height="20" *ngIf="view.cloudImage" [tooltip]="view.cloudName"> :
+                        <span class="text-primary mr-2 ml-1 text-value-sm pointer-link">{{view.count}}</span>
+                        <span class="border border-secondary mb-5 mr-1"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 pr-0">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="font-lg font-500">
+                <span class="badge badge-secondary">{{count}}</span>
+                <span class="ml-1">Catalogs</span>
+            </span>
+            <div class="d-flex justify-content-end">
+                <search-box (searched)="onSearched($event)"></search-box>
+                <ul class="d-flex mb-0 ml-2 px-0">
+                    <li class="d-flex align-items-center">
+                        <label class="pointer-link p-0 d-flex justify-content-center align-items-center h-100"
+                            [class.active]="this.catalogSelected == 'ordered'" tooltip="Ordered"
+                            [style.width.px]="this.catalogSelected == 'ordered' ? '55':'50'">
+                            <input type="radio" [value]="true" (click)="toggleStatus('ordered')">
+                            <span class="fas fa-cog font-lg"></span>
+                        </label>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <label class="pointer-link p-0 d-flex justify-content-center align-items-center h-100"
+                            [class.active]="this.catalogSelected == 'all'" tooltip="All"
+                            [style.width.px]="this.catalogSelected == 'all' ? '55':'50'">
+                            <input type="radio" [value]="false" (click)="toggleStatus('all')">
+                            <span class="fas fa-eye font-lg"></span>
+                        </label>
+                    </li>
+                </ul>
+                <button class="btn btn-pill btn-warning btn-sm px-3 font-sm ml-2" type="button" (click)="addCatalog()"
+                    accessControl moduleName="Service Catalog" accessType="Manage Service Catalog" elementType="btn">
+                    <span class="fas fa-plus"></span>
+                    <span class="ml-1">Catalog</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 d-flex pr-0">
+        <div class="w-20">
+            <div class="card mb-0">
+                <div class="card-body p-2">
+                    <ng-container *ngFor="let view of viewCloudData; let last=last">
+                        <div class="card" [ngClass]="last ? 'mb-0' : 'mb-2'">
+                            <div class="card-body p-2 d-flex justify-content-between align-items-center pointer-link custom-hover-effect"
+                                [class.active]="view.cloudName == cloudName"
+                                (click)="filterByCloudType(view.cloudName)">
+                                <div class="d-flex align-items-center">
+                                    <img *ngIf="view.logo" [src]="view.logo" height="23">
+                                    <span *ngIf="!view.logo">{{view.cloudName}}</span>
+                                </div>
+                                <div class="pointer-link text-value text-primary">{{view.orderCount}}</div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <div class="w-80 pl-2">
+            <div *ngIf="viewData" class="row mx-0">
+                <ng-container *ngFor="let view of viewData; let i = index;">
+                    <div class="col-4" [ngClass]="getClass(i)">
+                        <div class="card mb-2 rounded">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div class="font-lg">{{view.name}}</div>
+                                <div class="text-muted font-sm">{{view.catalogType}}</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <img [src]="view.logoUrl" height="50" width="100" [alt]="view.name" (error)="view.logoUrl = view.altLogoUrl">
+                                </div>
+                                <div class="text-truncate-multi d-flex justify-content-center mt-3"
+                                    [tooltip]="view.description">
+                                    {{view.description}}
+                                </div>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between p-2">
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-sm btn-pill btn-primary pull-right" *ngIf="view.ordersCount"
+                                        (click)="ordersPage(view.uuid,'orders')" accessControl
+                                        moduleName="Service Catalog" accessType="Order Catalog" elementType="btn">
+                                        <span class="mr-1">{{view.ordersCount}}</span>Orders
+                                    </button>
+                                    <button class="btn btn-sm btn-pill border-primary pull-right ml-1"
+                                        *ngIf="view.draftOrdersCount" (click)="ordersPage(view.uuid,'drafts')"
+                                        accessControl moduleName="Service Catalog" accessType="Order Catalog"
+                                        elementType="btn">
+                                        <span class="mr-1">{{view.draftOrdersCount}}</span>Drafts
+                                    </button>
+                                </div>
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <button class="action-icons mb-0 fas fa-plus font-sm ml-1" tooltip="Orders"
+                                        (click)="navigateToCreateOrders(view.uuid)" accessControl
+                                        moduleName="Service Catalog" accessType="Order Catalog"
+                                        elementType="actionbtn"></button>
+                                    <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                        (click)="editCatalog(view.uuid)" accessControl moduleName="Service Catalog"
+                                        accessType="Manage Service Catalog" elementType="actionbtn"></button>
+                                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                        (click)="deleteCatalog(view.uuid)" accessControl moduleName="Service Catalog"
+                                        accessType="Manage Service Catalog" elementType="actionbtn"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <div *ngIf="!viewData.length" class="d-flex justify-content-center align-items-center"
+                style="height: 250px;">
+                No Catalogs available.
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="taskDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This catalog will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmCatalogDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="taskDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

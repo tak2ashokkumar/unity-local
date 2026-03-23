@@ -1,0 +1,269 @@
+<h3>Virtual Load Balancing</h3>
+<h4><span ng-show="!vlbState.selection">Select a VLB to configure.</span></h4>
+<table class="table table-hover table-condensed">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>VMware Hostname</th>
+    <th>VMware IP</th>
+    <th>Status</th>
+    <th>Last Sync</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="vlb in cloud.virtual_load_balancers"
+      ng-click="selectVlb(vlb, $index)"
+      ng-class="{'success': $index === vlbState.idx}">
+    <td>{{ vlb.name }}</td>
+    <td>{{ vlb.vmware_vm.config.summary.guest.hostName }}</td>
+    <td>{{ vlb.vmware_vm.config.summary.guest.ipAddress }}</td>
+    <td>{{ vlb.vmware_vm.config.summary.overallStatus }}</td>
+    <td>{{ vlb.vmware_vm.updated_at | fullDate }}</td>
+
+    <td>
+      <div class="btn-group">
+        <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu action-button" ng-show="!vlb.vmware_vm">
+          <li><a href ng-click="linkVlb(vlb, $index, cloud)">Link to VMware object</a></li>
+        </ul>
+        <ul class="dropdown-menu action-button" ng-show="vlb.vmware_vm">
+          <li><a href ng-click="refreshVlb(vlb, $index, cloud)">Sync with VMware</a></li>
+          <li><a href ng-click="disassociateVlb(vlb, $index, cloud)" confirm>Disassociate from VMware</a></li>
+        </ul>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<button class="btn btn-primary" ng-show="!vlbState.selection" ng-click="link('virtual_load_balancers')">Add VLB</button>
+
+<div class="panel panel-default" ng-show="vlbState.selection">
+  <div class="panel-heading">
+    Virtual Load Balancer Config
+    <button type="button" class="close" aria-label="Close">
+      <span aria-hidden="true" ng-click="deselectVlb()">&times;</span>
+    </button>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-xs-4">
+        <h4>Info</h4>
+        <md-list>
+          <md-list-item class="md-2-line" ng-repeat="field in vlbFields">
+            <div class="md-list-item-text" ng-if="field.name !== 'Host Name' && field.name !== 'bootTime'">
+              <p>{{ field.name }}</p>
+              <h3>{{ field.resolve(vlbState.selection) }}</h3>
+            </div>
+            <div class="md-list-item-text" ng-if="field.name === 'Host Name'">
+              <p>Host Name</p>
+              <h3><a target="_blank" href="https://{{ field.resolve(vlbState.selection) }}">{{ field.resolve(vlbState.selection) }}</a></h3>
+            </div>
+            <div class="md-list-item-text" ng-if="field.name === 'bootTime'">
+              <p>Boot Time</p>
+              <h3>{{ field.resolve(vlbState.selection) | fullDate }}</h3>
+            </div>
+          </md-list-item>
+        </md-list>
+
+        <h4>Integrations</h4>
+        <md-content layout-padding>
+          <div ng-if="vlbState.selection.api_portal === null">
+            <p>Unity needs more information in order for the API integration to work. Please configure the integration below.</p>
+            <button type="button" class="btn btn-warning" ng-click="linkVlbApi(vlbState.selection)">
+              Link
+            </button>
+          </div>
+
+          <div ng-if="vlbState.selection.api_portal !== null">
+            <p>API is linked. <span class="text-success	glyphicon glyphicon-ok"></span></p>
+            <button type="button" class="btn btn-warning" ng-click="unlinkVlbApi(vlbState.selection)" confirm>
+              Unlink
+            </button>
+          </div>
+        </md-content>
+
+        <md-content layout-padding>
+          <div ng-if="!vlbState.selection.proxy">
+            <p>No proxy has been configured for this device. Please configure one below.</p>
+            <button type="button" class="btn btn-warning" ng-click="linkVlbProxy(vlbState.selection)">
+              Create Proxy
+            </button>
+          </div>
+          <div ng-if="vlbState.selection.proxy">
+            <p>Proxy configured <span class="text-success	glyphicon glyphicon-ok"></span>
+
+              <a target="_blank" href="https://{{ vlbState.selection.proxy.proxy_url }}">
+                Open in new window <span class="glyphicon glyphicon-new-window"></span></a>
+            </p>
+
+            <!--
+            <p>
+              Open in app
+              <button class="btn btn-success" ng-click="embedProxy(vlbState.selection)">:wq</button>
+            </p>-->
+
+            <button type="button" class="btn btn-warning" ng-click="unlinkVlbProxy(vlbState.selection)">
+              Remove Proxy
+            </button>
+          </div>
+        </md-content>
+
+      </div>
+
+
+       <div class="col-xs-4">
+        <h4>Networks</h4>
+        <md-list>
+              <md-list-item class="md-2-line" ng-cloak ng-if="vlbState.selection" ng-repeat="network in vmNetworks(vlbState.selection)">
+                <div class="md-list-item-text">
+                  <p>{{ network.backing.deviceName }}</p>
+                  <h4>Connected To: {{ network.deviceInfo.label }}</h4>
+                  <h4>(MAC): {{ network.macAddress }}</h4>
+                </div>
+              </md-list-item>
+            </md-list>
+
+        <md-card ng-if="false">
+          <md-card-title><span class="md-headline">{{ vlbState.selection.vmware_vm.config.guest.hostName }}</span></md-card-title>
+          <md-card-content>
+
+
+
+
+          </md-card-content>
+          <md-card-actions ng-if="false">
+            <md-button>REFRESH</md-button>
+          </md-card-actions>
+        </md-card>
+      </div>
+
+
+
+
+      <div class="col-xs-4">
+        <md-content>
+          <div layout-padding ng-if="vlbState.selection.api_portal">
+
+            <h4>Virtual Servers</h4>
+            <table layout-padding class="table table-condensed">
+              <thead>
+              <tr>
+                <th>Virtual Server Name</th>
+                <th>Address</th>
+                <th>App Port</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="vs in vlbState.selection.vlb_extern.virtual_servers">
+                <td>{{ vs.name }}</td>
+                <td>{{ vs.address }}</td>
+                <td>{{ vs.port }}</td>
+              </tr>
+              </tbody>
+            </table>
+
+            <h4>Pools</h4>
+            <table layout-padding class="table table-condensed">
+              <thead>
+              <tr>
+                <th>Pool Name</th>
+                <th>Description</th>
+                <th># Members</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="pool in vlbState.selection.vlb_extern.pools">
+                <td>{{ pool.name }}</td>
+                <td>{{ pool.description }}</td>
+                <td>{{ pool.poolMemberReferences.length }}</td>
+              </tr>
+              </tbody>
+            </table>
+
+            <h4>Nodes</h4>
+            <table layout-padding class="table table-condensed">
+              <thead>
+              <tr>
+                <th>Node Name</th>
+                <th>Node Description</th>
+                <th>Node IP</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="node in vlbState.selection.vlb_extern.nodes">
+                <td>{{ node.name }}</td>
+                <td>{{ node.description }}</td>
+                <td>{{ node.address }}</td>
+              </tr>
+              </tbody>
+            </table>
+
+            <h4>IPs</h4>
+            <table layout-padding class="table table-condensed">
+              <thead>
+              <tr>
+                <th>IP Address</th>
+                <th>Floating</th>
+                <th>VLAN</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="ip in vlbState.selection.vlb_extern.self_ips">
+                <td>{{ ip.address }}</td>
+                <td>{{ ip.floating }}</td>
+                <td>{{ ip.vlanReference.link | firstMatch:'.*~(\\w+)' }}</td>
+              </tr>
+              </tbody>
+            </table>
+
+            <h4>VLANs</h4>
+            <table layout-padding class="table table-condensed">
+              <thead>
+              <tr>
+                <th>VLAN Name</th>
+                <th>VLAN ID</th>
+                <th>Connected Interfaces</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="vlan in vlbState.selection.vlb_extern.vlans">
+                <td>{{ vlan.name }}</td>
+                <td>{{ vlan.tag }}</td>
+                <td>{{ vlan.interfacesReference.items | commaReduce:'name' }}</td>
+              </tr>
+              </tbody>
+            </table>
+
+          </div>
+          <div ng-if="!vlbState.selection.api_portal">
+            Please add API information to display detailed content.
+          </div>
+        </md-content>
+      </div>
+
+
+
+    </div>
+  </div>
+</div>
+
+
+<div class="panel panel-default" ng-if="proxyState.embedded">
+  <div class="panel-heading">
+    Load Balancer Admin Panel
+    <button type="button" class="close" aria-label="Close">
+      <span aria-hidden="true" ng-click="clearProxy()">&times;</span>
+    </button>
+  </div>
+  <div class="panel-body">
+    <iframe src="{{ proxyState.trust }}" frameborder="0"
+            style="overflow: hidden; height: 100%;width: 80%; position: absolute;"
+            height="100%"
+            width="80%"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+  </div>
+</div>

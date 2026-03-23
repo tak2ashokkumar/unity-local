@@ -1,0 +1,15 @@
+<div class="progress">
+  <div class="progress-bar bg-success" role="progressbar" [style.width.%]="percentData?.loader"
+    aria-valuenow="percentData.loader" aria-valuemin="0" aria-valuemax="100">
+    <i *ngIf="percentData?.loader" class="fa fa-spinner fa-spin"></i>
+  </div>
+
+  <div class="progress-bar bg-success" role="progressbar" [style.width.%]="percentData?.active"
+    aria-valuenow="percentData?.active" aria-valuemin="0" aria-valuemax="100">{{barData?.activeCount}}</div>
+
+  <div class="progress-bar bg-danger" role="progressbar" [style.width.%]="percentData?.inActive"
+    aria-valuenow="percentData?.inActive" aria-valuemin="0" aria-valuemax="100">{{barData?.inactiveCount}}</div>
+
+  <div class="progress-bar  bg-secondary" role="progressbar" [style.width.%]="percentData?.unknown"
+    aria-valuenow="percentData?.unknown" aria-valuemin="0" aria-valuemax="100">{{barData?.unknown}}</div>
+</div>

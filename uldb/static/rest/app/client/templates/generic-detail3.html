@@ -1,0 +1,76 @@
+
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Properties
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>{{ title.singular }} Attribute</th>
+            <th>Current Value</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="row in rows" ng-if="row.hasValue == undefined || row.hasValue(result) !== false">
+            <td class="col-md-4">
+              <div>{{ row.description }}</div>
+            </td>
+            <td>
+              <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+              <div ng-if="row.opaque === 'stringTransform'">
+                {{ row.read(result) }}
+              </div>
+              <div ng-if="row.opaque === 'link'">
+                <a href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div ng-repeat="rels in relatedObjects">
+    <div class="col-sm-12 col-md-12 col-lg-6">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          Related {{ rels.description }}
+        </div>
+        <div class="panel-body">
+          <div ng-if="result[rels.name].length > 0">
+            <table class="table">
+              <thead>
+              <tr>
+                <th ng-repeat="col in rels.columns">{{ col.description }}</th>
+              </tr>
+              </thead>
+
+              <tbody>
+              <tr ng-repeat="relObj in result[rels.name]">
+                <td ng-repeat="col in rels.columns">
+                  <div ng-if="col.opaque === undefined">{{ relObj[col.idField] }}</div>
+                  <div ng-if="col.opaque === 'link'">
+                    <a href="{{ col.urlPath }}{{ relObj.uuid }}">{{ relObj[col.idField] }}</a>
+                  </div>
+                  <div ng-if="col.opaque === 'stringTransform'">
+                    {{ col.read(relObj) }}
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <div ng-if="result[rels.name].length == 0">
+            This object does not have any related {{ rels.description }}.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

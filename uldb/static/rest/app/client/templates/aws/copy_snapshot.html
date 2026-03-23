@@ -1,0 +1,20 @@
+<form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength">
+	<div class="form-group ng-scope">
+		<label class="col-sm-3 control-label ng-binding" for="blockName">Snapshot Id *</label>
+		<div class="col-sm-9 ng-scope">
+			<label class="control-label ng-binding" for="blockName">{{obj.SnapshotId}}</label>
+		</div>
+		<div class="col-sm-9" style="float: right;">
+			<label class="errormsg" ng-if="obj['SnapshotIderr']">{{ obj['SnapshotIdMsg'] }}</label>
+		</div>
+	</div>
+	<div class="form-group ng-scope">
+		<label class="col-sm-3 control-label ng-binding" for="blockName">Description *</label>
+		<div class="col-sm-9 ng-scope">
+			<textarea class="form-control ng-empty ng-invalid ng-invalid-required" required="" maxlength="256" value="" ng-model="obj.description"></textarea>
+		</div>
+		<div class="col-sm-9" style="float: right;">
+			<label class="errormsg" ng-if="obj['descriptionerr']">{{ obj['descriptionMsg'] }}</label>
+		</div>
+	</div>
+</form>

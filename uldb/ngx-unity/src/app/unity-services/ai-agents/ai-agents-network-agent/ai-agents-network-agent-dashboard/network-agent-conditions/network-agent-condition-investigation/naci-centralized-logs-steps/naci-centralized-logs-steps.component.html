@@ -1,0 +1,46 @@
+<div class="container-fluid px-0" *ngIf="currentStep>0">
+  <div class="d-flex justify-content-between align-items-center">
+
+    <h5 class="mb-0">Workspace</h5>
+
+    <div class="d-flex align-items-center">
+
+      <ng-container *ngFor="let step of [1,2,3,4,5]">
+
+        <div class="step" [ngClass]="{
+        'step-completed': step < currentStep,
+        'step-active': step === currentStep,
+        'step-pending': step > currentStep
+        }">
+          <i [ngClass]="getIcon(step)"></i>
+        </div>
+
+        <div *ngIf="step < 5" class="step-line" [ngClass]="{
+            'bg-success': step < currentStep,
+            'bg-primary': step === currentStep,
+            'bg-secondary': step > currentStep
+          }"></div>
+
+      </ng-container>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 mt-2">
+      <cls-verify-and-audit-step *ngIf="currentStep>0" [chatResponse]="chatResponse">
+      </cls-verify-and-audit-step>
+    </div>
+    <div class="col-12">
+      <cls-root-cause-analysis-step *ngIf="currentStep>1" [chatResponse]="chatResponse"></cls-root-cause-analysis-step>
+    </div>
+    <div class="col-12 mt-2">
+      <cls-remediation-script-step *ngIf="currentStep>2" [chatResponse]="chatResponse"></cls-remediation-script-step>
+    </div>
+    <div class="col-12">
+      <cls-validate-fix-step *ngIf="currentStep>3" [chatResponse]="chatResponse"></cls-validate-fix-step>
+    </div>
+    <div class="col-12">
+      <cls-document-and-close-step *ngIf="currentStep>4" [chatResponse]="chatResponse"></cls-document-and-close-step>
+    </div>
+  </div>
+</div>

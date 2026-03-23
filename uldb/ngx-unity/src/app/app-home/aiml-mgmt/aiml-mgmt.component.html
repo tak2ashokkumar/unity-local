@@ -1,0 +1,88 @@
+<div class="card equalize-card" [appWidgetLazyLoader]="{ttw:500}" (lazyLoad)="onLazyLoad($event)">
+    <app-spinner [name]="'dashboard-aiml'"></app-spinner>
+    <div class="card-header d-flex justify-content-between bg-transparent border-bottom-0 pb-1" *ngIf="summaryData">
+        <a class="h4 text-truncate font-lg text-dark text-decoration-none" (click)="goTo()">AIML Event
+            Management</a>
+        <a class="text-primary" *ngIf="hasAIMLAccess()" (click)="goTo()">view more</a>
+    </div>
+    <div class="card-body pt-0">
+        <div class="row">
+            <div class="col-7 pl-1 pr-0" *ngIf="summaryData">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card entity-card mb-2 pointer-link" (click)="goTo('conditions')">
+                            <div
+                                class="card-header d-flex justify-content-between align-items-center bg-transparent border-bottom-0 py-1">
+                                <div class="font-lg font-500"> Conditions </div>
+                            </div>
+                            <div class="card-body d-flex h-100 justify-content-center align-items-center px-2 py-1">
+                                <div
+                                    class="h-100 d-flex justify-content-center align-items-center donut-center-value font-2x">
+                                    {{summaryData.conditions}}
+                                </div>
+                                <canvas *ngIf="summaryData.chartData" baseChart [chartType]="summaryData.chartData.type"
+                                    [labels]="summaryData.chartData.lables" [data]="summaryData.chartData.piedata"
+                                    [options]="summaryData.chartData.options" [plugins]="summaryData.chartData.plugins"
+                                    [legend]="summaryData.chartData.legend" [colors]="summaryData.chartData.colors"
+                                    height="160"></canvas>
+                                <div *ngIf="!summaryData.chartData">
+                                    <div class="text-center text-muted">No data available.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card entity-card mb-0 pointer-link" (click)="goTo('events')">
+                            <div class="card-body d-flex flex-column justify-content-between p-2">
+                                <div class="d-flex flex-column">
+                                    <span>Events</span>
+                                    <span class="font-2x">{{summaryData.events}}</span>
+                                </div>
+                                <div class="d-flex flex-column align-items-end" style="margin-top: -2rem;">
+                                    <span class="text-success font-2x">{{summaryData.eventReductionPercentage}}%</span>
+                                    <span class="font-lg text-truncate"> &nbsp; Event Reduction</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-5 pr-0" *ngIf="alertsData">
+                <div class="d-flex flex-column h-100 w-100 justify-content-around">
+                    <div class="d-flex w-100">
+                        <div style="z-index: 1" class="w-35 badge badge-pill badge-info p-2 font-500">
+                            <div class="font-xs-sm text-white mb-1">{{alertsData.compute}}</div>
+                            <div class="font-xs text-white px-1">Alerts</div>
+                        </div>
+                        <div class="d-flex w-65 alert-group align-items-center alert alert-info my-2 py-1">
+                            Compute</div>
+                    </div>
+                    <div class="d-flex w-100">
+                        <div style="z-index: 1" class="w-35 badge badge-pill badge-info p-2 font-500">
+                            <div class="font-xs-sm text-white mb-1">{{alertsData.network}}</div>
+                            <div class="font-xs text-white px-1">Alerts</div>
+                        </div>
+                        <div class="d-flex w-65 alert-group align-items-center alert alert-info my-2 py-1">
+                            Network</div>
+                    </div>
+                    <div class="d-flex w-100">
+                        <div style="z-index: 1" class="w-35 badge badge-pill badge-info p-2 font-500">
+                            <div class="font-xs-sm text-white mb-1">{{alertsData.storage}}</div>
+                            <div class="font-xs text-white px-1">Alerts</div>
+                        </div>
+                        <div class="d-flex w-65 alert-group align-items-center alert alert-info my-2 py-1">
+                            Storage</div>
+                    </div>
+                    <div class="d-flex w-100">
+                        <div style="z-index: 1" class="w-35 badge badge-pill badge-info p-2 font-500">
+                            <div class="font-xs-sm text-white mb-1">{{alertsData.others}}</div>
+                            <div class="font-xs text-white px-1">Alerts</div>
+                        </div>
+                        <div class="d-flex w-65 alert-group align-items-center alert alert-info my-2 py-1">
+                            Others</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

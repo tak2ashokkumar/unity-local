@@ -1,0 +1,136 @@
+<ng-template #mobileFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Mobile Device
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="mobileModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="mobileForm" [formGroup]="mobileForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Name<em>*</em></label>
+            <input id="name" class="form-control" type="text" formControlName="name"
+              [class.is-invalid]="mobileFormErrors.name">
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.name">
+              {{mobileFormErrors.name}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Serial Number<em>*</em></label>
+            <input id="serial_number" class="form-control" type="text" formControlName="serial_number"
+              [class.is-invalid]="mobileFormErrors.serial_number">
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.serial_number">
+              {{mobileFormErrors.serial_number}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="font-col-form-label" for="model">Model<em>*</em></label>
+            <input id="model" class="form-control" type="text" formControlName="model"
+              [class.is-invalid]="mobileFormErrors.model">
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.model">
+              {{mobileFormErrors.model}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">IP Address</label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'Device IP Address for Console Access'"></i>
+            <input id="ip_address" class="form-control" type="text" formControlName="ip_address"
+              [class.is-invalid]="mobileFormErrors.ip_address">
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.ip_address">
+              {{mobileFormErrors.ip_address}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Platform<em>*</em></label>
+            <select class="form-control" id="platform" formControlName="platform"
+              [ngClass]="{'is-invalid' : mobileFormErrors.platform}">
+              <option [value]="''" disabled>Select</option>
+              <option [value]="'Android'">Android</option>
+              <option [value]="'ios'">ios</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.platform">
+              {{mobileFormErrors.platform}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Device Type<em>*</em></label>
+            <select class="form-control" id="device_type" formControlName="device_type"
+              [ngClass]="{'is-invalid' : mobileFormErrors.device_type}">
+              <option [value]="''" disabled>Select</option>
+              <option [value]="'Smartphone'">Smartphone</option>
+              <option [value]="'Tablet'">Tablet</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.device_type">
+              {{mobileFormErrors.device_type}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="datacenter">
+            <label class="font-col-form-label" for="dcId">Datacenter<em>*</em></label>
+            <select id="dcId" class="form-control" formControlName="uuid"
+              [class.is-invalid]="mobileFormErrors.datacenter.uuid">
+              <option value="" disabled>Select Datacenter</option>
+              <option *ngFor="let dc of datacenters" [value]="dc.uuid">{{dc.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.datacenter.uuid">
+              {{mobileFormErrors.datacenter.uuid}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Tagged Device</label>
+            <input id="tagDevices" name="tagDevices" autocomplete="off" class="form-control" type="text"
+              [(ngModel)]="asyncSelected" [ngModelOptions]="{standalone: true}" [typeaheadAsync]="true"
+              typeaheadOptionField="name" [typeahead]="dataSource" typeaheadWaitMs="1000"
+              (typeaheadOnSelect)="typeaheadOnSelect($event)" [typeaheadScrollable]="true" [typeaheadMinLength]="0"
+              placeholder="Search" [ngClass]="{'is-invalid' : tagDeviceErr}">
+            <div class="invalid-feedback" *ngIf="tagDeviceErr">
+              Select platform to tag device</div>
+          </div>
+          <div *ngIf="mobileForm.get('collector')" class="form-group col-6" formGroupName="collector">
+            <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+            <select id="collectoruuid" class="form-control" formControlName="uuid"
+              [class.is-invalid]="mobileFormErrors.collector.uuid">
+              <option value="" disabled>Select Collector</option>
+              <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="mobileFormErrors.collector">{{mobileFormErrors.collector.uuid}}</div>
+          </div>
+          <unity-devices-custom-attributes-crud [deviceType]="deviceType" [deviceAttrs]="mobileForm?.get('custom_attribute_data')?.value" class="w-100"></unity-devices-custom-attributes-crud>
+          <div class="form-group col-12">
+            <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+              <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+              </tag-input-dropdown>
+            </tag-input>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmitCreate()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="mobileModelRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmMobileDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This Mobile Device will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmitDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmMobileDeleteModalRef.hide()"
+        type="button">No</button>
+    </div>
+  </div>
+</ng-template>

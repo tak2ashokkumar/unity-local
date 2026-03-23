@@ -1,0 +1,51 @@
+<style type="text/css">
+    .pagemargin .page_wrapper {
+        background-color: #FFFFFF;
+        width: 100%;
+        -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        padding: 20px;
+        padding-bottom: 60px;
+        padding-top: 0px;
+    }
+
+    .dataTables_filter input[type="search"] {
+        border: 2px solid #E4E4E4;
+        border-radius: 2px;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .dataTables_length select {
+        border: 1px solid #E4E4E4;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .table th {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        /*height: 50px !important;*/
+    }
+
+    .table td {
+        padding: 8px 13px !important;
+    }
+</style>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object={{model.results}}></loading>
+    <div class="pagemargin">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color top_shadow" ng-show="model.results !== undefined"
+            style="padding-left:0px;">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 pull-right" ng-class="{'padding_top15px' : disable_action_btn}">
+                <div class="action-bar pull-right" ng-class="{'table-button' : !disable_action_btn}">
+                    <button class="btn btn-primary" type="button" ng-click="ctrl.add()" style="margin-left:20px;"> Add
+                        Organization</button>
+                </div>
+            </div>
+        </div>
+        <model-results-admin></model-results-admin>
+    </div>
+</div>

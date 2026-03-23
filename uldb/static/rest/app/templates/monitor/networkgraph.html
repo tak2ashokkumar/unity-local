@@ -1,0 +1,76 @@
+<div class="row">
+  <div class="col-sm-10">
+   <h3>Network Utilization</h3>
+   <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+  
+</div>
+
+
+<div class="divpad" ng-app="uldb">
+
+  <div>
+    <form class="form-inline">
+      <div class="form-group">
+        <label for="orgName">Organization</label>
+        <input type="text" id="orgName" class="form-control ticketing"
+               ng-model="org"
+               placeholder="Type org to search..."
+               typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="">
+      </div>
+
+      <button type="button" class="btn btn-success" ng-click="loadPorts(org)" ng-if="org">
+        Load Ports
+      </button>
+
+    </form>
+
+    
+
+  </div>
+
+  <div style="height: 20px"></div>
+
+  <div class="panel panel-primary" ng-if="org">
+    <div class="panel-heading">
+      Graphed Ports
+    </div>
+    <div class="panel-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="resulttable-head">
+          <tr>
+            <th>Switch</th>
+            <th>Port Name</th>
+            <th>Graph</th>
+          </tr>
+          </thead>
+
+          <tbody ng-repeat="graphed_port in graphed_ports" border="1">
+          <tr>
+            <td>{{ graphed_port.switch.name }}</td>
+            <td>{{ graphed_port.interface_name }}</td>
+            <td>
+              <div class="getgraph" title="Graph">
+                <button type="button" class="btn btn-primary" ng-click="getGraph2(graphed_port, 'day')">Graph</button>
+            </td>
+          </tr>
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-primary" ng-if="switch || !switch.switchmonitor">
+    <div class="panel-body">
+      <nvd3 options="options" data="data"></nvd3>
+    </div>
+  </div>
+</div>
+
+

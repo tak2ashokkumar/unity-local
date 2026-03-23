@@ -1,0 +1,51 @@
+@import "variables";
+
+strong.h4 {
+  font-size: 1rem;
+}
+
+.info-value {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.device-status {
+  font-size: 1rem;
+}
+
+.pdu-info-name {
+  font-size: 0.9rem;
+  font-weight: bolder;
+}
+
+.pdu-info-value {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.text-value {
+  font-size: 0.875rem;
+}
+
+[class^="text-value"] {
+  font-weight: 600;
+}
+
+.text-warning {
+  color: #ff8800 !important;
+}
+
+.status-icon .fa {
+  font-size: 1rem;
+}
+
+.blinking {
+  animation: blinker 1s linear infinite;
+  color: $red;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,80 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+
+  <zendeskticketsdetails></zendeskticketsdetails>
+
+  <style type="text/css">
+    .btn.attachment_btn {
+      margin-right: 5px; padding:5px 10px;
+    }
+    .btn.attachment_btn:hover, .btn.attachment_btn:focus {
+      background-color: #204d74 !important;
+    }
+    .times_icon {
+      margin-left: 10px; 
+      color : #fff; 
+      text-decoration : none; 
+      font-weight: bold;
+    }
+  </style>
+
+  <script type="text/ng-template" id="createRequestModal.html">
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="cancel()">&times;</button>
+      <span class="modal-title"> Create New Ticket</span>
+    </div>
+    <div class="modal-form">
+        <form role="form" name="create_ticket_form">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div ng-if="userZendeskCheckMsg !== undefined">
+                  <label style="color:red">{{ userZendeskCheckMsg }}</label>
+                </div>
+                <div class="form-group">
+                    <label for="">Subject*</label>
+                    <span class="errormsg" ng-if="ticket_subject_errmsg">({{ ticket_subject_errmsg }})</span>
+                    <input name="subject" placeholder="What is your issue about?" required="required" autofocus class="form-control" type="text" ng-class="{'has-error': ticket_subject_errmsg }" ng-model="request.subject" />
+                </div>
+                <div class="form-group">
+                    <label for="collaborators">CC</label>
+                    <span ng-repeat="collaborator in collaborators"> {{collaborator}}</span>
+                    <input name="collaborators" id="collaborators" placeholder="example@unityonecloud.com" class="form-control" type="text" ng-model="request.collaborators"/>
+                </div>
+                <div class="form-group">
+                    <label for="">Priority*</label>
+                    <span class="errormsg" ng-if="ticket_priority_errmsg">({{ ticket_priority_errmsg }})</span>
+                    <select ng-options="option.long for option in ticket_priority_list track by option.short"
+                      class="form-control" required="required" ng-class="{'has-error': ticket_priority_errmsg }" ng-model="request.priority">
+                          <option value="">Select priority</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="">Description*</label>
+                    <span class="errormsg" ng-if="ticket_desc_errmsg"> ({{ ticket_desc_errmsg }})</span>
+                    <textarea rows="10"  placeholder="Describe your issue here." required="required" class="form-control" type="text" ng-model="request.description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="">Attachments : </label>
+                    <button ngf-select="uploadFiles($files)" multiple ngf-max-size="20MB">Select Attachments</button><br>
+                </div>
+                <div class="form-group">
+                    <ul>
+                       <li class="btn btn-primary attachment_btn" ng-repeat="attachment in attachments">
+                           {{attachment.name}}
+                           <a ng-click="remove_attachment($index,attachment)" class="times_icon">
+                               <span>&times;</span>
+                           </a>
+                       </li>
+                   </ul>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+        <span uib-tooltip="{{userZendeskCheckMsg}}">
+          <button class="btn btn-default" ng-click="createRequest(request, 'task')" type="submit" ng-class="{'fa-disabled': (userZendeskCheckMsg !== undefined) }"> Create Ticket</button>
+        </span>
+    </div>
+  </script>
+
+</div>

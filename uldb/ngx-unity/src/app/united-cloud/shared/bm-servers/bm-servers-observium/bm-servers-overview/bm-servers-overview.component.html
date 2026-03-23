@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-6">
+    <div class="row">
+      <div class="col">
+        <bm-server-overview-details [deviceId]="deviceId"></bm-server-overview-details>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <bm-server-overview-ports [deviceId]="deviceId"></bm-server-overview-ports>
+      </div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="row">
+      <div class="col">
+        <bm-server-overview-processors [deviceId]="deviceId"></bm-server-overview-processors>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <bm-server-overview-memory [deviceId]="deviceId"></bm-server-overview-memory>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col" *ngIf="deviceStatus">
+        <device-status [input]="deviceStatus"></device-status>
+      </div>
+    </div>
+    <div class="row" *ngFor="let sensor of sensors">
+      <div class="col">
+        <device-sensor [input]="sensor"></device-sensor>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<md-card>
+  <md-card-title>
+    <a href="#datacenter/{{ dcenter.id }}/">
+      <span style="display: inline-block">{{ dcenter.name }}, {{ dcenter.location.name }}</span></a>
+  </md-card-title>
+  <md-card-content>
+    <div class="col-lg-12 pad-small">
+      <div class="progress-item">
+        <div class="col-md-5 device-text progress-text">Hosts</div>
+        <div class="progress col-md-7 ">
+          <div class="progress-bar progress-bar-success" role="progressbar"
+               style="width:{{ host_widths['normal'] }}%">{{ dcenter.host_stats.normal }}</div>
+          <div class="progress-bar progress-bar-warning" role="progressbar"
+               style="width:{{ host_widths['warning'] }}%">{{ dcenter.host_stats.warning }}</div>
+          <div class="progress-bar progress-bar-danger" role="progressbar"
+               style="width:{{ host_widths['critical']  }}%">{{ dcenter.host_stats.critical }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 pad-small">
+      <div class="progress-item">
+        <div class="col-md-5 device-text progress-text">
+          Services
+        </div>
+        <div class="progress col-md-7 ">
+
+          <div class="progress-bar progress-bar-success" role="progressbar"
+               style="width:{{ serv_widths['normal'] }}%">{{ dcenter.service_stats.normal }}</div>
+          <div class="progress-bar progress-bar-warning" role="progressbar"
+               style="width:{{ serv_widths['warning'] }}%">{{ dcenter.service_stats.warning }}</div>
+          <div class="progress-bar progress-bar-danger" role="progressbar"
+               style="width:{{ serv_widths['critical'] }}%">{{ dcenter.service_stats.critical }}</div>
+        </div>
+      </div>
+      <div class="progress-item">
+        <div class="col-md-5 device-text progress-text">
+          Throughput
+        </div>
+        <div class="col-md-7 ">
+          <span>{{ round_throughput(dcenter.throughput) }}</span>
+        </div>
+      </div>
+    </div>
+    <ng-transclude></ng-transclude>
+  </md-card-content>
+</md-card>
+

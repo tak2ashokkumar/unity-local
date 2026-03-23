@@ -1,0 +1,23 @@
+@import "variables";
+
+.cabinet-table {
+  border-collapse: inherit;
+}
+table {
+  border: 8px ridge #acb4bc;
+  background-color: #292929;
+}
+td {
+}
+tr,
+td,
+tbody {
+  border-collapse: collapse !important;
+}
+.table1 td {
+  //   padding: 0;
+}
+.table2 td {
+  border: none;
+  padding: 0;
+}

@@ -1,0 +1,217 @@
+<div class="row dashboard-admin">
+    <div class="col-lg-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-6 pinnewcustitle pull-left">
+                        <i class="fa fa-clock-o fa-fw"></i>
+                        {{heading}}
+                    </div>
+                    <div ng-if="modeldata != undefined" >
+                        <div class="col-md-1" >
+                            <a class="fa fa-plus-square fa-2x pull-right" aria-hidden="true" ng-click="openModal('Add')"></a>
+                        </div>
+                    </div>
+                    <div ng-if="addbutton != undefined" class="pull-right" >
+                        <div class="col-md-1" ng-if="addbutton == 'ms_add'" >
+                            <a class="fa fa-plus-square fa-2x" aria-hidden="true" href="/admin#/maintenance-schedules"></a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 pinnewcus pull-right">
+                        <input
+                            class="form-control custom_search_field"
+                            type="text"
+                            ng-model="searchKeyword"
+                            placeholder="Search.."
+                            ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+
+                    </div>
+                </div> 
+            </div>
+
+            <div class="panel-body">
+                <span ng-if="!tabledata">
+                  <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+                </span>
+                <div class="dataTable_wrapper content_settings">
+                    <span ng-if="tabledata.length == 0">
+                      <h3 class="align-center">No records to display</h3>
+                    </span>
+                    <span ng-if="tabledata.length != 0">
+                        <table
+                            class="table table-hover"
+                            id="dataTables-example"
+                            float-thead="{top: 20, position: 'absolute', scrollContainer: true};"
+                            ng-model="tabledata">
+                            <thead>
+                            <tr>
+                                <th ng-repeat="row in headers" class="fixed_th">{{ row.title }}</th>
+                                <th ng-if="actions != undefined" class="fixed_th">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in tabledata | filter: searchKeyword">
+                                    <td ng-repeat="row_data in headers">
+                                        <div ng-if = "row_data.decorator == undefined">
+                                            {{row[row_data.key]| date:'medium'}}
+                                        </div>
+                                        <div ng-if = "row_data.decorator">
+                                            {{decorate(row_data.decorator,row[row_data.key])}}
+                                        </div>
+                                    </td>
+                                    <td ng-if="actions != undefined">
+                                        <div class="btn-group">
+                                            <button
+                                                type="button"
+                                                class="btn btn-default dropdown-toggle"
+                                                data-toggle="dropdown"
+                                                aria-haspopup="true"
+                                                aria-expanded="false">
+                                                Actions
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu actions_menu action-button">
+                                                <li ng-repeat="action in actions" data-toggle="collapse" data-target=".nav-collapse">
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading != 'Server (VM)') &&
+                                                        (heading != 'Tenant') &&
+                                                        (heading != 'Flavors') &&
+                                                        (heading != 'Hypervisors')"
+                                                        href="{{action.link}}">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading == 'Server (VM)')"
+                                                        href="{{action.link}}/server/{{row.id}}">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading == 'Tenant')"
+                                                        href="{{action.link}}{{row.id}}">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading == 'Hypervisors')"
+                                                        href="{{action.link}}{{row.hypervisor_id}}">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading == 'Flavors') &&
+                                                        (!row.is_public)"
+                                                        href="{{action.link}}{{row.flavor_id}}/flavoraccess/">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="
+                                                        (action.button != undefined) &&
+                                                        (action.button != 'edit_vcenter') &&
+                                                        (action.button != 'create_vm') &&
+                                                        (action.button != 'create_resource_pool') &&
+                                                        (action.button != 'power_on') &&
+                                                        (action.button != 'power_off') &&
+                                                        (action.button != 'edit_tenant') &&
+                                                        (action.button != 'create_snapshot') &&
+                                                        (action.button != 'create_hypervisor') &&
+                                                        (action.button != 'create_cluster') &&
+                                                        (action.button != 'add_volume') &&
+                                                        (action.button != 'access_information') &&
+                                                        (action.button != 'remove_general_tenant')"
+                                                        ng-click="openModal(action.button, row)">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="action.button == 'create_hypervisor'" ng-click="openModal(action.button,row)">{{action.name}}</a>
+
+                                                    <a ng-if="action.button == 'edit_tenant'" ng-click="openModal(action.button,row)">{{action.name}}</a>
+
+                                                    <a ng-if="action.button == 'create_cluster'" ng-click="openModal(action.button,row)">{{action.name}}</a>
+
+                                                    <a ng-if="
+                                                        (action.button == 'remove_general_tenant') &&
+                                                        (row.name != 'admin')"
+                                                        ng-click="openModal(action.button,row)">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="action.button == 'create_snapshot'" ng-click="openModal(action.button,row)">{{action.name}}</a>
+
+                                                    <a ng-if="
+                                                        ((action.button == 'create_vm')&&
+                                                        (row.hosts != '0'))"
+                                                        ng-click="openModal(action.button,row)">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="
+                                                        ((action.button == 'create_resource_pool') &&
+                                                        (row.hosts != '0'))"
+                                                        ng-click="openModal(action.button,row)">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="action.button == 'edit_vcenter'" ng-click="openModal(action.button,row)">{{action.name}}</a>
+
+                                                    <a ng-if="
+                                                        ((action.button == 'power_on') &&
+                                                        (row.state != 'poweredOn')) ||
+                                                        ((action.button == 'power_off') &&
+                                                        (row.state != 'poweredOff'))" ng-click="openModal(action.button,row)">
+                                                        {{action.name}}
+                                                    </a>
+
+                                                    <a ng-if="action.button == 'add_volume'" ng-click="openModal(action.button, row)">{{action.name}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <br>
+    </div>
+</div>
+<br/>
+<modal visible="showModal">
+    <ng-include src="modeldata.page"></ng-include>
+</modal>
+<modal1 visible="showModal1">
+    <ng-include src="modeldata1.page"></ng-include>
+</modal1>
+
+<modal2 visible="showModal2">
+    <ng-include src="modeldata2.page"></ng-include>
+</modal2>
+<modal3 visible="showModal3">
+    <ng-include src="modeldata3.page"></ng-include>
+</modal3>
+<modal4 visible="showModal4">
+    <ng-include src="modeldata4.page"></ng-include>
+</modal4>
+<modal5 visible="showModal5">
+    <ng-include src="modeldata5.page"></ng-include>
+</modal5>
+<modal6 visible="showModal6">
+    <ng-include src="modeldata6.page"></ng-include>
+</modal6>
+<modal7 visible="showModal7">
+    <ng-include src="modeldata7.page"></ng-include>
+</modal7>
+<modal8 visible="showModal8">
+    <ng-include src="modeldata8.page"></ng-include>
+</modal8>
+<modalvmtenant visible="showModal_vm_tenant">
+    <ng-include src="modeldatavmtenant.page"></ng-include>
+</modalvmtenant>

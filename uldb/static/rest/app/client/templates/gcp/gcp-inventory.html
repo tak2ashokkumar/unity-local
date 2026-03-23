@@ -1,0 +1,51 @@
+<style type="text/css">
+  @media only screen  and (min-device-width: 1024px)  and (max-device-width: 1300px)  and (min-resolution: 190dpi){
+    .tabs-level1 .nav-tabs>li>a {
+        margin-right: 2px;
+        padding: 1px 6px;
+    }
+
+    .tabs-level1 .nav-tabs>li.active>a {
+        margin-right: 2px;
+        padding: 9px 6px;
+    }
+  }
+
+  @media (min-resolution: 90dpi ) and (max-resolution: 99dpi ) and (max-width: 1380px){
+    .tabs-level1 .nav-tabs>li>a {
+        margin-right: 2px;
+        padding: 1px 6px;
+    }
+
+    .tabs-level1 .nav-tabs>li.active>a {
+        margin-right: 2px;
+        padding: 9px 6px;
+    }
+  }
+</style>
+
+<loading loader="{{loader}}"></loading>
+
+<div class="row" style="height: 30px;" ng-class="{'margin_top_minus_10px' : !sub_menu_tabs}">
+    
+    <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 fullheight pull-left">
+        <div class="ui-selectee fullheight">
+        <!-- <div id="tabs-ui-171882" class="mytabsclass"> -->
+            <nav class="column maintabs fullheight">
+                <uib-tabset active="activeTab" style="background : none;">
+                    <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{tab.tabname}}"
+                    select="getTabData(tab)" disable="tab.disabled"></uib-tab>
+                </uib-tabset>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 company-name pull-right" style="padding-right: 15px !important;">
+        <a href="" ng-click="goToPreviousPage()" style="padding-top:0px;width: 100%;" class="menubackoption">
+          <i  style="font-size: 14px; padding-top: 7px;padding-right: 5px;" class="fa fa-arrow-left" aria-hidden="true"></i>
+          <span style="font-size:15px;">GCP Dashboard</span>
+        </a>
+    </div>
+</div>
+
+<div ui-view></div>

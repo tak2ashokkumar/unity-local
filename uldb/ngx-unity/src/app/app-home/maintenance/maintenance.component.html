@@ -1,0 +1,111 @@
+<div class="card equalize-card maintenance-widget" [widgetLazyLoader]="{ttw:500}" (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="'dashboard_maintenance_widget'"></app-spinner>
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title font-lg">
+    <div class="row">
+      <div class="col-12">
+        <a class="d-block text-truncate font-lg text-dark text-decoration-none h4 mb-0" (click)="goTo()">
+          Maintenance <small class="text-muted font-sm float-right">All Clouds </small>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="card-body pt-0" *ngIf="!showEvents">
+    <div class="row text-center month-row font-weight-normal text-center py-2 px-0 text-dark">
+      <div class="col-md-2">
+        <a mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+          (viewDateChange)="viewDateChange.next(viewDate)">
+          <i class="fa  fa-angle-left" aria-hidden="true"></i>
+        </a>
+      </div>
+      <div class="col-md-8">
+        <span class="month-name">{{ viewDate | calendarDate: view + 'ViewTitle':locale }}</span>
+      </div>
+      <div class="col-md-2">
+        <a mwlCalendarNextView [view]="view" [(viewDate)]="viewDate" (viewDateChange)="viewDateChange.next(viewDate)">
+          <i class="fa  fa-angle-right" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="row">
+      <ng-template #customCellTemplate let-day="day" let-locale="locale">
+        <div class="cal-cell-top">
+          <span [ngClass]="(day.events.length > 0) ? 'cal-day-badge' : 'cal-day-number '">{{ day.date |
+            calendarDate:'monthViewDayNumber':locale }}</span>
+        </div>
+      </ng-template>
+      <mwl-calendar-month-view [viewDate]="viewDate" [events]="mSchedulesViewData" [cellTemplate]="customCellTemplate"
+        (dayClicked)="dayClicked($event.day)" class="w-100">
+      </mwl-calendar-month-view>
+    </div>
+  </div>
+  <div class="card-body pt-0 maintenance" *ngIf="showEvents">
+    <div class="row schedules-list">
+      <ul class="pl-4 list-unstyled w-100">
+        <li *ngFor="let event of events" class="text-truncate">
+          <span class="d-inline-block pull-left event-bullet mt-2 mr-2 rounded border-0"></span>
+          <a class="text-primary" (click)="showEventDetails(event)">{{ event.title }}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="row pull-right mr-1">
+      <button class="action-icons mb-0 fa fa-chevron-left font-sm ml-1" (click)="showCalendar()"></button>
+    </div>
+  </div>
+</div>
+
+<ng-template #eventInfo>
+  <div class="card mb-0">
+    <div class="card-header">
+      <h3 class="modal-title">Maintenance Schedule Details</h3>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col">
+          <table class="table text-left">
+            <tbody>
+              <tr>
+                <td class="w-25">
+                  <b>Title</b>
+                </td>
+                <td class="w-75">{{eventDetails.title}}</td>
+              </tr>
+              <tr>
+                <td class="w-25">
+                  <b>Status</b>
+                </td>
+                <td class="w-75">{{eventDetails.status}}</td>
+              </tr>
+              <tr>
+                <td class="w-25">
+                  <b>Datacenter</b>
+                </td>
+                <td class="w-75">{{eventDetails.dataCenter}}</td>
+              </tr>
+              <tr>
+                <td class="w-25">
+                  <b>Start Date</b>
+                </td>
+                <td class="w-75">{{eventDetails.start | date:'medium'}}</td>
+              </tr>
+              <tr>
+                <td class="w-25">
+                  <b>End Date</b>
+                </td>
+                <td class="w-75">{{eventDetails.end | date:'medium'}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right" (click)="modalRef.hide()" type="button">OK</button>
+    </div>
+  </div>
+</ng-template>

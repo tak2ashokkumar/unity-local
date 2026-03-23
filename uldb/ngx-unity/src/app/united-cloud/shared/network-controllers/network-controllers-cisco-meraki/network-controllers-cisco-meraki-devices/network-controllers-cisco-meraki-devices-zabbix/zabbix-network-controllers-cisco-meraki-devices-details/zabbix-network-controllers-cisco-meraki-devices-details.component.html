@@ -1,0 +1,160 @@
+<div class="row">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span> Details</span>
+                    </div>
+                    <div class="">
+                        <button class="action-icons fas fa-angle-down font-sm pull-right mr-2"
+                            [tooltip]="isDetailsOpen ? 'Minimize' : 'Expand'" (click)="toggleAccordion()"
+                            [attr.aria-expanded]="isDetailsOpen"></button>
+                    </div>
+                </div>
+                <div class="card-body" [collapse]="!isDetailsOpen">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="name" class="col-3 col-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="meraki_organization_name" class="col-3 col-form-label">Organization</label>
+                                <div class="col-9">
+                                    <input id="meraki_organization_name" class="form-control" type="text"
+                                        formControlName="meraki_organization_name">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="device_serial" class="col-3 col-form-label">Device Serial</label>
+                                <div class="col-9">
+                                    <input id="device_serial" class="form-control" type="text"
+                                        formControlName="device_serial">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="device_product_type" class="col-3 col-form-label">Device Product
+                                    Type</label>
+                                <div class="col-9">
+                                    <input id="device_product_type" class="form-control" type="text"
+                                        formControlName="device_product_type">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="device_model" class="col-3 col-form-label">Device Type</label>
+                                <div class="col-9">
+                                    <input id="device_model" class="form-control" type="text"
+                                        formControlName="device_model">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="meraki_network_name" class="col-3 col-form-label">Network</label>
+                                <div class="col-9">
+                                    <input id="meraki_network_name" class="form-control" type="text"
+                                        formControlName="meraki_network_name">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="device_ip" class="col-3 col-form-label">Device LAN IP</label>
+                                <div class="col-9">
+                                    <input id="device_ip" class="form-control" type="text" formControlName="device_ip">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form *ngIf="metaDataForm" [formGroup]="metaDataForm">
+
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span>Metadata</span>
+                    </div>
+                    <div class="">
+                        <button class="action-icons fas fa-angle-down font-sm pull-right mr-2"
+                            [tooltip]="isMetadataOpen ? 'Minimize' : 'Expand'" (click)="toggleMetadataAccordian()"
+                            [attr.aria-expanded]="isMetadataOpen"></button>
+                    </div>
+                </div>
+                <div class="card-body" [collapse]="!isMetadataOpen">
+                    <div class="row text-right">
+                        <div class="col-6">
+
+                            <div class="form-group row">
+                                <label for="configuration_updated_at" class="col-3 col-form-label">configuration
+                                    updated</label>
+                                <div class="col-9">
+                                    <input id="configuration_updated_at" class="form-control" type="text"
+                                        formControlName="configuration_updated_at" formControlNameDateFormatter>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="mac_address" class="col-3 col-form-label">Mac Address</label>
+                                <div class="col-9">
+                                    <input id="mac_address" class="form-control" type="text"
+                                        formControlName="mac_address">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="latitude" class="col-3 col-form-label">Latitude</label>
+                                <div class="col-9">
+                                    <input id="latitude" class="form-control" type="text" formControlName="latitude">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="firmware" class="col-3 col-form-label">Firmware</label>
+                                <div class="col-9">
+                                    <input id="firmware" class="form-control" type="text" formControlName="firmware">
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="asset_tag" class="col-3 col-form-label">Asset Tag</label>
+                                <div class="col-9">
+                                    <input id="asset_tag" class="form-control" type="text" formControlName="asset_tag">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="address" class="col-3 col-form-label">Address</label>
+                                <div class="col-9">
+                                    <input id="address" class="form-control" type="text" formControlName="address">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="longitude" class="col-3 col-form-label">Longitude</label>
+                                <div class="col-9">
+                                    <input id="longitude" class="form-control" type="text" formControlName="longitude">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-12 mb-4" *ngIf="deviceId && device.deviceType && view">
+        <device-details-components [deviceType]="device.deviceType" [deviceId]="deviceId"></device-details-components>
+    </div>
+</div>

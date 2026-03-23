@@ -1,0 +1,36 @@
+<div class="card" [class.border-danger]="dataError" appWidgetLazyLoader (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="meshServiceData.loaderName"></app-spinner>
+  <div class="card-body ">
+    <div class="row">
+      <div class="col-12">
+        <a class="d-inline-block font-lg text-dark text-decoration-none h4" (click)="goTo(meshServiceData.drillDownLink)">{{meshServiceData.name}}
+          - <small class="text-muted font-sm">{{meshServiceData.displayType}}</small></a>
+        <span class="pull-right fas fa-exclamation-triangle text-warning font-lg" [tooltip]="dataError" container="body"
+          *ngIf="dataError"></span>
+      </div>
+    </div>
+    <div class="row mt-2" [class.disabled-widget]="dataError">
+      <div class="col-sm-6 border-right">
+        <div style="display:flex; flex-direction:column">
+          <div style="flex-grow:1; height:120px; position:relative">
+            <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins" [options]="appMeshWidgetChartOptions"
+              [data]="appMeshWidgetChartData" [colors]="appMeshWidgetChartColors" [labels]="appMeshWidgetChartLabels"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm">
+        <div class="row pt-4">
+          <div class="col-6 text-center">
+            <div class="text-value">{{appMeshWidgetViewData.meshCount}}</div>
+            <div class="text-muted small">Mesh Services</div>
+          </div>
+          <div class="col-6 text-center">
+            <div class="text-value">{{appMeshWidgetViewData.rutesCount}}</div>
+            <div class="text-muted small">Routes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

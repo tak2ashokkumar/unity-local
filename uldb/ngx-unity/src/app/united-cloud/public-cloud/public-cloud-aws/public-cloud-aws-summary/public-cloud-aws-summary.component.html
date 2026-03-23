@@ -1,0 +1,289 @@
+<div class="row">
+    <div class="col-6">
+        <div class="row">
+            <div class="col-6">
+                <div class="card mb-2">
+                    <div class="card-body d-flex justify-content-between">
+                        <img [src]="imageUrl" class="w-40" style="height: 30px;
+                        max-width: -webkit-fill-available;
+                        max-height: -webkit-fill-available;" />
+                        <div class="text-primary text-value">{{CustomerListViewData?.totalAwsAccounts}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-2">
+                    <div class="card-body d-flex justify-content-between">
+                        <div class="text-value">Cost</div>
+                        <div class="text-primary text-value">
+                            ${{CustomerListViewData?.totalCost}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body d-flex justify-content-between ">
+                        <div class="text-value">Resources</div>
+                        <div class="text-primary text-value pointer-link" (click)="redirectToResourceDetails()">
+                            {{CustomerListViewData?.totalResources}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body d-flex justify-content-between ">
+                        <div class="text-value">Alerts</div>
+                        <div class="text-primary d-flex align-items-baseline text-value">
+                            <div class="ml-2">
+                                <span class="text-primary pointer-link mr-3 text-value" (click)="gotToAIMLPage()"
+                                    accessControl moduleName="AIML Event Management"
+                                    accessType="View AIML Event Management"
+                                    elementType="div">{{CustomerListViewData?.totalEvent}}</span>
+                                <span class="fas fa-exclamation-triangle text-danger font-xs-sm"></span>
+                                <span
+                                    class="text-primary font-xs-sm ml-1">{{CustomerListViewData?.totalCriticalAlerts}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-exclamation-circle text-warning font-xs-sm"></span>
+                                <span
+                                    class="text-primary font-xs-sm ml-1">{{CustomerListViewData?.totalWarningAlerts}}</span>
+                            </div>
+                            <div class="ml-2">
+                                <span class="fas fa-info-circle text-primary font-xs-sm"></span>
+                                <span
+                                    class="text-primary font-xs-sm ml-1">{{CustomerListViewData?.totalInformationAlerts}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card mb-2" *ngFor="let view of CustomerListViewData?.accountDetails">
+                    <div class="card-body py-2">
+                        <div class="row">
+                            <div class="col-6 d-flex flex-column">
+                                <div class="text-primary mb-2 text-value pointer-link" (click)="edit(view)"
+                                    accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                    elementType="div">
+                                    {{view?.accountName}}</div>
+                                <div class="text-primary text-value pointer-link" (click)="goToCostAnalysis(view)"
+                                    accessControl moduleName="Cost Analysis" accessType="View Cost Analysis"
+                                    elementType="div">
+                                    ${{view?.currentMonthCost.amount}}</div>
+                            </div>
+                            <div class="col-6 d-flex flex-column text-right">
+                                <div class="mb-2">
+                                    <span class="text-primary mr-2 text-value pointer-link"
+                                        (click)="showServices(view)">{{view?.totalServicesCount}}</span>
+                                    <span class="text-muted text-sm mr-2">Services</span>
+                                    <span class="border border-secondary mb-5"></span>
+                                    <span class="text-primary mx-2 text-value pointer-link"
+                                        (click)="redirectToResourceDetailsFromAccount(view)">{{view?.totalResourceCount}}</span>
+                                    <span class="text-muted text-sm mr-2">Resources</span>
+                                    <span class="border border-secondary mb-5"></span>
+                                    <span class="text-primary ml-2 text-value">{{view?.totalAlertEventCount}}</span>
+                                    <span class="text-muted text-sm ml-2">Alerts</span>
+                                </div>
+                                <div>
+                                    <button class="action-icons mb-0 fas fa-sync font-sm ml-1" (click)="syncNow(view)"
+                                        [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
+                                        [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}" accessControl
+                                        moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                        elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
+                                        tooltip="Schedule History" (click)="getScheduleHistory(view)"></button>
+                                    <button class="action-icons mb-0 fa fa-key font-sm ml-1" tooltip="Change API Keys"
+                                        (click)="changeAPIKeys(view)" accessControl moduleName="Public Cloud"
+                                        accessType="Manage Public Cloud" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1"
+                                        (click)="goToStats(view)" [tooltip]="view.statsTooltipMessage" accessControl
+                                        moduleName="Monitoring" accessType="View Monitoring" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                        tooltip="Manage by creating support ticket" (click)="createTicket(view)">
+                                    </button>
+                                    <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1"
+                                        tooltip="Delete Account" (click)="deleteAwsAccount(view)" accessControl
+                                        moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                        elementType="actionbtn">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center p-1">
+                <div>
+                    <span
+                        class="badge bg-secondary font-weight-bold ml-1 mt-1 rounded-circle p-2">{{serviceAndResourceViewData.totalResourceTypeCount}}</span>
+                    <span class="font-weight-bold ml-2">Services</span>
+                </div>
+                <div class="col-5 d-flex align-items-center justify-content-end">
+                    <div class="col-8 form-group mb-0 mr-3">
+                        <multiselect-dropdown class="form-control w-100 p-0" style="height:auto;"
+                            [options]="awsAccountData" [settings]="accountDetailsSettings" [texts]="accountDetailsTexts"
+                            [(ngModel)]="currentCriteria.multiValueParam.uuid"
+                            (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body  p-0">
+                <table class="table text-left font-xs-sm font-500 w-100 mb-0">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Service Name</th>
+                            <th>Resources</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let view of serviceAndResourceViewData?.resourceCounts">
+                        <tr>
+                            <td>
+                                <div>
+                                    <img [src]="view.iconPath" width="17" height="17" *ngIf="view.iconPath">
+                                    <span class="ml-2">{{view.name}}</span>
+                                </div>
+                            </td>
+                            <td class="tdw-10 text-primary">
+                                <div class="text-primary pointer-link" (click)="redirectToResourceDetails(view)">
+                                    {{view.resourceCount}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center text-muted p-4" *ngIf="!serviceAndResourceViewData.resourceCounts.length">No
+                    associated Services for this Account was found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteAwsModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This AWS account will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteAwsAccount()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteAwsModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #accessKey>
+    <div class="card mb-0">
+        <div class="card-header">
+            Change API Keys
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="accessKeyModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="accessKeyForm" [formGroup]="accessKeyForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="accessKeyFormErrors.error">{{accessKeyFormErrors.error}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="access_key">Access Key<em>*</em></label>
+                    <input class="form-control" id="access_key" type="text" formControlName="access_key"
+                        [ngClass]="{'is-invalid' : accessKeyFormErrors.access_key}">
+                    <div class="invalid-feedback" *ngIf="accessKeyFormErrors.access_key">
+                        {{accessKeyFormErrors.access_key}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="secret_key">Secret Key<em>*</em></label>
+                    <input class="form-control" id="secret_key" type="password" formControlName="secret_key"
+                        [ngClass]="{'is-invalid' : accessKeyFormErrors.secret_key}">
+                    <div class="invalid-feedback" *ngIf="accessKeyFormErrors.secret_key">
+                        {{accessKeyFormErrors.secret_key}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="updateAPIKeys()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="accessKeyModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #scheduleHistoryRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Schedule History
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body pt-0 pb-0">
+            <div class="row mt-1 mb-2">
+                <div class="col-3">
+                    <table-search-box (searched)="onSearched($event)"></table-search-box>
+                </div>
+                <div class="col-9">
+                    <div class="row justify-content-end mr-1">
+                        <table-page-size [currentPageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"
+                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+            </div>
+            <table class="table text-left">
+                <thead>
+                    <tr>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Executed By </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let view of scheduleHistory">
+                        <td>{{view.startedAt}}</td>
+                        <td>{{view.lastRun}}</td>
+                        <td>{{view.duration}}</td>
+                        <td class="{{view.statusClass}}">
+                            {{view.status}}
+                            <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+                        </td>
+                        <td>{{view.updatedBy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table-entries [pageNo]="scheduleHistoryCurrentCriteria.pageNo" [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                [totalCount]="scheduleHistoryCount"></table-entries>
+            <table-pager *ngIf="scheduleHistory.length" [pageNo]="scheduleHistoryCurrentCriteria.pageNo" [pageSize]="scheduleHistoryCurrentCriteria.pageSize"
+                [totalCount]="scheduleHistoryCount" (pageChange)="pageChange($event)"></table-pager>
+            <p *ngIf="scheduleHistory.length==0" class="text-center py-3">No history to display</p>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+        </div>
+    </div>
+</ng-template>

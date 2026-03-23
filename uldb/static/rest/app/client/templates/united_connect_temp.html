@@ -1,0 +1,58 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+  <loading loader="{{loader}}"></loading>
+  <div class="row page_wrapper">
+	<div class="col-xs-12 content-wrapper">
+        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+            <h1>VXC Connection Requests</h1>
+        </div>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget">
+            <form class="navbar-form">
+              <div class="form-group">
+                <input class="form-control" type="text" ng-model="searchKeyword" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+                <button class="btn btn-search" type="submit" style="top: 4px;">
+                <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </form>
+        </div>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+            <div class="action-bar table-button">
+              <span class="count">{{ ((vxc_list | filter: searchKeyword).length) || 0 }}</span>
+              <span class="count-text"> VXC's</span>
+              <button class="btn btn-default" type="button" ng-click="create_vxc_ticket()"> Buy VXC</button>
+            </div>
+        </div>
+	</div>
+  </div>
+  <div>
+    <div>
+      <section id="no-more-tables" class="margintop20 middle-wrapper">
+      <table class="display bg-color" cellspacing="0" width="100%" >
+        <tr>
+          <td>
+            <table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th>Requester</th>
+                  <th>Connection Type</th>
+                  <th>Ticket ID</th>
+                </tr>
+              </thead>
+              <tbody ng-if="vxc_list.length != 0">
+                <tr ng-repeat="vxc in vxc_list | filter: searchKeyword">
+                  <td>{{ vxc.requester_name }}</td>
+                  <td>{{ vxc.connection_type }}</td>
+                  <td><a href="/main#/zendesk/ticket/{{vxc.ticket_id}}">{{ vxc.ticket_id }}</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <div ng-if="vxc_list.length == 0 || ((vxc_list | filter: searchKeyword).length) == 0" class="content-wrapper">
+        <no-records-found message="No VXCs to display"></no-records-found>
+      </div>
+      </section>
+    </div>
+  </div>
+</div>

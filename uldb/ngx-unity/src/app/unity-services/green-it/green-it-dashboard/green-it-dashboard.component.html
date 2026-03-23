@@ -1,0 +1,174 @@
+<div class="card">
+    <div class="card-header bg-white border-bottom-0">
+        <div class="row">
+            <div class="col">
+                <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+            </div>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        <div class="row">
+            <div class="col-6">
+                <div class="card mb-0 border-0 equalize-card">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-3 text-center pl-0">
+                                <span class="badge badge-light w-100">
+                                    <div class="text-center py-3">
+                                        <div class="text-value">{{summaryData?.numberOfDatacenters}}</div>
+                                        <div class="text-muted mt-2">Datacenters</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="col-3 text-center pl-0">
+                                <span class="badge badge-light w-100">
+                                    <div class="text-center py-3">
+                                        <div class="text-value">{{summaryData?.numberOfDevices}}</div>
+                                        <div class="text-muted mt-2">Devices</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="col-3 text-center pl-0 pointer-link" (click)="goTo('gcp')">
+                                <span class="badge badge-light w-100">
+                                    <div class="text-center py-3">
+                                        <span *ngIf="!datacenterPublicCloudCo2SummarySpinner" class="fas fa-spinner fa-spin fa-2x"> </span>
+                                        <span class="text-value ">{{datacenterPublicCloudCo2Summary?.numberOfGcpAccounts}}</span>
+                                        <div class="text-muted mt-2">GCP Accounts</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="col-3 text-center pl-0 pointer-link" (click)="goTo('aws')">
+                                <span class="badge badge-light w-100">
+                                    <div class="text-center py-3">
+                                        <span *ngIf="!datacenterPublicCloudCo2SummarySpinner" class="fas fa-spinner fa-spin fa-2x"> </span>
+                                        <span class="text-value ">{{datacenterPublicCloudCo2Summary?.numberOfAwsAccounts}}</span>
+                                        <div class="text-muted mt-2">AWS Accounts</div>
+                                    </div>
+                                </span>
+                            </div>
+                            <div class="col-6 text-center mt-2">
+                                <!-- <div class="row"> -->
+                                <!-- <div class="col-9 d-inline-block text-right"> -->
+                                <span  class="badge badge-success p-5 rounded-circle">
+                                    <span *ngIf="!datacenterPublicCloudCo2SummarySpinner" class="fas fa-spinner fa-spin fa-2x"></span>
+                                    <h3>{{datacenterPublicCloudCo2Summary?.totalCo2Sum}} ton</h3>
+                                    <h3>CO2</h3>
+                                    <small>(Total infra per annum)</small>
+                                </span>
+                                <!-- </div> -->
+                                <!-- <div class="col-3 d-inline-block mt-5 pt-3 pl-0">
+                                        <span class="fas fa-long-arrow-alt-up text-success fa-4x"></span>
+                                        <span class="font-weight-bold">{{summaryData.percentageIncreaseInCo2}}%</span>
+                                    </div> -->
+                                <!-- </div> -->
+                            </div>
+                            <div class="col-6">
+                                <div class="row">
+                                    <div class="col-6 text-center pl-0 mt-3 d-flex align-items-stretch">
+                                        <span class="badge badge-light w-100">
+                                            <div class="text-center py-3 ">
+                                                <div class="text-value">{{summaryData?.totalPowerUsage}} kW h</div>
+                                                <div class="text-muted mt-2 pb-4">Total Power Usage</div>
+                                            </div>
+                                        </span>
+                                    </div>
+                                    <div class="col-6 text-center pl-0 mt-3 d-flex align-items-stretch">
+                                        <span class="badge badge-light w-100">
+                                            <div class="text-center py-3">
+                                                <div class="text-value text-wrap">
+                                                    {{summaryData?.manufacturerWithHighestCo2Emission}}</div>
+                                                <div class="text-muted mt-2 pd-3 text-wrap">Datacenter with Highest Carbon Emission
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
+                                    <div class="col-12 text-center pl-0 mt-3">
+                                        <span class="badge badge-light w-100">
+                                            <div class="text-center py-3">
+                                                <div class="text-value">{{summaryData?.deviceTypeWithHighestCo2Emission}}
+                                                </div>
+                                                <div class="text-muted mt-2">Device Type with Highest Carbon Emission
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6" *ngIf="!mapService.mapHidden">
+                <div class="card mb-0 equalize-card">
+                    <div class="card-body p-1">
+                        <sustainability-map></sustainability-map>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-6">
+                <div class="card mb-0 border-0 equalize-card">
+                    <div class="card-body py-0 chart-block">
+                        <canvas *ngIf="dcChartData" baseChart [chartType]="dcChartData.type"
+                            [labels]="dcChartData.lables" [datasets]="dcChartData.datasets"
+                            [options]="dcChartData.options" [plugins]="dcChartData.plugins"
+                            [legend]="dcChartData.legend" height="180" [colors]="dcChartData.colors"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-0 border-0">
+                    <div class="card-body py-0 chart-block">
+                        <canvas *ngIf="deviceTypeChartData" baseChart [chartType]="deviceTypeChartData.type"
+                            [labels]="deviceTypeChartData.lables" [datasets]="deviceTypeChartData.datasets"
+                            [options]="deviceTypeChartData.options" [plugins]="deviceTypeChartData.plugins"
+                            [legend]="deviceTypeChartData.legend" [colors]="deviceTypeChartData.colors"
+                            height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-0 border-0 equalize-card">
+                    <div class="card-body py-0 chart-block">
+                        <canvas *ngIf="pcChartData" baseChart [chartType]="pcChartData.type"
+                            [labels]="pcChartData.lables" [datasets]="pcChartData.datasets"
+                            [options]="pcChartData.options" [plugins]="pcChartData.plugins"
+                            [legend]="pcChartData.legend" height="180" [colors]="pcChartData.colors"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-0 border-0">
+                    <div class="card-body py-0 chart-block">
+                        <canvas *ngIf="quarterChartData" baseChart [chartType]="quarterChartData.type"
+                            [labels]="quarterChartData.lables" [datasets]="quarterChartData.datasets"
+                            [options]="quarterChartData.options" [plugins]="quarterChartData.plugins"
+                            [legend]="quarterChartData.legend" [colors]="quarterChartData.colors" height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-0 border-0">
+                    <div class="card-body py-0 chart-block">
+                        <canvas *ngIf="yearChartData" baseChart [chartType]="yearChartData.type"
+                            [labels]="yearChartData.lables" [datasets]="yearChartData.datasets"
+                            [options]="yearChartData.options" [plugins]="yearChartData.plugins"
+                            [legend]="yearChartData.legend" [colors]="yearChartData.colors" height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card mb-0 border-0">
+                    <div class="card-body py-0 chart-block">
+                        <canvas *ngIf="devicesChartData" baseChart [chartType]="devicesChartData.type"
+                            [labels]="devicesChartData.lables" [datasets]="devicesChartData.datasets"
+                            [options]="devicesChartData.options" [plugins]="devicesChartData.plugins"
+                            [legend]="devicesChartData.legend" [colors]="devicesChartData.colors" height="180"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+<form role="form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" ng-repeat="row in rows1">
+        <div class="form-group" ng-if="row.required">
+                <label ng-if= "row.type != 'hidden'" for="blockName">{{ row.description }}*</label>
+                <span class="errormsg" ng-if="azure_vm_errors[row.err_id]"> {{ azure_vm_errors[row.err_msg] }} </span>
+
+
+                <input ng-if="row.name=='customer'" class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')" type="{{ row.type }}" 
+                class="form-control" maxlength="128" ng-model="obj[row.name]" 
+                typeahead-on-select="getGroupssByOrg($item)"
+                uib-typeahead="obj as obj.organization_name for obj in row.render($viewValue)" 
+                value="{{row.value}}"required>
+
+                <input ng-if="(row.type == 'text' && row.name!='customer') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file') || (row.type == 'password')" type="{{ row.type }}" 
+                class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+
+                <textarea ng-if=" row.type == 'textarea' " type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="4" maxlength="128" cols="40" required></textarea>
+        
+                <select ng-if=" row.type == 'select' && row.name == 'location' " ng-change="setLocationvalues(obj[row.name])" ng-options="option.name for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+
+                <select ng-if=" row.type == 'select' && row.name != 'location' " ng-options="option.long for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+            </div>
+            <div class="form-group" ng-if="!row.required && (row.depends == undefined)">
+                <label for="blockName" ng-if= "row.type != 'hidden'">{{ row.description }}</label>
+                <span class="errormsg" ng-if="obj[row.err_id]"> &nbsp; ( {{ obj[row.err_msg] }} )</label>
+
+                <input ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file') || (row.type == 'password')" type="{{ row.type }}" class="{{ row.class }}" 
+                maxlength="128" ng-model="obj[row.name]" value="{{row.value}}">
+
+                <textarea ng-if=" row.type == 'textarea' "type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="4" maxlength="128" cols="40"></textarea>
+
+                <select ng-if=" row.type == 'select' " ng-options="option for option in row.options" 
+                class="{{ row.class }}" ng-model="obj[row.name]">
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+            </div>
+            <div class="form-group" ng-if="!row.required && (row.depends != undefined) && row.depends">
+                <label for="blockName" ng-if= "row.type != 'hidden'" >{{ row.description }}</label>
+                <span class="errormsg" ng-if="obj[row.err_id]"> &nbsp; ( {{ obj[row.err_msg] }} )</span>
+
+                <input ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')" type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" 
+                maxlength="128" value="{{row.value}}">
+
+                <textarea ng-if=" row.type == 'textarea' " type="{{ row.type }}" class="{{ row.class }}" 
+                ng-model="obj[row.name]" value="{{row.value}}" rows="4" maxlength="128" cols="40"></textarea>
+
+                <select ng-if=" row.type == 'select' " ng-options="option for option in row.options" 
+                class="{{ row.class }}" ng-model="obj[row.name]">
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</form>

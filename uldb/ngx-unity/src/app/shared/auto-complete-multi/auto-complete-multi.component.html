@@ -1,0 +1,27 @@
+<div class="autocomplete-wrapper">
+    <div class="tags-container p-1">
+        <ng-container *ngFor="let item of selectedOptions">
+            <span class="tag">
+                {{ item.name }} ({{ item.ip_address }})
+                <span class="remove" (click)="removeOption(item)">×</span>
+            </span>
+        </ng-container>
+        <input type="text" [formControl]="inputControl" [placeholder]="placeholder" (focus)="showDropdown = true"
+            (blur)="onTouched()" />
+        <div *ngIf="loading" class="mr-2">
+            <span class="text-muted">Loading...</span>
+        </div>
+    </div>
+
+    <ul class="dropdown list-unstyled" *ngIf="showDropdown && (options.length > 0 || noResults)">
+        <li *ngFor="let option of options" class="dropdown-item px-2 py-2">
+            <input type="checkbox" class="me-2" [checked]="isSelected(option)" (change)="toggleOption(option)" />
+            <label class="form-check-label mb-0">
+                {{ option.name }} ({{ option.ip_address }})
+            </label>
+        </li>
+        <li *ngIf="noResults && options.length === 0" class="dropdown-item no-hover px-2 text-muted">No results found
+        </li>
+    </ul>
+
+</div>

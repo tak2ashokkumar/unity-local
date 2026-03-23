@@ -1,0 +1,197 @@
+<!--<md-nav-bar
+    class="subnav-bar"
+    md-selected-nav-item="currentNavItem"
+    nav-bar-aria-label="navigation links">
+
+  <md-nav-item md-nav-click="goto('overview')" name="overview">
+    Overview
+  </md-nav-item>
+  <md-nav-item md-nav-click="goto('stack')" name="stack">
+    Full Stack
+  </md-nav-item>
+</md-nav-bar>
+-->
+
+<!--<ng-include src="p.url"></ng-include>-->
+
+<!--<script type="text/ng-template" id="overview.html">-->
+<div class="dashboard-admin" layout="row">
+  <div layout="column" flex="50">
+    <!--<md-card>
+      <mapview map="map"></mapview>
+    </md-card>-->
+    <admindashboardwidgets></admindashboardwidgets>
+    <datacenter-area></datacenter-area>
+  </div>
+  <div layout="column" flex="50">
+    <pinned-customer-area></pinned-customer-area>
+    <dashboard-alerts-area></dashboard-alerts-area>
+    <maintenance-card></maintenance-card>
+    <zendesk-tickets
+        fields="zendesk_fields"
+        items="zendesk_tickets">
+    </zendesk-tickets>
+  </div>
+</div>
+<!--</script>-->
+
+<script type="text/ng-template" id="fullStack.html">
+  <div layout="column">
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Compliance</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content layout="row">
+        <div flex="33">
+
+          <p>todo</p>
+        </div>
+        <div flex="33">
+
+          <h4>Compliance Monitoring</h4>
+          <p>PCI DSS Checks <span class="text-success	glyphicon glyphicon-ok"></span></p>
+
+
+        </div>
+        <div flex="33">
+          <!--  <md-button>
+              <md-icon class="material-icons md-48" style="color: #CCCCCC;">add_circle</md-icon>
+              <span style="color: #CCCCCC">Configure Compliance</span>
+            </md-button>-->
+        </div>
+      </md-card-content>
+    </md-card>
+
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Security</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content layout="row">
+        <div flex="33">
+
+          <p>todo</p>
+        </div>
+        <div flex="33">
+          <h4>Security Configuration</h4>
+          <p>Access Monitoring (16/16)<span class="text-success	glyphicon glyphicon-ok"></span></p>
+          <p>IDS <span class="text-success	glyphicon glyphicon-ok"></span></p>
+          <p>Nessus <span class="text-success	glyphicon glyphicon-ok"></span></p>
+          <p>2FA/U2F <span class="text-success	glyphicon glyphicon-ok"></span></p>
+        </div>
+        <div flex="33">
+          <md-button>
+            <md-icon class="material-icons md-48" style="color: #CCCCCC;">add_circle</md-icon>
+            <span style="color: #CCCCCC">Configure Security</span>
+          </md-button>
+        </div>
+      </md-card-content>
+    </md-card>
+
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Application</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content layout="row">
+        <div flex="33">
+          todo
+        </div>
+        <div flex="33">
+          <p>Logic Monitor <span class="text-success	glyphicon glyphicon-ok"></span></p>
+          <p>Ansible last run: 5 hours ago</p>
+        </div>
+        <div flex="33">
+          <md-button>
+            <md-icon class="material-icons md-48" style="color: #CCCCCC;">add_circle</md-icon>
+            <span style="color: #CCCCCC">Configure App</span>
+          </md-button>
+        </div>
+      </md-card-content>
+    </md-card>
+
+    <md-card>
+      <md-card-title>
+        <md-card-title-text>
+          <span class="md-headline">Platform</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content layout="row">
+        <div flex="33">
+          Logic Monitor not configured
+        </div>
+        <div flex="33">
+
+        </div>
+      </md-card-content>
+    </md-card>
+
+    <div layout="row">
+      <div layout="column" flex="33">
+        <div>
+          <md-card flex="33">
+            <md-card-title class="green-card">
+              <md-card-title-text>
+                <span class="md-headline">AWS/Azure</span>
+              </md-card-title-text>
+            </md-card-title>
+          </md-card>
+        </div>
+        <i style="text-align: center" class="fa fa-arrows-v fa-4x text-default" aria-hidden="true"></i>
+      </div>
+
+      <div layout="column" flex="33">
+        <div>
+          <md-card flex="33">
+            <md-card-title class="green-card">
+              <md-card-title-text>
+                <span class="md-headline">VMware</span>
+              </md-card-title-text>
+            </md-card-title>
+          </md-card>
+        </div>
+        <i style="text-align: center" class="fa fa-arrows-v fa-4x text-default" aria-hidden="true"></i>
+      </div>
+
+      <div layout="column" flex="33">
+        <div>
+          <md-card flex="33">
+            <md-card-title class="green-card">
+              <md-card-title-text>
+                <span class="md-headline">Colocation</span>
+              </md-card-title-text>
+            </md-card-title>
+          </md-card>
+        </div>
+        <i style="text-align: center" class="fa fa-arrows-v fa-4x text-default" aria-hidden="true"></i>
+      </div>
+    </div>
+
+
+    <md-card>
+      <md-card-title class="green-card">
+        <md-card-title-text>
+          <span class="md-headline">UnitedConnect</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content layout="row">
+        <div flex="33">
+          <h4>VXCs</h4>
+          <p>None</p>
+        </div>
+        <div flex="33">
+          <h4>Connected Clouds</h4>
+          <p>Cloud1&mdash;Cloud2</p>
+          <p>Cloud2&mdash;Cloud3</p>
+        </div>
+        <div flex="33">
+
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+</script>

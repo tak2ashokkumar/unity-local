@@ -1,0 +1,182 @@
+{% include 'include_frame.html' %}
+
+<div class="divpad" ng-app="uldb" ng-controller="TicketController">
+
+{% verbatim %}
+
+
+<div class="alert alert-danger" role="alert" ng-if="error">{{ errorMsg }}</div>
+
+{% endverbatim %}
+
+<!--<h3>Organization Tickets</h3>-->
+
+
+
+<div>
+    
+  <form class="form-inline ticketing">
+    {% if customer_view %}
+
+	 <div ng-init="getOrgCustomer({{ org_id }})" ng-model="org" class="form-group leftpan"> 
+	
+	 </div> 
+    {% else %}
+
+    <div class="form-group leftpan">
+      <label for="orgName">Organization</label>
+      <input type="text" id="orgName" class="form-control ticketing"
+	     ng-model="org"
+	     placeholder="Type org to search..."
+	     typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="">
+    </div>
+    <button type="button" class="btn btn-success ticketing" ng-click="getTickets(org)">Get Tickets</button>
+    {% endif %}
+    <div class="form-group rightpan">
+	<button type="button" class="btn btn-success ticketing" ng-click="open(lg)" ng-if="requests && org.url">Create Request</button>
+    </div>
+    <div style="height:10px"></div>
+  </form>
+   
+   
+  
+</div>
+
+
+
+
+{% verbatim %}
+
+
+ <div style="height:10px"></div>
+
+<div class="panel panel-primary ticketing" ng-if="org.url">
+  <div class="panel-heading">
+   <b> Tickets</b>
+  </div>
+  <div class="panel-body">
+    <!-- zendesk info starts here -->
+    <!--<div class="panel panel-success panel-padding" ng-if="org.url">
+      <div class="dash-heading" style="margin-bottom:5px;"> Zendesk info</div>
+    
+      <div ng-if="org.ticketorganization">Zendesk organization id: {{ org.ticketorganization }}</div>
+      <div ng-if="!org.ticketorganization">
+      	<button type="button" class="btn btn-success ticketing" ng-click="createTicketOrg(org)">Link To Zendesk</button>
+      </div>
+    </div>-->
+   <!-- zendesk info ends here -->
+
+   <!-- zendesk info for organization starts here-->
+   <div class="panel panel-success panel-padding" ng-if="requests && org.url">
+      <div class="dash-heading" style="margin-bottom:5px;"> Open requests  <span ng-if="org.organization_name">for {{ org.organization_name }}</span></div>
+
+      <div class="table-responsive zendisk_info_div_org">
+      
+      <!--<div class="panel panel-success zendisk_info_div_org fadein fadeout" ng-show = "IsVisible"  ng-if="org != null">
+		<div class="panel-heading">
+			<h4 class="panel-title ticketing">Create request</h4>
+		</div>
+
+		<div class="panel-body">
+			<div class="form-group">
+			<input placeholder="subject" class="form-control ticketing" type="text" ng-model="new_request.subject" data4="">
+			</div>
+			<div class="form-group">
+			<textarea placeholder="description" class="form-control ticketing" type="text"
+                        ng-model="new_request.description"></textarea>
+			</div>
+			<div class="form-group">
+			<droplet ng-model="new_request.image"></droplet>
+			<button type="button" class="btn btn-success ticketing" ng-click="createRequest(new_request)">Submit</button>
+			</div>
+		</div>
+	</div> -->
+
+
+      <table class="table table-striped zendisk_info_div_org" border="1">
+        <thead class="resulttable-head" >
+        <tr>
+          <th>ID</th>
+          <th>Subject</th>
+          <th>Status</th>
+          <th>Recipient</th>
+          <th>Created On</th>
+          <th>Updated On</th>
+        </tr>
+        </thead>
+
+        <tbody ng-repeat="request in requests" border="1" style="margin-bottom:5px;">
+        <tr>
+          <td>{{ request.id }}</td>
+          <td><a href ng-click="expandRequest(request)">{{ request.subject }}</a></td>
+          <td>{{ request.status }}</td>
+          <td>{{ request.recipient }}</td>
+          <td>{{ request.created_at | date : 'medium' }}</td>
+          <td>{{ request.updated_at | date : 'medium' }}</td>
+        </tr>
+        </tbody>
+
+      
+
+      </table>
+
+      
+   </div>
+
+    
+    </div>
+   <!-- zendesk info for organization ends here-->
+  </div>
+</div>
+
+
+<div style="height:10px"></div>
+
+<div class="panel panel-primary ticketing" ng-if="requests && org.url" ng-controller="TicketDetailController" >
+  <div class="panel-heading">
+    <b>Ticket Details: {{ request.subject }}</b>
+  </div>
+
+  <div class="panel-body">
+    <div class="table-responsive">
+      <table class="table table-striped ticketing" border="1">
+        <thead class="resulttable-head ticketing">
+        <tr>
+          <th>ID</th>
+          <th>Body</th>
+          <th>Created On</th>
+        </tr>
+        </thead>
+
+        <tbody ng-repeat="comment in comments" border="1">
+        <tr>
+          <td>{{ comment.id }}</td>
+          <td>{{ comment.body }}</td>
+          <td>{{ comment.created_at | date : 'medium' }}</td>
+        </tr>
+        </tbody>
+
+        <tbody ng-if="request != null" border="2">
+        <tr>
+          <td>Add comment:</td>
+        </tr>
+        <tr>
+          <td><input class="form-control" type="text" ng-model="new_comment" data4=""></td>
+        </tr>
+        <tr>
+          <td>
+            <button type="button" class="btn btn-success" ng-click="postComment(new_comment)">Post</button>
+          </td>
+        </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+</div>
+
+
+
+
+</div>
+{% endverbatim %}

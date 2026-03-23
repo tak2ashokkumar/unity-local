@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-12">
+    <div class="tab-content">
+      <div class="tab-pane active p-2">
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link py-0 pl-0 border-right text-success">{{device?.name}}</a>
+          </li>
+          <li class="nav-item" *ngFor="let tab of tabData">
+            <a class="nav-link py-0" [ngClass]="isActive(tab)" (click)="goTo(tab.url)" *ngIf="tab.enabled">{{tab.name}}</a>
+            <a class="nav-link py-0 disabled text-muted" *ngIf="!tab.enabled">{{tab.name}}</a>
+          </li>
+          <li class="nav-item ml-auto">
+            <data-refresh-btn></data-refresh-btn>
+          </li>
+          <li class="nav-item float-right text-warning">
+            <a class="nav-link py-0 " (click)="goBack()">
+              <i class="fa fa-arrow-left">&nbsp;</i>
+              <span *ngIf="!isCabinetViewDeviceStats">{{device?.deviceType}} List</span>
+              <span *ngIf="isCabinetViewDeviceStats">Back</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mt-3" [class.px-4]="isCabinetViewDeviceStats">
+    <router-outlet></router-outlet>
+  </div>
+</div>

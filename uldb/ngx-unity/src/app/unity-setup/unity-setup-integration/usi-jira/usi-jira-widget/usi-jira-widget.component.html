@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'JIRA'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addJira()"
+    (viewButtonClick)="jira()" [moduleName]="'Ticket Management'" [addAccessType]="'Manage Tickets'"
+    [viewAccessType]="'View Tickets'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<usi-jira-crud (onCrud)="onCrud($event)"></usi-jira-crud>

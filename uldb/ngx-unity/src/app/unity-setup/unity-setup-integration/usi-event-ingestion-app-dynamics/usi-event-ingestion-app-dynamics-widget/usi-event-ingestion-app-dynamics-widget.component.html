@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'App Dynamics'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addInstance()"
+    (viewButtonClick)="viewInstanceDetails()" [moduleName]="'Integrations'" [addAccessType]="'Add Integrations'"
+    [viewAccessType]="'View Integrations'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<usi-event-ingestion-app-dynamics-crud (onCrud)="onCrud($event)"></usi-event-ingestion-app-dynamics-crud>

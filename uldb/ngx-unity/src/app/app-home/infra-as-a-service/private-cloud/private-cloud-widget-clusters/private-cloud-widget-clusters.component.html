@@ -1,0 +1,166 @@
+<div class="card h-100 mb-0" [class.border-danger]="dataError" appWidgetLazyLoader (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="pcData.uuid"></app-spinner>
+  <div class="card-body px-2 py-0">
+    <div class="row border-bottom">
+      <div class="col-12 py-2 d-flex justify-content-between align-items-center">
+        <div class="pr-1 d-flex">
+          <shared-device-status [status]="pcData.status" class="align-start mr-1" *ngIf="pcData.status"></shared-device-status>
+          <a class="d-inline-block font-500 font-lg text-decoration-none text-primary"
+            (click)="goTo(pcData.drillDownLink)">{{pcData.name}}</a>
+        </div>
+        <div class="pl-1 d-flex align-items-center">
+          <div *ngIf="!dataError && showCost" class="px-1">
+            <div class="font-xs text-muted text-truncate">Month To Date Cost</div>
+            <div class="text-primary font-md font-500 text-right">{{view?.monthToDateCost}}</div>
+          </div>     
+          <div class="p-1">
+            <span *ngIf="!dataError" class="fas fa-eye font-sm p-1 text-primary border rounded-circle pointer-link" [tooltip]="'View cloud details'" container="body" (click)="goTo(pcData.drillDownLink)"></span>  
+            <span *ngIf="dataError" class="fas fa-exclamation-triangle font-lg p-1 text-warning" [tooltip]="dataError" container="body"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-between border-bottom pt-2">
+      <div class="w-25 pl-3 pb-2 border-right border-secondary">
+        <div class="font-md text-muted text-truncate">Total Clusters</div>
+        <div class="text-primary font-md">{{view?.totalClusters || 0}}</div>
+      </div>
+      <div class="w-25 pl-2 pb-2 border-right border-secondary">
+        <div class="font-md text-muted text-truncate">All Resources</div>
+        <div class="text-primary font-md">{{view?.totalResources || 0}}</div>
+      </div>
+      <div class="w-20 pl-2 pb-2 border-right border-secondary">
+        <div class="font-md text-muted text-truncate">Highest Host</div>
+        <div class="text-primary font-md text-truncate">
+          {{ view?.highestHostValue || 'NA'}}
+          <span *ngIf="view.extraHighestHosts?.length > 0"
+            class="badge bg-primary group-count rounded-3 ml-1 pointer-link" [popover]="popTemplate"
+            [popoverContext]="{ dataList: popOverList }" container="body" (click)="showHighestHosts(view)"
+            [outsideClick]="true">+{{view.extraHighestHosts?.length}}</span>
+        </div>
+      </div>
+      <div class="w-30 pr-2 pb-2 pl-2">
+        <div class="font-md text-muted text-truncate">Alerts</div>
+        <div class="d-flex align-items-baseline justify-content-between">
+          <span class="text-primary font-md">{{view?.alerts?.total || 0}}</span>
+          <span class="align-items-center d-flex pl-1">
+            <span class="fas fa-exclamation-circle text-danger"></span>
+            <span class="text-primary font-sm pl-1">{{view?.alerts?.critical || 0}}</span>
+          </span>
+          <span class="align-items-center d-flex pl-1">
+            <span class="fas fa-exclamation-circle text-warning"></span>
+            <span class="text-primary font-sm pl-1">{{view?.alerts?.warning || 0}}</span>
+          </span>
+          <span class="align-items-center d-flex pl-1">
+            <span class="fas fa-info-circle text-primary"></span>
+            <span class="text-primary font-sm pl-1">{{view?.alerts?.information || 0}}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-between pt-2 pb-1" [class.disabled-widget]="dataError">
+      <div class="border-right col-4 px-0">
+        <div class="border-bottom text-center py-1">
+          <span class="font-md font-500">Top CPU Usage</span>
+        </div>
+        <div class="w-100 cluster-container">
+          <div class="p-2 cluster" *ngFor="let cluster of view.topCpuUsage;let i = index;">
+            <div class="w-100 text-primary text-truncate">
+              <span class="pointer-link" (click)="goToClusterDetails(cluster)">{{cluster?.name}}</span>
+            </div>
+            <div class="w-100 text-truncate">
+              <small class="text-muted utilization-font-size">Capacity: {{cluster?.capacity}}</small>
+            </div>
+            <div class="w-100">
+              <div class="progress progress-xs">
+                <div class="progress-bar" role="progressbar" [style.width.%]="cluster.used_percentage"
+                  [ngClass]="getProgressClass(cluster.used_percentage)" aria-valuenow="cluster.used_percentage"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="w-100 d-flex justify-content-between">
+              <div class="w-50 text-truncate">
+                <small class="text-muted utilization-font-size mb-0 mt-1">Used: {{cluster?.used}}</small>
+              </div>
+              <div class="w-50 text-truncate text-right">
+                <small class="text-muted utilization-font-size mb-0 mt-1">Free: {{cluster?.free_percentage+'
+                  %'}}</small>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!view.topCpuUsage?.length" class="text-center font-sm text-muted py-3">No Clusters found!</div>
+        </div>
+      </div>
+
+      <div class="border-right col-4 px-0">
+        <div class="border-bottom text-center py-1">
+          <span class="font-md font-500">Top Memory Usage</span>
+        </div>
+        <div class="w-100 cluster-container">
+          <div class="p-2 cluster" *ngFor="let cluster of view.topMemoryUsage;let i = index;">
+            <div class="w-100 text-primary text-truncate">
+              <span class="pointer-link" (click)="goToClusterDetails(cluster)">{{cluster?.name}}</span>
+            </div>
+            <div class="w-100 text-truncate">
+              <small class="text-muted utilization-font-size">Capacity: {{cluster?.capacity}}</small>
+            </div>
+            <div class="w-100">
+              <div class="progress progress-xs">
+                <div class="progress-bar" role="progressbar" [style.width.%]="cluster.used_percentage"
+                  [ngClass]="getProgressClass(cluster.used_percentage)" aria-valuenow="cluster.used_percentage"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="w-100 d-flex justify-content-between">
+              <div class="w-50 text-truncate">
+                <small class="text-muted utilization-font-size mb-0 mt-1">Used: {{cluster?.used}}</small>
+              </div>
+              <div class="w-50 text-truncate text-right">
+                <small class="text-muted utilization-font-size mb-0 mt-1">Free: {{cluster?.free_percentage+'
+                  %'}}</small>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!view.topMemoryUsage?.length" class="text-center font-sm text-muted py-3">No Clusters found!</div>
+        </div>
+      </div>
+
+      <div class="col-4 px-0">
+        <div class="border-bottom text-center py-1">
+          <span class="font-md font-500">Top Storage Usage</span>
+        </div>
+        <div class="w-100 cluster-container">
+          <div class="p-2 cluster" *ngFor="let cluster of view.topStorageUsage;let i = index;">
+            <div class="w-100 text-primary text-truncate">
+              <span class="pointer-link" (click)="goToClusterDetails(cluster)">{{cluster?.name}}</span>
+            </div>
+            <div class="w-100 text-truncate">
+              <small class="text-muted utilization-font-size">Capacity: {{cluster?.capacity}}</small>
+            </div>
+            <div class="w-100">
+              <div class="progress progress-xs">
+                <div class="progress-bar" role="progressbar" [style.width.%]="cluster.used_percentage"
+                  [ngClass]="getProgressClass(cluster.used_percentage)" aria-valuenow="cluster.used_percentage"
+                  aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+            <div class="w-100 d-flex justify-content-between">
+              <div class="w-50 text-truncate">
+                <small class="text-muted utilization-font-size mb-0 mt-1">Used: {{cluster?.used}}</small>
+              </div>
+              <div class="w-50 text-truncate text-right">
+                <small class="text-muted utilization-font-size mb-0 mt-1">Free: {{cluster?.free_percentage+'
+                  %'}}</small>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!view.topStorageUsage?.length" class="text-center font-sm text-muted py-3">No Clusters found!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #popTemplate let-list="dataList">
+  <div *ngFor="let name of list">{{ name }}</div>
+</ng-template>

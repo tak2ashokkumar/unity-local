@@ -1,0 +1,101 @@
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Delete AWS Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #addAccount>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="addAccountModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="addAccountForm" [formGroup]="addAccountForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="addAccountFormErrors.error">{{addAccountFormErrors.error}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="account_name">Account Name<em>*</em></label>
+                    <input class="form-control" id="account_name" type="text" formControlName="account_name"
+                        [ngClass]="{'is-invalid' : addAccountFormErrors.account_name}">
+                    <div class="invalid-feedback" *ngIf="addAccountFormErrors.account_name">
+                        {{addAccountFormErrors.account_name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="access_key">Access Key<em>*</em></label>
+                    <input class="form-control" id="access_key" type="text" formControlName="access_key"
+                        [ngClass]="{'is-invalid' : addAccountFormErrors.access_key}">
+                    <div class="invalid-feedback" *ngIf="addAccountFormErrors.access_key">
+                        {{addAccountFormErrors.access_key}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="secret_key">Secret Key<em>*</em></label>
+                    <input class="form-control" id="secret_key" type="password" formControlName="secret_key"
+                        [ngClass]="{'is-invalid' : addAccountFormErrors.secret_key}">
+                    <div class="invalid-feedback" *ngIf="addAccountFormErrors.secret_key">
+                        {{addAccountFormErrors.secret_key}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="createAccount()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="addAccountModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #editAccount>
+    <div class="card mb-0">
+        <div class="card-header">
+            Edit Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="editAccountModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="editAccountForm" [formGroup]="editAccountForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="editAccountFormErrors.error">{{editAccountFormErrors.error}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label" for="account_name">Account Name<em>*</em></label>
+                    <input class="form-control" id="account_name" type="text" formControlName="account_name"
+                        [ngClass]="{'is-invalid' : editAccountFormErrors.account_name}">
+                    <div class="invalid-feedback" *ngIf="editAccountFormErrors.account_name">
+                        {{editAccountFormErrors.account_name}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="updateAccount()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="editAccountModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

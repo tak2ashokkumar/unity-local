@@ -1,0 +1,184 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card round-edge mt-3 w-100">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{action}} Forecast</span>
+                <button class="btn btn-pill btn-warning btn-sm" (click)="goBack()" tooltip="Back">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body py-2">
+                <form *ngIf="forecastForm" [formGroup]="forecastForm">
+                    <div class="form-group col-12 text-center">
+                        <div class="invalid-feedback d-block" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="name" class="col-2 ml-5 col-form-label text-right">Forecast Name<em>*</em>:
+                        </label>
+                        <div class="col-4">
+                            <input id="name" class="form-control" type="text" formControlName="name"
+                                placeholder="Enter Forecast Name" [ngClass]="{'is-invalid' : forecastFormErrors.name}">
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.name">
+                                {{forecastFormErrors.name}}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row" *ngIf="!this.forecastDetails">
+                        <div class="col-2 ml-5 mt-2 text-right">Device<em>*</em> : </div>
+                        <div class="col-3">
+                            <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypesSettings"
+                                class="form-control p-1" style="height:auto;"
+                                formControlName="device_types"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.device_types">
+                                {{forecastFormErrors.device_types}}
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <multiselect-dropdown [options]="devices" [settings]="devicesSettings"
+                                class="form-control p-1" style="height:auto;"
+                                formControlName="devices"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.devices">
+                                {{forecastFormErrors.devices}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="Metric" class="col-2 ml-5 col-form-label text-right">Metric<em>*</em> <span
+                                class="fa fa-info-circle text-muted mt-1 mx-1" containerClass="info-multi-line"
+                                tooltip="This metric is used for trend analysis for forecasts."></span>:</label>
+                        <div class="col-4">
+                            <select id="metric" class="form-control" formControlName="metric"
+                                [class.is-invalid]="forecastFormErrors.metric">
+                                <option value="" disabled>Select Metric</option>
+                                <option *ngFor="let item of items" [ngValue]="item">{{item.name}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.metric">
+                                {{forecastFormErrors.metric}}</div>
+                            <!-- <multiselect-dropdown [options]="items" [settings]="metricSettings"
+                                class="form-control p-1" style="height:auto;"
+                                formControlName="metric"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.metric">
+                                {{forecastFormErrors.metric}}</div> -->
+
+                            <!-- <search-dropdown [values]="items" [defaultLabel]="'Metric'" [displayField]="'name'"
+                                (selectedDropdownValue)="getCloudAccountDropdown($event)"
+                                [class.is-invalid]="forecastFormErrors.metric"></search-dropdown> -->
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="analysis_time_frame" class="col-2 ml-5 col-form-label text-right">Analysis Time
+                            Frame<em>*</em><span class="fa fa-info-circle text-muted mt-1 mx-1"
+                                containerClass="info-multi-line"
+                                tooltip="This defines the period for which data is analyzed to generate forecasts"></span>:</label>
+                        <div class="col-3">
+                            <input id="analysis_time_frame" class="form-control" type="number" min="1"
+                                formControlName="analysis_time_frame" placeholder="Enter Analysis Time Frame"
+                                [ngClass]="{'is-invalid' : forecastFormErrors.analysis_time_frame}">
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.analysis_time_frame">
+                                {{forecastFormErrors.analysis_time_frame}}</div>
+                        </div>
+                        <div class="col-3">
+                            <select id="analysis_time_unit" class="form-control" formControlName="analysis_time_unit"
+                                [class.is-invalid]="forecastFormErrors.analysis_time_unit">
+                                <option value="" disabled>Select</option>
+                                <option value="w">Weeks</option>
+                                <option value="d">Days</option>
+                                <option value="h">Hours</option>
+                                <option value="m">Minutes</option>
+                            </select>
+                            <div class="invalid-feedback " *ngIf="forecastFormErrors.analysis_time_unit">
+                                {{forecastErrors.analysis_time_unit}}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="projection_period" class="col-2 ml-5 col-form-label text-right">Projection
+                            Period<em>*</em><span class="fa fa-info-circle text-muted mt-1 mx-1"
+                                containerClass="info-multi-line"
+                                tooltip="Specifies the future time span for which forecasts are generated."></span>:</label>
+                        <div class="col-3">
+                            <input id="projection_period" class="form-control" type="number" min="1"
+                                formControlName="projection_period" placeholder="Enter Projection Period"
+                                [ngClass]="{'is-invalid' : forecastFormErrors.projection_period}">
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.projection_period">
+                                {{forecastFormErrors.projection_period}}</div>
+                        </div>
+                        <div class="col-3">
+                            <select id="projection_unit" class="form-control" formControlName="projection_unit"
+                                [class.is-invalid]="forecastFormErrors.projection_unit">
+                                <option value="" disabled>Select</option>
+                                <option value="w">Weeks</option>
+                                <option value="d">Days</option>
+                                <option value="h">Hours</option>
+                                <option value="m">Minutes</option>
+                            </select>
+                            <div class="invalid-feedback " *ngIf="forecastFormErrors.projection_unit">
+                                {{forecastFormErrors.projection_unit}}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="alerting" class="col-2 ml-5 text-right col-form-label">Alert Needed :</label>
+                        <div class="col-4">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="forecastForm.get('alerting').value === true"
+                                            [class.disabled]="forecastDetails && !forecastDetails.enabled">
+                                            <input type="radio" [value]="true"
+                                                [disabled]="forecastDetails && !forecastDetails.enabled"
+                                                (click)="(!forecastDetails || forecastDetails.enabled) && toggleStatus(true)" />
+                                            <span class="font-sm">Enable</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="forecastForm.get('alerting').value === false"
+                                            [class.disabled]="forecastDetails && !forecastDetails.enabled">
+                                            <input type="radio" [value]="false"
+                                                [disabled]="forecastDetails && !forecastDetails.enabled"
+                                                (click)="(!forecastDetails || forecastDetails.enabled) && toggleStatus(false)" />
+                                            <span class="font-sm">Disable</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group row" *ngIf="this.forecastForm.get('alerting').value === true">
+                        <label for="threshold" class="col-2 ml-5 col-form-label text-right">Threshold<em>*</em>:
+                            <span class="fa fa-info-circle text-muted mt-1 mx-1" containerClass="info-multi-line"
+                                tooltip="A defined limit or value used to trigger alerts, when exceeded or unmet."></span>:</label>
+                        <div class="col-">
+                            <select id="operator" class="form-control" formControlName="operator"
+                                [class.is-invalid]="forecastFormErrors.operator">
+                                <option value="" disabled>Select Operator</option>
+                                <option *ngFor="let operator of operators" [ngValue]="operator.value">{{operator.label}}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.operator">
+                                {{forecastFormErrors.operator}}</div>
+                        </div>
+                        <div class="col-4">
+                            <input id="threshold" class="form-control" type="text" formControlName="threshold"
+                                placeholder="Enter Threshold" [ngClass]="{'is-invalid' : forecastFormErrors.threshold}">
+                            <div class="invalid-feedback" *ngIf="forecastFormErrors.threshold">
+                                {{forecastFormErrors.threshold}}</div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-md btn-success" type="button"
+                        (click)="confirmforecastCreate()">Submit</button>
+                    <button class="btn btn-md btn-danger ml-1" type="button" (click)="goBack()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

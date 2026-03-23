@@ -1,0 +1,221 @@
+<style type="text/css">
+    .pagemargin .page_wrapper {
+        background-color: #FFFFFF;
+        width: 100%;
+        -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        padding: 20px;
+        padding-bottom: 60px;
+        padding-top: 0px;
+    }
+
+    /* .dataTables_filter input[type="search"] {
+        border: 2px solid #E4E4E4;
+        border-radius: 2px;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .dataTables_length select {
+        border: 1px solid #E4E4E4;
+        height: 30px;
+        margin-left: 3px;
+    } */
+
+    /* .table {
+        display: block;
+        overflow: auto;
+        white-space: nowrap;
+        height: 550px;
+        margin-bottom: 0px;
+    }
+
+    .table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        background-color: #eff2f5;
+    } */
+
+    /* .table td {
+        padding: 8px 13px !important;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: #eff2f5;
+        z-index: 100;
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+        position: sticky;
+        right: 0;
+        background-color: #eff2f5;
+        z-index: 100;
+    } */
+
+    .no-record {
+        background-color: #FFFFFF;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
+        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        padding: 20px;
+    }
+</style>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object={{devops_scripts.results}}></loading>
+    <div class="pagemargin">
+        <div class="col-xs-12 content-wrapper bg-color top_shadow" style="padding-left:0px; margin-bottom:10px;"
+            ng-if="devops_scripts && devops_scripts.results.length">
+            <div class="col-xs-4 pull-right">
+                <div class="action-bar pull-right table-button">
+                    <button class="btn btn-primary" type="button" ng-click="add()" style="margin-left:20px;"> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 page_wrapper" style="float:left; padding:0px;"
+            ng-if="devops_scripts && devops_scripts.results.length">
+            <section id="no-more-tables" class="margintop20 table_wrapper">
+                <table class="example table table-condensed cf">
+                    <thead class="cf">
+                        <tr>
+                            <th>Name</th>
+                            <th>Script Type</th>
+                            <th>Description</th>
+                            <th>Created On</th>
+                            <th>Updated By</th>
+                            <th class="numeric">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="view in devops_scripts.results">
+                            <td>{{view.name}}</td>
+                            <td>{{view.script_type}}</td>
+                            <td>{{view.description}}</td>
+                            <td><p ng-bind="view.created_at | date:'MMM dd, y, H:mm:ss'"></p></td>
+                            <td><p ng-bind="view.updated_at | date:'MMM dd, y, H:mm:ss'"></p></td>
+                            <td>
+                                <div class="action-icons">
+                                    <a class="fa fa-eye blue-text" tooltip-class="customClass" uib-tooltip="View"
+                                        ng-click="viewScript(view)"></a>
+                                    <a class="fa fa-pencil blue-text" tooltip-class="customClass" uib-tooltip="Edit"
+                                        ng-click="edit(view)"></a>
+                                    <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete"
+                                        ng-click="delete(view)"></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+        <div class="col-xs-12" ng-if="!devops_scripts || !devops_scripts.results.length">
+            <div class="no-record">
+                <span class="no-record-icon fa fa-info-circle"></span>
+                <span class="no-record-text">&nbsp;No scripts available.
+                    <a ng-click="add()" style="color:#5589d0; cursor:pointer; font-weight: 500;"> click here</a>
+                    to create</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="scriptCRUD.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> {{method}} Script</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+            <div class="col-xs-12">
+                <div class="form-group col-xs-12">
+                    <label style="color:red" ng-if="error">{{ error }}</label><br>
+                </div>
+                <div class="form-group col-xs-12">
+                    <label for="name">Name*</label>
+                    <input class="form-control" id="name" type="text" ng-model="obj.name"/>
+                </div>
+                <div class="form-group col-xs-12">
+                    <label for="description">Description</label>
+                    <textarea class="form-control" id="description" rows="3" ng-model="obj.description"></textarea>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="script_type">Script Type*</label>
+                    <select class="form-control" id="script_type" ng-model="obj.script_type" required
+                    ng-options="script for script in script_types"></select>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="status">Upload Script*</label>
+                    <input class="form-control" id="script_file" type="file" ngf-select 
+                    ng-model="script_file" name="script_file" accept="*/*"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-danger" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-success" ng-click="onSubmit(script_file)" type="submit"> Submit</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="deleteScript.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> Delete Script</span>
+    </div>
+    <div class="modal-content">
+        <div class="modal-header" style="text-align: center;">
+            <h4 class="modal-title">Confirm Delete</h4>
+        </div>
+      <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+        <div class="modal-body" style="text-align: center;">
+            Are you sure you want to delete the script {{obj.name}} ?
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons"  style="text-align: center;">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+                <button type="button" class="btn btn-default" ng-click="confirmDelete()"> Confirm </button>
+            </div>
+        </div>
+      </form>
+    </div>
+</script>
+
+<script type="text/ng-template" id="viewScriptContent.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> {{method}} Script</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+            <div class="col-xs-12">
+                <div class="form-group col-xs-12">
+                    <label style="color:red" ng-if="error">{{ error }}</label><br>
+                </div>
+                <div class="form-group col-xs-12">
+                    <label for="name">Name*</label>
+                    <input class="form-control" id="name" type="text" ng-model="obj.name"/>
+                </div>
+                <div class="form-group col-xs-12">
+                    <label for="content">Content</label>
+                    <textarea class="form-control" id="content" rows="20" ng-model="obj.content" readonly></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-danger" ng-click="cancel()" type="button">Close</button>
+    </div>
+</script>

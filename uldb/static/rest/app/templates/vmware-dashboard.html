@@ -1,0 +1,67 @@
+<div class="row dashboard-admin">
+  <div class="col-md-12"  ng-controller="UladminController">
+    <div class="col-sm-12">
+      <h3>Vmware Dashboard</h3>
+      <span>
+        <small ng-repeat="crumb in bread.crumbs">
+          <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+        </small>
+      </span>
+    </div>
+  </div>
+  <alerts></alerts>
+  <br>
+  <div class="col-md-12"  ng-controller="UladminController">
+    <div class = "col-md-12">
+      <tabset>
+        <vmservers heading="Management Servers - VCenters" servers="servers"></vmservers>
+      </tabset>
+    </div>
+    <div class="row col-md-12">
+      <!-- <div class="col-sm-4">
+        <datacentersinfo heading="Datacenters" datacenters="datacenters"></datacentersinfo>
+        <tagsinfo heading="Tags" tags_info="tags_info"></tagsinfo>
+      </div>  -->
+      <div class="col-sm-4">
+          <licensesinfo heading="Licenses" licenses="licenses"></licensesinfo>
+      </div>
+      <div class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <div class="col-md-8 pinnewcustitle">
+              <i class="fa fa-clock-o fa-fw"></i>vcenter5-3
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="status-serv-progress col-sm-12">
+              <span class="pull-left"> CPU </span>
+              <span class="pull-right"> FREE: 8GHz </span>
+              <br/>
+              <uib-progressbar value="5" class="no-mb"></uib-progressbar>
+              <span class="pull-left"> USED: 142MHz </span>
+              <span class="pull-right"> CAPACITY: 9GHz </span>
+            </div>
+            <br/>
+            <div class="status-serv-progress col-sm-12">
+              <span class="pull-left"> Memory </span>
+              <span class="pull-right"> FREE: 6GB </span>
+              <br/>
+              <uib-progressbar value="30" class="no-mb"></uib-progressbar>
+              <span class="pull-left"> USED: 2 GB </span>
+              <span class="pull-right"> CAPACITY: 8 GB </span>
+            </div>
+            <br/>
+            <div class="status-serv-progress col-sm-12">
+              <span class="pull-left"> Storage </span>
+              <span class="pull-right"> FREE: 18GB </span>
+              <br/>
+              <uib-progressbar value="8" class="no-mb"></uib-progressbar>
+              <span class="pull-left"> USED: 2 GB </span>
+              <span class="pull-right"> CAPACITY: 20 GB </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

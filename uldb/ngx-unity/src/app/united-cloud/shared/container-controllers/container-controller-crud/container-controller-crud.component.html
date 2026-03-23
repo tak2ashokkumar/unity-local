@@ -1,0 +1,174 @@
+<ng-template #template>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Controller
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="baseForm" [formGroup]="baseForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="controller_type">Controller Type<em>*</em></label>
+          <select class="form-control text-capitalize" id="controller_type" name="controller_type" formControlName="controller_type"
+            [ngClass]="{'is-invalid' : baseFormErrors.controller_type}">
+            <option [value]="''" disabled>Select Controller Type</option>
+            <option [value]="ControllerTypeMapping.KUBERNETES">Kubernetes</option>
+            <option [value]="ControllerTypeMapping.DOCKER">Docker</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="baseFormErrors.controller_type">{{baseFormErrors.controller_type}}</div>
+        </div>
+      </form>
+      <form *ngIf="kubernetesForm" [formGroup]="kubernetesForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="name">Name<em>*</em></label>
+          <input class="form-control" id="name" type="text" formControlName="name" [ngClass]="{'is-invalid' : kubernetesFormErrors.name}">
+          <div class="invalid-feedback" *ngIf="kubernetesFormErrors.name">{{kubernetesFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="hostname">Hostname<em>*</em></label>
+          <input class="form-control" id="hostname" type="text" formControlName="hostname" [ngClass]="{'is-invalid' : kubernetesFormErrors.hostname}">
+          <div class="invalid-feedback" *ngIf="kubernetesFormErrors.hostname">{{kubernetesFormErrors.hostname}}</div>
+        </div>
+        <div class="form-group" *ngIf="kubernetesForm.controls.username">
+          <label class="form-col-form-label" for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" type="text" formControlName="username" [ngClass]="{'is-invalid' : kubernetesFormErrors.username}">
+          <div class="invalid-feedback" *ngIf="kubernetesFormErrors.username">{{kubernetesFormErrors.username}}</div>
+        </div>
+        <div class="form-group" *ngIf="kubernetesForm.controls.password">
+          <label class="form-col-form-label" for="password">Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password" [ngClass]="{'is-invalid' : kubernetesFormErrors.password}">
+          <div class="invalid-feedback" *ngIf="kubernetesFormErrors.password">{{kubernetesFormErrors.password}}</div>
+        </div>
+      </form>
+      <form *ngIf="dockerForm" [formGroup]="dockerForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-col-form-label" for="name">Name<em>*</em></label>
+          <input class="form-control" id="name" type="text" formControlName="name" [ngClass]="{'is-invalid' : dockerFormErrors.name}">
+          <div class="invalid-feedback" *ngIf="dockerFormErrors.name">{{dockerFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="hostname">Hostname<em>*</em></label>
+          <input class="form-control" id="hostname" type="text" formControlName="hostname" [ngClass]="{'is-invalid' : dockerFormErrors.hostname}">
+          <div class="invalid-feedback" *ngIf="dockerFormErrors.hostname">{{dockerFormErrors.hostname}}</div>
+        </div>
+      </form>
+      <form [formGroup]="attachmentForm" *ngIf="attachmentForm">
+        <div class="form-group row"><label class="col-3 col-form-label" for="file-cert-input">Client Cert<em>*</em></label>
+          <div class="col-9">
+            <input class="form-control" id="file-cert-input" name="file-cert-input" type="file" accept=".pem"
+            [ngClass]="{'is-invalid' : attachmentFormErrors.cert}" (change)="handleCertFileInput($event.target.files)">
+            <div class="invalid-feedback" *ngIf="attachmentFormErrors.cert">{{attachmentFormErrors.cert}}</div>
+          </div>
+        </div>
+        <div class="form-group row"><label class="col-3 col-form-label" for="file-key-input">Client Key<em>*</em></label>
+          <div class="col-9">
+            <input class="form-control" id="file-key-input" name="file-key-input" type="file" accept=".pem"
+            [ngClass]="{'is-invalid' : attachmentFormErrors.key}" (change)="handleKeyFileInput($event.target.files)">
+            <div class="invalid-feedback" *ngIf="attachmentFormErrors.key">{{attachmentFormErrors.key}}</div>
+          </div>
+        </div>
+        <div class="form-group row"><label class="col-3 col-form-label" for="file-ca-input">Client CA<em>*</em></label>
+          <div class="col-9">
+            <input class="form-control" id="file-ca-input" name="file-ca-input" type="file" accept=".pem"
+            [ngClass]="{'is-invalid' : attachmentFormErrors.ca}" (change)="handleCaFileInput($event.target.files)">
+            <div class="invalid-feedback" *ngIf="attachmentFormErrors.ca">{{attachmentFormErrors.ca}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      All associated devices will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #passwordChange>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{credAction}}
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="passwordChangeRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="form-group" *ngIf="nonFieldErr">
+        <div class="invalid-credentials">{{nonFieldErr}}</div>
+      </div>
+      <form *ngIf="kubernetesCredForm" [formGroup]="kubernetesCredForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" type="username" formControlName="username" [ngClass]="{'is-invalid' : kubernetesCredFormErrors.username}">
+          <div class="invalid-feedback" *ngIf="kubernetesCredFormErrors.username">{{kubernetesCredFormErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="password">New Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password" [ngClass]="{'is-invalid' : kubernetesCredFormErrors.password}">
+          <div class="invalid-feedback" *ngIf="kubernetesCredFormErrors.password">{{kubernetesCredFormErrors.password}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="confirm_password">Confirm New Password<em>*</em></label>
+          <input class="form-control" id="confirm_password" type="password" formControlName="confirm_password"
+            [ngClass]="{'is-invalid' : kubernetesCredFormErrors.confirm_password}">
+          <div class="invalid-feedback" *ngIf="kubernetesCredFormErrors.confirm_password">{{kubernetesCredFormErrors.confirm_password}}</div>
+        </div>
+      </form>
+
+      <form *ngIf="dockerCredForm" [formGroup]="dockerCredForm">
+        <div class="form-group row"><label class="col-3 col-form-label" for="file-cert-input">Client Cert<em>*</em></label>
+          <div class="col-9">
+            <input class="form-control" id="file-cert-input" name="file-cert-input" type="file" accept=".pem"
+            [ngClass]="{'is-invalid' : dockerCredFormErrors.cert}" (change)="handleCertFileInput($event.target.files)">
+            <div class="invalid-feedback" *ngIf="dockerCredFormErrors.cert">{{dockerCredFormErrors.cert}}</div>
+          </div>
+        </div>
+        <div class="form-group row"><label class="col-3 col-form-label" for="file-key-input">Client Key<em>*</em></label>
+          <div class="col-9">
+            <input class="form-control" id="file-key-input" name="file-key-input" type="file" accept=".pem"
+            [ngClass]="{'is-invalid' : dockerCredFormErrors.key}" (change)="handleKeyFileInput($event.target.files)">
+            <div class="invalid-feedback" *ngIf="dockerCredFormErrors.key">{{dockerCredFormErrors.key}}</div>
+          </div>
+        </div>
+        <div class="form-group row"><label class="col-3 col-form-label" for="file-ca-input">Client CA<em>*</em></label>
+          <div class="col-9">
+            <input class="form-control" id="file-ca-input" name="file-ca-input" type="file" accept=".pem"
+            [ngClass]="{'is-invalid' : dockerCredFormErrors.ca}" (change)="handleCaFileInput($event.target.files)">
+            <div class="invalid-feedback" *ngIf="dockerCredFormErrors.ca">{{dockerCredFormErrors.ca}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="updatePassword()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="passwordChangeRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

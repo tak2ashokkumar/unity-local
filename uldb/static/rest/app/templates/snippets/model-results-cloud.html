@@ -1,0 +1,57 @@
+<div>
+  <span ng-if="model.results === undefined">
+      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </span>
+  <div ng-if="model.results !== undefined">
+    <table class="table table-condensed" ng-if="model.results.length > 0">
+      <thead>
+      <tr>
+        <th ng-repeat="f in fields" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''">
+          <div ng-if="f.hide === undefined">{{ f.description }}</div>
+        </th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr ng-repeat="result in model.results | filter: searchKeyword as filtered"
+          ng-click="selection.selected = result; selection.index = $index; selectActions(result)"
+          ng-class="classSelectors(result)">
+        <td ng-repeat="f in fields" ng-if="!(f.hide)" ng-switch="f.opaque">
+          <div ng-switch-when="link">
+            <a href="{{ linkify(result, f).url }}">{{ linkify(result, f).text }}</a>
+          </div>
+          <div ng-switch-when="customLink">
+            <a href="{{ custom_linkify(result, f).url }}">{{ custom_linkify(result, f).text }}</a>
+          </div>
+          <div ng-switch-when="stringTransform">{{ desub(result, f) }}</div>
+          <div ng-switch-when="choices">{{ result[f.name] }}</div>
+          <div ng-switch-when="arbitraryLink">{{ f.func(result) }}</div>
+          <div ng-switch-when="multiple">
+            <div ng-repeat="r in result[f.name]">
+            <p><a ng-if='f.uriPrefix' href="{{ f.uriPrefix }}{{r[f.idField]}}">{{ r.name }}</a><span ng-if='!f.uriPrefix'>{{ r.name }}</span></p>
+            </div>
+          </div>
+          <div ng-switch-when="newType"><uldb-field result="result" field="f"></uldb-field></div>
+          <div ng-switch-default>{{ result[f.name] }}</div>
+        </td>
+        <td>
+          <div class="action-icons">
+             <a ng-if="proxy_link(result) !== null" class="fa fa-external-link" href="#/{{ proxy_prefix(result) }}/{{ proxy_link(result)[0].uuid }}" title="Manage {{ result.platform_type }}"></a>
+
+              <a class="fa fa-trash-o blue-text" href="" ng-click="selection.selected = result; selection.index = $index;ctrl.dailog_box(result, $index)"></a>
+              <span ng-repeat="act in additional_actions">
+                <a class="fa fa-lock blue-text" ng-if="act.name === 'Change Password' || act.name === 'Change Api Keys'" title="{{ act.name }}" href ng-click="act['func'](result, $index)"></a>
+                <a class="fa fa-external-link-square" ng-if="act.name !== 'Change Password' && act.name !== 'Manage in New Tab' && act.name !== 'Change Api Keys'" title="{{ act.name }}" href ng-click="act['func'](result, $index)"></a>
+                <a class="fa fa-external-link" ng-if="act.name === 'Manage in New Tab'" title="{{ act.name }}" href ng-click="act['func'](result, $index)"></a>
+              </span>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <span ng-if="model.results.length === 0">
+      <h3 class="align-center">No records to display</h3>
+    </span>
+  </div>
+</div>

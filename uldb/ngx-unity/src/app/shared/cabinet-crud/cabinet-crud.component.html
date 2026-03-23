@@ -1,0 +1,140 @@
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      All associated devices will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #create>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{actionMessage}} Cabinet
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="cabinetForm" *ngIf="cabinetForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group" *ngIf="showSelectDC">
+            <label class="font-col-form-label" for="datacenter">Datacenter<em>*</em></label>
+            <select id="datacenterid" class="form-control" formControlName="datacenter" [ngClass]="{'is-invalid' : formErrors.datacenter}">
+              <option [value]="''" disabled>Select Datacenter</option>
+              <option *ngFor="let dc of dataCenters" [value]="dc.uuid">
+                {{dc.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="formErrors.datacenter">
+              {{formErrors.datacenter}}</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-6">
+            <label for="name">Name<em>*</em></label>
+            <input class="form-control" id="name" type="text" placeholder="Name" formControlName="name" [ngClass]="{'is-invalid' : formErrors.name}">
+            <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label for="size">Size<em>*</em></label>
+            <input class="form-control" id="size" type="number" placeholder="Size" formControlName="size"
+              [ngClass]="{'is-invalid' : formErrors.size}">
+            <div class="invalid-feedback" *ngIf="formErrors.size">{{formErrors.size}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label for="model">Model<em>*</em></label>
+            <input class="form-control" id="model" type="text" placeholder="Model" formControlName="model" [ngClass]="{'is-invalid' : formErrors.model}">
+            <div class="invalid-feedback" *ngIf="formErrors.model">{{formErrors.model}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="contract_start_date">Contract Start Date</label>
+            <div class="input-group">
+              <owl-date-time #contractStartDate [pickerType]="'calendar'"></owl-date-time>
+              <input class="form-control rounded-left" formControlName="contract_start_date" [owlDateTimeTrigger]="contractStartDate"
+                [owlDateTime]="contractStartDate" [max]="cabinetForm.controls.contract_end_date.value" type="text" name="contract_start_date">
+              <div class="input-group-append " [owlDateTimeTrigger]="contractStartDate">
+                <span class="input-group-text bg-white">
+                  <i class="fas fa-calendar-alt"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="contract_end_date">Contract End Date</label>
+            <div class="input-group">
+              <owl-date-time #contractEndDate [pickerType]="'calendar'"></owl-date-time>
+              <input class="form-control rounded-left" formControlName="contract_end_date" [owlDateTimeTrigger]="contractEndDate"
+                [owlDateTime]="contractEndDate" [min]="cabinetForm.controls.contract_start_date.value" type="text" name="contract_end_date">
+              <div class="input-group-append " [owlDateTimeTrigger]="contractEndDate">
+                <span class="input-group-text bg-white">
+                  <i class="fas fa-calendar-alt"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label class="font-col-form-label" for="renewal">Renewal</label>
+            <select id="renewal" class="form-control" formControlName="renewal" [class.is-invalid]="formErrors.renewal">
+              <option [value]="'Auto'">Auto</option>
+              <option [value]="'Manual'">Manual</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="formErrors.renewal">{{formErrors.renewal}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label for="cost">Cost</label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line" [tooltip]="'Cost per month'"></i>
+            <div class="input-group">
+              <div class="input-group-append">
+                <span class="input-group-text bg-white">
+                  <i class="fas fa-dollar-sign"></i>
+                </span>
+              </div>
+              <input class="form-control" id="cost" type="number" formControlName="cost" min="0" [ngClass]="{'is-invalid' : formErrors.cost}">
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="formErrors.cost">{{formErrors.cost}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label for="annual_escalation">Annual Escalation</label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line" [tooltip]="'Percentage of escalation per year'"></i>
+            <div class="input-group">
+              <div class="input-group-append">
+                <span class="input-group-text bg-white">
+                  <i class="fas fa-percentage"></i>
+                </span>
+              </div>
+              <input class="form-control" id="annual_escalation" type="number" formControlName="annual_escalation" max="100"
+                [ngClass]="{'is-invalid' : formErrors.annual_escalation}">
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="formErrors.annual_escalation">{{formErrors.annual_escalation}}</div>
+          </div>
+          <div class="form-group col-12">
+            <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+                <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+                </tag-input-dropdown>
+            </tag-input>
+        </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" (click)="onSubmit()" type="button">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

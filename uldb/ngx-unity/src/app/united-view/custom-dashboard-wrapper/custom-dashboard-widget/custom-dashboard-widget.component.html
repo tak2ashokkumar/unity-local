@@ -1,0 +1,188 @@
+<div class="card">
+    <div class="card-header bg-white py-2">
+        <div class="d-flex">
+            <div class="text-truncate mr-2">
+                <span class="h6 text-capitalize">{{data.category}}</span>
+                <span>&nbsp;-&nbsp;{{data.name}}&nbsp;-&nbsp;</span>
+                <span class="text-muted">{{data.tags.join(', ')}}</span>
+            </div>
+            <div class="ml-auto">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                    <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                        (click)="editWidget()"></button>
+                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                        (click)="deleteWidget()"></button>
+                    <button class="action-icons mb-0 fa fa-angle-down font-sm ml-1"
+                        [tooltip]="isCollapsed ? 'Expand' : 'Minimize'" (click)="isCollapsed = !isCollapsed"
+                        [attr.aria-expanded]="!isCollapsed"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div [collapse]="isCollapsed" [isAnimated]="true">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-3">
+                    <div class="row h-100 mx-0">
+                        <div class="col-12 align-self-start border rounded p-0">
+                            <app-spinner *ngIf="statusLoaderName" [name]="statusLoaderName"></app-spinner>
+                            <div class="card mb-2 p-2 border-0">
+                                <div class="card-header bg-white border-bottom-0 h6 p-0 mb-2">
+                                    Devices
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="row">
+                                        <div class="col-3" tooltip="Up">
+                                            <i class="fa fa-lg fa-caret-up text-success"></i>
+                                            {{deviceStatusCounts.up}}
+                                        </div>
+                                        <div class="col-3" tooltip="Down">
+                                            <i class="fa fa-lg fa-caret-down text-danger"></i>
+                                            {{deviceStatusCounts.down}}
+                                        </div>
+                                        <div class="col-3" tooltip="Not configured">
+                                            <i class="fa fa-exclamation-circle text-warning"></i>
+                                            {{deviceStatusCounts.non_configured}}
+                                        </div>
+                                        <div class="col-3" tooltip="Unknown">
+                                            <i class="fa fa-exclamation-triangle text-secondary"></i>
+                                            {{deviceStatusCounts.unknown}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 align-self-end border rounded p-0">
+                            <app-spinner *ngIf="alertLoaderName" [name]="alertLoaderName"></app-spinner>
+                            <div class="card mb-2 p-2 border-0">
+                                <div class="card-header bg-white border-bottom-0 h6 p-0 mb-2">
+                                    Alerts
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="row">
+                                        <div class="col-4" tooltip="Critical">
+                                            <i class="fas fa-lg fa-exclamation-triangle text-danger"></i>
+                                            {{alertCount.Critical || 0 }}
+                                        </div>
+                                        <div class="col-4" tooltip="Warning">
+                                            <i class="fa fa-lg fa-exclamation-circle text-warning"></i>
+                                            {{alertCount.Warning || 0}}
+                                        </div>
+                                        <div class="col-4" tooltip="Information">
+                                            <i class="fas fa-lg fa-info-circle text-info"></i>
+                                            {{alertCount.Information || 0}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="card h-100">
+                        <app-spinner [name]="utilizationLoaderName" *ngIf="utilizationLoaderName"></app-spinner>
+                        <div class="row" *ngIf="widgetDetails">
+                            <div class="col-4">
+                                <div *ngIf="widgetDetails.cpuUnused + widgetDetails.cpuUsed">
+                                    <div style="display:flex; flex-direction:column">
+                                        <div style="flex-grow:1; height: 120px; position:relative">
+                                            <canvas baseChart class="chart" [chartType]="defaultChartType"
+                                                [plugins]="defaultChartPlugins" [options]="vCPUChartOptions"
+                                                [data]="vCPUChartData" [colors]="vCPUChartColor"
+                                                [labels]="vCPUChartLabels"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="text-center"><small
+                                            class="text-muted font-weight-bold">{{widgetDetails.cpuCount}}
+                                            vCPU</small></div>
+                                </div>
+                                <span *ngIf="!(widgetDetails.cpuUnused + widgetDetails.cpuUsed)"
+                                    class="d-flex justify-content-center align-content-center flex-wrap h-100 text-muted">
+                                    No data to show</span>
+                            </div>
+
+
+                            <div class="col-4">
+                                <div *ngIf="(widgetDetails.memoryUnused + widgetDetails.memoryUsed)">
+
+                                    <div style="display:flex; flex-direction:column">
+                                        <div style="flex-grow:1; height: 120px;  position:relative">
+                                            <canvas baseChart class="chart" [chartType]="defaultChartType"
+                                                [plugins]="defaultChartPlugins" [options]="ramChartOptions"
+                                                [data]="ramChartData" [colors]="ramChartColor"
+                                                [labels]="ramChartLabels"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="text-center"><small
+                                            class="text-muted font-weight-bold">{{widgetDetails.memoryTotal}}
+                                            RAM</small></div>
+                                </div>
+
+                                <span *ngIf="!(widgetDetails.memoryUnused + widgetDetails.memoryUsed)"
+                                    class="d-flex justify-content-center align-content-center flex-wrap h-100 text-muted">
+                                    No data to show</span>
+                            </div>
+
+
+                            <div class="col-4">
+                                <div *ngIf="(widgetDetails.storageUnused + widgetDetails.storageUsed)">
+
+                                    <div style="display:flex; flex-direction:column">
+                                        <div style="flex-grow:1; height: 100px; position:relative">
+                                            <canvas baseChart class="chart" [chartType]="defaultChartType"
+                                                [plugins]="defaultChartPlugins" [options]="storageChartOptions"
+                                                [data]="storageChartData" [colors]="storageChartColor"
+                                                [labels]="ramChartLabels"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="text-center"><small
+                                            class="text-muted font-weight-bold">{{widgetDetails.storageTotal}}
+                                            Storage</small>
+                                    </div>
+                                    <div class="d-flex justify-content-center align-content-center">
+
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="progress progress-sm">
+                                                    <div class="progress-bar" role="progressbar"
+                                                        [style.width.%]="widgetDetails.storageUsed"
+                                                        [ngClass]="storageProgressBarColor"
+                                                        aria-valuenow="widgetDetails.storageUsed" aria-valuemin="0"
+                                                        aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col w-50 text-truncate">
+                                                <small class="text-muted utilization-font-size mb-0 mt-1">Configured:
+                                                    {{widgetDetails.storageUsedVal}}</small>
+                                            </div>
+                                            <div class="col w-50 text-truncate">
+                                                <small class="text-muted utilization-font-size mb-0 mt-1">Allocated:
+                                                    {{widgetDetails.storageUnusedVal}}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <span *ngIf="!(widgetDetails.storageUnused + widgetDetails.storageUsed)"
+                                    class="d-flex justify-content-center align-content-center flex-wrap h-100 text-muted">
+                                    No data to show</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3" *ngIf="data.datasets.length">
+                <ng-container *ngFor="let dataset of data.datasets; let i = index;">
+                    <div class="col-6 mb-3" *ngIf="i < 2 || viewAllDataSet">
+                        <custom-dashboard-widget-dataset [data]="dataset">
+                        </custom-dashboard-widget-dataset>
+                    </div>
+                </ng-container>
+                <div class="col-12" *ngIf="data.datasets.length > 2">
+                    <span class="font-xs-sm font-500 text-primary pull-right pointer-link"
+                        (click)="viewAllDataSet = !viewAllDataSet">View <span *ngIf="!viewAllDataSet">All</span>
+                        <span *ngIf="viewAllDataSet">Less</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

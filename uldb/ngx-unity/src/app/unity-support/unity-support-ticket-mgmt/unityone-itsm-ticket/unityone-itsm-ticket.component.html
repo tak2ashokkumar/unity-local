@@ -1,0 +1,91 @@
+<div class="row p-2">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-transparent px-0 d-flex justify-content-between align-items-center py-2 mr-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="ml-2 text-left align-middle"><span
+                            class="badge badge-secondary font-sm">{{count}}</span>&nbsp;<span
+                            class="font-lg font-500">Tickets
+                        </span></span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center">
+                    <button class="btn btn-pill btn-sm btn-warning font-500" type="button"
+                        (click)="createUnityOneITSM()" accessControl [moduleName]="'Ticket Management'"
+                        [accessType]="'View Tickets'" [elementType]="'actionbtn'">
+                        <span class="fas fa-plus"></span>
+                        <span class="font-xs-sm mx-1">Ticket</span>
+                    </button>
+                    <data-refresh-btn [page]="currentCriteria.pageNo"
+                        (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <div class="row d-flex justify-content-between pb-2 mx-0">
+                    <div class="col-12 p-0 mb-2">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <div class="w-80">
+                                <div class="w-20">
+                                    <table-search-box [searchValue]="currentCriteria.searchValue"
+                                        (searched)="onSearched($event)"></table-search-box>
+                                </div>
+                            </div>
+                            <div class="w-20">
+                                <form *ngIf="columnForm" class="col-12" [formGroup]="columnForm">
+                                    <div class="form-group mb-0">
+                                        <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                            formControlName="columns" [options]="tableColumns"
+                                            [settings]="columnSelectionSettings" [texts]="columnSelectionTexts"
+                                            (dropdownClosed)="columnChange()"></multiselect-dropdown>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="w-10">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+                        <thead class="bg-light">
+                            <tr>
+                                <th *ngFor="let h of headers">
+                                    {{ h.label }}
+                                </th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+                            <tr *ngFor="let row of viewData; trackBy: trackByFn">
+                                <td *ngFor="let col of headers">
+
+                                    <!-- Ticket Id -->
+                                    <a *ngIf="col.key === 'ticket_id'"
+                                        class="text-primary font-weight-500 cursor-pointer"
+                                        (click)="editUnityOneITSM(row)">
+                                        {{ row[col.key] }}
+                                    </a>
+
+                                    <!-- Other fields -->
+                                    <span *ngIf="col.key !== 'ticket_id'">
+                                        {{ row[col.key] !== null && row[col.key] !== undefined ? row[col.key] : '' }}
+                                    </span>
+
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                        [totalCount]="count"></table-entries>
+                    <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                        [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageChange)="pageChange($event)"></table-pager>
+                    <div class="col-12 text-center text-muted py-4" *ngIf="!viewData.length">No UnityOne ITSM Ticket
+                        available.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

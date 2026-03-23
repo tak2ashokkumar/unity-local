@@ -1,0 +1,22 @@
+<style type="text/css">
+  .modal-body {
+    text-align: center;
+  }
+
+  .modal-image {
+    max-width: 100%;
+    max-height: 80vh;
+    /* or any suitable value to keep inside modal */
+    display: block;
+    margin: 0 auto;
+  }
+</style>
+<div class="modal-header">
+  <h5 class="modal-title">Company Logo</h5>
+</div>
+<div class="modal-body">
+  <img class="modal-image" ng-src="{{ logo }}">
+</div>
+<div class="modal-footer">
+  <button class="btn btn-success" type="button" ng-click="cancel()">Close</button>
+</div>

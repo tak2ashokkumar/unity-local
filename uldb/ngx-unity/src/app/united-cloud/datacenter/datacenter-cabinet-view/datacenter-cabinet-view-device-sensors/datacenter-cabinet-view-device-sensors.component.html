@@ -1,0 +1,21 @@
+<div class="progress" *ngIf="!sensor">
+    <div class="progress-bar" role="progressbar" style="width:16.6%">
+        < 10&#8451; </div> <div class="progress-bar" role="progressbar" style="width:16.6%">
+            20&#8451;
+    </div>
+    <div class="progress-bar" role="progressbar" style="width:16.6%">
+        40&#8451;
+    </div>
+    <div class="progress-bar" role="progressbar" style="width:16.6%">
+        60&#8451;
+    </div>
+    <div class="progress-bar" role="progressbar" style="width:16%">
+        80&#8451;
+    </div>
+    <div class="progress-bar" role="progressbar" style="width:16.6%">
+        > 90&#8451;
+    </div>
+</div>
+
+<!-- For heatmap layer on devices inside cabinet -->
+<span class="heat_map_indicator" *ngIf="sensor && sensor.sensorState && showHeatMapLayer" [ngClass]="[sensor.deviceType, sensor.sensorState, sensor.deviceSensorClass]"></span>

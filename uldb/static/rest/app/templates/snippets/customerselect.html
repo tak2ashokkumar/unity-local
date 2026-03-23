@@ -1,0 +1,6 @@
+<span ng-if="customer.organization_name != ''">
+  <a href="" ng-click="func()">
+    {{ customer.organization_name }}
+  </a>
+</span>
+<span ng-if="customer.organization_name == '' || customer.organization_name == null"><a href="" ng-click="func()">&ltSet Customer&gt</a></span>

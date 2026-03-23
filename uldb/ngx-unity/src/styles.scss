@@ -1,0 +1,293 @@
+/**
+* All our custom css goes here
+* NOTE: USE THIS ONLY WHEN NECESSARY
+**/
+
+@import "variables";
+
+.tabs-level1-menu {
+  margin-bottom: 0;
+  cursor: pointer;
+  padding: 0.75rem 0.5rem;
+  margin-left: auto;
+}
+
+.tabs-level1-link {
+  padding: 0 0.5rem;
+  border: none;
+}
+
+.modal-dialog {
+  top: 55px;
+}
+
+.fa {
+  &.firewalls {
+    color: $firewalls;
+  }
+
+  &.switches {
+    color: $switches;
+  }
+
+  &.lbs {
+    color: $lbs;
+  }
+
+  &.hypervisor {
+    color: $hypervisor;
+  }
+
+  &.bms {
+    color: $bms;
+  }
+
+  &.vms {
+    color: $vms;
+  }
+
+  &.otherdev {
+    color: $otherdev;
+  }
+
+  &.cabinets {
+    color: $cabinets;
+  }
+
+  &.pdus {
+    color: $pdus;
+  }
+
+  &.storage {
+    color: $storage;
+  }
+}
+
+// Dashboard Maintenance Widget CSS Start
+.cal-month-view {
+  .cal-header {
+    font-weight: normal;
+    padding-top: 4%;
+    padding-bottom: 3%;
+  }
+
+  .cal-days {
+    border: none;
+    pointer-events: none;
+
+    .cal-cell-row {
+      height: 30px !important;
+      border: none;
+
+      &:hover {
+        background-color: $white;
+      }
+
+      .cal-cell {
+        &:hover {
+          background-color: $white;
+        }
+      }
+
+      .cal-day-cell {
+        border: none;
+        min-height: 0px;
+
+        &:not(:last-child) {
+          border: none;
+        }
+
+        .cal-cell-top {
+          height: 30px;
+          min-height: 0px;
+          text-align: center;
+
+          .cal-day-number {
+            margin-top: 10%;
+            margin-bottom: 0px;
+            margin-left: 0px;
+            margin-right: 0px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 6px;
+            float: none;
+          }
+
+          .cal-day-badge {
+            margin-top: 10%;
+            margin-bottom: 0px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0px;
+            padding: 4px 6px;
+            background-color: $green;
+            pointer-events: auto;
+            cursor: pointer;
+          }
+        }
+      }
+
+      .cal-day-cell.cal-weekend {
+        .cal-day-number {
+          color: $gray-900;
+        }
+      }
+
+      .cal-day-cell.cal-today {
+        background-color: $white;
+
+        .cal-day-number {
+          font-size: 0.9rem;
+          text-decoration: underline;
+          font-weight: bold !important;
+        }
+
+        .cal-day-badge {
+          font-size: 0.9rem;
+          text-decoration: underline;
+          font-weight: bold !important;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1250px) {
+  .cal-month-view {
+    .cal-day-badge {
+      padding: 2px 4px;
+    }
+
+    .cal-day-number {
+      padding: 2px 4px;
+    }
+  }
+}
+
+// Dashboard Maintenance widget css ends
+
+.nopointerevents {
+  pointer-events: none;
+  cursor: default;
+}
+
+.font-xs {
+  font-size: $font-xs !important;
+}
+
+.sidebar-lg-show {
+  .notification-content {
+    width: calc(100% - 225px) !important;
+  }
+}
+
+.sidebar-lg-show.sidebar-minimized {
+  .notification-content {
+    width: calc(100% - 50px) !important;
+  }
+}
+
+.tooltip.static {
+  z-index: 1040 !important;
+}
+
+.info-multi-line .tooltip-inner {
+  white-space: pre-line;
+}
+
+.btn-outline-primary:not(:disabled):not(.disabled):active:focus,
+.btn-outline-primary:not(:disabled):not(.disabled).active:focus,
+.show>.btn-outline-primary.dropdown-toggle:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.btn-outline-secondary:not(:disabled):not(.disabled):active:focus,
+.btn-outline-secondary:not(:disabled):not(.disabled).active:focus,
+.show>.btn-outline-secondary.dropdown-toggle:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.btn-outline-warning:not(:disabled):not(.disabled):active:focus,
+.btn-outline-warning:not(:disabled):not(.disabled).active:focus,
+.show>.btn-outline-warning.dropdown-toggle:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.btn-outline-danger:not(:disabled):not(.disabled):active:focus,
+.btn-outline-danger:not(:disabled):not(.disabled).active:focus,
+.show>.btn-outline-danger.dropdown-toggle:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.vis-timeline {
+  border-left: none !important;
+  border-top: none !important;
+  border-right: none !important;
+}
+
+.vis-time-axis .vis-grid.vis-minor {
+  border: none !important;
+}
+
+.vis-item {
+  border-radius: 50% !important;
+  background-color: #008cba;
+  color: #fff;
+}
+
+.workflow-poc-body {
+  min-height: 85vh;
+
+  a {
+    color: #2c18df;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  textarea {
+    font-size: 9pt !important;
+    line-height: 1.2em !important;
+  }
+
+  .sqd-designer-angular {
+    // width: 100vw;
+    height: 85vh;
+  }
+
+  .sqd-editor {
+    padding: 10px;
+  }
+
+  .block {
+    text-align: center;
+    margin: 10px;
+  }
+
+}
+
+.custom-agentic-modal-lg {
+  min-width: 1350px !important;
+  margin: 85px auto !important;
+  /* distance from top/bottom */
+}
+
+.custom-agentic-workflow-modal-md {
+  min-width: 750px !important;
+  margin: 85px auto !important;
+  /* distance from top/bottom */
+}
+
+bs-dropdown-container {
+  z-index: 9999 !important;
+}

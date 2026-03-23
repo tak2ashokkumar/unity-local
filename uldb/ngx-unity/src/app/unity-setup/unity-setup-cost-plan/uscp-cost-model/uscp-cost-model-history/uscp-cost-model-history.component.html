@@ -1,0 +1,107 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card round-edge">
+                    <div
+                        class="card-header card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <span class="badge badge-secondary font-lg font-500">{{count}}</span>
+                            <span class="ml-1 font-lg font-500">History :{{historyTableName}}</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back"
+                                (click)="goBack()"><i class="fa fa-arrow-left"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="row mt-3 mb-2">
+                            <div class="col-2">
+                            </div>
+                            <div class="col-10">
+                                <div class="row justify-content-end">
+                                    <!-- <div class="col-2">
+                                        <select class="form-control" type="text"
+                                            [(ngModel)]="currentCriteria.params[0].is_active"
+                                            (ngModelChange)="onFilterChange()">
+                                            <option [value]="''">Select status</option>
+                                            <option [value]="'True'">Enabled</option>
+                                            <option [value]="'False'">Disabled</option>
+                                        </select>
+                                    </div> -->
+
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table text-left">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th> Name</th>
+                                    <th>Plan Type</th>
+                                    <th>Price Unit </th>
+                                    <th>Allocation</th>
+                                    <th>Cost($)</th>
+                                    <th>Modified On</th>
+                                    <th>Modified By</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData; let i = index">
+                                    <td class="text-primary tdw-10">
+                                        <div [tooltip]="view.planName">{{view.planName}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.planType">{{view.planType}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.priceUnit">{{view.priceUnit}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.priceAllocation">{{view.priceAllocation}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.costTooltip">{{view.unitViceCost}} /<em
+                                                class="text-muted">{{view.costUnit}}</em>
+                                        </div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.createdOn">{{view.createdOn}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.createdBy">{{view.createdBy}}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-inline-block" accessControl moduleName="Cost Plan"
+                                            accessType="Manage Cost Plan" elementType="div">
+                                            <ul class="d-flex px-0 mb-0">
+                                                <li>
+                                                    <label class="pointer-link" [class.active]="view.isMaster">
+                                                        <input type="radio" [value]="true"
+                                                            (change)="toggleStatus(view,true)">
+                                                        <span class="font-sm">Enable</span>
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <label class="pointer-link" [class.active]="!view.isMaster">
+                                                        <input type="radio" [value]="false"
+                                                            (change)="toggleStatus(view,false)">
+                                                        <span class="font-sm">Disable</span>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div *ngIf="!viewData.length" class="d-flex py-4 justify-content-center align-items-center">
+                            No clouds mapped.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

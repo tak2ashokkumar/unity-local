@@ -1,0 +1,101 @@
+.workflow-body {
+    min-height: 65vh;
+    background: linear-gradient(-90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(-90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+        linear-gradient(rgba(0, 0, 0, 0.04) 1px, white 1px),
+        linear-gradient(transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+        linear-gradient(-90deg, #aaa 1px, white 1px),
+        linear-gradient(-90deg, transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+        linear-gradient(#aaa 1px, transparent 1px), #f2f2f2;
+    background-size:
+        12px 12px,
+        12px 12px,
+        120px 120px,
+        120px 120px,
+        240px 240px,
+        240px 240px,
+        240px 240px,
+        240px 240px;
+
+    .dot {
+        height: 60px;
+        width: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 500;
+    }
+
+    .dot.workflow-start {
+        background-color: #c0f3d8;
+        border: 1px solid #0cbb70;
+        color: #0cbb70;
+    }
+
+    .dot.workflow-end {
+        background-color: #ffa1a1;
+        border: 1px solid #b72525;
+        color: #b72525;
+    }
+
+    .widget-card {
+        min-width: 10rem;
+    }
+
+    .condition {
+        width: 3rem;
+        height: 3rem;
+        background-color: #ffffff;
+        border: 2px solid #c8ced3 !important;
+        transform: rotateX(45deg) rotateZ(45deg);
+    }
+
+    #task_wrapper_div {
+        .widget-card.Success,
+        .condition.Success {
+            border: 1px solid #0cbb70 !important;
+            .card-header {
+                background-color: #c0f3d8 !important;
+                color: #0cbb70 !important;
+            }
+        }
+        .widget-card.InProgress,
+        .condition.InProgress {
+            border: 1px solid #378ad8 !important;
+            .card-header {
+                background-color: #378ad8 !important;
+                color: #ffffff !important;
+            }
+        }
+        .widget-card.Running,
+        .condition.Running {
+            border: 1px solid #378ad8 !important;
+            .card-header {
+                background-color: #378ad8 !important;
+                color: #ffffff !important;
+            }
+        }
+        .widget-card.Failed,
+        .condition.Failed {
+            border: 1px solid #b72525 !important;
+            .card-header {
+                background-color: #ffc1c1 !important;
+                color: #b72525 !important;
+            }
+        }
+    }
+}
+
+.task-details-card {
+    position: fixed;
+    z-index: 2050;
+    top: 55px;
+    left: 78vw;
+    bottom: 50px;
+    height: calc(100% - 55px);
+    width: 0;
+    overflow-x: hidden;
+    transition: 0.5s;
+}

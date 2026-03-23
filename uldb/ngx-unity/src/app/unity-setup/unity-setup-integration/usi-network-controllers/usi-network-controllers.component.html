@@ -1,0 +1,66 @@
+<h5 class="mt-4">SD-WANs</h5>
+<div class="row mb-4">
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="networkControllers.viptela.imageURL" class="w-100" [alt]="'viptela'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="networkControllers.viptela.length">
+                            <button
+                                class="btn btn-pill btn-sm btn-primary font-xs">{{networkControllers.viptela.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="networkControllers.viptela.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToViptelaViewDetails()">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="goToaddViptela()" accessControl [moduleName]="'Datacenter'"
+                            [accessType]="'Manage Datacenter'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card round-edge equalize-card">
+            <div class="card-body p-1">
+                <div class="row mx-0">
+                    <div class="col-6">
+                        <img [src]="networkControllers.meraki.imageURL" class="w-100" [alt]="'meraki'" loading="eager"
+                            style="height: 36px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                    </div>
+                </div>
+                <div class="row border-top pt-1 pb-0 mx-0">
+                    <div class="col-6 d-flex align-items-center">
+                        <ng-container *ngIf="networkControllers.meraki.length">
+                            <button class="btn btn-pill btn-sm btn-primary font-xs">{{networkControllers.meraki.length}}
+                                Instances</button>
+                        </ng-container>
+                    </div>
+                    <div class="col-6">
+                        <ng-container *ngIf="networkControllers.meraki.length">
+                            <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right"
+                                [tooltip]="viewtooltipMsg" (click)="goToCiscoMerakiViewDetails()">
+                            </button>
+                        </ng-container>
+                        <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                            (click)="goToaddCiscoMeraki()" accessControl [moduleName]="'Datacenter'"
+                            [accessType]="'Manage Datacenter'" [elementType]="'actionbtn'">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

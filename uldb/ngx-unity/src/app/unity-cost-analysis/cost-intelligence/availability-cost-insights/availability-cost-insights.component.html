@@ -1,0 +1,283 @@
+<div class="d-flex flex-wrap gap-2">
+    <div class="card round-edge mb-2 mr-2" style="flex: 1 1 10%;">
+        <div class="card-body">
+            <div>Total Cost</div>
+            <div class="d-flex">
+                <span class="text-primary font-xl">
+                    $9000 <span class="text-success">10%</span> <span class="text-muted">since last month</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card round-edge mb-2 mr-2" style="flex: 1 1 10%;">
+        <div class="card-body">
+            <div>Total Monthly Spend</div>
+            <div class="d-flex">
+                <span class="text-primary font-xl">
+                    $9000 <span class="text-success">10%</span> <span class="text-muted">since last month</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card round-edge mb-2 mr-2" style="flex: 1 1 10%;">
+        <div class="card-body">
+            <div>Total Annual Budget</div>
+            <div class="d-flex">
+                <span class="text-primary font-xl">
+                    $9000 <span class="text-success">10%</span> <span class="text-muted">since last month</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card round-edge mb-2 mr-2" style="flex: 1 1 10%;">
+        <div class="card-body">
+            <div>Average Availability Threshold</div>
+            <div class="d-flex">
+                <span class="text-primary font-xl">
+                    $9000 <span class="text-success">10%</span> <span class="text-muted">since last month</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card round-edge mb-2" style="flex: 1 1 10%;">
+        <div class="card-body">
+            <div>Services Below 99.99%</div>
+            <div class="d-flex">
+                <span class="text-primary font-xl">
+                    $9000 <span class="text-success">10%</span> <span class="text-muted">since last month</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-8 pr-0">
+        <div class="card round-edge equalize-card">
+            <div class="card-header bg-transparent font-lg font-500">
+                Service Spend vs Availablility
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Service ID</th>
+                            <th>Service Name</th>
+                            <th>Type</th>
+                            <th>Provider</th>
+                            <th>Availability Metric</th>
+                            <th>Threshold</th>
+                            <th>Rate</th>
+                            <th>Budget</th>
+                            <th>Allocation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr setTableColumnWidth>
+                            <td>abc</td>
+                            <td class="text-truncate">asdf</td>
+                            <td>ad</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card round-edge equalize-card">
+            <div class="card-header bg-transparent font-lg font-500">
+                Spend Distribution By Service Type
+            </div>
+            <div class="card-body p-0">
+                <ng-container *ngIf="costBycloudChartViewData">
+                    <div echarts [options]="costBycloudChartViewData.options"
+                        [extentions]="costBycloudChartViewData.extensions" [defaultHeight]="260"></div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!costBycloudChartViewData">No
+                    data
+                    available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-6 pr-1">
+        <div class="card round-edge mb-2 equalize-card" style="flex: 1 1 10%;">
+            <div class="card-header bg-transparent font-lg font-500">
+                Availability Metrics Trend
+            </div>
+            <div class="card-body">
+                <ng-container *ngIf="hourlyLineChartViewData">
+                    <div
+                      echarts
+                      [options]="hourlyLineChartViewData.options"
+                      [extentions]="hourlyLineChartViewData.extensions"
+                      [defaultHeight]="300"
+                    ></div>
+                  </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 pl-1">
+        <div class="card round-edge mb-2 equalize-card" style="flex: 1 1 10%;">
+            <div class="card-header bg-transparent font-lg font-500">
+                Monthly spend By Provider
+            </div>
+            <div class="card-body">
+                <ng-container *ngIf="costBycloudChartViewData">
+                    <div echarts [options]="costBycloudChartViewData.options"
+                        [extentions]="costBycloudChartViewData.extensions" [defaultHeight]="260"></div>
+                </ng-container>
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!costBycloudChartViewData">No
+                    data
+                    available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-6 pr-1">
+        <div class="card round-edge mb-2 equalize-card" style="flex: 1 1 10%;">
+            <div class="card-header bg-transparent font-lg font-500">
+                Monthly Cost vs Budget
+            </div>
+            <div class="card-body">
+                <ng-container *ngIf="hourlyLineChartViewData">
+                    <div
+                      echarts
+                      [options]="hourlyLineChartViewData.options"
+                      [extentions]="hourlyLineChartViewData.extensions"
+                      [defaultHeight]="300"
+                    ></div>
+                  </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 pl-1">
+        <div class="card round-edge mb-2 equalize-card" style="flex: 1 1 10%;">
+            <div class="card-header bg-transparent font-lg font-500">
+                Cost Anomaly Overview
+            </div>
+            <div class="card-body">
+                <ng-container *ngIf="costVsBudgetChartViewData">
+                    <div
+                      echarts
+                      [options]="costVsBudgetChartViewData.options"
+                      [extentions]="costVsBudgetChartViewData.extensions"
+                      [defaultHeight]="320"
+                    ></div>
+                  </ng-container>                  
+                <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!costBycloudChartViewData">No
+                    data
+                    available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="card round-edge mb-2 equalize-card" style="flex: 1 1 10%;">
+            <div class="card-header bg-transparent font-lg font-500">
+                Top Cost Anomalies
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Service_ID</th>
+                            <th>Service Name</th>
+                            <th>Rate Value</th>
+                            <th>Monthly Budget</th>
+                            <th>Anomaly Type</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr setTableColumnWidth>
+                            <td>abc</td>
+                            <td class="text-truncate">asdf</td>
+                            <td>ad</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="card round-edge mb-2 equalize-card" style="flex: 1 1 10%;">
+            <div class="card-header bg-transparent font-lg font-500">
+                Anomalies Based On Cost per %Availability
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Service_ID</th>
+                            <th>Service Name</th>
+                            <th>Rate Value</th>
+                            <th>Monthly Budget</th>
+                            <th>Anomaly Type</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr setTableColumnWidth>
+                            <td>abc</td>
+                            <td class="text-truncate">asdf</td>
+                            <td>ad</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                            <td>asdf</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

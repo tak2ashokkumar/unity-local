@@ -1,0 +1,103 @@
+@use "sass:math";
+
+@import "variables";
+
+$wizard-color-neutral: $secondary !default;
+$wizard-color-active: $primary !default;
+$wizard-color-complete: $success !default;
+$wizard-step-width-height: 40px !default;
+
+.step-indicator {
+    border-collapse: separate;
+    display: block;
+    margin-left: 0px;
+    position: relative;
+    table-layout: fixed;
+    text-align: center;
+    // vertical-align: middle;
+    padding-left: 0;
+    // padding-top: 20px;
+    margin-bottom: 0;
+    overflow-x: auto;
+
+    li {
+        display: table-cell;
+        position: relative;
+        float: none;
+        padding: 0;
+        width: 1%;
+
+        &:after {
+            background-color: $wizard-color-neutral;
+            content: "";
+            display: block;
+            height: 1px;
+            position: absolute;
+            width: 100%;
+            top: math.div($wizard-step-width-height, 2);
+        }
+
+        &:after {
+            left: 50%;
+        }
+
+        &:last-of-type {
+            &:after {
+                display: none !important;
+            }
+        }
+
+        &.active {
+            .step {
+                border-color: $wizard-color-active;
+                color: $wizard-color-active;
+            }
+
+            .caption {
+                color: $wizard-color-active;
+            }
+        }
+
+        &.complete {
+            &:after {
+                background-color: $wizard-color-complete;
+            }
+
+            .step {
+                border-color: $wizard-color-complete;
+                color: $wizard-color-complete;
+            }
+
+            .caption {
+                color: $wizard-color-complete;
+            }
+        }
+    }
+
+    .step {
+        background-color: #fff;
+        border-radius: 50%;
+        border: 1px solid $wizard-color-neutral;
+        color: $wizard-color-neutral;
+        height: $wizard-step-width-height;
+        line-height: $wizard-step-width-height;
+        margin: 0 auto;
+        position: relative;
+        width: $wizard-step-width-height;
+        z-index: 1;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .caption {
+        color: $wizard-color-neutral;
+        padding: 11px 16px;
+        span {
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}

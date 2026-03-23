@@ -1,0 +1,17 @@
+<div class="card equalize-card">
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title ">
+    <h4 class="card-title font-lg">{{data.Label}}</h4>
+  </div>
+  <div class="card-body pt-0">
+    <div class="row align-items">
+      <div class="col">
+        <div style="display:flex; flex-direction:column">
+          <div style="flex-grow:1; position:relative">
+            <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="chartOptions"
+              [chartType]="lineChartType"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

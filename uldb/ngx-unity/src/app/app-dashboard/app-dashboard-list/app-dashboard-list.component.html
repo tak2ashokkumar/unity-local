@@ -1,0 +1,149 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card round-edge">
+                    <div
+                        class="card-header card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <span class="badge badge-secondary font-lg font-500">{{count}}</span>
+                            <span class="ml-1 font-lg">Dashboards</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <button class="btn btn-pill btn-sm btn-warning mr-2" accessControl moduleName="Dashboard"
+                                accessType="Manage Dashboard" elementType="btn" (click)="add()">
+                                <i class="fas fa-plus"></i> &nbsp;Dashboard</button>
+                            <data-refresh-btn [page]="currentCriteria.pageNo"
+                                (refresh)="refreshData($event)"></data-refresh-btn>
+                            <button class="btn btn-pill btn-sm btn-warning ml-2" (click)="goBack()" [tooltip]="'Back'"
+                                container="body">
+                                <i class="fa fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="row my-2">
+                            <div class="col-2">
+                                <search-box (searched)="onSearched($event)"></search-box>
+                            </div>
+                            <div class="col-10">
+                                <div class="row justify-content-end">
+                                    <div class="mx-2">
+                                        <table-page-size [currentPageSize]="currentCriteria.pageSize"
+                                            [totalCount]="count"
+                                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Refresh Interval</th>
+                                    <!-- <th>Owner</th> -->
+                                    <th>Last Modified</th>
+                                    <!-- <th>Groups</th> -->
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData; let i = index" truncateText>
+                                    <td class="text-primary tdw-25">
+                                        <div [tooltip]="view.name">{{view.name}}</div>
+                                    </td>
+                                    <td class="tdw-10">
+                                        <div [tooltip]="view.type">{{ view.type }}</div>
+                                    </td>
+                                    <td class="tdw-15">
+                                        <div [tooltip]="view.refreshInterval">{{ view.refreshInterval }}</div>
+                                    </td>
+                                    <td class="tdw-25">
+                                        <div [tooltip]="view.lastModified">{{ view.lastModified }}</div>
+                                    </td>
+
+                                    <td class="text-center tdw-25">
+                                        <div class="d-inline-block" accessControl moduleName="Dashboard"
+                                            accessType="Manage Dashboard" elementType="div">
+                                            <ul class="d-flex px-0 mb-0 ml-0">
+                                                <li>
+                                                    <label class="pointer-link" [class.active]="view.status == 'draft'">
+                                                        <input type="radio" [value]="true"
+                                                            (click)="toggleStatus(view,true)">
+                                                        <span class="font-sm">Draft</span>
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <label class="pointer-link"
+                                                        [class.active]="view.status == 'published'">
+                                                        <input type="radio" [value]="false"
+                                                            (click)="toggleStatus(view,false)">
+                                                        <span class="font-sm">Publish</span>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td class="action-icons-column text-center">
+                                        <!-- <button class="action-icons mb-0 fas fa-eye font-sm ml-1" tooltip="View"
+                                            (click)="viewDashboard(view)"></button> -->
+                                        <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                            (click)="edit(view)" accessControl moduleName="Dashboard"
+                                            accessType="Manage Dashboard" elementType="actionbtn"
+                                            [modulePermissions]="view.applicableModulePermissions"></button>
+                                        <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                            (click)="delete(view)" accessControl moduleName="Dashboard"
+                                            accessType="Manage Dashboard" elementType="actionbtn"
+                                            [modulePermissions]="view.applicableModulePermissions"></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div *ngIf="!viewData.length" class="d-flex py-4 justify-content-center align-items-center">
+                            No Dashboard available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmStatusChangeRef>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure to {{selectedView.status == 'draft' ? 'Publish' : 'Draft'}} this Dashboard?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2 px-4" type="button"
+                (click)="confirmToggleStatus()">Yes</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmDeleteRef>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to Delete ?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button" (click)="confirmDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #popTemplate let-list="dataList">
+    <div *ngFor="let name of list">{{ name }}</div>
+</ng-template>

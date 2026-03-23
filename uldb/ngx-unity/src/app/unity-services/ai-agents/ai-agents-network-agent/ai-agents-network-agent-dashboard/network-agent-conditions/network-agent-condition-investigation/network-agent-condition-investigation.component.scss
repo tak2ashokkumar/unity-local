@@ -1,0 +1,58 @@
+@import "variables";
+
+.condition-detail {
+    .event-severity {
+        height: 20px;
+    }
+
+    .event-data {
+        width: 75%;
+
+        .event-name {
+            min-width: 10%;
+            max-width: 75%;
+        }
+
+        .event-time {
+            max-width: 25%;
+        }
+    }
+
+    .source-count {
+        height: 20px;
+        width: 20px;
+        text-align: center;
+        border-radius: 50% !important;
+        background-color: $gray-200;
+        color: $gray-600;
+    }
+}
+
+.wizard {
+  position: relative;
+
+  .check-icon-container {
+    display: flex;
+    background-color: #fff;
+    border-radius: 50%;
+    text-align: center;
+
+    .action-icons {
+      border: 1px solid $success-500;
+      background-color: $success-100;
+      padding-top: 8px;
+    }
+  }
+
+  .step {
+    padding: 15px 0;
+    position: relative;
+    .line {
+      top: 47px;
+      left: 15px;
+      height: 55%;
+      position: absolute;
+      border: 1px solid #e5e5e5;
+    }
+  }
+}

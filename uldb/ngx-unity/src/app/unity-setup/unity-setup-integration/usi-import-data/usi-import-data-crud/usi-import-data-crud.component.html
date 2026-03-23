@@ -1,0 +1,42 @@
+<div class="container-fluid pt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-0">
+                    <div
+                        class="card-title mb-2 px-2 py-2 border-bottom d-flex justify-content-between font-weight-bold">
+                        <span class="font-lg font-500">Integration</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-8 offset-2">
+                                <form class="form" [formGroup]="importForm" *ngIf="importForm">
+                                    <div class="row">
+                                        <div class="form-group col-12">
+                                            <label for="name">Platform<em>*</em></label>
+                                            <select id="platform" class="form-control" formControlName="platform"
+                                                [ngClass]="{'is-invalid' : formErrors.platform}">
+                                                <option [value]="''" disabled>Select option</option>
+                                                <option [value]="'sustainability'">Sustainability</option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="formErrors.platform">
+                                                {{formErrors.platform}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <usi-import-sustainability-data
+                                    *ngIf="importForm.get('platform').value == 'sustainability'"
+                                    (formData)="childFormData($event)"></usi-import-sustainability-data>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+                        <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                        <button class="btn btn-success ml-3" type="button" (click)="onSubmit()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h3>IPv6 Assignments <span ng-if="model.location != '' && model.location != null">- ({{model.location}})</span></h3>
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<script type="text/ng-template" id="alert23.html">
+  <div class="alert alert-{{ type }}" role="alert">
+    <button type="button" class="close" data-dismiss="alert" ng-click="close()">
+      <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+    </button>
+    <div ng-transclude></div>
+  </div>
+</script>
+
+<div class="row">
+  <div class="col-sm-6">
+    <uib-alert template-url="alert23.html" ng-repeat="alert in alerts" type="{{ alert.severity }}"
+               close="alertService.closeAlert($index)"
+               dismiss-on-timeout="10000">
+      {{ alert.msg }}
+    </uib-alert>
+  </div>
+</div>
+
+<div ng-if="AssignFromAllocation"><br/></div>
+
+<div class="row" ng-if="AssignFromAllocation">
+  <div class="col-sm-8">
+    <div class="col-sm-4">
+	<b>Customer - </b><button type="button" class="btn btn-success" ng-click="Create48(model.ext_tier_id, 'Customer 48')">Create/48</button>
+    </div>
+    <div class="col-sm-4">
+	<b>Internal - </b><button type="button" class="btn btn-success" ng-click="Create48(model.int_tier_id, 'Internal 48')">Create/48</button>
+    </div>
+  </div>
+
+</div>
+
+<div ng-if="AssignFromAllocation"><br/></div>
+
+<table class="table table-hover">
+  <thead>
+  <tr>
+    <th class="col-sm-2">Customer</th>
+    <th class="col-sm-2">Prefix/Mask</th>
+    <th class="col-sm-2">Parent Allocation</th>
+    <th class="col-sm-1">Type</th>
+    <th class="col-sm-1">Location</th>
+    <th class="col-sm-1">Interface</th>    
+    <th class="col-sm-1">Interface Details</th>
+    <th class="col-sm-1"></th>
+  </tr>
+  </thead>
+  <tbody> 
+  <tr ng-repeat="assignment in model.results" 	
+      ng-click="selectAssignment(assignment)"
+      ng-class="{'selected': assignment === currentAssignment}"> 
+    <td>
+      <customerselect customer="assignment.customer"
+                      func="setCustomer(assignment)()">
+      </customerselect>
+    </td>
+    <td>{{ assignment.prefix }}/{{ assignment.prefixlen }}</td>
+    <td>{{ assignment.allocation.name }}</td>
+    <td><div ng-if="assignment.tier.purpose == '1'">Internal</div><div ng-if="assignment.tier.purpose == '2'">Customer</div></td>
+    <td>{{ assignment.tier.region.name }}</td>
+    <td><a href="" ng-if="assignment.is_allow_64 && assignment.customer != null" ng-click="Create64(assignment)">Create/64</a></td>
+    <td><a href="" ng-if="assignment.is_allow_64 && assignment.customer != null" ng-click="ShowInterfaceDetails(assignment)">Details</a></td>
+    <td>
+      <button ng-if="currentAssignment === assignment"
+              class="btn btn-danger btn-xs"
+              ng-click="delete(assignment, $index)" confirm>
+        <i class="glyphicon glyphicon-erase" aria-hidden="true"></i> Delete
+      </button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<uib-pagination total-items="model.count" items-per-page="pageSize" max-size="5" rotate="false"
+                ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+
+<script type="text/ng-template" id="customerModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Set Customer for {{ currentAssignment.prefix }}</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="org" class="col-sm-2 control-label">
+          Organization
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control"
+                 ng-model="org"
+                 placeholder="Type the name of an Organization to search..."
+                 uib-typeahead="org as org.organization_name for org in getOrgs($viewValue)">
+        </div>
+      </div>
+    </form>
+  </div>
+  
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="assign(org, currentAssignment)">
+      Assign to this customer!
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Never mind, I made a mistake.
+    </button>
+  </div>
+</script>
+

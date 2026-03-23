@@ -1,0 +1,10 @@
+<div class="card border-0 mb-0">
+  <div class="card-body">
+    <ul class="mb-0">
+      <li *ngFor="let release of releases" class="mb-1">
+        <button class="btn btn-link p-0" (click)="goToView(release)">{{release.name}}</button>
+        <span class="ml-2 text-muted align-middle">{{release.release_date | date:'mediumDate'}}</span>
+      </li>
+    </ul>
+  </div>
+</div>

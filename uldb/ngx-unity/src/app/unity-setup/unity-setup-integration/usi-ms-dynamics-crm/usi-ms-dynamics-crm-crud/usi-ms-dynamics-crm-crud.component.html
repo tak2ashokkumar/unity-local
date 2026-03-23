@@ -1,0 +1,127 @@
+<div class="container-fluid pt-3" *ngIf="isAddOrEdit">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-title mb-2 px-2 py-2 border-bottom d-flex justify-content-between font-weight-bold">
+            <span class="font-lg font-500">Integration</span>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-8 offset-2">
+                <form [formGroup]="form" *ngIf="form">
+                  <div class="row">
+                    <div class="form-group col-12">
+                      <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="name">Name<em>*</em></label>
+                      <input class="form-control" id="name" formControlName="name" type="text" placeholder="Name"
+                        [ngClass]="{'is-invalid' : formErrors.name}">
+                      <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="crm_url">CRM URL<em>*</em></label>
+                      <input class="form-control" id="crm_url" formControlName="crm_url" type="text"
+                        placeholder="CRM URL" [ngClass]="{'is-invalid' : formErrors.crm_url}">
+                      <div class="invalid-feedback" *ngIf="formErrors.crm_url">
+                        {{formErrors.crm_url}}
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="client_id">Client ID<em>*</em></label>
+                      <input class="form-control" id="client_id" formControlName="client_id" type="text"
+                        placeholder="Client ID" [ngClass]="{'is-invalid' : formErrors.client_id}">
+                      <div class="invalid-feedback" *ngIf="formErrors.client_id">
+                        {{formErrors.client_id}}
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="tenant_id">Tenant ID<em>*</em></label>
+                      <input class="form-control" id="tenant_id" formControlName="tenant_id" type="text"
+                        placeholder="Tenant ID" [ngClass]="{'is-invalid' : formErrors.tenant_id}">
+                      <div class="invalid-feedback" *ngIf="formErrors.tenant_id">
+                        {{formErrors.tenant_id}}
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="crm_account_uuid">Account ID<em>*</em></label>
+                      <input class="form-control" id="crm_account_uuid" formControlName="crm_account_uuid" type="text"
+                        placeholder="Account ID" [ngClass]="{'is-invalid' : formErrors.crm_account_uuid}">
+                      <div class="invalid-feedback" *ngIf="formErrors.crm_account_uuid">
+                        {{formErrors.crm_account_uuid}}</div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="access_type">Access Type<em>*</em></label>
+                      <select id="access_type" class="form-control" formControlName="access_type"
+                        [class.is-invalid]="formErrors.access_type">
+                        <option value="" disabled>Access Type</option>
+                        <option value="admin">Admin</option>
+                        <option value="tenant">Tenant</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="formErrors.access_type">
+                        {{formErrors.access_type}}
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="username">Username<em>*</em></label>
+                      <input class="form-control" id="username" formControlName="username" type="text"
+                        placeholder="Username" [ngClass]="{'is-invalid' : formErrors.username}">
+                      <div class="invalid-feedback" *ngIf="formErrors.username">
+                        {{formErrors.username}}
+                      </div>
+                    </div>
+                    <div class="form-group col-6" *ngIf="form.controls.password">
+                      <label for="password">Password<em>*</em></label>
+                      <input class="form-control" id="password" formControlName="password" type="password"
+                        placeholder="Password" [ngClass]="{'is-invalid' : formErrors.password}">
+                      <div class="invalid-feedback" *ngIf="formErrors.password">
+                        {{formErrors.password}}
+                      </div>
+                    </div>
+                    <div class="form-group col-6">
+                      <label class="col-form-label">Default</label>
+                      <div class="col-form-label">
+                        <div class="form-check form-check-inline mx-1 mt-0">
+                          <input class="form-check-input" id="is_default" formControlName="is_default" type="checkbox"
+                            placeholder="is_default" [ngClass]="{'is-invalid' : formErrors.is_default}">
+                          <div class="invalid-feedback" *ngIf="formErrors.is_default">
+                            {{formErrors.is_default}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="onSubmit()">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Disconnect
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to disconnect?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

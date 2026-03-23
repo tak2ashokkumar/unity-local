@@ -1,0 +1,91 @@
+<alerts></alerts>
+
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+
+<script type="text/ng-template" id="obsOrg.html">
+  <div ng-repeat="port in org_ports">
+    <h3>{{ port.switch.name }} {{ port.interface_name }}</h3>
+    <div class="row">
+      <div class="col-xs-8">
+        <observium-graph port="port" val="intervals[port.$$hashKey]"></observium-graph>
+      </div>
+      <div class="col-xs-4">
+        <observium-interval-picker interval="intervals[port.$$hashKey]"></observium-interval-picker>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="obsPort.html">
+  <nested-model-results model="graphedPortScope" ctrl="graphedPortCtrl"></nested-model-results>
+  <div>
+    <button class="btn btn-primary" ng-click="graphedPortCtrl.add()">Add</button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="obsCust.html">
+  <form class="form-horizontal">
+    <div class="form-group">
+      <label class="col-sm-2 control-label">
+        Customer
+      </label>
+      <div class="col-sm-4">
+        <input class="form-control"
+               ng-model="customer"
+               uib-typeahead="org as org.name for org in getOrgs($viewValue)">
+      </div>
+      <div class="col-sm-4">
+        <button class="btn btn-primary" ng-click="load(customer)">Load</button>
+      </div>
+    </div>
+  </form>
+
+  <div ng-if="loaded !== false">
+    <graph-control-panel ports="ports"></graph-control-panel>
+
+    <div>
+      <h3>Cumulative Bandwidth (95th percentile, bps)</h3>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4>Day</h4>
+          <nvd3 options="day_opts" data="stats.day"></nvd3>
+        </div>
+        <div class="col-sm-6">
+          <h4>Week</h4>
+          <nvd3 options="day_opts" data="stats.week"></nvd3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4>Month</h4>
+          <nvd3 options="day_opts" data="stats.month"></nvd3>
+        </div>
+        <div class="col-sm-6">
+          <h4>Year</h4>
+          <nvd3 options="day_opts" data="stats.year"></nvd3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</script>
+
+<script type="text/ng-template" id="obsHost.html">
+  <nested-model-results model="observiumScope" ctrl="observium_ctrl"></nested-model-results>
+  <div>
+    <button class="btn btn-primary" ng-click="observium_ctrl.add()">Add</button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="obsTransit.html">
+  <nested-model-results model="transitScope" ctrl="transit_ctrl"></nested-model-results>
+  <div>
+    <button class="btn btn-primary" ng-click="transit_ctrl.add()">Add</button>
+  </div>
+</script>

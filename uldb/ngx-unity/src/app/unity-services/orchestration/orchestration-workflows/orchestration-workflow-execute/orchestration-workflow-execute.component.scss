@@ -1,0 +1,328 @@
+.right-sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 0 0 rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    scrollbar-width: none;
+    z-index: 1050;
+}
+
+.accordion-headers {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #e0e0e0;
+    // background-color: #f8f9fa;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.accordion-sub-headers {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.accordion .accordion .accordion-headers {
+    background-color: #ffffff;
+    // border: 1px solid #f0f0f0;
+    font-size: 12px;
+    font-weight: 500;
+    padding-left: 15px;
+    padding: 6px;
+}
+
+/* Sub accordion body */
+.accordion .accordion .accordion-body {
+    padding-left: 20px;
+}
+
+/* Step styling */
+ul {
+    margin-bottom: 0;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+    /* space between steps */
+    line-height: 1.5;
+}
+
+/* Make Step text bold using a regex-friendly wrap */
+ul li strong:first-child {
+    font-weight: 600;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    /* adjust if needed */
+    cursor: pointer;
+    outline: none;
+    /* remove outline */
+}
+
+.btn-close:focus {
+    outline: none;
+    /* remove focus ring */
+    box-shadow: none;
+    /* remove any box-shadow */
+}
+
+
+//For chatTrigger
+.chat-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* IMPORTANT */
+    overflow: hidden;
+    padding: 0px;
+}
+
+
+/* The scrollable messages area */
+.chat-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    justify-content: flex-start;
+    max-height: 410px;
+}
+
+
+.chat-body::-webkit-scrollbar {
+    display: none;
+    /* Hide the scrollbar in WebKit browsers (Chrome, Safari) */
+}
+
+/* messages column centered */
+.chat-messages {
+    width: 100%;
+    max-width: 750px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 380px;
+    /* reserve space for input */
+}
+
+
+/* responsive adjustments */
+@media (max-width: 768px) {
+    .chat-messages {
+        width: 92%;
+    }
+
+    .chat-input-container {
+        max-width: 100%;
+        padding: 0 12px;
+    }
+
+    .message-row.user {
+        padding-right: 12px;
+    }
+}
+
+/* rows and alignment */
+.message-row {
+    display: flex;
+}
+
+.message-row.user {
+    justify-content: flex-end;
+    // padding-right: 85px;
+}
+
+.message-row.bot {
+    justify-content: flex-start;
+}
+
+/* bubble */
+// .message-box {
+//     max-width: 70%;
+//     padding: 5px;
+//     font-size: 12px;
+//     line-height: 1.2;
+//     word-wrap: break-word;
+// }
+
+.message-box {
+    display: inline-flex;
+    /* allow text and dots to be on same line */
+    align-items: flex-end;
+    /* align dots to bottom of text */
+    max-width: 70%;
+    padding: 7px;
+    // border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.2;
+    word-wrap: break-word;
+    color: #000;
+}
+
+.user-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.dots {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 16px;
+    // line-height: 1;
+    // vertical-align: text-bottom;
+
+    /* reserve height so adding dots doesn’t move text */
+    min-width: 1em;
+    /* enough space for 3 dots */
+    // height: 1em;
+    /* reserve line height */
+}
+
+.dots::after {
+    content: "";
+    /* initial empty content */
+    display: inline-block;
+    /* make sure it’s inline */
+    animation: dots 1.5s steps(3, end) infinite;
+}
+
+.typing-indicator {
+    display: flex;
+    /* horizontal layout */
+    justify-content: flex-start;
+    align-items: center;
+    /* vertically center dots */
+    height: 24px;
+    /* enough space for dots */
+}
+
+
+.pulse-loader {
+    display: flex;
+    /* keep dots in a row */
+    gap: 2px;
+    align-items: center;
+    /* prevent vertical stretching */
+}
+
+.pulse-loader>div {
+    width: 4px;
+    height: 4px;
+    flex-shrink: 0;
+    /* prevent shrinking */
+    border-radius: 50%;
+    /* perfect circle */
+    background-color: #000;
+    animation: pulse 1s infinite ease-in-out;
+}
+
+.pulse-loader>div:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.pulse-loader>div:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.chat-input-bottom {
+    flex: 0 0 auto;
+    padding: 10px 0;
+    background: white;
+}
+
+
+/* shared input container */
+.chat-input-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0;
+    position: absolute;
+    bottom: 25px;
+    /* adjust as needed */
+    //   left: 330px;
+    flex-direction: column;
+    z-index: 90;
+}
+
+/* input box shared styles */
+.chat-input-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: #fff;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* inputs */
+.chat-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px 8px;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
+    resize: none;
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+.chat-input::placeholder {
+    color: #999;
+}
+
+/* send button */
+.send-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #777;
+    font-size: 18px;
+    margin-left: 8px;
+    outline: none;
+}
+
+.send-btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.send-btn.active-send {
+    color: #28a745;
+    /* green when input has content */
+}
+
+:host {
+    display: block;
+    background: #fff;
+    box-shadow: -2px 0 0 rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+}
+
+.resize-handle-right {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+}
+
+.resize-handle-right:hover {
+    background: rgba(0, 0, 0, 0.1);
+}

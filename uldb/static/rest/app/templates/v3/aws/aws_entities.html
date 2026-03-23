@@ -1,0 +1,36 @@
+<alerts></alerts>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-sm-12">
+            <h3>Entities</h3>
+            <span>
+                <small ng-repeat="crumb in bread.crumbs">
+                    <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                </small>
+            </span>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-6">
+            <awsgenerictable
+                heading="POLICY GROUPS"
+                headers="aws_entities_group_headers"
+                tabledata="aws_entities_list_content.data.policy_groups">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-6">
+            <awsgenerictable
+                heading="POLICY USERS"
+                headers="aws_entities_user_headers"
+                tabledata="aws_entities_list_content.data.policy_users">
+            </awsgenerictable>
+        </div>
+        <div class="col-md-6">
+            <awsgenerictable
+                heading="POLICY ROLES"
+                headers="aws_entities_role_headers"
+                tabledata="aws_entities_list_content.data.policy_roles">
+            </awsgenerictable>
+        </div>
+    </div>
+</div>

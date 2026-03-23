@@ -1,0 +1,92 @@
+<div class="panel panel-default">
+    <div class="panel-heading vcloud-head">
+        <div class="col-md-8 vcloudtitle"><i class="fa fa-cloud  fa-fw"></i> PUBLIC CLOUDS</div>
+        <div class="col-md-4 pinnewcus">
+            <input class="form-control custom_search_field" type="text" ng-model="searchKeyword"
+                   placeholder="Search by name.." ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+        </div>
+    </div>
+
+    <div class="panel-body limt-scroll-cloud-widget" >
+        <span ng-if="!public_clouds">
+          <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+        </span>
+        <div class="publicClouds-wrapper">
+            <div class="dataTable_wrapper auto-height">
+                <span ng-if="public_clouds.data.info.length != 0">
+                    <table class="table" id="dataTables-example">
+                        <div ng-repeat="(index, page) in public_clouds.data.info | filter: searchKeyword"
+                            class="cus-widget-item widget-item-wrapper col-lg-4 col-md-4">
+                            <div class="no-border">
+                                <!-- <div class="cus-widget-item widget-item-wrapper col-lg-4 col-md-4"> -->
+                                <a href="{{get_platform_url(page.platform_type,page.adapter_id,page.unique_id)}}" class="dash-item-wrapper">
+                                    <div class="col-md-12 pad-small ">
+
+                                        <div class="p-cloud-icon icon-{{page.platform_type}}"></div>
+
+                                        <div class="p-cloud-text"> {{page.name}}</div>
+                                       <div ng-if="page.status== 0" class="status-buttons">
+                                            <span class="btn-status-top status-none"></span>
+                                            <span class="btn-status-top status-bad"></span>
+                                        </div>
+                                        <div ng-if="page.status== 1" class="status-buttons">
+                                            <span class="btn-status-top status-good"></span>
+                                            <span class="btn-status-top status-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 pad-small">
+                                        <div class="col-lg-12 pad-small">
+                                            <div class="progress-item">
+                                                <div class="col-md-5 device-text progress-text">Device</div>
+                                                <div class="progress col-md-7 ">
+                                                    <div class="progress-bar progress-bar-success" role="progressbar" style=width:{{page.device.normal}}%>{{page.device.normal}}</div>
+                                                    <div class="progress-bar progress-bar-warning" role="progressbar" style=width:{{page.device.warning}}%>{{page.device.warning}}</div>
+                                                    <div class="progress-bar progress-bar-danger" role="progressbar" style=width:{{page.device.critical}}%>{{page.device.critical}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <div class="col-md-12 pad-small">
+
+                                        <div class="progress-item">
+                                            <div class="col-md-5 device-text progress-text">
+                                                Connectivity
+                                            </div>
+                                            <div class="progress col-md-7 ">
+
+                                                <div class="progress-bar progress-bar-success" role="progressbar" style=width:{{page.connectivity.connected}}%>{{page.connectivity.connected}}</div>
+                                                <div class="progress-bar progress-bar-warning" role="progressbar" style=width:{{page.connectivity.retrying}}%>{{page.connectivity.retrying}}</div>
+                                                <div class="progress-bar progress-bar-danger" role="progressbar" style=width:{{page.connectivity.disconnected}}%>{{page.connectivity.disconnected}}</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress-item">
+                                            <div class="col-md-5 device-text progress-text">
+                                                Alerts
+                                            </div>
+                                            <div class="progress col-md-7 ">
+                                                <div class="progress-bar progress-bar-success" role="progressbar" style=width:{{page.availability.status[0][0]}}%>{{page.availability.status[0][0]}}</div>
+                                                <div class="progress-bar progress-bar-warning" role="progressbar" style=width:{{page.availability.status[0][1]}}%>{{page.availability.status[0][1]}}</div>
+                                                <div class="progress-bar progress-bar-danger" role="progressbar" style=width:{{page.availability.status[0][2]}}%>{{page.availability.status[0][2]}}</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                        <div class="col-md-9">
+                                          <canvas id="bar" class="chart chart-bar" data="page.availability.status" labels="medal_ticks" colours="medals_colours"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 pad-small availability-text">Availability (since 16/03/2016)</div>
+                                </a>
+                                <!-- </div> -->
+                            </div>
+                        </div>
+                    </table>
+                </span>
+                <span ng-if="public_clouds.data.info.length == 0">
+                    <h3 class="align-center">No records to display</h3>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

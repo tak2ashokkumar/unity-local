@@ -1,0 +1,51 @@
+<loading loader="{{loader}}"></loading>
+<style type="text/css">
+    .heading_style{
+        font-weight: 600;
+        color: #555;
+    }
+    .pdu_name{
+        text-align: left;
+        padding-top: 10px;
+        padding-left: 10px !important;
+        font-size: 13px !important;
+    }
+    .cabinet_name{
+        text-align: right;
+        padding-right: 10px !important;
+    }
+</style>
+<div class="row" style="margin-right: -15px !important;">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" ng-repeat="pdu in pdu_list"
+     style="padding-right : 10px !important; padding-bottom : 10px;">
+        <div class="row page_wrapper">
+            <div class="col-xs-12">
+                <div class="form-group col-xs-4 pdu_name heading_style">
+                    <a style="color: #252422;" href="#/colo_cloud//pdu/{{pdu.pdu.uuid}}/healthstats">
+                        {{pdu.pdu.hostname}}
+                    </a>
+                </div>
+                <div class="form-group col-xs-offset-2 col-xs-6 cabinet_name">
+                    Cab: <label class="heading_style">{{pdu.pdu.cabinet | limitTo: 15}}{{pdu.pdu.cabinet.length < 15 ? '' : '...'}}</label>
+                </div>
+            </div>
+            <div class="col-xs-12" style="min-height: 278px;">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <sub-title title="{{pdu.pdu.graph_obj[0].displayName}}" style="padding-left: 10px;"></sub-title>
+                                <img class="pduhealthgraphsimg" ng-src="data:image/png;base64,{{ pdu.pdu.graph_obj[0].graph }}">
+                            </td>
+                            <td>
+                                <sub-title title="{{pdu.pdu.graph_obj[1].displayName}}" style="padding-left: 10px;"></sub-title>
+                                <img class="pduhealthgraphsimg" ng-src="data:image/png;base64,{{ pdu.pdu.graph_obj[1].graph }}">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

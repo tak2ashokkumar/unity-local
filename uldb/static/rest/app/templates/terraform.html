@@ -1,0 +1,90 @@
+<alerts></alerts>
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+
+<div>
+  <form class="form-inline">
+    <div class="form-group leftpan">
+      <label for="orgName">Organization : </label>
+        <input id="orgName" class="form-control ticketing"
+               ng-model="org"
+               placeholder="Type org to search..."
+               uib-typeahead="org as org.name for org in getOrgs($viewValue)"
+               force-null="col.nullify"
+               autocomplete="off">
+    </div>
+    <button type="button" class="btn btn-success ticketing" ng-click="get_terraform_vms(org)">Get Terrform VMs</button>
+  </form>
+</div>
+
+<br/>
+<br/>
+<span ng-if="!collections && org_id">
+    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+</span>
+
+<div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-primary" ng-repeat="collection in collections">
+        <div class="panel-heading">
+          {{ collection.heading }}
+        </div>
+        <div class="panel-body">
+          <table class="table">
+            <thead>
+            <tr>
+              <th ng-repeat="field in asset_fields[collection.heading]" ng-if="field.hidden == undefined">
+                {{ field.description }}
+              </th>
+              <th>
+                Manage
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="object in collection.items"
+                ng-click="select(object, $index, collection)"
+                ng-class="{'success': object === collection.selection.item }">
+              <td ng-repeat="field in asset_fields[collection.heading]" ng-if="field.hidden == undefined">
+                <span ng-if="field.transform == undefined && field.name !== 'status'">{{ object[field.name] }}</span>
+                <span ng-if="field.transform == undefined && field.name === 'status'">{{ object[field.name] | powerState }}</span>
+                <span ng-if="field.transform === 'accessor'">{{ field.access(object) }}</span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu action-button">
+                    <li><a href="/vm-console-ul#/services/terraform/{{ object.instance_id }}" target="_blank">Console in New Tab</a></li>
+                    <!-- <li><a href="/admin#/services/terraform/iframe/{{ object.instance_id }}">Console in Same Tab</a></li> -->
+                    <li><a href="" ng-click="console_terraform(object.instance_id)">Console in Same Tab</a></li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer">
+          <button ng-if="collection.add && collection.items.length === 0" class="btn btn-primary" ng-click="create(collection)">Add New</button>
+          <button ng-if="collection.selection" class="btn btn-info" ng-click="modify(collection)">
+            Edit {{ collection.selection.item[collection.key] }}</button>
+          <button ng-if="collection.selection" class="btn btn-danger" ng-click="remove(collection, collection.selection.index)" confirm>Delete
+            {{ collection.selection.item[collection.key] }}</button>
+          <button ng-if="collection.selection" ng-repeat="custom in collection.custom"
+                  class="btn btn-info" ng-click="custom.func(custom.name, collection)">{{ custom.name }}</button>
+          <div ng-if="!collection.selection">
+            <span>Select an item above to edit/delete.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+</div>
+

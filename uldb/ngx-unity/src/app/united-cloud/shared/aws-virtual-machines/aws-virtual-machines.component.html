@@ -1,0 +1,602 @@
+<div class="card rounded-0 border-top-0">
+  <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+    <div class="d-flex justify-content-center align-items-center font-500">
+      <span class="badge badge-secondary font-sm">{{filteredViewData?.length}}</span>
+      <span class="ml-1 font-lg">Virtual Machines</span>
+    </div>
+    <div class="d-flex justify-content-end align-items-center">
+      <button class="btn btn-pill btn-sm btn-warning mx-2 px-3 font-500" type="button" (click)="createInstance()"
+        *ngIf="accountId && regionId" accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+        elementType="btn">
+        <span class="font-sm">Create Instance</span>
+      </button>
+      <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+  </div>
+  <div class="card-body py-2">
+    <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+      <div class="w-25">
+        <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+      </div>
+      <div>
+        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+          (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+      </div>
+    </div>
+    <table class="table table-sm text-left">
+      <thead class="bg-light">
+        <tr>
+          <th>Instance ID</th>
+          <th>Status</th>
+          <th>Instance Type</th>
+          <th>Account Name</th>
+          <th>Public IP</th>
+          <th>Availability Zone</th>
+          <th class="action-icons-column">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of pagedviewData" setTableColumnWidth>
+          <td>
+            <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+              (click)="popData=view.popOverDetails" [popover]="popTemplate" [outsideClick]="true"
+              [tooltip]="view.instanceId">{{view.instanceId}}</button>
+          </td>
+          <td>
+            <shared-device-status [status]="view.powerStatus"></shared-device-status>
+          </td>
+          <td>
+            <div [tooltip]="view.instanceType">{{view.instanceType}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.accountName">{{view.accountName}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.publicIp">{{view.publicIp}}</div>
+          </td>
+          <td>
+            <div [tooltip]="view.availabilityZone">{{view.availabilityZone}}</div>
+          </td>
+          <td class="action-icons-column">
+            <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerStatusIcon"
+              [ngClass]="{'action-icons-on':view.powerStatusOn, 'action-icons-disabled':!view.isPowerIconEnabled}"
+              [tooltip]="view.powerTooltipMessage" (click)="powerToggle(view)" accessControl moduleName="Public Cloud"
+              accessType="Manage Public Cloud" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.terminateIcon"
+              [ngClass]="{'action-icons-disabled':!view.isTerminateIconEnabled}" (click)="terminateInstance(view)"
+              [tooltip]="view.terminateTooltipMessage" accessControl moduleName="Public Cloud"
+              accessType="Manage Public Cloud" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1"
+              [ngClass]="{'action-icons-disabled':!view.isStatsEnabled}" (click)="goToStats(view)"
+              [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fa cfa-search-in-cloud font-sm ml-1"
+              [ngClass]="{'action-icons-disabled':!view.isCloudWatchIconEnabled}"
+              [tooltip]="view.cloudWatchTooltipMessage" (click)="gotToCloudWatch(view)"></button>
+            <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+              [ngClass]="{'action-icons-disabled':!view.isCreateTicketIconEnabled}"
+              [tooltip]="view.createTicketTooltipMessage" (click)="createTicket(view)"></button>
+            <span dropdown placement="bottom right" container="body">
+              <button id="button-container" class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle (click)="false"
+                [tooltip]="'More Actions'" container="body"></button>
+              <div container="body" id="icons-dropdown-container"
+                class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                aria-labelledby="button-container">
+                <button class="action-icons mt-2 mb-1 fa fa-info-circle font-sm"
+                  [ngClass]="{'action-icons-disabled':!view.isInfoIconEnabled}" [tooltip]="view.infoTooltipMessage"
+                  container="body" (click)="showInfo(view)"></button>
+                <button class="action-icons mt-1 far fa-image font-sm"
+                  [ngClass]="{'action-icons-disabled':!view.isCreateImageIconEnabled}"
+                  [tooltip]="view.createImageTooltipMessage" container="body" (click)="createImage(view)" accessControl
+                  moduleName="Public Cloud" accessType="Manage Public Cloud" elementType="actionbtn"></button>
+                <!-- <button class="action-icons mt-1 far fa-object-group font-sm" [ngClass]="{'action-icons-disabled':!view.isAttachASGIconEnabled}"
+                  [tooltip]="view.attachASGTooltipMessage" container="body" (click)="attachAutoScaleGroup(view)"></button> -->
+                <button class="action-icons mt-1 mb-2 fab fa-connectdevelop font-sm"
+                  [ngClass]="{'action-icons-disabled':!view.isAttachNwInfIconEnabled}"
+                  [tooltip]="view.attachNwInfTooltipMessage" container="body" (click)="attachNetworkInterface(view)"
+                  accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+                  elementType="actionbtn"></button>
+              </div>
+            </span>
+
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+      [totalCount]="filteredViewData.length"></table-entries>
+    <table-pager *ngIf="filteredViewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+      [totalCount]="filteredViewData.length" (pageChange)="pageChange($event)"></table-pager>
+    <div class="text-center text-muted py-4" *ngIf="!filteredViewData.length">No VMs were found.</div>
+  </div>
+</div>
+<ng-template #popTemplate>
+  <devices-popover [data]="popData"></devices-popover>
+</ng-template>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{confirmInput?.confirmTitle}}
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      {{confirmInput?.confirmMessage}}
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmToggle()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #terminate>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{confirmInput?.confirmTitle}}
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="terminateModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      {{confirmInput?.confirmMessage}}
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmTerminate()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="terminateModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #createImageModal>
+  <div class="card mb-0">
+    <div class="card-header">
+      Create Image
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="createImageModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="createImageForm" [formGroup]="createImageForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="createImageFormErrors.error">{{createImageFormErrors.error}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="name">Image Name<em>*</em></label>
+          <input class="form-control" id="name" type="text" formControlName="name"
+            [ngClass]="{'is-invalid' :createImageFormErrors.name}">
+          <div class="invalid-feedback" *ngIf="createImageFormErrors.name">{{createImageFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="description">Image Description<em>*</em></label>
+          <input class="form-control" id="description" type="text" formControlName="description"
+            [ngClass]="{'is-invalid' :createImageFormErrors.description}">
+          <div class="invalid-feedback" *ngIf="createImageFormErrors.description">{{createImageFormErrors.description}}
+          </div>
+        </div>
+        <div class="form-group row">
+          <div class="col-12 col-form-label">
+            <div class="form-check form-check-inline mr-1">
+              <label class="form-check-label mr-1" for="inline-checkbox1">No Reboot</label>
+              <input class="form-check-input" id="inline-checkbox1" formControlName="is_validated" type="checkbox">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitCreateImage()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="createImageModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+
+<ng-template #autoScale>
+  <div class="card mb-0">
+    <div class="card-header">
+      Attach Autoscaling Group
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="autoScaleModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="autoScaleForm" [formGroup]="autoScaleForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="autoScaleFormErrors.error">{{autoScaleFormErrors.error}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="group">Autoscaling Group<em>*</em></label>
+          <select *ngIf="asgs.length" class="form-control rounded-left" id="group" formControlName="group"
+            [ngClass]="{'is-invalid' : autoScaleFormErrors.group}">
+            <option [value]="''">Select Group</option>
+            <option *ngFor="let asg of asgs" [value]="asg.auto_scaling_group">{{asg.auto_scaling_group}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="autoScaleFormErrors.group">{{autoScaleFormErrors.group}}</div>
+          <input class="form-control" id="group" value="No Autoscaling Groups present" type="text" readonly
+            *ngIf="!asgs.length">
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitAutoScale()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="autoScaleModalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #nwInterface>
+  <div class="card mb-0">
+    <div class="card-header">
+      Attach Network Interface
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="nwInterfaceModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="nwInterfaceForm" [formGroup]="nwInterfaceForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nwInterfaceFormErrors.error">{{nwInterfaceFormErrors.error}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="network_interface_id">Network Interface<em>*</em></label>
+          <select *ngIf="nwInterfaces.length" class="form-control rounded-left" id="network_interface_id"
+            formControlName="network_interface_id"
+            [ngClass]="{'is-invalid' : nwInterfaceFormErrors.network_interface_id}">
+            <option [value]="''">Select Network Interface</option>
+            <option *ngFor="let nwInterface of nwInterfaces">{{nwInterface}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="nwInterfaceFormErrors.network_interface_id">
+            {{nwInterfaceFormErrors.network_interface_id}}</div>
+          <input class="form-control" id="network_interface_id" value="No Network Interfaces present" type="text"
+            readonly *ngIf="!nwInterfaces.length">
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="device_index">Device Index<em>*</em></label>
+          <input class="form-control" id="device_index" type="number" min="0" formControlName="device_index"
+            [ngClass]="{'is-invalid' :nwInterfaceFormErrors.device_index}">
+          <div class="invalid-feedback" *ngIf="nwInterfaceFormErrors.device_index">
+            {{nwInterfaceFormErrors.device_index}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitNwInterface()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="nwInterfaceModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #loadBalancer>
+  <div class="card mb-0">
+    <div class="card-header">
+      Attach LoadBalancer
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="loadBalancerModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="loadBalancerForm" [formGroup]="loadBalancerForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="loadBalancerFormErrors.error">{{loadBalancerFormErrors.error}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="load_balancer">LoadBalancer<em>*</em></label>
+          <select *ngIf="lbs.length" class="form-control rounded-left" id="load_balancer"
+            formControlName="load_balancer" [ngClass]="{'is-invalid' : loadBalancerFormErrors.load_balancer}">
+            <option [value]="''">Select LoadBalancer</option>
+            <option *ngFor="let lb of lbs" [value]="lb.load_balancer">{{lb.load_balancer}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="loadBalancerFormErrors.load_balancer">
+            {{loadBalancerFormErrors.load_balancer}}</div>
+          <input class="form-control" id="load_balancer" type="text" value="No LoadBalancers present" readonly
+            *ngIf="!lbs.length">
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitLB()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="loadBalancerModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #info>
+  <div class="card mb-0">
+    <div class="card-header">
+      AWS Instance Details
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="infoModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table text-left">
+        <tbody>
+          <tr>
+            <td>Instance Id</td>
+            <td class="h6">{{instanceDetails.InstanceId}}</td>
+          </tr>
+          <tr>
+            <td>Image Id</td>
+            <td class="h6">{{instanceDetails.ImageId}}</td>
+          </tr>
+          <tr>
+            <td>Ramdisk Id</td>
+            <td class="h6">{{instanceDetails.RamdiskId}}</td>
+          </tr>
+          <tr>
+            <td>Key Name</td>
+            <td class="h6">{{instanceDetails.KeyName}}</td>
+          </tr>
+          <tr>
+            <td>Host Id</td>
+            <td class="h6">{{instanceDetails.HostId}}</td>
+          </tr>
+          <tr>
+            <td>Availability Zone</td>
+            <td class="h6">{{instanceDetails.AvailabilityZone}}</td>
+          </tr>
+          <tr>
+            <td>Private Dns Name</td>
+            <td class="h6">{{instanceDetails.PrivateDnsName}}</td>
+          </tr>
+          <tr>
+            <td>Public Dns Name</td>
+            <td class="h6">{{instanceDetails.PublicDnsName}}</td>
+          </tr>
+          <tr>
+            <td>Kernel Id</td>
+            <td class="h6">{{instanceDetails.KernelId}}</td>
+          </tr>
+          <tr>
+            <td>InstanceState</td>
+            <td class="h6">{{instanceDetails.InstanceState}}</td>
+          </tr>
+          <tr>
+            <td>MonitoringState</td>
+            <td class="h6">{{instanceDetails.MonitoringState}}</td>
+          </tr>
+          <tr>
+            <td>Security Group</td>
+            <td class="h6">{{instanceDetails.SecurityGroup}}</td>
+          </tr>
+          <tr>
+            <td>GroupName</td>
+            <td class="h6">{{instanceDetails.GroupName}}</td>
+          </tr>
+          <tr>
+            <td>LaunchTime</td>
+            <td class="h6">{{instanceDetails.LaunchTime | date:dateFormat:userInfo.userTimeZoneAbbr}}</td>
+          </tr>
+          <tr>
+            <td>Platform</td>
+            <td class="h6">{{instanceDetails.Platform}}</td>
+          </tr>
+          <tr>
+            <td>Subnet Id</td>
+            <td class="h6">{{instanceDetails.SubnetId}}</td>
+          </tr>
+          <tr>
+            <td>Instance Type</td>
+            <td class="h6">{{instanceDetails.InstanceType}}</td>
+          </tr>
+          <tr>
+            <td>LoadBalancers</td>
+            <td class="h6">{{instanceDetails.LoadBalancers}}</td>
+          </tr>
+          <tr class="border-bottom">
+            <td>Tags</td>
+            <td>
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td class="h6">Key</td>
+                    <td class="h6">Value</td>
+                  </tr>
+                  <tr *ngFor="let tag of instanceDetails.Tags">
+                    <td>{{tag.Key}}</td>
+                    <td>{{tag.Value}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right" (click)="infoModalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #createInstanceRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Create Instance
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="createInstanceModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="createInstanceForm" [formGroup]="createInstanceForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="image_id">ImageId<em>*</em></label>
+          <select class="form-control rounded-left" id="image_id" formControlName="image_id"
+            [class.is-invalid]="createInstanceErrors.image_id">
+            <option [value]="''" disabled>Select Image</option>
+            <option [value]="''" *ngIf="!imageList.length">No Images present</option>
+            <option *ngFor="let image of imageList" [value]="image.id">{{image.name}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.image_id">{{createInstanceErrors.image_id}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="availability_zone">Availability Zone<em>*</em></label>
+          <select class="form-control rounded-left" id="availability_zone" formControlName="availability_zone"
+            [class.is-invalid]="createInstanceErrors.availability_zone">
+            <option [value]="''" disabled>Select Availability Zone</option>
+            <option *ngFor="let zone of availableZones" [value]="zone.value">{{zone.displayName}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.availability_zone">
+            {{createInstanceErrors.availability_zone}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="instance_type">Instance Type<em>*</em></label>
+          <select class="form-control rounded-left" id="instance_type" formControlName="instance_type"
+            [class.is-invalid]="createInstanceErrors.instance_type">
+            <option [value]="''" disabled>Select Instance Type</option>
+            <option *ngFor="let type of instanceTypes" [value]="type.value">{{type.displayName}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.instance_type">
+            {{createInstanceErrors.instance_type}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="instance_count">Number of Instances<em>*</em></label>
+          <input class="form-control" id="instance_count" type="number" min="1" formControlName="max_count"
+            [class.is-invalid]="createInstanceErrors.max_count">
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.max_count">{{createInstanceErrors.max_count}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="vpc">VPC<em>*</em></label>
+          <select class="form-control rounded-left" id="vpc" formControlName="vpc"
+            [class.is-invalid]="createInstanceErrors.vpc">
+            <option [value]="''" disabled>Select VPC</option>
+            <option *ngFor="let vpc of vpcList" [value]="vpc.value">{{vpc.displayName}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.availability_zone">
+            {{createInstanceErrors.availability_zone}}</div>
+        </div>
+        <div class="form-group" *ngIf="createInstanceForm.controls.vpc.value">
+          <label class="form-col-form-label" for="SubnetId">Subnet Id<em>*</em></label>
+          <select class="form-control rounded-left" id="SubnetId" formControlName="subnet_id"
+            [class.is-invalid]="createInstanceErrors.subnet_id">
+            <option [value]="''" disabled>Select SubnetId</option>
+            <option *ngFor="let subnet of subnetArray" [value]="subnet.value">{{subnet.displayName}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.subnet_id">{{createInstanceErrors.subnet_id}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="shutdown_behavior">Shutdown Behavior<em>*</em></label>
+          <select class="form-control rounded-left" id="shutdown_behavior" formControlName="shutdown_behavior"
+            [class.is-invalid]="createInstanceErrors.shutdown_behavior">
+            <option [value]="''" disabled>Select Shutdown Behavior</option>
+            <option [value]="'stop'">Stop</option>
+            <option [value]="'terminate'">Terminate</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.shutdown_behavior">
+            {{createInstanceErrors.shutdown_behavior}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="keypair_behavior">Key Pair behaviour<em>*</em></label>
+          <select class="form-control rounded-left" id="keypair_behavior" formControlName="keypair_behavior"
+            [class.is-invalid]="createInstanceErrors.keypair_behavior">
+            <option [value]="''" disabled>Select Key Pair behaviour</option>
+            <option [value]="'a'">Proceed without a key pair (Use credentials from above Selected Ami
+              image)</option>
+            <option [value]="'b'">Choose an existing key pair</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.keypair_behavior">
+            {{createInstanceErrors.keypair_behavior}}</div>
+        </div>
+        <div class="form-group" *ngIf="createInstanceForm.controls.keypairname">
+          <label class="form-col-form-label" for="keypairname">Key Pair<em>*</em></label>
+          <select class="form-control rounded-left" id="keypairname" formControlName="keypairname"
+            [class.is-invalid]="createInstanceErrors.keypairname">
+            <option [value]="''" disabled>Select Key Pair</option>
+            <option *ngFor="let pair of keyPairs" [value]="pair.KeyName">{{pair.KeyName}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.keypairname">{{createInstanceErrors.keypairname}}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="storage_size">Storage Size (should be more than 3, in
+            GiB)<em>*</em></label>
+          <input class="form-control" id="storage_size" type="number" min="3" formControlName="storage_size"
+            [class.is-invalid]="createInstanceErrors.storage_size">
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.storage_size">{{createInstanceErrors.storage_size}}
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="storage_type">Storage Type<em>*</em></label>
+          <select class="form-control rounded-left" id="storage_type" formControlName="storage_type"
+            [class.is-invalid]="createInstanceErrors.storage_type">
+            <option [value]="''" disabled>Select Storage Type</option>
+            <option [value]="'standard'">Standard</option>
+            <option [value]="'io1'">Provisioned IOPS SSD (IO1)</option>
+            <option [value]="'gp2'">General purpose SSD (GP2)</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.storage_type">{{createInstanceErrors.storage_type}}
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-3 col-form-label">Delete On Termination</label>
+          <div class="col-9 col-form-label">
+            <div class="form-check form-check-inline mr-1">
+              <input class="form-check-input" id="dot" type="checkbox" formControlName="dot">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="security_group">Security Group<em>*</em></label>
+          <select class="form-control rounded-left" id="security_group" formControlName="security_group"
+            [class.is-invalid]="createInstanceErrors.security_group">
+            <option [value]="''" disabled>Select Security Group</option>
+            <option *ngFor="let group of securityGroups" [value]="group.value">{{group.displayName}}</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.security_group">
+            {{createInstanceErrors.security_group}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="tags_key">Tags Key</label>
+          <input class="form-control" id="tags_key" type="text" formControlName="tags_key"
+            [class.is-invalid]="createInstanceErrors.tags_key">
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.tags_key">
+            {{createInstanceErrors.tags_key}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="tags_value">Tags Value</label>
+          <input class="form-control" id="tags_value" type="text" formControlName="tags_value"
+            [class.is-invalid]="createInstanceErrors.tags_value">
+          <div class="invalid-feedback" *ngIf="createInstanceErrors.tags_value">
+            {{createInstanceErrors.tags_value}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="tags_applicability">Tags Applicable To?</label>
+          <select class="form-control rounded-left" id="tags_applicability" formControlName="tags_applicability">
+            <option [value]="''" disabled>Select Tag Applicability</option>
+            <option [value]="'instance'">Instance</option>
+            <option [value]="'volume'">Volume</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="submitCreateInstance()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="createInstanceModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

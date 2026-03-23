@@ -1,0 +1,9 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span style="display: inline-block">{{ dcenter.name }}, <span ng-if="dcenter.location">{{ dcenter.location }}</span><span
+        ng-if="dcenter.datacenter">{{ dcenter.datacenter.name }}</span></span>
+  </div>
+  <div class="panel-body">
+    <footprint-stats footprint="dcenter"></footprint-stats>
+  </div>
+</div>

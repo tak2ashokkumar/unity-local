@@ -1,0 +1,18 @@
+img {
+  width: auto;
+  height: auto;
+  max-width: -webkit-fill-available;
+  max-height: -webkit-fill-available;
+}
+@-moz-document url-prefix()  {
+  img {
+    max-width: -moz-available;
+    max-height: -moz-available;
+  }
+}
+.app-header.navbar {
+  z-index: 2500;
+}
+.app-header .navbar-brand {
+  width: 225px;
+}

@@ -1,0 +1,50 @@
+<div class="right-sidebar p-0">
+    <div class="resize-handle-right" (mousedown)="startResize($event)"></div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-dark">Help Guide</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="onClose()">
+            <i class="fas fa-times text-muted"></i>
+        </button>
+    </div>
+
+    <div class="accordion p-3">
+        <!-- MAIN ACCORDION LOOP -->
+        <div *ngFor="let section of helpSections; let i = index" class="mb-2">
+            <div class="accordion-headers d-flex justify-content-between align-items-center"
+                (click)="toggleAccordion(i)">
+                <span>{{ section.title }}</span>
+                <i class="fas" [ngClass]="{
+             'fa-chevron-down': openAccordionIndex === i,
+             'fa-chevron-right': openAccordionIndex !== i
+           }"></i>
+            </div>
+
+            <div class="accordion-body mt-2" *ngIf="openAccordionIndex === i">
+                <!-- Sub items (with subtitles + description) -->
+                <div *ngIf="section.items" class="accordion mt-2 pl-3">
+                    <div *ngFor="let item of section.items; let j = index" class="mb-1">
+                        <div class="accordion-sub-headers d-flex justify-content-between align-items-center"
+                            (click)="toggleSubAccordion(i, j)">
+                            <span>{{ item.subtitle }}</span>
+                            <i class="fas" [ngClass]="{
+                   'fa-chevron-down': isSubAccordionOpen(i, j),
+                   'fa-chevron-right': !isSubAccordionOpen(i, j)
+                 }"></i>
+                        </div>
+
+                        <div class="accordion-body mt-1 pl-2" *ngIf="isSubAccordionOpen(i, j)">
+                            <p class="medium text-muted" [innerHTML]="item.description"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps (if present) -->
+                <div *ngIf="section.steps" class="mt-2">
+                    <ul class="pl-3 medium text-muted">
+                        <li *ngFor="let step of section.steps" [innerHTML]="step"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

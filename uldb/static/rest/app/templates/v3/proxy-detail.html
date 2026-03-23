@@ -1,0 +1,7 @@
+<span>
+  <small ng-repeat="crumb in bread.crumbs">
+    <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+  </small>
+</span>
+<iframe src="{{ trustSrc(proxy_url) }}" ng-if="proxy_url" frameborder="0"
+        style="overflow: hidden; height: 100%;width: 80%; position: absolute;" height="100%" width="80%"></iframe>

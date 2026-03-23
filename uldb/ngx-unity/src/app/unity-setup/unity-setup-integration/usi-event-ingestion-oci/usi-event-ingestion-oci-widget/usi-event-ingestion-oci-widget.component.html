@@ -1,0 +1,7 @@
+<unity-setup-integration-widget [imageUrl]="imageURL" [altText]="'OCI Monitoring'" [addtooltipMsg]="addtooltipMsg"
+    [viewtooltipMsg]="viewtooltipMsg" [viewEnabled]="viewDisabled" (addButtonClick)="addInsatnce()"
+    (viewButtonClick)="viewInstanceDetails()" [moduleName]="'Integrations'" [addAccessType]="'Add Integrations'"
+    [viewAccessType]="'View Integrations'" [elementType]="'actionbtn'">
+</unity-setup-integration-widget>
+
+<usi-event-ingestion-oci-crud (onCrud)="onCrud($event)"></usi-event-ingestion-oci-crud>

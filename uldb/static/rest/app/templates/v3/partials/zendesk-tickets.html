@@ -1,0 +1,33 @@
+<md-card md-theme="'default'">
+  <md-card-title class="green-card">
+    <md-card-title-text>
+      <span class="md-headline">Zendesk Tickets</span>
+    </md-card-title-text>
+  </md-card-title>
+  <md-card-content>
+    <div class="dataTable_wrapper content_settings">
+      <table class="table table-hover"
+             ng-if="items.length !== 0">
+        <thead>
+        <tr>
+          <th ng-repeat="field in fields" class="fixed_th">{{ field.name }}</th>
+          <!--<th ng-if="actions != undefined" class="fixed_th">Actions</th>-->
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in items | filter: searchKeyword" class="odd gradeX">
+          <td ng-repeat="field in fields">
+            <default-field field="field"
+                           item="item"
+                           ng-if="!field.opaque"></default-field>
+            <link-field field="field"
+                        item="item"
+                        ng-if="field.opaque === 'link'"></link-field>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <h3 ng-if="!items" class="align-center">No records to display</h3>
+    </div>
+  </md-card-content>
+</md-card>

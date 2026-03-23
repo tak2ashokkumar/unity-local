@@ -1,0 +1,9 @@
+<!-- <div *ngIf="show">
+  <i class="fa fa-spinner fa-spin"></i>
+</div> -->
+
+<div class="spinner-wrapper" *ngIf="show" [style.width]="wrapperwidth" [style.position]="wrapperPosition" [style.z-index]="zIndex">
+  <div *ngIf="show" [ngClass]="baseClass">
+    <div *ngFor="let item of items; let i = index" [ngClass]="childClass + (i+1)" [style.backgroundColor]="color"></div>
+  </div>
+</div>

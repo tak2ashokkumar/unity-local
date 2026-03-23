@@ -1,0 +1,32 @@
+<h3>Uplinks</h3>
+
+<table class="table">
+  <thead>
+  <tr>
+    <th>Switch</th>
+    <th>Interface Name</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="p in cloud.upstream_providers">
+    <td>{{ p.switch }}</td>
+    <td>{{ p.interface_name }}</td>
+    <td>
+      <div class="btn-group">
+        <button type="button" class="btn btn-dropdown btn-default"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu action-button">
+          <li><a href ng-click="removePort(p, $index)" confirm>Remove</a></li>
+        </ul>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<button class="btn btn-primary" ng-click="addPort(cloud)">Add Upstream</button>
+
+

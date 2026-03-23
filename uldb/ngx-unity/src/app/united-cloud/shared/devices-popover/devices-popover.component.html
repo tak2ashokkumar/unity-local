@@ -1,0 +1,36 @@
+<div class="p-2" *ngIf="!data.uptime">
+  <div class="row">
+    <div class="col">
+      <i class="fa fa-spinner fa-spin"></i>
+    </div>
+  </div>
+</div>
+<div *ngIf="data.uptime && data.uptime!=='0'">
+  <table>
+    <tr>
+      <td class="border-0">
+        <h6 *ngIf="data.status=='1'">Uptime</h6>
+        <h6 *ngIf="data.status=='0'">Down</h6>
+      </td>
+      <td class="border-0">
+        {{data.uptime | SecToDays}}
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <h6>Last Reboot</h6>
+      </td>
+      <td>
+        {{data.lastreboot| date:dateFormat:userInfo.userTimeZoneAbbr}}
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="p-2" *ngIf="data.uptime && data.uptime=='0'">
+  <div class="row">
+    <div class="col">
+      {{notEnabled}}
+    </div>
+  </div>
+</div>

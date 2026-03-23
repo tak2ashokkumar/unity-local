@@ -1,0 +1,568 @@
+<ng-container *ngIf="activeCloud && platformType">
+  <ng-container [ngSwitch]="platformType">
+    <ng-container *ngSwitchCase="platFormMapping?.VMWARE">
+      <vcenter-cloud></vcenter-cloud>
+    </ng-container>
+    <ng-container *ngSwitchCase="platFormMapping?.UNITED_PRIVATE_CLOUD_VCENTER">
+      <vcenter-cloud></vcenter-cloud>
+    </ng-container>
+    <ng-container *ngSwitchCase="platFormMapping?.NUTANIX">
+      <nutanix></nutanix>
+    </ng-container>
+
+    <ng-container *ngSwitchDefault>
+      <ng-container *ngTemplateOutlet="pcSummaryRef"></ng-container>
+    </ng-container>
+  </ng-container>
+</ng-container>
+
+<ng-template #pcSummaryRef>
+  <div class="tab-content">
+    <div class="tab-pane active pt-2">
+      <div class="row mb-2">
+        <div class="col-12">
+          <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body p-2">
+              <div class="row">
+                <div class="col-12">
+                  <table class="">
+                    <tbody class="text-left">
+                      <tr>
+                        <td>
+                          <p class="mb-2">Name</p>
+                        </td>
+                        <td>
+                          <p class="mb-2">Virtualization Platform</p>
+                        </td>
+                        <td>
+                          <p class="mb-2">Hypervisors</p>
+                        </td>
+                        <td>
+                          <p class="mb-2">Virtual Machines</p>
+                        </td>
+                        <td>
+                          <p class="mb-2">Manage</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <shared-device-status [status]="getPCStatus(privateCloud?.status)" class="align-bottom mr-1"
+                            *ngIf="privateCloud?.status"></shared-device-status>
+                          <button type="button" class="btn btn-link text-decoration-none mb-0 p-0"
+                            [routerLink]="['../','vms']">
+                            {{privateCloud?.name}}
+                          </button>
+                        </td>
+                        <td>
+                          <p class="mb-0"> {{privateCloud?.display_platform}}</p>
+                        </td>
+                        <td>
+                          <p class="mb-0">
+                            <i class="fa fa-fw fa-lg text-danger" [ngClass]="iconMapping.HYPERVISOR"></i>
+                            <span class="ml-1">{{privateCloud?.hypervisors?.length}}</span>
+                          </p>
+                        </td>
+                        <td>
+                          <p class="mb-0">
+                            <i class="fa fa-fw fa-lg text-primary" [ngClass]="iconMapping.VIRTUAL_MACHINE"></i>
+                            <span class="ml-1">{{vmsCount}}</span>
+                          </p>
+                        </td>
+                        <td>
+                          <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                            (click)="editPrivateCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn"></button>
+
+                          <button class="action-icons mb-0 fa fa-key font-sm ml-1" *ngIf="view?.canChangePassword"
+                            tooltip="Change Password" (click)="changePassWord()" accessControl
+                            moduleName="Private Cloud" accessType="Manage Private Cloud"
+                            elementType="actionbtn"></button>
+
+                          <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                            (click)="deletePrivateCloud()" accessControl moduleName="Private Cloud"
+                            accessType="Manage Private Cloud" elementType="actionbtn"></button>
+
+                          <button class="action-icons mb-0 fas fa-book font-sm ml-1" tooltip="Content Library"
+                            *ngIf="platformType == platFormMapping?.VMWARE" (click)="goToContentLib()"></button>
+
+                          <!-- <button *ngIf="view" class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
+                            [tooltip]="view.sameTabTooltipMessage"
+                            [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
+                            (click)="webAccessSameTab(view)"></button> -->
+
+                          <button *ngIf="view" class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
+                            [tooltip]="view.newTabTooltipMessage"
+                            [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" (click)="webAccessNewTab(view)"
+                            accessControl moduleName="Private Cloud" accessType="Manage Private Cloud"
+                            elementType="actionbtn"></button>
+
+                          <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                            tooltip="Manage by creating support ticket" (click)="createTicket(view)"></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-4">
+          <ng-container *ngTemplateOutlet="pcComponentSummaryRef"></ng-container>
+        </div>
+        <div class="col-8">
+          <div class="row" *ngIf="showStastics">
+            <div class="col-4">
+              <div class="card equalize-card">
+                <div class="card-header">vCPU</div>
+                <div class="card-body">
+                  <div class="row" *ngIf="usageData">
+                    <div class="col ml-auto mb-1 text-right">
+                      <small class="text-muted utilization-font-size">Available: {{usageData.vCPUAvailable}}
+                        vCPU</small>
+                    </div>
+                    <div class="col-12">
+                      <div class="progress">
+                        <div class="progress-bar" role="progressbar" [style.width.%]="usageData.vCPUUtilizationValue"
+                          [ngClass]="getProgressClass(usageData.vCPUUtilizationValue)"
+                          aria-valuenow="usageData.vCPUUtilizationValue" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <small class="text-muted utilization-font-size">Configured: {{usageData.vCPUConfigured}}
+                        vCPU</small>
+                    </div>
+                    <div class="col ml-auto text-right">
+                      <small class="text-muted utilization-font-size">Allocated: {{usageData.vCPUAllocated}}
+                        vCPU</small>
+                    </div>
+                  </div>
+                  <div class="row" *ngIf="!usageData">
+                    <div class="col">
+                      <div class="text-center align-middle">
+                        <i class="fa fa-spinner fa-spin"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card equalize-card">
+                <div class="card-header">RAM</div>
+                <div class="card-body">
+                  <div class="row" *ngIf="usageData">
+                    <div class="col ml-auto mb-1 text-right">
+                      <small class="text-muted utilization-font-size">Available: {{usageData.RAMAvailableValue}}
+                        {{usageData.RAMAvailableUnit}}</small>
+                    </div>
+                    <div class="col-12">
+                      <div class="progress">
+                        <div class="progress-bar" role="progressbar" [style.width.%]="usageData.RAMUtilizationValue"
+                          [ngClass]="getProgressClass(usageData.RAMUtilizationValue)"
+                          aria-valuenow="usageData.RAMUtilizationValue" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <small class="text-muted utilization-font-size">Configured: {{usageData.RAMConfiguredValue}}
+                        {{usageData.RAMConfiguredUnit}}</small>
+                    </div>
+                    <div class="col ml-auto text-right">
+                      <small class="text-muted utilization-font-size">Allocated: {{usageData.RAMAllocatedValue}}
+                        {{usageData.RAMAllocatedUnit}}</small>
+                    </div>
+                  </div>
+                  <div class="row" *ngIf="!usageData">
+                    <div class="col">
+                      <div class="text-center align-middle">
+                        <i class="fa fa-spinner fa-spin"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card equalize-card">
+                <div class="card-header">Storage Disk</div>
+                <div class="card-body">
+                  <div class="row" *ngIf="usageData">
+                    <div class="col ml-auto mb-1 text-right">
+                      <small class="text-muted utilization-font-size">Available: {{usageData.diskSpaceAvailableValue}}
+                        {{usageData.diskSpaceAvailableUnit}}</small>
+                    </div>
+                    <div class="col-12">
+                      <div class="progress">
+                        <div class="progress-bar" role="progressbar"
+                          [style.width.%]="usageData.diskSpaceUtilizationValue"
+                          [ngClass]="getProgressClass(usageData.diskSpaceUtilizationValue)"
+                          aria-valuenow="usageData.diskSpaceUtilizationValue" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col">
+                      <small class="text-muted utilization-font-size">Configured: {{usageData.diskSpaceConfiguredValue}}
+                        {{usageData.diskSpaceConfiguredUnit}}</small>
+                    </div>
+                    <div class="col ml-auto text-right">
+                      <small class="text-muted utilization-font-size">Allocated: {{usageData.diskSpaceAllocatedValue}}
+                        {{usageData.diskSpaceAllocatedUnit}}</small>
+                    </div>
+                  </div>
+                  <div class="row" *ngIf="!usageData">
+                    <div class="col">
+                      <div class="text-center align-middle">
+                        <i class="fa fa-spinner fa-spin"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2" *ngIf="vCenterDatastores.length">
+            <ng-container *ngTemplateOutlet="vCenterDataStoresRef"></ng-container>
+          </div>
+          <div class="row mt-2" *ngIf="hypervisorUsagedata.length">
+            <ng-container *ngTemplateOutlet="hypervisorUsageDataRef"></ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #pcComponentSummaryRef>
+  <div class="card w-100">
+    <div class="card-header ">Component Summary</div>
+    <div class="card-body py-0">
+      <div class="row">
+        <div class="col-6 border-right">
+          <table class="table  mb-0 mt-2 component-summary">
+            <tbody>
+              <tr>
+                <td rowspan="2"><button class="summary-icons fa font-lg hypervisor" [ngClass]="iconMapping.HYPERVISOR"
+                    disabled></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.hypervisorCount}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p class="font-sm">Hypervisors</p>
+                </td>
+              </tr>
+
+              <tr>
+                <td rowspan="2"><button class="summary-icons fa font-lg bms"
+                    [ngClass]="iconMapping.BARE_METAL_SERVER"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.bmsCount}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p class="font-sm">Bare Metal Servers</p>
+                </td>
+              </tr>
+
+              <tr>
+                <td rowspan="2"><button class="summary-icons fa font-lg vms"
+                    [ngClass]="iconMapping.VIRTUAL_MACHINE"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.vmsCount}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p class="font-sm">Virtual Machines</p>
+                </td>
+              </tr>
+
+              <tr>
+                <td rowspan="2"><button class="summary-icons fa font-lg cfa-kubernetes"
+                    [ngClass]="iconMapping.KUBERNETES"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.containerCount}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p class="font-sm">Containers</p>
+                </td>
+              </tr>
+
+              <tr>
+                <td rowspan="2"><button class="summary-icons fa font-lg otherdev"
+                    [ngClass]="iconMapping.OTHER_DEVICES"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.otherCount}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p class="font-sm">Other Devices</p>
+                </td>
+              </tr>
+
+              <tr>
+                <td rowspan="2"><button class="summary-icons fa font-lg storage"
+                    [ngClass]="iconMapping.STORAGE_DEVICE"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.storageCount}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <p class="font-sm">Storage</p>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+        <div class="col-6">
+          <table class="table mb-0 mt-2 component-summary">
+            <tbody>
+              <tr>
+                <td rowspan="2"><button class="summary-icons fa font-lg bg-gray-600"
+                    [ngClass]="iconMapping.MAC_MINI"></button></td>
+                <td colspan="2">
+                  <h6 class="mb-0">{{summaryData?.macMiniCount}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <p class=" text-center font-sm">Mac Minis</p>
+                </td>
+              </tr>
+              <tr>
+                <td rowspan="3"><button class="summary-icons fa font-lg switches"
+                    [ngClass]="iconMapping.SWITCH"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.switchDedicated}}</h6>
+                </td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.switchShared}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td><small class="text-muted">Dedicated</small></td>
+                <td><small class="text-muted">Shared</small></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <p class="text-center font-sm">Switches</p>
+                </td>
+              </tr>
+
+              <tr>
+                <td rowspan="3"><button class="summary-icons fa font-lg firewalls"
+                    [ngClass]="iconMapping.FIREWALL"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.firewallsDedicated}}</h6>
+                </td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.firewallShared}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td><small class="text-muted">Dedicated</small></td>
+                <td><small class="text-muted">Shared</small></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <p class="text-center font-sm">Firewalls</p>
+                </td>
+              </tr>
+
+              <tr>
+                <td rowspan="3"><button class="summary-icons fa font-lg lbs"
+                    [ngClass]="iconMapping.LOAD_BALANCER"></button></td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.lbDedicated}}</h6>
+                </td>
+                <td>
+                  <h6 class="mb-0">{{summaryData?.lbShared}}</h6>
+                </td>
+              </tr>
+              <tr>
+                <td><small class="text-muted">Dedicated</small></td>
+                <td><small class="text-muted">Shared</small></td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <p class="text-center font-sm">Load Balancers</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #vCenterDataStoresRef>
+  <div class="col-12">
+    <div class="card equalize-card">
+      <div class="card-header py-2 font-weight-bold">Datastore</div>
+      <div class="card-body px-1 py-0">
+        <table class="table table-sm table-left mb-0">
+          <thead>
+            <tr>
+              <th>Datastore Name</th>
+              <th>Type</th>
+              <th>Allocation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ds of vCenterDatastores" class="hyp-border border-bottom">
+              <td class="w-30">
+                <div>{{ds.name}}</div>
+              </td>
+              <td class="w-15">
+                <div *ngIf="ds.summary">{{ds.summary.type}}</div>
+              </td>
+              <td class="w-30">
+                <div class="d-flex flex-column" *ngIf="ds.summary">
+                  <div class="d-flex justify-content-end mb-1">
+                    <small class="text-muted utilization-font-size">Available:
+                      {{ds.summary.freespace?.value || 0}} {{ds.summary.freespace?.unit || 'bytes'}}</small>
+                  </div>
+                  <div class="progress progress-bar-sm">
+                    <div class="progress-bar" role="progressbar"
+                      [style.width.%]="ds.summary.provisioned_percentage?.value"
+                      [ngClass]="getProgressClass(ds.summary.provisioned_percentage?.value)"
+                      aria-valuenow="ds.summary.provisioned_percentage?.value" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted utilization-font-size">Configured:
+                      {{ds.summary.provisioned?.value || 0}} {{ds.summary.provisioned?.unit || 'bytes'}}</small>
+                    <small class="text-muted utilization-font-size">Allocated:{{ds.summary.capacity?.value || 0}}
+                      {{ds.summary.capacity?.unit || 'bytes'}}</small>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #hypervisorUsageDataRef>
+  <div class="col-12">
+    <table class="table table-left mb-0">
+      <thead class="thead-light">
+        <tr>
+          <th>Hypervisor</th>
+          <th>vCPU</th>
+          <th>RAM</th>
+          <th>Storage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usageData of hypervisorUsagedata" class="hyp-border border-bottom">
+          <td>
+            <div>
+              <button type="button" class="btn btn-link text-decoration-none mb-0 p-0" (click)="goToHypVms(usageData)">
+                {{usageData.name}}
+              </button>
+            </div>
+            <div class="small text-muted" *ngIf="usageData.usageDataExists"><span>Vms</span> :
+              {{usageData.vm_count}} </div>
+          </td>
+          <td>
+            <div class="row" *ngIf="usageData.usageDataExists">
+              <div class="col ml-auto mb-1 text-right">
+                <small class="text-muted utilization-font-size">Available: {{usageData.available_vcpu}}
+                  vCPU</small>
+              </div>
+              <div class="col-12">
+                <div class="progress progress-xs">
+                  <div class="progress-bar" role="progressbar" [style.width.%]="usageData.vcpu_utilization?.value"
+                    [ngClass]="getProgressClass(usageData.vcpu_utilization?.value)"
+                    aria-valuenow="usageData.vcpu_utilization?.value" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <div class="col">
+                <small class="text-muted utilization-font-size">Configured: {{usageData.configured_vcpu}}
+                  vCPU</small>
+              </div>
+              <div class="col ml-auto text-right">
+                <small class="text-muted utilization-font-size">Allocated: {{usageData.allocated_vcpu}}
+                  vCPU</small>
+              </div>
+            </div>
+            <div class="row" *ngIf="!usageData.usageDataExists">
+              <div class="col text-center">N/A</div>
+            </div>
+          </td>
+          <td>
+            <div class="row" *ngIf="usageData.usageDataExists">
+              <div class="col ml-auto mb-1 text-right">
+                <small class="text-muted utilization-font-size">Available: {{usageData.available_ram?.value || 0}}
+                  {{usageData.available_ram?.unit || 'bytes'}}</small>
+              </div>
+              <div class="col-12">
+                <div class="progress progress-xs">
+                  <div class="progress-bar" role="progressbar" [style.width.%]="usageData.ram_utilization?.value"
+                    [ngClass]="getProgressClass(usageData.ram_utilization?.value)"
+                    aria-valuenow="usageData.ram_utilization?.value" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <div class="col">
+                <small class="text-muted utilization-font-size">Configured: {{usageData.configured_ram?.value || 0}}
+                  {{usageData.configured_ram?.unit || 'bytes'}}</small>
+              </div>
+              <div class="col ml-auto text-right">
+                <small class="text-muted utilization-font-size">Allocated: {{usageData.allocated_ram?.value || 0}}
+                  {{usageData.allocated_ram?.unit || 'bytes'}}</small>
+              </div>
+            </div>
+            <div class="row" *ngIf="!usageData.usageDataExists">
+              <div class="col text-center">N/A</div>
+            </div>
+          </td>
+          <td>
+            <div class="row" *ngIf="usageData.usageDataExists">
+              <div class="col ml-auto mb-1 text-right">
+                <small class="text-muted utilization-font-size">Available:
+                  {{usageData.available_storage_disk?.value || 0}}
+                  {{usageData.available_storage_disk?.unit || 'bytes'}}</small>
+              </div>
+              <div class="col-12">
+                <div class="progress progress-xs">
+                  <div class="progress-bar" role="progressbar" [style.width.%]="usageData.disk_utilization?.value"
+                    [ngClass]="getProgressClass(usageData.disk_utilization?.value)"
+                    aria-valuenow="usageData.disk_utilization?.value" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <div class="col">
+                <small class="text-muted utilization-font-size">Configured:
+                  {{usageData.configured_storage_disk?.value || 0}} {{usageData.configured_storage_disk?.unit ||
+                  'bytes'}}</small>
+              </div>
+              <div class="col ml-auto text-right">
+                <small class="text-muted utilization-font-size">Allocated:
+                  {{usageData.allocated_storage_disk?.value || 0}}
+                  {{usageData.allocated_storage_disk?.unit || 'bytes'}}</small>
+              </div>
+            </div>
+            <div class="row" *ngIf="!usageData.usageDataExists">
+              <div class="col text-center">N/A</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>

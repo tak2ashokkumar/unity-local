@@ -1,0 +1,456 @@
+<div class="card text-center border-0 mb-0">
+  <div class="card-header bg-transparent align-items-center px-0 py-2">
+    <div class="row" *ngIf="selectedNetwork">
+      <div class="col-12">
+        <div class="row">
+          <div class="d-flex align-items-center font-500 col-6">
+            {{selectedNetwork?.name}}
+          </div>
+          <div class="d-flex justify-content-end align-items-center col-6">
+            <span>
+              <button class="action-icons mb-0 fas fa-play font-sm ml-1" container="body" tooltip="Execute"
+                (click)="executeDiscovery(selectedNetwork)" *ngIf="!selectedNetwork?.isInProgress" accessControl
+                moduleName="Onboarding" accessType="Manage Onboarding" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 fas fa-times font-sm ml-1" container="body" tooltip="Cancel"
+                (click)="cancelDiscovery(selectedNetwork)" *ngIf="selectedNetwork?.isInProgress" accessControl
+                moduleName="Onboarding" accessType="Manage Onboarding" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body" tooltip="Schedule History"
+                (click)="getScheduleHistory(selectedNetwork)"></button>
+              <button class="action-icons mb-0 fas fa-project-diagram font-sm ml-1" container="body"
+                tooltip="Network Topology" (click)="getNetworkTopology(selectedNetwork)" accessControl
+                moduleName="Network Topology" accessType="View Network Topology" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" container="body" tooltip="Edit"
+                (click)="editDiscovery(selectedNetwork)" accessControl moduleName="Onboarding"
+                accessType="Manage Onboarding" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body" tooltip="Delete"
+                (click)="deleteDiscovery(selectedNetwork)" accessControl moduleName="Onboarding"
+                accessType="Manage Onboarding" elementType="actionbtn"></button>
+              <button class="action-icons mb-0 fas fa-copy font-sm ml-1" container="body" tooltip="Clone"
+                (click)="cloneTemplate(selectedNetwork?.uuid)" accessControl moduleName="Onboarding"
+                accessType="Manage Onboarding" elementType="actionbtn"></button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="row" *ngIf="selectedNetwork">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-3 d-flex">
+            <label class="labelColor mr-1">Target Type: </label>
+            <span class="subHeaderFont">{{selectedNetwork?.networkType}}</span>
+          </div>
+          <div class="col-3">
+            <label class="labelColor mr-1">Target: </label>
+            <span class="subHeaderFont">{{selectedNetwork.discoverIps}}</span>
+          </div>
+          <div class="col-3">
+            <label class="labelColor mr-1">Collector: </label>
+            <span class="subHeaderFont">{{selectedNetwork.collector}}</span>
+          </div>
+          <div class="col-3">
+            <label class="labelColor mr-1">Last Executed on: </label>
+            <span class="subHeaderFont">{{selectedNetwork.lastRun}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-12">
+        <div class="row">
+          <div class="d-flex align-items-center font-500 col-3">
+            <span class="badge badge-secondary font-sm">{{count}}</span>
+            <span class="ml-1 font-lg">Devices</span>
+          </div>
+          <div class="w-25 col-3">
+            <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+          </div>
+          <div class="col-3" *ngIf="viewData.length" style="min-width:200px;">
+            <form *ngIf="columnForm" class="col-12" [formGroup]="columnForm">
+              <div class="form-group mb-0">
+                <multiselect-dropdown class="form-control p-0" style="height:auto;" formControlName="columns"
+                  [options]="tableColumns" [settings]="columnSelectionSettings" [texts]="columnSelectionTexts"
+                  (dropdownClosed)="columnChange()"></multiselect-dropdown>
+              </div>
+            </form>
+          </div>
+          <div class="col-3 d-flex justify-content-end align-items-center">
+            <a class="btn btn-warning btn-sm" href="{{downloadScanResultUrl}}" accessControl moduleName="Onboarding"
+              accessType="Manage Onboarding" elementType="btn">
+              <span class="fa fa-download"></span>
+              <span class="ml-2">Download</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body px-0 pt-0">
+    <div class="table-responsive">
+      <table class="table table-sm text-left scan-op">
+        <thead class="bg-light">
+          <tr>
+            <th>IP</th>
+            <!-- <th>Hostname</th>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Operating System</th>
+            <th>Version</th> -->
+            <!-- <th>CPU</th>
+            <th>Memory</th>
+            <th>DiskSize</th>
+            <th>Processor</th>
+            <th>E-O-L</th>
+            <th>Type</th>
+            <th>Onboarded Message</th> -->
+            <th *ngFor="let col of columnsSelected">{{col.name}}</th>
+            <th>Type</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of viewData;let i = index"
+            [ngClass]="view.status === 'new' ? 'newRowColor' : view.status === 'deleted' ? 'deletedRowColor' : ''">
+            <td>
+              <i class="fas fa-check text-success" *ngIf="view.onboardedStatus">&nbsp;</i>
+              <span>{{view.ip}}</span>
+            </td>
+            <!-- <td>{{view.hostname}}</td>
+            <td>{{view.manufaturer}}</td>
+            <td>{{view.model}}</td>
+            <td style="max-width: 20px;">
+              <div class="text-truncate" [tooltip]="view.os">{{view.os}}</div>
+            </td>
+            <td style="max-width: 30px;">
+              <div class="text-truncate" [tooltip]="view.version">{{view.version}}</div>
+            </td> -->
+            <!-- <td>{{view.CPU}}</td>
+            <td>{{view.Memory}}</td>
+            <td>{{view.DiskSize}}</td>
+            <td>{{view.Processor}}</td>
+            <td>{{view.endOfLife}}</td> -->
+            <td *ngFor="let col of columnsSelected">
+              <ng-container *ngIf="col.type == 'btn-link'">
+                <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                  [tooltip]="col.name" (click)="loadDetails(view)">{{view[col.key]}}</button>
+              </ng-container>
+              <!-- <ng-container *ngIf="col.type == 'status_field'">
+                <shared-device-status [status]="view.state"></shared-device-status>
+              </ng-container> -->
+              <ng-container *ngIf="!col.type || col.type=='text'">
+                <div [tooltip]="view[col.key]">
+                  {{view[col.key]}}</div>
+                <!-- <div [tooltip]="view[col.key]" [ngClass]="[view.statusTextColor, 'text-capitalize']"
+                  *ngIf="col.key == 'status'">{{view[col.key]}}</div>
+                <div *ngIf="col.key == 'eventMetric'" [tooltip]="view[col.key]" class="text-truncate"
+                  style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">{{view[col.key]}}
+                </div>
+                <div *ngIf="col.key == 'severity'"><i class="fa status-icon" [ngClass]="view.severityIcon"
+                    [tooltip]="view.severity" container="body"></i></div> -->
+              </ng-container>
+            </td>
+            <td style="min-width: 30px;">
+              <select [formControl]="view.select" (change)="onDeviceTypeChange($event.target.value,i)"
+                class="form-control form-control-sm" [style.width]="'150px'" accessControl moduleName="Onboarding"
+                accessType="Manage Onboarding" elementType="formelem">
+                <option [value]="''" disabled>Select Device Type</option>
+                <option [value]="'firewall'" [selected]="view.isSelected('firewall')">Firewall</option>
+                <option [value]="'switch'" [selected]="view.isSelected('switch')">Switch</option>
+                <option [value]="'load_balancer'" [selected]="view.isSelected('load_balancer')">Load Balancer</option>
+                <option [value]="'baremetal'" [selected]="view.isSelected('baremetal')">Bare Metal Server</option>
+                <option [value]="'hypervisor'" [selected]="view.isSelected('hypervisor')">Hypervisor</option>
+                <option [value]="'mac'" [selected]="view.isSelected('mac')">MacMini</option>
+                <option [value]="'storage'" [selected]="view.isSelected('storage')">Storage</option>
+                <option [value]="'pdu'" [selected]="view.isSelected('pdu')">PDU</option>
+                <option [value]="'virtual_machine'" [selected]="view.isSelected('virtual_machine')">Virtual Machine
+                </option>
+                <option [value]="'smart_pdu'" [selected]="view.isSelected('smart_pdu')">Smart PDU
+                </option>
+                <option [value]="'sensor'" [selected]="view.isSelected('sensor')">Sensor
+                </option>
+                <option [value]="'rfid_reader'" [selected]="view.isSelected('rfid_reader')">RFID Reader
+                </option>
+                <option [value]="'unknown'" [selected]="view.isSelected('unknown')">Unknown</option>
+              </select>
+            </td>
+            <!-- <td class="{{view.statusClass}}" style="max-width: 20px;">
+              <div class="text-truncate" [tooltip]="view.onboardedMsg">{{view.onboardedMsg}}</div>
+            </td> -->
+            <td style="min-width: 155px;">
+              <button class="action-icons mb-0 fas fa-server font-sm ml-1"
+                (click)="showIpAddresses(view.discovery, view.uniqueId)" tooltip="Show Ip Address Info">
+              </button>
+              <button class="action-icons mb-0 fas fa-info font-sm ml-1"
+                (click)="showInterfaces(view.discovery, view.uniqueId)" tooltip="Show Interfaces">
+              </button>
+              <button class="boarding-icon mb-0 font-sm ml-1" [ngClass]="{
+              'not-onboard': !view.isLoading && !view.isOnboard,
+              'loading': view.isLoading,
+              'onboarded': (view.isOnboard !== 'pending onboarding' && view.isOnboard)
+              }" (click)="onBoard(view.discovery, view.uniqueId, i)" tooltip="Onboard" accessControl
+                moduleName="Onboarding" accessType="Manage Onboarding" elementType="actionbtn">
+                <i [ngClass]="{
+                  'fas fa-upload': !view.isLoading,
+                  'fa fa-spinner fa-spin': view.isLoading
+                }"></i>
+              </button>
+              <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" (click)="onScanOpDelete(i)"
+                tooltip="Remove" accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                elementType="actionbtn">
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No devices available as scan results.</div>
+        <br>
+      </div>
+      <div class="col">
+        <advanced-discovery-next-prev></advanced-discovery-next-prev>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #confirmchange>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cancelDeviceTypeChange()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This device type will be updated to {{selectedType}}. Are you sure you want to update?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmDeviceTypeChange()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="cancelDeviceTypeChange()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #interfaceInfo>
+  <app-spinner [name]="'interface'"></app-spinner>
+  <div class="card mb-0">
+    <div class="card-header">
+      <!-- <span class="font-weight-bold">{{viewData[selectedIndex].hostname}}</span> -->
+      <span class="ml-2">Interfaces</span>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="interfaceInfoModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive" style="max-height:60vh;">
+        <table class="table text-left tableFixHead">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Type</th>
+              <th>Mac Address</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let inf of viewDataInterface">
+              <td class="w-20">{{inf.name}}</td>
+              <td class="w-25">{{inf.description}}</td>
+              <td class="w-15">{{inf.status}}</td>
+              <td class="w-15">{{inf.type}}</td>
+              <td class="w-15">{{inf.macAddress}}</td>
+              <td class="w-10">{{inf.ipAddress}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!viewDataInterface.length" class="text-center text-muted py-5">No interfaces
+        available for this host.
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="interfaceInfoModalRef.hide()"
+        type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #ipAddressesInfo>
+  <div class="card mb-0">
+    <app-spinner [name]="'ip-addresses'"></app-spinner>
+    <div class="card-header">
+      <!-- <span class="font-weight-bold">{{viewData[selectedIndex].hostname}}</span> -->
+      <span class="ml-2">IP Addresses</span>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="ipAddressesInfoModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive" style="max-height:60vh;">
+        <table class="table text-left tableFixHead">
+          <thead>
+            <tr>
+              <th>IPv4 Address</th>
+              <th>IPv6 Address</th>
+              <th>Interface</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ips of viewDataIpAddresses">
+              <td class="w-30">{{ips.ipv4_address}}</td>
+              <td class="w-30">{{ips.ipv6_address}}</td>
+              <td class="w-40">{{ips.interface}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!viewDataIpAddresses.length" class="text-center text-muted py-5">No IP Addresses
+        available for this host.
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="ipAddressesInfoModalRef.hide()"
+        type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmNetDelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Discovery Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmNetModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmNetworkDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmNetModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #cloneNet>
+  <div class="card mb-0">
+    <div class="card-header">
+      Clone Network
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cloneNetModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form class="form" [formGroup]="cloneForm">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="name" class="form-control" formControlName="name" placeholder="Enter Name"
+            [ngClass]="{'is-invalid' : cloneFormErrors.name}">
+          <div class="invalid-feedback" *ngIf="cloneFormErrors.name">
+            {{cloneFormErrors.name}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-sm btn-primary pull-right ml-2 w-15"
+        (click)="confirmNetClone()">Create</button>
+      <button type="button" class="btn btn-sm btn-outline-danger pull-right w-15"
+        (click)="cloneNetModalRef.hide()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+<ng-template #scheduleHistoryRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Schedule History
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row mt-1 mb-2">
+        <div class="col-3">
+          <table-search-box (searched)="onSearchedSchedule($event)"></table-search-box>
+        </div>
+        <div class="col-9">
+          <div class="row justify-content-end mr-1">
+            <table-page-size [currentPageSize]="scheduleHistoryCurrentCriteria.pageSize"
+              [totalCount]="scheduleHistoryCount" (pageSizeChange)="pageSizeChangeSchedule($event)"></table-page-size>
+          </div>
+        </div>
+      </div>
+      <table class="table text-left">
+        <thead>
+          <tr>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Executed By </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of scheduleHistory">
+            <td>{{view.startedAt}}</td>
+            <td>{{view.lastRun}}</td>
+            <td>{{view.duration}}</td>
+            <td class="{{view.statusClass}}">
+              {{view.status}}
+              <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+            </td>
+            <td>{{view.updatedBy}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table-entries [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+        [pageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"></table-entries>
+      <table-pager *ngIf="scheduleHistory.length" [pageNo]="scheduleHistoryCurrentCriteria.pageNo"
+        [pageSize]="scheduleHistoryCurrentCriteria.pageSize" [totalCount]="scheduleHistoryCount"
+        (pageChange)="pageChangeSchedule($event)"></table-pager>
+      <p *ngIf="scheduleHistory.length==0" class="text-center py-3">No history to display</p>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>

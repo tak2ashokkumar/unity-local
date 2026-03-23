@@ -1,0 +1,151 @@
+<div class="modal-content" ng-show="showStopStartTerminateModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click="cancel()" aria-hidden="true">×</button>
+    <h4 class="modal-title ng-binding">&nbsp;AWS Virtual Machine</h4>
+  </div>
+  <div class="modal-body ng-binding">Are you sure you want to continue with this action?</div>
+  <div class="modal-footer modal-button"><button class="btn btn-cancel" type="button" ng-click="cancel()">No</button><button class="btn btn-default" type="submit" ng-click="toggle()">Yes</button></div>
+</div>
+
+<div class="modal-content" ng-show="showImageModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click= "cancel()" aria-hidden="true">&times;</button> 
+    <h4 class="modal-title">Create Image</h4>
+  </div>
+  <div class="modal-body">
+    <form role="form" class="ng-pristine ng-scope ng-invalid ng-invalid-required">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group ng-scope">
+          <label for="blockName">Instance Id *</label>
+          <input class="form-control ng-invalid ng-invalid-required ng-pristine ng-untouched ng-valid ng-not-empty" ng-model="obj.instance_id" disabled="" aria-invalid="false" type="text">
+          <label class="errormsg" ng-if="obj['instance_iderr']">{{ obj['instance_idMsg'] }}</label>
+          <!-- ngIf: obj['instance_iderr'] -->
+        </div>
+        <div class="form-group ng-scope">
+          <label for="blockName">Image Name *</label>
+          <input class="form-control ng-empty ng-invalid ng-invalid-required ng-pristine ng-untouched" required="" value="" ng-model="obj.name" aria-invalid="true" type="text">
+          <label class="errormsg" ng-if="obj['nameerr']">{{ obj['nameMsg'] }}</label>
+          <!-- ngIf: obj['nameerr'] -->
+        </div>
+        <div class="form-group ng-scope">
+          <label for="blockName">Image Description *</label>
+          <input class="form-control ng-empty ng-invalid ng-invalid-required ng-pristine ng-untouched" required="" value="" ng-model="obj.description" aria-invalid="true" type="text">
+          <label class="errormsg" ng-if="obj['descriptionerr']">{{ obj['descriptionMsg'] }}</label>
+          <!-- ngIf: obj['descriptionerr'] -->
+        </div>
+        <div class="form-group ng-scope">
+          <label for="blockName">No reboot</label>
+          <label class="ng-binding">
+          <input class="ckeckbox cbox_view ng-pristine ng-untouched ng-valid ng-empty" name="No reboot" ng-model="obj.reboot" aria-invalid="false" type="checkbox">
+          </label>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer modal-button"> 
+    <button class="btn btn-cancel" type="button" ng-click="cancel()">No, not right now.</button> 
+    <button class="btn btn-default" type="submit" ng-click="aws_image_add(obj)">Create!</button> 
+  </div>
+</div>
+
+<div class="modal-content" ng-show="showAsgModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click= "cancel()" aria-hidden="true">&times;</button> 
+    <h4 class="modal-title">Attach to Auto Scaling Group</h4>
+  </div>
+  <div class="modal-body">
+      <form role="form">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="form-group ng-scope">
+                  <label for="blockName">Auto Scaling Group ** </label>
+                  <select ng-if="(!angular.isDefined(aws_attachinstance_dropdowns.autoscaling_group)) || (aws_attachinstance_dropdowns.autoscaling_group.length === 0 )" ng-options="row.auto_scaling_group as row.auto_scaling_group for row in aws_attachinstance_dropdowns.autoscaling_group" class="form-control" ng-model="aws_attachinstance_dropdowns.group" disabled>
+                      <option selected="selected" value="">-- no auto scaling group present --</option>
+                  </select>
+                  <select ng-if="angular.isDefined(aws_attachinstance_dropdowns.autoscaling_group) && (aws_attachinstance_dropdowns.autoscaling_group.length > 0)" ng-options="row.auto_scaling_group as row.auto_scaling_group for row in aws_attachinstance_dropdowns.autoscaling_group" class="form-control" ng-model="aws_attachinstance_dropdowns.group">
+                      <option selected="selected" value="">-- choose an auto scaling group --</option>
+                  </select>
+                  <label class="errormsg" ng-if="aws_attachinstance_dropdowns['grouperr']">{{ aws_attachinstance_dropdowns['groupMsg'] }}</label>
+              </div>
+              <p ng-show = "aws_attachinstance_dropdowns.group" class="text-center">Are you sure you want to attach to this instance <b>{{aws_attachinstance_dropdowns.instance_id}}</b> ?</p>
+          </div>
+      </form>
+  </div>    
+  <div class="modal-footer modal-button"> 
+    <button class="btn btn-cancel" type="button" ng-click="cancel()">No, not right now.</button> 
+    <button class="btn btn-default" type="submit" ng-click="attach_autoscaling_group(aws_attachinstance_dropdowns)">Attach!</button> 
+  </div>
+</div>
+
+
+
+<div class="modal-content" ng-show="showAttachNetworkInterfaceModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click= "cancel()" aria-hidden="true">&times;</button> 
+    <h4 class="modal-title">Attach Network Interface</h4>
+  </div>
+  <div class="modal-body">
+      <form role="form">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="form-group ng-scope">
+                  <label for="blockName">Instance Id *</label>
+                  <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" ng-model="aws_attachinterface_dropdowns.instance_id" disabled>
+              </div>
+              <div class="form-group ng-scope">
+                  <label for="blockName">Network Interface*</label>
+                  <select ng-if="!angular.isDefined(aws_attachinterface_dropdowns.network_interface_list) || (aws_attachinterface_dropdowns.network_interface_list.length == 0)"
+                   ng-options="row.network_interface_id as row.network_interface_id+'('+row.availability_zone+')' for row in aws_attachinterface_dropdowns.network_interface_list" class="form-control" ng-model="aws_attachinterface_dropdowns.network_interface_id" disabled>
+                      <option selected="selected" value="">-- no network interface present --</option>
+                  </select>
+                  <select ng-if="angular.isDefined(aws_attachinterface_dropdowns.network_interface_list) && (aws_attachinterface_dropdowns.network_interface_list.length > 0)"
+                   ng-options="row.network_interface_id as row.network_interface_id+'('+row.availability_zone+')' for row in aws_attachinterface_dropdowns.network_interface_list" class="form-control" ng-model="aws_attachinterface_dropdowns.network_interface_id">
+                      <option selected="selected" value="">-- select network interface --</option>
+                  </select>
+                  <span class="select-arrow"></span>
+                  <label class="errormsg" ng-if="aws_attachinterface_dropdowns['network_interface_iderr']">{{ aws_attachinterface_dropdowns['network_interface_idMsg'] }}</label>
+              </div>
+              <div class="form-group ng-scope">
+                  <label for="blockName">Device Index *</label>
+                  <input class="form-control ng-empty ng-invalid ng-invalid-required" type="number" min="1" required="" value="" ng-model="aws_attachinterface_dropdowns.device_index">
+                  <label class="errormsg" ng-if="aws_attachinterface_dropdowns['device_indexerr']">{{ aws_attachinterface_dropdowns['device_indexMsg'] }}</label>
+              </div>
+          </div>
+      </form>
+  </div>    
+  <div class="modal-footer modal-button"> 
+    <button class="btn btn-cancel" type="button" ng-click="cancel()">No, not right now.</button> 
+    <button class="btn btn-default" type="submit" ng-click="attach_network_interface(aws_attachinterface_dropdowns)">Attach!</button> 
+  </div>
+</div>
+
+
+<div class="modal-content" ng-show="showAttachLoadBalancerModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" ng-click= "cancel()" aria-hidden="true">&times;</button> 
+    <h4 class="modal-title">Attach LoadBalancer</h4>
+  </div>
+  <div class="modal-body">
+      <form role="form">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+              <div class="form-group ng-scope">
+                  <label for="blockName">Loadbalancer *</label>
+                  <select ng-if="!angular.isDefined(aws_attachloadbalancer_dropdowns.loadbalancer_list) || (aws_attachloadbalancer_dropdowns.loadbalancer_list.length === 0)" ng-options="row.load_balancer as row.load_balancer for row in aws_attachloadbalancer_dropdowns.loadbalancer_list" class="form-control" ng-model="aws_attachloadbalancer_dropdowns.load_balancer" disabled>
+                      <option selected="selected" value="">-- no loadbalancer present --</option>
+                  </select>
+                  <select ng-if="angular.isDefined(aws_attachloadbalancer_dropdowns.loadbalancer_list) && (aws_attachloadbalancer_dropdowns.loadbalancer_list.length > 0)" ng-options="row.load_balancer as row.load_balancer for row in aws_attachloadbalancer_dropdowns.loadbalancer_list" class="form-control" ng-model="aws_attachloadbalancer_dropdowns.load_balancer">
+                      <option selected="selected" value="">-- choose a loadbalancer --</option>
+                  </select>
+                  <span class="select-arrow"></span>
+                  <label class="errormsg" ng-if="aws_attachloadbalancer_dropdowns['load_balancererr']">{{ aws_attachloadbalancer_dropdowns['load_balancerMsg'] }}</label>
+              </div>
+              <p ng-if="aws_attachloadbalancer_dropdowns.load_balancer" class="text-center"> Are you sure you want to attach to the instance  <b>{{aws_attachloadbalancer_dropdowns.instance_id}}</b> ?</p>
+          </div>
+      </form>
+  </div>    
+  <div class="modal-footer modal-button"> 
+    <button class="btn btn-cancel" type="button" ng-click="cancel()">No, not right now.</button> 
+    <button class="btn btn-default" type="submit" ng-click="attach_loadbalancer(aws_attachloadbalancer_dropdowns)">Attach!</button> 
+  </div>
+</div>
+
+
+          

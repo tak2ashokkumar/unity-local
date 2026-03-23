@@ -1,0 +1,14 @@
+::ng-deep .cm-lint-error {
+    background-color: rgba(255, 0, 0, 0.1);
+    border-bottom: 1px dotted red;
+}
+
+.CodeMirror-lint-tooltip {
+    z-index: 1000;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+    font-size: 14px;
+}

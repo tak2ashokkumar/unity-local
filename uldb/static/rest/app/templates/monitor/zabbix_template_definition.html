@@ -1,0 +1,233 @@
+<style type="text/css">
+    .pagemargin .page_wrapper {
+        background-color: #FFFFFF;
+        width: 100%;
+        -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        padding: 20px;
+        padding-bottom: 60px;
+        padding-top: 0px;
+    }
+
+    .dataTables_filter input[type="search"] {
+        border: 2px solid #E4E4E4;
+        border-radius: 2px;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .dataTables_length select {
+        border: 1px solid #E4E4E4;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .table {
+        display: block;
+        overflow: auto;
+        white-space: nowrap;
+        height: 550px;
+        margin-bottom: 0px;
+    }
+
+    .table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        background-color: #eff2f5;
+    }
+
+    .table td {
+        padding: 8px 13px !important;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+        position: sticky;
+        left: 0;
+        background-color: #eff2f5;
+        z-index: 100;
+    }
+
+    .table th:last-child,
+    .table td:last-child {
+        position: sticky;
+        right: 0;
+        background-color: #eff2f5;
+        z-index: 100;
+    }
+</style>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object={{template_definitions}}></loading>
+    <div class="pagemargin">
+        <div class="col-xs-12 content-wrapper bg-color top_shadow" ng-if="template_definitions"
+            style="padding-left:0px; margin-bottom:10px;">
+            <div class="col-xs-4 pull-right">
+                <div class="action-bar pull-right table-button">
+                    <button class="btn btn-primary" type="button" ng-click="add()" style="margin-left:20px;"> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 page_wrapper" style="float:left; padding:0px;">
+            <section ng-if="template_definitions" id="no-more-tables" class="margintop20 table_wrapper">
+                <table class="example table  table-condensed cf" ng-if="template_definitions.length">
+                    <thead class="cf">
+                        <tr>
+                            <th>Instance</th>
+                            <th>Template</th>
+                            <th>Status</th>
+                            <th>Power</th>
+                            <th>Temperature</th>
+                            <th>UpTime</th>
+                            <th>Voltage</th>
+                            <th>Current</th>
+                            <th>Storage Total</th>
+                            <th>Storage Used</th>
+                            <th>CPU</th>
+                            <th>CPU Count</th>
+                            <th>Memory</th>
+                            <th>Total Memory</th>
+                            <th class="numeric">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="def in template_definitions">
+                            <td>{{def.zabbix_instance.account_name}}</td>
+                            <td>{{def.template_name}}</td>
+                            <td>{{def.item_key.status}}</td>
+                            <td>{{def.item_key.power}}</td>
+                            <td>{{def.item_key.temperature}}</td>
+                            <td>{{def.item_key.uptime}}</td>
+                            <td>{{def.item_key.voltage}}</td>
+                            <td>{{def.item_key.current}}</td>
+                            <td>{{def.item_key.storage_total}}</td>
+                            <td>{{def.item_key.storage_used}}</td>
+                            <td>{{def.item_key.cpu}}</td>
+                            <td>{{def.item_key.cpu_count}}</td>
+                            <td>{{def.item_key.memory}}</td>
+                            <td>{{def.item_key.total_memory}}</td>
+                            <td>
+                                <div class="action-icons">
+                                    <a class="fa fa-pencil blue-text" tooltip-class="customClass" uib-tooltip="Edit"
+                                        ng-click="edit(def)"></a>
+                                    <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete"
+                                        ng-click="delete(def)"></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="!template_definitions.length" class="content-wrapper text-center" style="padding-top:30px">
+                    <span class="no-record-text">No Template Definitions to display</span>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="templateDefinition.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> {{method}} Template Definition</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+            <div class="col-xs-12">
+                <label style="color:red" ng-if="err">{{ error }}</label><br>
+                
+                <div class="form-group col-xs-6">
+                    <label for="instance">Instance*</label>
+                    <input class="form-control" id="instance" ng-model="obj.zabbix_instance" required
+                    uib-typeahead="instance as instance.account_name for instance in get_instances($viewValue)"
+                    typeahead-on-select="onInstanceSelect($item)">
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="template">Templates*</label>
+                    <select class="form-control" id="template" ng-model="obj.template_id" required
+                    ng-options="tmpl.template_id as tmpl.name for tmpl in templates"></select>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="status">Status key</label>
+                    <input class="form-control" id="status" type="text" ng-model="obj.item_key.status"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="power">Power key</label>
+                    <input class="form-control" id="power" type="text" ng-model="obj.item_key.power"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="temperature">Temperature key</label>
+                    <input class="form-control" id="temperature" type="text" ng-model="obj.item_key.temperature"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="uptime">Uptime key</label>
+                    <input class="form-control" id="uptime" type="text" ng-model="obj.item_key.uptime"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="temperature">Voltage key</label>
+                    <input class="form-control" id="temperature" type="text" ng-model="obj.item_key.voltage"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="uptime">Current key</label>
+                    <input class="form-control" id="uptime" type="text" ng-model="obj.item_key.current"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="temperature">Storage Total key</label>
+                    <input class="form-control" id="temperature" type="text" ng-model="obj.item_key.storage_total"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="uptime">Storage Used key</label>
+                    <input class="form-control" id="uptime" type="text" ng-model="obj.item_key.storage_used"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="temperature">CPU key</label>
+                    <input class="form-control" id="temperature" type="text" ng-model="obj.item_key.cpu"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="temperature">CPU Count key</label>
+                    <input class="form-control" id="temperature" type="text" ng-model="obj.item_key.cpu_count"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="uptime">Memory key</label>
+                    <input class="form-control" id="uptime" type="text" ng-model="obj.item_key.memory"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="uptime">Total Memory key</label>
+                    <input class="form-control" id="uptime" type="text" ng-model="obj.item_key.total_memory"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-danger" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-success" ng-click="onSubmit()" type="submit"> Submit</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="deleteTemplateDefinition.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> Delete Template Definition</span>
+    </div>
+    <div class="modal-content">
+        <div class="modal-header" style="text-align: center;">
+            <h4 class="modal-title">Confirm Delete</h4>
+        </div>
+      <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+        <div class="modal-body" style="text-align: center;">
+            Are you sure you want to delete definition for template {{obj.template_id}} ?
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons"  style="text-align: center;">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+                <button type="button" class="btn btn-default" ng-click="confirmDelete()"> Confirm </button>
+            </div>
+        </div>
+      </form>
+    </div>
+</script>

@@ -1,0 +1,322 @@
+<div class="card round-edge mb-2">
+    <div class="card-body d-flex">
+        <div class="border-right mr-1 w-15">
+            <div class="text-muted">Total Cost</div>
+            <div class="text-primary font-xl">$145,070</div>
+            <div class="text-success d-flex align-items-center">
+                <i class="fas fa-caret-down"></i> 20%
+                <span class="text-muted ml-1">Since Last Month</span>
+            </div>
+        </div>
+        <div class="border-right mr-1 w-15">
+            <div class="text-muted">Functional Cost</div>
+            <div class="text-primary font-xl">$56,784</div>
+            <div class="text-danger d-flex align-items-center">
+                <i class="fas fa-caret-up"></i> 12%
+                <span class="text-muted ml-1">Since Last Month</span>
+            </div>
+        </div>
+        <div class="border-right mr-1 w-15">
+            <div class="text-muted">Dynamic Cost</div>
+            <div class="text-primary font-xl">$24,950</div>
+        </div>
+        <div class="border-right mr-1 w-15">
+            <div class="text-muted">Operational Cost</div>
+            <div class="text-primary font-xl">$39,516</div>
+        </div>
+        <div class="border-right mr-1 w-15">
+            <div class="text-muted">Fixed Spent Cost</div>
+            <div class="text-primary font-xl">$14,820</div>
+        </div>
+        <div class="border-right mr-1 w-15">
+            <div class="text-muted">Availablility Cost</div>
+            <div class="text-primary font-xl">$14,820</div>
+        </div>
+        <div class="w-15">
+            <div class="text-muted">Cost Optimization Potential</div>
+            <div class="text-primary font-xl">$19,000</div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Outer Card: Spend Distribution -->
+<div class="card round-edge mb-2" style="min-height: 280px;">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2">
+        <span class="font-lg font-500">Spend Distribution</span>
+    </div>
+
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <!-- Card 1: Cost By Cloud Type -->
+            <div class="flex-fill pr-2 text-center border-right" style="min-width: 0;">
+                <app-spinner [name]="'CostByCloudTypeChartLoader'"></app-spinner>
+                <div class="mb-2 pb-1">
+                    <span class="font-lg font-500">Cost By Cloud Type</span>
+                </div>
+                <ng-container *ngIf="costBycloudChartViewData">
+                    <div echarts [options]="costBycloudChartViewData.options"
+                        [extentions]="costBycloudChartViewData.extensions" [defaultHeight]="260"></div>
+                </ng-container>
+            </div>
+
+            <!-- Vertical Divider -->
+            <span class="border border-secondary mx-2"></span>
+
+            <!-- Card 2: Cost By Subscription -->
+            <div class="flex-fill text-center px-2 border-right" style="min-width: 0;">
+                <app-spinner [name]="'CostBySubscriptionChartLoader'"></app-spinner>
+                <div class="mb-2 pb-1">
+                    <span class="font-lg font-500">Cost By Subscription</span>
+                </div>
+                <ng-container *ngIf="costBySubscriptionChartViewData">
+                    <div echarts [options]="costBySubscriptionChartViewData.options"
+                        [extentions]="costBySubscriptionChartViewData.extensions" [defaultHeight]="260">
+                    </div>
+                </ng-container>
+            </div>
+
+            <!-- Vertical Divider -->
+            <span class="border border-secondary mx-2"></span>
+
+            <!-- Card 3: Cost By Services -->
+            <div class="flex-fill pl-2 text-center" style="max-width: 450px;">
+                <app-spinner [name]="'CostByServicesTableLoader'"></app-spinner>
+                <div class="mb-2 pb-1 text-center">
+                    <span class="font-lg font-500">Cost By Services</span>
+                    <!-- Optional dropdown/filter here -->
+                </div>
+                <div class="scrollit">
+                    <table class="table table-sm table-borderless text-left">
+                        <tbody>
+                            <ng-container *ngFor="let view of costByServiceViewData;">
+                                <tr class="border-bottom">
+                                    <td style="width: 40px">
+                                        <img class="w-100" [src]="view.cloudImg" [alt]="view.cloud"
+                                            style="height: 25px; max-width: -webkit-fill-available;" />
+                                    </td>
+                                    <td class="pointer-link" (click)="openRow(view)">
+                                        {{view.service}} ({{view.deviceListCount}})
+                                    </td>
+                                    <td class="text-right">${{view.totalCost}}</td>
+                                </tr>
+                                <tr *ngIf="view.isOpen" class="fold" [ngClass]="{ 'open': view.isOpen }">
+                                    <td class="px-2 py-0 pr-4" colspan="3">
+                                        <ng-container [ngTemplateOutlet]="serviceDetails"
+                                            [ngTemplateOutletContext]="{view:view.deviceList}"></ng-container>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!costByServiceViewData.length"
+                        class="d-flex py-4 justify-content-center align-items-center">
+                        No Services available.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-8 pr-1">
+        <div class="card round-edge equalize-card mb-2">
+            <div class="card-header font-lg font-500 bg-transparent py-2">Business Unit Spend Distribution</div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Business Unit</th>
+                            <th>Monthly Spend ($)</th>
+                            <th>Annual Budget ($)</th>
+                            <th>Allocated Budget ($)</th>
+                            <th>Growth/Decline (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr>
+                            <td>Manufacturing</td>
+                            <td>3,496</td>
+                            <td>41,961</td>
+                            <td>38,000</td>
+                            <td>10.40%</td>
+                        </tr>
+                        <tr>
+                            <td>Sales</td>
+                            <td>1,955</td>
+                            <td>23,480</td>
+                            <td>25,000</td>
+                            <td>-6.1%</td>
+                        </tr>
+                        <tr>
+                            <td>Marketing</td>
+                            <td>1,907</td>
+                            <td>22,872</td>
+                            <td>20,000</td>
+                            <td>14.40%</td>
+                        </tr>
+                        <tr>
+                            <td>HR</td>
+                            <td>4,449</td>
+                            <td>53,527</td>
+                            <td>50,000</td>
+                            <td>7.10%</td>
+                        </tr>
+                        <tr>
+                            <td>IT</td>
+                            <td>278</td>
+                            <td>3,230</td>
+                            <td>6,000</td>
+                            <td>-46.2%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 pl-1">
+        <div class="card round-edge equalize-card mb-2">
+            <div class="card-header font-lg font-500 bg-transparent py-2">Business Unit Spend Distribution</div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Business Unit</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr>
+                            <td>IT</td>
+                            <td>Reassess campaign spending in Q3.</td>
+                        </tr>
+                        <tr>
+                            <td>HR</td>
+                            <td>Optimize SaaS tools subscription.</td>
+                        </tr>
+                        <tr>
+                            <td>Sales</td>
+                            <td>Budget can be reallocated.</td>
+                        </tr>
+                        <tr>
+                            <td>Manufacturing</td>
+                            <td>Slight overspend – adjust forecast.</td>
+                        </tr>
+                        <tr>
+                            <td>Marketing</td>
+                            <td>Budget can be reallocated.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-8 pr-1">
+        <div class="card round-edge equalize-card mb-2">
+            <div class="card-header font-lg font-500 bg-transparent py-2">KPI Summary Cards</div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>KPI</th>
+                            <th>Indicator</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth>
+                            <td>{{view.name}}</td>
+                            <td class="text-truncate">{{view.categoryName}}</td>
+                            <td>{{view.totalTask}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                            <td>{{view.lastExecutedTime}}</td>
+                        </tr> -->
+                        <tr>
+                            <td>Total Budget Used</td>
+                            <td><i class="text-success fas fa-check-circle mr-1"></i>$1,500,000 (75% of Annual Budget)
+                            </td>
+                            <td>$108,920</td>
+                        </tr>
+                        <tr>
+                            <td>Cost Efficiency Score</td>
+                            <td><i class="text-warning fas fa-exclamation-circle mr-1"></i>$1,200,000 (75% of Annual
+                                Budget)</td>
+                            <td>84%</td>
+                        </tr>
+                        <tr>
+                            <td>Budget Overused Units</td>
+                            <td><i class="text-danger fas fa-exclamation-triangle mr-1"></i>$2,000,000 (75% of Annual
+                                Budget) <span>Optimization alert</span></td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>Potential Savings Identified</td>
+                            <td><i class="text-success fas fa-check-circle mr-1"></i>$500,000 (75% of Annual Budget)
+                            </td>
+                            <td>$9,540</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 pl-1">
+        <div class="card round-edge equalize-card mb-2">
+            <div class="card-header font-lg font-500 bg-transparent py-2">Insight Inbox</div>
+            <div class="card-body p-0">
+                <div class="d-flex align-items-start">
+                    <span class="text-danger mx-2 mt-2">
+                        <i class="fas fa-exclamation-triangle font-xl"></i>
+                    </span>
+                    <span>
+                        HR spend in March spiked by 42% due to unplanned onboarding tools licensing.
+                    </span>
+                </div>
+                <hr class="my-1">
+                <div class="d-flex align-items-start">
+                    <span class="text-success mx-2 mt-2">
+                        <i class="fas fa-check-circle font-xl"></i>
+                    </span>
+                    <span>
+                        Finance remained 8% under budget consistently over last 5 months
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<ng-template #serviceDetails let-view="view">
+    <table class="table table-sm table-borderless mb-0 text-left">
+        <tr *ngFor="let v of view;" class="d-flex justify-content-between">
+            <td class="text-primary">{{v?.deviceName}}</td>
+            <td>${{v?.cost}}</td>
+        </tr>
+    </table>
+</ng-template>

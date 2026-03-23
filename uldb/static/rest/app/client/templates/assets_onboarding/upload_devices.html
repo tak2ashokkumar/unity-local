@@ -1,0 +1,255 @@
+<div class="modal-header">
+  <h3 class="modal-title">Upload Asset/Device details</h3>
+</div>
+<div class="modal-body">
+  <style type="text/css">
+    /*.btn-group .btn:hover, .btn:focus{
+    background-color: #2e6da4 !important;
+    }*/
+    li.list_item {
+      padding: 5px;
+      padding-left: 10px;
+      display : list-item !important; 
+      width:100%;
+      list-style: inside !important;
+      font-size: 16px;
+      color : #9f9f9f;
+    }
+
+    .network_scan_table {
+      width: 100%;
+    }
+
+    .network_scan_table thead,.network_scan_table tbody,
+    .network_scan_table tr,.network_scan_table  th,.network_scan_table td {
+      display: block;
+    }
+
+    .network_scan_table thead tr th {
+      height: 36px;
+      width: 25%;
+      float: left;
+      padding: 8px 15px;
+    }
+
+    .network_scan_table thead tr th .action-icons div {
+      display: inline-block;
+    }
+
+    .network_scan_table thead tr th .action-icons div.buttons{
+      margin-top: -8px;
+      margin-right: -15px;
+      width: 50%;
+    }
+
+    .network_scan_table thead tr th .action-icons div.buttons .btn{
+      width: 100%;
+    }
+
+    .network_scan_table tbody{
+      height:400px;
+      overflow-y:auto;
+      width: 100%;
+    }
+    .network_scan_table tbody tr td{
+      height: 40px;
+      width: 25%;
+      float: left;
+      padding: 9px 15px;
+    }
+
+    .network_scan_table tbody tr td.full-width {
+      width: 100%;
+    }
+
+    .network_scan_table tbody tr td input, 
+    .network_scan_table tbody tr td .btn {
+      margin-top: -6px;
+    }
+
+    .network_scan_table tbody tr td.full-width .input {
+      display: inline-block;
+      width: 74%;
+    }
+
+    .network_scan_table tbody tr td.full-width .input input{
+      display: inline-block;
+      width: 60%;
+    }
+
+    .network_scan_table>tbody>tr>td .action-icons {
+      margin-top: -7px;
+    }
+
+    .action-icons .fa.btn-default{
+      padding: 7px 0px;
+    }
+
+  </style>
+  <div class="row">
+    <!-- Tabs start -->
+    <uib-tabset active="activeJustified" justified="true">
+      <!-- VMWare VM Monitoring tab container div -->
+      <uib-tab index="0" classes="uibtab-header">
+        <uib-tab-heading>
+          <h2  style="font-size:18px"><b>Devices OnBoarding </b></h2>
+        </uib-tab-heading>
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+            <div class="col-xs-3 col-sm-4 col-md-3 col-lg-3 paddingright">
+              <div class="row middle-wrapper">
+                <div class="row cardbox-header"> Template Excel File  </div>
+                <div class="row Dashwrap" style="padding-bottom : 10px;">
+                  <h1 style="color : #896c6c; font-size:12px"> Download Template Excel File to fill in the details </h1>
+                </div>
+                <div class="row Dashwrap" style="margin-top:16px;">
+                  <a href="{{ onboarding_file }}" >
+                    <button class="btn btn-default" type="button">Download Now</button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-xs-6 col-sm-5 col-md-6 col-lg-6 paddingright">
+              <div class="row middle-wrapper">
+                <div class="row cardbox-header">Upload Sheet</div>
+                <div class="row Dashwrap" style="padding-bottom: 0px !important">
+                  <form role="form" name="inventory_onboard_form">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                      <div class="form-group">
+                        <div class="btn-group" role="group">
+                          <button type="button" class="btn" 
+                          style="pointer-events:none;">Select File </button>
+                          <button type="button" class="btn btn-primary" style="margin-bottom:10px;" 
+                          ngf-select ng-model="file" ngf-model-invalid="errorFile"
+                          name="file" required ngf-max-size="1MB" ngf-accept="'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">
+                          <i class="fa fa-upload"></i>
+                        </button>
+                        <span ng-if="inventory_onboard_form.file.$valid"> &nbsp; &nbsp; {{file.name}} </span>
+                        <span ng-if="inventory_onboard_form.file.$error.maxSize">
+                          &nbsp; &nbsp; File too large [Uploaded {{errorFile.size / 1000000 | number : 1}}MB : Max allowed 1MB]
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="form-group row Dashwrap" style="padding-top: 25px; margin-bottom: 2px !important">
+                <button class="btn btn-default" ng-click="createOnboardRequest(file)" type="submit"> Upload </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <div class="row middle-wrapper">
+              <div class="row cardbox-header"> Update vCenter Details</div>
+              <div class="row Dashwrap" style="padding-bottom : 10px;">
+                <h1 style="color : #896c6c; font-size:12px"> {{vcenterMsg}} </h1>
+              </div>
+              <div class="row Dashwrap" style="margin-top:16px;">
+                <span uib-tooltip="{{vcenterMsg}}">
+                  <button class="btn btn-default" ng-class="{'fa-disabled': (vcenters.length==0) }" ng-click="update_vcenter_credentials()" type="button">Update vCenter</button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-12">
+          <div class="row Dashwrap">
+            <ul>
+              <li class="list_item"> Click on Download Now button to download template excel file.
+                <a href="/media/onboarding_files/sample/OnboardingSampleExcel.xlsx"> Click here </a> to download sample asset details file.
+              </li>
+              <li class="list_item"> Fill in the sheets with asset details according to the catogeries mentioned.</li>
+              <li class="list_item"> Upload the filled file.</li>
+              <li class="list_item"> The status of each asset, whether it is saved or not can be known from Status column with the description in the Remarks. </li>
+              <li class="list_item">If there are errors, please correct the details accordingly and re-upload the file.</li>
+              <li class="list_item">Repeat the process until all the assets are saved successfully.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </uib-tab>
+    <uib-tab index="1" classes="uibtab-header">
+      <uib-tab-heading>
+        <h2 style="font-size:18px"><b>Device Discovery</b></h2>
+      </uib-tab-heading>
+      <div ng-init="getOrgScans()">
+        <div class="col-xs-12" style="padding-top: 20px;">
+          <table class="table network_scan_table table-condensed table-hover">
+            <thead>
+              <tr>
+                <th> Network CIDR </th>
+                <th> Scan Status </th>
+                <th> Updated at </th>
+                <th class="actions">
+                  <div class="action-icons">
+                    <div class="" style="display: inline-block;">Action</div>
+                    <div class="pull-right buttons" tooltip-class="customClass" 
+                    uib-tooltip="{{newScanRequest ? 'Cancel' : 'New Network Scan'}}" >
+                      <span class="btn btn-default" ng-click="newScan(true)" ng-if="!newScanRequest">
+                        New Scan
+                      </span>
+                      <span class="btn btn-default" ng-click="newScan(false)" ng-if="newScanRequest">
+                        Cancel 
+                      </span>
+                  </div>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-if="newScanRequest">
+              <td class="full-width" colspan="4">
+                <form role="form" name="network_scan_form" id="network_scan_form" novalidate>
+                  <div class="input form-group">
+                    <input type="text" class="form-control" name="network_cidr" ng-model="inet" placeholder="Network CIDR" autofocus>
+                    <span class="errormsg" ng-if="inet_address_error">({{ inet_address_error }})</span>
+                  </div>
+
+                  <button class="btn btn-default" type="button" name="Start Scanning" ng-click="scanNetwork(inet)">
+                  Initiate Scanning</button>
+                </form>
+              </td>
+            </tr>
+            <tr ng-repeat="row in scanData track by $index">
+              <td> {{row.inet}}</td>
+              <td>{{row.scan_status}}</td>
+              <td>{{row.updated_at | unityDate : $root.users_timezone}}</td>
+              <td>
+                <div class="action-icons">
+                  <span uib-tooltip="{{(row.scan_status !== 'COMPLETED') ? 'Network scan in progress' : 'Re-scan'}}" tooltip-class="customClass">
+                    <a ng-class="{'fa-disabled': row.scan_status !== 'COMPLETED'}" ng-click="scanNetwork(row.inet, row.uuid)" >
+                      <i class="fa fa-refresh" aria-hidden="true"></i>  
+                    </a>
+                  </span>
+                  <span uib-tooltip="{{ row.scan_status !== 'COMPLETED' ? 'Network scan in progress' : (row.scan_status == 'COMPLETED' && row.noHostsFound) ? 'No devices found' : 'Download Report'}}" tooltip-class="customClass">
+                    <a ng-class="{'fa-disabled': ((row.scan_status !== 'COMPLETED') || (row.noHostsFound)) }" href="/customer/network_scans/download/?uuid={{row.uuid}}">
+                      <i class="fa fa-download" aria-hidden="true"></i>
+                    </a>
+                  </span>
+                  <span uib-tooltip="Delete" tooltip-class="customClass">
+                    <a ng-click="deleteNetwork($index, row)" >
+                      <i class="fa fa-trash-o" aria-hidden="true"></i>  
+                    </a>
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div ng-if="results_loaded && scanData.length===0" class="content-wrapper">
+          <no-records-found message="No records were found !!"></no-records-found>
+        </div>
+      </div>
+          <!-- <div class="col-xs-offset-4 col-xs-4 col-xs-offset-4 content-wrapper" >
+            <button type="button" class="btn btn-default" ng-click="newScan(true)">New Network Scan</button>
+          </div> -->
+        </div>
+      </uib-tab>
+    </uib-tabset>
+  </div>
+</div>
+<div class="modal-footer modal-buttons">
+  <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+    Close
+  </button>
+</div>

@@ -1,0 +1,392 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="card round-edge">
+            <div class="card-header d-flex justify-content-between bg-white align-items-center py-2">
+                <div class="font-500">{{actionMessage}} Policy</div>
+                <button class="btn btn-pill btn-warning btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                        class="fa fa-arrow-left"></i></button>
+            </div>
+            <div class="card-body">
+                <form *ngIf="form" [formGroup]="form">
+                    <div *ngIf="nonFieldErr" class="row form-group offset-1">
+                        <div class="invalid-credentials text-left">{{nonFieldErr}}</div>
+                    </div>
+                    <div *ngIf="policyTypeErr" class="row form-group offset-1">
+                        <div class="invalid-credentials text-left">{{policyTypeErr}}</div>
+                    </div>
+                    <div class="row form-group ml-2">
+                        <div class="col-2 text-right align-self-center">Name<em>* </em>:</div>
+                        <div class="col-3">
+                            <input class="form-control" type="text" placeholder="Enter Name" formControlName="name"
+                                [class.is-invalid]="formErrors.name">
+                            <small class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="form-group row ml-2">
+                        <div class="col-2 text-right mt-1">Description:</div>
+                        <div class="col-6">
+                            <textarea class="form-control" type="text" placeholder="Enter Description"
+                                formControlName="description" [class.is-invalid]="formErrors.description"></textarea>
+                            <small class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="form-group row ml-2">
+                        <div class="col-2 text-right  align-self-center">Type<em>* </em>:</div>
+                        <div class="col-3">
+                            <select class="form-control" type="text" formControlName="policy_type"
+                                [class.is-invalid]="formErrors.policy_type">
+                                <option [value]="''" disabled>Select Type</option>
+                                <option *ngFor="let type of policyTypeList" [value]="type">{{ type }}</option>
+                            </select>
+                            <small class="invalid-feedback" *ngIf="formErrors.policy_type">{{formErrors.policy_type}}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="form-group row ml-2">
+                        <div class="col-2 text-right  align-self-center">Scope<em>* </em>:</div>
+                        <div class="col-3">
+                            <select class="form-control" type="text" formControlName="scope"
+                                [class.is-invalid]="formErrors.scope">
+                                <option [value]="''" disabled>Select Scope</option>
+                                <option [value]="'Global'">Global</option>
+                                <option [value]="'Cloud'">Cloud</option>
+                            </select>
+                            <small class="invalid-feedback" *ngIf="formErrors.scope">{{formErrors.scope}}
+                            </small>
+                        </div>
+                    </div>
+                    <ng-conatiner *ngIf="this.form.get('scope').value == 'Cloud'">
+                        <div class="form-group row ml-2">
+                            <div class="col-2 text-right align-self-center">Cloud Type<em>* </em>:</div>
+                            <div class="col-3">
+                                <select class="form-control" type="text" formControlName="cloud_type"
+                                    [class.is-invalid]="formErrors.cloud_type">
+                                    <option [value]="''" disabled>Select Cloud Type</option>
+                                    <option *ngFor="let cloud of cloudList" [value]="cloud.type">
+                                        {{cloud.type}}
+                                    </option>
+                                </select>
+                                <small class="invalid-feedback" *ngIf="formErrors.cloud_type">{{formErrors.cloud_type}}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="form-group row ml-2">
+                            <div class="col-2 text-right align-self-center">Scope Identifier<em>* </em>:</div>
+                            <div class="col-3">
+                                <select class="form-control" type="text" formControlName="scope_id"
+                                    [class.is-invalid]="formErrors.scope_id">
+                                    <option [value]="''" disabled>Select Scope Identifier</option>
+                                    <option *ngFor="let scope of scopeIdentifierList" [value]="scope.id">
+                                        {{scope.account_name}}
+                                </select>
+                                <small class="invalid-feedback" *ngIf="formErrors.scope_id">{{formErrors.scope_id}}
+                                </small>
+                            </div>
+                        </div>
+                    </ng-conatiner>
+                    <ng-container [ngSwitch]="form.get('policy_type')?.value">
+                        <ng-container *ngSwitchCase="'Approval Policy'">
+                            <div formGroupName="config">
+
+                                <!-- ITSM Type -->
+                                <div class="form-group row ml-2">
+                                    <div class="col-2 text-right align-self-center">ITSM<em>*</em>:</div>
+                                    <div class="col-3">
+                                        <select class="form-control" formControlName="itsm_type"
+                                            [class.is-invalid]="formErrors.config?.itsm_type">
+                                            <option [value]="''" disabled>Select ITSM</option>
+                                            <option *ngFor="let itsm of ItsmList" [value]="itsm">{{ itsm }}</option>
+                                        </select>
+                                        <small class="invalid-feedback" *ngIf="formErrors.config?.itsm_type">{{
+                                            formErrors.config?.itsm_type }}</small>
+                                    </div>
+                                </div>
+
+                                <!-- ITSM Instance -->
+                                <div class="form-group row ml-2">
+                                    <div class="col-2 text-right align-self-center">Instance<em>*</em>:</div>
+                                    <div class="col-3">
+                                        <select class="form-control" formControlName="itsm_instance"
+                                            [class.is-invalid]="formErrors.config?.itsm_instance">
+                                            <option [value]="''" disabled>Select Instance</option>
+                                            <option *ngFor="let itsm of filteredItsmInstances" [value]="itsm.uuid">{{
+                                                itsm.name }}</option>
+                                        </select>
+                                        <small class="invalid-feedback" *ngIf="formErrors.config?.itsm_instance">{{
+                                            formErrors.config?.itsm_instance }}</small>
+                                    </div>
+                                </div>
+
+                                <!-- Approval Workflow -->
+                                <div class="form-group row ml-2">
+                                    <div class="col-2 text-right align-self-center">Workflow<em>*</em>:</div>
+                                    <div class="col-3">
+                                        <!-- <multiselect-dropdown [options]="approvalWorkflows"
+                                            [settings]="approvalWorkflowSettings"
+                                            class="form-control form-control-sm p-0" [texts]="workflowTexts"
+                                            style="height:auto;" formControlName="approval_workflow"
+                                            [class.is-invalid]="formErrors.config?.approval_workflow">
+                                        </multiselect-dropdown> -->
+                                        <search-dropdown [values]="approvalWorkflows" [defaultLabel]="'Workflow'"
+                                            [displayField]="'name'"
+                                            (selectedDropdownValue)="getApprovalWorkflowTypeDropdown($event)"
+                                            [editCaseValue]="workflowValue"
+                                            [hasError]="formErrors.approval_workflow"></search-dropdown>
+                                        <small class="invalid-feedback" *ngIf="formErrors.config?.approval_workflow">{{
+                                            formErrors.config?.approval_workflow }}</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group ml-2 row" *ngIf="hasParameterMapping">
+                                    <div class="col-2 text-right align-self-start">Parameter Mapping<em>*</em>:</div>
+                                    <div class="col-8 mx-0 border rounded p-3 ml-2 position-relative"
+                                        formArrayName="parameter_mapping">
+                                        <div class="row mb-2">
+                                            <div class="col-3">Service Now Attribute</div>
+                                            <div class="col-3">Unity Attribute</div>
+                                        </div>
+
+                                        <div *ngFor="let mapping of form.get('config.parameter_mapping')['controls']; let i = index"
+                                            [formGroupName]="i" class="row mb-2">
+                                            <div class="col-3">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="workflow_attribute" readonly />
+                                            </div>
+                                            <div class="col-3">
+                                                <input type="text" class="form-control form-control-sm"
+                                                    formControlName="unityone_attribute"
+                                                    placeholder="Enter UnityOne Attribute"
+                                                    [class.is-invalid]="formErrors.config.parameter_mapping[i]?.unityone_attribute" />
+                                                <div class="invalid-feedback"
+                                                    *ngIf="formErrors.config.parameter_mapping[i]?.unityone_attribute">
+                                                    {{ formErrors.config.parameter_mapping[i]?.unityone_attribute }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Resource Quota Policy'">
+                            <div formGroupName="config">
+                                <!-- Show error if none of the fields are filled and the group is touched -->
+
+                                <!-- Max VMs -->
+                                <div class="row form-group ml-2">
+                                    <div class="col-2 text-right align-self-center">Max VMs:</div>
+                                    <div class="col-1">
+                                        <input class="form-control" type="number" formControlName="max_vms" min="0">
+                                    </div>
+                                </div>
+
+                                <!-- Max CPUs -->
+                                <div class="row form-group ml-2">
+                                    <div class="col-2 text-right align-self-center">Max CPUs:</div>
+                                    <div class="col-1">
+                                        <input class="form-control" type="number" formControlName="max_cpus" min="0">
+                                    </div>
+                                </div>
+
+                                <!-- Max Memory -->
+                                <div class="row form-group ml-2">
+                                    <div class="col-2 text-right align-self-center">Max Memory:</div>
+                                    <div class="col-1">
+                                        <input class="form-control" type="number" formControlName="max_memory" min="0">
+                                    </div>
+                                    <div class="col-1">
+                                        <select class="form-control" disabled>
+                                            <option value="MB">MB</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Max Storage -->
+                                <div class="row form-group ml-2">
+                                    <div class="col-2 text-right align-self-center">Max Storage:</div>
+                                    <div class="col-1">
+                                        <input class="form-control" type="number" formControlName="max_storage" min="0">
+                                    </div>
+                                    <div class="col-1">
+                                        <select class="form-control" disabled>
+                                            <option value="GB">GB</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div *ngIf="formErrors.config.atLeastOneRequired" class="text-danger ">
+                                    {{formErrors.config.atLeastOneRequired}}
+                                </div>
+                            </div>
+
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Naming Policy'">
+                            <div formGroupName="config">
+                                <div class="row form-group ml-2">
+                                    <div class="col-2 text-right align-self-center">Naming Pattern<em>* </em>:</div>
+                                    <div class="col-3">
+                                        <input class="form-control" type="text" placeholder="Enter Name"
+                                            formControlName="naming_pattern"
+                                            [class.is-invalid]="formErrors.config.naming_pattern">
+                                        <small class="invalid-feedback"
+                                            *ngIf="formErrors.config.naming_pattern">{{formErrors.config.naming_pattern}}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="row form-group ml-2">
+                                    <div class="col-2 text-right align-self-center">Case Sensitivity<em>* </em>:</div>
+                                    <div class="col-3">
+                                        <div class="w-20">
+                                            <input id="case_sensitivity" class="policy-checkbox" type="checkbox"
+                                                formControlName="case_sensitivity"
+                                                [class.is-invalid]="formErrors.config.case_sensitivity">
+                                        </div>
+                                        <small class="invalid-feedback"
+                                            *ngIf="formErrors.config.case_sensitivity">{{formErrors.config.case_sensitivity}}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'Tagging Policy'">
+                            <div formGroupName="config">
+                                <div class="form-group ml-2 row" *ngIf="hasRequiredTags">
+                                    <div class="col-2 text-right align-self-start">Required Tags<em>*</em>:</div>
+                                    <div class="col-8 mx-0 border rounded p-3 ml-2 position-relative">
+                                        <div class="row mb-2">
+                                            <div class="col-3">Tag Name</div>
+                                            <div class="col-3">Allowed Values</div>
+                                            <div class="col-3">Required</div>
+                                        </div>
+                                        <div formArrayName="required_tags">
+                                            <div *ngFor="let tags of form.get('config.required_tags')['controls'];  let i = index;let first = first; let last = last;"
+                                                [formGroupName]="i" class="row mb-2">
+                                                <div class="col-3">
+                                                    <input type="text" class="form-control" formControlName="tag_name"
+                                                        [class.is-invalid]="formErrors.config.required_tags[i]?.tag_name" />
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.config.required_tags[i]?.tag_name">
+                                                        {{ formErrors.config.required_tags[i]?.tag_name }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-3">
+                                                    <input type="text" class="form-control "
+                                                        formControlName="allowed_values"
+                                                        [class.is-invalid]="formErrors.config.required_tags[i]?.allowed_values" />
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.config.required_tags[i]?.allowed_values">
+                                                        {{ formErrors.config.required_tags[i]?.allowed_values }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <div class="ml-3">
+                                                        <input id="case_sensitivity" class="policy-checkbox"
+                                                            type="checkbox" formControlName="required">
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span class="form-control border-0 p-0">
+                                                        <button tooltip="Remove Parameter"
+                                                            (click)="removeRequiredTag(i)"
+                                                            class="action-icons fas fa-minus font-sm ml-1"
+                                                            *ngIf="form.get('config.required_tags').controls.length > 1"></button>
+                                                        <button tooltip="Add Parameter"
+                                                            class="action-icons fas fa-plus font-sm ml-1" *ngIf="last"
+                                                            (click)="addRequiredTag(i)"></button>
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-container>
+                    </ng-container>
+
+
+
+                    <div class="form-group row ml-2">
+                        <div class="col-2 text-right  align-self-center">Notification :</div>
+                        <div class="col-3" style="max-width: 200px;">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('notification_enabled').value == true">
+                                            <input type="radio" [value]="true" formControlName="notification_enabled">
+                                            <span class="font-sm mr-2">Enable</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('notification_enabled').value == false"
+                                            [ngClass]="form.get('notification_enabled').value == false ? 'pl-2' : 'pl-0'">
+                                            <input type="radio" [value]="false" formControlName="notification_enabled">
+                                            <span class="font-sm mr-2">Disable</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-6 row" *ngIf="form.get('notification_enabled').value == true">
+                            <div class="col-4 px-2">
+                                <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                                    class="form-control form-control-sm p-0" [texts]="userGroupTexts"
+                                    style="height:auto;" formControlName="notify_groups"
+                                    [class.is-invalid]="formErrors.notify_groups"></multiselect-dropdown>
+                                <small class="invalid-feedback"
+                                    *ngIf="formErrors.notify_groups">{{formErrors.notify_groups}}
+                                </small>
+                            </div>
+                            <div class="col-4 px-2">
+                                <multiselect-dropdown [options]="userList" [settings]="userListSettings"
+                                    [texts]="userTexts" class="form-control form-control-sm p-0" style="height:auto;"
+                                    formControlName="notify_users"
+                                    [class.is-invalid]="formErrors.notify_users"></multiselect-dropdown>
+                                <small class="invalid-feedback"
+                                    *ngIf="formErrors.notify_groups">{{formErrors.notify_groups}}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row ml-2">
+                        <div class="col-2 text-right  align-self-center">Status :</div>
+                        <div class="col-3">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('is_enabled').value == true">
+                                            <input type="radio" [value]="true" formControlName="is_enabled">
+                                            <span class="font-sm mr-2">Enable</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('is_enabled').value == false"
+                                            [ngClass]="form.get('is_enabled').value == false ? 'pl-2' : 'pl-0'">
+                                            <input type="radio" [value]="false" formControlName="is_enabled">
+                                            <span class="font-sm mr-2">Disable</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-2">
+                <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success ml-3" type="button" (click)="onSubmit()">{{actionMessage}}</button>
+            </div>
+        </div>
+    </div>
+</div>

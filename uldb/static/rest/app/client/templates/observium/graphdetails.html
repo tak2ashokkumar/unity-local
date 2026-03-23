@@ -1,0 +1,51 @@
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 10px;" ng-if="selectedGraphObj.graphDetails.graph">
+    <div class="row tabs-level1" style="height:50px !important;padding-top: 5px;">
+        <form class="form-inline" name="observiumdateselectform" novalidate ng-submit="getGraphforUpdatedDateRange()">
+
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 form-group" style="padding-left: 20px !important;">
+                <label for="from_date">From : &nbsp;</label>
+                <div class="dropdown form-group dropdown-start-parent Maintenancecal" >
+                    <a class="dropdown-toggle" id="dropdownStart" role="button" data-toggle="dropdown" data-target="#">
+                        <div class="input-group date">
+                            <input type="text" class="form-control" data-date-time-input="D MMM, YYYY h:mm A" data-ng-model="graphDateObj.from_date">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="graphDateObj.from_date" name="from_date"
+                                        data-datetimepicker-config="{ dropdownSelector: '#dropdownStart'}"></datetimepicker>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 form-group">
+                <label for="to_date">To : &nbsp;</label>
+                <div class="dropdown form-group dropdown-start-parent Maintenancecal" >
+                    <a class="dropdown-toggle" id="dropdownEnd" role="button" data-toggle="dropdown" data-target="#">
+                        <div class="input-group date">
+                            <input type="text" class="form-control" data-date-time-input="D MMM, YYYY h:mm A" data-ng-model="graphDateObj.to_date">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="graphDateObj.to_date" name="to_date"
+                                      data-datetimepicker-config="{ dropdownSelector: '#dropdownEnd'}"></datetimepicker>
+                    </ul>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 3px;" uib-tooltip="{{ (graphDateObj.to_date < graphDateObj.from_date) ? 'Invalid Date range': 'Update' }}">
+                <button type="submit" class="btn btn-default" ng-class="{'fa-disabled': (graphDateObj.to_date < graphDateObj.from_date)}">Update</button>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="row">
+         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 page_wrapper">
+            <div class="row">
+                <sub-title title="{{selectedGraphObj.displayName}}"></sub-title>
+                <img class="graph_details_img" ng-src="data:image/png;base64,{{ selectedGraphObj.graphDetails.graph}}">
+            </div>
+        </div>
+    </div>
+</div>

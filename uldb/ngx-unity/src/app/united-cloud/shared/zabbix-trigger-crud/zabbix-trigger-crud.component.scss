@@ -1,0 +1,22 @@
+// merging both input an select as input group.
+form.form-inline .input-group input.form-control {
+  width: 60%;
+}
+.input-group-addon.input-select {
+  width: 40%;
+  padding: 0;
+}
+.input-group-addon.input-select select {
+  border-left: none;
+  border-radius: 0;
+}
+
+form.form-inline .form-control {
+  width: 100%;
+  padding: 0.375rem 0.2rem;
+}
+.checkbox-text {
+  margin-left: 10px;
+  margin-right: 10px; 
+}
+

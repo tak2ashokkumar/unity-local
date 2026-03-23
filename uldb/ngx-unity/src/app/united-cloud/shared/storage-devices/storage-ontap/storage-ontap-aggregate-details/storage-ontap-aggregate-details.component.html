@@ -1,0 +1,131 @@
+<div class="row mb-2">
+    <div class="col-6 pr-0" style="min-height: 250px;">
+        <div class="card round-edge mb-0">
+            <!-- <app-spinner [name]="'cluster_details'"></app-spinner> -->
+            <div class="card-header py-2 bg-white">Aggregate Details</div>
+            <div class="card-body d-flex flex-column font-sm" *ngIf="view">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="text-muted w-30 text-right">Aggregate Name :</span>
+                    <span class="font-500 ml-2">{{view.name}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Checksum Style :</span>
+                    <span class="font-500 ml-2">{{view.checksumStyle || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Disk Type :</span>
+                    <span class="font-500 ml-2">{{view.type || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Node Name :</span>
+                    <span class="font-500 ml-2">{{view.nodeName || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Number of Plexes :</span>
+                    <span class="font-500 ml-2">{{view.plexCount || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Plex Detail :</span>
+                    <span class="pl-2 w-60">
+                        <span class="badge badge-secondary badge-pill px-2 py-1 mb-2 mr-2" *ngFor="let name of view.plexDetails;">{{name}}</span>
+                        <span *ngIf="!view.plexDetails || !view.plexDetails.length">NA</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Raid Type :</span>
+                    <span class="font-500 ml-2">{{view.raidType || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Hybrid :</span>
+                    <span class="font-500 ml-2">{{view.isHybrid || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">State :</span>
+                    <span class="font-500 ml-2">
+                        <span class="fa" [ngClass]="view.stateIcon"></span>
+                        <span class="ml-2">[ {{view.state}} ]</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Capacity :</span>
+                    <span class="font-500 ml-2">{{view.totalSpace}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Used :</span>
+                    <span class="font-500 ml-2">{{view.usedSpace}}</span>
+                    <span class="font-500 ml-2">[ {{view.usedPercentage}}% ]</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Available :</span>
+                    <span class="font-500 ml-2">{{view.availableSpace}}</span>
+                    <span class="font-500 ml-2">[ {{view.availablePercentage}}% ]</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Logical Space Used :</span>
+                    <span class="font-500 ml-2">{{view.logicalSpaceUsed || 'NA'}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card round-edge mb-0">
+            <!-- <app-spinner [name]="'cluster_storage_details'"></app-spinner> -->
+            <div class="card-header py-2 bg-white">Storage</div>
+            <div class="card-body d-flex flex-column justify-content-around align-items-center px-3" *ngIf="view">
+                <div *ngIf="view.storageChartData">
+                    <canvas baseChart [chartType]="view.storageChartData.type" [labels]="view.storageChartData.lables"
+                        [data]="view.storageChartData.piedata" [options]="view.storageChartData.options"
+                        [plugins]="view.storageChartData.plugins" [legend]="view.storageChartData.legend"
+                        [colors]="view.storageChartData.colors" height="100"></canvas>
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="font-lg-xl font-500">Total {{view.storage.size}}</div>
+                        <div class="pt-2 font-sm font-500">
+                            <span class="fa fa-circle text-success"></span>
+                            <span class="ml-1">Used {{view.storage.used}}</span>
+                        </div>
+                        <div class="pt-2 font-sm font-500">
+                            <span class="fa fa-circle text-muted"></span>
+                            <span class="ml-1">Free {{view.storage.available}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!view.storageChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-6">
+        <div class="card round-edge mb-0 equalize-card">
+            <app-spinner [name]="'top_volumes'"></app-spinner>
+            <div class="card-header py-2 bg-white">Top 5 Volumes</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3 py-2">
+                <canvas *ngIf="volumeChartData" baseChart [chartType]="volumeChartData.type"
+                    [labels]="volumeChartData.lables" [datasets]="volumeChartData.bardata"
+                    [options]="volumeChartData.options" [plugins]="volumeChartData.plugins"
+                    [legend]="volumeChartData.legend" [colors]="volumeChartData.colors" height="120"></canvas>
+                <div *ngIf="!volumeChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card round-edge mb-0 equalize-card">
+            <app-spinner [name]="'top_luns'"></app-spinner>
+            <div class="card-header py-2 bg-white">Top 5 LUNs</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3 py-2">
+                <canvas *ngIf="lunChartData" baseChart [chartType]="lunChartData.type"
+                    [labels]="lunChartData.lables" [datasets]="lunChartData.bardata"
+                    [options]="lunChartData.options" [plugins]="lunChartData.plugins" [legend]="lunChartData.legend"
+                    [colors]="lunChartData.colors" height="120"></canvas>
+                <div *ngIf="!lunChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

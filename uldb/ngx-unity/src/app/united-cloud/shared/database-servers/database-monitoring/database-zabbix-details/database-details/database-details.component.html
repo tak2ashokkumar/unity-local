@@ -1,0 +1,252 @@
+<div class="row">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center font-weight-bold px-2 py-1">
+                    <div class="w-75 d-flex py-1">
+                        <span class="pl-0 font-md">{{device?.name}}</span>
+                        <span class="pl-1 font-md text-muted">(Database)</span>
+                        <span class="pl-1 font-md">Details</span>
+                    </div>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm" tooltip="Back" container="body"
+                        (click)="goBack()">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="name" class="col-3 h-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="detailFormErrors.name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                        {{detailFormErrors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="shortDescription" class="col-3 h-form-label">Short Description</label>
+                                <div class="col-9">
+                                    <input id="shortDescription" class="form-control" type="text"
+                                        formControlName="shortDescription"
+                                        [class.is-invalid]="detailFormErrors.shortDescription">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.shortDescription">
+                                        {{detailFormErrors.shortDescription}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="description" class="col-3 h-form-label">Description</label>
+                                <div class="col-9">
+                                    <input id="description" class="form-control" type="text"
+                                        formControlName="description" [class.is-invalid]="detailFormErrors.description">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.description">
+                                        {{detailFormErrors.description}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="model" class="col-3 h-form-label">Model</label>
+                                <div class="col-9">
+                                    <input id="model" class="form-control" type="text" formControlName="model"
+                                        [class.is-invalid]="detailFormErrors.model">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.model">
+                                        {{detailFormErrors.model}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="discoveryMethod" class="col-3 h-form-label">Discovery Method</label>
+                                <div class="col-9">
+                                    <input id="discoveryMethod" class="form-control" type="text"
+                                        formControlName="discoveryMethod"
+                                        [class.is-invalid]="detailFormErrors.discoveryMethod">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.discoveryMethod">
+                                        {{detailFormErrors.discoveryMethod}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="version" class="col-3 h-form-label">Version</label>
+                                <div class="col-9">
+                                    <input id="version" class="form-control" type="text" formControlName="version"
+                                        [class.is-invalid]="detailFormErrors.version">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.version">
+                                        {{detailFormErrors.version}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="databaseServer" class="col-3 h-form-label">Database Server</label>
+                                <div class="col-9">
+                                    <input id="databaseServer" class="form-control" type="text"
+                                        formControlName="databaseServer"
+                                        [class.is-invalid]="detailFormErrors.databaseServer">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.databaseServer">
+                                        {{detailFormErrors.databaseServer}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <ng-container *ngIf="view">
+            <unity-devices-custom-attributes-crud [deviceType]="device?.deviceType" [deviceId]="entityId"
+                [deviceAttrs]="view?.custom_attribute_data" [isOutBound]="true"></unity-devices-custom-attributes-crud>
+        </ng-container>
+    </div>
+</div>
+
+<ng-container *ngTemplateOutlet="serverFormRef"></ng-container>
+
+<ng-template #serverFormRef>
+    <div class="row">
+        <div class="col-12">
+            <form *ngIf="serverForm" [formGroup]="serverForm">
+                <div class="card">
+                    <app-spinner [name]="'serverSpinner'"></app-spinner>
+                    <div class="card-header font-weight-bold px-2 py-2">
+                        Server
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-right">
+                            <div class="col-6">
+                                <div class="form-group row">
+                                    <label for="Name" class="col-3 col-form-label">Name</label>
+                                    <div class="col-9">
+                                        <input id="Name" class="form-control" type="text" formControlName="Name">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="VersionNumber" class="col-3 col-form-label">Version Number</label>
+                                    <div class="col-9">
+                                        <input id="VersionNumber" class="form-control" type="text"
+                                            formControlName="VersionNumber">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="Type" class="col-3 col-form-label">Type</label>
+                                    <div class="col-9">
+                                        <input id="Type" class="form-control" type="text" formControlName="Type">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="ManufactureName">Manufacture Name</label>
+                                    <div class="col-9">
+                                        <input id="ManufactureName" class="form-control" type="text"
+                                            formControlName="ManufactureName">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="MarketVersion">Market Version</label>
+                                    <div class="col-9">
+                                        <input id="MarketVersion" class="form-control" type="text"
+                                            formControlName="MarketVersion">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="EndOfLife">End Of Life</label>
+                                    <div class="col-9">
+                                        <input id="EndOfLife" class="form-control date" type="text"
+                                            formControlName="EndOfLife" readonly formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="EndOfSecuritySupport">End Of Security
+                                        Support</label>
+                                    <div class="col-9">
+                                        <input id="EndOfSecuritySupport" class="form-control date" type="text"
+                                            formControlName="EndOfSecuritySupport" readonly
+                                            formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="ShortDescription">Short
+                                        Description</label>
+                                    <div class="col-9">
+                                        <textarea id="ShortDescription" class="form-control static" rows='4'
+                                            formControlName="ShortDescription"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-group row">
+                                    <label for="SoftwareServerType" class="col-3 col-form-label">Software Server
+                                        Type</label>
+                                    <div class="col-9">
+                                        <input id="SoftwareServerType" class="form-control" type="text"
+                                            formControlName="SoftwareServerType">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="Category" class="col-3 col-form-label">Category</label>
+                                    <div class="col-9">
+                                        <input id="Category" class="form-control" type="text"
+                                            formControlName="Category">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="Item" class="col-3 col-form-label">Item</label>
+                                    <div class="col-9">
+                                        <input id="Item" class="form-control" type="text" formControlName="Item">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="Model" class="col-3 col-form-label">Model</label>
+                                    <div class="col-9">
+                                        <input id="Model" class="form-control" type="text" formControlName="Model">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="TokenId" class="col-3 col-form-label">Token ID</label>
+                                    <div class="col-9">
+                                        <input id="TokenId" class="form-control" type="text" formControlName="TokenId">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="EndOfSupport" class="col-3 col-form-label">End Of Support</label>
+                                    <div class="col-9">
+                                        <input id="EndOfSupport" class="form-control date" type="text"
+                                            formControlName="EndOfSupport" readonly formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="EndOfExtendedSupport">End Of Extended
+                                        Support</label>
+                                    <div class="col-9">
+                                        <input id="EndOfExtendedSupport" class="form-control date" type="text"
+                                            formControlName="EndOfExtendedSupport" readonly
+                                            formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="Description" class="col-3 col-form-label">Description</label>
+                                    <div class="col-9">
+                                        <textarea id="Description" class="form-control static" rows='4'
+                                            formControlName="Description"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,95 @@
+<alerts></alerts>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        System Details
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr ng-repeat="col in syscols" ng-if="col.hidden == undefined">
+            <td class="col-md-3">
+              <div>{{ col.description }}</div>
+            </td>
+            <td class="col-md-9">
+              <div ng-if="col.transform === undefined">
+                <strong>{{ result[col.name] }}</strong>
+              </div>
+              <div ng-if="col.transform === 'accessor'">
+                <strong>{{ col.access(result) }}</strong>
+              </div>
+            </td>
+          </tr>
+          </thead>
+        </table>
+
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="modify()">Modify VM</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Instance Details
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr ng-repeat="col in svrcols">
+            <td class="col-md-4">
+              <div>{{ col.description }}</div>
+            </td>
+            <td>
+              <div ng-if="col.transform === undefined">
+                <strong>{{ result.instance[col.name] }}</strong>
+              </div>
+              <div ng-if="col.transform === 'accessor'">
+                <strong>{{ col.access(result.instance) }}</strong>
+              </div>
+            </td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="modifyInstance()">Modify Instance</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="Connection Details">
+      <table class="table table-striped" ng-if='result.icds'>
+        <thead>
+        <tr>
+          <th>Ethernet</th>
+          <th>Ethernet Type</th>
+          <th>MAC Address</th>
+          <th>IP Address</th>
+          <th>Default Gateway</th>
+          <th>VLAN</th>
+          <th>Management Interface</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="eth in result.icds">
+          <td>{{ eth.interface_name }}</td>
+          <td>{{ eth.interface_type }}</td>
+          <td>{{ eth.nic_macaddress }}</td>
+          <td>{{ eth.nic_ipaddress }}</td>
+          <td>{{ eth.default_gateway }}</td>
+          <td>{{ eth.vlan_tag }}</td>
+          <td>{{ eth.management_interface }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <span ng-if='!result.icds'>This object does not have any related ICDS Connection Details.</span>
+    </panelhalf>
+  </div>
+</div>

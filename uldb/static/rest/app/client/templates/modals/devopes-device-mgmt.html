@@ -1,0 +1,52 @@
+<form role="form" name="add_device_form" novalidate ng-submit="manageDeviceDetails(device, add_device_form)">
+  <div class="modal-header">
+    <span class="modal-title"> {{device.operation}} Server</span>
+  </div>
+  <div class="modal-form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="form-group">
+        <label for="device_name">Name*</label>
+        <span class="errormsg" ng-if="add_device_form.$submitted && add_device_form.device_name.$invalid">
+          <span ng-if="add_device_form.device_name.$error.required">(This field is required)</span>
+          <span ng-if="add_device_form.device_name.$error.unique">(Server with this name already exists)</span>
+        </span>
+        <input type="text" name="device_name" class="form-control" ng-model="device.device_name" autofocus required unique/>
+      </div>
+      <div class="form-group">
+        <label for="platform_type">Platform Type*</label>
+        <span class="errormsg" ng-if="add_device_form.$submitted && add_device_form.platform_type.$invalid">(This field is required)</span>
+        <select name="platform_type" class="form-control" ng-model="device.platform_type">
+          <option value="Linux" selected> Linux </option>
+          <option value="Windows"> Windows </option>
+        </select>
+        <span class="select-arrow"></span>
+      </div>
+      <div class="form-group">
+        <label for="os">OS*</label>
+        <span class="errormsg" ng-if="add_device_form.$submitted && add_device_form.os.$invalid">(This field is required)</span>
+        <input type="text" name="os" class="form-control"  ng-model="device.os" required/>
+      </div>
+      <div class="form-group">
+        <label for="ip_address">IP Address*</label>
+        <span class="errormsg" ng-if="add_device_form.$submitted && add_device_form.ip_address.$invalid">
+          <span ng-if="add_device_form.ip_address.$error.required">(This field is required)</span>
+          <span ng-if="add_device_form.ip_address.$error.pattern">(Not a valid IP Address)</span>
+        </span>
+        <input type="text" name="ip_address" class="form-control" ng-model="device.ip_address"
+        ng-pattern="/\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/" required/>
+      </div>
+      <div class="form-group">
+        <label for="port">Port*</label>
+        <span class="errormsg" ng-if="add_device_form.$submitted && add_device_form.port.$invalid">
+          <span ng-if="add_device_form.port.$error.required">(This field is required)</span>
+          <span ng-if="add_device_form.port.$error.pattern">(Not a valid Port Number)</span>
+        </span>
+        <input type="text" name="port" class="form-control" ng-model="device.port" ng-pattern="/^[0-9]{1,7}$/" required/>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer modal-buttons">
+    <button class="btn btn-cancel" ng-click="close_modal()" type="button">Cancel</button>
+    <button class="btn btn-default new_btn" type="submit"> Save </button>
+  </div>
+</form>

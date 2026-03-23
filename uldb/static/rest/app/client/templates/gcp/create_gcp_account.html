@@ -1,0 +1,36 @@
+<form role="form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-repeat="row in rows">
+        <div class="form-group" ng-if="row.required && !(row.type == 'password')">
+            <label ng-if= "(row.type != 'hidden')" for="blockName">{{ row.description }} *</label>
+            <span class="errormsg" ng-if="addRGErrors[row.err_id]"> {{ addRGErrors[row.err_msg] }} </span>
+            <input ng-if="row.name=='customer_old'" class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')"
+            type="{{ row.type }}" class="form-control" maxlength="128" ng-model="obj[row.name]"
+            placeholder="" typeahead-on-select="getGroupssByOrg($item)"
+            uib-typeahead="obj as obj.organization_name for obj in row.render($viewValue)" value="{{row.value}}" required>
+            <input ng-if="(row.type == 'text' && row.name!='customer') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file') || (row.type == 'password')"
+            type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}" required>
+            <textarea ng-if=" row.type == 'textarea'" type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="8" maxlength="4096" cols="40" required></textarea>
+            <select ng-if=" row.type == 'select' " ng-options="option.long for option in row.options track by option.short" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                <option value="">-- select {{ row.description | lowercase }} --</option>
+            </select>
+        </div>
+        <div class="form-group" ng-if="!row.required && (row.depends == undefined)">
+            <label ng-if= "(row.type != 'hidden')" for="blockName">{{ row.description }}</label>
+            <span class="errormsg" ng-if="addRGErrors[row.err_id]"> &nbsp; ( {{ addRGErrors[row.err_msg] }} )</span>
+            <input ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file') || (row.type == 'password')" type="{{ row.type }}" class="{{ row.class }}" maxlength="128" ng-model="obj[row.name]" value="{{row.value}}">
+            <textarea ng-if=" row.type == 'textarea' " type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="8" maxlength="4096" cols="40"></textarea>
+            <select ng-if=" row.type == 'select' " ng-options="option for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]">
+                <option value="">-- select {{ row.description | lowercase }} --</option>
+            </select>
+        </div>
+        <div class="form-group" ng-if="!row.required && (row.depends != undefined) && (row.depends)">
+            <label ng-if= "(row.type != 'hidden')" for="blockName">{{ row.description }}</label>
+            <span class="errormsg" ng-if="obj[row.err_id]"> &nbsp; ( {{ obj[row.err_msg] }} )</span>
+            <input ng-if="(row.type == 'text') || (row.type == 'checkbox') || (row.type == 'number') || (row.type == 'file')" type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" maxlength="128" value="{{row.value}}">
+            <textarea ng-if=" row.type == 'textarea' " type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" rows="8" maxlength="4096" cols="40"></textarea>
+            <select ng-if=" row.type == 'select' " ng-options="option for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]">
+                <option value="">-- select {{ row.description | lowercase }} --</option>
+            </select>
+        </div>
+    </div>
+</form>

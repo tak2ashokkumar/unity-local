@@ -1,0 +1,29 @@
+
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-sm-12" ng-show="awsregions">
+            <h3>AWS Regions</h3>
+            <span>
+                <small ng-repeat="crumb in bread.crumbs">
+                    <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+                </small>
+            </span>
+        </div>
+    </div>
+    
+    <br>
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <awsgenerictable
+                heading="AWS Account"
+                headers="aws_region_list_content.headers"
+                tabledata="aws_region_list_content.info"
+                modeldata="aws_dashboard"
+                rows="aws_dashboard_rows"
+                addclick="aws_dashboard_add(data)"
+                actions="aws_region_list_content.actions">
+            </awsgenerictable>
+        </div>
+
+    </div>
+</div>

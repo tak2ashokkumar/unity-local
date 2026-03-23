@@ -1,0 +1,226 @@
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col">
+                <div class="card round-edge border-top-0">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center font-500">
+                            <span class="badge badge-secondary font-sm">{{count}}</span>
+                            <span class="ml-1 font-lg">Accounts</span>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <!-- <button class="btn btn-pill btn-sm btn-warning mx-2 px-3 font-500" type="button"
+                                (click)="addAccount()" accessControl moduleName="Integrations"
+                                accessType="Add Integrations" elementType="btn">
+                                <span class="font-sm">Add Account</span>
+                            </button> -->
+                            <button class="btn btn-pill btn-warning pull-right btn-sm" type="button" container="body"
+                                (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                            </button>
+                            <data-refresh-btn [page]="currentCriteria.pageNo"
+                                (refresh)="refreshData($event)"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                            <div class="d-flex justify-content-start w-20">
+                                <div class="w-100">
+                                    <search-box [searchValue]="currentCriteria.searchValue"
+                                        (searched)="onSearched($event)"></search-box>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end w-80">
+                                <table-page-size *ngIf="viewData.length" [currentPageSize]="currentCriteria.pageSize"
+                                    [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+                        <table class="table table-sm text-left">
+                            <thead class="bg-light">
+                                <th>Name</th>
+                                <th *ngIf="columnFlags.discoverReourcesFlag" class="text-center">Discover Resources</th>
+                                <th *ngIf="columnFlags.discoverTopologyFlag" class="text-center">Discover Topology</th>
+                                <th *ngIf="columnFlags.manageAccountFlag" class="text-center">Manage Account</th>
+                                <th *ngIf="columnFlags.eventIngestionFlag" class="text-center">Event Ingestion</th>
+                                <th class="text-center">Actions</th>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData" truncateText>
+                                    <td class="text-primary tdw-20">
+                                        <div>{{view.name}}</div>
+                                    </td>
+                                    <!-- <td class="w-15 text-center" *ngIf="columnFlags.discoverReourcesFlag">
+                                      <span class="fas fa-lg" [ngClass]="view.discoverResourcesIcon"
+                                          [tooltip]="view.discoverResources"></span>
+                                  </td>
+                                  <td class="w-15 text-center" *ngIf="columnFlags.discoverTopologyFlag">
+                                      <span class="fas fa-lg" [ngClass]="view.discoverDependencyIcon"
+                                          [tooltip]="view.discoverDependency"></span>
+                                  </td>
+                                  <td class="w-15 text-center" *ngIf="columnFlags.manageAccountFlag">
+                                      <span class="fas fa-lg" [ngClass]="view.isManagedIcon"
+                                          [tooltip]="view.isManaged"></span>
+                                  </td> -->
+                                    <td class="w-15 text-center" *ngIf="columnFlags.eventIngestionFlag">
+                                        <span class="fas fa-lg" [ngClass]="view.ingestEventIcon"
+                                            [tooltip]="view.ingestEvent"></span>
+                                    </td>
+                                    <td class="action-icons-column text-center">
+                                        <!-- <button class="action-icons mb-0 fas fa-sync font-sm ml-1"
+                                          (click)="syncNow(view)" *ngIf="actionFlags.syncFlag"
+                                          [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
+                                          [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}">
+                                      </button>
+                                      <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
+                                          tooltip="Schedule History" (click)="getScheduleHistory(view)" *ngIf="actionFlags.scheduleHistoryFlag"></button> -->
+                                        <button class="action-icons mb-0 fas fa-magic font-sm ml-1"
+                                            tooltip="Test Payload" (click)="testPayloadModal(view)"
+                                            *ngIf="actionFlags.testPayloadFlag" accessControl moduleName="Integrations"
+                                            accessType="Manage Integrations" elementType="actionbtn">
+                                        </button>
+                                        <span dropdown placement="bottom right" container="body">
+                                            <button id="button-container"
+                                                class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                                                data-toggle="dropdown" aria-controls="icons-dropdown-container"
+                                                dropdownToggle (click)="false" [tooltip]="'More Actions'"
+                                                container="body" accessControl moduleName="Integrations"
+                                                accessType="Manage Integrations" elementType="actionbtn"></button>
+                                            <div container="body" id="icons-dropdown-container"
+                                                class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                                                aria-labelledby="button-container">
+                                                <button class="action-icons mt-2 mb-1 fas fa-key font-sm"
+                                                    *ngIf="actionFlags.copyKeyFlag" tooltip="Copy Key"
+                                                    (click)="cpyKey(view.token)" container="body">
+                                                </button>
+                                                <button class="action-icons mt-2 mb-1 fas fa-link font-sm"
+                                                    *ngIf="actionFlags.copyUrlFlag" tooltip="Copy URL"
+                                                    (click)="cpyUrl(view.url)" container="body">
+                                                </button>
+                                                <button class="action-icons mt-2 mb-1 fas fa-pencil-alt font-sm"
+                                                    *ngIf="actionFlags.editFlag" (click)="editAccount(view)"
+                                                    tooltip="Edit Account" container="body">
+                                                </button>
+                                                <button class="action-icons mt-2 mb-1 fas fa-trash-alt font-sm"
+                                                    *ngIf="actionFlags.deleteFlaag" tooltip="Delete Account"
+                                                    (click)="deleteAccount(view)" container="body">
+                                                </button>
+                                            </div>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table-entries *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"></table-entries>
+                        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!viewData.length">No accounts available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="emitDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #payload>
+    <div class="card mb-0">
+        <div class="card-header">
+            Test Payload
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="payloadModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="payloadForm" [formGroup]="payloadForm">
+                <div class="row form-group">
+                    <div class="col">
+                        <label class="form-col-form-label">Payload<em>*</em></label>
+                        <textarea class="form-control" name="payload" id="payload" formControlName="payload"
+                            [ngClass]="{'is-invalid' : payloadFormErrors.payload}"
+                            placeholder="Enter Payload"></textarea>
+                        <div class="invalid-feedback" *ngIf="payloadFormErrors.payload">{{payloadFormErrors.payload}}
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!isSubmit" class="row form-group">
+                    <div class="col">
+                        <label class="form-col-form-label">Response</label>
+                        <textarea class="form-control" name="payload" id="payload" rows="3" formControlName="response"
+                            readonly></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button *ngIf="isSubmit" class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="emitPayload()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="payloadModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<!-- <ng-template #scheduleHistory>
+  <div class="card mb-0">
+      <div class="card-header">
+          Schedule History
+          <div class="card-header-actions">
+              <a class="card-header-action btn-close" (click)="scheduleHistoryRef.hide()">
+                  <i class="fas fa-times"></i>
+              </a>
+          </div>
+      </div>
+      <div class="card-body">
+          <table class="table text-left">
+              <thead>
+                  <tr>
+                      <th>Start Time</th>
+                      <th>End Time</th>
+                      <th>Duration</th>
+                      <th>Status</th>
+                      <th>Executed By </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ngFor="let view of scheduleHistoryData">
+                      <td>{{view.startedAt}}</td>
+                      <td>{{view.lastRun}}</td>
+                      <td>{{view.duration}}</td>
+                      <td class="{{view.statusClass}}">
+                          {{view.status}}
+                          <i *ngIf="view.isInProgress" class="fas fa-sync-alt ml-1"></i>
+                      </td>
+                      <td>{{view.updatedBy}}</td>
+                  </tr>
+              </tbody>
+          </table>
+          <p *ngIf="scheduleHistoryData.length==0" class="text-center py-3">No history to display</p>
+      </div>
+      <div class="card-footer">
+          <button class="btn btn-sm btn-danger pull-right" (click)="scheduleHistoryRef.hide()"
+              type="button">Close</button>
+      </div>
+  </div>
+</ng-template> -->

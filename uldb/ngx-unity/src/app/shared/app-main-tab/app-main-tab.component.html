@@ -1,0 +1,40 @@
+<!-- <ul class="nav nav-tabs tabs-level1">
+  <ng-template ngFor let-tabitem [ngForOf]="tabItems">
+    <li class="nav-item tabs-level1-item" routerLinkActive="active" [routerLink]="[tabitem.url]">
+      <a class="nav-link tabs-level1-link border-0"><i class="fa text-muted" *ngIf="tabitem.icon"
+          [ngClass]="tabitem.icon">&nbsp;</i>{{tabitem.name}}</a>
+    </li>
+  </ng-template>
+  <ng-template ngFor let-tabitem [ngForOf]="tabItems">
+    <ng-template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{$implicit:tabitem}"></ng-template>
+  </ng-template>
+</ul> -->
+<scrollable-tab [selector]="'active'">
+  <div class="nav nav-tabs tabs-level1 p-0">
+    <div class="nav-item rounded-top tabs-level1-item-scroll" #scrollLeft>
+      <a class="nav-link rounded-top border-0"><i class="fa fa-angle-left"></i></a>
+    </div>
+  </div>
+  <!-- <ul class="nav nav-tabs nav-tabs custom-nav-container border-bottom-0" #tabContent role="tablist">
+    <li class="nav-item bg-secondary rounded-top" *ngFor="let tab of tabData">
+      <a class="nav-link" [ngClass]="isActive(tab)" (click)="goTo(tab)">
+        <i class="fa" [ngClass]="tab.icon"></i> {{tab.name}}</a>
+    </li>
+  </ul> -->
+  <ul class="nav nav-tabs tabs-level1 custom-nav-container" [ngClass]="{ 'no-bg mb-0 mt-4': removeBg }" #tabContent>
+    <ng-template ngFor let-tabitem [ngForOf]="tabItems">
+      <li class="nav-item rounded-top tabs-level1-item" [ngClass]="isActive(tabitem.url)" (click)="goTo(tabitem)">
+        <a class="nav-link tabs-level1-link border-0"><i class="fa" *ngIf="tabitem.icon" [ngClass]="tabitem.icon">&nbsp;</i>{{tabitem.name}}</a>
+      </li>
+    </ng-template>
+  </ul>
+  <div class="nav nav-tabs tabs-level1 p-0">
+    <div class="nav-item rounded-top tabs-level1-item-scroll" #scrollRight>
+      <a class="nav-link rounded-top border-0 "><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+  <div class="nav nav-tabs tabs-level1 py-0" [ngClass]="{ 'd-none': removeBg }">
+    <ng-template [ngTemplateOutlet]="templateRef"></ng-template>
+    <ng-template icon-host></ng-template>
+  </div>
+</scrollable-tab>

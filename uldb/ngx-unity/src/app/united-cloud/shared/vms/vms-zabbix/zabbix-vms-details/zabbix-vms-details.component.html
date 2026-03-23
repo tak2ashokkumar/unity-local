@@ -1,0 +1,644 @@
+<div class="row">
+    <div class="col-12">
+        <ng-container *ngIf="detailForm">
+            <ng-container *ngTemplateOutlet="detailFormRef"></ng-container>
+        </ng-container>
+        <ng-container *ngIf="metaDataForm">
+            <ng-container *ngTemplateOutlet="metaDataFormRef"></ng-container>
+        </ng-container>
+        <ng-container *ngIf="view">
+            <unity-devices-custom-attributes-crud [deviceType]="device?.deviceType" [deviceId]="deviceId"
+                [deviceAttrs]="view?.custom_attribute_data" [isOutBound]="true"></unity-devices-custom-attributes-crud>
+        </ng-container>
+        <ng-container *ngIf="locationForm">
+            <ng-container *ngTemplateOutlet="locationFormRef"></ng-container>
+        </ng-container>
+        <div class="col-12 px-0 mb-4" *ngIf="deviceId && device?.deviceType && view">
+            <device-details-components [deviceType]="device.deviceType" [deviceId]="deviceId"
+                [deviceDetails]="view"></device-details-components>
+        </div>
+    </div>
+</div>
+
+<ng-template #detailFormRef>
+    <form [formGroup]="detailForm">
+        <div class="card">
+            <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                <div class="w-75 py-1">
+                    <span> Details</span>
+                </div>
+                <div class="w-25" *ngIf="isEditable">
+                    <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1"
+                        (click)="manageDetailsForm()" [tooltip]="'Edit'" container="body" accessControl
+                        moduleName="Monitoring" accessType="Manage Monitoring" elementType="actionbtn"></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row text-right">
+                    <div class="col-6">
+                        <div class="form-group row">
+                            <label for="name" class="col-3 col-form-label">Name<em>*</em></label>
+                            <div class="col-9">
+                                <input id="name" class="form-control" type="text" formControlName="name"
+                                    [class.is-invalid]="detailFormErrors.name" readonly>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                    {{detailFormErrors.name}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="ip_address" class="col-3 col-form-label">IP Address</label>
+                            <div class="col-9" *ngIf="detailForm.get('ip_address')">
+                                <input id="ip_address" class="form-control" type="text" formControlName="ip_address"
+                                    [class.is-invalid]="detailFormErrors.ip_address">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.ip_address">
+                                    {{detailFormErrors.ip_address}}</div>
+                            </div>
+                            <div class="col-9" *ngIf="detailForm.get('management_ip')">
+                                <input id="management_ip" class="form-control" type="text"
+                                    formControlName="management_ip" [class.is-invalid]="detailFormErrors.management_ip">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.management_ip">
+                                    {{detailFormErrors.management_ip}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="environment" class="col-3 col-form-label">Environment</label>
+                            <div class="col-9">
+                                <select id="environment" class="form-control" formControlName="environment"
+                                    [class.is-invalid]="detailFormErrors.environment">
+                                    <option value="null" disabled>Select Environment Type</option>
+                                    <option *ngFor="let opt of deviceEnvironmentOptions" [value]="opt">
+                                        {{opt}}</option>
+                                </select>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.environment">
+                                    {{detailFormErrors.environment}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="serial_number" class="col-3 col-form-label">Serial Number</label>
+                            <div class="col-9">
+                                <input id="serial_number" class="form-control" type="text"
+                                    formControlName="serial_number" [class.is-invalid]="detailFormErrors.serial_number">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.serial_number">
+                                    {{detailFormErrors.serial_number}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="manufacturer" class="col-3 col-form-label">Manufacturer
+                            </label>
+                            <div class="col-9">
+                                <input id="manufacturer" class="form-control" type="text" formControlName="manufacturer"
+                                    [class.is-invalid]="detailFormErrors.manufacturer" readonly>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.manufacturer">
+                                    {{detailFormErrors.manufacturer}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="name" class="col-3 col-form-label">OS<em
+                                    *ngIf="deviceType != customVM || isRequiredFieldInDetailForm('os_name') || isRequiredFieldInDetailForm('os')">*</em></label>
+                            <div class=" col-9" *ngIf="detailForm.get('os')">
+                                <input id="os" class="form-control" type="text" formControlName="os"
+                                    [class.is-invalid]="detailFormErrors.os">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os">
+                                    {{detailFormErrors.os}}</div>
+                            </div>
+                            <div class="col-9" *ngIf="detailForm.get('os_name')">
+                                <input id="os_name" class="form-control" type="text" formControlName="os_name"
+                                    [class.is-invalid]="detailFormErrors.os_name">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os_name">
+                                    {{detailFormErrors.os_name}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="mac_address" class="col-3 col-form-label">Mac Address
+                            </label>
+                            <div class="col-9">
+                                <input id="mac_address" class="form-control" type="text" formControlName="mac_address"
+                                    [class.is-invalid]="detailFormErrors.mac_address">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.mac_address">
+                                    {{detailFormErrors.mac_address}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="template" class="col-3 col-form-label">Template</label>
+                            <div class="col-9">
+                                <select id="template" class="form-control" formControlName="template"
+                                    [class.is-invalid]="detailFormErrors.template">
+                                    <option [value]="true">Yes</option>
+                                    <option [value]="false">No</option>
+                                </select>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.template">
+                                    {{detailFormErrors.template}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-3">
+                                <label class="col-form-label" for="credentials_m2m">Credentials</label>
+                                <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                    containerClass="info-multi-line"
+                                    [tooltip]="'Only one credential can be selected of each type'"></i>
+                            </div>
+                            <div class="col-9">
+                                <multiselect-dropdown [options]="credentials" [settings]="credentialSettings"
+                                    [optionDisabledMap]="credentialMap" class="form-control p-0" style="height:auto;"
+                                    formControlName="credentials_m2m"></multiselect-dropdown>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" formGroupName="collector">
+                            <label class="col-3 col-form-label" for="collectoruuid">Collector</label>
+                            <div class="col-9">
+                                <select id="collectoruuid" class="form-control" formControlName="uuid">
+                                    <option value="" disabled>Select Collector</option>
+                                    <option *ngFor="let collector of collectors" [value]="collector.uuid">
+                                        {{collector.name}}</option>
+                                </select>
+                                <!-- <div class="invalid-feedback text-left" *ngIf="detailFormErrors.collector.uuid">
+                                    {{detailFormErrors.collector.uuid}}</div> -->
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="first_discovered" class="col-3 col-form-label">First Discovered</label>
+                            <div class="col-9">
+                                <input id="first_discovered" class="form-control" type="text"
+                                    formControlName="first_discovered"
+                                    [class.is-invalid]="detailFormErrors.first_discovered" readonly
+                                    formControlNameDateFormatter>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.first_discovered">
+                                    {{detailFormErrors.first_discovered}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="uptime" class="col-3 col-form-label">Uptime</label>
+                            <div class="col-9">
+                                <input id="uptime" class="form-control" type="text" formControlName="uptime"
+                                    [class.is-invalid]="detailFormErrors.uptime" readonly>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.uptime">
+                                    {{detailFormErrors.uptime}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="description" class="col-3 col-form-label">Description</label>
+                            <div class="col-9">
+                                <textarea id="description" class="form-control static" rows='4'
+                                    formControlName="description" [class.is-invalid]="detailFormErrors.description"
+                                    readonly></textarea>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.description">
+                                    {{detailFormErrors.description}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="life_cycle_stage" class="col-3 col-form-label">Life Cycle Stage</label>
+                            <div class="col-9">
+                                <select id="life_cycle_stage" class="form-control" formControlName="life_cycle_stage"
+                                    [class.is-invalid]="detailFormErrors.life_cycle_stage">
+                                    <option value="''" disabled>Select Life Cycle Stage</option>
+                                    <option *ngFor="let opt of lifeCycleStageOptions" [value]="opt">
+                                        {{opt}}</option>
+                                </select>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.life_cycle_stage">
+                                    {{detailFormErrors.life_cycle_stage}}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group row">
+                            <label for="dns_name" class="col-3 col-form-label">DNS Name</label>
+                            <div class="col-9">
+                                <input id="dns_name" class="form-control" type="text" formControlName="dns_name"
+                                    [class.is-invalid]="detailFormErrors.dns_name">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.dns_name">
+                                    {{detailFormErrors.dns_name}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="domain" class="col-3 col-form-label">Domain</label>
+                            <div class="col-9">
+                                <input id="domain" class="form-control" type="text" formControlName="domain" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="availability_status" class="col-3 col-form-label">Availability
+                                Status</label>
+                            <div class="col-9">
+                                <input id="availability_status" class="form-control" type="text"
+                                    formControlName="availability_status" readonly>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.availability_status">
+                                    {{detailFormErrors.availability_status}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="asset_tag" class="col-3 col-form-label">Asset Tag</label>
+                            <div class="col-9">
+                                <input id="asset_tag" class="form-control" type="text" formControlName="asset_tag"
+                                    [class.is-invalid]="detailFormErrors.asset_tag" readonly>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.asset_tag">
+                                    {{detailFormErrors.asset_tag}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="model" class="col-3 col-form-label">Model
+                            </label>
+                            <div class="col-9">
+                                <input id="model" class="form-control" type="text" formControlName="model"
+                                    [class.is-invalid]="detailFormErrors.model">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.model">
+                                    {{detailFormErrors.model}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="os_build_version" class="col-3 col-form-label">OS Build Version
+                            </label>
+                            <div class="col-9">
+                                <input id="os_build_version" class="form-control" type="text"
+                                    formControlName="os_build_version"
+                                    [class.is-invalid]="detailFormErrors.os_build_version">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os_build_version">
+                                    {{detailFormErrors.os_build_version}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="service_pack" class="col-3 col-form-label">Service Pack</label>
+                            <div class="col-9">
+                                <input id="service_pack" class="form-control" type="text" formControlName="service_pack"
+                                    [class.is-invalid]="detailFormErrors.service_pack">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.service_pack">
+                                    {{detailFormErrors.service_pack}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row pb-4">
+                            <div class="w-100"></div>
+                        </div>
+
+                        <div class="form-group row pt-2">
+                            <label for="credentials_type" class="col-3 col-form-label">Credential Type</label>
+                            <div class="col-9">
+                                <input type="text" id="credentials_type" class="form-control"
+                                    formControlName="credentials_type" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="discovery_method" class="col-3 col-form-label">Discovery Method</label>
+                            <div class="col-9">
+                                <input id="discovery_method" class="form-control" type="text"
+                                    formControlName="discovery_method"
+                                    [class.is-invalid]="detailFormErrors.discovery_method" readonly>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.discovery_method">
+                                    {{detailFormErrors.discovery_method}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="last_discovered" class="col-3 col-form-label">Last Discovered</label>
+                            <div class="col-9">
+                                <input id="last_discovered" class="form-control" type="text"
+                                    formControlName="last_discovered"
+                                    [class.is-invalid]="detailFormErrors.last_discovered" readonly
+                                    formControlNameDateFormatter>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.last_discovered">
+                                    {{detailFormErrors.last_discovered}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="last_rebooted" class="col-3 col-form-label">Last Rebooted</label>
+                            <div class="col-9">
+                                <input id="last_rebooted" class="form-control" type="text"
+                                    formControlName="last_rebooted" [class.is-invalid]="detailFormErrors.last_rebooted"
+                                    readonly formControlNameDateFormatter>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.last_rebooted">
+                                    {{detailFormErrors.last_rebooted}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="note" class="col-3 col-form-label">Notes</label>
+                            <div class="col-9">
+                                <textarea id="note" class="form-control static" rows='4' formControlName="note"
+                                    [class.is-invalid]="detailFormErrors.note"></textarea>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.note">
+                                    {{detailFormErrors.note}}</div>
+                            </div>
+                        </div>
+                                           
+                        <div class="form-group row">
+                            <label for="life_cycle_stage_status" class="col-3 mt--1 mb-0">Life Cycle Stage Status</label>
+                            <div class="col-9">
+                                <select id="life_cycle_stage_status" class="form-control" formControlName="life_cycle_stage_status"
+                                    [class.is-invalid]="detailFormErrors.life_cycle_stage_status">
+                                    <option value="''" disabled>Select Life Cycle Stage</option>
+                                    <option *ngFor="let opt of lifeCycleStageStatusOptions" [value]="opt">
+                                        {{opt}}</option>
+                                </select>
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.life_cycle_stage_status">
+                                    {{detailFormErrors.life_cycle_stage_status}}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-12 text-center" *ngIf="detailForm.dirty">
+                        <button type="button" class="btn btn-primary" (click)="submitDetailForm()">Update</button>
+                        <button type="button" class="btn btn-danger ml-2" (click)="buildDetailForm()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #metaDataFormRef>
+    <form [formGroup]="metaDataForm">
+        <div class="card">
+            <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                <div class="w-75 py-1">
+                    <span> Metadata</span>
+                </div>
+                <div class="w-25" *ngIf="isEditable">
+                    <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1"
+                        (click)="manageMetaDataForm()" [tooltip]="'Edit'" container="body" accessControl
+                        moduleName="Monitoring" accessType="Manage Monitoring" elementType="actionbtn"></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row text-right">
+                    <div class="col-6">
+
+                        <div class="form-group row">
+                            <label for="cpu" class="col-3 col-form-label">Number of CPUs<em
+                                    *ngIf="isRequiredFieldInMetaDataForm('cpu') || isRequiredFieldInMetaDataForm('vcpus')">*</em></label>
+                            <div class="col-9" *ngIf="metaDataForm.get('cpu')">
+                                <input id="cpu" class="form-control" type="number" formControlName="cpu"
+                                    [class.is-invalid]="metaDataFormErrors.cpu">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.cpu">
+                                    {{metaDataFormErrors.cpu}}</div>
+                            </div>
+                            <div class="col-9" *ngIf="metaDataForm.get('vcpus')">
+                                <input id="vcpus" class="form-control" type="number" formControlName="vcpus"
+                                    [class.is-invalid]="metaDataFormErrors.vcpus">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.vcpus">
+                                    {{metaDataFormErrors.vcpus}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="cpu_core" class="col-3 col-form-label">Number of CPU Cores<em
+                                    *ngIf="isRequiredFieldInMetaDataForm('cpu_core')">*</em></label>
+                            <div class="col-9">
+                                <input id="cpu_core" class="form-control" type="number" formControlName="cpu_core"
+                                    [class.is-invalid]="metaDataFormErrors.cpu_core">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.cpu_core">
+                                    {{metaDataFormErrors.cpu_core}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="memory" class="col-3 col-form-label">Memory(MB)<em
+                                    *ngIf="isRequiredFieldInMetaDataForm('memory') || isRequiredFieldInMetaDataForm('guest_memory')">*</em></label>
+                            <div class="col-9" *ngIf="metaDataForm.get('memory')">
+                                <input id="memory" class="form-control" type="number" formControlName="memory"
+                                    [class.is-invalid]="metaDataFormErrors.memory">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.memory">
+                                    {{metaDataFormErrors.memory}}</div>
+                            </div>
+                            <div class="col-9" *ngIf="metaDataForm.get('guest_memory')">
+                                <input id="guest_memory" class="form-control" type="number"
+                                    formControlName="guest_memory" [class.is-invalid]="metaDataFormErrors.guest_memory">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.guest_memory">
+                                    {{metaDataFormErrors.guest_memory}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="metaDataForm.get('available_memory')">
+                            <label for="available_memory" class="col-3 col-form-label">Available Memory</label>
+                            <div class=" col-9">
+                                <input id="available_memory" class="form-control" type="text"
+                                    formControlName="available_memory"
+                                    [class.is-invalid]="metaDataFormErrors.available_memory">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.available_memory">
+                                    {{metaDataFormErrors.available_memory}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="metaDataForm.get('used_memory')">
+                            <label for="used_memory" class="col-3 col-form-label">Used Memory</label>
+                            <div class=" col-9">
+                                <input id="used_memory" class="form-control" type="text" formControlName="used_memory"
+                                    [class.is-invalid]="metaDataFormErrors.used_memory">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.used_memory">
+                                    {{metaDataFormErrors.used_memory}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="!isHypervVm">
+                            <label for="firmware_version" class="col-3 col-form-label">Firmware Version</label>
+                            <div class="col-9">
+                                <input id="firmware_version" class="form-control" type="text"
+                                    formControlName="firmware_version"
+                                    [class.is-invalid]="metaDataFormErrors.firmware_version">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.firmware_version">
+                                    {{metaDataFormErrors.firmware_version}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+
+                        <div class="form-group row">
+                            <label for="storage" class="col-3 col-form-label">Storage(GB)<em
+                                    *ngIf="isRequiredFieldInMetaDataForm('storage') || isRequiredFieldInMetaDataForm('disk_space')">*</em></label>
+                            <div class=" col-9" *ngIf="metaDataForm.get('storage')">
+                                <input id="storage" class="form-control" type="number" formControlName="storage"
+                                    [class.is-invalid]="metaDataFormErrors.storage">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.storage">
+                                    {{metaDataFormErrors.storage}}</div>
+                            </div>
+                            <div class="col-9" *ngIf="metaDataForm.get('disk_space')">
+                                <input id="disk_space" class="form-control" type="number" formControlName="disk_space"
+                                    [class.is-invalid]="metaDataFormErrors.disk_space">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.disk_space">
+                                    {{metaDataFormErrors.disk_space}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="metaDataForm.get('available_storage')">
+                            <label for="available_storage" class="col-3 col-form-label">Available Storage</label>
+                            <div class=" col-9">
+                                <input id="available_storage" class="form-control" type="text"
+                                    formControlName="available_storage"
+                                    [class.is-invalid]="metaDataFormErrors.available_storage">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.available_storage">
+                                    {{metaDataFormErrors.available_storage}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="metaDataForm.get('used_storage')">
+                            <label for="used_storage" class="col-3 col-form-label">Used Storage</label>
+                            <div class=" col-9">
+                                <input id="used_storage" class="form-control" type="text" formControlName="used_storage"
+                                    [class.is-invalid]="metaDataFormErrors.used_storage">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.used_storage">
+                                    {{metaDataFormErrors.used_storage}}</div>
+                            </div>
+                        </div>
+
+                        <div formArrayName="hard_disks" *ngIf="metaDataForm.get('hard_disks')">
+                            <div
+                                *ngFor="let control of metaDataForm.get('hard_disks').controls; let i=index;let first=first;let last=last;">
+                                <div [formGroupName]="i">
+                                    <div class="form-group row">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">Disk
+                                                    Label</label>
+                                                <div class="col-9">
+                                                    <input id="disk_label" class="form-control" type="text"
+                                                        formControlName="disk_label" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">Disk
+                                                    File Name</label>
+                                                <div class="col-9">
+                                                    <input id="disk_file_name" class="form-control" type="text"
+                                                        formControlName="disk_file_name" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">Disk
+                                                    Size</label>
+                                                <div class="col-9">
+                                                    <input id="disk_size" class="form-control" type="text"
+                                                        formControlName="disk_size" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">Disk
+                                                    Size Unit</label>
+                                                <div class="col-9">
+                                                    <input id="disk_size_unit" class="form-control" type="text"
+                                                        formControlName="disk_size_unit" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row" *ngIf="isHypervVm">
+                            <label for="firmware_version" class="col-3 col-form-label">Firmware Version</label>
+                            <div class="col-9">
+                                <input id="firmware_version" class="form-control" type="text"
+                                    formControlName="firmware_version"
+                                    [class.is-invalid]="metaDataFormErrors.firmware_version">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.firmware_version">
+                                    {{metaDataFormErrors.firmware_version}}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="last_updated" class="col-3 col-form-label">Last Updated</label>
+                            <div class="col-9">
+                                <owl-date-time #last_updated [hour12Timer]="true"
+                                    [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="last_updated"
+                                    [owlDateTimeTrigger]="last_updated" [owlDateTime]="last_updated" type="text"
+                                    name="last_updated" [max]="now"
+                                    [class.is-invalid]="metaDataFormErrors.last_updated">
+                                <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.last_updated">
+                                    {{metaDataFormErrors.last_updated}}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-12 text-center" *ngIf="metaDataForm.dirty">
+                        <button type="button" class="btn btn-primary" (click)="submitMetaDataForm()">Update</button>
+                        <button type="button" class="btn btn-danger ml-2" (click)="buildMetaDataForm()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #locationFormRef>
+    <form [formGroup]="locationForm">
+        <div class="card">
+            <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                <div class="w-75 py-1">
+                    <span> Location</span>
+                </div>
+                <!-- <div class="w-25">
+                    <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1"
+                        (click)="manageLocationForm()" [tooltip]="'Edit'" container="body"></button>
+                </div> -->
+            </div>
+            <div class="card-body">
+                <div class="row text-right">
+                    <div class="col-6">
+                        <div class="form-group row">
+                            <label for="datacenter" class="col-3 col-form-label">Datacenter<em>*</em></label>
+                            <div class="col-9">
+                                <input id="datacenter" class="form-control" type="text" formControlName="datacenter"
+                                    [class.is-invalid]="detailFormErrors.datacenter">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.datacenter">
+                                    {{detailFormErrors.datacenter}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group row">
+                            <label for="cloud" class="col-3 col-form-label">Cloud<em>*</em></label>
+                            <div class="col-9">
+                                <input id="cloud" class="form-control" type="text" formControlName="cloud"
+                                    [class.is-invalid]="detailFormErrors.cloud">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cloud">
+                                    {{detailFormErrors.cloud}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group row">
+                            <label for="hypervisor" class="col-3 col-form-label">Hypervisor</label>
+                            <div class="col-9">
+                                <input id="hypervisor" class="form-control" type="text" formControlName="hypervisor"
+                                    [class.is-invalid]="detailFormErrors.hypervisor">
+                                <div class="invalid-feedback text-left" *ngIf="detailFormErrors.hypervisor">
+                                    {{detailFormErrors.hypervisor}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center" *ngIf="locationForm.dirty">
+                        <button type="button" class="btn btn-primary" (click)="submitLocationForm()">Update</button>
+                        <button type="button" class="btn btn-danger ml-2" (click)="buildLocationForm()">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>

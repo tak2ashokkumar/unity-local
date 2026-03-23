@@ -1,0 +1,97 @@
+@import "variables";
+
+.entity-card {
+  height: 100%;
+  background-color: $white;
+  .sub-entity {
+    color: $gray-500;
+  }
+  .value {
+    color: $primary;
+  }
+}
+
+.card .entity-card.active {
+  height: 100%;
+  background-color: $primary;
+  border-radius: 0.3rem !important;
+  .sub-entity {
+    color: $white;
+  }
+  .value {
+    color: $white;
+  }
+}
+
+.funnel-wrapper::before {
+  position: relative;
+  max-width: 66%;
+  float: right;
+  content: "";
+  right: 15px;
+  top: 8px;
+  height: 15px;
+  width: 100%;
+  background-color: #c7b8fc;
+  border-radius: 50%;
+  z-index: 6;
+}
+
+.funnel-wrapper {
+  overflow: hidden;
+  text-align: center;
+
+  .entity-events {
+    border: 1px solid #7e60e4;
+    border-radius: 25px;
+    color: #7e60e4;
+
+    .funnel {
+      left: 31%;
+      max-width: 65%;
+      border-top: 57px solid #7e60e4;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+
+      label {
+        margin: -35px 0px 0px -20px;
+      }
+    }
+  }
+
+  .entity-alerts {
+    border: 1px solid #5863d6;
+    border-radius: 25px;
+    color: #5863d6;
+
+    .funnel {
+      left: 37%;
+      max-width: 53%;
+      border-top: 57px solid #5863d6;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+
+      label {
+        margin: -38px 0px 0px -20px;
+      }
+    }
+  }
+
+  .entity-conditions {
+    border: 1px solid #56b0c8;
+    border-radius: 25px;
+    color: #56b0c8;
+
+    .funnel {
+      left: 43%;
+      max-width: 41%;
+      border-top: 57px solid #56b0c8;
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+
+      label {
+        margin: -38px 0px 0px -30px;
+      }
+    }
+  }
+}

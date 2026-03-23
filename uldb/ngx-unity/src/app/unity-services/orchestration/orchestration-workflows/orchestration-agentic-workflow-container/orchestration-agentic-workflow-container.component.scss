@@ -1,0 +1,768 @@
+@import "../../../../unity-chatbot/unity-chatbot.component.scss";
+
+.parent-container {
+  color: #5c6873 !important;
+}
+
+.body-container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* Left panel as overlay */
+.body-container .left-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 361px;
+  background: #fff;
+  z-index: 50;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.15);
+  transition:
+    transform 0.3s ease,
+    opacity 0.2s ease;
+  overflow: visible;
+}
+
+/* Collapsed (hidden) state */
+.body-container.left-collapsed .left-panel {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+/* Right panel always full width */
+.body-container .right-panel {
+  flex: 1 1 auto;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* EXTREME RIGHT PANEL (slide-in overlay) */
+.body-container .extreme-right-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 430px;
+  background-color: #fff;
+  box-shadow: -2px 0 0 0 rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+  transition:
+    transform 0.3s ease,
+    opacity 0.2s ease;
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* Visible state */
+.body-container .extreme-right-panel.open {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Divider toggle button */
+.divider-toggle {
+  position: absolute;
+  z-index: 60;
+  background: #fff;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    left 0.25s ease,
+    box-shadow 0.2s ease;
+  left: 93px;
+  bottom: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  height: 37px;
+  width: 37px;
+  outline: none !important;
+  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.12);
+}
+
+// .body-container.left-collapsed .divider-toggle {
+//   // left: 0%;
+//   left: 21px;
+// }
+
+// .body-container.left-collapsed .toolbar-container {
+//   left: -175px;
+// }
+
+#agentic-drawflow {
+  flex: 1;
+  min-height: 80vh !important;
+  height: calc(100vh - 130px);
+  border: 1px solid #ccc;
+  background-color: white;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+
+  /* Dotted pattern */
+  background-image: radial-gradient(#ccc 1px, transparent 1px);
+  background-size: 20px 20px;
+  /* spacing of dots */
+}
+
+/* Remove unwanted white background & border */
+.drawflow-node.agentic-default-node {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.agentic-custom-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent !important;
+  min-width: 60px;
+  /* same as box width */
+  max-width: 60px;
+  cursor: grab;
+  /* fix width so text won't expand node */
+}
+
+/* Node box fixed size */
+.node-box {
+  width: 60px !important;
+  height: 60px !important;
+  border: 2px solid #5c6873 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  position: relative;
+}
+
+/* Label should not affect node width */
+.node-label {
+  margin-top: 6px;
+  font-size: 13px;
+  text-align: center;
+  width: 170px;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  // word-break: break-word;
+}
+
+.node-label .node-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(100% - 14px);
+}
+
+// .status-icon-inname {
+//   font-size: 12px;
+//   line-height: 1;
+//   flex: 0 0 12px;
+//   opacity: 0.95;
+//   pointer-events: none;
+// }
+// .status-icon-inname { color: #2563eb; }  /* choose your neutral color */
+
+/* Optional semantic colors */
+// .status-icon-inname.fas.fa-check-circle {
+//   color: #16a34a;
+// }
+
+// .status-icon-inname.fas.fa-times-circle {
+//   color: #dc2626;
+// }
+
+// .status-icon-inname.fas.fa-exclamation-triangle {
+//   color: #d97706;
+// }
+
+// .status-icon-inname.fas.fa-ban {
+//   color: #6b7280;
+// }
+
+// .status-icon-inname.fas.fa-clock {
+//   color: #6b7280;
+// }
+
+// .status-icon-inname.fas.fa-spinner {
+//   color: #2563eb;
+// }
+
+/* Switch node height */
+.node-box.switch-case {
+  height: 100px !important;
+}
+
+// .node-box.llm-case {
+//   height: 100px !important;
+// }
+
+.node-box.aiagent {
+  height: 100px !important;
+  width: 150px !important;
+}
+
+.node-box.llm {
+  height: 100px !important;
+  width: 90px !important;
+}
+
+/* Node wrapper only contains the visual box */
+.agentic-custom-node .node-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.drawflow .drawflow-node.agentic-default-node .input {
+  visibility: visible !important;
+  /* make them visible */
+  width: 7px !important;
+  /* wider rectangle */
+  height: 14px !important;
+  /* taller rectangle */
+  left: -3px !important;
+  /* stick out from left */
+  top: -10px !important;
+  border-radius: 0px !important;
+  /* small rounding */
+  background-color: #5c6873 !important;
+  /* fill color */
+  cursor: pointer !important;
+  border: transparent;
+}
+
+.drawflow .drawflow-node.agentic-default-node:has(.type-trigger) .input {
+  display: none !important;
+  /* make them visible */
+}
+
+.drawflow .drawflow-node.agentic-default-node .drawflow-delete {
+  display: none !important;
+}
+
+/* Force output alignment relative to wrapper */
+.drawflow .drawflow-node.agentic-default-node .output {
+  position: absolute !important;
+  right: -6px;
+  top: 35%;
+  transform: translateY(-50%);
+  width: 12px !important;
+  height: 12px !important;
+  border: 1px solid #5c6873;
+  background-color: #5c6873 !important;
+  cursor: pointer !important;
+}
+
+.drawflow .drawflow-node.agentic-default-node:has(.node-box.aiagent) .input {
+  left: -48px !important;
+  /* always outside */
+  // top: 40% !important;             /* force vertical center */
+}
+
+.drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .input {
+  left: -18px !important;
+  /* always outside */
+  // top: 40% !important;             /* force vertical center */
+}
+
+.drawflow .drawflow-node.agentic-default-node:has(.node-box.aiagent) .output {
+  right: -50px !important;
+  /* always outside */
+  top: 40% !important;
+  /* force vertical center */
+}
+
+.drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .output {
+  right: -20px !important;
+  /* always outside */
+  top: 40% !important;
+  /* force vertical center */
+}
+
+.drawflow .connection path {
+  stroke: #5c6873 !important;
+  /* Color of the arrow */
+  stroke-width: 1px !important;
+  /* Thickness */
+  fill: none;
+  stroke-linecap: round;
+  /* Makes the line edges round */
+  marker-end: url(#arrow);
+  /* Attach an arrow marker */
+  cursor: pointer;
+  // stroke-opacity: 0.5 !important;
+}
+
+.node-left-icon {
+  position: absolute !important;
+  left: -8px !important;
+  top: 45% !important;
+  transform: translateY(-50%) !important;
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.node-left-icon img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.node-center-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+}
+
+.node-center-icon img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Container for icon + title */
+.icon-and-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* spacing between icon and text */
+  justify-content: center;
+  /* horizontally center in the node box */
+  padding-top: 5%;
+}
+
+.node-center-icon-ai {
+  position: relative;
+  /* remove absolute */
+  width: 25px;
+  height: 25px;
+}
+
+.node-center-icon-ai img {
+  width: 100%;
+  height: 100%;
+}
+
+.node-center-icon-llm {
+  position: relative;
+  /* remove absolute */
+  width: 20px;
+  height: 20px;
+}
+
+.node-center-icon-llm img {
+  width: 100%;
+  height: 100%;
+}
+
+.node-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+// Node css ends here
+
+.plus-buttons {
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+  align-items: flex-end;
+  padding-bottom: 30%;
+}
+
+.plus-btn {
+  width: 28px;
+  height: 28px;
+  border: 2px dotted #5c6873;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  cursor: pointer;
+  background: #e4e7ea;
+  color: #5c6873;
+}
+
+.slot-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.slot-row {
+  text-align: center;
+  z-index: 5;
+  pointer-events: auto;
+  cursor: pointer;
+  justify-items: center;
+}
+
+.slot-name {
+  font-size: xx-small;
+  // color: #2F353A;
+}
+
+.slot-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #5c6873;
+  border-radius: 50%;
+  background: #e4e7ea;
+  font-size: 12px;
+  color: #5c6873;
+}
+
+.col-custom-left {
+  flex: 0 0 22%;
+  /* 2.5/12 = ~20.83% */
+  max-width: 22%;
+}
+
+.tb {
+  position: relative;
+  left: 30%;
+}
+
+.toolbar-container {
+  position: absolute;
+  bottom: 25px;
+  /* adjust as needed */
+  left: 330px;
+  flex-direction: column;
+  /* stack vertically */
+  gap: 6px;
+  /* space between buttons */
+  z-index: 90;
+  /* ensure it sits above the canvas content */
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.logs-full-width {
+  width: 100%;
+  text-align: center;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: white !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-cross {
+  position: absolute;
+  top: 7px;
+  left: 365px;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.body-container.left-collapsed .icon-cross {
+  transform: translateX(-355px);
+}
+
+.workflow-var-btn {
+  border-radius: 50%;
+  background-color: white !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+// .logs-btn {
+//   border-radius: 50%;
+//   background-color: white !important;
+//   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+//   cursor: pointer;
+// }
+
+/* Floating buttons */
+.floating-actions {
+  position: fixed;
+  left: 400px;
+  display: flex;
+  align-items: center;
+  transition: bottom 0.25s ease;
+  z-index: 1000;
+}
+
+/* Logs button */
+.logs-btn {
+  background-color: #fff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Logs panel */
+.logs-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  color: #fff;
+  transition: height 0.25s ease;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Collapsed state */
+.logs-panel.collapsed {
+  height: 0 !important;
+  overflow: hidden;
+}
+
+/* Resize handle */
+.resize-handle {
+  height: 4px;
+  background: #ccc;
+  cursor: ns-resize;
+  flex-shrink: 0;
+}
+
+/* Logs content */
+.logs-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  font-family: monospace;
+}
+
+.bottom-panel {
+  position: fixed;
+  bottom: 32px;
+  left: 59px;
+  right: 9px;
+
+  box-sizing: border-box;
+  background: #fff;
+  z-index: 1000;
+  flex-direction: column;
+  overflow: hidden;
+  transition: height 0.15s ease, left 0.2s ease, right 0.2s ease;
+}
+
+.bottom-panel.left-open {
+  left: 421px;
+}
+
+.bottom-panel.right-open {
+  right: 317px;
+  left: 60px;
+}
+
+
+.bottom-panel.left-open.right-open {
+  left: 421px;
+  right: 309px;
+}
+
+.logs-header {
+  height: 40px;
+  /* must match headerHeight */
+  min-height: 40px;
+  flex-shrink: 0;
+  /* DO NOT shrink */
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Actions bubble at top-right, outside the node border */
+.agentic-custom-node .node-actions {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  right: 0;
+  height: 28px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+  visibility: hidden;
+  background: transparent;
+  color: #73818f;
+  cursor: pointer !important;
+}
+
+/* Show when hovering node OR hovering actions */
+.agentic-custom-node:hover .node-actions,
+.agentic-custom-node .node-actions:hover {
+  visibility: visible;
+}
+
+.agentic-custom-node .node-actions-agentic {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  right: -40px;
+  height: 28px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+  visibility: hidden;
+  background: transparent;
+  color: #73818f;
+  cursor: pointer !important;
+}
+
+/* Show when hovering node OR hovering actions */
+.agentic-custom-node:hover .node-actions-agentic,
+.agentic-custom-node .node-actions:hover {
+  visibility: visible;
+}
+
+.center-text-container {
+  position: absolute;
+  width: 240px;
+  top: 200px;
+  right: 630px;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+  color: #5c6873;
+  border: 2px dotted #5c6873;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+/* Styled tooltip using data-tip */
+.node-status {
+  position: relative;
+}
+
+/* bubble */
+.node-status[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: 125%;
+  transform: translateX(-50%);
+  max-width: 240px;
+  white-space: pre-wrap;
+  /* honor \n and wrap long lines */
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.3;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 1;
+}
+
+/* arrow */
+.node-status[data-tip]:hover::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 115%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #222;
+  /* arrow color matches bubble */
+  z-index: 1001;
+}
+
+/* optional: fade/transition */
+.node-status[data-tip]::after,
+.node-status[data-tip]::before {
+  opacity: 0;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+  pointer-events: none;
+}
+
+.node-status[data-tip]:hover::after,
+.node-status[data-tip]:hover::before {
+  opacity: 1;
+}
+
+/* right-anchored holder for non-AI/LLM */
+.node-status-right {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Bottom panel as overlay */
+// .body-container .bottom-panel {
+//   position: absolute;
+//   // left: 361px;
+//   right: 0;
+//   bottom: 0;
+//   height: 70%;
+//   // width: 722px;
+//   background: #fff;
+//   z-index: 50;
+//   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+//   transition:
+//     transform 0.3s ease,
+//     opacity 0.2s ease;
+//   transform: translateY(0);
+//   overflow: auto;
+// }
+
+// .body-container .bottom-panel {
+//   position: absolute;
+//   bottom: 0;
+//   height: 50%;
+//   background: #fff;
+//   z-index: 50;
+//   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+//   overflow: auto;
+
+//   transition:
+//     left 0.3s ease,
+//     width 0.3s ease;
+// }
+
+
+
+// /* Collapsed (hidden) state */
+// .body-container.bottom-collapsed .bottom-panel {
+//   transform: translateY(100%);
+//   opacity: 0;
+//   display: none;
+// }
+
+.fx-icon {
+  font-weight: 600;
+  margin-right: 6px;
+  color: #5c6873 !important;
+}

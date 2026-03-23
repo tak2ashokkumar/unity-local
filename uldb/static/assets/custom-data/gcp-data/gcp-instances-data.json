@@ -1,0 +1,416 @@
+[
+    {
+        "name": "General Purpose",
+        "code": "General Purpose",
+        "series": [
+            {
+                "name": "N1",
+                "code": "N1",
+                "machine_types": [
+                    {
+                        "cpu": 1,
+                        "name": "n1-standard-1",
+                        "ram": 3840
+                    },
+                    {
+                        "cpu": 16,
+                        "name": "n1-standard-16",
+                        "ram": 61440
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "n1-standard-2",
+                        "ram": 7680
+                    },
+                    {
+                        "cpu": 32,
+                        "name": "n1-standard-32",
+                        "ram": 122880
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "n1-standard-4",
+                        "ram": 15360
+                    },
+                    {
+                        "cpu": 64,
+                        "name": "n1-standard-64",
+                        "ram": 245760
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "n1-standard-8",
+                        "ram": 30720
+                    },
+                    {
+                        "cpu": 96,
+                        "name": "n1-standard-96",
+                        "ram": 368640
+                    },
+                    {
+                        "cpu": 16,
+                        "name": "n1-highmem-16",
+                        "ram": 106496
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "n1-highmem-2",
+                        "ram": 13312
+                    },
+                    {
+                        "cpu": 32,
+                        "name": "n1-highmem-32",
+                        "ram": 212992
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "n1-highmem-4",
+                        "ram": 26624
+                    },
+                    {
+                        "cpu": 64,
+                        "name": "n1-highmem-64",
+                        "ram": 425984
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "n1-highmem-8",
+                        "ram": 53248
+                    },
+                    {
+                        "cpu": 96,
+                        "name": "n1-highmem-96",
+                        "ram": 638976
+                    },
+                    {
+                        "cpu": 16,
+                        "name": "n1-highcpu-16",
+                        "ram": 14746
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "n1-highcpu-2",
+                        "ram": 1843
+                    },
+                    {
+                        "cpu": 32,
+                        "name": "n1-highcpu-32",
+                        "ram": 29491
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "n1-highcpu-4",
+                        "ram": 3686
+                    },
+                    {
+                        "cpu": 64,
+                        "name": "n1-highcpu-64",
+                        "ram": 58982
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "n1-highcpu-8",
+                        "ram": 7373
+                    },
+                    {
+                        "cpu": 96,
+                        "name": "n1-highcpu-96",
+                        "ram": 88474
+                    }
+                ]
+            },
+            {
+                "name": "N2",
+                "code": "N2",
+                "machine_types": [
+                    {
+                        "cpu": 16,
+                        "name": "n2-standard-16",
+                        "ram": 65536
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "n2-standard-2",
+                        "ram": 8192
+                    },
+                    {
+                        "cpu": 32,
+                        "name": "n2-standard-32",
+                        "ram": 131072
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "n2-standard-4",
+                        "ram": 16384
+                    },
+                    {
+                        "cpu": 48,
+                        "name": "n2-standard-48",
+                        "ram": 196608
+                    },
+                    {
+                        "cpu": 64,
+                        "name": "n2-standard-64",
+                        "ram": 262144
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "n2-standard-8",
+                        "ram": 32768
+                    },
+                    {
+                        "cpu": 80,
+                        "name": "n2-standard-80",
+                        "ram": 327680
+                    },
+                    {
+                        "cpu": 16,
+                        "name": "n2-highmem-16",
+                        "ram": 131072
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "n2-highmem-2",
+                        "ram": 16384
+                    },
+                    {
+                        "cpu": 32,
+                        "name": "n2-highmem-32",
+                        "ram": 262144
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "n2-highmem-4",
+                        "ram": 32768
+                    },
+                    {
+                        "cpu": 48,
+                        "name": "n2-highmem-48",
+                        "ram": 393216
+                    },
+                    {
+                        "cpu": 64,
+                        "name": "n2-highmem-64",
+                        "ram": 524288
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "n2-highmem-8",
+                        "ram": 65536
+                    },
+                    {
+                        "cpu": 80,
+                        "name": "n2-highmem-80",
+                        "ram": 655360
+                    },
+                    {
+                        "cpu": 16,
+                        "name": "n2-highcpu-16",
+                        "ram": 16384
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "n2-highcpu-2",
+                        "ram": 2048
+                    },
+                    {
+                        "cpu": 32,
+                        "name": "n2-highcpu-32",
+                        "ram": 32768
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "n2-highcpu-4",
+                        "ram": 4096
+                    },
+                    {
+                        "cpu": 48,
+                        "name": "n2-highcpu-48",
+                        "ram": 49152
+                    },
+                    {
+                        "cpu": 64,
+                        "name": "n2-highcpu-64",
+                        "ram": 65536
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "n2-highcpu-8",
+                        "ram": 8192
+                    },
+                    {
+                        "cpu": 80,
+                        "name": "n2-highcpu-80",
+                        "ram": 81920
+                    }
+                ]
+            },
+            {
+                "name": "E2",
+                "code": "E2",
+                "machine_types": [
+                    {
+                        "cpu": 16,
+                        "name": "e2-highcpu-16",
+                        "ram": 16384
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "e2-highcpu-2",
+                        "ram": 2048
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "e2-highcpu-4",
+                        "ram": 4096
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "e2-highcpu-8",
+                        "ram": 8192
+                    },
+                    {
+                        "cpu": 16,
+                        "name": "e2-highmem-16",
+                        "ram": 131072
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "e2-highmem-2",
+                        "ram": 16384
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "e2-highmem-4",
+                        "ram": 32768
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "e2-highmem-8",
+                        "ram": 65536
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "e2-medium",
+                        "ram": 4096
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "e2-micro",
+                        "ram": 1024
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "e2-small",
+                        "ram": 2048
+                    },
+                    {
+                        "cpu": 16,
+                        "name": "e2-standard-16",
+                        "ram": 65536
+                    },
+                    {
+                        "cpu": 2,
+                        "name": "e2-standard-2",
+                        "ram": 8192
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "e2-standard-4",
+                        "ram": 16384
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "e2-standard-8",
+                        "ram": 32768
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Compute Optimized",
+        "code": "Compute-optimized",
+        "series": [
+            {
+                "name": "C2",
+                "code": "C2",
+                "machine_types": [
+                    {
+                        "cpu": 16,
+                        "name": "c2-standard-16",
+                        "ram": 65536
+                    },
+                    {
+                        "cpu": 30,
+                        "name": "c2-standard-30",
+                        "ram": 122880
+                    },
+                    {
+                        "cpu": 60,
+                        "name": "c2-standard-30",
+                        "ram": 245760
+                    },
+                    {
+                        "cpu": 4,
+                        "name": "c2-standard-4",
+                        "ram": 16384
+                    },
+                    {
+                        "cpu": 8,
+                        "name": "c2-standard-8",
+                        "ram": 32768
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "Memory Optimized",
+        "code": "Memory-optimized",
+        "series": [
+            {
+                "name": "M1",
+                "code": "M1",
+                "machine_types": [
+                    {
+                        "cpu": 96,
+                        "name": "m1-megamem-96",
+                        "ram": 1468006
+                    },
+                    {
+                        "cpu": 160,
+                        "name": "m1-ultramem-160",
+                        "ram": 3936256
+                    },
+                    {
+                        "cpu": 40,
+                        "name": "m1-ultramem-40",
+                        "ram": 984064
+                    },
+                    {
+                        "cpu": 80,
+                        "name": "m1-ultramem-80",
+                        "ram": 1968128
+                    }
+                ]
+            },
+            {
+                "name": "M2",
+                "code": "M1",
+                "machine_types": [
+                    {
+                        "cpu": 208,
+                        "name": "m2-ultramem-208",
+                        "ram": 6029312
+                    },
+                    {
+                        "cpu": 416,
+                        "name": "m2-ultramem-416",
+                        "ram": 12058624
+                    }
+                ]
+            }
+        ]
+    }
+]

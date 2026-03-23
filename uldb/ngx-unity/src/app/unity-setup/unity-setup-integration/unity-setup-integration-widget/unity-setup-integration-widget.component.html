@@ -1,0 +1,22 @@
+<div class="card rounded-edge equalize-card">
+    <div class="card-body">
+        <div class="row pt-2">
+            <div class="col-6">
+                <img [src]="imageUrl" class="w-100" [alt]="altText" loading="eager"
+                    style="height: 40px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+            </div>
+            <div class="col-6">
+                <!-- <button class="btn btn-warning btn-sm pull-right" style="font-weight: 600;" [tooltip]="tooltipMsg"
+                    (click)="handleButtonClick()">{{buttonLabel}}</button> -->
+                <button class="action-icons mb-0 fas fa-eye font-sm ml-1 pull-right" [tooltip]="viewtooltipMsg"
+                    [ngClass]="{'action-icons-disabled':!viewEnabled}" (click)="handleViewButtonClick()" accessControl
+                    [moduleName]="moduleName" [accessType]="viewAccessType" [elementType]="elementType">
+                </button>
+                <button class="action-icons mb-0 fas fa-tools font-sm ml-1 pull-right" [tooltip]="addtooltipMsg"
+                    [ngClass]="{'action-icons-disabled':!addEnabled}" (click)="handleAddButtonClick()" accessControl
+                    [moduleName]="moduleName" [accessType]="addAccessType" [elementType]="elementType">
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

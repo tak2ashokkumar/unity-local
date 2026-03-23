@@ -1,0 +1,61 @@
+<div class="card round-edge equalize-card">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+        <span class="font-lg font-500">Customer Behavior Insights KPISs</span>
+    </div>
+    <div class="card-body px-2" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+        <div class="row mx-0">
+            <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <div class="card equalize-card border-0">
+                    <app-spinner [name]="sessionToOrderFunnelWidgetViewData?.loader"></app-spinner>
+                    <div class="card-body p-0 d-flex flex-column justify-content-around">
+                        <ng-container *ngIf="sessionToOrderFunnelWidgetViewData?.chartData">
+                            <div echarts [options]="sessionToOrderFunnelWidgetViewData?.chartData?.options"
+                                [extentions]="sessionToOrderFunnelWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300"></div>
+                        </ng-container>
+                        <ng-container *ngIf="!sessionToOrderFunnelWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No Session To Order Funnel data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <div class="card equalize-card border-0">
+                    <app-spinner [name]="returningCustomerCategoryWidgetViewData?.loader"></app-spinner>
+                    <div class="card-body p-0 d-flex flex-column justify-content-around">
+                        <ng-container *ngIf="returningCustomerCategoryWidgetViewData?.chartData">
+                            <div echarts [options]="returningCustomerCategoryWidgetViewData?.chartData?.options"
+                                [extentions]="returningCustomerCategoryWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300">
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!returningCustomerCategoryWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No Returning Customer Category data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <div class="card equalize-card border-0">
+                    <app-spinner [name]="newCustomersWidgetViewData?.loader"></app-spinner>
+                    <div class="card-body p-0 d-flex flex-column justify-content-around">
+                        <ng-container *ngIf="newCustomersWidgetViewData?.chartData">
+                            <div echarts [options]="newCustomersWidgetViewData?.chartData?.options"
+                                [extentions]="newCustomersWidgetViewData?.chartData?.extensions" [defaultHeight]="300">
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!newCustomersWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No New Customers data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

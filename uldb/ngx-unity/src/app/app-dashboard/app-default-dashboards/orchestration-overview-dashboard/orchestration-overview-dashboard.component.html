@@ -1,0 +1,512 @@
+<div class="row d-flex justify-content-end mr-2 pr-1 mt-2">
+    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
+        [tooltip]="'Go Back'" container="body">
+        <i class="fa fa-arrow-left"></i>
+    </button>
+</div>
+<div class="mt-2 mx-3 px-1">
+    <div class="row">
+        <div class="col-6 px-0">
+            <div class="card round-edge equalize-card">
+                <app-spinner [name]="taskWidget.loader"></app-spinner>
+                <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                    <span class="font-lg font-500">Tasks</span>
+                    <span class="font-xl font-500 text-primary pointer-link cursor"
+                        (click)="goToTasks()">{{taskWidget?.count}}</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row mx-0 section1">
+                        <div class="col-6 p-0 align-content-center my-3 border-right" *ngIf="taskWidget?.count">
+                            <div class="row mx-0">
+                                <div class="col-12 p-0">
+                                    <ng-container *ngIf="taskWidget?.byStatusChartData">
+                                        <div echarts [options]="taskWidget?.byStatusChartData.options"
+                                            (chartInit)="onChartClick($event)"
+                                            [extentions]="taskWidget?.byStatusChartData.extensions"
+                                            [defaultHeight]="120">
+                                        </div>
+                                    </ng-container>
+                                </div>
+                                <div class="col-12 p-0">
+                                    <ng-container *ngIf="taskWidget?.byTargetChartData">
+                                        <div echarts [options]="taskWidget?.byTargetChartData.options"
+                                            (chartInit)="onChartClick($event)"
+                                            [extentions]="taskWidget?.byTargetChartData.extensions"
+                                            [defaultHeight]="120">
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 p-0" *ngIf="taskWidget?.count">
+                            <ng-container *ngIf="taskWidget?.byScriptTypeChartData">
+                                <div echarts [options]="taskWidget?.byScriptTypeChartData.options"
+                                    (chartInit)="onChartClick($event)"
+                                    [extentions]="taskWidget?.byScriptTypeChartData.extensions" [defaultHeight]="250">
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="col-12 d-flex justify-content-center align-items-center" *ngIf="!taskWidget?.count">
+                            No
+                            data
+                            available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 pr-0">
+            <div class="card round-edge equalize-card">
+                <app-spinner [name]="workflowWidget.loader"></app-spinner>
+                <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                    <span class="font-lg font-500">Workflows</span>
+                    <span class="font-xl font-500 text-primary pointer-link cursor"
+                        (click)="goToWorkflows()">{{workflowWidget?.count}}</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row mx-0 section1">
+                        <div class="col-6 p-0 align-content-center my-3 border-right" *ngIf="workflowWidget?.count">
+                            <div class="row mx-0">
+                                <div class="col-12 p-0">
+                                    <ng-container *ngIf="workflowWidget?.byStatusChartData">
+                                        <div echarts [options]="workflowWidget?.byStatusChartData.options"
+                                            (chartInit)="onChartClick($event)"
+                                            [extentions]="workflowWidget?.byStatusChartData.extensions"
+                                            [defaultHeight]="120"></div>
+                                    </ng-container>
+                                </div>
+                                <div class="col-12 p-0">
+                                    <ng-container *ngIf="workflowWidget?.byTargetTypeChartData">
+                                        <div echarts [options]="workflowWidget?.byTargetTypeChartData.options"
+                                            (chartInit)="onChartClick($event)"
+                                            [extentions]="workflowWidget?.byTargetTypeChartData.extensions"
+                                            [defaultHeight]="120"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 p-0" *ngIf="workflowWidget?.count">
+                            <ng-container *ngIf="workflowWidget?.byCategoryChartData">
+                                <div echarts [options]="workflowWidget?.byCategoryChartData.options"
+                                    (chartInit)="onChartClick($event)"
+                                    [extentions]="workflowWidget?.byCategoryChartData.extensions" [defaultHeight]="250">
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="col-12 d-flex justify-content-center align-items-center"
+                            *ngIf="!workflowWidget?.count">
+                            No data
+                            available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2" *ngIf="executionSummaryWidget">
+        <div class="col-12 px-0">
+            <div class="card round-edge mb-0">
+                <app-spinner [name]="executionSummaryWidget.loader"></app-spinner>
+                <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                    <span class="font-lg font-500">Executions Summary</span>
+                    <custom-date-dropdown [options]="executionSummaryWidget.dropdownOptions"
+                        [enableCustomDateRange]="true" [customClass]="'form-control-sm'"
+                        [default]="executionSummaryWidget.defaultSelected"
+                        (onSubmit)="onExecutionSummaryWidgetFormChanged($event)">
+                    </custom-date-dropdown>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row m-0 section3">
+                        <div class="col-12 mt-2 p-0 d-flex justify-content-center"
+                            *ngIf="executionSummaryWidget?.counts?.total">
+                            <div class="row m-0 d-flex justify-content-center w-60">
+                                <div class="col-3 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="font-lg font-500">Total</span>
+                                        <span
+                                            class="font-xl font-500 text-primary pointer-link">{{executionSummaryWidget?.counts?.total}}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <div>
+                                            <span class="fa fa-check-circle text-success" tooltip="Success"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.successful}}</span>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-exclamation-circle text-danger" tooltip="Failed"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.failed}}</span>
+                                        </div>
+                                        <div>
+                                            <span class="fas fa-spinner fa-spin text-primary"
+                                                tooltip="In Progress"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.inProgress}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-1 mt-3">
+                                    <span class="border border-secondary mx-2 py-2"></span>
+                                </div>
+                                <div class="col-3 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="font-lg font-500">Tasks</span>
+                                        <span
+                                            class="font-xl font-500 text-primary pointer-link">{{executionSummaryWidget?.counts?.tasks}}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <div>
+                                            <span class="fa fa-check-circle text-success" tooltip="Success"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.successfulTasks}}</span>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-exclamation-circle text-danger" tooltip="Failed"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.failedTasks}}</span>
+                                        </div>
+                                        <div>
+                                            <span class="fas fa-spinner fa-spin text-primary"
+                                                tooltip="In Progress"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.inProgressTasks}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-1 mt-3">
+                                    <span class="border border-secondary mx-2 py-2"></span>
+                                </div>
+                                <div class="col-3 d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="font-lg font-500">Workflows</span>
+                                        <span
+                                            class="font-xl font-500 text-primary pointer-link">{{executionSummaryWidget?.counts?.workflows}}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <div>
+                                            <span class="fa fa-check-circle text-success" tooltip="Success"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.successfulWorkflows}}</span>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa fa-exclamation-circle text-danger"
+                                                tooltip="Failed"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.failedWorkflows}}</span>
+                                        </div>
+                                        <div>
+                                            <span class="fas fa-spinner fa-spin text-primary"
+                                                tooltip="In Progress"></span>
+                                            <span
+                                                class="text-primary text-value-xs ml-1">{{executionSummaryWidget?.counts?.inProgressWorkflows}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 p-0 my-3" *ngIf="executionSummaryWidget?.counts?.total">
+                            <div class="row mx-0">
+                                <div class="col-4 px-1 border-right">
+                                    <ng-container *ngIf="executionSummaryWidget.byTypeChartData">
+                                        <div echarts [options]="executionSummaryWidget.byTypeChartData.options"
+                                            [extentions]="executionSummaryWidget.byTypeChartData.extensions"
+                                            (chartInit)="onChartClick($event)" [defaultHeight]="250"></div>
+                                    </ng-container>
+                                </div>
+                                <div class="col-4 px-4 border-right">
+                                    <div class="row m-0">
+                                        <div class="col-12 p-0 mt-3 text-center font-500 font-lg">
+                                            <span>Average Execution Time</span>
+                                        </div>
+                                        <div class="col-12 px-0 py-4"
+                                            *ngIf="executionSummaryWidget.avgExecutionTimeViewData">
+                                            <div class="row execution-row">
+                                                <div class="col-12 d-flex justify-content-between align-items-center">
+                                                    <span class="font-weight-bold">Task</span>
+                                                    <div class="font-sm">
+                                                        <span class="text-muted">Avg Time :</span>
+                                                        <span class="ml-1">{{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow?.avg_exec_time
+                                                            }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 bar-chart d-flex mt-1">
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#83DFAE', 'width': 25 + '%' }"
+                                                        [title]="'0min-5min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['0min-5min'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['0min-5min']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#29945B', 'width': 25 + '%' }"
+                                                        [title]="'5min-30min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['5min-30min'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['5min-30min']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#FF8800', 'width': 25 + '%' }"
+                                                        [title]="'30min-1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['30min-1hr'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['30min-1hr']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#CC0000', 'width': 25 + '%' }"
+                                                        [title]="'>1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['>1hr'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_taskflow['>1hr']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row execution-row">
+                                                <div class="col-12 d-flex justify-content-between align-items-center">
+                                                    <span class="font-weight-bold">Workflow</span>
+                                                    <div class="font-sm">
+                                                        <span class="text-muted">Avg Time :</span>
+                                                        <span class="ml-1">{{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_workflow?.avg_exec_time
+                                                            }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 bar-chart d-flex mt-1">
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#83DFAE', 'width': 25 + '%' }"
+                                                        [title]="'0min-5min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['0min-5min'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['0min-5min']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#29945B', 'width': 25 + '%' }"
+                                                        [title]="'5min-30min: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['5min-30min'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['5min-30min']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#FF8800', 'width': 25 + '%' }"
+                                                        [title]="'30min-1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['30min-1hr'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['30min-1hr']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                    <div class="bar text-center text-white"
+                                                        [ngStyle]="{'background-color': '#CC0000', 'width': 25 + '%' }"
+                                                        [title]="'>1hr: ' + executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['>1hr'] + '%'">
+                                                        <span class="bar-text">
+                                                            {{
+                                                            executionSummaryWidget.avgExecutionTimeViewData?.average_workflow['>1hr']
+                                                            }}%
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="row mt-4 d-flex justify-content-center align-items-center font-xs">
+                                                <div class="legend-item d-flex align-items-center mx-1">
+                                                    <div class="legend-color" style="background-color: #83DFAE;"></div>
+                                                    <span class="ml-1">0min - 5min</span>
+                                                </div>
+                                                <div class="legend-item d-flex align-items-center mx-1">
+                                                    <div class="legend-color" style="background-color: #29945B;"></div>
+                                                    <span class="ml-1">5min - 30min</span>
+                                                </div>
+                                                <div class="legend-item d-flex align-items-center mx-1">
+                                                    <div class="legend-color" style="background-color: #FF8800;"></div>
+                                                    <span class="ml-1">30min - 1hr</span>
+                                                </div>
+                                                <div class="legend-item d-flex align-items-center mx-1">
+                                                    <div class="legend-color" style="background-color: #CC0000;"></div>
+                                                    <span class="ml-1">>1hr</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 px-1">
+                                    <ng-container *ngIf="executionSummaryWidget.byUserChartData">
+                                        <div echarts [options]="executionSummaryWidget.byUserChartData.options"
+                                            [extentions]="executionSummaryWidget.byUserChartData.extensions"
+                                            (chartInit)="onChartClick($event)" [defaultHeight]="250"></div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 d-flex justify-content-center align-items-center"
+                            *ngIf="!executionSummaryWidget?.counts?.total">No data available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2" *ngIf="executionsOverviewViewData">
+        <div class="col-12 px-0">
+            <div class="card round-edge mb-0">
+                <app-spinner [name]="executionsOverviewViewData.loader"></app-spinner>
+                <div class="card-header d-flex justify-content-between align-items-center bg-white px-2 py-1">
+                    <span class="font-lg font-500">Executions Overview</span>
+                    <custom-date-dropdown [options]="executionsOverviewViewData.dropdownOptions"
+                        [enableCustomDateRange]="true" [customClass]="'form-control-sm'"
+                        [default]="executionsOverviewViewData.defaultSelected"
+                        (onSubmit)="onExecutionsOverviewWidgetFormChanged($event)">
+                    </custom-date-dropdown>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row mx-0 section4">
+                        <div class="col-6 border-right">
+                            <ng-container *ngIf="executionsOverviewViewData.successRateChartData">
+                                <div echarts [options]="executionsOverviewViewData.successRateChartData.options"
+                                    [extentions]="executionsOverviewViewData.successRateChartData.extensions"
+                                    [defaultHeight]="350"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!executionsOverviewViewData.successRateChartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">No data available.
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="col-6 border-left">
+                            <ng-container *ngIf="executionsOverviewViewData.efficiencyChartData">
+                                <div echarts [options]="executionsOverviewViewData.efficiencyChartData.options"
+                                    [extentions]="executionsOverviewViewData.efficiencyChartData.extensions"
+                                    [defaultHeight]="350"></div>
+                            </ng-container>
+                            <ng-container *ngIf="!executionsOverviewViewData.efficiencyChartData">
+                                <div class="d-flex justify-content-center align-items-center h-100">No data available.
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row my-2">
+        <div class="col-6 px-0">
+            <div class="card round-edge equalize-card">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                    <span class="font-lg font-500">Recent Failures</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm text-left font-500 mb-0">
+                        <thead class="bg-light font-sm-xs">
+                            <tr>
+                                <th>ID</th>
+                                <th>Target</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Started On</th>
+                                <th>Executed By</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-xs-sm">
+                            <tr *ngFor="let data of recentFailureViewData" truncateText>
+                                <td class="text-primary pointer-link tdw-20 cursor">
+                                    <div class="text-truncate" (click)="redirectToExecutionPage(data)"
+                                        [tooltip]="data.id">
+                                        {{data.id}}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div class="text-truncate" [tooltip]="data.target">{{data.target}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div class="text-truncate" [tooltip]="data.name">{{data.name}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div class="text-truncate" [tooltip]="data.type">{{data.type}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div class="text-truncate" [tooltip]="data.startedOn">{{data.startedOn}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div class="text-truncate" [tooltip]="data.executedBy">{{data.executedBy}}</div>
+                                </td>
+                                <td class="action-icons-column text-center tdw-10">
+                                    <button class="action-icons action-icons-off mb-0 fas fa-play font-sm ml-1"
+                                        tooltip="Execute" (click)="execute(data)"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center text-muted py-5" *ngIf="!recentFailureViewData?.length">No recently failed
+                        executions.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 pr-0">
+            <div class="card round-edge equalize-card">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                    <span class="font-lg font-500">Upcoming Executions</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm text-left font-500 mb-0">
+                        <thead class="bg-light font-sm-xs">
+                            <tr>
+                                <th>Name</th>
+                                <th>Target</th>
+                                <th>Category</th>
+                                <th>Next Execution</th>
+                                <th>Last Execution</th>
+                                <th>Frequency</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-xs-sm">
+                            <tr *ngFor="let data of upcomingExecutionViewData" truncateText>
+                                <td class="text-primary pointer-link tdw-15 cursor">
+                                    <div class="text-truncate" [tooltip]="data.name"
+                                        (click)="redirectToTaskOrWorkflowEdit(data)">
+                                        {{data.name}}</div>
+                                </td>
+                                <td class="tdw-15 pointer-link cursor">
+                                    <div class="text-truncate" [tooltip]="data.target">{{data.target}}</div>
+                                </td>
+                                <td class="tdw-18 pointer-link cursor">
+                                    <div class="text-truncate" [tooltip]="data.category">{{data.category}}</div>
+                                </td>
+                                <td class="tdw-22 pointer-link cursor">
+                                    <div class="text-truncate" [tooltip]="data.nextExecution">{{data.nextExecution}}
+                                    </div>
+                                </td>
+                                <td class="tdw-20 pointer-link cursor">
+                                    <div class="text-truncate" [tooltip]="data.lastExecution">{{data.lastExecution}}
+                                    </div>
+                                </td>
+                                <td class="tdw-15 pointer-link cursor">
+                                    <div class="text-truncate" [tooltip]="data.frequency">{{data.frequency}}</div>
+                                </td>
+                                <td class="action-icons-column text-center">
+                                    <button class="action-icons action-icons-off mb-0 fas fa-calendar-alt font-sm ml-1"
+                                        tooltip="Schedule" (click)="schedule(data)"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center text-muted py-5" *ngIf="!upcomingExecutionViewData?.length">No executions
+                        scheduled.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

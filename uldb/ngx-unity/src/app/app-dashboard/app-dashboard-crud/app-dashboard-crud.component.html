@@ -1,0 +1,623 @@
+<ng-container>
+    <div class="row py-2">
+        <div class="col-4 offset-4 d-flex justify-content-between pt-2">
+            <div class="d-flex flex-column align-items-center step pointer-link">
+                <span class="badge icon-wrap"
+                    [ngClass]="{'active':activeForm == 'detailsForm','success':activeForm != 'detailsForm'}"
+                    (click)="manageActiveForm('detailsForm')">
+                    <span class="fas fa-link font-xl"></span>
+                </span>
+                <label class="mt-1 font-md mb-0">Details</label>
+            </div>
+            <!-- <div>
+                <div class="d-flex flex-column align-items-center step pointer-link">
+                    <span class="badge icon-wrap"
+                        [ngClass]="{'active':activeForm == 'filterForm','success':activeForm == 'widgetForm'}"
+                        (click)="manageActiveForm('filterForm')">
+                        <span class="fas fa-filter font-xl"></span>
+                    </span>
+                    <label class="mt-1 font-md mb-0">Filters</label>
+                </div>
+            </div> -->
+            <div class="d-flex flex-column align-items-center step pointer-link">
+                <span class="badge icon-wrap" [ngClass]="{'active':activeForm == 'widgetForm'}"
+                    (click)="manageActiveForm('widgetForm')">
+                    <span class="fas fa-bezier-curve font-xl"></span>
+                </span>
+                <label class="mt-1 font-md mb-0">Widgets</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4 offset-4 divider-wrap">
+            <hr class="divider-line active w-88">
+        </div>
+    </div>
+    <div class="row">
+        <ng-container [ngSwitch]="activeForm">
+            <ng-container *ngSwitchCase="'detailsForm'">
+                <div class="col-10 offset-1">
+                    <ng-container *ngTemplateOutlet="detailsFormRef"></ng-container>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'filterForm'">
+                <div class="col-10 offset-1">
+                    <ng-container *ngTemplateOutlet="filterFormRef"></ng-container>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="'widgetForm'">
+                <div class="col-3 pr-0">
+                    <div class="card ml-2">
+                        <div class="card-header py-2 d-flex justify-content-between align-items-center bg-transparent">
+                            <search-box [searchValue]="widgetCriteria.searchValue" [customClass]="'form-control-sm' "
+                                [placeholder]="'Search'" (searched)="onWidgetSearched($event)"></search-box>
+                            <button type="button" (click)="addWidget()"
+                                class="action-icons mb-0 fas fa-plus font-sm ml-1"></button>
+                        </div>
+                        <div class="card-body p-0">
+                            <ng-container *ngIf="dashboardWidgets && dashboardWidgets.length > 0">
+                                <ul class="list-group">
+                                    <ng-container *ngFor="let widget of dashboardWidgets">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                            <div class="d-flex flex-column w-80 text-truncate">
+                                                <span class="text-left text-truncate">{{widget.name}}</span>
+                                                <span class="d-flex align-items-baseline">
+                                                    <span class="text-muted font-sm">Status :</span>
+                                                    <span class="ml-1 font-sm"
+                                                        [class]="widget.status == 'published' ? 'text-success' : 'text-warning'">{{widget.status}}</span>
+                                                </span>
+                                            </div>
+                                            <span dropdown placement="bottom right" container="body">
+                                                <button id="button-container"
+                                                    class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                                                    data-toggle="dropdown" aria-controls="icons-dropdown-container"
+                                                    dropdownToggle (click)="false" [tooltip]="'Actions'"
+                                                    container="body"></button>
+                                                <div container="body" id="icons-dropdown-container"
+                                                    class="dropdown-menu dropdown-menu-right text-center mt-2"
+                                                    *dropdownMenu aria-labelledby="button-container">
+                                                    <button class="action-icons mt-1 mb-1 fas fa-pencil-alt font-sm"
+                                                        (click)="editWidget(widget)" [tooltip]="'Edit'"
+                                                        container="body"></button>
+                                                    <button class="action-icons mt-1 mb-2 far fa-trash-alt font-sm"
+                                                        (click)="deleteWidget(widget)" [tooltip]="'Delete'"
+                                                        container="body"></button>
+                                                </div>
+                                            </span>
+                                        </li>
+                                    </ng-container>
+                                </ul>
+                            </ng-container>
+                            <div class="d-flex justify-content-center align-items-center h-100 py-5"
+                                *ngIf="!dashboardWidgets || !dashboardWidgets.length">
+                                No widgets available.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <ng-container *ngTemplateOutlet="widgetFormRef"></ng-container>
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+</ng-container>
+
+
+<ng-template #detailsFormRef>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <form [formGroup]="detailsForm" *ngIf="detailsForm">
+                        <div class="form-group row" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials text-center w-60">
+                                {{nonFieldErr}}</div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="name" class="col-2 h-form-label px-0">Name<em>* </em>:</label>
+                            <div class="col-4">
+                                <input id="name" class="form-control form-control-sm" type="text" formControlName="name"
+                                    [class.is-invalid]="detailsFormErrors.name">
+                                <div class="invalid-feedback text-left" *ngIf="detailsFormErrors.name">
+                                    {{detailsFormErrors.name}}</div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="description" class="col-2 h-form-label px-0">Description:</label>
+                            <div class="col-7">
+                                <textarea id="description" class="form-control form-control-sm" rows="2"
+                                    formControlName="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="status" class="col-2 h-form-label px-0">Status:</label>
+                            <div class="col">
+                                <div class="d-inline-block">
+                                    <ul class="d-flex px-0 mb-0 radio-group">
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="detailsForm.get('status').value == 'draft'">
+                                                <input type="radio" [value]="'draft'" formControlName="status">
+                                                <span class="font-sm mr-2">Draft</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="detailsForm.get('status').value == 'published'">
+                                                <input type="radio" [value]="'published'" formControlName="status">
+                                                <span class="font-sm mr-2">Publish</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group d-flex">
+                            <label for="status" class="col-2 h-form-label px-0">Refresh Interval:<em>*</em></label>
+                            <div class="d-flex px-2">
+                                <div class="d-inline-block">
+                                    <ul class="d-flex px-0 mb-0 radio-group">
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="detailsForm.get('refresh').value">
+                                                <input type="radio" [value]="true" formControlName="refresh">
+                                                <span class="font-sm mr-2">Enable</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="!detailsForm.get('refresh').value">
+                                                <input type="radio" [value]="false" formControlName="refresh">
+                                                <span class="font-sm mr-2">Disable</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="d-flex px-2"
+                                *ngIf="detailsForm.get('refresh')?.value && detailsForm.get('refresh_interval_in_sec')">
+                                <select class="form-control form-control-sm" formControlName="refresh_interval_in_sec">
+                                    <option disabled [value]="null">Select Interval</option>
+                                    <option *ngFor="let interval of refreshIntervals" [value]="interval.valueInSecs">
+                                        {{interval.label}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="timeframe" class="col-2 h-form-label px-0">Timeframe:<em>*</em></label>
+                            <div class="col-4 pl-0">
+                                <custom-date-dropdown [options]="timeframeDropdownOptions"
+                                    [customClass]="'form-control-sm'" [default]="defaultTimeFrameSelected"
+                                    (onSubmit)="onTimeFrameChange($event)">
+                                </custom-date-dropdown>
+                                <div class="invalid-feedback text-left" *ngIf="detailsFormErrors.timeframe">
+                                    {{detailsFormErrors.timeframe}}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success ml-3" (click)="onSubmitDetailsForm()">Save & Next</button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #filterFormRef>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <form [formGroup]="filterForm" *ngIf="filterForm">
+                        <div class="form-group row" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials text-center w-60">
+                                {{nonFieldErr}}</div>
+                        </div>
+                        <div class="row form-group d-flex">
+                            <label for="status" class="col-2 h-form-label px-0">Refresh Interval:<em>*</em></label>
+                            <div class="d-flex px-2">
+                                <div class="d-inline-block">
+                                    <ul class="d-flex px-0 mb-0 radio-group">
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="filterForm.get('refresh').value">
+                                                <input type="radio" [value]="true" formControlName="refresh">
+                                                <span class="font-sm mr-2">Enable</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="!filterForm.get('refresh').value">
+                                                <input type="radio" [value]="false" formControlName="refresh">
+                                                <span class="font-sm mr-2">Disable</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="d-flex px-2"
+                                *ngIf="filterForm.get('refresh')?.value && filterForm.get('refresh_interval_in_sec')">
+                                <select class="form-control form-control-sm" formControlName="refresh_interval_in_sec">
+                                    <option disabled [value]="null">Select Interval</option>
+                                    <option *ngFor="let interval of refreshIntervals" [value]="interval.valueInSecs">
+                                        {{interval.label}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="timeframe" class="col-2 h-form-label px-0">Timeframe:<em>*</em></label>
+                            <div class="col-4 pl-0">
+                                <custom-date-dropdown [options]="timeframeDropdownOptions"
+                                    [customClass]="'form-control-sm'" [default]="defaultTimeFrameSelected"
+                                    (onSubmit)="onTimeFrameChange($event)">
+                                </custom-date-dropdown>
+                                <div class="invalid-feedback text-left" *ngIf="filterFormErrors.timeframe">
+                                    {{filterFormErrors.timeframe}}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success ml-3" (click)="onSubmitFilterForm()">Save & Next</button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #widgetFormRef>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <form [formGroup]="widgetForm" *ngIf="widgetForm">
+                        <div class="form-group row" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials text-center w-60">
+                                {{nonFieldErr}}</div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="name" class="col-2 h-form-label px-0">Name<em>* </em>:</label>
+                            <div class="col-4">
+                                <input id="name" class="form-control form-control-sm" type="text" formControlName="name"
+                                    [class.is-invalid]="widgetFormErrors.name">
+                                <div class="invalid-feedback text-left" *ngIf="widgetFormErrors.name">
+                                    {{widgetFormErrors.name}}</div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="status" class="col-2 h-form-label px-0">Status:</label>
+                            <div class="col">
+                                <div class="d-inline-block">
+                                    <ul class="d-flex px-0 mb-0 radio-group">
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="widgetForm.get('status').value == 'draft'">
+                                                <input type="radio" [value]="'draft'" formControlName="status">
+                                                <span class="font-sm mr-2">Draft</span>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="pointer-link"
+                                                [class.active]="widgetForm.get('status').value == 'published'">
+                                                <input type="radio" [value]="'published'" formControlName="status">
+                                                <span class="font-sm mr-2">Publish</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="widget_type" class="col-2 h-form-label px-0">Category:</label>
+                            <div class="col-3">
+                                <select id="widget_type" class="form-control form-control-sm"
+                                    formControlName="widget_type" [class.is-invalid]="widgetFormErrors.widget_type">
+                                    <option disabled value="">Select Category</option>
+                                    <option *ngFor="let c of widgetCategories" [value]="c.value">
+                                        {{c.label}}</option>
+                                </select>
+                                <small class="invalid-feedback"
+                                    *ngIf="widgetFormErrors.widget_type">{{widgetFormErrors.widget_type}}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="row form-group"
+                            *ngIf="widgetForm.get('widget_type')?.value && widgetForm.get('group_by')">
+                            <div class="col-2 text-right align-self-center">Group By<em>* </em>:</div>
+                            <div class="col-3 align-self-center">
+                                <select class="form-control form-control-sm" formControlName="group_by"
+                                    [class.is-invalid]="widgetFormErrors.group_by">
+                                    <option [value]="''" disabled>Select Group</option>
+                                    <option *ngFor="let option of widgetGroupByOptions" [value]="option.value">
+                                        {{option.label}}
+                                    </option>
+                                </select>
+                                <small class="invalid-feedback"
+                                    *ngIf="widgetFormErrors.group_by">{{widgetFormErrors.group_by}}
+                                </small>
+                            </div>
+                            <ng-container *ngIf="showWidgetGroupByFilter">
+                                <div class="text-right align-self-center px-2">Group By Filter<em>* </em>:</div>
+                                <div class="col-3 align-self-center">
+                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                        formControlName="group_by_filter"
+                                        [class.is-invalid]="widgetFormErrors.group_by_filter"
+                                        [options]="widgetGroupByFilterOptions" [settings]="widgetGroupByFilterSettings"
+                                        [texts]="widgetGroupByFilterTexts"></multiselect-dropdown>
+                                    <small class="invalid-feedback"
+                                        *ngIf="widgetFormErrors.group_by_filter">{{widgetFormErrors.group_by_filter}}
+                                    </small>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <ng-container *ngIf="widgetForm.get('filter_by')">
+                            <div class="row form-group">
+                                <label for="filter_by" class="col-2 h-form-label px-0">Value Type<em>* </em>:</label>
+                                <div class="col-8-w px-2 d-flex">
+                                    <div class="d-inline-block">
+                                        <ul class="d-flex px-0 mb-0 radio-group">
+                                            <li>
+                                                <label class="pointer-link px-4"
+                                                    [class.active]="widgetForm.get('filter_by').value=='latest'">
+                                                    <input type="radio" formControlName="filter_by" [value]="'latest'">
+                                                    <span class="font-sm mr-2">Latest</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link px-4"
+                                                    [class.active]="widgetForm.get('filter_by').value=='avg'">
+                                                    <input type="radio" formControlName="filter_by" [value]="'avg'">
+                                                    <span class="font-sm mr-2">Average</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link px-4"
+                                                    [class.active]="widgetForm.get('filter_by').value=='min'">
+                                                    <input type="radio" formControlName="filter_by" [value]="'min'">
+                                                    <span class="font-sm mr-2">Min</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link px-4"
+                                                    [class.active]="widgetForm.get('filter_by').value=='max'">
+                                                    <input type="radio" formControlName="filter_by" [value]="'max'">
+                                                    <span class="font-sm mr-2">Max</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <ng-container *ngIf="widgetForm.get('filter_by')?.value != 'latest'">
+                                        <custom-date-dropdown [options]="customDropdownOptions"
+                                            [enableCustomDateRange]="false" [default]="customDateRangeValue"
+                                            (onSubmit)="onCustomDateSubmit($event)"
+                                            [customClass]="'form-control-sm'"></custom-date-dropdown>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <form *ngIf="metricesMappingForm" [formGroup]="metricesMappingForm">
+                            <div class="row form-group border round-edge px-2 py-4 position-relative mt-4 mx-0"
+                                [ngClass]="{'border-danger': isMetricesMappingInvalid}">
+                                <div class="pb-2 mb-3 bg-white position-absolute section-name">Metrices Mapping</div>
+                                <div class="col-4 pr-1">
+                                    <div class="card round-edge equalize-card">
+                                        <div
+                                            class="card-header bg-white d-flex justify-content-between align-items-center p-2">
+                                            <div class="d-flex align-items-center font-500 w-28 mr-1">
+                                                <span class="badge badge-secondary font-sm">{{deviceCount}}</span>
+                                                <span class="ml-1 font-sm">Devices</span>
+                                            </div>
+                                            <div class="d-flex w-42 mx-1 flex-shrink-1">
+                                                <div class="form-group w-100 mb-0">
+                                                    <search-box customClass="form-control-sm"
+                                                        [searchValue]="metricesMappingForm.get('device_key').value"
+                                                        (searched)="onDeviceSearch($event)"></search-box>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex w-30">
+                                                <div class="form-group mb-0">
+                                                    <select class="form-control form-control-sm w-100"
+                                                        formControlName="device_type">
+                                                        <option [value]="''">Device Type</option>
+                                                        <option *ngFor="let option of deviceTypeList"
+                                                            [value]="option.name">
+                                                            {{option.displayName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0"
+                                            style="max-height: 250px; overflow-y: auto; overflow-x: hidden;"
+                                            [ngStyle]="{ 'height': infiniteDeviceList.length ? '250px' : 'auto' }"
+                                            [ngClass]="{'d-flex flex-column justify-content-center': isDeviceBottomLoader || !infiniteDeviceList.length}">
+                                            <div *ngIf="deviceCount" class="h-100 w-100">
+                                                <virtual-scroller #scroll [items]="infiniteDeviceList"
+                                                    (vsEnd)="fetchMoreDevices($event)" class="h-100 w-100"
+                                                    style="overflow-x: hidden">
+                                                    <div class="row border-bottom py-1 px-2"
+                                                        *ngFor="let m of scroll.viewPortItems; let i = index"
+                                                        (click)="selectDevice(m)" style="cursor: pointer">
+                                                        <div class="col d-flex align-items-center">
+                                                            <span [ngClass]="getDeviceClass(m)"></span>
+                                                            <span class="font-sm ml-1">{{m?.name}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="isDeviceBottomLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        <span>Loading</span>
+                                                        <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                                    </div>
+                                                </virtual-scroller>
+                                            </div>
+                                            <div *ngIf="isDeviceLoader"
+                                                class="d-flex align-items-center justify-content-center py-4">
+                                                <span>Loading</span>
+                                                <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                            </div>
+                                            <div *ngIf="!infiniteDeviceList.length && !isDeviceBottomLoader && !isDeviceLoader"
+                                                class="d-flex align-items-center justify-content-center py-4">
+                                                No Devices available.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col pl-1">
+                                    <div class="row equalize-card">
+                                        <div class="col-6">
+                                            <div class="card round-edge equalize-card">
+                                                <div
+                                                    class="card-header bg-white d-flex justify-content-between align-items-center p-2">
+                                                    <div
+                                                        class="d-flex justify-content-center align-items-center font-500 mr-2">
+                                                        <span
+                                                            class="badge badge-secondary font-sm">{{metricsCount}}</span>
+                                                        <span class="ml-1 font-sm">Metrices</span>
+                                                    </div>
+                                                    <div class="d-flex w-70 flex-shrink-1">
+                                                        <div class="form-group w-100 mb-0">
+                                                            <search-box customClass="form-control-sm"
+                                                                [searchValue]="metricesMappingForm.get('metrices_key').value"
+                                                                (searched)="onMetricesSearch($event)"></search-box>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-0"
+                                                    style="max-height: 250px; overflow-y: auto; overflow-x: hidden;"
+                                                    [ngClass]="{'d-flex flex-column justify-content-center': isMetricesBottomLoader || !infiniteMetricList.length}">
+                                                    <div *ngIf="metricsCount" class="h-100 w-100">
+                                                        <virtual-scroller #scroll [items]="infiniteMetricList"
+                                                            (vsEnd)="fetchMoreMetrics($event)" class="h-100 w-100"
+                                                            style="overflow-x: hidden">
+                                                            <div class="row border-bottom py-1 px-2"
+                                                                *ngFor="let m of scroll.viewPortItems; let i = index"
+                                                                (click)="selectMetricsToBeAdded(m)"
+                                                                style="cursor: pointer">
+                                                                <div class="col d-flex align-items-center">
+                                                                    <span [ngClass]="getMetricClass(m)"></span>
+                                                                    <span class="font-sm ml-1">{{m?.item_name}}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div *ngIf="isMetricesBottomLoader"
+                                                                class="d-flex align-items-center justify-content-center py-4">
+                                                                <span>Loading</span>
+                                                                <span
+                                                                    class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                                            </div>
+                                                        </virtual-scroller>
+                                                    </div>
+                                                    <div *ngIf="isMetricLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        <span>Loading</span>
+                                                        <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                                    </div>
+                                                    <div *ngIf="!infiniteMetricList.length && !isMetricesBottomLoader && !isMetricLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        No Metrices available.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-1 d-flex flex-column justify-content-center">
+                                            <div class="align-content-center align-items-center d-flex flex-column">
+                                                <span *ngIf="metricesToBeAdded.length"
+                                                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{metricesToBeAdded.length}}</span>
+                                                <span class="fas fa-arrow-right font-lg p-2 pointer-link"
+                                                    [ngClass]="metricesToBeAdded.length ? 'text-primary-500' : 'text-muted'"
+                                                    (click)="addMetrices()" tooltip="Add"></span>
+                                            </div>
+                                            <div class="align-content-center align-items-center d-flex flex-column">
+                                                <span class="fas fa-arrow-left font-lg p-2 pointer-link"
+                                                    [ngClass]="metricesToBeRemoved.length ? 'text-primary-500' : 'text-muted'"
+                                                    (click)="removeMetrices()" tooltip="Remove"></span>
+                                                <span *ngIf="metricesToBeRemoved.length"
+                                                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{metricesToBeRemoved.length}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-5">
+                                            <div class="card round-edge equalize-card">
+                                                <div
+                                                    class="card-header bg-white d-flex justify-content-between align-items-center p-2">
+                                                    <div
+                                                        class="d-flex justify-content-center align-items-center font-500 mr-2">
+                                                        <span
+                                                            class="badge badge-secondary font-sm">{{selectedMetricesList?.length}}</span>
+                                                        <span class="ml-1 font-sm">Selected</span>
+                                                    </div>
+                                                    <div class="d-flex w-70 flex-shrink-1">
+                                                        <div class="form-group w-100 mb-0">
+                                                            <!-- <search-box customClass="form-control-sm"
+                                                                [searchValue]="metricesMappingForm.get('selected_metrices_key').value"
+                                                                (searched)="onSelectedMetricesSearch($event)"></search-box> -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-0"
+                                                    [ngClass]="{'d-flex flex-column justify-content-center': !selectedMetricesList?.length}"
+                                                    style="max-height: 250px; overflow-y: auto; overflow-x: hidden;">
+                                                    <div *ngFor="let device of selectedMetricesList; let i = index;"
+                                                        class="row border-bottom mx-0 pt-1" style="cursor: pointer">
+                                                        <div class="col-12 d-flex align-items-center pb-1"
+                                                            (click)="selectAllMetricesUnderDevice(i)">
+                                                            <span [ngClass]="getSelectedDevice(i)"></span>
+                                                            <div class="ml-1">{{device.name}}</div>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div *ngFor="let metric of selectedMetricesList[i].items; let j = index;"
+                                                                class="row py-1" [ngClass]="{'border-top': j == 0}"
+                                                                (click)="selectMetricsToBeRemoved(i, j)"
+                                                                style="cursor: pointer">
+                                                                <div class="pl-4 col-12 d-flex align-items-center">
+                                                                    <span
+                                                                        [ngClass]="getSelectedMetricClass(i, j)"></span>
+                                                                    <div class="ml-1">{{metric.item_name}}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="!selectedMetricesList?.length"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        No Metrices are selected.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="isMetricesMappingInvalid" class="text-danger font-sm-xs mt-1 ml-3">Selection of
+                                metrices is mandatory.
+                            </div>
+                        </form>
+                        <!-- <adc-preview></adc-preview> -->
+                    </form>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center pt-4">
+                <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                <button class="btn btn-md btn-outline-warning ml-3" (click)="resetWidgetForm()">Reset</button>
+                <button class="btn btn-success ml-3" (click)="onSubmitWidgetForm()">Save</button>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmWidgetDeleteRef>
+    <div class="card round-edge mb-0">
+        <div class="card-body text-center pb-2">
+            <div>Are you sure you want to Delete ?</div>
+        </div>
+        <div class="card-footer bg-white d-flex justify-content-center border-top-0">
+            <button class="btn btn-sm btn-pill btn-warning mr-2" type="button"
+                (click)="confirmWidgetDelete()">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning" type="button"
+                (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

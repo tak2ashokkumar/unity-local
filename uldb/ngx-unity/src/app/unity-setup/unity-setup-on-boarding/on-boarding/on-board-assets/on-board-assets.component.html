@@ -1,0 +1,26 @@
+<div class="onb-wrap mb-2">
+  <div class="onb-links">
+    <button class="btn" [ngClass]="viewData.excelBtnClass" type="button" (click)="onBoardAsset()"><i class="fas fa-cloud-upload-alt"></i></button>
+  </div>
+</div>
+
+<ng-template #template>
+  <div class="card mb-0 border-0">
+    <div class="card-header">
+      <span class="h6">Devices OnBoarding</span>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="templateModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <div>
+        <devices-boarding (emitToParent)="emitEvent()"></devices-boarding>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" type="button" (click)="templateModalRef.hide()">Close</button>
+    </div>
+  </div>
+</ng-template>

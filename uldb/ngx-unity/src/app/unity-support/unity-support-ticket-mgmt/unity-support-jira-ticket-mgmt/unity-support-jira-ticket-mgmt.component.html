@@ -1,0 +1,25 @@
+<scrollable-tab [selector]="'active'">
+    <div class="nav-item border-right border-light" #scrollLeft>
+        <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-left"></i></a>
+    </div>
+    <ul class="nav nav-tabs nav-tabs custom-nav-container border-bottom-0" #tabContent role="tablist">
+        <li class="nav-item bg-secondary rounded-top" *ngFor="let tab of projects">
+            <a class="nav-link" [ngClass]="isActive(tab)" (click)="goTo(tab)">{{tab.project_name}}</a>
+        </li>
+    </ul>
+    <div class="nav-item border-left border-light" #scrollRight>
+        <a class="nav-link bg-secondary rounded-top border-bottom-0"><i class="fa fa-angle-right"></i></a>
+    </div>
+</scrollable-tab>
+<div class="tab-content">
+    <div class="tab-pane active pt-2">
+        <ng-container *ngIf="projects.length">
+            <router-outlet></router-outlet>
+        </ng-container>
+        <ng-container *ngIf="!projects.length">
+            <div class="d-flex justify-content-center align-items-center h-100 w-100" style="min-height: 200px;">
+                No Projects available in this JIRA Instance.
+            </div>
+        </ng-container>
+    </div>
+</div>

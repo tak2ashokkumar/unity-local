@@ -1,0 +1,68 @@
+<!-- System view -->
+
+<div class="row">
+  <div class="col-sm-8">
+    <h3>VIRTUAL DATA CENTERS</h3>
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+  <div class="col-sm-4">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-6">
+          <listviewsearch ng-model="searchKeyword"></listviewsearch>	  
+        </div>
+	<div class="col-xs-2">
+          <button type="button" class="btn btn-success" title="Delete" ng-click="AddVDC()" style="font-size: 13px;">Add</button>	  	  
+        </div>
+	<div class="col-xs-2">
+	  <button type="button" class="btn btn-danger delete_rows" title="Delete" ng-click="DeleteVDC('md')" style="font-size: 13px;">Delete</button>
+	</div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="alert alert-info" role="alert" ng-if="message" ng-click="closeAlert()">{{alertMsg}}</div>
+
+<table class="display" cellspacing="0" width="100%"> 
+	<tr> 
+	   <td>
+		
+<table class="table table-striped tableheader tabborder">
+  <thead>
+  <tr width="100%" align="center">
+    <th width="1%"><span><input type="checkbox" ng-click="selectAllRows($event)" ng-model="allSystems" /></span></th>
+    
+    <th class="col-md-2">Cloud Name</th>
+    <th class="col-md-2">Cloud Type</th>
+    <th class="col-md-2">Allocated</th>
+    <th class="col-md-2">Customer</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="vdc in model.results | filter: searchKeyword" width="100%">
+    <td><input type="checkbox" class="action-select" ng-model="sys.checked" ng-click="selectCurrentRow($event)" 				checked="{{syschk}}" value="{{vdc.url}}" data="{{ vdc.name }}" width="1%"/></td>  
+   
+    <th class="col-md-2 systemedit bolder"><a href="" class="serversysname" ng-click="ShowVDCDetails(vdc.id)">{{ vdc.name }}</a>
+	<div class="edit_system" value="{{vdc.url}}" ng-click="EditVDC(vdc)"title="VDC Edit"/></div>
+   </th>    
+    <td class="col-md-2">
+	<div ng-if="vdc.cloud_type != null">{{ vdc.cloud_type }}</div>
+    </td>
+    <td class="col-md-2">{{ vdc.is_allocated }} </td>
+    <td class="col-md-2"><a ng-click="ShowCustomerDetails(vdc.customer_id)" class="server_customer">{{ vdc.customer }}</a></td>
+  </tr>
+  </tbody>
+</table>
+</td>
+
+</tr>
+</table>
+
+<pagination total-items="model.count" ng-model="model.currentPage" max-size="5" rotate="false" ng-change="pageChanged()"></pagination>
+

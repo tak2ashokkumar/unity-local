@@ -1,0 +1,116 @@
+<app-header [fixed]="true" [navbarBrandFull]="{src: unityLogo, alt: 'UL Logo'}" [navbarBrandMinimized]="{src: unityLogo, alt: 'UL Logo'}"
+    [sidebarToggler]="'lg'" [asideMenuToggler]="'lg'">
+    <!-- <ul class="nav navbar-nav d-md-down-none">
+    <li class="nav-item px-3">
+      <a class="nav-link" href="#">Dashboard</a>
+    </li>
+    <li class="nav-item px-3">
+      <a class="nav-link" href="#">Users</a>
+    </li>
+    <li class="nav-item px-3">
+      <a class="nav-link" href="#">Settings</a>
+    </li>
+  </ul> -->
+    <app-breadcrumb></app-breadcrumb>
+    <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+            <a class="nav-link reset-cursor">
+                <span class="text-primary">{{user.userOrg}}</span>
+            </a>
+        </li>
+        <li class="nav-item d-md-down-none">
+            <button class="action-icons reset-action-icon mb-0 fa fa-envelope font-sm ml-1" (click)="reportAnIssue()"
+                tooltip="Report an Issue" placement="left" container="body"></button>
+        </li>
+        <li class="nav-item d-md-down-none" *ngIf="user.inventoryViewEnabled">
+            <button class="action-icons reset-action-icon mb-0 fas fa-search font-sm ml-1" (click)="search()" tooltip="Search"
+                placement="left" container="body"></button>
+        </li>
+        <li class="nav-item dropdown" dropdown placement="bottom right">
+            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"
+                (click)="false">
+                <!-- <i class="icon-bell"></i> -->
+                <i class="far fa-bell"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg" *dropdownMenu aria-labelledby="simple-dropdown">
+                <div class="dropdown-header text-center">
+                    <strong>You have 4 messages</strong>
+                </div>
+                <a class="dropdown-item" href="#">
+                    <div class="message">
+                        <div class="py-3 mr-3 float-left">
+                            <div class="avatar">
+                                <img class="img-avatar" src="{{assetsUrl}}avatars/default_user.jpg" alt="admin@bootstrapmaster.com">
+                                <span class="avatar-status badge-success"></span>
+                            </div>
+                        </div>
+                        <div>
+                            <small class="text-muted">John Doe</small>
+                            <small class="text-muted float-right mt-1">Just now</small>
+                        </div>
+                        <div class="text-truncate font-weight-bold">
+                            <span class="fa fa-exclamation text-danger"></span> Important message</div>
+                        <div class="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing
+                            elit, sed do
+                            eiusmod tempor incididunt...</div>
+                    </div>
+                </a>
+                <a class="dropdown-item text-center" href="#">
+                    <strong>View all messages</strong>
+                </a>
+            </div>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link reset-cursor">
+                <span class="text-muted">GMT{{user.userTimeZone}}</span>
+            </a>
+        </li>
+        <li class="nav-item dropdown" dropdown placement="bottom right">
+            <a class="nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+                dropdownToggle (click)="false">
+                <span>&nbsp;&nbsp;{{user.userName}}</span>
+                <img src="{{assetsUrl}}avatars/default_user.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" />
+                <span class="badge-pill badge-danger impersonated-icon" *ngIf="user.isImpersonated"><i class="fa fa-info"></i></span>
+                <span class="fa fa-angle-down">&nbsp;</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+                <div class="dropdown-header text-center"><strong>Account</strong></div>
+                <a class="dropdown-item" routerLink="/welcomepage"><i class="far fa-newspaper"></i> Welcome Page</a>
+                <a class="dropdown-item" routerLink="/settings/profile"><i class="fa fa-user"></i>Profile Settings</a>
+                <a class="dropdown-item" (click)="logout()" *ngIf="!user.isImpersonated"><i class="fa fa-lock"></i>
+                    Logout</a>
+                <a class="dropdown-item text-danger" (click)="stopImpersonating()" *ngIf="user.isImpersonated"><i class="fa fa-lock"></i>
+                    Stop Impersonating</a>
+                <a class="dropdown-item text-danger" (click)="mapService.toggleWorldMap()" *ngIf="user.isUserAdmin && mapService.showToggle()">
+                    <i class="fas fa-map-marked-alt"></i>{{mapService.action}}</a>
+            </div>
+        </li>
+    </ul>
+</app-header>
+<div class="app-body">
+    <app-sidebar [fixed]="true" [display]="'lg'" *ngIf="navItems.length">
+        <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="sidebarMinimized">
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:void(0);" (click)="reportAnIssue()">
+                    <i class="nav-icon fa fa-envelope"></i>
+                    Report an Issue</a>
+            </li>
+        </app-sidebar-nav>
+        <app-sidebar-minimizer></app-sidebar-minimizer>
+    </app-sidebar>
+    <app-notification></app-notification>
+    <create-ticket></create-ticket>
+    <shared-create-ticket></shared-create-ticket>
+    <report-an-issue></report-an-issue>
+    <self-help-popup></self-help-popup>
+    <app-search></app-search>
+    <main class="main">
+        <app-spinner [name]="'main'" [width]="mainWidth"></app-spinner>
+        <unity-chatbot [moduleLevelData]="chatbotData"></unity-chatbot>
+        <div [style.margin-bottom]="contentHeight">
+            <router-outlet></router-outlet>
+        </div>
+        <check-auth></check-auth>
+        <floating-terminal></floating-terminal>
+    </main>
+</div>

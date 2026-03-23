@@ -1,0 +1,70 @@
+<div class="row" style="min-height: 350px;">
+    <div class="col-12">
+        <div class="card rounded-0 border-top-0">
+            <div class="card-header bg-transparent border-bottom-0 d-flex justify-content-between">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-lg">{{count}}</span>
+                    <span class="ml-1">Cluster Peers</span>
+                </div>
+                <div class="align-items-center w-50">
+                    <div class="w-20 pull-right" *ngIf="viewData.length">
+                        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                    <div class="w-40 pull-right">
+                        <table-search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body py-0">
+                <div class="table-responsive">
+                    <table class="table text-left mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>State</th>
+                                <th>Encryption State</th>
+                                <th>Authentication State</th>
+                                <th>Remote IP Addresses</th>
+                                <th>Authentication In Use</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of viewData" setTableColumnWidth>
+                                <td>{{view.name}}</td>
+                                <td>{{view.state}}</td>
+                                <td>{{view.encryptionState}}</td>
+                                <td>{{view.authenticationState}}</td>
+                                <td>
+                                    <span>{{view.remoteIpAddress}}</span>
+                                    <span *ngIf="view.ipAddressesBadgeCount"
+                                        class="badge bg-secondary group-count rounded-3 w-auto ml-1"
+                                        [popover]="popTemplate" container="body" (click)="showIpAddresses(view)"
+                                        [outsideClick]="true">+{{view.ipAddressesBadgeCount}}</span>
+                                </td>
+                                <td>{{view.authenticationInUse}}</td>
+                                <td class="action-icons-column text-center">
+                                    <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                        tooltip="Manage by creating support ticket"
+                                        (click)="createTicket(view)"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No cluster peers available.</div>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #popTemplate>
+    <div *ngFor="let name of popOverList">{{name}}</div>
+</ng-template>

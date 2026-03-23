@@ -1,0 +1,775 @@
+<ng-container *ngIf="activeTabId">
+    <ng-container [ngSwitch]="activeTabId">
+        <ng-container *ngSwitchCase="'ip_address'">
+            <ng-container *ngTemplateOutlet="ipAddressFormRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'mac_address'">
+            <ng-container *ngTemplateOutlet="macDetailsRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'cpu_processor'">
+            <ng-container *ngTemplateOutlet="processorDetailsRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'interface'">
+            <ng-container *ngTemplateOutlet="interfaceDetailsRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'product'">
+            <ng-container *ngTemplateOutlet="productDetailsRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'file_system'">
+            <ng-container *ngTemplateOutlet="fileDetailsRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'os'">
+            <ng-container *ngTemplateOutlet="osFormRef"></ng-container>
+        </ng-container>
+        <ng-container *ngSwitchCase="'software_server'">
+            <ng-container *ngTemplateOutlet="serverDetailsRef"></ng-container>
+        </ng-container>
+    </ng-container>
+</ng-container>
+
+<!-- <div class="d-flex align-items-start">
+    <button *ngIf="showScrollButtons" class="btn btn-sm btn-secondary py-2" (click)="scrollTabs('left')">&lt;</button>
+
+    <div #tabHeaderContainer class="flex-grow-1 overflow-hidden">
+        <div class="tab-scroll-wrapper d-flex" style="overflow-x: auto; white-space: nowrap; scrollbar-width: none;">
+            <style>
+                .tab-scroll-wrapper::-webkit-scrollbar {
+                    display: none;
+                }
+            </style>
+            <tabset ariaLabel="customTabs" id="tabset-container">
+                <ng-container>
+                    <tab id="ip_address" heading="Ip Address" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="ipAddressFormRef"></ng-container>
+                    </tab>
+                </ng-container>
+                <ng-container>
+                    <tab id="mac_address" heading="MAC Address" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="macDetailsRef"></ng-container>
+                    </tab>
+                </ng-container>
+                <ng-container>
+                    <tab id="cpu_processor" heading="CPU Processor" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="processorDetailsRef"></ng-container>
+                    </tab>
+                </ng-container>
+                <ng-container>
+                    <tab id="interface" heading="Interface" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="interfaceDetailsRef"></ng-container>
+                    </tab>
+                </ng-container>
+                <ng-container>
+                    <tab id="product" heading="Product" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="productDetailsRef"></ng-container>
+                    </tab>
+                </ng-container>
+                <ng-container>
+                    <tab id="file_system" heading="File System" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="fileDetailsRef"></ng-container>
+                    </tab>
+                </ng-container>
+                <ng-container>
+                    <tab id="os" heading="Operating System" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="osFormRef"></ng-container>
+                    </tab>
+                </ng-container>
+                <ng-container>
+                    <tab id="software_server" heading="Software Server" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngTemplateOutlet="serverDetailsRef"></ng-container>
+                    </tab>
+                </ng-container>
+
+               
+            </tabset>
+        </div>
+    </div>
+    <button *ngIf="showScrollButtons" class="btn btn-sm btn-secondary py-2" (click)="scrollTabs('right')">&gt;</button>
+
+</div> -->
+
+<ng-template #ipAddressFormRef>
+    <div class="row">
+        <div class="col-12">
+            <form *ngIf="ipAddressForm" [formGroup]="ipAddressForm">
+                <div class="card mb-0 border-0 rounded-0">
+                    <app-spinner [name]="'ipaddressSpinner'"></app-spinner>
+                    <div class="card-body">
+                        <div class="row text-right">
+                            <div class="col-6">
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Name</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="name">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Address</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="address">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Protocol Type</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="protocolType">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Category</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="category">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Item</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="item">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row mb-1">
+                                    <label class="col-3 col-form-label">Management Address</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="managementAddress">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Short Description</label>
+                                    <div class="col-9">
+                                        <textarea class="form-control static" rows="4"
+                                            formControlName="shortDescription"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- RIGHT COLUMN -->
+                            <div class="col-6">
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">DNS Host Name</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="dnsHostName">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Address Type</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="addressType">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Subnet Mask</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="subnetMask">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Type</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="type">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Name Format</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="nameFormat">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Company</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="company">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row pt-2">
+                                    <label class="col-3 col-form-label">Description</label>
+                                    <div class="col-9">
+                                        <textarea class="form-control static" rows="4"
+                                            formControlName="description"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #macDetailsRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <app-spinner [name]="'macAddressSpinner'"></app-spinner>
+        <div class="card-header bg-transparent p-0">
+            <div class="row">
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left mb-0" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>MAC Address</th>
+                                    <th>Protocol Type</th>
+                                    <th>Address</th>
+                                    <th>Name Format</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Item</th>
+                                    <th>Company</th>
+                                    <th>Last Scan Date</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="let view of macViewData; let i = index">
+                                    <td>{{ view.name }}</td>
+                                    <td>{{ view.macAddress }}</td>
+                                    <td>{{ view.protocolType }}</td>
+                                    <td>{{ view.address }}</td>
+                                    <td>{{ view.nameFormat }}</td>
+                                    <td>{{ view.category }}</td>
+                                    <td>{{ view.type }}</td>
+                                    <td>{{ view.item }}</td>
+                                    <td>{{ view.company }}</td>
+                                    <td>{{ view.lastScanDate }}</td>
+                                    <td>{{ view.description }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="macAddressCount">
+                        </table-entries>
+
+                        <table-pager *ngIf="macAddressCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="macAddressCount"
+                            (pageChange)="pageChange($event)">
+                        </table-pager>
+
+                        <div class="text-center text-muted py-4" *ngIf="!macViewData?.length">
+                            No MAC addresses found.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #interfaceDetailsRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-header bg-transparent p-0">
+            <app-spinner [name]="'interfaceSpinner'"></app-spinner>
+            <div class="row">
+                <!-- <div class="col-1 pl-2 mt-1">
+                    <div class="d-flex justify-content-start align-items-center font-500 pl-1">
+                        <span class="badge badge-secondary font-sm">{{deviceEventsCount}}</span>
+                        <span class="ml-1 font-lg">Events</span>
+                    </div>
+                </div> -->
+                <!-- <div class="col-3 pr-0">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div> -->
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left mb-0" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Manufacturer</th>
+                                    <th>Network Address</th>
+                                    <th>Perimeter Address</th>
+                                    <th>VRF Type</th>
+                                    <th>Speed</th>
+                                    <th>Congestion</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Item</th>
+                                    <th>Last Scan Date</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="let view of interfaceViewData; let i = index">
+                                    <td>{{ view.name }}</td>
+                                    <td>{{ view.manufacturerName }}</td>
+                                    <td>{{ view.networkAddress }}</td>
+                                    <td>{{ view.perimeterAddress }}</td>
+                                    <td>{{ view.vrfType }}</td>
+                                    <td>{{ view.speed }}</td>
+                                    <td>{{ view.congestion }}</td>
+                                    <td>{{ view.category }}</td>
+                                    <td>{{ view.type }}</td>
+                                    <td>{{ view.item }}</td>
+                                    <td>{{ view.lastScanDate }}</td>
+                                    <td>{{ view.description }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="interfaceCount">
+                        </table-entries>
+                        <table-pager *ngIf="interfaceCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="interfaceCount"
+                            (pageChange)="pageChange($event)">
+                        </table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!interfaceViewData?.length">
+                            No interfaces found.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #osFormRef>
+    <div class="row">
+        <div class="col-12">
+            <form *ngIf="operatingSystemForm" [formGroup]="operatingSystemForm">
+                <div class="card">
+                    <app-spinner [name]="'OsSpinner'"></app-spinner>
+                    <div class="card-body">
+                        <div class="row text-right">
+                            <div class="col-6">
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Name</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="name">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">OS Type</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="osType">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Manufacturer</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="manufacturerName">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Model</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="model">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Version</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="versionNumber">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Build Number</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="buildNumber">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Service Pack</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="servicePack">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">End Of Life</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="endOfLife" readonly
+                                            formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">End Of Support</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="endOfSupport" readonly
+                                            formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Short Description</label>
+                                    <div class="col-9">
+                                        <textarea class="form-control static" rows="3"
+                                            formControlName="shortDescription"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Description</label>
+                                    <div class="col-9">
+                                        <textarea class="form-control static" rows="3"
+                                            formControlName="description"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- RIGHT COLUMN -->
+                            <div class="col-6">
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Category</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="category">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Type</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="type">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Item</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="item">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Token ID</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="tokenId">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Name Format</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="nameFormat">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Market Version</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="marketVersion">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">License Type</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="licenseType">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">Company</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="company">
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">End Of Security Support</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="endOfSecuritySupport"
+                                            readonly formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-3 col-form-label">End Of Extended Support</label>
+                                    <div class="col-9">
+                                        <input class="form-control" type="text" formControlName="endOfExtendedSupport"
+                                            readonly formControlNameDateFormatter>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #processorDetailsRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'processorSpinner'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left mb-0" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Model</th>
+                                    <th>Manufacturer</th>
+                                    <th>Cores</th>
+                                    <th>Logical CPUs</th>
+                                    <th>Clock Speed</th>
+                                    <th>Architecture</th>
+                                    <th>Status</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="let view of processorViewData">
+                                    <td>{{ view.name }}</td>
+                                    <td>{{ view.model }}</td>
+                                    <td>{{ view.manufacturerName }}</td>
+                                    <td>{{ view.numberOfCores }}</td>
+                                    <td>{{ view.numberOfLogicalProcessors }}</td>
+                                    <td>{{ view.maxClockSpeed }}</td>
+                                    <td>{{ view.processorArchitecture }}</td>
+                                    <td>{{ view.processorStatus }}</td>
+                                    <td>{{ view.category }}</td>
+                                    <td>{{ view.type }}</td>
+                                    <td>{{ view.description }}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="processorCount">
+                        </table-entries>
+
+                        <table-pager *ngIf="processorCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="processorCount"
+                            (pageChange)="pageChange($event)">
+                        </table-pager>
+
+                        <div class="text-center text-muted py-4" *ngIf="!processorViewData?.length">
+                            No processors found.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #productDetailsRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <app-spinner [name]="'productSpinner'"></app-spinner>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left mb-0" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Manufacturer</th>
+                                    <th>Model</th>
+                                    <th>Version</th>
+                                    <th>Market Version</th>
+                                    <th>License</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="let view of productViewData">
+                                    <td>{{ view.name }}</td>
+                                    <td>{{ view.manufacturerName }}</td>
+                                    <td>{{ view.model }}</td>
+                                    <td>{{ view.versionNumber }}</td>
+                                    <td>{{ view.marketVersion }}</td>
+                                    <td>{{ view.licenseType }}</td>
+                                    <td>{{ view.category }}</td>
+                                    <td>{{ view.type }}</td>
+                                    <td>{{ view.description }}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="productCount">
+                        </table-entries>
+
+                        <table-pager *ngIf="productCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="productCount"
+                            (pageChange)="pageChange($event)">
+                        </table-pager>
+
+                        <div class="text-center text-muted py-4" *ngIf="!productViewData?.length">
+                            No products found.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #fileDetailsRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <app-spinner [name]="'fileSystemSpinner'"></app-spinner>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left mb-0" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>File System</th>
+                                    <th>Total Size</th>
+                                    <th>Available</th>
+                                    <th>Block Size</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="let view of fileViewData">
+                                    <td>{{ view.name }}</td>
+                                    <td>{{ view.fileSystemType }}</td>
+                                    <td>{{ view.fileSystemSize }}</td>
+                                    <td>{{ view.availableSpace }}</td>
+                                    <td>{{ view.blockSize }}</td>
+                                    <td>{{ view.category }}</td>
+                                    <td>{{ view.type }}</td>
+                                    <td>{{ view.description }}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="fileDetailsCount">
+                        </table-entries>
+
+                        <table-pager *ngIf="fileDetailsCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="fileDetailsCount"
+                            (pageChange)="pageChange($event)">
+                        </table-pager>
+
+                        <div class="text-center text-muted py-4" *ngIf="!fileViewData?.length">
+                            No file systems found.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #serverDetailsRef>
+    <div class="card mb-0 border-0 rounded-0">
+        <app-spinner [name]="'serverSpinner'"></app-spinner>
+        <div class="card-body p-0">
+            <div class="card mb-0 border-0 rounded-0">
+                <div class="card-body p-0 border-0">
+                    <div class="table-responsive-no-truncate">
+                        <table class="table table-sm text-left mb-0" tableStickyScroll>
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Server Type</th>
+                                    <th>Manufacturer</th>
+                                    <th>Model</th>
+                                    <th>Version</th>
+                                    <th>Market Version</th>
+                                    <th>Category</th>
+                                    <th>Support Ends</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr *ngFor="let view of serverViewData">
+                                    <td>{{ view.name }}</td>
+                                    <td>{{ view.softwareServerType }}</td>
+                                    <td>{{ view.manufacturerName }}</td>
+                                    <td>{{ view.model }}</td>
+                                    <td>{{ view.versionNumber }}</td>
+                                    <td>{{ view.marketVersion }}</td>
+                                    <td>{{ view.category }}</td>
+                                    <td>{{ view.endOfSupport }}</td>
+                                    <td>{{ view.description }}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="serverDetailsCount">
+                        </table-entries>
+
+                        <table-pager *ngIf="serverDetailsCount" [pageNo]="currentCriteria.pageNo"
+                            [pageSize]="currentCriteria.pageSize" [totalCount]="serverDetailsCount"
+                            (pageChange)="pageChange($event)">
+                        </table-pager>
+
+                        <div class="text-center text-muted py-4" *ngIf="!serverViewData?.length">
+                            No servers found.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

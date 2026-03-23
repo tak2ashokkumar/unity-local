@@ -1,0 +1,46 @@
+.fw-medium {
+    font-weight: 500;
+}
+
+.severity-low {
+    background-color: #e6fcf5;
+    color: #087f5b;
+}
+
+.severity-medium {
+    background-color: #fff3bf;
+    color: #f08c00;
+}
+
+.severity-high {
+    background-color: #ffe3e3;
+    color: #d6336c;
+}
+
+.severity-critical {
+    background-color: #f03e3e;
+    color: #fff;
+}
+
+.more-popup {
+    position: absolute;
+    bottom: 100%;
+    transform: translateY(-8px);
+    background: #fff;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 260px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.badge.bg-light {
+    background-color: #eef1f4 !important;
+    font-weight: 500;
+}

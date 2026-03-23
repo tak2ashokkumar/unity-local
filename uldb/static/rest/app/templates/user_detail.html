@@ -1,0 +1,345 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h3>{{ result.email }}</h3>
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<div class="row">
+  <div class="col-sm-6 col-md-6 col-lg-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        User Details
+      </div>
+      <div class="panel-body">
+        <table class="table table-condensed">
+          <thead>
+          <tr>
+            <td><b> UUID </b></td>
+            <td> {{ result.uuid }} </td>
+          </tr>
+          <tr>
+            <td><b>First Name </b></td>
+            <td> {{ result.first_name }} </td>
+          </tr>
+          <tr>
+            <td><b>Last Name </b></td>
+            <td> {{ result.last_name }} </td>
+          </tr>
+          <tr>
+            <td><b>Active </b></td>
+            <td> {{ result.is_active }} </td>
+          </tr>
+          <tr>
+            <td><b>Organization </b></td>
+            <td> {{ result.org.name }} </td>
+          </tr>
+          <tr>
+            <td><b>Salesforce ID </b></td>
+            <td> {{ result.salesforce_id }} </td>
+          </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="changeDetails()">Change Details</button>
+        <button class="btn btn-primary" ng-click="attemptSalesforceLink()">Link Salesforce</button>
+      </div>
+    </div>
+
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Roles and Groups
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Roles</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="role in result.roles">
+            <td>{{ role.name }}</td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Groups</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="group in result.groups">
+            <td>{{ group.name }}</td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="changeAccess()">Change Roles and Groups</button>
+      </div>
+    </div>
+
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Access Types
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Access Type</th>
+            <th>Description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="access_type in result.access_types">
+            <th>{{ access_type.name }}</th>
+            <td>{{ access_type.description }}</td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-primary" ng-click="changeAccess()">Change Access</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <panelhalf heading="Invitation Status" ng-cloak>
+      <table class="table">
+        <thead>
+        <tr>
+          <td>Invitation Sent</td>
+          <td>{{ result.invitations.length > 0 ? 'Yes': 'No'}}</td>
+        </tr>
+        <tr>
+          <td>Last Invitation</td>
+          <td>{{ getLastInvite()['created_date'] | date : 'medium' }}</td>
+        </tr>
+        <tr>
+          <td>Pending Acceptance</td>
+          <td>{{ checkPending() ? 'Yes' : 'No' }}</td>
+        </tr>
+        <tr>
+          <td>Send Email Invitation</td>
+          <td>
+            <button class="btn btn-success" ng-click="sendEmailInvitation(result)">Invite</button>
+          </td>
+        </tr>
+        </thead>
+      </table>
+    </panelhalf>
+
+    <panelhalf heading="All Invitations">
+      <table class="table">
+        <thead>
+        <tr>
+          <th>Invitation Date</th>
+          <th>Pending</th>
+          <th>Cancel</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="invite in result.invitations">
+          <td>{{ invite.created_at | date : 'medium' }}</td>
+          <td>{{ invite.pending }}</td>
+          <td>
+            <button class="btn btn-warning" ng-click="rescindInvitation(invite)">Rescind</button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+  </div>
+</div>
+
+<h4>Audit Information</h4>
+<div class="row">
+  <div class="col-xs-12">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        Logins
+      </div>
+      <div class="panel-body">
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="col-xs-3">Last Activity</th>
+            <th class="col-xs-3">Expire Date</th>
+            <th class="col-xs-2">IP</th>
+            <th class="col-xs-4">User Agent</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="entry in audit_data">
+            <td>{{ entry.last_activity | date:'MMMM d, y h:mm:ss a' }}</td>
+            <td>{{ entry.expire_date | date:'MMMM d, y h:mm:ss a' }}</td>
+            <td>{{ entry.ip }}</td>
+            <td>{{ entry.user_agent }}</td>
+          </tr>
+          <tr ng-if="audit_data.length == 0">
+            <td>No audit data for user. User has never logged in.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h4>Advanced Options</h4>
+
+<div class="row">
+  <div class="col-xs-12">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        Disable User
+      </div>
+      <div class="panel-body">
+        <p>Disabling a user prevents portal and API access. The user session is immediately destroyed.
+          The user remains assigned to any previously assigned objects.</p>
+
+        <p>If the user was disabled before, this section allows you to enable the user.</p>
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-danger" ng-click="disableUser()" confirm>Disable User</button>
+        <button class="btn btn-info" ng-if="!result.is_active" ng-click="enableUser()" confirm>Enable User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-12">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <strong>Delete</strong> User
+      </div>
+      <div class="panel-body">
+        Deleting a user removes the user entirely from the database.
+        <strong>All</strong> audit information is effectively destroyed and cannot be recovered
+        unless you have made a backup.
+      </div>
+      <div class="panel-footer">
+        <button class="btn btn-danger" ng-click="deleteUser(result)" confirm>Delete User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="userDetails.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Edit Details for <span class="text-default">{{ obj.email }}</span>
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          First Name
+        </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.first_name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Last Name
+        </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.last_name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Email
+        </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Organization
+        </label>
+        <div class="col-sm-10">
+          <input type="text"
+                 class="form-control"
+                 ng-model="obj.org"
+                 placeholder=""
+                 uib-typeahead="org as org.name for org in getOrgs($viewValue)"
+                 typeahead-select-on-blur="true">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Salesforce ID
+        </label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.salesforce_id">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="update(obj)">
+      Save changes!
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="userAccessControl.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Edit Access for <span class="text-warning">{{ obj.email }}</span>
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+
+      <div class="form-group">
+
+        <label class="col-sm-2 control-label">
+          Access Types
+        </label>
+        <div class="col-sm-10">
+          <select multiple class="form-control"
+                  ng-model="obj.access_types"
+                  ng-options="a as a.name for a in accessTypes track by a.id">
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="update(obj)">
+      Save changes!
+    </button>
+  </div>
+</script>

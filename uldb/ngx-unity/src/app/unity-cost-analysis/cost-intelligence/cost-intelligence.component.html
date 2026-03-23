@@ -1,0 +1,648 @@
+<!-- <app-main-tab [tabItems]="tabItems"></app-main-tab>
+<div class="container-fluid px-2">
+  <div class="animated fadeIn">
+    <router-outlet></router-outlet>
+  </div>
+</div> -->
+
+<div class="card-header bg-white border-bottom-0 py-2 d-flex justify-content-between align-items-center">
+  <ul class="nav nav-tabs tabs-level1 custom-nav-container">
+    <li class="nav-item rounded-top tabs-level1-item">
+      <a class="nav-link tabs-level1-link border-0 text-success">InfraSpend 360</a>
+    </li>
+  </ul>
+  <div class="d-flex align-items-center" *ngIf="dateDropdownOptions">
+    <custom-date-dropdown [options]="dateDropdownOptions.options" [customClass]="'form-control-sm'"
+      [default]="dateDropdownOptions.defaultSelected" (onSubmit)="onFilterChange($event)">
+    </custom-date-dropdown>
+    <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+  </div>
+</div>
+
+<div>
+  <div class="row mx-0 mt-2">
+    <ng-container *ngTemplateOutlet="summaryRef"></ng-container>
+  </div>
+  <div class="row mx-0 mt-2">
+    <div class="col-4 pl-2 pr-0">
+      <ng-container *ngTemplateOutlet="costByDeviceTypeWidgetRef"></ng-container>
+    </div>
+    <div class="col-4 pl-2 pr-0">
+      <ng-container *ngTemplateOutlet="costByCostCenterWidgetRef"></ng-container>
+    </div>
+    <div class="col-4 px-2">
+      <ng-container *ngTemplateOutlet="costPerVMWidgetRef"></ng-container>
+    </div>
+  </div>
+  <div class="row mx-0 mt-2">
+    <div class="col-7 pl-2 pr-0">
+      <ng-container *ngTemplateOutlet="costByBUWidgetRef"></ng-container>
+    </div>
+    <div class="col-5 px-2">
+      <ng-container *ngTemplateOutlet="costByOSWidgetRef"></ng-container>
+    </div>
+  </div>
+  <div class="row mx-0 mt-2">
+    <div class="col-12 px-2">
+      <ng-container *ngTemplateOutlet="operationAndFixedCostWidgetRef"></ng-container>
+    </div>
+  </div>
+  <div class="row mx-0 mt-2">
+    <div class="col-12 px-2">
+      <ng-container
+        *ngIf="costUtilizationByMetricsViewData && costUtilizationByMetricsViewData.dropdownOptions && costUtilizationByMetricsViewData.defaultSelected">
+        <ng-container *ngTemplateOutlet="costUtilizationTrendWidgetRef"></ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <!-- <div class="row mx-0 mt-2">
+    <div class="col-12 px-2">9
+      <ng-container *ngTemplateOutlet="metricAndRateWidgetRef"></ng-container>
+    </div>
+  </div> -->
+  <!-- <div class="row mx-0 mt-2">
+    <div class="col-12 px-2">
+      <ng-container *ngTemplateOutlet="costAlertsWidgetRef"></ng-container>
+    </div>
+  </div> -->
+  <div class="row mx-0 my-2">
+    <div class="col-12 px-2">
+      <ng-container *ngTemplateOutlet="deviceDetailsWidgetRef"></ng-container>
+    </div>
+  </div>
+  <div class="row mx-0 my-2">
+    <div class="col-12 px-2">
+      <ng-container *ngTemplateOutlet="costAnomalyWidgetRef"></ng-container>
+    </div>
+  </div>
+</div>
+<ng-template #elseBlock>
+  <div class="row mx-0 my-2">
+    <div class="col">
+      <div class="card vh-75">
+        <div class="card-body d-flex justify-content-center align-items-center">
+          No Cost details available for the Inventory.
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #summaryRef>
+  <div class="col pr-0">
+    <div class="card round-edge equalize-card mb-0">
+      <app-spinner [name]="'totalCostWidgetLoader'"></app-spinner>
+      <div class="card-body d-flex flex-column p-2">
+        <div class="d-flex justify-content-between">
+          <span class="font-lg font-500">Total Cost</span>
+          <span class="font-lg-xl text-primary font-500 mx-1">
+            <span>{{totalCostWidgetViewData?.currency}}</span>
+            <span class="ml-1">{{totalCostWidgetViewData?.currentCost}}</span>
+          </span>
+        </div>
+        <div class="d-flex justify-content-start ml-1 mt-1">
+          <span class="mr-1" [ngClass]="totalCostWidgetViewData?.percentageChangeTextClass">
+            <span class="fas" [ngClass]="totalCostWidgetViewData?.percentageChangeIconClass"></span>
+            <span class="ml-1">{{totalCostWidgetViewData?.percentageChange}}</span>
+          </span>
+          <span>since last Month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col pl-2 pr-0">
+    <div class="card round-edge equalize-card mb-0">
+      <app-spinner [name]="'deviceCountWidgetLoader'"></app-spinner>
+      <div class="card-body d-flex flex-column p-2">
+        <div class="d-flex justify-content-between">
+          <span class="font-lg font-500">Devices</span>
+          <span class="font-lg-xl text-primary font-500 mx-1">{{deviceCountWidgetViewData?.currentCount}}</span>
+        </div>
+        <div class="d-flex justify-content-start ml-1 mt-1">
+          <span class="mr-1" [ngClass]="deviceCountWidgetViewData?.percentageChangeTextClass">
+            <span class="fas" [ngClass]="deviceCountWidgetViewData?.percentageChangeIconClass"></span>
+            <span class="ml-1">{{deviceCountWidgetViewData?.percentageChange}}</span>
+          </span>
+          <span>since last Month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col pl-2 pr-2">
+    <div class="card round-edge equalize-card mb-0">
+      <app-spinner [name]="'idleVmsSummaryLoader'"></app-spinner>
+      <div class="card-body d-flex flex-column p-2">
+        <div class="d-flex justify-content-between">
+          <span class="font-lg font-500">Idle Virtual Machines</span>
+          <span class="font-lg-xl text-primary font-500 mx-1">{{idleVmsWidgetViewData?.currentCount}}</span>
+        </div>
+        <div class="d-flex justify-content-start ml-1 mt-1">
+          <span class="mr-1" [ngClass]="idleVmsWidgetViewData?.percentageChangeTextClass">
+            <span class="fas" [ngClass]="idleVmsWidgetViewData?.percentageChangeIconClass"></span>
+            <span class="ml-1">{{idleVmsWidgetViewData?.percentageChange}}</span>
+          </span>
+          <span>since last Month</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costByDeviceTypeWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="'costByDeviceTypeLoader'"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Cost Breakdown by Device Type</span>
+    </div>
+    <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <table class="table table-sm font-sm text-left mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th>Device Type</th>
+            <th>Monthly Cost</th>
+            <th>Potential Savings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of costByDeviceTypeWidgetViewData" truncateText>
+            <td class="tdw-30">
+              <!-- <div [tooltip]="view.deviceType" (click)="goToDetails(view)">{{view.deviceType}}</div> -->
+              <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                  [tooltip]="view.label" (click)="goToDetails(view)">{{view.label}}</button>
+            </td>
+            <td class="tdw-30">
+              <div [tooltip]="view.currentCost">{{view.currentCost}}</div>
+            </td>
+            <td class="tdw-30">
+              <div [tooltip]="view.potentialSavings">{{view.potentialSavings}}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-container *ngIf="!costByDeviceTypeWidgetViewData.length">
+        <div class="d-flex justify-content-center align-items-center py-5">
+          No cost by device type details available.
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costByCostCenterWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="'costByCostCenterLoader'"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Cost & Savings by Cost Center</span>
+    </div>
+    <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <table class="table table-sm font-sm text-left mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th>Licence Cost Center</th>
+            <th>Monthly Cost</th>
+            <th>Potential Savings</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of costByCostCenterWidgetViewData" truncateText>
+            <td class="tdw-30">
+              <div [tooltip]="view.costCenter">{{view.costCenter}}</div>
+            </td>
+            <td class="tdw-30">
+              <div [tooltip]="view.currentCost">{{view.currentCost}}</div>
+            </td>
+            <td class="tdw-30">
+              <div [tooltip]="view.potentialSavings">{{view.potentialSavings}}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-container *ngIf="!costByCostCenterWidgetViewData.length">
+        <div class="d-flex justify-content-center align-items-center py-5">
+          No cost by cost center details available.
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costPerVMWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="'costPerVMLoader'"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Cost per VM (Allocated vs. Used)</span>
+    </div>
+    <div class="card-body d-flex flex-column p-2 justify-content-around"
+      style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <div class="d-flex justify-content-around align-items-center" *ngFor="let view of costPerVMViewData">
+        <div class="w-30 text-right text-truncate pr-1 text-primary font-sm font-500">{{view?.vmName}}</div>
+        <div class="w-55">
+          <div class="progress" [style.height.rem]="1.5">
+            <div class="progress-bar bg-primary" role="progressbar" [style.width.%]="view?.allocatedPercentage"
+              aria-valuenow="percentData.active" aria-valuemin="0" aria-valuemax="100"></div>
+
+            <div class="progress-bar bg-warning" role="progressbar" [style.width.%]="view?.overUsedPercentage"
+              aria-valuenow="percentData.unknown" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+        <div class="w-15 text-warning pl-1 font-sm font-500">{{view.overUsed}}%</div>
+      </div>
+      <ng-container *ngIf="!costPerVMViewData.length">
+        <div class="d-flex justify-content-center align-items-center h-100">
+          No Virtual Machines available.
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costByBUWidgetRef>
+  <div class="card round-edge equalize-card">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Business Unit Cost</span>
+    </div>
+    <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <div class="row mx-0">
+        <div class="col-6 px-2 border-right"
+          style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+          <div class="card equalize-card border-0">
+            <app-spinner [name]="'costByBUChartDataLoader'"></app-spinner>
+            <div class="card-body p-0">
+              <ng-container *ngIf="costByBUChartData">
+                <div echarts [options]="costByBUChartData.options" [extentions]="costByBUChartData.extensions"
+                  [defaultHeight]="250"></div>
+              </ng-container>
+              <ng-container *ngIf="!costByBUChartData">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  No Business Units available.
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+          <div class="card equalize-card border-0">
+            <app-spinner [name]="'costByApplicationLoader'"></app-spinner>
+            <div class="card-body p-0 d-flex flex-column justify-content-between">
+              <span class="font-500 text-center my-2 py-1">Top 5 Applications By Cost</span>
+              <div class="d-flex flex-column justify-content-between h-100" *ngIf="costByApplicationViewData.length">
+                <div class="d-flex justify-content-around align-items-center"
+                  *ngFor="let view of costByApplicationViewData">
+                  <div class="w-30 text-right text-truncate pr-1 text-primary font-sm font-500">
+                    {{view?.applicationName}}</div>
+                  <div class="w-55">
+                    <div class="progress" [style.height.rem]="1.5">
+                      <div class="progress-bar bg-primary" role="progressbar"
+                        [style.width.%]="view?.allocatedPercentage" aria-valuenow="percentData.active" aria-valuemin="0"
+                        aria-valuemax="100"></div>
+                      <div class="progress-bar bg-warning" role="progressbar" [style.width.%]="view?.overUsedPercentage"
+                        aria-valuenow="percentData.unknown" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                  <div class="w-15 text-warning pl-1 font-sm font-500">{{view.overUsedPercentage}}%</div>
+                </div>
+              </div>
+              <ng-container *ngIf="!costByApplicationViewData.length">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  No Applications available.
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costByOSWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="'costByOSChartDataLoader'"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Top 5 OS Cost</span>
+    </div>
+    <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <ng-container *ngIf="costByOSChartData">
+        <div echarts [options]="costByOSChartData.options" [extentions]="costByOSChartData.extensions"
+          [defaultHeight]="250"></div>
+      </ng-container>
+      <ng-container *ngIf="!costByOSChartData">
+        <div class="d-flex justify-content-center align-items-center h-100">
+          No Operating Systems available.
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #operationAndFixedCostWidgetRef>
+  <div class="card round-edge equalize-card">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Operational & Fixed Cost</span>
+    </div>
+    <div class="card-body px-2" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <div class="row mx-0">
+        <div class="col-4 px-2 border-right"
+          style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+          <div class="card equalize-card border-0">
+            <app-spinner [name]="'operationalCostUtilizationByServiceLoader'"></app-spinner>
+            <div class="card-body p-0">
+              <ng-container *ngIf="operationalUtilizationByServiceChartData">
+                <div echarts [options]="operationalUtilizationByServiceChartData.options"
+                  [extentions]="operationalUtilizationByServiceChartData.extensions" [defaultHeight]="250"></div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 px-2 border-right"
+          style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+          <div class="card equalize-card border-0">
+            <app-spinner [name]="'fixedCostUtilizationByServiceLoader'"></app-spinner>
+            <div class="card-body p-0">
+              <ng-container *ngIf="fixedUtilizationByServiceChartData">
+                <div echarts [options]="fixedUtilizationByServiceChartData.options"
+                  [extentions]="fixedUtilizationByServiceChartData.extensions" [defaultHeight]="250"></div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+          <div class="card equalize-card border-0">
+            <app-spinner [name]="'budgetAnomalyLoader'"></app-spinner>
+            <div class="card-body p-0 d-flex flex-column justify-content-around">
+              <span class="font-500 text-center">Budget Anomalies</span>
+              <div class="d-flex justify-content-around align-items-center mb-1"
+                *ngFor="let view of budgetAnomalyViewData">
+                <div class="w-30 text-right text-truncate pr-1 text-primary font-sm font-500">{{view?.name}}</div>
+                <div class="w-55">
+                  <div class="progress" [style.height.rem]="1.5">
+                    <div class="progress-bar bg-primary" role="progressbar" [style.width.%]="view?.allocatedPercentage"
+                      aria-valuenow="percentData.active" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-warning" role="progressbar" [style.width.%]="view?.overUsedPercentage"
+                      aria-valuenow="percentData.unknown" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+                <div class="w-15 text-warning pl-1 font-sm font-500">{{view.overUsed}}%</div>
+              </div>
+              <ng-container *ngIf="!budgetAnomalyViewData.length">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  No Budget Anomalies found.
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costUtilizationTrendWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="costUtilizationByMetricsViewData.loader"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Cost Utilization Trend</span>
+      <custom-date-dropdown [options]="costUtilizationByMetricsViewData.dropdownOptions"
+        [customClass]="'form-control-sm'" [default]="costUtilizationByMetricsViewData.defaultSelected"
+        (onSubmit)="onUtilizationTrendFilterChange($event)">
+      </custom-date-dropdown>
+    </div>
+    <div class="card-body p-0" style="min-height:350px;max-height:600px;overflow-y: auto;overflow-x: hidden;">
+      <div class="row mx-2 py-2">
+        <div class="col-4 d-flex flex-column py-2">
+          <span class="text-center font-500 font-lg">CPU</span>
+          <div class="d-flex justify-content-around pt-1">
+            <div class="d-flex flex-column">
+              <span class="font-sm text-muted font-500">Current</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.cpu?.currentCost || 'NA'}}</span>
+            </div>
+            <!-- <div class="d-flex flex-column border-left pl-3">
+              <span class="font-sm text-muted font-500">Avg Cost Per CPU</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.cpu?.averageCost || 'NA'}}</span>
+            </div> -->
+            <div class="d-flex flex-column pl-3">
+              <span class="font-sm text-muted font-500">Peak Utilization</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.cpu?.peakUtilization || 'NA'}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 d-flex flex-column border-left p-2">
+          <span class="text-center font-500 font-lg">Memory</span>
+          <div class="d-flex justify-content-around pt-1">
+            <div class="d-flex flex-column">
+              <span class="font-sm text-muted font-500">Current</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.memory?.currentCost || 'NA'}}</span>
+            </div>
+            <!-- <div class="d-flex flex-column border-left pl-3">
+              <span class="font-sm text-muted font-500">Avg Cost Per GB</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.memory?.averageCost || 'NA'}}</span>
+            </div> -->
+            <div class="d-flex flex-column pl-3">
+              <span class="font-sm text-muted font-500">Peak Utilization</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.memory?.peakUtilization || 'NA'}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 d-flex flex-column border-left pl-2 py-2">
+          <span class="text-center font-500 font-lg">Storage</span>
+          <div class="d-flex justify-content-around pt-1">
+            <div class="d-flex flex-column">
+              <span class="font-sm text-muted font-500">Current</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.storage?.currentCost || 'NA'}}</span>
+            </div>
+            <!-- <div class="d-flex flex-column border-left pl-3">
+              <span class="font-sm text-muted font-500">Avg Cost Per GB</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.storage?.averageCost || 'NA'}}</span>
+            </div> -->
+            <div class="d-flex flex-column pl-3">
+              <span class="font-sm text-muted font-500">Peak Utilization</span>
+              <span class="font-500">{{costUtilizationByMetricsViewData.storage?.peakUtilization || 'NA'}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngIf="costUtilizationByMetricsViewData?.chartData">
+        <div echarts [options]="costUtilizationByMetricsViewData.chartData.options"
+          [extentions]="costUtilizationByMetricsViewData.chartData.extensions" [defaultHeight]="250"></div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costAlertsWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="'costAlertsLoader'"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Cost Alerts</span>
+    </div>
+    <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <table class="table table-sm text-left">
+        <thead class="bg-light">
+          <tr>
+            <th>Alert ID</th>
+            <th>Alert Name</th>
+            <th>Scope</th>
+            <th>Threshold Type</th>
+            <th>Threshold Value</th>
+            <th>Actual Value</th>
+            <th>Alert Triggered on</th>
+            <th>Severity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of costAlerts; let i = index" truncateText>
+            <td class="tdw-10">
+              <div [tooltip]="view.alertId">{{view.alertId}}</div>
+            </td>
+            <td class="tdw-15">
+              <div [tooltip]="view.alertName">{{view.alertName}}</div>
+            </td>
+            <td class="tdw-15">
+              <div [tooltip]="view.scope">{{view.scope}}</div>
+            </td>
+            <td class="tdw-15">
+              <div [tooltip]="view.thresholdType">{{view.thresholdType}}</div>
+            </td>
+            <td class="tdw-13">
+              <div [tooltip]="view.thresholdValue">{{view.thresholdValue}}</div>
+            </td>
+            <td class="tdw-12">
+              <div [tooltip]="view.actualValue">{{view.actualValue}}</div>
+            </td>
+            <td class="tdw-15">
+              <div [tooltip]="view.alertTime">{{view.alertTime}}</div>
+            </td>
+            <td class="tdw-5">
+              <div class="text-center">
+                <i class="fa status-icon" [ngClass]="view.severityIcon" [tooltip]="view.severity" container="body"></i>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deviceDetailsWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="'budgetDetailsByDevice'"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Device Details</span>
+    </div>
+    <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <table class="table table-sm font-sm text-left">
+        <thead class="bg-light">
+          <tr>
+            <th>Device Name</th>
+            <th>Management IP</th>
+            <th>Application(s)/Service(s)</th>
+            <th>Allcoation Type</th>
+            <th>Budget Amount</th>
+            <th>Budget Period</th>
+            <th>Budget Utilization</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of budgetDetailsByDevice; let i = index;" truncateText>
+            <td class="tdw-15">
+              <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.managementIP">{{view.managementIP}}</div>
+            </td>
+            <td class="tdw-20">
+              <div [tooltip]="view.applicationOrService">{{view.applicationOrService}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.allocationType">{{view.allocationType}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.budgetAmount">{{view.budgetAmount}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.budgetPeriod">{{view.budgetPeriod}}</div>
+            </td>
+            <td class="tdw-25">
+              <span *ngIf="!view.budgetUtilization">N/A</span>
+              <div class="row mt-2" *ngIf="view.budgetUtilization">
+                <div class="col-12">
+                  <div class="progress progress-xs">
+                    <div class="progress-bar" [ngClass]="view?.budgetUtilization?.usedBarColor" role="progressbar"
+                      [style.width.%]="view?.budgetUtilization?.used" aria-valuenow="percentData.active"
+                      aria-valuemin="0" aria-valuemax="100"></div>
+
+                    <div class="progress-bar bg-secondary" role="progressbar"
+                      [style.width.%]="view?.budgetUtilization?.available" aria-valuenow="percentData.unknown"
+                      aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+                <div class="col">
+                  <small class="text-muted utilization-font-size">Used:
+                    {{view?.budgetUtilization?.usedPercentage}}</small>
+                </div>
+                <div class="col ml-auto text-right">
+                  <small class="text-muted utilization-font-size">Free:
+                    {{view?.budgetUtilization?.availablePercentage}}</small>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #costAnomalyWidgetRef>
+  <div class="card round-edge equalize-card">
+    <app-spinner [name]="'costAnomalyLoader'"></app-spinner>
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+      <span class="font-lg font-500">Cost Anomaly</span>
+    </div>
+    <div class="card-body p-0" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+      <table class="table table-sm font-sm text-left">
+        <thead class="bg-light">
+          <tr>
+            <th>Device Name</th>
+            <th>Management IP</th>
+            <th>Building Block</th>
+            <th>Total Cost</th>
+            <th>Budget Amount</th>
+            <th>Over Budget</th>
+            <th>Over Budget(%)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let view of costAnomalyViewData; let i = index;" truncateText>
+            <td class="tdw-15">
+              <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+            </td>
+            <td class="tdw-15">
+              <div [tooltip]="view.managemetIp">{{view.managemetIp}}</div>
+            </td>
+            <td class="tdw-15">
+              <div [tooltip]="view.buildingBlock">{{view.buildingBlock}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.totalCost">{{view.totalCost}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.budgetAmount">{{view.budgetAmount}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.overBudget">{{view.overBudget}}</div>
+            </td>
+            <td class="tdw-10">
+              <div [tooltip]="view.overBudgetPercent">{{view.overBudgetPercent}}</div>
+            </td>
+            <td class="tdw-15">
+              <div [tooltip]="view.status">{{view.status}}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-template>

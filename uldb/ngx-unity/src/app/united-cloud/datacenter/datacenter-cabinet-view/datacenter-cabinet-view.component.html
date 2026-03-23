@@ -1,0 +1,859 @@
+<ng-template #cabinetHeader>
+  <div class="card-header bg-white border-0 p-2">
+    <div class="row" *ngIf="cabinetViewData.cabinetUnits.length">
+      <div class="col-4 cabinet_legends_gradient pr-1">
+        <datacenter-cabinet-view-device-sensors></datacenter-cabinet-view-device-sensors>
+      </div>
+      <div class="col-1 pl-0 pr-1">
+        <form [formGroup]="heatMapForm" *ngIf="heatMapForm" class="form-inline">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="inlineFormCheck" [checked]="showHeatMapLayer"
+              (change)="onHeatmapLayerCheck($event)">
+            <label class="form-check-label" for="inlineFormCheck">Heatmap</label>
+          </div>
+        </form>
+      </div>
+      <div class="col-7 pr-1">
+        <div class="row">
+          <div class="col-8">
+            <form>
+              <div class="form-row">
+                <div class="col-auto my-0">
+                  <select class="custom-select mr-sm-2 py-0 view-type-dropdown" [ngModel]="selectedCabinetView"
+                    (ngModelChange)="changeView($event)" name="cabinetViewType">
+                    <option [value]="view" *ngFor="let view of cabinetViews">{{view}}</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-4">
+            <div class="col-auto pull-right">
+              <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
+                [tooltip]="'Go Back'" container="body" placement="bottom"><i class="fas fa-arrow-left"></i></button>
+              <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="refreshData()"
+                [tooltip]="'Refresh'" [disabled]="termOpened || inProgress" container="body" placement="bottom"><i
+                  class="fas fa-sync"></i></button>
+              <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" *ngIf="selectedDevice.name"
+                [tooltip]="'Back to Cabinet Details'" container="body" placement="bottom"
+                (click)="backToCabinetViewMonitoring()" [disabled]="termOpened || inProgress"><i
+                  class="fas fa-undo-alt"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<div class="card border-top-0 m-1" [ngClass]="cabinetViewData.cabinetClass">
+  <ng-container *ngTemplateOutlet="cabinetHeader"></ng-container>
+  <div class="card-body pt-0">
+    <div class="row">
+      <div class="col-12 pr-0" *ngIf="selectedCabinetView == cabinetViewTypes.FRONT_AND_REAR">
+        <ng-container *ngTemplateOutlet="frontAndRearView"></ng-container>
+      </div>
+      <div class="col-12 pr-0" *ngIf="selectedCabinetView != cabinetViewTypes.FRONT_AND_REAR">
+        <ng-container *ngTemplateOutlet="frontOrRearView"></ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #frontOrRearView>
+  <div class="row">
+    <div class="col-5 p-0" *ngIf="selectedCabinetView == cabinetViewTypes.FRONT">
+      <ng-container *ngTemplateOutlet="frontView"></ng-container>
+    </div>
+    <div class="col-5 p-0" *ngIf="selectedCabinetView == cabinetViewTypes.REAR">
+      <ng-container *ngTemplateOutlet="rearView"></ng-container>
+    </div>
+    <div class="col-7">
+      <div class="row info_div" *ngIf="!selectedDevice.name">
+        <datacenter-cabinet-view-cabinet-info [cabinetInfo]="cabinetViewData" class="w-100">
+        </datacenter-cabinet-view-cabinet-info>
+      </div>
+
+      <div class="row info_div" *ngIf="selectedDevice.name">
+        <datacenter-cabinet-view-device-info [deviceInfo]="selectedDevice" class="w-100">
+        </datacenter-cabinet-view-device-info>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="card border-0">
+            <app-spinner [name]="'monitoring-loader'"></app-spinner>
+            <div class="card-header bg-white p-0">
+              <div class="row">
+                <div class="col">
+                  <ul class="nav nav-tabs nav-tabs my-0" #tabContent role="tablist">
+                    <li class="nav-item bg-secondary rounded-top" *ngFor="let tab of tabData; let i = index">
+                      <a class="nav-link py-2 border-top"
+                        *ngIf="!selectedDevice.name || (selectedDevice.name && (tab.url != 'bucket'))"
+                        [ngClass]="{'active text-success': (selectedTab.name == tab.name)}" (click)="goTo(tab)">
+                        <i class="fa" [ngClass]="tab.icon"></i> {{tab.name}}</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="card-body pt-2 pb-0 px-2 border border-top-0 tab_body">
+              <div class="row monitoring_div" *ngIf="(selectedTab.url == 'monitoring') && (!selectedDevice.name)">
+                <div class="col-12" *ngIf="!cabinetViewData.pduList.length">
+                  <span class="w-25 mx-auto mt-5 d-block"> No PDUs available !!</span>
+                </div>
+                <div class="col-12"
+                  *ngIf="cabinetViewData.pduList.length && !cabinetViewData.monitoringConfiguredPDUs.length ">
+                  <span class="w-50 mx-auto mt-5 d-block"> No PDUs are configured to moniter !!</span>
+                </div>
+                <div class="col-12"
+                  *ngIf="cabinetViewData.monitoringConfiguredPDUs.length && !cabinetViewData.pdusWithGraphs.length">
+                  <span class="w-50 mx-auto mt-5 d-block"> No Graphs available for PDUs</span>
+                </div>
+                <div [ngClass]="pdu.monitoring.observium ? 'col-4' : 'col-12'"
+                  *ngFor="let pdu of cabinetViewData.pdusWithGraphs">
+                  <datacenter-cabinet-view-monitoring-graphs [device]="pdu"
+                    [isCabinetGraphs]="true"></datacenter-cabinet-view-monitoring-graphs>
+                </div>
+              </div>
+              <div class="row monitoring_div" *ngIf="(selectedTab.url == 'monitoring') && (selectedDevice.name)">
+                <ng-container [ngTemplateOutlet]='deviceMonitoringGraphs'
+                  [ngTemplateOutletContext]="{device:selectedDevice}"></ng-container>
+              </div>
+              <div class="row bucket_div" *ngIf="selectedTab.url == 'bucket'" dndDropzone dndEffectAllowed="move"
+                dndAllowExternal="true" (dndDrop)="onBucketDrop($event)" accessControl moduleName="Datacenter"
+                accessType="Manage Datacenter" elementType="div">
+                <ul class="w-100 px-1 py-0 my-0">
+                  <li class="dndPlaceholder d-inline-block" dndPlaceholderRef></li>
+                  <li class="col-3 p-2 d-inline-block"
+                    *ngFor="let device of (cabinetViewData.bucketDevices | callback:filterBucketDevices); let i = index"
+                    [dndDraggable]="device" [dndType]="device" dndEffectAllowed="move"
+                    (dndStart)="onBucketDragStart($event, i, device)" (dndEnd)="onBucketDragEnd($event)"
+                    [tooltip]="device.name">
+                    <div class="pointer-link w-100" dndDragImageRef>
+                      <span class="font-weight-bold font-sm w-100 d-block text-truncate">
+                        <i class="{{device.faIconClass}}"></i>
+                        {{device.name}} ({{device.size}}U)
+                      </span>
+                    </div>
+                  </li>
+                  <li class="d-block mx-auto w-25 mt-5" *ngIf="cabinetViewData.isBucketEmpty"> No devices
+                    available </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #frontView>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td class="w-13 pt-0 border-top-0">
+          <div class="pr-0" *ngIf="cabinetViewData.verticalLPDUs">
+            <div class="row justify-content-around" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+              (dndDrop)="onLPDUDrop($event)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+              elementType="div">
+              <div class="verticalPDU col-3 pointer-link"
+                *ngFor="let pdu of cabinetViewData.verticalLPDUs; let i = index" [dndDraggable]="pdu" [dndType]="pdu"
+                dndEffectAllowed="move" (dndStart)="onLPDUDragStart($event, i, pdu)" (dndEnd)="onLPDUDragEnd($event)">
+                <div class="row" (click)="onSelectDevice(pdu)">
+                  <div class="w-100" *ngIf="pdu.isDevice">
+                    <div class="label_slot w-100 text-center">
+                      <h2 class="slot_name"> {{i == 0 ? 'C' : 'A'}}</h2>
+                    </div>
+                    <div class="w-100 text-center pdu_meter">
+                      <div class="pdu_meter_reading" *ngIf="pdu.sensor">
+                        {{(pdu.sensor.sensorValue | number:'1.0-0')}}
+                      </div>
+                      <div class="pdu_meter_reading" *ngIf="!pdu.sensor">NA</div>
+                    </div>
+                  </div>
+                  <div class="vpdu mt-3" *ngIf="pdu.pduType" dndDragImageRef>
+                    <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
+
+                    <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
+                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      #vLPDURef="bs-tooltip" />
+
+                    <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
+                  </div>
+                  <div class="vpdu" *ngIf="!pdu.pduType">
+                    <h2> &nbsp; </h2>
+                  </div>
+                </div>
+              </div>
+              <div class="dndPlaceholder" dndPlaceholderRef></div>
+            </div>
+          </div>
+        </td>
+        <td class="w-54 pt-0 border-top-0">
+          <table class="table cabinet-table" [ngStyle]="{'margin-top' : cabinetViewData.spaceOnTop + 'px' }">
+            <tbody class="cabinetView">
+              <tr>
+                <td><img class="img-fluid cabinet-top" *ngIf="cabinetViewData.cabinetUnits.length"
+                    [src]="cabinetViewData.cabinetTopImgURL" /></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="col-12 px-0" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+                    (dndDrop)="onCabinetDrop($event)" accessControl moduleName="Datacenter"
+                    accessType="Manage Datacenter" elementType="div">
+                    <div class="row dndPlaceholder" dndPlaceholderRef></div>
+                    <div class="row" *ngFor="let device of cabinetViewData.cabinetUnits; let i = index"
+                      [dndDraggable]="device" [dndType]="device" dndEffectAllowed="move"
+                      (dndStart)="onCabinetDragStart($event, i, device)" (dndEnd)="onCabinetDragEnd($event)"
+                      (mouseenter)="onHoverDevice(device)" (mouseleave)="onLeaveDevice(device)">
+                      <div class="col-12">
+                        <div class="row cabinetDevices mx-0">
+                          <div class="col-1 unitNumbers px-0">
+                            {{cabinetViewData.unitCapacity - i}}
+                          </div>
+                          <div class="col-10 units px-0">
+                            <div class="w-100 h-100 pointer-link" (click)="onSelectDevice(device)">
+                              <img class="img-fluid left-cell pull-left"
+                                [src]="cabinetViewData.cabinetUnitLeftCellImgURL" alt="" />
+
+                              <img class="img-fluid device" *ngIf="device.frontView && !device.isPDU"
+                                [ngClass]="device.unitOccupiedClass" [src]="device.frontView"
+                                [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
+                                dndDragImageRef />
+
+                              <span class="hpdu" *ngIf="device.frontView && device.isPDU" dndDragImageRef>
+                                <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
+                                  [src]="device.hPDUStartImgURL" alt="" />
+
+                                <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
+                                  *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
+                                  id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                  [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
+                                  [style.width]="socket + '%'" />
+
+                                <img class="hpdu_end" [ngClass]="device.unitOccupiedClass" [src]="device.hPDUEndImgURL"
+                                  alt="" />
+                              </span>
+
+                              <img class="img-fluid right-cell pull-right"
+                                [src]="cabinetViewData.cabinetUnitRightCellImgURL" alt="" />
+
+                              <datacenter-cabinet-view-device-sensors *ngIf="device.showSensorOnCabinetDevice"
+                                [sensor]="device.sensor" [showHeatMapLayer]="showHeatMapLayer">
+                              </datacenter-cabinet-view-device-sensors>
+                              <datacenter-cabinet-view-device-status [status]="device.status.status"
+                                [units]="device.unitOccupiedClass" *ngIf="device.status">
+                              </datacenter-cabinet-view-device-status>
+                            </div>
+                          </div>
+                          <div class="col-1 unitEnd px-0">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><img class="img-fluid cabinet-bottom" *ngIf="cabinetViewData.cabinetUnits.length"
+                    [src]="cabinetViewData.cabinetBottomImgURL" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td class="w-13 pt-0 border-top-0">
+          <div class="pr-0" *ngIf="cabinetViewData.verticalRPDUs">
+            <div class="row justify-content-around" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+              (dndDrop)="onRPDUDrop($event)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+              elementType="div">
+              <div class="verticalPDU col-3 pointer-link"
+                *ngFor="let pdu of cabinetViewData.verticalRPDUs; let i = index" [dndDraggable]="pdu" [dndType]="pdu"
+                dndEffectAllowed="move" (dndStart)="onRPDUDragStart($event, i, pdu)" (dndEnd)="onRPDUDragEnd($event)">
+                <div class="row" (click)="onSelectDevice(pdu)">
+                  <div class="w-100" *ngIf="pdu.isDevice">
+                    <div class="label_slot w-100 text-center">
+                      <h2 class="slot_name"> {{i == 0 ? 'B' : 'D'}}</h2>
+                    </div>
+                    <div class="w-100 text-center pdu_meter">
+                      <div class="pdu_meter_reading" *ngIf="pdu.sensor">
+                        {{(pdu.sensor.sensorValue | number:'1.0-0')}}
+                      </div>
+                      <div class="pdu_meter_reading" *ngIf="!pdu.sensor">NA</div>
+                    </div>
+                  </div>
+                  <div class="vpdu mt-3" *ngIf="pdu.pduType" dndDragImageRef>
+                    <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
+
+                    <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
+                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      #vRPDURef="bs-tooltip" />
+
+                    <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
+                  </div>
+                  <div class="vpdu" *ngIf="!pdu.pduType">
+                    <h2> &nbsp; </h2>
+                  </div>
+                </div>
+              </div>
+              <div class="dndPlaceholder" dndPlaceholderRef></div>
+            </div>
+          </div>
+        </td>
+        <td class="w-20 pt-0 pr-0 border-top-0">
+          <table class="table cabinet-table" [ngStyle]="{'margin-top' : cabinetViewData.spaceOnTop + 'px' }">
+            <tbody class="cabinetView">
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              <tr class="cabinetDevices" *ngFor="let device of cabinetViewData.cabinetUnits; let i = index">
+                <td class="pr-0">
+                  <div class="row m-0 unitDeviceNames p-0" (click)="onSelectDevice(device)"
+                    [class.text-warning]="((device.name == hoveredDevice.name) || (device.name == selectedDevice.name))"
+                    [class.device_selected]="(device.name == selectedDevice.name)">
+                    <a class="d-inline-block text-truncate deviceName">
+                      <span class="font-weight-bold"> {{device.name}} </span>
+                    </a>
+                    <a class="d-inline-block text-truncate icons">
+                      <span *ngIf="device.sshNewTab" [class.action-icons-disabled]="!device.sshNewTab.isEnabled">
+                        <i class="fas fa-external-link-alt"></i>
+                      </span>
+                      <span *ngIf="device.blinker" [class.pl-2]="device.sshNewTab"
+                        [class.action-icons-disabled]="!device.blinker.isEnabled">
+                        <i class="far fa-lightbulb"></i>
+                      </span>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>
+
+<ng-template #rearView>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td class="w-13 pt-0 border-top-0">
+          <div class="pr-0" *ngIf="cabinetViewData.verticalLPDUs">
+            <div class="row justify-content-around" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+              (dndDrop)="onLPDUDrop($event)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+              elementType="div">
+              <div class="verticalPDU col-3 pointer-link"
+                *ngFor="let pdu of cabinetViewData.verticalLPDUs; let i = index" [dndDraggable]="pdu" [dndType]="pdu"
+                dndEffectAllowed="move" (dndStart)="onLPDUDragStart($event, i, pdu)" (dndEnd)="onLPDUDragEnd($event)">
+                <div class="row" (click)="onSelectDevice(pdu)">
+                  <div class="w-100" *ngIf="pdu.isDevice">
+                    <div class="label_slot w-100 text-center">
+                      <h2 class="slot_name"> {{i == 0 ? 'C' : 'A'}}</h2>
+                    </div>
+                    <div class="w-100 text-center pdu_meter">
+                      <div class="pdu_meter_reading" *ngIf="pdu.sensor">
+                        {{(pdu.sensor.sensorValue | number:'1.0-0')}}
+                      </div>
+                      <div class="pdu_meter_reading" *ngIf="!pdu.sensor">NA</div>
+                    </div>
+                  </div>
+                  <div class="vpdu mt-3" *ngIf="pdu.pduType" dndDragImageRef>
+                    <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
+
+                    <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
+                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      #vLPDURef="bs-tooltip" />
+
+                    <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
+                  </div>
+                  <div class="vpdu" *ngIf="!pdu.pduType">
+                    <h2> &nbsp; </h2>
+                  </div>
+                </div>
+              </div>
+              <div class="dndPlaceholder" dndPlaceholderRef></div>
+            </div>
+          </div>
+        </td>
+        <td class="w-54 pt-0 border-top-0">
+          <table class="table cabinet-table" [ngStyle]="{'margin-top' : cabinetViewData.spaceOnTop + 'px' }">
+            <tbody class="cabinetView">
+              <tr>
+                <td><img class="img-fluid cabinet-top" *ngIf="cabinetViewData.cabinetUnits.length"
+                    [src]="cabinetViewData.cabinetTopImgURL" /></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="col-12 px-0" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+                    (dndDrop)="onCabinetDrop($event)" accessControl moduleName="Datacenter"
+                    accessType="Manage Datacenter" elementType="div">
+                    <div class="row dndPlaceholder" dndPlaceholderRef></div>
+                    <div class="row" *ngFor="let device of cabinetViewData.cabinetUnits; let i = index"
+                      [dndDraggable]="device" [dndType]="device" dndEffectAllowed="move"
+                      (dndStart)="onCabinetDragStart($event, i, device)" (dndEnd)="onCabinetDragEnd($event)"
+                      (mouseenter)="onHoverDevice(device)" (mouseleave)="onLeaveDevice(device)">
+                      <div class="col-12">
+                        <div class="row cabinetDevices mx-0">
+                          <div class="col-1 unitNumbers px-0">
+                            {{cabinetViewData.unitCapacity - i}}
+                          </div>
+                          <div class="col-10 units px-0">
+                            <div class="w-100 h-100 pointer-link" (click)="onSelectDevice(device)">
+                              <img class="img-fluid left-cell pull-left"
+                                [src]="cabinetViewData.cabinetUnitLeftCellImgURL" alt="" />
+
+                              <img class="img-fluid device" [ngClass]="device.unitOccupiedClass"
+                                *ngIf="device.rearView && !device.isPDU" [src]="device.rearView"
+                                [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
+                                dndDragImageRef />
+
+                              <span class="hpdu" *ngIf="device.rearView && device.isPDU" dndDragImageRef>
+                                <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
+                                  [src]="device.hPDUStartImgURL" alt="" />
+
+                                <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
+                                  *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
+                                  id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                  [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
+                                  [style.width]="socket + '%'" />
+
+                                <img class="hpdu_end" [ngClass]="device.unitOccupiedClass" [src]="device.hPDUEndImgURL"
+                                  alt="" />
+                              </span>
+
+                              <img class="img-fluid right-cell pull-right"
+                                [src]="cabinetViewData.cabinetUnitRightCellImgURL" alt="" />
+
+                              <datacenter-cabinet-view-device-sensors *ngIf="device.showSensorOnCabinetDevice"
+                                [sensor]="device.sensor" [showHeatMapLayer]="showHeatMapLayer">
+                              </datacenter-cabinet-view-device-sensors>
+                              <datacenter-cabinet-view-device-status [status]="device.status.status"
+                                [units]="device.unitOccupiedClass" *ngIf="device.status">
+                              </datacenter-cabinet-view-device-status>
+                            </div>
+                          </div>
+                          <div class="col-1 unitEnd px-0">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><img class="img-fluid cabinet-bottom" *ngIf="cabinetViewData.cabinetUnits.length"
+                    [src]="cabinetViewData.cabinetBottomImgURL" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td class="w-13 pt-0 border-top-0">
+          <div class="pr-0" *ngIf="cabinetViewData.verticalRPDUs">
+            <div class="row justify-content-around" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+              (dndDrop)="onRPDUDrop($event)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+              elementType="div">
+              <div class="verticalPDU col-3 pointer-link"
+                *ngFor="let pdu of cabinetViewData.verticalRPDUs; let i = index" [dndDraggable]="pdu" [dndType]="pdu"
+                dndEffectAllowed="move" (dndStart)="onRPDUDragStart($event, i, pdu)" (dndEnd)="onRPDUDragEnd($event)">
+                <div class="row" (click)="onSelectDevice(pdu)">
+                  <div class="w-100" *ngIf="pdu.isDevice">
+                    <div class="label_slot w-100 text-center">
+                      <h2 class="slot_name"> {{i == 0 ? 'C' : 'A'}}</h2>
+                    </div>
+                    <div class="w-100 text-center pdu_meter">
+                      <div class="pdu_meter_reading" *ngIf="pdu.sensor">
+                        {{(pdu.sensor.sensorValue | number:'1.0-0')}}
+                      </div>
+                      <div class="pdu_meter_reading" *ngIf="!pdu.sensor">NA</div>
+                    </div>
+                  </div>
+                  <div class="vpdu mt-3" *ngIf="pdu.pduType" dndDragImageRef>
+                    <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
+
+                    <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
+                      [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
+                      *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                      #vRPDURef="bs-tooltip" />
+
+                    <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
+                  </div>
+                  <div class="vpdu" *ngIf="!pdu.pduType">
+                    <h2> &nbsp; </h2>
+                  </div>
+                </div>
+              </div>
+              <div class="dndPlaceholder" dndPlaceholderRef></div>
+            </div>
+          </div>
+        </td>
+        <td class="w-20 pt-0 pr-0 border-top-0">
+          <table class="table cabinet-table" [ngStyle]="{'margin-top' : cabinetViewData.spaceOnTop + 'px' }">
+            <tbody class="cabinetView">
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+              <tr class="cabinetDevices" *ngFor="let device of cabinetViewData.cabinetUnits; let i = index">
+                <td class="pr-0">
+                  <div class="row m-0 unitDeviceNames p-0" (click)="onSelectDevice(device)"
+                    [class.text-warning]="((device.name == hoveredDevice.name) || (device.name == selectedDevice.name))"
+                    [class.device_selected]="(device.name == selectedDevice.name)">
+                    <a class="d-inline-block text-truncate deviceName">
+                      <span class="font-weight-bold"> {{device.name}} </span>
+                    </a>
+                    <a class="d-inline-block text-truncate icons">
+                      <span *ngIf="device.sshNewTab" [class.action-icons-disabled]="!device.sshNewTab.isEnabled">
+                        <i class="fas fa-external-link-alt"></i>
+                      </span>
+                      <span *ngIf="device.blinker" [class.pl-2]="device.sshNewTab"
+                        [class.action-icons-disabled]="!device.blinker.isEnabled">
+                        <i class="far fa-lightbulb"></i>
+                      </span>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>
+
+<ng-template #frontAndRearView>
+  <div class="row">
+    <div class="col-9 p-0">
+      <table class="table">
+        <tbody>
+          <tr>
+            <td class="w-7 pt-0 border-top-0">
+              <div class="pr-0" *ngIf="cabinetViewData.verticalLPDUs">
+                <div class="row justify-content-around" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+                  (dndDrop)="onLPDUDrop($event)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+                  elementType="div">
+                  <div class="verticalPDU col-3 pointer-link"
+                    *ngFor="let pdu of cabinetViewData.verticalLPDUs; let i = index" [dndDraggable]="pdu"
+                    [dndType]="pdu" dndEffectAllowed="move" (dndStart)="onLPDUDragStart($event, i, pdu)"
+                    (dndEnd)="onLPDUDragEnd($event)">
+                    <div class="row" (click)="onSelectDevice(pdu)">
+                      <div class="w-100" *ngIf="pdu.isDevice">
+                        <div class="label_slot w-100 text-center">
+                          <h2 class="slot_name"> {{i == 0 ? 'C' : 'A'}}</h2>
+                        </div>
+                        <div class="w-100 text-center pdu_meter">
+                          <div class="pdu_meter_reading" *ngIf="pdu.sensor">
+                            {{(pdu.sensor.sensorValue | number:'1.0-0')}}
+                          </div>
+                          <div class="pdu_meter_reading" *ngIf="!pdu.sensor">NA</div>
+                        </div>
+                      </div>
+                      <div class="vpdu mt-3" *ngIf="pdu.pduType" dndDragImageRef>
+                        <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
+
+                        <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
+                          [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
+                          *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                          #vLPDURef="bs-tooltip" />
+
+                        <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
+                      </div>
+                      <div class="vpdu" *ngIf="!pdu.pduType">
+                        <h2> &nbsp; </h2>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dndPlaceholder" dndPlaceholderRef></div>
+                </div>
+              </div>
+            </td>
+            <td class="w-33 pt-0 border-top-0">
+              <table class="table cabinet-table" [ngStyle]="{'margin-top' : cabinetViewData.spaceOnTop + 'px' }">
+                <tbody class="cabinetView">
+                  <tr>
+                    <td><img class="img-fluid cabinet-top" *ngIf="cabinetViewData.cabinetUnits.length"
+                        [src]="cabinetViewData.cabinetTopImgURL" /></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="col-12 px-0" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+                        (dndDrop)="onCabinetDrop($event)" accessControl moduleName="Datacenter"
+                        accessType="Manage Datacenter" elementType="div">
+                        <div class="row dndPlaceholder" dndPlaceholderRef></div>
+                        <div class="row" *ngFor="let device of cabinetViewData.cabinetUnits; let i = index"
+                          [dndDraggable]="device" [dndType]="device" dndEffectAllowed="move"
+                          (dndStart)="onCabinetDragStart($event, i, device)" (dndEnd)="onCabinetDragEnd($event)"
+                          (mouseenter)="onHoverDevice(device)" (mouseleave)="onLeaveDevice(device)">
+                          <div class="col-12">
+                            <div class="row cabinetDevices mx-0">
+                              <div class="col-1 unitNumbers px-0">
+                                {{cabinetViewData.unitCapacity - i}}
+                              </div>
+                              <div class="col-10 units px-0">
+                                <div class="w-100 h-100 pointer-link" (click)="onSelectDevice(device)">
+                                  <img class="img-fluid left-cell pull-left"
+                                    [src]="cabinetViewData.cabinetUnitLeftCellImgURL" alt="" />
+
+                                  <img class="img-fluid device" [ngClass]="device.unitOccupiedClass"
+                                    *ngIf="device.frontView && !device.isPDU" [src]="device.frontView"
+                                    [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
+                                    dndDragImageRef />
+
+                                  <span class="hpdu" *ngIf="device.frontView && device.isPDU" dndDragImageRef>
+                                    <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
+                                      [src]="device.hPDUStartImgURL" alt="" />
+
+                                    <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
+                                      *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
+                                      id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                      [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
+                                      [style.width]="socket + '%'" />
+
+                                    <img class="hpdu_end" [ngClass]="device.unitOccupiedClass"
+                                      [src]="device.hPDUEndImgURL" alt="" />
+                                  </span>
+
+                                  <img class="img-fluid right-cell pull-right"
+                                    [src]="cabinetViewData.cabinetUnitRightCellImgURL" alt="" />
+
+                                  <datacenter-cabinet-view-device-sensors *ngIf="device.showSensorOnCabinetDevice"
+                                    [sensor]="device.sensor" [showHeatMapLayer]="showHeatMapLayer">
+                                  </datacenter-cabinet-view-device-sensors>
+                                  <datacenter-cabinet-view-device-status [status]="device.status.status"
+                                    [units]="device.unitOccupiedClass" *ngIf="device.status">
+                                  </datacenter-cabinet-view-device-status>
+                                </div>
+                              </div>
+                              <div class="col-1 unitEnd px-0">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><img class="img-fluid cabinet-bottom" *ngIf="cabinetViewData.cabinetUnits.length"
+                        [src]="cabinetViewData.cabinetBottomImgURL" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td class="w-33 pt-0 border-top-0">
+              <table class="table cabinet-table" [ngStyle]="{'margin-top' : cabinetViewData.spaceOnTop + 'px' }">
+                <tbody class="cabinetView">
+                  <tr>
+                    <td><img class="img-fluid cabinet-top" *ngIf="cabinetViewData.cabinetUnits.length"
+                        [src]="cabinetViewData.cabinetTopImgURL" /></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="col-12 px-0" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+                        (dndDrop)="onCabinetDrop($event)" accessControl moduleName="Datacenter"
+                        accessType="Manage Datacenter" elementType="div">
+                        <div class="row dndPlaceholder" dndPlaceholderRef></div>
+                        <div class="row" *ngFor="let device of cabinetViewData.cabinetUnits; let i = index"
+                          [dndDraggable]="device" [dndType]="device" dndEffectAllowed="move"
+                          (dndStart)="onCabinetDragStart($event, i, device)" (dndEnd)="onCabinetDragEnd($event)"
+                          (mouseenter)="onHoverDevice(device)" (mouseleave)="onLeaveDevice(device)">
+                          <div class="col-12">
+                            <div class="row cabinetDevices mx-0">
+                              <div class="col-1 unitNumbers px-0">
+                                {{cabinetViewData.unitCapacity - i}}
+                              </div>
+                              <div class="col-10 units px-0">
+                                <div class="w-100 h-100 pointer-link" (click)="onSelectDevice(device)">
+                                  <img class="img-fluid left-cell pull-left"
+                                    [src]="cabinetViewData.cabinetUnitLeftCellImgURL" alt="" />
+
+                                  <img class="img-fluid device" [ngClass]="device.unitOccupiedClass"
+                                    *ngIf="device.rearView && !device.isPDU" [src]="device.rearView"
+                                    [style.opacity]="(device.sensor && device.sensor.sensorState ? '0.8' : '1')"
+                                    dndDragImageRef />
+
+                                  <span class="hpdu" *ngIf="device.rearView && device.isPDU" dndDragImageRef>
+                                    <img class="hpdu_start" [ngClass]="device.unitOccupiedClass"
+                                      [src]="device.hPDUStartImgURL" alt="" />
+
+                                    <img class="hpdu_single_socket" [ngClass]="device.unitOccupiedClass"
+                                      *ngFor='let socket of device.hPDUSingleSocketArray; let k = index'
+                                      id="{{'pdu-' + device.id + k}}" [src]="device.hPDUSingleSocketImgURL"
+                                      [tooltip]="device.uuid + k" triggers="" #hDURef="bs-tooltip"
+                                      [style.width]="socket + '%'" />
+
+                                    <img class="hpdu_end" [ngClass]="device.unitOccupiedClass"
+                                      [src]="device.hPDUEndImgURL" alt="" />
+                                  </span>
+
+                                  <img class="img-fluid right-cell pull-right"
+                                    [src]="cabinetViewData.cabinetUnitRightCellImgURL" alt="" />
+
+                                  <datacenter-cabinet-view-device-sensors *ngIf="device.showSensorOnCabinetDevice"
+                                    [sensor]="device.sensor" [showHeatMapLayer]="showHeatMapLayer">
+                                  </datacenter-cabinet-view-device-sensors>
+                                  <datacenter-cabinet-view-device-status [status]="device.status.status"
+                                    [units]="device.unitOccupiedClass" *ngIf="device.status">
+                                  </datacenter-cabinet-view-device-status>
+                                </div>
+                              </div>
+                              <div class="col-1 unitEnd px-0">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><img class="img-fluid cabinet-bottom" *ngIf="cabinetViewData.cabinetUnits.length"
+                        [src]="cabinetViewData.cabinetBottomImgURL" /></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td class="w-7 pt-0 border-top-0">
+              <div class="pr-0" *ngIf="cabinetViewData.verticalRPDUs">
+                <div class="row justify-content-around" dndDropzone dndEffectAllowed="move" dndAllowExternal="true"
+                  (dndDrop)="onRPDUDrop($event)" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+                  elementType="div">
+                  <div class="verticalPDU col-3 pointer-link"
+                    *ngFor="let pdu of cabinetViewData.verticalRPDUs; let i = index" [dndDraggable]="pdu"
+                    [dndType]="pdu" dndEffectAllowed="move" (dndStart)="onRPDUDragStart($event, i, pdu)"
+                    (dndEnd)="onRPDUDragEnd($event)">
+                    <div class="row" (click)="onSelectDevice(pdu)">
+                      <div class="w-100" *ngIf="pdu.isDevice">
+                        <div class="label_slot w-100 text-center">
+                          <h2 class="slot_name"> {{i == 0 ? 'C' : 'A'}}</h2>
+                        </div>
+                        <div class="w-100 text-center pdu_meter">
+                          <div class="pdu_meter_reading" *ngIf="pdu.sensor">
+                            {{(pdu.sensor.sensorValue | number:'1.0-0')}}
+                          </div>
+                          <div class="pdu_meter_reading" *ngIf="!pdu.sensor">NA</div>
+                        </div>
+                      </div>
+                      <div class="vpdu mt-3" *ngIf="pdu.pduType" dndDragImageRef>
+                        <img class="cousor_pointer pdu_start img-responsive" [src]="pdu.vPDUStartImgURL" alt="" />
+
+                        <img class="cousor_pointer single_socket img-responsive" [src]="pdu.vPDUSingleSocketImgURL"
+                          [ngStyle]="{'top' : '-' + (0.5 + (i*0.2)) + 'rem'}" [id]="'pdu-' + pdu.id + i"
+                          *ngFor='let socket of verticalPDUSockets; let i = index' [tooltip]=" pdu.uuid + i" triggers=""
+                          #vRPDURef="bs-tooltip" />
+
+                        <img class="cousor_pointer pdu_end img-responsive" [src]="pdu.vPDUEndImgURL" alt="" />
+                      </div>
+                      <div class="vpdu" *ngIf="!pdu.pduType">
+                        <h2> &nbsp; </h2>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dndPlaceholder" dndPlaceholderRef></div>
+                </div>
+              </div>
+            </td>
+            <td class="w-20 pt-0 border-top-0">
+              <table class="table cabinet-table" [ngStyle]="{'margin-top' : cabinetViewData.spaceOnTop + 'px' }">
+                <tbody class="cabinetView">
+                  <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr *ngFor="let device of cabinetViewData.cabinetUnits; let i = index">
+                    <td>
+                      <div class="row m-0 unitDeviceNames p-0" (click)="onSelectDevice(device)"
+                        [class.text-warning]="((device.name == hoveredDevice.name) || (device.name == selectedDevice.name))"
+                        [class.device_selected]="(device.name == selectedDevice.name)">
+                        <a class="d-inline-block text-truncate deviceName">
+                          <span class="font-weight-bold"> {{device.name}} </span>
+                        </a>
+                        <a class="pl-1 d-inline-block text-truncate icons">
+                          <span *ngIf="device.sshNewTab" [class.action-icons-disabled]="!device.sshNewTab.isEnabled">
+                            <i class="fas fa-external-link-alt"></i>
+                          </span>
+                          <span *ngIf="device.blinker" [class.pl-2]="device.sshNewTab"
+                            [class.action-icons-disabled]="!device.blinker.isEnabled">
+                            <i class="far fa-lightbulb"></i>
+                          </span>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-3">
+      <div class="row info_div" *ngIf="!selectedDevice.name">
+        <datacenter-cabinet-view-cabinet-info [showBriefInfo]="true" [cabinetInfo]="cabinetViewData" class="w-100">
+        </datacenter-cabinet-view-cabinet-info>
+      </div>
+
+      <div class="row info_div" *ngIf="selectedDevice.name">
+        <datacenter-cabinet-view-device-info [showBriefInfo]="true" [deviceInfo]="selectedDevice" class="w-100">
+        </datacenter-cabinet-view-device-info>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deviceMonitoringGraphs let-device="device">
+
+  <ng-container *ngIf="!device.monitoring">
+    <span class="mx-auto mt-5 d-block"> Monitoring not available for {{device.name}}</span>
+  </ng-container>
+
+  <ng-container *ngIf="device.monitoring">
+
+    <span class="mx-auto mt-5 d-block" *ngIf="!device.monitoring.configured"> Monitoring not configured for
+      {{device.name}}</span>
+
+    <span class="mx-auto mt-5 d-block" *ngIf="device.monitoring.configured && !device.monitoring.enabled">
+      Monitoring not enabled for {{device.name}}</span>
+
+    <ng-container *ngIf="device.monitoring.configured && device.monitoring.enabled && device.monitoring.zabbix">
+      <span class="mx-auto mt-5 d-block" *ngIf="!device.graphs.length"> No graphs available for {{device.name}}</span>
+      <form [formGroup]="zabbixDeviceGraphsForm" class="w-100"
+        *ngIf="zabbixDeviceGraphsForm && deviceGraphs.length && device.graphs.length">
+        <div class="form-group col-12">
+          <multiselect-dropdown [options]="deviceGraphs" [settings]="mySettings" class="form-control p-0 w-100"
+            style="height:auto;" formControlName="graph_list" (dropdownClosed)="showSelectedGraphs(device)"
+            [class.is-invalid]="zabbixGraphListFormErrors.graph_list"></multiselect-dropdown>
+          <div class="invalid-feedback" *ngIf="zabbixGraphListFormErrors.graph_list">
+            {{zabbixGraphListFormErrors.graph_list}}</div>
+        </div>
+      </form>
+      <div class="col-12" *ngFor="let graphDetails of device.graphs; let i = index">
+        <datacenter-cabinet-view-monitoring-graphs [graphDetails]="graphDetails"
+          [isCabinetGraphs]="false"></datacenter-cabinet-view-monitoring-graphs>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="device.monitoring.configured && device.monitoring.enabled && device.monitoring.observium">
+      <span class="mx-auto mt-5 d-block" *ngIf="!device.graphs.length"> No graphs available for {{device.name}}</span>
+
+      <div class="col-4" *ngFor="let graphDetails of device.graphs; let i = index">
+        <datacenter-cabinet-view-monitoring-graphs [graphDetails]="graphDetails"
+          [isCabinetGraphs]="false"></datacenter-cabinet-view-monitoring-graphs>
+      </div>
+    </ng-container>
+
+  </ng-container>
+
+</ng-template>
+
+<pdu-recycle></pdu-recycle>

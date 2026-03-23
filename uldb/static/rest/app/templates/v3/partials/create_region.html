@@ -1,0 +1,32 @@
+<form class="form-horizontal">
+    <div class="form-group" ng-repeat="row in rows" >
+        <div ng-if="row.required">
+            <label for="blockName" class="col-sm-3 control-label">{{ row.description }}*</label>
+            <div class="col-sm-9" ng-if="(row.type == 'text')">
+                <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" maxlength="128" value="{{row.value}}" required>
+            </div>
+            <div class="col-sm-9" ng-if="row.type == 'select' && row.name == 'id'">
+                <select ng-options="option.id as option.name for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+            </div>
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj[row.err_id]">{{ obj[row.err_msg] }}</label>
+            </div>
+        </div>
+
+        <!--for non required fields-->
+        <div ng-if="!row.required">
+            <label for="blockName" class="col-sm-3 control-label">{{ row.description }}</label>
+            <div class="col-sm-9" ng-if="(row.type == 'text') || (row.type == 'checkbox') ">
+                <input type="{{ row.type }}" class="{{ row.class }}" ng-model="obj[row.name]" value="{{row.value}}" required>
+            </div>
+            <div class="col-sm-9" ng-if="row.type == 'select' && row.name == 'parent_region_id'">
+                <select ng-options="option.parent_region_id as option.parent_region_name for option in row.options" class="{{ row.class }}" ng-model="obj[row.name]" required>
+                    <option value="">-- select {{ row.description | lowercase }} --</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+</form>

@@ -1,0 +1,30 @@
+<alerts></alerts>
+<h3>AWS Instance Details</h3>
+<div class="row">
+    <div class="col-sm-6 col-md-6 col-lg-6">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                AWS Instance Details
+            </div>
+            <div class="panel-body">
+                <span ng-if="!aws_instance_details_list_content">
+                    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+                </span>
+                <table class="table">
+                    <thead>
+                    <tr ng-repeat="col in aws_instance_details_headers">
+                        <td class="col-md-4">
+                            <div>{{ col.title }}</div>
+                        </td>
+                        <td class="col-md-8">
+                            <div ng-if="col.title != 'Tags'"><strong>{{ aws_instance_details_list_content[col.key] }}</strong></div>
+                            <div ng-if="col.title == 'Tags'"><table class="table table-bordered"><tr><th>Key</th><th>Value</th></tr><strong><tr ng-repeat="val in aws_instance_details_list_content[col.key]"><td>{{val.Key}}</td><td>{{val.Value}}</td></tr></strong></table></div>
+                        </td>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

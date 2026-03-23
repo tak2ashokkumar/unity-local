@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-sm-12">
+        <h3>Public Clouds - AWS</h3>
+        <span>
+        <small ng-repeat="crumb in bread.crumbs">
+            <span ng-if="$index > 0">&lt;</span><a href="{{ crumb.url }}">{{ crumb.name }}</a>
+        </small>
+        </span>
+    </div>
+</div>
+<alerts></alerts>
+<br>
+<div class="row">
+    <div class="col-xs-12 ul-admin-panel-1">
+        <tabset>
+            <customersview customers="customers"></customersview>
+            <br/>
+        </tabset>
+    </div>
+</div>

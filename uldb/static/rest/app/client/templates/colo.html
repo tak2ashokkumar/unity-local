@@ -1,0 +1,110 @@
+<style type="text/css">
+    .pdu_popover {
+        min-height : 80px;
+        min-width: 276px;
+        /*left: 0px !important;*/
+    }
+</style>
+<div class="page_wrapper" style="float:left">
+    <loading object="{{model.results}}"></loading>
+    <table-search-widget ng-show="model.results !== undefined"></table-search-widget>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="model.results !== undefined">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table infinite-scroll='loadPageData()' class="table table-condensed table-hover margin0">
+                <thead>
+                    <tr>
+                      <th class="{{ row.col_class }}" ng-repeat="row in rows" custom-sort order="{{ row.name }}" sort="sort" sortdisabled="{{row.is_sort_disabled}}">{{ row.description }}</th>
+                      <th ng-if="angular.isDefined(disable_action) && !disable_action">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="result in model.results">
+                        <td ng-repeat="row in rows">
+                            <span ng-if="row.opaque === undefined">{{ result[row.name] }}</span>
+                            <span ng-if="row.opaque === 'stringTransform'">{{ row.read(result) }}</span>
+
+                            <a ng-if="(device_type !== 'pdu') && (row.opaque === 'link')" href="" ng-click="showDetails(row.read(result).uuid, row.read(result).type)">{{ row.read(result).innerText }}</a>
+                            
+                            <a tabindex="0" ng-if="(device_type === 'pdu') && (row.opaque === 'link')"
+                                popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                                popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                                ng-init="get_pdu_details(result)" ng-click="show_observium_details(result)">{{ row.read(result).innerText }}</a>
+
+                            <span ng-if="row.opaque === 'string'">{{ row.read(result).innerText }}</span>
+                        </td>
+                        <td ng-if="angular.isDefined(disable_action) && !disable_action">
+                            <div class="action-icons">
+                                <div ng-if="(device_type === 'cabinet')">
+                                    <span tooltip-class="customClass" uib-tooltip="View Cabinet">
+                                      <a ng-class="{'fa-disabled': !result.available_size}" ng-click="showCabinetView(result)">
+                                        <i class="fa fa-eye" ng-class="{'fa-disabled': !result.available_size}" aria-hidden="true"></i>
+                                      </a>
+                                    </span>
+                                </div>
+                                <div ng-if="(device_type === 'pdu')">
+                                    <a class="fa fa-info-circle" tooltip-class="customClass" uib-tooltip="Show PDU Info" href="javascript:void(0)" ng-click="showDetails(uuid,'PDU')"></a>
+
+                                    <span tooltip-class="customClass" ng-show="(result.observium_details !== null)"
+                                     uib-tooltip="Show PDU Statistics">
+                                        <a ng-click="show_health_statistics(result.uuid)">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+                                    <span tooltip-class="customClass" ng-show="(result.observium_details === null)"
+                                    uib-tooltip="{{ $root.monitoring_not_enabled_msg }}">
+                                        <a>
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="model.results.length === 0" class="content-wrapper">
+                <no-records-found message="No {{title.plural}} to display"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>
+
+<style type="text/css">
+    .popover{
+        width : 28%;
+        max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    }
+</style>
+
+<script type="text/ng-template" id="pdudetailstemplate.html">
+    <div class="row">
+        <table class="table"  ng-show="pdu_details.device_data">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div>Uptime</div>
+                    </th>
+                    <td class="table_no_top_border">
+                        <div ng-if="pdu_details.device_data.status == 1">{{pdu_details.device_data.uptime | unityObserviumTime}}</div>
+                        <div ng-if="pdu_details.device_data.status == 0">Down {{pdu_details.device_data.uptime | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4">
+                        <div>Last reboot</div>
+                    </th>
+                    <td>
+                        <div>{{pdu_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="angular.isDefined(pdu_details) && (pdu_details === null)" style="padding : 20px">
+            <p>{{ $root.monitoring_not_enabled_msg }}</p>
+        </div>
+    </div>
+</script>

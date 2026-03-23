@@ -1,0 +1,92 @@
+<div ng-controller="PortDetailsController">
+	<div class="row tabs-level1" style="margin-top: 10px;height: 35px;" ng-show="submenutabs">
+	    <div class="col-xs-8 col-sm-7 col-md-6 col-lg-4" style="padding-left: 5px !important;">
+	        <div class="ui-selectee">
+	            <nav class="column subtabs">
+	                <uib-tabset ng-show="submenutabs" active="activeSubTab">
+	                    <uib-tab ng-repeat="subtab in submenutabs" index="$index" heading="{{subtab.tabname}}"
+	                    select="getGraphSubtabsData(subtab);"></uib-tab>
+	                </uib-tabset>
+	            </nav>
+	        </div>
+	    </div>
+
+	    <div class="col-xs-4 col-sm-5 col-md-6 col-lg-8" style="padding-left: 5px !important;">
+	        <div class="ui-selectee">
+	        	<p>
+	        		<label style="font-weight: 600 !important;"> PORT  : </label>
+	        		<label style="font-weight: 600 !important;"> &nbsp; {{selectedPort.entity_name}} </label>
+	        	</p>
+	        </div>
+	    </div>
+	</div>
+
+	<div class="row" ng-show="!showDetailsView && show_pdu_graphs">
+		 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 page_wrapper">
+			<div class="row" ng-repeat="pdu_graph_obj in pdu_graph_data">
+			    <sub-title title="{{pdu_graph_obj.displayName}}"></sub-title>
+			    <table>
+			    	<tbody>
+			    		<tr ng-click="getGraphforDefaultDateRange(pdu_graph_obj)">
+			    			<td>
+			    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ pdu_graph_obj.graphDetails.graph_by_day }}">
+			    			</td>
+			    			<td>
+			    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ pdu_graph_obj.graphDetails.graph_by_week }}">
+			    			</td>
+			    			<td>
+			    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ pdu_graph_obj.graphDetails.graph_by_month }}">
+			    			</td>
+			    			<td>
+			    				<img class="pdugraphsimg" ng-src="data:image/png;base64,{{ pdu_graph_obj.graphDetails.graph_by_year }}">
+			    			</td>
+			    		</tr>
+			    	</tbody>
+			    </table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" ng-show="!showDetailsView && show_pdu_alerts">
+		<div class="row page_wrapper margin_top20px">
+		  <div class="col-xs-12 content-wrapper">
+		    <h1>PDU Alerts</h1>
+		  </div>
+		</div>
+		<div class="page_wrapper" style="float:left">
+		    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="pdu_port_alerts !== undefined">
+		        <section id="no-more-tables" class="margintop20 middle-wrapper">
+		            <table class="table table-condensed table-hover margin0">
+		                <thead>
+		                    <tr>
+		                      <th>Alert</th>
+		                      <th>Status</th>
+		                      <th>Checked</th>
+		                      <th>Changed</th>
+		                      <th>Alerted</th>
+		                      <th>Entity ID</th>
+		                      <th>Entity Type</th>
+		                    </tr>
+		                </thead>
+
+		                <tbody>
+		                    <tr ng-repeat="(alertid,alert) in pdu_port_alerts.alerts">
+		                      <td>{{alert.alert_name}}</td>
+		                      <td>{{alert.status}}</td>
+		                      <td>{{alert.checked}}</td>
+		                      <td>{{alert.changed}}</td>
+		                      <td>{{alert.alerted}}</td>
+		                      <td>{{alert.entity_id}}</td>
+		                      <td>{{alert.entity_type}}</td>
+		                    </tr>
+		                </tbody>
+		            </table>
+		            <div ng-if="!pdu_port_alerts.alerts && !loader" class="content-wrapper">
+		                <no-records-found message="No Alerts to display"></no-records-found>
+		            </div>
+		        </section>
+		    </div>
+		</div>
+	</div>
+</div>
+<observium-graph-details ng-show="showDetailsView"></observium-graph-details>

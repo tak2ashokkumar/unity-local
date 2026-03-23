@@ -1,0 +1,141 @@
+
+<!--<h3>Private IPv4 Allocations</h3>-->
+
+<script type="text/ng-template" id="alert23.html">
+  <div class="alert alert-{{ type }}" role="alert">
+    <button type="button" class="close" data-dismiss="alert" ng-click="close()">
+      <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+    </button>
+    <div ng-transclude></div>
+  </div>
+</script>
+
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <a href="tab.url"></a>
+  </uib-tab>
+</uib-tabset>
+
+<div class="row">
+  <div class="col-sm-6">
+    <uib-alert template-url="alert23.html" ng-repeat="alert in alertService.alerts" type="{{ alert.severity }}"
+               close="alertService.closeAlert($index)"
+               dismiss-on-timeout="10000">
+      {{ alert.msg }}
+    </uib-alert>
+  </div>
+</div>
+
+<table class="table table-striped table-hover">
+  <thead>
+  <tr>
+    <th class="col-sm-2">Name</th>
+    <th class="col-sm-2">Description</th>
+    <th class="col-sm-2">CIDR</th>
+    <th class="col-sm-2"></th>
+    <th class="col-sm-2"></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr ng-repeat="allocation in model.results"
+      ng-click="selection.selected = allocation; selection.index = $index"
+      ng-class="{'selected': allocation === selection.selected}">
+    <td>{{ allocation.name }}</td>
+    <td>{{ allocation.description }}</td>
+    <td>{{ allocation.prefix }}/{{ allocation.prefixlen }}</td>
+    <td>
+      <button ng-if="allocation === selection.selected"
+              class="btn btn-warning btn-xs"
+              ng-click="edit(allocation, $index)">
+        <span class="glyphicon glyphicon-pencil"></span> Edit
+      </button>
+    </td>
+    <td>
+      <button ng-if="allocation === selection.selected"
+              class="btn btn-danger btn-xs"
+              ng-click="delete(allocation, $index)" confirm>
+        <i class="glyphicon glyphicon-erase" aria-hidden="true"></i> Delete
+      </button>
+    </td>
+  </tr>
+  <tr ng-if="model.results.length === 0"> <td>No Records found</td><td></td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+<uib-pagination total-items="model.count" items-per-page="pageSize" max-size="5" rotate="false"
+                ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+
+<div class="row">
+  <div class="col-sm-1">
+    <button class="btn btn-default" ng-click="addBlock()">Add</button>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="newPrivateBlockModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Add New IPv4 Block</h3>
+  </div>
+
+  <div class="modal-body" style="height: 400px;">
+    <form class="form-horizontal">
+
+      <div class="form-group">
+        <label for="blockName" class="col-sm-2 control-label">
+          New Block Name
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.name">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="blockName" class="col-sm-2 control-label">
+          Prefix
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.prefix">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="blockName" class="col-sm-2 control-label">
+          Prefix Length
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.prefixlen">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="blockName" class="col-sm-2 control-label">
+          Description
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="obj.description">
+        </div>
+      </div>
+
+    </form>
+
+
+  </div>
+
+  <div class="modal-footer">
+    <button ng-if="method === 'create'" class="btn btn-success" type="button" ng-click="add(obj)">
+      Create this IP block!
+    </button>
+    <button ng-if="method === 'edit'" class="btn btn-success" type="button" ng-click="update(obj, selection.index)">
+      Save changes!
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+  </div>
+</script>

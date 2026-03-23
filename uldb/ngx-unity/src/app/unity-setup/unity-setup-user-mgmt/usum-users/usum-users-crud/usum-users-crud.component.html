@@ -1,0 +1,164 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="row justify-content-between">
+                    <div class="col-5 font-weight-bold">
+                        <span class="ml-2 font-weight-bold font-lg">{{action}} User</span>
+                    </div>
+                    <div class="col-1">
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" *ngIf="form" [formGroup]="form">
+                    <div class="form-group text-center" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="border rounded position-relative px-4 pt-4 pb-2 mb-3">
+                        <div class="bg-white position-absolute section-name-one font-500">Basic Details</div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right"><span class="text-muted">Email</span><em>*</em>
+                                <span class="text-muted pl-2">:</span>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <input id="email" class="form-control form-control-sm" type="text"
+                                    placeholder="Enter Email" formControlName="email"
+                                    [ngClass]="{'is-invalid' : formErrors.email}">
+                                <div class="invalid-feedback" *ngIf="formErrors.email">{{formErrors.email}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right"><span class="text-muted">First Name</span><em>*</em>
+                                <span class="text-muted pl-2">:</span>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <input id="first_name" class="form-control form-control-sm" type="text"
+                                    placeholder="Enter First Name" formControlName="first_name"
+                                    [ngClass]="{'is-invalid' : formErrors.first_name}">
+                                <div class="invalid-feedback" *ngIf="formErrors.first_name">
+                                    {{formErrors.first_name}}</div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right"><span class="text-muted">Last Name</span><em>*</em>
+                                <span class="text-muted pl-2">:</span>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <input id="last_name" class="form-control form-control-sm" type="text"
+                                    placeholder="Enter Last Name" formControlName="last_name"
+                                    [ngClass]="{'is-invalid' : formErrors.last_name}">
+                                <div class="invalid-feedback" *ngIf="formErrors.last_name">
+                                    {{formErrors.last_name}}</div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right"><span class="text-muted">Phone Number</span>
+                                <span class="text-muted pl-2">:</span>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <input id="phone_number" class="form-control form-control-sm" type="text"
+                                    placeholder="Enter Phone Number" formControlName="phone_number"
+                                    [ngClass]="{'is-invalid' : formErrors.phone_number}">
+                                <div class="invalid-feedback" *ngIf="formErrors.phone_number">
+                                    {{formErrors.phone_number}}</div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">
+                                <span class="text-muted">Carrier</span>
+                                <span *ngIf="isCarrierFieldRequiredField()"><em>*</em></span>
+                                <span class="ml-1 text-muted pl-2">:</span>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <select class="form-control form-control-sm" id="carrier" formControlName="carrier"
+                                    [ngClass]="{'is-invalid' : formErrors.carrier}">
+                                    <option [ngValue]="''">Select Carrier</option>
+                                    <option *ngFor="let c of carriers" [ngValue]="c.id">{{c.carrier_name}}</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.carrier">{{formErrors.carrier}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border rounded position-relative px-4 pt-4 pb-2 mb-3">
+                        <div class="bg-white position-absolute section-name-one font-500">Add to Groups</div>
+                        <div class="form-group row mt-3">
+                            <div class="col-2 text-right">
+                                <span class="text-muted">Select User Group</span>
+                                <!-- <span *ngIf="isRequiredField('user_groups')"><em>*</em></span> -->
+                                <span class="text-muted pl-2">:</span>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                                    class="form-control form-control-sm p-0" style="height:auto;"
+                                    formControlName="user_groups"
+                                    [ngClass]="{'is-invalid' : formErrors.user_groups}"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="formErrors.user_groups">{{formErrors.user_groups}}
+                                </div>
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="col offset-2" *ngIf="selectedUserGroups.length">
+                                <div class="row mt-2">
+                                    <div *ngFor="let group of selectedUserGroups; let i=index">
+                                        <span
+                                            class="badge badge-pill custom-bg-blue text-primary font-xs py-2 mb-2 mr-2 pl-2">{{group.name}}
+                                            <span class="fas fa-times pointer-link px-1" *ngIf="!group.isForceIncluded"
+                                                (click)="unSelectUserGroup(i)"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border rounded position-relative px-4 pt-4 pb-2 mb-2">
+                        <div class="bg-white position-absolute section-name-one font-500">Assign Roles</div>
+                        <div class="form-group row">
+                            <div class="col-2 text-right">
+                                <span class="text-muted">Select Roles</span>
+                                <span class="text-muted pl-2">:</span>
+                            </div>
+                            <div class="col-4 pl-0">
+                                <multiselect-dropdown [options]="userRoles" [settings]="rolesSettings"
+                                    class="form-control form-control-sm p-0" style="height:auto;"
+                                    formControlName="rbac_roles"
+                                    [class.is-invalid]="formErrors.rbac_roles"></multiselect-dropdown>
+                                <div class="invalid-feedback" *ngIf="formErrors.rbac_roles">
+                                    {{formErrors.rbac_roles}}
+                                </div>
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="col offset-2">
+                                <div class="row mt-2">
+                                    <ng-container *ngIf="userRolesByUserGroup.length">
+                                        <div *ngFor="let role of userRolesByUserGroup; let i=index">
+                                            <span
+                                                class="badge badge-pill custom-bg-blue text-primary font-xs py-2 mb-2 mr-2 pl-2">{{role.name}}
+                                            </span>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="selectedUserRoles.length">
+                                        <div *ngFor="let userRole of selectedUserRoles; let i=index">
+                                            <span
+                                                class="badge badge-pill custom-bg-blue text-primary font-xs py-2 mb-2 mr-2 pl-2">{{userRole.name}}
+                                                <span class="fas fa-times pointer-link px-1"
+                                                    (click)="unSelectUserRole(i)"></span></span>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                    <button class="btn btn-success ml-2" (click)="onSubmit()" *ngIf="!userId">Create</button>
+                    <button class="btn btn-success ml-2" (click)="onSubmit()" *ngIf="userId">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

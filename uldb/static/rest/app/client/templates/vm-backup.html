@@ -1,0 +1,380 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object="{{vm_snapshots.results}}"></loading>
+    <page-title title="VM Backup"></page-title>
+    <div class="row">
+      <div class="date-wrapper">
+        <div class="col-xs-10 col-sm-8 col-md-8 col-lg-6">
+          <form role="form" class="form-horizontal">
+              <label class="col-sm-3" for="selectcloud"><span class="daterange">Select Cloud</span></label>
+              <div class="col-sm-7" style="padding-top : 20px;">
+                <select name="speed" placeholder="Select Sector" id="speed" ng-change="load_vm_list(cloud_list_select)" ng-options="option.long for option in cloud_list track by option.short.uuid" class="ng-touched" ng-model="cloud_list_select">
+                </select>
+                <span class="select-arrow"></span>
+              </div>
+              <label class="col-sm-1" for="selectcloud" style="margin-left: -8px !important;"><span class="daterange"></span></label>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="margin_top20px page_wrapper" style="float:left">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color" ng-show="vm_snapshots.results !== undefined">
+            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+                <form class="navbar-form">
+                    <div class="form-group">
+                        <input class="form-control" type="text" ng-model="searchkey" ng-model-options="{debounce: 1000}" id="searchKeyword" placeholder="Enter keyword" ng-change="getSearchResults()">
+                        <button class="btn btn-search" type="submit" style="top: 4px;">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+              <div class="action-bar pull-right">
+                <span class="count">
+                {{ vm_snapshots.count}}</span>
+                <span class="count-text"> Virtual Machines</span>
+              </div>
+            </div>
+        </div>
+
+        <div class="bg-color">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="vm_snapshots.results !== undefined">
+            <section id="no-more-tables" class="margintop20 middle-wrapper">
+                <table infinite-scroll='loadMoreResults()' ng-if="vm_snapshots.results.length > 0" class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                            <th ng-if="row.title !== 'Actions'" custom-sort order="{{row.key}}" sort="sort" ng-repeat="row in vm_backup_headers">{{row.title}}</th>
+                            <th class="numeric">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-show="items.length === 0">
+                            <td class="center" colspan="3">Nobody is here</td>
+                        </tr>
+
+                        <tr ng-repeat=" row in vm_snapshots.results track by $index">
+                            <td ng-repeat="row_data in vm_backup_headers" ng-class="{'width12p' :(row_data.key == 'vmware_actions') || (row_data.key == 'openstack_actions')}" style="padding : 10px;">
+                                <span ng-if="row_data.key == 'updated_at' || row_data.key == 'backup_date'">
+                                    {{ (row[row_data.key] | unityDate : $root.users_timezone) || 'N/A'}}
+                                </span>
+                                <span ng-if="row_data.key == 'size'">
+                                    {{(row[row_data.key]/(1024*1024))|number: 1}}
+                                </span>
+                                <span ng-if="row_data.key == 'state' || row_data.key == 'last_known_state'">
+                                  <device-up ng-if="(row[row_data.key] | powerState) === 'On'"></device-up>
+                                  <device-down ng-if="(row[row_data.key] | powerState) === 'Off'"></device-down>
+                                  <span ng-if="((row[row_data.key] | powerState) !== 'Off') && ((row[row_data.key] | powerState) !== 'On')"> N/A </span>
+                                </span>
+                                <span
+                                    ng-if="row_data.key != 'updated_at' && row_data.key != 'backup_date' &&
+                                    row_data.key != 'openstack_actions' && row_data.key != 'size' && row_data.key != 'vmware_actions' && row_data.key != 'state' && row_data.key != 'last_known_state'">
+                                  {{ row[row_data.key] || 'N/A'}}
+                                </span>
+                                <span ng-if="row_data.key == 'openstack_actions'" >
+                                  <div class="action-icons" style="display : inline-flex">
+                                      <a tooltip-class="customClass" uib-tooltip="AWS Backup" class="fa fa-cloud " href
+                                         ng-class="{'fa-disabled' :( backup_status_check(row['backup_status']))}"
+                                         ng-click="backupOpenStackVm(row.instance_id, 'AWS', $index, row )"></a>
+                                      <a tooltip-class="customClass" uib-tooltip="Azure Backup" class="fa fa-cloud-upload" href
+                                         ng-class="{'fa-disabled' :( backup_status_check(row['backup_status']))}"
+                                         ng-click="backupOpenStackVm(row.instance_id, 'Azure', $index, row )"></a>
+                                      <a tooltip-class="customClass" uib-tooltip="Backup History" class="fa fa-history" href ng-click="backupHistory(row.id, 'OpenStack', $index)"></a>
+                                  </div>
+                                </span>
+                                <span ng-if="row_data.key == 'vmware_actions'">
+                                  <div class="action-icons"  style="display : inline-flex">
+                                    <a tooltip-class="customClass" uib-tooltip="AWS Backup"  class="fa fa-cloud "
+                                       ng-class="{'fa-disabled' :( backup_status_check(row['backup_status']))}"
+                                       href ng-click="backupVMWareVm(row.instance_id, 'AWS', $index, row)"></a>
+                                    <a tooltip-class="customClass" uib-tooltip="Azure Backup" class="fa fa-cloud-upload" href
+                                       ng-class="{'fa-disabled' :( backup_status_check(row['backup_status']))}"
+                                       ng-click="backupVMWareVm(row.instance_id, 'Azure', $index, row)" ></a>
+                                    <a tooltip-class="customClass" uib-tooltip="Backup History"  class="fa fa-history" href ng-click="backupHistory(row.id, 'VMware', $index)"></a>
+                                  </div>
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <div  ng-if="vm_snapshots.results.length === 0" class="content-wrapper">
+                    <no-records-found message="No records to display. {{backup_instance_unsupported}}"></no-records-found>
+                </div>
+            </section>
+          </div>
+      </div>
+    </div>
+</div>
+
+ 
+
+
+<script type="text/ng-template" id="awsAccountSelection.html">
+
+ <div class="modal-content">
+     <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && create(request)">
+
+      <div class="modal-header">
+        <h4 class="modal-title"  >Select AWS Bucket</h4>
+      </div>
+
+      <div class="modal-body">
+
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-show="aws_account_list.length!==0">
+
+
+                  <div class="paddingR"  >
+
+                      <div class="form-group">
+                            <label for="aws_account" >
+                                AWS Account <span> *</span>
+                                <span class="errormsg"  ng-if="!aws_region_list_errmsg && (modalform.$submitted && modalform.aws_account.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="aws_account_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ aws_account_list_errmsg }} )
+                                </span>
+                            </label>
+
+                            <select ng-change="loadAwsRegionList(request.aws_account_list)" ng-options="option.long for option in aws_account_list track by option.short" class="form-control"
+                                      ng-model="request.aws_account_list" required  name ="aws_account" >
+                                      <option value="">-- Select aws account --</option>
+                            </select>
+                      </div>
+                  </div>
+
+
+                  <div class="paddingR"  >
+
+                      <div class="form-group">
+                            <label for="aws_region" >
+                                Region <span  > *</span>
+                                <span class="errormsg"  ng-if="!aws_region_list_errmsg && (modalform.$submitted && modalform.aws_region.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="aws_region_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ aws_region_list_errmsg }} )
+                                </span>
+                            </label>
+
+                            <select ng-change="loadAwsBucketList(request.aws_region_list)" ng-options="option.long for option in aws_region_list track by option.short" class="form-control"
+                                     ng-model="request.aws_region_list" name ="aws_region" required>
+                                    <option value="">-- Select Region --</option>
+                            </select>
+                      </div>
+                  </div>
+
+
+                  <div class="paddingR"  >
+                      <div class="form-group">
+                            <label for="aws_bucket" >
+                                Bucket  <span > *</span>
+                                <span class="errormsg"  ng-if="!aws_region_list_errmsg && (modalform.$submitted && modalform.aws_bucket.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="aws_bucket_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ aws_bucket_list_errmsg }} )
+                                </span>
+                            </label>
+
+                            <select ng-change="" ng-options="option.long for option in aws_bucket_list track by option.short" class="form-control"
+                                      ng-model="request.aws_bucket_list" name ="aws_bucket"  required>
+                                      <option value="">-- Select bucket --</option>
+                            </select>
+                      </div>
+                  </div>
+              </div>
+          <div ng-if="aws_account_list.length==0" style="font-size: 17px; padding: 12px;">
+              There is no AWS account associated.Please <a href="main#/public_cloud/aws-dashboard">click here</a> to add one.
+          </div>
+      </div>
+
+      <div class="modal-footer modal-buttons">
+        <div class="modal-footer modal-buttons" ng-if="aws_account_list.length!=0">
+          <button type="button" class="btn btn-cancel" ng-click="cancel()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-default">
+            Submit
+          </button>
+        </div>
+        <div class="modal-footer modal-buttons" ng-if="aws_account_list.length==0">
+          <button type="button" class="btn btn-default" ng-click="cancel()">
+            Cancel
+          </button>
+        </div>
+      </div>
+     </form>
+ </div>
+</script>
+
+
+
+
+
+<script type="text/ng-template" id="azureAccountSelection.html">
+
+ <div class="modal-content">
+     <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && create(request)">
+
+      <div class="modal-header">
+        <h4 class="modal-title"  >Select Azure Bucket</h4>
+      </div>
+
+      <div class="modal-body">
+
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-show="azure_account_list.length!=0">
+
+                  <div class="paddingR "   >
+                      <div class="form-group">
+                            <label for="azure_account" >
+                                Azure Account <span> *</span>
+                                <span class="errormsg"  ng-if="!azure_account_list_errmsg && (modalform.$submitted && modalform.azure_account.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="azure_account_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ azure_account_list_errmsg }} )
+                                </span>
+                            </label>
+
+                            <select  ng-change="loadAzureResourceList(request.azure_account_list)"  ng-options="option.long for option in azure_account_list track by option.short"
+                                     class="form-control" ng-model="request.azure_account_list" required name ="azure_account">
+                                  <option value="">-- Select azure account --</option>
+                            </select>
+                      </div>
+                  </div>
+
+                  <div class="paddingR"   >
+
+                      <div class="form-group">
+                            <label for="azure_resource_group" >
+                                Resource group <span  > *</span>
+                                <span class="errormsg"  ng-if="!azure_resource_list_errmsg && (modalform.$submitted && modalform.azure_resource_group.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="azure_resource_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ azure_resource_list_errmsg }} )
+                                </span>
+                            </label>
+
+                            <select ng-change="loadAzureStorageList(request.azure_resource_list)" ng-options="option.long for option in azure_resource_list track by option.short" class="form-control"
+                                      ng-model="request.azure_resource_list" required name="azure_resource_group">
+                                      <option value="">-- Select resource group --</option>
+                            </select>
+                      </div>
+                  </div>
+
+
+                  <div class="paddingR"  >
+                      <div class="form-group">
+                            <label for="azure_storage_account" >
+                                Storage Account   <span > *</span>
+                                <span class="errormsg"  ng-if="!azure_storage_list_errmsg && (modalform.$submitted && modalform.azure_storage_account.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="azure_storage_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ azure_storage_list_errmsg }} )
+                                </span>
+                            </label>
+                            <select ng-change="loadAzureContainerList(request.azure_storage_list)" ng-options="option.long for option in azure_storage_list track by option.short" class="form-control"
+                                      ng-model="request.azure_storage_list" required name="azure_storage_account">
+                                <option value="">-- Select storage account --</option>
+                            </select>
+                      </div>
+                  </div>
+
+
+                  <div class="paddingR"   >
+                      <div class="form-group">
+                            <label for="azure_container_list" >
+                                Container  <span > *</span>
+                                <span class="errormsg"  ng-if="!azure_container_list_errmsg && (modalform.$submitted && modalform.azure_container_list.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                                <span class="errormsg" ng-if="azure_container_list_errmsg && (modalform.$submitted)" >
+                                    &nbsp; ( {{ azure_container_list_errmsg }} )
+                                </span>
+                            </label>
+
+                            <select ng-options="option.long for option in azure_container_list track by option.short" class="form-control"
+                                      ng-model="request.azure_container_list" required name="azure_container_list">
+                                      <option value="">-- Select container account --</option>
+                            </select>
+                      </div>
+                  </div>
+
+              </div>
+          <div ng-if="azure_account_list.length==0" style="font-size: 17px; padding: 12px;">
+              There is no Azure account associated.Please <a href="main#/public_cloud/azure-dashboard">click here</a> to add one.
+          </div>
+      </div>
+
+      <div class="modal-footer modal-buttons">
+        <div class="modal-footer modal-buttons" ng-if="azure_account_list.length!=0">
+          <button type="button" class="btn btn-cancel" ng-click="cancel()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-default">
+            Submit
+          </button>
+        </div>
+        <div class="modal-footer modal-buttons" ng-if="azure_account_list.length==0">
+          <button type="button" class="btn btn-default" ng-click="cancel()">
+            Cancel
+          </button>
+        </div>
+      </div>
+     </form>
+ </div>
+</script>
+
+
+
+
+
+
+
+<script type="text/ng-template" id="backupHistory.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Backup History</h3>
+  </div>
+  <div class="modal-body">
+    <span ng-if="!backup_history">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+    </span>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+            <section   class="margintop20 middle-wrapper">
+                <table infinite-scroll='loadMore()' class="table table-condensed table-hover">
+                    <thead>
+                        <tr>
+                          <th>File Name</th>
+                          <th>Backup Date</th>
+                          <th>Target Type</th>
+                          <th>Target Account Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="d in backup_history">
+                          <td>{{ d.file_name }}</td>
+                          <td>{{ d.backup_date | unityDate : $root.users_timezone }}</td>
+                          <td>{{ d.target_type }}</td>
+                          <td><span ng-if="d.target_type == 'Azure'">{{ d.azure_account__account_name }}</span>
+                            <span ng-if="d.target_type == 'AWS'">{{ d.aws_account_id }}</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+  </div>
+      <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                  Cancel
+                </button>
+
+            </div>
+      </div>
+</script>

@@ -1,0 +1,233 @@
+<div class="row mt-3">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="row justify-content-between">
+                    <div class="col-5 font-weight-bold">
+                        <span class="ml-2 font-weight-bold font-lg">{{action}} Anomaly Detection</span>
+                    </div>
+                    <div class="col-1">
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" *ngIf="triggerForm" [formGroup]="triggerForm">
+                    <div class="form-group text-center" *ngIf="nonFieldErr">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">Trigger Name<em>*</em> : </div>
+                        <div class="col-4">
+                            <input id="name" class="form-control form-control-sm" type="text" formControlName="name"
+                                autocomplete="off" [class.is-invalid]="triggerFormErrors.name">
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.name">{{triggerFormErrors.name}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">Device<em>*</em> : </div>
+                        <div class="col-2">
+                            <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypesSettings"
+                                class="form-control form-control-sm p-0" style="height:auto;"
+                                formControlName="device_types"
+                                [class.is-invalid]="triggerFormErrors.device_types"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.device_types">
+                                {{triggerFormErrors.device_types}}
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <multiselect-dropdown [options]="devices" [settings]="devicesSettings"
+                                class="form-control form-control-sm p-0" style="height:auto;" formControlName="devices"
+                                [class.is-invalid]="triggerFormErrors.devices"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.devices">
+                                {{triggerFormErrors.devices}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">Severity<em>*</em> : </div>
+                        <div class="col-2">
+                            <select id="severity" class="form-control form-control-sm" formControlName="severity"
+                                [class.is-invalid]="triggerFormErrors.severity">
+                                <option value="" disabled>Select Severity</option>
+                                <option value="information">Information</option>
+                                <option value="warning">Warning</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.severity">
+                                {{triggerFormErrors.severity}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2 text-right">Mode<i class="fa fa-info-circle text-muted ml-2" container="body"
+                                containerClass="info-multi-line" [tooltip]="'Event Generation Mode'"></i> : </div>
+                        <div class="col-2">
+                            <select id="mode" class="form-control form-control-sm" formControlName="mode"
+                                [class.is-invalid]="triggerFormErrors.mode">
+                                <option value="0">Single</option>
+                                <option value="1">Multiple</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.mode">{{triggerFormErrors.mode}}
+                            </div>
+                        </div>
+                    </div>
+                    <ng-container *ngTemplateOutlet="triggerRuleFormRef"></ng-container>
+                    <div class="form-group row">
+                        <div class="col-8 offset-2">
+                            <textarea id="problem_expression" rows="4" class="form-control form-control-sm"
+                                formControlName="problem_expression"
+                                [class.is-invalid]="triggerFormErrors.problem_expression"></textarea>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.problem_expression">
+                                {{triggerFormErrors.problem_expression}}</div>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                    <button class="btn btn-success ml-2" (click)="confirmTriggerCreate()"
+                        *ngIf="!anomalyDetctionTriggerId">Create</button>
+                    <button class="btn btn-success ml-2" (click)="confirmTriggerCreate()"
+                        *ngIf="anomalyDetctionTriggerId">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #triggerRuleFormRef>
+    <form [formGroup]="triggerRulesForm" *ngIf="triggerRulesForm">
+        <div class="form-group row">
+            <div class="col-2 text-right">Metric<em>*</em> <i class="fa fa-info-circle text-muted ml-2" container="body"
+                    containerClass="info-multi-line"
+                    [tooltip]="'Select the Metric/parameter for setup of anomaly detection for example CPU Utilization.'"></i>
+                :</div>
+            <div class="col-3">
+                <select id="item_key" class="form-control form-control-sm" formControlName="item_key"
+                    [class.is-invalid]="triggerRulesFormErrors.item_key">
+                    <option value="" disabled>Select Metric</option>
+                    <option *ngFor="let item of items" [ngValue]="item">{{item.name}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.item_key">
+                    {{triggerRulesFormErrors.item_key}}</div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2 text-right">Rules<em>*</em>:</div>
+            <div class="col-3">
+                <div class="d-flex">
+                    <div class="bg-secondary w-21 text-center pt-1 rounded-left">
+                        <span class="fa fa-info-circle text-muted mt-1" containerClass="info-multi-line" tooltip="the time period that must be decomposed (minimum '1h'), defined as <N><time unit> where
+                                N- the number of time units,
+                                time unit- h (hour), d (day)"></span>
+                    </div>
+                    <input id="function_value" class="form-control form-control-sm rounded-0" type="text"
+                        formControlName="function_value" [class.is-invalid]="triggerRulesFormErrors.function_value">
+                    <div *ngIf="triggerRulesForm.controls.function_unit" class="w-40">
+                        <select id="function_unit"
+                            class="form-control form-control-sm px-0 custom-left-border-radius function-unit-select border-left-0"
+                            formControlName="function_unit" [class.is-invalid]="triggerRulesFormErrors.function_value">
+                            <option *ngFor="let unit of zabbixTriggerFunctionUnits" [value]="unit">
+                                {{unit}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="triggerRulesFormErrors.function_value">
+                    {{triggerRulesFormErrors.function_value}}</div>
+            </div>
+            <div class="col-3">
+                <div class="d-flex">
+                    <div class="bg-secondary w-21 text-center pt-1 rounded-left">
+                        <span class="fa fa-info-circle text-muted mt-1" containerClass="info-multi-line" tooltip="the time period before the end of eval period for which anomalies are calculated (minimum '1Hours', cannot be longer than eval period), defined as <N><time unit> where
+                                N- the number of time units,
+                                time unit- Hours,Days"></span>
+                    </div>
+                    <input id="detect_period_value" class="form-control form-control-sm rounded-0" type="text"
+                        placeholder="Detection Period" formControlName="detect_period_value"
+                        [class.is-invalid]="triggerRulesFormErrors.detect_period_value">
+                    <div class="w-40">
+                        <select id="detect_period_unit"
+                            class="form-control form-control-sm px-0 custom-left-border-radius unit-select border-left-0"
+                            formControlName="detect_period_unit">
+                            <option *ngFor="let unit of detectionPeriodUnits" [value]="unit.value">
+                                {{unit.label}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="triggerRulesFormErrors.detect_period_value">
+                    {{triggerRulesFormErrors.detect_period_value}}</div>
+            </div>
+            <div class="col-3">
+                <div class="d-flex">
+                    <div class="bg-secondary w-21 text-center pt-1 rounded-left">
+                        <span class="fa fa-info-circle text-muted mt-1" containerClass="info-multi-line" tooltip="the shortest time period where a repeating pattern ('season') is expected (minimum '2Hours', cannot be longer than eval period, the number of entries in the eval period must be greater than the two times of the resulting frequency (season/h)), defined as <N><time unit> where
+                            N- the number of time units,
+                            time unit- Hours,Days"></span>
+                    </div>
+                    <input id="season_value" class="form-control form-control-sm rounded-0" type="text"
+                        placeholder="Season" formControlName="season_value"
+                        [class.is-invalid]="triggerRulesFormErrors.season_value">
+                    <div class="w-40">
+                        <select id="season_unit"
+                            class="form-control form-control-sm px-0 custom-left-border-radius unit-select border-left-0"
+                            formControlName="season_unit">
+                            <option *ngFor="let unit of seasonUnits" [value]="unit.value">
+                                {{unit.label}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="triggerRulesFormErrors.season_value">
+                    {{triggerRulesFormErrors.season_value}}</div>
+            </div>
+            <div class="w-100"></div>
+            <div class="col-2 offset-2 mt-3">
+                <div class="input-group">
+                    <div class="input-group-prepend bg-secondary rounded-left">
+                        <span class="input-group-text"><i class="fa fa-info-circle text-muted"
+                                tooltip="the number of deviations (calculated by devalg) to count as anomaly (can be decimal), (must be greater than or equal to 1, default is 3)"></i></span>
+                    </div>
+                    <input id="deviation" class="form-control form-control-sm" type="number" placeholder="Deviation"
+                        formControlName="deviation" [class.is-invalid]="triggerRulesFormErrors.deviation">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.deviation">
+                        {{triggerRulesFormErrors.deviation}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2 mt-3">
+                <div class="input-group">
+                    <div class="input-group-prepend bg-secondary rounded-left">
+                        <span class="input-group-text"><i class="fa fa-info-circle text-muted"
+                                [tooltip]="'select the Operator for threshold step.'"></i></span>
+                    </div>
+                    <select id="operator" class="form-control form-control-sm px-0" formControlName="operator"
+                        [class.is-invalid]="triggerRulesFormErrors.operator">
+                        <option *ngFor="let op of zabbixTriggerOperators" [ngValue]="op">{{op.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.operator">
+                        {{triggerRulesFormErrors.operator}}</div>
+                </div>
+            </div>
+            <div class="col-2 mt-3">
+                <div class="input-group">
+                    <div class="input-group-prepend bg-secondary rounded-left">
+                        <span class="input-group-text"><i class="fa fa-info-circle text-muted"
+                                [tooltip]="'select the threshold value for the selected parameters. Input value example 1 or 2 or custom.'"></i></span>
+                    </div>
+                    <input id="value" class="form-control form-control-sm" type="text" formControlName="value"
+                        [class.is-invalid]="triggerRulesFormErrors.value">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.value">
+                        {{triggerRulesFormErrors.value}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2 mt-3">
+                <button type="button" class="btn btn-sm btn-success px-3 rounded" (click)="confirmTriggerRuleCreate()">
+                    Add Rule
+                </button>
+            </div>
+        </div>
+    </form>
+</ng-template>

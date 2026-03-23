@@ -1,0 +1,15 @@
+<div layout="row">
+  <div layout="column" flex="100">
+    <md-card>
+      <md-card-title class="green-card">
+        <md-card-title-text>
+          <span class="md-headline">Host Alerts</span>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content>
+        <nested-model-results handler="nagios_model" ctrl="nagios_ctrl" config="nagios_ctrl_config"></nested-model-results>
+      </md-card-content>
+    </md-card>
+    <div flex></div>
+  </div>
+</div>

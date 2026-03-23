@@ -1,0 +1,84 @@
+<ng-template #emailNotificationFormRef>
+    <div class="card mb-0" *ngIf="alertConfig && alertConfig.org_config">
+        <div class="card-header">
+            Create Alert Notification
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="emailNotificationModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body" [ngClass]="{'nopointerevents': !alertConfig.org_config.is_enabled}">
+            <ng-template #emailNotificationTemplate let-model="item" let-index="index">
+                <h5>This is: {{model | json}} Index: {{ index }}</h5>
+            </ng-template>
+            <div class="row">
+                <div class="col-12">
+                    <div class="invalid-credentials">{{nonFieldErr}}</div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="toggle-wrapper d-inline-block">
+                        <label class="toggle-switch mb-4">
+                            <input type="checkbox" [(ngModel)]="alertNotificationEnabled" (click)="$event.stopPropagation();$event.preventDefault();manageZabbixNotification()" />
+                            <span class="toggle-label">
+                                <span>&nbsp;</span>
+                                <span>&nbsp;</span>
+                            </span>
+                            <a></a>
+                        </label>
+                    </div>
+                    <div class="d-inline-block pl-4 align-top font-lg">
+                        <span class="pl-2" *ngIf="alertNotificationEnabled">Enabled Alert Notification</span>
+                        <span class="pl-2 text-muted" *ngIf="!alertNotificationEnabled">Disabled Alert Notification</span>
+                    </div>
+                </div>
+                <div class="col-12 my-4">
+                    <form *ngIf="zabbixEmailNotificationForm" [formGroup]="zabbixEmailNotificationForm">
+                        <div class="form-group">
+                            <label for="input">Users <em>*</em></label>
+                            <input id="input" class="form-control" placeholder="Type username or email"
+                                [class.is-invalid]="zabbixEmailNotificationFormErrors.input" formControlName="input"
+                                [typeahead]="userList" typeaheadOptionField="full_name" (typeaheadOnSelect)="typeaheadOnSelect($event)"
+                                (typeaheadNoResults)="typeaheadNoResults($event)">
+
+                            <div class="alert alert-secondary" *ngIf="noUsers">No Results Found</div>
+                            <div *ngIf="alertConfig.org_config && alertConfig.org_config.users.length">
+                                <span *ngFor="let user of alertConfig.org_config.users; let i = index;" class="badge badge-pill badge-light border border-secondary font-xs py-1 my-2 mx-1">
+                                    {{user.first_name}} {{user.last_name}} ({{user.email}})
+                                </span>
+                            </div>
+                            <div *ngIf="selectedUsers.length">
+                                <span *ngFor="let user of selectedUsers; let i = index;" class="badge badge-pill badge-secondary font-xs py-1 my-2 mx-1">
+                                    {{user['full_name']}}
+                                    <span class="fas fa-times pointer-link pl-1" (click)="manageSelectedUsers(i)"></span>
+                                </span>
+                            </div>
+                            <div class="invalid-feedback" *ngIf="zabbixEmailNotificationFormErrors.input">{{zabbixEmailNotificationFormErrors.input}}</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" [disabled]="!alertConfig.org_config.is_enabled"
+                (click)="onSubmitZabbixEmailNotificationForm()">Submit</button>
+            <button class="btn btn-sm btn-danger bg-white text-danger pull-right" (click)="emailNotificationModelRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmNotificationRef>
+    <div class="card mb-0">
+        <div class="card-body text-center">
+            Are you sure you want to {{alertNotificationEnabled ? 'disable' : 'enable'}} notification?
+            <div class="col-12 mt-4">
+                <button class="btn btn-pill btn-sm btn-warning px-4" (click)="confirmZabbixNotification()" type="button">
+                    {{alertNotificationEnabled ? 'Disable' : 'Enable'}}
+                </button>
+                <button class="btn btn-pill btn-sm btn-warning bg-white text-warning ml-2 px-4" (click)="confirmNotificationModalRef.hide()"
+                    type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+</ng-template>

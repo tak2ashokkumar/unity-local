@@ -1,0 +1,47 @@
+<app-main-tab [tabItems]="tabItems"></app-main-tab>
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="row mx-0">
+      <div class="col-2 offset-10 px-0 custom-row-tab1-col">
+        <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+      </div>
+    </div>
+    <!-- <div class="row">
+      <div class="col-sm">
+        <asset-onboarding-status></asset-onboarding-status>
+      </div>
+    </div> -->
+    <div class="row" *ngIf="showDCMapWidget()">
+      <div class="col-sm">
+        <dashboard-map-widget *ngIf="!reloading"></dashboard-map-widget>
+      </div>
+    </div>
+    <div class="row" *ngIf="showInfraAsServiceWidget()">
+      <div class="col-sm">
+        <infra-as-a-service *ngIf="!reloading"></infra-as-a-service>
+      </div>
+    </div>
+    <div class="row" *ngIf="showDCWidget()">
+      <div class="col-sm">
+        <cabinet-widget-wrapper *ngIf="!reloading"></cabinet-widget-wrapper>
+      </div>
+    </div>
+    <div class="row mb-4 pt5">
+      <div class="col-sm-5">
+        <asset-under-mgmt *ngIf="showAssetsUnderMgmtWidget() && !reloading"></asset-under-mgmt>
+      </div>
+      <div class="col-sm-3">
+        <maintenance *ngIf="showMaintenanceWidget() && !reloading"></maintenance>
+      </div>
+      <div class="col-sm-4">
+        <aiml-mgmt *ngIf="showAIMLWidget() && !reloading"></aiml-mgmt>
+        <alerts *ngIf="showAlertsWidget() && !reloading"></alerts>
+      </div>
+    </div>
+    <div class="row" *ngIf="showTicketMgmtWidget()">
+      <div class="col-sm">
+        <dashboard-ticket-mgmt *ngIf="!reloading"></dashboard-ticket-mgmt>
+      </div>
+    </div>
+  </div>
+</div>

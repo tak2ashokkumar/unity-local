@@ -1,0 +1,147 @@
+<app-main-tab [tabItems]="tabItems"></app-main-tab>
+
+<div class="container-fluid cost-calculator">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col-12">
+        <div class="card mb-4">
+          <div class="card-body p-2">
+            <div class="row mb-2">
+              <div class="col-2" *ngFor="let cloud of clouds; let i = index">
+                <div class="card mb-2 equalize-card" [ngClass]="getCloudState(cloud)">
+                  <div class="card-body py-3 pl-2 pr-0 d-flex align-items-center" (click)="selectCloud(cloud, i)">
+                    <i class="fa {{cloud.icon}} p-3 font-2xl mr-2" [class.text-secondary]="cloud.isDisabled"
+                      *ngIf="!cloud.isSelected"></i>
+                    <div *ngIf="!cloud.isSelected">
+                      <div class="text-value-sm font-weight-bold" [ngClass]="cloud.textClass">{{cloud.displayName}}
+                      </div>
+                      <div class="text-secondary font-weight-bold small" *ngIf="cloud.isDisabled">(coming
+                        soon)</div>
+                    </div>
+                    <i class="fa {{cloud.icon}} py-3 font-2xl w-25" *ngIf="cloud.isSelected"></i>
+                    <div *ngIf="cloud.isSelected" class="w-75">
+                      <div class="text-value-sm text-muted">
+                        <i class="fa fas fa-dollar-sign"></i> {{cloud.totalPrice | number: '1.0-2'}}
+                      </div>
+                      <div class="text-muted font-weight-bold small">for {{cloud.instancesSelected}} instances</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-warning btn-sm pull-right mt-1" type="button" (click)="reset()">
+                  <i class="fas fa-sync "> Reset </i>
+                </button>
+                <button class="btn btn-success btn-sm pull-right mt-1 mr-1" type="button" (click)="showHelp()">
+                  <i class="fa fa-info-circle "> </i>
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <form class="col-12 form-inline cloudUnitsForm" *ngIf="cloudUnitsForm" [formGroup]="cloudUnitsForm">
+                <div class="col-3">
+                  <div class="form-group">
+                    <label for="cpus">vCPUs<em>*</em></label>
+                    <ngx-slider class="main-sliders" [options]="cloudUnitsFormOptions.cpuMainOptions"
+                      formControlName="cpuMainSliderControl">
+                    </ngx-slider>
+                  </div>
+                </div>
+
+                <div class="col-3">
+                  <div class="form-group">
+                    <label for="ram">RAM(GB)<em>*</em></label>
+                    <ngx-slider class="main-sliders" [options]="cloudUnitsFormOptions.ramMainOptions"
+                      formControlName="ramMainSliderControl">
+                    </ngx-slider>
+                  </div>
+                </div>
+
+                <div class="col-2">
+                  <div class="form-group">
+                    <label for="storage">Storage(GB)<em>*</em></label>
+                    <input class="form-control w-100" id="storage" type="number" min="1" formControlName="storage"
+                      [class.is-invalid]="cloudUnitsFormErrors.storage">
+                    <div class="invalid-feedback" *ngIf="cloudUnitsFormErrors.storage">
+                      {{cloudUnitsFormErrors.storage}}</div>
+                  </div>
+                </div>
+
+                <div class="col-2">
+                  <div class="form-group">
+                    <label for="instances_number">Number of Instances<em>*</em></label>
+                    <input class="form-control w-100" id="instances_number" type="number" min="1"
+                      formControlName="instances_number" [class.is-invalid]="cloudUnitsFormErrors.instances_number">
+                    <div class="invalid-feedback" *ngIf="cloudUnitsFormErrors.instances_number">
+                      {{cloudUnitsFormErrors.instances_number}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-2">
+                  <div class="form-group">
+                    <label for="commitment">Term<em>*</em></label>
+                    <select id="commitment" class="form-control w-100" formControlName="commitment"
+                      [class.is-invalid]="cloudUnitsFormErrors.commitment">
+                      <option *ngFor="let year of commitmentYears" [ngValue]="year"> {{year.displayText}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="cloudUnitsFormErrors.commitment">
+                      {{cloudUnitsFormErrors.commitment}}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-3">
+                  <div class="form-group">
+                    <ngx-slider class="full-sliders" [options]="cloudUnitsFormOptions.cpuFullOptions"
+                      formControlName="cpuFullSliderControl" (userChangeEnd)="onCPUFullSliderValueChange()">
+                    </ngx-slider>
+                  </div>
+                </div>
+
+                <div class="col-3">
+                  <div class="form-group">
+                    <ngx-slider class="full-sliders" [options]="cloudUnitsFormOptions.ramFullOptions"
+                      formControlName="ramFullSliderControl" (userChangeEnd)="onRAMFullSliderValueChange()">
+                    </ngx-slider>
+                  </div>
+                </div>
+                <div class="col-6 text-right">
+                  <button class="btn btn-success ml-1 mt-2" [disabled]="!selectedClouds.length" type="button"
+                    (click)="submitcloudUnitsForm()">Search</button>
+                </div>
+              </form>
+            </div>
+            <div class="row mt-4" *ngIf="cloudUnits">
+              <div class="col-4" *ngFor="let cloud of selectedClouds; let i = index;">
+                <div [ngSwitch]="cloud.name">
+                  <aws-instance-list *ngSwitchCase="CLOUD_TYPES.AWS" [cloud]="cloud" [cloudUnits]="cloudUnits"
+                    (instanceSelected)="updateInstanceSelected($event)">
+                  </aws-instance-list>
+                  <azure-instance-list *ngSwitchCase="CLOUD_TYPES.AZURE" [cloud]="cloud" [cloudUnits]="cloudUnits"
+                    (instanceSelected)="updateInstanceSelected($event)">
+                  </azure-instance-list>
+                  <gcp-instance-list *ngSwitchCase="CLOUD_TYPES.GCP" [cloud]="cloud" [cloudUnits]="cloudUnits"
+                    (instanceSelected)="updateInstanceSelected($event)">
+                  </gcp-instance-list>
+                  <g3-instance-list *ngSwitchCase="CLOUD_TYPES.G3_CLOUD" [cloud]="cloud" [cloudUnits]="cloudUnits"
+                    (instanceSelected)="updateInstanceSelected($event)">
+                  </g3-instance-list>
+                </div>
+              </div>
+              <div class="col-12">
+                <button class="btn btn-success pull-right ml-1" type="button"
+                  (click)="addInstanceToCompare()">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<cost-comparator *ngIf="instancesToCompare.length" [instances]="instancesToCompare"
+  (deleteInstance)="deleteInstance($event)" (resetComparison)="reset()">
+</cost-comparator>

@@ -1,0 +1,31 @@
+<div class="card summary-card" (click)="gotToDevice()" [ngClass]="summaryCardClass" accessControl
+    [moduleName]="moduleName" [accessType]="accessType" [elementType]="'div'">
+    <div class="card-body p-0 d-flex align-items-center">
+        <div class="col-2">
+            <i class="fa p-4 font-2xl summary-icons ml-3" [ngClass]="[data.icon, data.deviceClass]"></i>
+        </div>
+
+
+        <div class="col-4 ml-3">
+            <h6 [ngClass]="'text-'+data.deviceClass">{{data.deviceType}}</h6>
+            <h6 class="d-inline" [ngClass]="'text-'+data.deviceClass">{{data.success}}</h6><span
+                class="text-muted small">/{{data.count}}</span>
+        </div>
+
+        <div class="donut mr-3" [style.background]="graphData.graphBg" *ngIf="data.success && graphData">
+            <div class="hole">
+                <span>{{graphData.percent}}%</span>
+            </div>
+        </div>
+        <!-- <div class="col-6">
+            <div style="display:flex; flex-direction:column">
+                <div style="flex-grow:1; position:relative">
+                    <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+                        [options]="defaultChartOptions" [data]="chartData" [colors]="chartColor"
+                        [labels]="chartLabels"></canvas>
+                </div>
+            </div>
+        </div> -->
+
+    </div>
+</div>

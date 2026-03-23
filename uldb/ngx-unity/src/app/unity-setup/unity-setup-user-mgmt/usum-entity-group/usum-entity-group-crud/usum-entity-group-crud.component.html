@@ -1,0 +1,179 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                        <span class="h6 mb-0 font-500">{{action}} Entity Group</span>
+                        <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                            <i class="fa fa-arrow-left"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-2">
+                        <form *ngIf="form" [formGroup]="form">
+                            <div class="form-group col-12 text-center">
+                                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="name" class="col-2 text-right col-form-label text-muted">Name<em>* </em> :</label>
+                                <div class="col-4">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="formErrors.name" placeholder="Enter Name">
+                                    <div class="invalid-feedback" *ngIf="formErrors.name">
+                                        {{formErrors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="description" class="col-2 text-right col-form-label text-muted">Description<em> </em> :</label>
+                                <div class="col-10">
+                                    <textarea id="description" class="form-control static" rows='3'
+                                        formControlName="description" [class.is-invalid]="formErrors.description"
+                                        placeholder="Description"></textarea>
+                                    <div class="invalid-feedback" *ngIf="formErrors.description">
+                                        {{formErrors.description}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="module_models" class="col-2 text-right col-form-label text-muted">Entity Type<em>*
+                                    </em> :</label>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="entityTypes"
+                                        [settings]="entityTypeSettings"
+                                        [texts]="entityTypeSelectionTexts" class="form-control p-0" style="height:auto;" formControlName="module_models"
+                                        [ngClass]="{'is-invalid' : formErrors.module_models}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback" *ngIf="formErrors.module_models">
+                                        {{formErrors.module_models}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="entity_selection" class="col-2 text-right col-form-label text-muted">Selection<em>*
+                                    </em> :</label>
+                                <div class="col-4 d-flex align-items-center">
+                                    <div class="custom-control custom-radio mr-2">
+                                        <input id="all" type="radio" class="custom-control-input" value="all"
+                                            name="entity_selection" formControlName="entity_selection">
+                                        <label class="custom-control-label" for="all">All</label>
+                                    </div>
+                                    <div class="custom-control custom-radio">
+                                        <input id="custom" type="radio" class="custom-control-input" value="custom"
+                                            name="entity_selection" formControlName="entity_selection">
+                                        <label class="custom-control-label" for="custom">Custom</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-12 py-0" *ngIf="form.get('group_objects')">
+                                    <div class="row mx-0 border position-relative rounded mt-4 px-2 pt-3 pb-0"
+                                        [class.border-danger]="formErrors.group_objects">
+                                        <div class="bg-white font-md section-name-one"
+                                            [class.text-danger]="formErrors.group_objects">Entity Resource
+                                        </div>
+                                        <ng-container [ngTemplateOutlet]='entityTypeSelectionRef'></ng-container>
+                                    </div>
+                                    <!-- <div class="row mx-0 d-flex invalid-feedback" *ngIf="formErrors.group_objects">
+                                        {{formErrors.group_objects}}
+                                    </div> -->
+                                </div>
+                            </div>
+                        </form>
+                        <div class="d-flex justify-content-center mt-3">
+                            <button class="btn btn-md btn-outline-danger" (click)="goBack()">Cancel</button>
+                            <button class="btn btn-success ml-2" (click)="submitEntityGroupForm()"
+                                *ngIf="!entityGroupId">Create</button>
+                            <button class="btn btn-success ml-2" (click)="submitEntityGroupForm()"
+                                *ngIf="entityGroupId">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #entityTypeSelectionRef>
+    <div class="col-12 p-0 d-flex justify-content-between align-items-center">
+        <div class="w-15 px-0 py-2"></div>
+        <div class="w-30 pl-0 py-2 pr-2">
+            <div class="card rounded-5 mb-0">
+                <app-spinner [name]="'entityResourcesList'"></app-spinner>
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+                    <div class="d-flex align-items-center font-500 w-40">
+                        <span class="badge badge-secondary font-xs-sm">{{entityResourcesCount}}</span>
+                        <span class="ml-1">All Resources</span>
+                    </div>
+                    <div class="d-flex align-items-center font-500 w-60">
+                        <search-box [searchValue]="entityResourcesCriteria.searchValue"
+                            [customClass]="'form-control-sm'" (searched)="onResourceSearched($event)"
+                            class="w-100"></search-box>
+                    </div>
+                </div>
+                <div class="card-body p-0 scrollable-list">
+                    <div *ngIf="entityResourcesCount" class="h-100 w-100">
+                        <virtual-scroller #scroll [items]="entityResources" (vsEnd)="fetchMoreResources($event)"
+                            class="h-100 w-100">
+                            <div class="d-flex align-items-center border-bottom px-2 py-1 pointer-link"
+                                *ngFor="let d of scroll.viewPortItems"
+                                [class.nopointerevents]="isResourceInSelectedList(d)" (click)="onClickToSelectResource(d)">
+                                <span class="text-primary" [ngClass]="entityResourcesSelectedClass(d)"></span>
+                                <span class="font-sm ml-2">
+                                    <span class="ml-1">{{d?.name}} </span>
+                                </span>
+                            </div>
+                            <div *ngIf="entityResourcesLoading" class="loader px-3 text-primary font-lg-xl font-500">
+                            </div>
+                        </virtual-scroller>
+                    </div>
+                    <div class="h-100 d-flex justify-content-center align-items-center" *ngIf="!entityResourcesCount">No Resources found.</div>
+                </div>
+            </div>
+        </div>
+        <div class="w-5 d-flex flex-column p-2">
+            <div class="align-items-center align-items-center d-flex flex-column">
+                <span *ngIf="entityResourcesToBeSelected.length"
+                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{entityResourcesToBeSelected?.length}}</span>
+                <span class="fas fa-arrow-right font-lg p-2 pointer-link"
+                    [ngClass]="entityResourcesToBeSelected?.length ? 'text-primary-500' : 'text-muted'"
+                    (click)="addToSelectedResources()" tooltip="add"></span>
+            </div>
+            <div class="align-items-center align-items-center d-flex flex-column">
+                <span class="fas fa-arrow-left font-lg p-2 pointer-link"
+                    [ngClass]="entityResourcesToBeRemoved?.length ? 'text-primary-500' : 'text-muted'"
+                    (click)="removeFromSelectedResources()" tooltip="remove"></span>
+                <span *ngIf="entityResourcesToBeRemoved?.length"
+                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{entityResourcesToBeRemoved?.length}}</span>
+            </div>
+        </div>
+        <div class="w-35 px-0 py-2">
+            <div class="card rounded-5 mb-0">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+                    <div class="d-flex align-items-center font-500 w-40">
+                        <span class="badge badge-secondary font-xs-sm">{{selectedEntityResources?.length}}</span>
+                        <span class="ml-1">Selected</span>
+                    </div>
+                    <div class="d-flex align-items-center font-500 w-60" [style.visibility]="'hidden'">
+                        <search-box [searchValue]="entityResourcesCriteria.searchValue"
+                            [customClass]="'form-control-sm'" (searched)="onSelectedSearch($event)"
+                            class="w-100"></search-box>
+                    </div>
+                </div>
+                <div class="card-body p-0 scrollable-list">
+                    <div *ngIf="selectedEntityResources?.length" class="h-100 w-100">
+                        <div class="d-flex align-items-center border-bottom px-2 py-1 pointer-link"
+                            *ngFor="let d of selectedEntityResources; let i=index"
+                            (click)="removeResourceFromSelection(d)">
+                            <span class="text-primary"
+                                [ngClass]="d.toBeRemoved ? 'fas fa-check-square' : 'far fa-square'"></span>
+                            <span class="font-sm ml-2">
+                                <span class="ml-1">{{d?.name}} </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="h-100 d-flex justify-content-center align-items-center"
+                        *ngIf="!selectedEntityResources?.length">No resources selected.</div>
+                </div>
+            </div>
+        </div>
+        <div class="w-15 px-0 py-2"></div>
+    </div>
+</ng-template>

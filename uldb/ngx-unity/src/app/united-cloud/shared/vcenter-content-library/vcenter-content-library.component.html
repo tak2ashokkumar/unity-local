@@ -1,0 +1,67 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-0 border-top-0">
+            <div class="card-header bg-transparent border-bottom-0 mt-3">
+                <div class="row">
+                    <div class="col-3">
+                        <table-search-box (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <div class="col ">
+                        <a class="py-0 float-right ml-2 text-warning" (click)="goToSummary()"><i
+                                class="fa fa-arrow-left">&nbsp;</i>To Summary</a>
+                        <span class="ml-2 text-muted font-sm float-right align-middle"><span
+                                class="badge badge-pill badge-secondary">{{filteredViewData.length}}</span>&nbsp;Other
+                            Devices</span>
+                        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)">
+                        </data-refresh-btn>
+                        <table-page-size [currentPageSize]="currentCriteria.pageSize"
+                            [totalCount]="filteredViewData.length" (pageSizeChange)="pageSizeChange($event)">
+                        </table-page-size>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table text-left" sortableTable (sorted)="onSorted($event)"
+                    *ngIf="filteredViewData.length">
+                    <thead>
+                        <tr>
+                            <th sortable-column="name">Name</th>
+                            <th sortable-column="type">Type</th>
+                            <th>Create At</th>
+                            <th>Updated At</th>
+                            <!-- <th>Action</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of pagedviewData" setTableColumnWidth>
+                            <td>
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                    [tooltip]="view.name" (click)="goToFiles(view)">{{view.name}}</button>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.type">{{view.type}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.createdAt">{{view.createdAt}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.lastUpdated">{{view.lastUpdated}}</div>
+                            </td>
+                            <!-- <td class="action-icons-column">
+                                <button class="action-icons mb-0 fa fa-info-circle font-sm ml-1"
+                                    tooltip="Other device info" (click)="goToFiles(view)"></button>
+                            </td> -->
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="filteredViewData.length"></table-entries>
+                <table-pager *ngIf="filteredViewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted" *ngIf="!filteredViewData.length">No associated libraries were found.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

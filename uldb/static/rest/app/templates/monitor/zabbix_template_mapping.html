@@ -1,0 +1,164 @@
+<style type="text/css">
+    .pagemargin .page_wrapper {
+        background-color: #FFFFFF;
+        width: 100%;
+        -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+        padding: 20px;
+        padding-bottom: 60px;
+        padding-top: 0px;
+    }
+
+    .dataTables_filter input[type="search"] {
+        border: 2px solid #E4E4E4;
+        border-radius: 2px;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .dataTables_length select {
+        border: 1px solid #E4E4E4;
+        height: 30px;
+        margin-left: 3px;
+    }
+
+    .table th {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        /*height: 50px !important;*/
+    }
+
+    .table td {
+        padding: 8px 13px !important;
+    }
+</style>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object={{template_mappings}}></loading>
+    <uib-tabset active="activeTabNumber" type="pills">
+        <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.display_name }}" ng-click="updateTab($index)">
+            <a href="tab.url"></a>
+        </uib-tab>
+    </uib-tabset>
+    <div class="pagemargin">
+        <div class="col-xs-12 content-wrapper bg-color top_shadow" ng-if="template_mappings" style="padding-left:0px;">
+            <div class="col-xs-4 pull-right">
+                <div class="action-bar pull-right table-button">
+                    <button class="btn btn-primary" type="button" ng-click="add()" style="margin-left:20px;"> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="page_wrapper" style="float:left">
+            <section ng-if="template_mappings" id="no-more-tables" class="margintop20">
+                <table class="example table  table-condensed cf" ng-if="template_mappings.length">
+                    <thead class="cf">
+                        <tr>
+                            <th>Instance</th>
+                            <th ng-if="activeTab.data.interface_types">Interface Type</th>
+                            <th>Template</th>
+                            <th ng-if="activeTab.item">{{activeTab.item.name}}</th>
+                            <th ng-if="activeTab.item && activeTab.item.sub_item">{{activeTab.item.sub_item.name}}</th>
+                            <th class="numeric">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="mapping in template_mappings">
+                            <td>{{mapping.zabbix_instance.account_name}}</td>
+                            <td ng-if="activeTab.data.interface_types">{{mapping.interface_type}}</td>
+                            <td>{{mapping.zabbix_template.template_name}}</td>
+                            <td ng-if="activeTab.item && activeTab.item.data">{{get_display_name(activeTab.item.data, mapping[activeTab.item.key])}}</td>
+                            <td ng-if="activeTab.item && !activeTab.item.data">{{mapping[activeTab.item.key].name}}</td>
+                            <td ng-if="activeTab.item && activeTab.item.sub_item">{{mapping[activeTab.item.sub_item.key].name}}</td>
+                            <td>
+                                <div class="action-icons">
+                                    <a class="fa fa-pencil blue-text" tooltip-class="customClass" uib-tooltip="Edit"
+                                        ng-click="edit(mapping)"></a>
+                                    <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete"
+                                        ng-click="delete(mapping)"></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="!template_mappings.length" class="content-wrapper text-center" style="padding-top:30px">
+                    <span class="no-record-text">No {{activeTab.item.name}} template mappings to display</span>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="templateMapping.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> {{method}} Template Mapping</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+            <div class="col-xs-12">
+                <label style="color:red" ng-if="err">{{ error }}</label><br>
+                <div class="form-group">
+                    <label for="instance">Instance*</label>
+                    <input class="form-control" id="instance" ng-model="obj.zabbix_instance" required
+                    uib-typeahead="instance as instance.account_name for instance in get_instances($viewValue)"
+                    typeahead-on-select="onInstanceSelect($item)">
+                </div>
+                <div class="form-group" ng-if="activeTab.data.interface_types">
+                    <label for="template">Interface Type*</label>
+                    <select class="form-control" id="template" ng-model="obj.interface_type" required
+                    ng-options="interface_type for interface_type in interface_types"></select>
+                </div>
+                <div class="form-group">
+                    <label for="template">Templates*</label>
+                    <select class="form-control" id="template" ng-model="obj.zabbix_template" required
+                    ng-options="tmpl as tmpl.template_name for tmpl in templates track by tmpl.template_id"></select>
+                </div>
+                <div class="form-group" ng-if="activeTab.item && activeTab.item.data">
+                    <label for="item">{{activeTab.item.name}}*</label>
+                    <select class="form-control" id="item" ng-model="obj[activeTab.item.key]" required
+                    ng-options="item.value as item.name for item in items track by item.value"></select>
+                </div>
+                <div class="form-group" ng-if="activeTab.item && !activeTab.item.data">
+                    <label for="item">{{activeTab.item.name}}*</label>
+                    <select class="form-control" id="item" ng-model="obj[activeTab.item.key]" ng-change="get_subitems(obj[activeTab.item.key])" required
+                    ng-options="item as item.name for item in items track by item.id"></select>
+                </div>
+                <div class="form-group" ng-if="activeTab.item && activeTab.item.sub_item && obj[activeTab.item.key]">
+                    <label for="item">{{activeTab.item.sub_item.name}}*</label>
+                    <select class="form-control" id="item" ng-model="obj[activeTab.item.sub_item.key]" required
+                    ng-options="sub_item as sub_item.name for sub_item in activeTab.item.sub_item.res track by sub_item.id"></select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-danger" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-success" ng-click="onSubmit()" type="submit"> Submit</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="deleteTemplateMapping.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> Delete Template Mapping</span>
+    </div>
+    <div class="modal-content">
+        <div class="modal-header" style="text-align: center;">
+            <h4 class="modal-title">Confirm Delete</h4>
+        </div>
+      <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+        <div class="modal-body" style="text-align: center;">
+            Are you sure you want to delete mapping for template {{obj.template_id}} ?
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons"  style="text-align: center;">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+                <button type="button" class="btn btn-default" ng-click="confirmDelete()"> Confirm </button>
+            </div>
+        </div>
+      </form>
+    </div>
+</script>

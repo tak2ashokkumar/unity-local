@@ -1,0 +1,183 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded border-top-0">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{count}}</span>
+                    <span class="ml-1 font-lg">SD-WANs</span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center">
+                    <data-refresh-btn [page]="currentCriteria.pageNo"
+                        (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                    <div class="w-22">
+                        <search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></search-box>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center w-20">
+                        <multiselect-dropdown class="form-control p-0 w-60" style="height:auto;" [options]="statusList"
+                            [settings]="statusSettings" [texts]="statusTypeTexts" (dropdownClosed)="onFilterChange()"
+                            [(ngModel)]="currentCriteria.multiValueParam.status"></multiselect-dropdown>
+                        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Account Type</th>
+                            <th>Account URL</th>
+                            <th>Port</th>
+                            <th>Devices</th>
+                            <th>Tags</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData" truncateText>
+                            <td class="tdw-17">
+                                <div [tooltip]="view.name">{{view.name}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div [tooltip]="view.accountType" class="text-capitalize">{{view.accountType}}
+                                </div>
+                            </td>
+                            <td class="tdw-17">
+                                <div [tooltip]="view.accountUrl">{{view.accountUrl}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div [tooltip]="view.port">{{view.port}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div [tooltip]="view.devicesCount">{{view.devicesCount}}</div>
+                            </td>
+                            <td class="tdw-11">
+                                <ng-container [ngTemplateOutlet]='tagsList'
+                                    [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
+                            </td>
+                            <td class="w-6 text-center">
+                                <shared-device-status [status]="view.deviceStatus"></shared-device-status>
+                            </td>
+                            <td class="action-icons-column text-center">
+                                <button class="action-icons mb-0 fas fa-eye font-sm ml-1" tooltip="View Details"
+                                    (click)="viewDeviceDetials(view)"></button>
+                                <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
+                                    [tooltip]="view.proxyTooltip" [ngClass]="{'action-icons-disabled':!view.proxyUrl}"
+                                    (click)="webAccessNewTab(view)"></button>
+                                <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1"
+                                    (click)="goToStats(view)" [tooltip]="'View statistics'" accessControl
+                                    moduleName="Monitoring" accessType="View Monitoring" elementType="actionbtn">
+                                </button>
+                                <span dropdown placement="bottom right" container="body">
+                                    <button id="button-container"
+                                        class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1" data-toggle="dropdown"
+                                        aria-controls="icons-dropdown-container" dropdownToggle (click)="false"
+                                        [tooltip]="'More Actions'" container="body"></button>
+                                    <div container="body" id="icons-dropdown-container"
+                                        class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                                        aria-labelledby="button-container">
+                                        <button class="action-icons mt-2 mb-1 fas fa-pencil-alt font-sm"
+                                            (click)="goToEdit(view)" tooltip="Edit" container="body"></button>
+                                        <button class="action-icons mt-1 mb-1 fas fa-sync font-sm"
+                                            (click)="syncNow(view)"
+                                            [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
+                                            [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}"
+                                            container="body">
+                                        </button>
+                                        <button class="action-icons fas fa-tag font-sm mt-1 mb-1"
+                                            (click)="updateTags(view)" tooltip="Update Tags" container="body"></button>
+                                        <button class="action-icons mt-1 mb-1 far fa-trash-alt font-sm"
+                                            (click)="delete(view)" tooltip="Delete" container="body"></button>
+                                        <button class="action-icons mt-1 mb-2 fas fa-ticket-alt font-sm"
+                                            tooltip="Create Ticket" (click)="createTicket(view)"
+                                            container="body"></button>
+                                    </div>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count">
+                </table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!viewData.length">No associated SD-WANs were
+                    found.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #tagsList let-tags="tags">
+    <div [popoverContext]="{ tags: tags }" [popover]="tagsTooltipTmpl" triggers="mouseenter:mouseleave" placement="top">
+        <span *ngFor="let tag of tags" class="badge badge-pill badge-primary">{{tag}}</span>
+    </div>
+    <div *ngIf="!tags.length">N/A</div>
+</ng-template>
+
+<ng-template #tagsTooltipTmpl let-tags="tags">
+    <div class="font-weight-bold">
+        <span *ngFor="let tag of tags" class="badge badge-pill badge-primary m-1 font-sm">{{tag}}</span>
+    </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This SD-WAN - {{view.accountType}} will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #tagsFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Update Tags
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="tagsFormModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="tagsForm" [formGroup]="tagsForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col">
+                        <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+                            <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+                            </tag-input-dropdown>
+                        </tag-input>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitTags()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="tagsFormModelRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

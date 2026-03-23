@@ -1,0 +1,683 @@
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="card round-edge">
+            <div class="card-header bg-white">
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Create Policy</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="bordered-container mb-3 mt-3">
+                        <div class="mr-3 border rounded p-4 position-relative">
+                            <div class="pb-2 mb-3 bg-white position-absolute section-name">Basic
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-1 text-right">Name<em>*</em> : </div>
+                                <div class="col-6">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Enter Name"
+                                        formControlName="name" [class.is-invalid]="formErrors.name">
+                                    <div class="invalid-feedback" *ngIf="formErrors.name">
+                                        {{formErrors.name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bordered-container mb-4 mt-4">
+                        <div class="mr-3 border rounded p-4 position-relative">
+                            <div class="pb-2 mb-3 bg-white position-absolute section-name">Discovery
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-2">Discovery Type<em>*</em> : </div>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="discoveryType" [settings]="discoveryTypeSettings"
+                                        class="form-control p-0"
+                                        formControlName="discovery_methods"></multiselect-dropdown>
+                                    <div class="d-block invalid-feedback" *ngIf="formErrors.discovery_methods">
+                                        {{formErrors.discovery_methods}}</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3 form-group">
+                                    <label class="form-col-form-label">Network Type<em>*</em></label>
+                                    <select class="form-control form-control-sm"
+                                        formControlName="network_type">
+                                        <option [value]="'ip_range'">IP Range</option>
+                                        <option [value]="'subnet'">Subnet</option>
+                                        <option [value]="'ip'">IP</option>
+                                    </select>
+                                </div>
+                                <div class="col-3 form-group" *ngIf="form.get('network_type').value == 'ip_range'">
+                                    <label class="form-col-form-label">IP Range<em>*</em></label>
+                                    <div class="d-flex flex-row">
+                                        <div class="input-group">
+                                            <div class="row">
+                                                <div class="col-6 pr-0"><input type="text"
+                                                        class="form-control form-control-sm"
+                                                        placeholder="E.g. 120.60.30.1" formControlName="ip_range_from"
+                                                        [class.is-invalid]="formErrors.ip_range_from">
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.ip_range_from">
+                                                        {{formErrors.ip_range_from}}</div>
+                                                </div>
+                                                <div class="col-6 pl-0"><input type="text"
+                                                        class="form-control form-control-sm"
+                                                        placeholder="E.g. 120.60.30.1" formControlName="ip_range_to"
+                                                        [class.is-invalid]="formErrors.ip_range_to">
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.ip_range_to">
+                                                        {{formErrors.ip_range_to}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3 form-group" *ngIf="form.get('network_type').value == 'subnet'">
+                                    <label class="form-col-form-label">Subnet<em>*</em></label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="Enter Subnet"
+                                        formControlName="discover_ips" [class.is-invalid]="formErrors.discover_ips">
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.discover_ips">
+                                        {{formErrors.discover_ips}}</div>
+                                </div>
+                                <div class="col-3 form-group" *ngIf="form.get('network_type').value == 'ip'">
+                                    <label class="form-col-form-label">IP<em>*</em></label>
+                                    <input type="text" class="form-control form-control-sm" placeholder="Enter IP"
+                                        formControlName="discover_ips" [class.is-invalid]="formErrors.discover_ips">
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.discover_ips">
+                                        {{formErrors.discover_ips}}</div>
+                                </div>
+                                <div class="col-3 form-group">
+                                    <label class="form-col-form-label">Exclude</label>
+                                    <input type="text" class="form-control form-control-sm"
+                                        placeholder="E.g. 120.60.30.10" formControlName="exclude_ips"
+                                        [class.is-invalid]="formErrors.exclude_ips">
+                                    <div class="invalid-feedback" *ngIf="formErrors.exclude_ips">
+                                        {{formErrors.exclude_ips}}</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3 form-group" formGroupName="collector">
+                                    <label for="id" class="form-col-form-label">Collector<em>*</em></label>
+                                    <select name="id" id="id" class="form-control form-control-sm" formControlName="id">
+                                        <option value="">Select</option>
+                                        <option [value]="collector.id" *ngFor="let collector of collectors">
+                                            {{collector.name}}</option>
+                                    </select>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.collector.id">
+                                        {{formErrors.collector.id}}</div>
+                                </div>
+                                <div class="col-3 form-group">
+                                    <label class="form-col-form-label">Credentials</label>
+                                    <multiselect-dropdown [options]="credentials" [settings]="credentialsSettings"
+                                        class="form-control form-control-sm p-0" formControlName="credentials"></multiselect-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bordered-container mb-4 mt-4">
+                        <div class="mr-3 border rounded p-4 position-relative">
+                            <div class="pb-2 mb-3 bg-white position-absolute section-name">Filter
+                            </div>
+                            <div class="col-10 d-inline-block">
+                                <div class="btn-group rounded-pill border" style="border-radius: 50px;">
+                                    <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                        type="button" (click)="enableFilter()"
+                                        [class.active]="form.controls.filter_enabled.value">Enable</button>
+                                    <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                        type="button" (click)="disableFilter()"
+                                        [class.active]="!form.controls.filter_enabled.value">Disable</button>
+                                </div>
+                            </div>
+                            <div class="col-10 form-group mt-2"
+                                *ngIf="form.controls.filter_enabled.value && queryBuilderConfig">
+                                <query-builder #queryBuilder formControlName='filter_rule_meta'
+                                    [classNames]='queryBuilderClassNames' [config]='queryBuilderConfig'
+                                    [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
+                                    [persistValueOnFieldChange]='persistValueOnFieldChange'>
+                                    <ng-container
+                                        *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+                                        <textarea class="text-input text-area" [(ngModel)]="rule.value"
+                                            [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                            placeholder="Custom Textarea"></textarea>
+                                    </ng-container>
+                                    <ng-container
+                                        *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
+                                        <div class="col-auto">
+                                            <tag-input [clearOnBlur]="true" [(ngModel)]="rule.value"
+                                                [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                                [modelAsStrings]="true" [secondaryPlaceholder]="'Enter tag'">
+                                                <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems"
+                                                    [zIndex]="2200">
+                                                </tag-input-dropdown>
+                                            </tag-input>
+                                        </div>
+                                    </ng-container>
+                                </query-builder>
+                            </div>
+                            <div class="col" *ngIf="form.controls.filter_enabled.value && queryBuilderConfig">
+                                <textarea class="form-control" id="description" name="description"
+                                    formControlName="description" rows="4" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bordered-container mb-4 mt-4">
+                        <div class="mr-3 border rounded p-4 position-relative">
+                            <div class="pb-2 mb-3 bg-white position-absolute section-name">Actions
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-2 pl-0 text-right">Onboard Device To Platform : </div>
+                                <div class="col-1 ml-2">
+                                    <input class="form-check-input form-check-xl" type="checkbox"
+                                        formControlName="onboard_device">
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-2 text-right">Update If Any Changes : </div>
+                                <div class="col-1 ml-2">
+                                    <input class="form-check-input form-check-xl" type="checkbox"
+                                        formControlName="update_changes">
+                                </div>
+                            </div>
+                            <div class="row form-group" style="height:60px">
+                                <div class="col-2 text-right mt-3">Update Location : </div>
+                                <div class="col d-flex align-item-center">
+                                    <div class="ml-2 mt-3 pr-0">
+                                        <input class="form-check-input form-check-xl" type="checkbox"
+                                            formControlName="update_location">
+                                    </div>
+                                    <div class="col-2 pl-0 ml-3" *ngIf="form.get('default_datacenter')">
+                                        <label class="form-col-form-label">Datacenter<em>*</em></label>
+                                        <!-- <multiselect-dropdown [options]="datacenters" [settings]="dcSettings"
+                                            class="form-control p-0" (dropdownClosed)="dcChange()"
+                                            formControlName="default_datacenter"></multiselect-dropdown> -->
+                                        <select name="default_datacenter" id="default_datacenter"
+                                            class="form-control form-control-sm" formControlName="default_datacenter"
+                                            (change)="dcChange()">
+                                            <option value="">Select</option>
+                                            <option [value]="datacenter.id" *ngFor="let datacenter of datacenters">
+                                                {{datacenter.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.default_datacenter">
+                                            {{formErrors.default_datacenter}}</div>
+                                    </div>
+                                    <div class="col-2" *ngIf="form.get('default_cabinet')">
+                                        <label class="form-col-form-label">Cabinets<em>*</em></label>
+                                        <!-- <multiselect-dropdown [options]="datacenterCabinets"
+                                            [settings]="cabinetSettings" class="form-control p-0"
+                                            formControlName="default_cabinet"
+                                            [isDisabled]="!selectedDCIds.length"></multiselect-dropdown> -->
+                                        <select name="default_cabinet" id="default_cabinet"
+                                            class="form-control form-control-sm" formControlName="default_cabinet">
+                                            <option value="">Select</option>
+                                            <option [value]="datacenterCabinet.id"
+                                                *ngFor="let datacenterCabinet of datacenterCabinets">
+                                                {{datacenterCabinet.name}}</option>
+                                        </select>
+                                        <div class="invalid-feedback d-block" *ngIf="formErrors.default_cabinet">
+                                            {{formErrors.default_cabinet}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-2 text-right">Activate Monitoring : </div>
+                                <div class="col-1 ml-2">
+                                    <input class="form-check-input form-check-xl" type="checkbox"
+                                        formControlName="activate_monitoring">
+                                </div>
+                            </div>
+                            <div class="bordered-container mb-4 mt-4" *ngIf="form.get('activate_monitoring').value">
+                                <div class="border rounded p-4 position-relative">
+                                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Select Template
+                                    </div>
+                                    <ng-container formArrayName="monitoring_templates"
+                                        *ngFor="let mt of form.controls.monitoring_templates.controls; let i = index; let last = last;">
+                                        <div [formGroupName]="i">
+                                            <div class="row">
+                                                <div class="col-2 form-group">
+                                                    <label for="type" class="form-col-form-label">Type <em>*</em></label>
+                                                    <select name="type" id="type" class="form-control form-control-sm"
+                                                        formControlName="type"
+                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.type">
+                                                        <option value="manufacturers">Manufacturer</option>
+                                                        <option value="operatingsystems">Operating System</option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.monitoring_templates[i]?.type">
+                                                        {{formErrors.monitoring_templates[i]?.type}}</div>
+                                                </div>
+                                                <div class="col-2 form-group"
+                                                    *ngIf="form.get('monitoring_templates').controls[i].get('type')?.value=='manufacturers'">
+                                                    <label class="form-col-form-label">Device Type
+                                                        <em>*</em></label>
+                                                    <select name="device_type" id="device_type"
+                                                        class="form-control form-control-sm"
+                                                        formControlName="device_type"
+                                                        (change)="onSelectDeviceType(i,$event.target.value)"
+                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.device_type">
+                                                        <option value="">Select Device Type</option>
+                                                        <option value="Switch">Switch</option>
+                                                        <option value="Firewall">Firewall</option>
+                                                        <option value="Load Balancer">Load Balancer</option>
+                                                        <option value="Hypervisor">Hypervisor</option>
+                                                        <option value="Bare Metal">Bare Metal</option>
+                                                        <option value="Mac Device">Mac Device</option>
+                                                        <option value="VM">VM</option>
+                                                        <option value="Storage">Storage</option>
+                                                        <option value="PDU">PDU</option>
+                                                        <option value="Mobile Device">Mobile Device</option>
+                                                        <option value="Custom Device">Custom Device</option>
+                                                    </select>
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.monitoring_templates[i]?.device_type">
+                                                        {{formErrors.monitoring_templates[i]?.device_type}}</div>
+                                                </div>
+                                                <div class="col-2 form-group"
+                                                    *ngIf="form.get('monitoring_templates').controls[i].get('type')?.value=='manufacturers'">
+                                                    <label for="manufacturer" class="form-col-form-label">Manufacturer
+                                                        <em>*</em></label>
+                                                    <select name="manufacturer" id="manufacturer"
+                                                        class="form-control form-control-sm"
+                                                        formControlName="manufacturers"
+                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.manufacturers">
+                                                        <option value="">Select Manufacturer</option>
+                                                        <option [value]="manufacturer.id"
+                                                            *ngFor="let manufacturer of allManufacturers[i]">
+                                                            {{manufacturer.name}}</option>
+                                                    </select>
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.monitoring_templates[i]?.manufacturers">
+                                                        {{formErrors.monitoring_templates[i]?.manufacturers}}</div>
+                                                </div>
+                                                <div class="col-2 form-group"
+                                                    *ngIf="form.get('monitoring_templates').controls[i].get('type')?.value=='operatingsystems'">
+                                                    <label for="operatingsystems" class="form-col-form-label">Operating System
+                                                        <em>*</em></label>
+                                                    <select name="operatingsystems" id="operatingsystems"
+                                                        class="form-control form-control-sm"
+                                                        formControlName="operatingsystems"
+                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.operatingsystems "
+                                                        *ngIf="operatingSystems && operatingSystems.length > 0">
+                                                        <option value="">Select Operating System</option>
+                                                        <option [value]="operatingsystem.id"
+                                                            *ngFor="let operatingsystem of operatingSystems">
+                                                            {{operatingsystem.full_name}}</option>
+                                                    </select>
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.monitoring_templates[i]?.operatingsystems">
+                                                        {{formErrors.monitoring_templates[i]?.operatingsystems}}</div>
+                                                </div>
+                                                <div class="col-2 form-group">
+                                                    <label for="connection_type" class="form-col-form-label">Monitoring Type
+                                                        <em>*</em></label>
+                                                    <select name="connection_type" id="connection_type"
+                                                        class="form-control form-control-sm"
+                                                        formControlName="connection_type"
+                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.connection_type">
+                                                        <option value="">Select Monitoring Type</option>
+                                                        <option value="snmp">SNMP</option>
+                                                        <option value="agent">Agent</option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.monitoring_templates[i]?.connection_type">
+                                                        {{formErrors.monitoring_templates[i]?.connection_type}}</div>
+                                                </div>
+                                                <div class="col-2 form-group" *ngIf="templates && templates.length > 0">
+                                                    <label class="form-col-form-label">Template
+                                                        <em>*</em></label>
+                                                    <!-- <select name="template" id="template"
+                                                        class="form-control form-control-sm" formControlName="template"
+                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.template">
+                                                        <option value="">Select Contain</option>
+                                                        <option [value]="template.id"
+                                                            *ngFor="let template of templates">
+                                                            {{template.template_name}}</option>
+                                                    </select> -->
+                                                    <multiselect-dropdown [options]="templates"
+                                                        [settings]="templateSettings"
+                                                        class="form-control form-control-sm p-0" style="height:auto;"
+                                                        formControlName="template"
+                                                        [class.is-invalid]="formErrors.monitoring_templates[i]?.template"></multiselect-dropdown>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.monitoring_templates[i]?.template">
+                                                        {{formErrors.monitoring_templates[i]?.template}}</div>
+                                                </div>
+                                                <div class="col-2 form-group mt-4">
+                                                    <span class="form-control border-0 p-0">
+                                                        <button tooltip="Remove Filter"
+                                                            *ngIf="form.controls.monitoring_templates.controls.length > 1"
+                                                            class="action-icons mb-0 fas fa-minus font-sm ml-1"
+                                                            (click)="removeFilter(i)"></button>
+                                                        <button tooltip="Add Filter" *ngIf="last"
+                                                            class="action-icons mb-0 fas fa-plus font-sm ml-1"
+                                                            (click)="addFilter(i)"></button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bordered-container mb-4 mt-4">
+                        <div class="mr-3 border rounded p-4 position-relative">
+                            <div class="pb-2 mb-3 bg-white position-absolute section-name">Schedule
+                            </div>
+                            <unity-schedule></unity-schedule>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-center mt-3">
+                    <button class="btn btn-primary mr-2" (click)="onSubmitCreateForm(false)">Create</button>
+                    <button class="btn btn-primary mr-2" (click)="onSubmitCreateForm(true)">Create & Run Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 
+<ng-template #monitoringTemplatesRef>
+    <div class="card mb-0">
+        <div class="card-header p-1">
+            <table-search-box [searchValue]="searchValue" (searched)="onSearched($event)">
+            </table-search-box>
+        </div>
+        <div class="card-body px-2 py-1" style="height:300px; overflow-y: auto;">
+            <div class="mb-1 pointer-link">
+                <span class="fas fa-check text-success"
+                    [style.visibility]="tmpl.isSelected ? 'visible' : 'hidden'"></span>
+                <span class="ml-2"></span>
+            </div>
+        </div>
+    </div>
+</ng-template> -->
+
+
+<!-- <ng-template #schedulePart>
+    <div class="row form-group">
+        <div class="col-2 text-right pr-1">Time Zone <em>*</em> : </div>
+        <div class="col-4 text-right">
+            <select class="form-control form-control-sm">
+                <option value="">select</option>
+            </select>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-2 text-right pr-1">Schedule <em>*</em> : </div>
+        <div class="col-10">
+            <div class="d-inline-block">
+                <ul class="d-flex px-0 mb-0">
+                    <li>
+                        <label class="pointer-link" [class.active]="form.get('schedule_meta').value=='none'">
+                            <input type="radio" formControlName="schedule_meta" [value]="'none'">
+                            <span class="font-sm mr-2">None</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link" [class.active]="form.get('schedule_meta').value=='one_time'">
+                            <input type="radio" formControlName="schedule_meta" [value]="'one_time'">
+                            <span class="font-sm mr-2">One Time</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link" [class.active]="form.get('schedule_meta').value=='hourly'">
+                            <input type="radio" formControlName="schedule_meta" [value]="'hourly'">
+                            <span class="font-sm mr-2">Hourly</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link" [class.active]="form.get('schedule_meta').value=='daily'">
+                            <input type="radio" formControlName="schedule_meta" [value]="'daily'">
+                            <span class="font-sm mr-2">Daily</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link" [class.active]="form.get('schedule_meta').value=='weekly'">
+                            <input type="radio" formControlName="schedule_meta" [value]="'weekly'">
+                            <span class="font-sm mr-2">Weekly</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="pointer-link" [class.active]="form.get('schedule_meta').value=='monthly'">
+                            <input type="radio" formControlName="schedule_meta" [value]="'monthly'">
+                            <span class="font-sm mr-2">Monthly</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <div class="row mt-3" *ngIf="form.get('schedule_meta').value == 'one_time'">
+                <div class="col-8 form-group">
+                    <div class="row">
+                        <div class="col-3 pr-0 form-group">
+                            <div class="form-check">
+                                <input class="form-check-input form-check-inline pr-0" type="radio" name="execute_now"
+                                    formControlName="execute_now">
+                                <label class="form-check-label">Execute Now</label>
+                            </div>
+                        </div>
+                        <div class="col-1 pl-0 form-group">
+                            <div class="form-check">
+                                <input class="form-check-input form-check-inline" type="radio" name="execute_on"
+                                    formControlName="execute_on">
+                                <label class="form-check-label">On</label>
+                            </div>
+                        </div>
+                        <div class="col-4 form-group">
+                            <div class="input-group">
+                                <owl-date-time #date [pickerType]="'calendar'"></owl-date-time>
+                                <input class="form-control form-control-sm rounded-left" name="date"
+                                    formControlName="date" [owlDateTimeTrigger]="date" [owlDateTime]="date" type="text"
+                                    placeholder="Date">
+                                <div class="input-group-append " [owlDateTimeTrigger]="date">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2 form-group">
+                            <input class="form-control form-control-sm" type="number" min="0" max="23" placeholder="Hr">
+                        </div>
+                        <div class="col-2 form-group">
+                            <input class="form-control form-control-sm" type="number" min="0" max="59"
+                                placeholder="Min">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3"
+            *ngIf="form.get('schedule_meta').value == 'hourly' || form.get('schedule_meta').value == 'monthly' || form.get('schedule_meta').value == 'daily' || form.get('schedule_meta').value == 'weekly'">
+            <div class="col-2 text-right px-0 mt-4">Range of Recurrence <em>*</em> : </div>
+            <div class="col-10 form-group">
+                <div class="row mt-0">
+                    <div class="col-5 form-group">
+                        <span for="startDatePicker">Start Date <em>*</em></span>
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <div class="input-group">
+                                    <owl-date-time #startDatePicker [pickerType]="'calendar'"></owl-date-time>
+                                    <input class="form-control form-control-sm rounded-left" name="startDatePicker"
+                                        formControlName="startDatePicker" [owlDateTimeTrigger]="startDatePicker"
+                                        [owlDateTime]="startDatePicker" type="text" placeholder="Date">
+                                    <div class="input-group-append" [owlDateTimeTrigger]="startDatePicker">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3 form-group">
+                                <input type="number" min="1" max="23" placeholder="Hr"
+                                    class="form-control form-control-sm" formControlName="startdate_hour">
+                            </div>
+                            <div class="col-3 form-group">
+                                <input type="number" min="1" max="59" placeholder="Min"
+                                    class="form-control form-control-sm" formControlName="startdate_minute">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-7 form-group">
+                        <span>End Date <em>*</em></span>
+                        <div class="row">
+                            <div class="col-2 form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input form-check-inline pr-0" type="radio" name="never"
+                                        formControlName="never">
+                                    <label class="form-check-label">Never</label>
+                                </div>
+                            </div>
+                            <div class="col-2 form-group pr-0">
+                                <div class="form-check">
+                                    <input class="form-check-input form-check-inline" type="radio" name="on"
+                                        formControlName="on">
+                                    <label class="form-check-label">On</label>
+                                </div>
+                            </div>
+                            <div class="col-4 form-group pl-0">
+                                <div class="input-group">
+                                    <owl-date-time #endDatePicker [pickerType]="'calendar'"></owl-date-time>
+                                    <input class="form-control form-control-sm rounded-left" name="endDatePicker"
+                                        formControlName="endDatePicker" [owlDateTimeTrigger]="endDatePicker"
+                                        [owlDateTime]="endDatePicker" type="text" placeholder="Date">
+                                    <div class="input-group-append" [owlDateTimeTrigger]="endDatePicker">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-2 form-group">
+                                <input type="number" min="1" max="23" placeholder="Hr"
+                                    class="form-control form-control-sm" formControlName="enddate_hour">
+                            </div>
+                            <div class="col-2 form-group">
+                                <input type="number" min="1" max="59" placeholder="Min"
+                                    class="form-control form-control-sm" formControlName="enddate_minute">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="form.get('schedule_meta').value == 'hourly'">
+                    <div class="col-3 form-group">
+                        <div class="row">
+                            <div class="col-3 pr-0 form-group">Every</div>
+                            <div class="col-5 form-group">
+                                <input class="form-control form-control-sm" type="number" min="0" max="23"
+                                    placeholder="Hr">
+                            </div>
+                            <div class="col-3 pr-0 form-group">Hours</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="form.get('schedule_meta').value == 'daily'">
+                    <div class="col-6 form-group pr-0">
+                        <div class="row">
+                            <div class="col-2 form-group pr-0">Every</div>
+                            <div class="col-2 form-group mr-1 pl-0">
+                                <input class="form-control form-control-sm" type="number" min="0" max="30"
+                                    placeholder="days">
+                            </div>
+                            <div class="col-2 form-group">Day(s)</div>
+                            <div class="col-1 form-group px-0">at</div>
+                            <div class="col-4 form-group px-0">
+                                <div class="input-group">
+                                    <owl-date-time #schedule_time [pickerType]="'timer'"></owl-date-time>
+                                    <input class="form-control form-control-sm rounded-left"
+                                        formControlName="schedule_time" name="schedule_time"
+                                        [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="form.get('schedule_meta').value == 'weekly'">
+                    <div class="col-9 form-group">
+                        <div class="row">
+                            <div class="col-8 pr-0 form-group">
+                                <div *ngFor="let day of days" class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" [value]="day">
+                                    <label class="form-check-label">{{ day }}</label>
+                                </div>
+                            </div>
+                            <div class="col-1 form-group px-0">at</div>
+                            <div class="col-3 form-group pl-0">
+                                <div class="input-group">
+                                    <owl-date-time #schedule_time [pickerType]="'timer'"></owl-date-time>
+                                    <input class="form-control form-control-sm rounded-left"
+                                        formControlName="schedule_time" name="schedule_time"
+                                        [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="form.get('schedule_meta').value == 'monthly'">
+                    <div class="col-9 form-group">
+                        <div class="row">
+                            <div class="col-1 form-group pr-0">Every</div>
+                            <div class="col-2 form-group">
+                                <select formControlName="monthly_field1"
+                                    class="form-control form-control-sm">
+                                    <option value="">Select</option>
+                                    <option [value]="'first'">First</option>
+                                    <option value="">Second</option>
+                                    <option value="">Third</option>
+                                    <option value="">Fourth</option>
+                                </select>
+                            </div>
+                            <div class="col-2 form-group">
+                                <select formControlName="monthly_field2"
+                                    class="form-control form-control-sm">
+                                    <option value="">Select</option>
+                                    <option [value]="'sunday'">Sunday</option>
+                                    <option value="">Monday</option>
+                                    <option value="">Tuesday</option>
+                                    <option value="">Wednesday</option>
+                                    <option value="">Thursday</option>
+                                    <option value="">Friday</option>
+                                    <option value="">Saturday</option>
+                                </select>
+                            </div>
+                            <div class="col-3 form-group"> of Every month(s)</div>
+                            <div class="col-1 form-group px-0">at</div>
+                            <div class="col-3 form-group pl-0">
+                                <div class="input-group">
+                                    <owl-date-time #schedule_time [pickerType]="'timer'"></owl-date-time>
+                                    <input class="form-control form-control-sm rounded-left"
+                                        formControlName="schedule_time" name="schedule_time"
+                                        [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time" type="text">
+                                    <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-clock"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template> -->

@@ -1,0 +1,47 @@
+<div layout="row">
+  <div flex-gt-xs="33" layout="column">
+    <md-card class="widget-card">
+      <md-card-content>
+        <div class="row">
+          <div class="col-xs-3">
+            <svg-datacenter></svg-datacenter>
+          </div>
+          <div class="col-xs-9 text-right">
+            <span class="huge">{{ datacenter_count }}</span>
+          </div>
+          <span class="text-right-wid"><a href="#/datacenter-all">Data Centers</a></span>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+  <div flex-gt-xs="33" layout="column">
+    <md-card class="widget-card">
+      <md-card-content>
+        <div class="row">
+          <div class="col-xs-3">
+            <svg-private-cloud></svg-private-cloud>
+          </div>
+          <div class="col-xs-9 text-right">
+            <span class="huge">{{ private_cloud_count }}</span>
+          </div>
+          <span class="text-right-wid"><a href="#/private-clouds-all">Private Clouds</a></span>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+  <div flex-gt-xs="33" layout="column">
+    <md-card class="widget-card">
+      <md-card-content>
+        <div class="row">
+          <div class="col-xs-3">
+            <svg-public-cloud></svg-public-cloud>
+          </div>
+          <div class="col-xs-9 text-right">
+            <span class="huge">{{ public_cloud_count }}</span>
+          </div>
+          <span class="text-right-wid"><a href="#/public-clouds-all">Public Clouds</a></span>
+        </div>
+      </md-card-content>
+    </md-card>
+  </div>
+</div>

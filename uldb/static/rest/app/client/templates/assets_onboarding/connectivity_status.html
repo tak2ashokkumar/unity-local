@@ -1,0 +1,37 @@
+<div class="modal-header">
+    <h3 class="modal-title">Connectivity Status</h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+    	<div class="col-xs-12" style="text-align : center" ng-if="user_obj.onb_status.vpn_req && !user_obj.vpn_status">
+    		<span class="badge warning_badge"> 
+    			<i class="fa fa-exclamation-triangle"></i>
+    		</span> 
+    		<p class="content-wrapper" style="font-size : 16px;"> 
+    			Agent/VPN Connection setup is in progress. <br> 
+    			<!-- Please wait untill it get's completed. <br> -->
+    			<!-- Contact our team to clarify Your queries -->
+    		</p>
+    	</div>
+
+        <div class="col-xs-12" style="text-align : center" ng-if="user_obj.vpn_status">
+            <span class="badge success_badge"> 
+                <i class="fa fa-check"></i>
+            </span> 
+            <p class="content-wrapper" style="font-size : 16px;"> 
+                Agent/VPN Connection setup is completed. <br> 
+                <!-- You can access further steps to upload assets to Unity. -->
+            </p>
+        </div>
+        <div style="text-align: center">
+            <button type="button" class="btn btn-default" ng-click="connectivityRequest()">
+                Request another Connection (Agent/VPN)
+            </button>
+        </div>
+    </div>
+</div>
+<div class="modal-footer modal-buttons">
+    <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+      Close
+    </button>
+</div>

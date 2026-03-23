@@ -1,0 +1,25 @@
+<div class="card text-center">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card text-center" *ngIf="steps.length">
+                    <div class="card-body">
+                        <ol class="step-indicator" [perfectScrollbar]>
+                            <li *ngFor="let step of steps; let i = index;" [ngClass]="isActive(step)">
+                                <div class="step" (click)="goTo(step)">
+                                    <i class="step-icon" [ngClass]="step.icon"></i>
+                                </div>
+                                <div class="caption hidden-xs hidden-sm pb-0">
+                                    <span (click)="goTo(step)">{{step.stepName}}</span>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </div>
+</div>

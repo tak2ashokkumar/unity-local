@@ -1,0 +1,21 @@
+.nav-link.active {
+  border-color: white;
+  border-bottom: 2px solid #f48e1f;
+}
+
+.nav-link:not(.active):hover,
+.nav-link:not(.active):focus {
+  border-color: transparent;
+}
+
+/* .table {
+    border: 1px solid #c8ced3;
+} */
+
+.full-details {
+  padding: 0.75rem 0.5rem;
+}
+
+.full-details a {
+  border: 1px solid transparent;
+}

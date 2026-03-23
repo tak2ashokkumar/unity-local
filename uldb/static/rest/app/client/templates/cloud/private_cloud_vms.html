@@ -1,0 +1,123 @@
+<!--  -->
+
+<div style="margin:20px">
+    <div ng-if="!openstack_loaded && !vmware_loaded">
+      <h4><span class="fa fa-spinner spinning"></span> Loading...</h4>
+    </div>
+
+    <span ng-if="loader">
+      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+    </span>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="openstack_result.length > 0">
+      <div class="row content-wrapper bg-color">
+          <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+              <form class="navbar-form">
+                  <div class="form-group width100">
+                      <input class="form-control" type="text" ng-model="searchKeyword" id="searchKeyword" placeholder="Enter keyword">
+                      <button class="btn btn-search" type="submit" style="top: 4px;">
+                          <i class="fa fa-search"></i>
+                      </button>
+                  </div>
+              </form>
+          </div>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-top:1%">
+              <div class="action-bar">
+                  <span class="count">{{openstack_result.length}}</span>
+                  <span class="count-text"> Virtual Machines</span>
+              </div>
+          </div>
+      </div>
+      <section id="no-more-tables" class="margintop20 middle-wrapper">
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
+                <th ng-repeat="row in openstack_rows track by $index">{{ row.description }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="result in openstack_result">
+              <td ng-repeat="row in openstack_rows">
+                <!-- <span ng-if="row.opaque === undefined" ng-bind="result[row.name]"></span> -->
+                <span ng-if="row.opaque === undefined && row.name ==='last_known_state'">{{ result[row.name] | powerState}}</span>
+                <span ng-if="row.opaque === undefined && row.name !=='last_known_state'">
+                  <span ng-if="row.name ==='management_ip'">
+                    <span ng-if="result.management_ip">{{ result[row.name] }}</span>
+                    <span ng-if="!result.management_ip">Not Assigned</span>
+                  </span>
+                  <span ng-if="row.name !=='management_ip'">{{ result[row.name] }}</span>
+                </span>
+                <span ng-if="row.opaque === 'stringTransform'" ng-bind="row.read(result)"></span>
+                <a ng-if="row.opaque === 'link'" href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+                <span ng-if="row.opaque === 'string'" ng-bind="row.read(result).innerText"></span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+    <div ng-if="openstack_loaded && openstack_result.length === 0" class="content-wrapper">
+        <no-records-found message="There are no vms associated with this account."></no-records-found>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="vmware_result.length > 0">
+      <div class="row content-wrapper bg-color">
+          <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+              <form class="navbar-form">
+                  <div class="form-group width100">
+                      <input class="form-control" type="text" ng-model="searchKeyword" id="searchKeyword" placeholder="Enter keyword">
+                      <button class="btn btn-search" type="submit" style="top: 4px;">
+                          <i class="fa fa-search"></i>
+                      </button>
+                  </div>
+              </form>
+          </div>
+          <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" style="padding-top:1%">
+              <div class="action-bar">
+                  <span class="count">{{vmware_result.length}}</span>
+                  <span class="count-text"> Vms</span>
+              </div>
+          </div>
+      </div>
+      <section id="no-more-tables" class="margintop20 middle-wrapper">
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
+              <th ng-repeat="row in vmware_rows track by $index">{{row.description}}</th>
+              <th style="width: 15%;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="result in vmware_result">
+              <td ng-repeat="row in vmware_rows track by $index">
+                <span ng-if="row.opaque === undefined && row.name ==='state'">{{ result[row.name] | powerState}}</span>
+                <span ng-if="row.opaque === undefined && row.name !=='state'">
+                  <span ng-if="row.name ==='management_ip'">
+                    <span ng-if="result.management_ip">{{ result[row.name] }}</span>
+                    <span ng-if="!result.management_ip">Not Assigned</span>
+                  </span>
+                  <span ng-if="row.name !=='management_ip'">{{ result[row.name] }}</span>
+                </span>
+                <span ng-if="row.opaque === 'stringTransform'" ng-bind="row.read(result)"></span>
+                <a ng-if="row.opaque === 'link'" href="{{ row.read(result).url }}">{{ row.read(result).innerText }}</a>
+                <span ng-if="row.opaque === 'string'" ng-bind="row.read(result).innerText"></span>
+              </td>
+              <td>
+                <div class="action-icons">
+                  <a class="fa fa-external-link" ng-class="{'disabled': !result.power}" href="/terminal#/vmware-wmks-vm/webconsole/{{ result.instance_id }}" target="_blank"></a>
+                  <a class="fa fa-external-link-square" ng-class="{'disabled': !result.power}" href="/main#/vmware-wmks-vm/webconsole/iframe/{{ result.instance_id }}"></a>
+                  <a ng-class="{'disabled': !result.power}">
+                    <i class="fa fa-power-off blue-text" aria-hidden="true"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <div ng-if="vmware_loaded && (vmware_result.length === 0)" class="content-wrapper">
+        <no-records-found message="There are no vms associated with this account."></no-records-found>
+    </div>
+</div>

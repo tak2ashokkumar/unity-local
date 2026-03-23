@@ -1,0 +1,38 @@
+<!-- <div class="btn-group" dropdown [insideClick]="true" (onShown)="handler('onShown')" (onHidden)="handler('onHidden')">
+    <button dropdownToggle type="button" class="btn btn-primary dropdown-toggle">
+        Button dropdown <span class="caret"></span>
+    </button>
+    <ul *dropdownMenu class="dropdown-menu" role="menu">
+        <li role="menuitem"><a class="dropdown-item" href="#">Action</a></li>
+        <li role="menuitem"><a class="dropdown-item" href="#">Another action</a></li>
+        <li role="menuitem"><a class="dropdown-item" href="#">Something else here</a></li>
+        <li class="divider dropdown-divider"></li>
+        <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a>
+        </li>
+    </ul>
+</div> -->
+
+<div class="card rounded-5 mb-0">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+        <div class="d-flex align-items-center font-500 w-40">
+            <span class="badge badge-secondary font-xs-sm">{{count}}</span>
+            <span class="ml-1">Options</span>
+        </div>
+        <!-- <div class="d-flex align-items-center font-500 w-60">
+            <search-box [searchValue]="metricsCriteria.searchValue" [customClass]="'form-control-sm'"
+                (searched)="onSearched($event)" class="w-100"></search-box>
+        </div> -->
+    </div>
+    <div class="card-body p-0 scrollable-list">
+        <div *ngIf="count" class="h-100 w-100">
+            <virtual-scroller #scroll [items]="optionsList" (vsEnd)="fetchMore($event)" class="h-100 w-100">
+                <div class="d-flex align-items-center border-bottom px-2 py-1 pointer-link"
+                    *ngFor="let m of scroll.viewPortItems" (click)="selectOption(m)">
+                    <span class="mt-1 text-primary"></span>
+                    <span class="font-sm ml-1">{{m?.item_name}}</span>
+                </div>
+                <div *ngIf="isLoading" class="loader px-3 text-primary font-lg-xl font-500"></div>
+            </virtual-scroller>
+        </div>
+    </div>
+</div>

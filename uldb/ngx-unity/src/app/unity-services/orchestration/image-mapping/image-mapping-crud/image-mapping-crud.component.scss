@@ -1,0 +1,42 @@
+.datastore-column {
+  max-height: 300px; /* Set the maximum height for the left column */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.datastore-column::-webkit-scrollbar {
+  width: 8px; /* Set the width of the scrollbar */
+}
+
+.datastore-column::-webkit-scrollbar-thumb {
+  background-color: #cccccc; /* Set the color of the scrollbar thumb */
+  // border-radius: 4px; /* Set the radius of the scrollbar thumb */
+}
+
+.datastore-column::-webkit-scrollbar-track {
+  background-color: #f8f9fa; /* Set the color of the scrollbar track */
+}
+
+.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.input-container {
+  position: relative;
+}
+
+.input-container input {
+  padding-left: 30px;
+}
+
+.icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.failedHighlight {
+  border: 1px solid #f1b8b8 !important;
+  background-color: #f5cccc !important;
+}

@@ -1,0 +1,145 @@
+<alerts></alerts>
+
+<h5>Click on a row to expand that opportunity</h5>
+
+<div class="row">
+  <div class="col-sm-12">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-12">
+          <input class="form-control ng-valid ng-dirty"
+                 type="text" id="searchKeyword"
+                 ng-model="searchKeyword" placeholder="Search by server name, type, OS, etc."
+                 ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<span ng-if="!model.opportunities">
+  <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+</span>
+<table class="display" cellspacing="0" width="100%">
+  <tr>
+    <td>
+      <table class="table table-condensed">
+        <thead>
+        <tr>
+          <th>Oppty. Name</th>
+          <th>Account</th>
+          <th>Owner</th>
+          <th>Email</th>
+          <th>Stage Name</th>
+          <th>Unity Enabled</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-click="setOppty(opportunity)"
+            ng-class="{'success': opportunity === sel.oppty }"
+            ng-repeat="opportunity in model.opportunities | filter: searchKeyword">
+          <td>{{ opportunity.Name }}</td>
+          <td>{{ opportunity.Account.Name }}</td>
+          <td>{{ opportunity.Owner.Name }}</td>
+          <td>{{ opportunity.Email__c }}</td>
+          <td>{{ opportunity.StageName }}</td>
+          <td>{{ opportunity.Unity_Enabled_Opportunity__c }}</td>
+        </tr>
+        </tbody>
+      </table>
+      <span ng-if="model.opportunities && model.opportunities.length == 0">
+        <h3 class="align-center">No records to display</h3>
+      </span>
+    </td>
+  </tr>
+</table>
+
+
+<div ng-if="sel.oppty" class="panel panel-danger">
+  <div class="panel-heading">
+    Status
+  </div>
+  <div class="panel-body">
+    <table class="table">
+      <thead>
+      <tr>
+        <td>Salesforce Account Name</td>
+        <td>{{ sel.oppty.Name }}</td>
+      </tr>
+      <tr>
+        <td>Unity Account</td>
+        <td>
+          <span ng-if="sel.linked" class="text-primary">
+            <a href="{{ '#/organization/:id'.replace(':id', sel.org.id) }}">{{ sel.org.organization_name }}</a>
+            <button ng-click="unlinkAccount(sel.oppty)" class="btn btn-danger">Unlink Account</button>
+          </span>
+          <span ng-if="!sel.linked" class="text-danger">
+            <strong>None</strong>
+            <button ng-click="linkAccount(sel.oppty)" class="btn btn-success">Link Account</button>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td>Imported</td>
+        <td>
+          <span ng-if="sel.imported">Yes</span>
+          <span ng-if="!sel.imported">
+            No
+            <button ng-click="import(sel)" class="btn btn-info">Import</button>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td>Synced with Salesforce</td>
+        <td>
+          <span ng-if="sel.synced">Yes</span>
+          <span ng-if="!sel.synced">No</span>
+        </td>
+      </tr>
+      </thead>
+    </table>
+  </div>
+</div>
+
+<script type="text/ng-template" id="salesforceLinkerModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Link Account
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group" >
+        <label class="col-sm-2 control-label">
+          Organization
+        </label>
+        <div class="col-sm-10">
+          <input class="form-control"
+                 ng-model="obj"
+                 uib-typeahead="org as org.organization_name for org in getOrgs($viewValue)">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Salesforce ID
+        </label>
+        <div class="col-sm-10">
+          <input readonly class="form-control" placeholder="{{ salesforceId }}">
+        </div>
+      </div>
+
+      <input type="submit" style="visibility: hidden">
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="link(obj)">
+      Link!
+    </button>
+  </div>
+</script>

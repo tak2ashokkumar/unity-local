@@ -1,0 +1,179 @@
+<div ng-init="setTicketType('task')">
+  <form class="form-inline ticketing">
+    <div class="form-group leftpan">
+      <label for="orgName">Organization : </label>
+        <input id="orgName" class="form-control ticketing"
+               ng-model="org"
+               placeholder="Type org to search..."
+               uib-typeahead="org as org.name for org in getOrgs($viewValue)"
+               force-null="col.nullify"
+               autocomplete="off">
+    </div>
+    <button type="button" class="btn btn-success ticketing" ng-click="getTickets(org)">Get Tickets</button>
+    <div style="height:10px"></div>
+  </form>
+</div>
+<span ng-if="loader">
+    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+</span>
+<div class="row">
+  <div class="col-sm-4" ng-if="(requests.length>0) && (!errorMsg)">
+    <h3>Existing Tickets</h3>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th colspan="50%">Subject</th>
+        <th colspan="50%">Status</th>
+      </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="request in requests"
+            ng-click="expandRequest(request, $index)"
+            ng-class="{'active': isExpanded(request)}">
+          <td colspan="50%">{{ request.subject }}</td>
+          <td colspan="50%">{{ request.status }}</td>
+        </tr>
+      </tbody>
+      <tfoot ng-if="requestCount!==0">
+        <td colspan="100%" style="text-align: center;">
+          <div class="pagination center">
+            <button class="btn" ng-class="{'disabled': disablePrev}" ng-click="disablePrev || prevPage()">« Prev</button>
+            <label>{{firstRecord}}-{{lastRecord}} of {{requestCount}}</label>
+            <button class="btn" ng-class="{'disabled': disableNext}" ng-click="disableNext || nextPage()">Next »</button>
+          </div>
+        </td>
+      </tfoot>
+    </table>
+  </div>
+  <div ng-if="errorMsg">
+    <h3 class="align-center">{{errorMsg}}</h3>
+  </div>
+  
+  <div class="col-sm-8" ng-if="request">
+    <h3>Ticket</h3>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <strong>Subject: </strong>{{ request.subject }}
+      </div>
+      <div class="panel-body">
+        <p><b ng-bind-html="request.description">Description:</b></p>
+        <p><b>Created at:</b> {{ request.created_at | date : 'medium' }}</p>
+        <p><b>Updated at:</b> {{ request.updated_at | date : 'medium' }}</p>
+        <p><b>Created via:</b> {{ request.via.channel }}</p>
+        <p><b>Zendesk URL:</b> <a href="{{ zendeskRequestUrlBase }}{{ request.id }}" target="_blank">
+          {{ zendeskRequestUrlBase }}{{ request.id }}</a></p>
+      </div>
+    </div>
+      
+    <h3>Comments</h3>
+    <div class="panel panel-default" ng-repeat="comment in comments"
+         ng-class="{'panel-danger': userIsAdmin(comment.author_id) }">
+      <div class="panel-heading">
+        <strong>{{ users[comment.author_id].name }} <span ng-if="userIsAdmin(comment.author_id)">(Agent)</span></strong>
+        <span class="pull-right"> {{ comment.created_at | date : 'medium' }}</span>
+      </div>
+      <div class="panel-body" ng-bind-html="comment.body">
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- div class="col-sm-8" ng-if="!request">
+    <h3>Select a ticket from the right</h3>
+  </div> -->
+</div>
+
+
+<div class="row">
+  <div class="col-sm-4"></div>
+  <div class="col-sm-8" ng-if="comments && request.status!='closed'" ng-cloak>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Post New Comment
+      </div>
+      <div class="panel-body">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label for="org" class="col-sm-2 control-label">
+              Comment
+            </label>
+
+            <div class="col-sm-10">
+              <textarea rows="5"
+                        class="form-control"
+                        ng-model="currentPost.body"
+                        placeholder="Add your comment here"></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+              <button type="button" class="btn btn-primary" ng-click="postComment(currentPost.body)">Post</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="createRequestModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Create New Ticket</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <form class="form-horizontal">
+      <label ng-if="createRequestError" style="color:red">{{createRequestError}}</label>
+      <div class="form-group">
+        <label for="request.subject" class="col-sm-2 control-label">
+          Subject
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text"
+                 class="form-control"
+                 ng-model="request.subject"
+                 placeholder="What is your issue about?"
+                 required="required">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.priority" class="col-sm-2 control-label">
+          Priority
+        </label>
+        <div class="col-sm-10">
+          <select ng-model="request.priority" class="form-control" required="required">
+            <option value="low" selected>low</option>
+            <option value="normal">normal</option>
+            <option value="high">high</option>
+            <option value="urgent">urgent</option>
+          </select>          
+        </div>        
+      </div>
+
+      <div class="form-group">
+        <label for="request.description" class="col-sm-2 control-label">
+          Description
+        </label>
+
+        <div class="col-sm-10">
+          <textarea rows="3"
+                    class="form-control"
+                    ng-model="request.description"
+                    placeholder="Describe your issue here."
+                    required="required"></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="createRequest(request)">
+      Create Ticket
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+  </div>
+</script>

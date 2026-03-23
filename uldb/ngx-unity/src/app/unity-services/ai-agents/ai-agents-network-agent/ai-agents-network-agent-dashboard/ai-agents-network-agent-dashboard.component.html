@@ -1,0 +1,392 @@
+<div class="d-flex justify-content-end move-dropdowns-up-end-of-top-tabs">
+    <div>
+        <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+</div>
+
+<!-- <div class="d-flex mt--3">
+    <div class="w-26 pr-2">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="summaryWidgetsViewData.tasksRecommendedLoader"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="font-lg">Task Recommended</div>
+                <div class="font-lg-xl text-primary">{{summaryWidgetsViewData.taskRecommended}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="w-15 pr-2">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="summaryWidgetsViewData.taskExecutedLoader"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="font-lg">Task Executed</div>
+                <div class="font-lg-xl text-primary">{{summaryWidgetsViewData.taskExecuted}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="w-15 pr-2">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="summaryWidgetsViewData.taskApprovedLoader"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="d-flex justify-content-between">
+                    <span class="font-lg">Task Approved</span>
+                    <i class="fas fa-check-circle text-success fa-lg mt-2"></i>
+                </div>
+                <div class="font-lg-xl text-primary">{{summaryWidgetsViewData.taskApproved}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="w-20 pr-2">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="summaryWidgetsViewData.waitingForApprovalLoader"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="d-flex justify-content-between">
+                    <span class="font-lg">Waiting For Approval</span>
+                    <i class="fas fa-exclamation-circle text-warning fa-lg mt-2"></i>
+                </div>
+                <div class="font-lg-xl text-primary">{{summaryWidgetsViewData.waitingForApproval}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="w-24 pr">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="summaryWidgetsViewData.approvalRejectedLoader"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="d-flex justify-content-between">
+                    <span class="font-lg">Approval Rejected</span>
+                    <i class="fas fa-exclamation-triangle text-danger fa-lg mt-2"></i>
+                </div>
+                <div class="font-lg-xl text-primary">{{summaryWidgetsViewData.approvalRejected}}</div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="row mb-2 mt-3 pl-2">
+    <div class="col-6 p-0">
+        <div class="card h-100 mb-0">
+            <div class="card-body d-flex flex-column px-2 py-2">
+                <div class="d-flex justify-content-between pointer-link">
+                    <div class="d-flex justify-content-around align-items-center entity-card w-15 py-1 pointer-link"
+                        [class.active]="currentPath == 'events'" (click)="goTo('events')">
+                        <div class="font-lg font-500 text-truncate">Events</div>
+                        
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center entity-card w-16 py-1 pointer-link"
+                        [class.active]="currentPath == 'alerts'" (click)="goTo('alerts')">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-500 text-truncate">Alerts</span>
+                            
+                        </div>
+                        <!-- <div class="d-flex">
+                            <span class="font-xss sub-entity font-500 text-truncate">Noise Reduction :
+                            </span>
+                            
+                        </div> -->
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center entity-card w-16 py-1 pointer-link"
+                        [class.active]="currentPath == 'conditions'" (click)="goTo('conditions')">
+                        <div class="d-flex justify-content-between">
+                            <span class="font-500 text-truncate">Conditions</span>
+                            
+                        </div>
+                        <!-- <div class="d-flex">
+                            <span class="font-xss sub-entity font-500 text-truncate">Correlation % :
+                            </span>
+                            
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>
+
+<!-- <div class="row mt-2">
+    <div class="col">
+        <div class="card round-edge">
+            <app-spinner [name]="'alertsControlPanelWidgetLoader'"></app-spinner>
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{count}}</span>
+                    <span class="ml-1 font-lg">Alerts Control Panel</span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center w-40">
+                    <div class="w-46 mr-2">
+                        <search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></search-box>
+                    </div>
+                    <div class="w-40">
+                        <multiselect-dropdown class="form-control p-0" style="height:auto;" [options]="deviceTypesList"
+                            [settings]="deviceTypesSettings" [texts]="deviceTypesTexts"
+                            (dropdownClosed)="OnFilterChange()"
+                            [(ngModel)]="currentCriteria.multiValueParam.device_type">
+                        </multiselect-dropdown>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <th>Alert ID</th>
+                        <th>Device Name</th>
+                        <th>Alert Description</th>
+                        <th>Alert Time</th>
+                        <th class="text-center">Task Status</th>
+                        <th class="text-center">Execution Status</th>
+                        <th>AI Task Recommendation</th>
+                        <th class="text-center">Agent Analysis</th>
+                        <th>Approvals</th>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of alertsControlPanelViewData;let i = index" truncateText>
+                            <td class="tdw-8">
+                                <div [tooltip]="view.alertId">{{view.alertId}}</div>
+                            </td>
+                            <td class="tdw-11">
+                                <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                            </td>
+                            <td class="tdw-13">
+                                <div [tooltip]="view.alertDescription">{{view.alertDescription}}</div>
+                            </td>
+                            <td class="tdw-11">
+                                <div [tooltip]="view.alertTime">{{view.alertTime}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div class="text-center">
+                                    <i [ngClass]="view.statusClass" [tooltip]="view.status" container="body"></i>
+                                </div>
+                            </td>
+                            <td class="w-11 text-center">
+                                <span class="fa" [ngClass]="view.executionStatusCssClass"
+                                    [tooltip]="view.executionStatusTooltip"></span>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.aiTaskRecomendation">{{view.aiTaskRecomendation}}</div>
+                            </td>
+                            <td class="w-13 text-center">
+                                <button class="action-icons fas fa-magic font-sm" tooltip="Agent Analysis"
+                                    (click)=agentAnalysisOfAlert(view)>
+                                </button>
+                            </td>
+                            <td class="w-8">
+                                <div class="d-flex">
+                                    <div class="custom-control custom-radio">
+                                        <input id="{{i}}-yes" type="radio" class="custom-control-input" [value]="true"
+                                            name="{{i}}-approval" [(ngModel)]="view.approvalStatus"
+                                            (change)="onApprovalChange(view)"
+                                            [disabled]="!view.contextualSummary?.isRecommendedScriptPresent || !view.isApprovalStatusPending">
+                                        <label class="custom-control-label" for="{{i}}-yes">Yes</label>
+                                    </div>
+                                    <div class="custom-control custom-radio ml-3">
+                                        <input id="{{i}}-no" type="radio" class="custom-control-input" [value]="false"
+                                            name="{{i}}-approval" [(ngModel)]="view.approvalStatus"
+                                            (change)="onApprovalChange(view)"
+                                            [disabled]="!view.contextualSummary?.isRecommendedScriptPresent || !view.isApprovalStatusPending">
+                                        <label class="custom-control-label" for="{{i}}-no">No</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries *ngIf="alertsControlPanelViewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"></table-entries>
+                <table-pager *ngIf="alertsControlPanelViewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!alertsControlPanelViewData.length">No Alerts control
+                    panel data
+                    available.</div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- <ng-template #agentAnalysis>
+    <div class="card mb-0">
+        <div class="card-header">
+            <div class="d-flex justify-content-between">
+                <div class="font-lg">Alert Analysis Powered by Network Agent</div>
+                <div class="card-header-actions">
+                    <a class="card-header-action btn-close" (click)="agentAnalysisModalRef.hide()">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body" [ngClass]="{'py-1 properties':selectedAlertsControlPanelView,'p-0 position-relative':
+            !selectedAlertsControlPanelView}">
+            <app-spinner [name]="'agentAnalysisPopupLoader'"></app-spinner>
+            <ng-container *ngIf="selectedAlertsControlPanelView">
+                <div class="d-flex">
+                    <img [src]="analysisLogos?.UnityOne?.imageURL" [alt]="'UnityOne.ai'"
+                        style="height: 20px; max-width: 20px;" />
+                    <div class="text-success ml-2">Summary by UnityOne.AI</div>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Summary: </span>
+                    <span class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.summary ||
+                        'N/A'}}</span>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Root Cause: </span>
+                    <span class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.rootCause ||
+                        'N/A'}}</span>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Supporting Evidence: </span>
+                    <span
+                        class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.supportingEvidence
+                        ||
+                        'N/A'}}</span>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Recommended Script: </span>
+                    <span
+                        class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.recommendedScript
+                        ||
+                        'N/A'}}</span>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Script Description: </span>
+                    <span
+                        class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.scriptDescription
+                        ||
+                        'N/A'}}</span>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Expected Remediation Outcome: </span>
+                    <span
+                        class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.expectedRemediationOutcome
+                        || 'N/A'}}</span>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Impacted Devices : </span>
+                    <span
+                        class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.impactedDevices
+                        ||
+                        'N/A'}}</span>
+                </div>
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Accuracy Score: </span>
+                    <span
+                        class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.accuracyScore}}</span>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row">
+                            <img [src]="analysisLogos?.factors?.imageURL" [alt]="'Root Cause'" class="w-100 "
+                                style=" max-width: 35px; max-height: 30px;" />
+                            <span class="font-lg font-500 text-truncate ml-2">Why It Happened</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul *ngIf="selectedAlertsControlPanelView?.contextualSummary?.whyItHappened?.length">
+                            <li *ngFor="let factor of selectedAlertsControlPanelView?.contextualSummary?.whyItHappened">
+                                {{ factor }}</li>
+                        </ul>
+                        <div *ngIf="!selectedAlertsControlPanelView?.contextualSummary?.whyItHappened?.length">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header bg-white">
+                        <div class="row">
+                            <img [src]="analysisLogos?.factors?.imageURL" [alt]="'Root Cause'" class="w-100 "
+                                style=" max-width: 35px; max-height: 30px;" />
+                            <span class="font-lg font-500 text-truncate ml-2">How It Happened</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul *ngIf="selectedAlertsControlPanelView?.contextualSummary?.howItHappened?.length">
+                            <li *ngFor="let factor of selectedAlertsControlPanelView?.contextualSummary?.howItHappened">
+                                {{ factor }}</li>
+                        </ul>
+                        <div *ngIf="!selectedAlertsControlPanelView?.contextualSummary?.howItHappened?.length">
+                            <div class="text-center text-muted h-100">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card my-3">
+                    <div class="card-header bg-white">
+                        <div class="row">
+                            <button class="action-icons mb-0 fas fa-calendar-alt font-sm ml-1"></button>
+                            <span class="font-lg font-500 text-truncate ml-2">Event Timeline</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive"
+                            *ngIf="selectedAlertsControlPanelView?.contextualSummary?.timelineOfEvents?.length">
+                            <table class="table">
+                                <thead class="font-500">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let event of selectedAlertsControlPanelView?.contextualSummary?.timelineOfEvents"
+                                        truncateText>
+                                        <td class="tdw-10">
+                                            <div [tooltip]="event.date">
+                                                {{ event.date }}
+                                            </div>
+                                        </td>
+                                        <td class="tdw-10">
+                                            <div [tooltip]="event.time"> {{ event.time }}</div>
+                                        </td>
+                                        <td class="tdw-80">
+                                            <div [tooltip]="event.description">
+                                                {{event.description}}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center text-muted py-4"
+                            *ngIf="!selectedAlertsControlPanelView?.contextualSummary?.timelineOfEvents?.length">No
+                            data available.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-1">
+                    <span class="font-sm-xs text-muted">Note: </span>
+                    <span class="font-sm-xs font-500">{{selectedAlertsControlPanelView?.contextualSummary?.notes ||
+                        'N/A'}}</span>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="!selectedAlertsControlPanelView">
+                <div class="text-center font-500 py-5">Network Agent is analysing your Alerts and Events.........</div>
+            </ng-container>
+        </div>
+        <div class="card-footer px-0" *ngIf="selectedAlertsControlPanelView">
+            <div class="text-center">Would you like to execute the Agent recommended Script?</div>
+            <hr>
+            <div class="d-flex justify-content-center align-items-center">
+                <button class="btn btn-sm btn-success mr-2"
+                    [ngClass]="{'btn-disabled':!selectedAlertsControlPanelView?.isApprovalStatusPending || !selectedAlertsControlPanelView?.contextualSummary?.isRecommendedScriptPresent}"
+                    type="button" (click)="confirmScriptExecute(true)"
+                    [disabled]="!selectedAlertsControlPanelView?.isApprovalStatusPending || !selectedAlertsControlPanelView?.contextualSummary?.isRecommendedScriptPresent">Yes</button>
+                <button class="btn btn-sm btn-outline-danger pull-right"
+                    [ngClass]="{'btn-disabled':!selectedAlertsControlPanelView?.isApprovalStatusPending || !selectedAlertsControlPanelView?.contextualSummary?.isRecommendedScriptPresent}"
+                    type="button" (click)="confirmScriptExecute(false)"
+                    [disabled]=" !selectedAlertsControlPanelView?.isApprovalStatusPending || !selectedAlertsControlPanelView?.contextualSummary?.isRecommendedScriptPresent">No</button>
+            </div>
+        </div>
+    </div>
+</ng-template> -->

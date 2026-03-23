@@ -1,0 +1,403 @@
+<div class="row mb-2 mx-2 d-flex justify-content-end">
+    <form class="form-inline w-55" *ngIf="filterForm" [formGroup]="filterForm">
+        <div class="form-group px-1 w-20">
+            <multiselect-dropdown [options]="datacenters" [settings]="dcSettings" class="form-control w-100 p-0"
+                style="height:auto;" formControlName="datacenters" (dropdownClosed)="getPrivateCloudsByDC()"
+                [ngClass]="{'is-invalid' : filterFormErrors.datacenters}"></multiselect-dropdown>
+        </div>
+        <div class="form-group px-1 w-20">
+            <multiselect-dropdown [options]="clouds" [settings]="cloudSettings" class="form-control w-100 p-0"
+                style="height:auto;" formControlName="private_clouds"
+                [ngClass]="{'is-invalid' : filterFormErrors.private_clouds}"></multiselect-dropdown>
+        </div>
+        <div class="form-group px-1 w-20">
+            <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings" class="form-control w-100 p-0"
+                style="height:auto;" formControlName="device_types"
+                [ngClass]="{'is-invalid' : filterFormErrors.device_types}"></multiselect-dropdown>
+        </div>
+        <div class="form-group px-1 w-20">
+            <select class="form-control form-control-sm w-100" formControlName="timeline"
+                [class.is-invalid]="filterFormErrors.timeline">
+                <option [value]="duration.LAST_24_HOURS">Last 24 Hours</option>
+                <option [value]="duration.LAST_WEEK">Last Week</option>
+                <option [value]="duration.LAST_MONTH">Last Month</option>
+            </select>
+        </div>
+        <div class="w-7 px-1">
+            <button class="btn btn-sm btn-pill btn-warning" [tooltip]="'Filter'" container="body"
+                (click)="filterData()">
+                <i class="fas fa-filter font-xs"></i>
+            </button>
+        </div>
+        <div class="d-flex justify-content-end w-13 border-left">
+            <button class="btn btn-pill btn-warning btn-sm" [tooltip]="'Rules'" container="body" (click)="goTo('rules')"
+                accessControl moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                elementType="btn">
+                <i class="fas fa-cog"></i>
+            </button>
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+    </form>
+</div>
+
+<div class="row mb-2">
+    <div class="col-8">
+        <div class="row" *ngIf="summaryData">
+            <div class="col-12">
+                <div class="card h-100 mb-0">
+                    <div class="card-body d-flex flex-column p-0">
+                        <div class="d-flex justify-content-between">
+                            <div class="entity-card w-20 p-2 pointer-link" (click)="goTo('summary')">
+                                <div class="font-xl text-truncate font-500">Event Reduction</div>
+                                <div class="d-flex align-items-baseline">
+                                    <span
+                                        class="text-value value font-weight-bold">{{summaryData.eventReductionPercentage}}%</span>
+                                </div>
+                            </div>
+                            <div class="w-0 my-2 border border-secondary"></div>
+                            <div class="d-flex w-17 justify-content-between align-items-center entity-card py-2 pointer-link"
+                                (click)="goTo('event-analytics')">
+                                <div class="font-xl font-500 text-truncate">Events</div>
+                                <div class="text-value value font-weight-bold">{{summaryData.events}}</div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                            </div>
+                            <div class="d-flex flex-column w-18 justify-content-around entity-card py-2 pointer-link">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-xl font-500 text-truncate">Alerts</span>
+                                    <span class="text-value value font-weight-bold">{{summaryData.alerts}}</span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="font-xs sub-entity font-500 text-truncate">Noise Reduction :
+                                    </span>
+                                    <span
+                                        class="font-xs value font-500 ml-1">{{summaryData.noiseReductionPercentage}}%</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="fas fa-caret-right fa-2x text-secondary"></span>
+                            </div>
+                            <div class="d-flex flex-column w-20 justify-content-around entity-card py-2 pointer-link">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-xl font-500 text-truncate">Conditions</span>
+                                    <span class="text-value value font-weight-bold">{{summaryData.conditions}}</span>
+                                </div>
+                                <div class="d-flex">
+                                    <span class="font-xs sub-entity font-500 text-truncate">Correlation % :
+                                    </span>
+                                    <span
+                                        class="font-xs value font-500 ml-1">{{summaryData.correlationPercentage}}%</span>
+                                </div>
+                            </div>
+                            <div class="w-0 my-2 border border-secondary"></div>
+                            <div class="d-flex w-12 justify-content-center align-items-center entity-card p-2 pointer-link active"
+                                (click)="goTo('analytics')">
+                                <div class="font-xl font-500 text-truncate text-white">Analytics</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="row" *ngIf="alertsData">
+            <div class="col-12">
+                <div class="card round-edge mb-0">
+                    <div class="card-body d-flex flex-column p-2">
+                        <div class="d-flex justify-content-around">
+                            <div>
+                                <div class="text-truncate pt-1">Compute</div>
+                                <div class="d-flex align-items-baseline pb-1">
+                                    <span class="text-primary text-value">{{alertsData.compute}}</span>
+                                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                </div>
+                            </div>
+                            <div class="my-2 border border-secondary"></div>
+                            <div>
+                                <div class="text-truncate pt-1">Network</div>
+                                <div class="d-flex align-items-baseline pb-1">
+                                    <span class="text-primary text-value">{{alertsData.network}}</span>
+                                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                </div>
+                            </div>
+                            <div class="my-2 border border-secondary"></div>
+                            <div>
+                                <div class="text-truncate pt-1">Storage</div>
+                                <div class="d-flex align-items-baseline pb-1">
+                                    <span class="text-primary text-value">{{alertsData.storage}}</span>
+                                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                </div>
+                            </div>
+                            <div class="my-2 border border-secondary"></div>
+                            <div>
+                                <div class="text-truncate pt-1">Others</div>
+                                <div class="d-flex align-items-baseline pb-1">
+                                    <span class="text-primary text-value">{{alertsData.others}}</span>
+                                    <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-7 pr-0">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="trendByTimelineViewData.loader"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                <div class="py-1">
+                    <span> Trend by timeline</span>
+                </div>
+                <div>
+                    <form *ngIf="trendByTimelineViewData.form" [formGroup]="trendByTimelineViewData.form">
+                        <div class="row pr-3">
+                            <div class="form-group mb-0">
+                                <select class="form-control-sm border-secondary" formControlName="type"
+                                    (change)="getTrendsByTimeline()">
+                                    <option [value]="'all'">All</option>
+                                    <option [value]="'event'">Events</option>
+                                    <option [value]="'alert'">Alerts</option>
+                                    <option [value]="'condition'">Conditions</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-0 ml-2">
+                                <select class="form-control-sm border-secondary" formControlName="timeline"
+                                    (change)="getTrendsByTimeline()">
+                                    <option [value]="duration.LAST_24_HOURS">Last 24 Hours</option>
+                                    <option [value]="duration.LAST_WEEK">Last Week</option>
+                                    <option [value]="duration.LAST_MONTH">Last Month</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body d-flex h-100 justify-content-center align-items-center">
+                <canvas *ngIf="trendByTimelineViewData.chartData" baseChart
+                    [chartType]="trendByTimelineViewData.chartData.type"
+                    [labels]="trendByTimelineViewData.chartData.lables"
+                    [datasets]="trendByTimelineViewData.chartData.linedata"
+                    [options]="trendByTimelineViewData.chartData.options"
+                    [plugins]="trendByTimelineViewData.chartData.plugins"
+                    [legend]="trendByTimelineViewData.chartData.legend"
+                    [colors]="trendByTimelineViewData.chartData.colors" height="110"></canvas>
+
+                <div *ngIf="!trendByTimelineViewData.chartData">
+                    <div class="text-center text-muted">No timeline data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-5" *ngIf="eventCountByDeviceTypeViewData">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="eventCountByDeviceTypeViewData.loader"></app-spinner>
+            <div class="card-header d-flex justify-content-between px-2 py-1 font-500">
+                <div class="py-1">
+                    <span> Events By Device Type</span>
+                </div>
+                <div>
+                    <form *ngIf="eventCountByDeviceTypeViewData.form" [formGroup]="eventCountByDeviceTypeViewData.form">
+                        <div class="row pr-3">
+                            <div class="form-group mb-0">
+                                <select class="form-control-sm border-secondary" formControlName="timeline"
+                                    (change)="getEventsCountByDeviceType($event.target.value)">
+                                    <option [value]="duration.LAST_24_HOURS">Last 24 Hours</option>
+                                    <option [value]="duration.LAST_WEEK">Last Week</option>
+                                    <option [value]="duration.LAST_MONTH">Last Month</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <ng-container *ngIf="eventCountByDeviceTypeViewData?.chartData">
+                    <div echarts [options]="eventCountByDeviceTypeViewData?.chartData?.options"
+                        [extentions]="eventCountByDeviceTypeViewData?.chartData?.extensions" [defaultHeight]="300"></div>
+                </ng-container>
+                <div *ngIf="!eventCountByDeviceTypeViewData?.chartData">
+                    <div class="text-center text-muted py-5">No event data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2" *ngIf="noisyHostsViewData">
+    <div class="col-12">
+        <div class="card round-edge mb-0 w-100">
+            <app-spinner [name]="noisyHostsViewData.loader"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                <div class="py-1">
+                    <span>Top 10 Noisy Hosts</span>
+                </div>
+                <div>
+                    <form *ngIf="noisyHostsViewData.form" [formGroup]="noisyHostsViewData.form">
+                        <div class="row pr-3">
+                            <div class="form-group mb-0">
+                                <select class="form-control-sm border-secondary" formControlName="timeline"
+                                    (change)="getNoisyHosts($event.target.value)">
+                                    <option [value]="duration.LAST_24_HOURS">Last 24 Hours</option>
+                                    <option [value]="duration.LAST_WEEK">Last Week</option>
+                                    <option [value]="duration.LAST_MONTH">Last Month</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body py-0">
+                <div class="row">
+                    <div [ngClass]="noisyHostsViewData.chartData ? 'col-6' : 'col-12'">
+                        <div class="card mb-0 border-0">
+                            <div class="card-body p-0">
+                                <table class="table text-left font-xs-sm font-500 w-100">
+                                    <thead>
+                                        <tr>
+                                            <th>Host Name</th>
+                                            <th>Device Type</th>
+                                            <th>Count</th>
+                                            <th>Management Ip</th>
+                                            <th>Source</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let view of noisyHostsViewData.data" truncateText>
+                                            <td class="tdw-30 text-primary">
+                                                <div [tooltip]="view.hostName">{{view.hostName}}</div>
+                                            </td>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="view.deviceType">{{view.deviceType}}</div>
+                                            </td>
+                                            <td class="tdw-10 text-primary">
+                                                <div [tooltip]="view.events">{{view.events}}</div>
+                                            </td>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="view.managementIp">{{view.managementIp}}</div>
+                                            </td>
+                                            <td class="tdw-20">
+                                                <div [tooltip]="view.source">{{view.source}}</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="text-center text-muted pb-3" *ngIf="!noisyHostsViewData.data.length">No
+                                    hosts with events available.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 border border-right-0 py-0 pr-0" *ngIf="noisyHostsViewData.chartData">
+                        <div class="card mb-0 border-0">
+                            <div class="card-body py-0 chart-block">
+                                <canvas baseChart [chartType]="noisyHostsViewData.chartData.type"
+                                    [labels]="noisyHostsViewData.chartData.lables"
+                                    [datasets]="noisyHostsViewData.chartData.bardata"
+                                    [options]="noisyHostsViewData.chartData.options"
+                                    [plugins]="noisyHostsViewData.chartData.plugins"
+                                    [legend]="noisyHostsViewData.chartData.legend"
+                                    [colors]="noisyHostsViewData.chartData.colors" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2" *ngIf="selectedRuleType && rulesViewData">
+    <div class="col-12">
+        <div class="card round-edge mb-0 w-100">
+            <app-spinner [name]="rulesViewData.loader"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center px-2 py-1 font-500">
+                <div class="btn-group pull-right" role="group">
+                    <button class="btn btn-pill btn-sm btn-outline-primary" type="button"
+                        (click)="changeRuleView(ruleTypes.SUPPRESSION)"
+                        [ngClass]="selectedRuleType == ruleTypes.SUPPRESSION ? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                        {{ruleTypes.SUPPRESSION}}
+                    </button>
+                    <button class="btn btn-pill btn-sm btn-outline-primary" type="button"
+                        (click)="changeRuleView(ruleTypes.CORRELATION)"
+                        [ngClass]="selectedRuleType == ruleTypes.CORRELATION ? 'active btn-outline-primary' : 'btn-outline-secondary' ">
+                        {{ruleTypes.CORRELATION}}
+                    </button>
+                </div>
+                <div>
+                    <form *ngIf="rulesViewData.form" [formGroup]="rulesViewData.form">
+                        <div class="row pr-3">
+                            <div class="form-group mb-0">
+                                <select class="form-control-sm border-secondary" formControlName="timeline"
+                                    (change)="getRules(selectedRuleType, $event.target.value)">
+                                    <option [value]="duration.LAST_24_HOURS">Last 24 Hours</option>
+                                    <option [value]="duration.LAST_WEEK">Last Week</option>
+                                    <option [value]="duration.LAST_MONTH">Last Month</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table text-left font-xs-sm font-500">
+                    <thead>
+                        <tr>
+                            <th>Rule Name</th>
+                            <th *ngIf="selectedRuleType == ruleTypes.SUPPRESSION">Event Count</th>
+                            <th *ngIf="selectedRuleType == ruleTypes.CORRELATION">Condition Count</th>
+                            <th>Created By</th>
+                            <th>Created On</th>
+                            <th>Last Update</th>
+                            <th *ngIf="selectedRuleType == ruleTypes.CORRELATION">Correlator</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of rulesViewData.data" setTableColumnWidth>
+                            <td>
+                                <div [tooltip]="view.name">{{view.name}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.cou">{{view.count}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.user">{{view.user|| 'NA'}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.createdAt">{{view.createdAt|| 'NA'}}</div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.updatedAt">{{view.updatedAt|| 'NA'}}</div>
+                            </td>
+                            <td *ngIf="selectedRuleType == ruleTypes.CORRELATION">
+                                <div [tooltip]="view.correlator">{{view.correlator|| 'NA'}}</div>
+                            </td>
+                            <td>
+                                <div [popoverContext]="{ desc: view.description }" [popover]="ruleDescTooltipTmpl"
+                                    triggers="mouseenter:mouseleave" placement="top" [innerHtml]="view.description">
+                                </div>
+                            </td>
+                            <td>
+                                <div [tooltip]="view.status" [class]="view.statusClass">{{view.status}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center text-muted" *ngIf="!rulesViewData.data.length">No
+                    {{selectedRuleType.toLowerCase()}} rules available.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #ruleDescTooltipTmpl let-desc="desc">
+    <div [innerHtml]="desc"></div>
+</ng-template>

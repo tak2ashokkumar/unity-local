@@ -1,0 +1,36 @@
+<div class="row">
+  <div class="col-sm-6">
+   <span ng-if="breadCrumb">
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+<alerts></alerts>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <awsaccounts
+                heading="AWS Accounts"
+                headers="aws_account_headers"
+                tabledata="aws_dashboard_content.data"
+                modeldata="aws_dashboard_content_modeldata"
+                switches="aws_switches(args)"
+                rows="aws_dashboard_content_rows"
+                rows1="aws_add_region_rows"
+                rows2="aws_change_password_row"
+                addclick="aws_dashboard_add(data)"
+                editclick="aws_edit(data)"
+                deleteclick = "aws_account_delete(data)"
+                deleteconfirm = "account_delete_modal"
+                actions="aws_dashboard_content.actions"
+                modeldata1="aws_add_region_modaldata"
+                modeldata2="aws_change_password_modeldata"
+                addclick1="aws_add_region(data1)"
+                addclick2="aws_change_password(data2)"
+                 >
+            </awsaccounts>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,125 @@
+<div id="conditionDetailsTemplate" class="ml-2 condition-details">
+    <div class="card rounded mb-0 pb-4" style="min-height:100%">
+        <div class="card-header d-flex justify-content-between align-items-center px-3 py-2" *ngIf="view">
+            <div class="font-500">
+                <span> {{view.ruleName}}</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="font-sm font-500 mr-2">
+                    <span class="text-muted">Status : </span>
+                    <span [ngClass]="[view.statusTextColor, 'text-capitalize']">{{view.conditionStatus}}</span>
+                </span>
+                <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeConditionDetails()"></a>
+            </div>
+        </div>
+        <div class="card-body pt-2 px-4 d-flex flex-column font-sm" *ngIf="view">
+            <div class="d-flex align-items-center mb-2">
+                <span class="text-muted w-25 text-truncate">Alert Start Time :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.firstAlertDateTime}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Latest Alert Time :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.lastAlertDateTime}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Duration :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.conditionDuration}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Alert Count :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.alertCount}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Event Count :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.eventCount}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Device Name :</span>
+                <span class="text-primary w-75 font-sm-xs font-500 mr-2 text-truncate">{{view.hosts}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Source :</span>
+                <span
+                    class="font-sm-xs w-75 font-500 mr-2 text-capitalize text-truncate">{{view.conditionSource}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Rule Name :</span>
+                <span class="font-sm-xs w-75 font-500 mr-2 text-truncate">{{view.ruleName}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Correlator :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.correlator}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Severity :</span>
+                <span class="font-sm-xs font-500 mr-2"
+                    [class]="view.severityTextColor">{{view.conditionSeverity}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Time Window :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.correlationWindow}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1" *ngIf="view.conditionStatus == 'Resolved'">
+                <span class="text-muted w-25 text-truncate">Resolved Time :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.recoveredDateTime}}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2 mt-1">
+                <span class="text-muted w-25 text-truncate">Acknowledged :</span>
+                <span class="font-sm-xs font-500 mr-2">{{view.isAcknowledged}}</span>
+            </div>
+            <div class="row mb-2 mt-4" *ngIf="view.alerts.length && showConditionDetailsTable">
+                <div class="table-responsive">
+                    <table class="table text-left font-xs-sm font-500">
+                        <thead>
+                            <tr>
+                                <th>Device Name</th>
+                                <th class="text-center">Severity</th>
+                                <th>Event Timeline</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let alert of view.alerts;let i = index;" truncateText>
+                                <td class="tdw-25 text-primary pt-3">
+                                    <div>
+                                        <span class="fas" [ngClass]="alert.deviceIcon"></span>
+                                        <span class="ml-1">{{alert.deviceName}} </span>
+                                    </div>
+                                </td>
+                                <td class="tdw-10 pt-3">
+                                    <div class="text-center" [tooltip]="alert.severity" container="body">
+                                        <i class="fa status-icon" [ngClass]="alert.severityIcon"></i>
+                                    </div>
+                                </td>
+                                <td id="condition-events-timeline" class="tdw-65" style="min-width:300px;">
+                                    <div class="d-flex flex-column px-2" style="min-width:300px;">
+                                        <div class="d-flex w-100" *ngIf="showConditionAlertTimeline"
+                                            style="min-width:300px;">
+                                            <div class="pointer-link" *ngFor="let event of alert.events; let i = index;"
+                                                (click)="viewEventDetails(event.uuid, alert.uuid)">
+                                                <span class="badge rounded-pill"
+                                                    [ngClass]="event.severityPointerBGClass">{{i
+                                                    + 1}}</span>
+                                                <div class="vertical border border-right-0"
+                                                    [ngClass]="event.severityBorderClass"></div>
+                                                <div class="events_timeline_post_event_line"
+                                                    [ngClass]="event.severityBorderClass"
+                                                    [style.width.px]="event.severityBorderLength"></div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex w-100 text-center" *ngIf="!showConditionAlertTimeline"
+                                            style="min-width:300px;">
+                                            <span class="fas fa-spinner fa-spin fa-2x ml-4"></span>
+                                        </div>
+                                        <div class="d-flex font-xss font-500 w-100" *ngIf="showConditionAlertTimeline">
+                                            <span class="text-muted">{{alert.firstEventDateTime}}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+<page-title title="Infrastructre Monitoring"></page-title>
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+  <loading object={{tableData}}></loading>
+  <div style="margin:20px">
+    <div class="Tabs3">
+      <table class="display bg-color" cellspacing="0" width="100%" ng-if="tableData.length != 0">
+        <tr>
+          <td>
+            <table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Manage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="row in tableData">
+                  <td>{{ row.name }}</td>
+                  <td>
+                    <div class="action-icons">
+                      <a class="fa fa-external-link-square" tooltip-class="customClass" uib-tooltip="Manage in Same Tab" ng-if="access_name" href="#{{access_name}}/{{ row.uuid }}/" ></a>
+                      <a class="fa fa-external-link" tooltip-class="customClass" uib-tooltip="Manage in New Tab" href="{{row.proxy_fqdn}}" target="_blank" target="_blank"></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <span ng-if="tableData.length == 0">
+        <no-records-found message="No records to display"></no-records-found>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+<div class="card-header bg-white border-bottom-0 ">
+    <div class="row">
+        <ul class="nav nav-tabs tabs-level1 custom-nav-container">
+            <li class="nav-item rounded-top tabs-level1-item">
+                <a class="nav-link tabs-level1-link border-0 text-success">Cost Planner</a>
+            </li>
+        </ul>
+        <div class="col text-warning">
+            <a class="nav-link pull-right py-0" (click)="goBack()">
+                <i class="fa fa-arrow-left">&nbsp;</i>
+                <span>To Summary</span>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="container-fluid mt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card text-center">
+                    <div class="card-header bg-transparent border-bottom-0 py-2">
+                        <div class="row">
+                            <div class="col-2 text-left pl-0">
+                                <span class="ml-2 text-muted font-sm align-middle">
+                                    <span class="badge badge-pill badge-secondary">{{viewData.length}}</span>
+                                    <span class="ml-2">Cost Planner</span>
+                                </span>
+                            </div>
+                            <div class="col">
+                                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button"
+                                    (click)="addCostPlanner()" accessControl moduleName="Cost Analysis"
+                                    accessType="Manage Cost Analysis" elementType="btn">Create Cost Planner
+                                </button>
+                            </div>
+                            <div class="col-3 pull-right">
+                                <search-box (searched)="onSearched($event)"></search-box>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0 px-2">
+                        <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+                            <thead>
+                                <tr>
+                                    <th>Planner Name</th>
+                                    <th>Contract Start Date</th>
+                                    <th>Contract End Date</th>
+                                    <th>Description</th>
+                                    <!-- <th>Bandwidth</th> -->
+                                    <th>Datacenter</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of viewData; let i = index" setTableColumnWidth>
+                                    <td>{{view.name}}</td>
+                                    <td>{{view.startDate}}</td>
+                                    <td>{{view.endDate}}</td>
+                                    <td>{{view.description}}</td>
+                                    <!-- <td></td> -->
+                                    <td>
+                                        <form *ngIf="view.dcForm" [formGroup]="view.dcForm">
+                                            <div class="form-group mb-0" accessControl moduleName="Cost Analysis"
+                                                accessType="Manage Cost Analysis" elementType="div">
+                                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                                    formControlName="datacenter" [options]="datacenters"
+                                                    [settings]="datacenterListSettings"
+                                                    (dropdownClosed)="onDcChange(i)"></multiselect-dropdown>
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td class="action-icons-column text-center">
+                                        <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                                            (click)="editCostPlanner(view)" accessControl moduleName="Cost Analysis"
+                                            accessType="Manage Cost Analysis" elementType="actionbtn"></button>
+                                        <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                            (click)="deleteCostPlanner(view)" accessControl moduleName="Cost Analysis"
+                                            accessType="Manage Cost Analysis" elementType="actionbtn"></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="!viewData.length" class="d-flex py-5 justify-content-center align-items-center">
+                            No cost planners available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="plannerDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Cost Planner will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmPlannerDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="plannerDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

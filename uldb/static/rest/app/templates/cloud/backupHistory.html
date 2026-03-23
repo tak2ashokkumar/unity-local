@@ -1,0 +1,34 @@
+<div class="modal-header">
+    <h3 class="modal-title">Backup History</h3>
+</div>
+<div class="modal-body">
+    <span ng-if="!backup_history">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+    </span>
+    <div class="row">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>File Name</th>
+            <th>Backup Date</th>
+            <th>Target Type</th>
+            <th>Target Account Name</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="d in backup_history">
+            <td>{{ d.file_name }}</td>
+            <td>{{ d.backup_date | date : 'medium'}}</td>
+            <td>{{ d.target_type }}</td>
+            <td><span ng-if="d.target_type == 'Azure'">{{ d.azure_account__account_name  }}</span>
+              <span ng-if="d.target_type == 'AWS'">{{ d.aws_account_id }}</span></td>
+          </tr>
+          </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Ok
+    </button>
+</div>

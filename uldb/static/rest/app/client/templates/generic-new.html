@@ -1,0 +1,71 @@
+
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+
+
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+            <form class="navbar-form">
+                <div class="form-group">
+                    <input class="form-control" type="text" ng-model="searchKeyword" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+                    <button class="btn btn-search" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+            <div class="action-bar table-button">
+                <span class="count">{{model.count}}</span>
+                <span class="count-text"> {{ title.plural }}</span>
+            </div>
+        </div>
+    </div>
+
+  <div class="bg-color">
+  <span ng-if="model.results === undefined">
+      <img src="/static/images/v3/loading_icon.gif" class="ajax-loader">
+  </span>
+  <section ng-if="model.results !== undefined" id="no-more-tables" class="margintop20">
+    <table infinite-scroll='loadPageData()' ng-if="model.results.length > 0" id="example" class="example table  table-condensed cf">
+      <thead class="cf">
+      <tr>
+        <th ng-repeat="f in fields" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''">
+          <div ng-if="f.hide === undefined">{{ f.description }}</div>
+        </th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr ng-repeat="result in model.results | filter: searchKeyword as filtered">
+        <td ng-repeat="f in fields" ng-if="!(f.hide)" ng-switch="f.opaque">
+          <div ng-switch-when="link">
+            <a href="{{ linkify(result, f).url }}">{{ linkify(result, f).text }}</a>
+          </div>
+          <div ng-switch-when="stringTransform">{{ desub(result, f) }}</div>
+          <div ng-switch-when="choices">{{ result[f.name] }}</div>
+          <div ng-switch-when="arbitraryLink">{{ f.func(result) }}</div>
+          <div ng-switch-when="multiple">
+            <div ng-repeat="r in result[f.name]">
+            <p><a ng-if='f.uriPrefix' href="{{ f.uriPrefix }}{{r[f.idField]}}">{{ r.name }}</a><span ng-if='!f.uriPrefix'>{{ r.name }}</span></p>
+            </div>
+          </div>
+          <div ng-switch-when="newType"><uldb-field result="result" field="f"></uldb-field></div>
+          <div ng-switch-default>{{ result[f.name] }}</div>
+        </td> 
+      </tr>
+      </tbody>
+    </table>
+    <span ng-if="model.results.length === 0">
+      <h3 class="align-center">No records to display</h3>
+    </span>
+  </section>
+</div>
+<div ng-if="loaded && model.results.length === 0" class="content-wrapper">
+  <no-records-found message="No records to display"></no-records-found>
+</div>

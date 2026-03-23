@@ -1,0 +1,923 @@
+<div class="card border-0 mb-0">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottm-0 py-2">
+        <div class="d-flex align-items-center justify-content-center">
+            <ul class="nav nav-tabs tabs-level1 custom-nav-container">
+                <li class="nav-item rounded-top tabs-level1-item">
+                    <a class="nav-link tabs-level1-link border-0 text-success py-0">Infrastructure Overview</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center justify-content-end w-16">
+            <div class="form-group mb-0 w-100">
+                <multiselect-dropdown class="form-control p-0" style="height:auto;" [(ngModel)]="dcFilter"
+                    [options]="datacenterList" [settings]="datacenterListSettings" [texts]="datacenterSelectionTexts"
+                    (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+            </div>
+            <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
+                [tooltip]="'Go Back'" container="body" *ngIf="isDashboard">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-0 my-2">
+    <div class="col-3 pr-0">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="'InfrastructureDatacenterSummaryLoader'"></app-spinner>
+            <div class="card-body d-flex flex-column  p-2">
+                <div class="d-flex justify-content-between">
+                    <div class="ml-1">
+                        <span class="fas fa-database text-warning mr-2"></span>
+                        <span class="font-lg font-500">Datacenter</span>
+                    </div>
+                    <div>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryViewData?.datacenterTotal ||
+                            0}}</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-start mt-1 ml-1">
+                    <!-- <div>
+                        <span class="text-primary font-lg-xl font-500">4</span>
+                        <span class="font-xs text-muted font-500 ml-1 text-truncate">Locations</span>
+                    </div>
+                    <div class="mx-2 my-1 border border-secondary"></div> -->
+                    <div>
+                        <span class="text-primary font-lg-xl font-500">{{summaryViewData?.datacenterAlerts || 0}}</span>
+                        <span class="font-xs text-muted font-500 ml-1 text-truncate">Alerts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pr-0">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="'InfrastructureCabinetSummaryLoader'"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="d-flex justify-content-between">
+                    <div class="ml-1">
+                        <span class="fas fa-cube text-success mr-2"></span>
+                        <span class="font-lg font-500">Cabinet</span>
+                    </div>
+                    <div>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryViewData?.cabinetTotal ||
+                            0}}</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-start mt-1 ml-1">
+                    <div>
+                        <span class="text-primary font-lg-xl font-500">{{summaryViewData?.cabinetAvailable || 0}}</span>
+                        <span class="font-xs text-muted font-500 ml-1 text-truncate">Available</span>
+                    </div>
+                    <div class="mx-2 my-1 border border-secondary"></div>
+                    <div>
+                        <span class="text-primary font-lg-xl font-500">{{summaryViewData?.cabinetEmission || 0}}</span>
+                        <span class="font-xs text-muted font-500 ml-1 text-truncate">ton CO2 (per annum)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pr-0">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="'InfrastructureAlertsSummaryLoader'"></app-spinner>
+            <div class="card-body d-flex flex-column  p-2">
+                <div class="d-flex justify-content-between">
+                    <div class="ml-1">
+                        <span class="fas fa-bell text-warning mr-2"></span>
+                        <span class="font-lg font-500">Alerts</span>
+                    </div>
+                    <div>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryViewData?.alertsTotal || 0}}</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-start mt-1 ml-1">
+                    <span class="fas fa-exclamation-circle text-danger align-self-center"></span>
+                    <span class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryViewData?.alertsCritical ||
+                        0}}</span>
+                    <span class="fas fa-exclamation-circle text-warning align-self-center"></span>
+                    <span class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryViewData?.alertsWarning ||
+                        0}}</span>
+                    <span class="fas fa-info-circle text-primary align-self-center"></span>
+                    <span class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryViewData?.alertsInformation ||
+                        0}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pr-0">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="'InfrastructureTotalResourcesSummaryLoader'"></app-spinner>
+            <div class="card-body d-flex flex-column  p-2">
+                <div class="d-flex justify-content-between">
+                    <div class="ml-1">
+                        <span class="fas fa-list-ul text-warning mr-2"></span>
+                        <span class="font-lg font-500">Total Resources</span>
+                    </div>
+                    <div>
+                        <span class="font-lg-xl text-primary font-500 mx-1">{{summaryViewData?.resourceTotal ||
+                            0}}</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-start mt-1 ml-1">
+                    <span class="fas fa-long-arrow-alt-up text-success align-self-center"></span>
+                    <span class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryViewData?.resourceUp || 0}}</span>
+                    <span class="fas fa-long-arrow-alt-down text-danger align-self-center"></span>
+                    <span class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryViewData?.resourceDown ||
+                        0}}</span>
+                    <span class="fas fa-exclamation-circle text-muted align-self-center"></span>
+                    <span class="font-lg-xl text-primary font-500 ml-1 mr-3">{{summaryViewData?.resourceUnknown ||
+                        0}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-0">
+    <div class="pr-0"
+        [ngClass]="!privateCloudViewData?.totalPrivateCloudCount && !publicCloudViewData?.total ? 'col-6' : 'col-4'">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="'TotalDevicesSummaryLoader'"></app-spinner>
+            <!-- <div class="card-header d-flex justify-content-between align-items-center bg-white py-2">
+                <div>
+                    <span class="font-lg font-500">Total Devices</span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center">
+                    <div>
+                        <span class="total-devices text-primary ml-1 mr-3">{{totalDevicesViewData?.total || 0}}</span>
+                        <span class="fas fa-long-arrow-alt-up text-success mt-2"></span>
+                        <span class="font-size text-primary ml-1 mr-3">{{totalDevicesViewData?.up || 0}}</span>
+                        <span class="fas fa-long-arrow-alt-down text-danger mt-2"></span>
+                        <span class="font-size text-primary ml-1 mr-3">{{totalDevicesViewData?.down || 0}}</span>
+                        <span class="fas fa-exclamation-circle text-muted mt-2"></span>
+                        <span class="font-size text-primary ml-1">{{totalDevicesViewData?.unknown || 0}}</span>
+                    </div>
+                </div>
+            </div> -->
+            <div class="card-body d-flex flex-column  p-2">
+
+                <div class="d-flex justify-content-center">
+                    <div class="mr-3">
+                        <span class="fas fa-list-ul text-warning mr-2"></span>
+                        <span class="font-lg font-500">Total Devices</span>
+                    </div>
+                    <div>
+                        <span class="fas fa-long-arrow-alt-up text-success mt-2"></span>
+                        <span class="font-lg-xl font-500 ml-1 mr-3">{{totalDevicesViewData?.up || 0}}</span>
+                        <span class="fas fa-long-arrow-alt-down text-danger mt-2"></span>
+                        <span class="font-lg-xl font-500 ml-1 mr-3">{{totalDevicesViewData?.down || 0}}</span>
+                        <span class="fas fa-exclamation-circle text-muted mt-2"></span>
+                        <span class="font-lg-xl font-500 ml-1 mr-3">{{totalDevicesViewData?.unknown || 0}}</span>
+                    </div>
+                </div>
+                <!-- 
+                <div class="d-flex justify-content-center pt-1">
+                    <div>
+                        <span class="font-lg font-500 ml-1 text-truncate mr-2">Network</span>
+                        <button class="btn btn-link text-decoration-none p-0 mb-1" type="button"
+                            (click)="goTo('network-devices', totalDevicesViewData?.networkTotal)"><span
+                                class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.networkTotal
+                                || 0}}</span></button>
+                    </div>
+                    <div class="mx-2 my-1 border border-secondary"></div>
+                    <div>
+                        <span class="font-lg font-500 ml-1 text-truncate mr-2">Compute</span>
+                        <span class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.computeTotal ||
+                            0}}</span>
+                    </div>
+                    <div class="mx-2 my-1 border border-secondary"></div>
+                    <div>
+                        <span class="font-lg font-500 ml-1 text-truncate mr-2">Storage</span>
+                        <span class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.storageTotal ||
+                            0}}</span>
+                    </div>
+                </div> -->
+
+                <!-- <div class="d-flex justify-content-center pt-1">
+                    <div>
+                        <span class="font-lg font-500 ml-1 text-truncate mr-2">Database</span>
+                        <span class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.databaseTotal ||
+                            0}}</span>
+                    </div>
+                    <div class="mx-2 my-0 border border-secondary"></div>
+                    <div>
+                        <span class="font-lg font-500 ml-1 text-truncate mr-2">IOT Devices</span>
+                        <button class="btn btn-link text-decoration-none p-0 " type="button"
+                            (click)="goTo('iot-devices', totalDevicesViewData?.iotTotal)">
+                            <span class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.iotTotal
+                                || 0}}</span>
+                        </button>
+                    </div>
+                    <div class="mx-2 my-0 border border-secondary"></div>
+                    <div>
+                        <span class="font-lg font-500 ml-1 text-truncate mr-2">Other</span>
+                        <span class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.otherTotal ||
+                            0}}</span>
+                    </div>
+                </div> -->
+
+                <div class="row mt-2">
+                    <div class="col-6 my-1 pr-1">
+                        <div class="card round-edge equalize-card mb-0">
+                            <div class="card-body d-flex flex-column  p-2">
+                                <div class="d-flex justify-content-between">
+                                    <div class="ml-1">
+                                        <span class="font-lg font-500">Network</span>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-link text-decoration-none p-0 " type="button"
+                                            (click)="goTo('network-devices', totalDevicesViewData?.networkTotal)"><span
+                                                class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.networkTotal
+                                                || 0}}</span></button>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start mt-1 ml-1 align-items-center">
+                                    <span class="fas fa-long-arrow-alt-up text-success"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.networkUp ||
+                                        0}}</span>
+                                    <span class="fas fa-long-arrow-alt-down text-danger"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.networkDown ||
+                                        0}}</span>
+                                    <span class="fas fa-exclamation-circle text-muted"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.networkUnknown ||
+                                        0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 my-1 pl-1">
+                        <div class="card round-edge equalize-card mb-0">
+                            <div class="card-body d-flex flex-column  p-2">
+                                <div class="d-flex justify-content-between">
+                                    <div class="ml-1">
+                                        <span class="font-lg font-500">Compute</span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.computeTotal
+                                            || 0}}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start mt-1 ml-1 align-items-center">
+                                    <span class="fas fa-long-arrow-alt-up text-success"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.computeUp ||
+                                        0}}</span>
+                                    <span class="fas fa-long-arrow-alt-down text-danger"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.computeDown ||
+                                        0}}</span>
+                                    <span class="fas fa-exclamation-circle text-muted"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.computeUnknown ||
+                                        0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 my-1 pr-1">
+                        <div class="card round-edge equalize-card mb-0">
+                            <div class="card-body d-flex flex-column  p-2">
+                                <div class="d-flex justify-content-between">
+                                    <div class="ml-1">
+                                        <span class="font-lg font-500">Storage</span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.storageTotal
+                                            || 0}}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start mt-1 ml-1 align-items-center">
+                                    <span class="fas fa-long-arrow-alt-up text-success"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.storageUp ||
+                                        0}}</span>
+                                    <span class="fas fa-long-arrow-alt-down text-danger"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.storageDown ||
+                                        0}}</span>
+                                    <span class="fas fa-exclamation-circle text-muted"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.storageUnknown ||
+                                        0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 my-1 pl-1">
+                        <div class="card round-edge equalize-card mb-0">
+                            <div class="card-body d-flex flex-column  p-2">
+                                <div class="d-flex justify-content-between">
+                                    <div class="ml-1">
+                                        <span class="font-lg font-500">Database</span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.databaseTotal
+                                            || 0}}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start mt-1 ml-1 align-items-center">
+                                    <span class="fas fa-long-arrow-alt-up text-success"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.databaseUp ||
+                                        0}}</span>
+                                    <span class="fas fa-long-arrow-alt-down text-danger"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.databaseDown ||
+                                        0}}</span>
+                                    <span class="fas fa-exclamation-circle text-muted"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.databaseUnknown ||
+                                        0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 my-1 pr-1">
+                        <div class="card round-edge equalize-card mb-0">
+                            <div class="card-body d-flex flex-column  p-2">
+                                <div class="d-flex justify-content-between">
+                                    <div class="ml-1">
+                                        <span class="font-lg font-500">IOT Devices</span>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-link text-decoration-none p-0 " type="button"
+                                            (click)="goTo('iot-devices', totalDevicesViewData?.iotTotal)">
+                                            <span
+                                                class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.iotTotal
+                                                || 0}}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start mt-1 ml-1 align-items-center">
+                                    <span class="fas fa-long-arrow-alt-up text-success"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.iotUp || 0}}</span>
+                                    <span class="fas fa-long-arrow-alt-down text-danger"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.iotDown ||
+                                        0}}</span>
+                                    <span class="fas fa-exclamation-circle text-muted"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.iotUnknown ||
+                                        0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 my-1 pl-1">
+                        <div class="card round-edge equalize-card mb-0">
+                            <div class="card-body d-flex flex-column  p-2">
+                                <div class="d-flex justify-content-between">
+                                    <div class="ml-1">
+                                        <span class="font-lg font-500">Other</span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            class="font-lg text-primary font-500 mx-1">{{totalDevicesViewData?.otherTotal
+                                            || 0}}</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-start mt-1 ml-1 align-items-center">
+                                    <span class="fas fa-long-arrow-alt-up text-success"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.otherUp ||
+                                        0}}</span>
+                                    <span class="fas fa-long-arrow-alt-down text-danger"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.otherDown ||
+                                        0}}</span>
+                                    <span class="fas fa-exclamation-circle text-muted"></span>
+                                    <span class="font-md font-500 ml-1 mr-3">{{totalDevicesViewData?.otherUnknown ||
+                                        0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <ng-container *ngIf="totalDevicesViewData?.chartData && totalDevicesViewData?.total">
+                        <div echarts [options]="totalDevicesViewData.chartData?.options"
+                            [extentions]="totalDevicesViewData.chartData?.extensions" [defaultHeight]="220"
+                            style="width: 100%;">
+                        </div>
+                    </ng-container>
+                    <div class="col-12 d-flex justify-content-center align-items-center py-5"
+                        *ngIf="!totalDevicesViewData?.total">
+                        <span class="text-muted">No data available.</span>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 pr-0" *ngIf="privateCloudViewData?.totalPrivateCloudCount">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'PrivateCloudSummaryLoader'"></app-spinner>
+            <div
+                class="card-header bg-white d-flex justify-content-between align-items-center border-bottom-0 px-2 pt-1 pb-0">
+                <span class="font-lg font-500">Private Clouds</span>
+                <span class="font-lg-xl text-primary font-500">{{privateCloudViewData?.totalPrivateCloudCount}}</span>
+            </div>
+            <div class="card-body px-1 py-0 mt--1">
+                <table class="table table-sm mb-0">
+                    <thead class="bg-white">
+                        <tr>
+                            <th class="border-0 p-1 w-30"></th>
+                            <th class="text-muted border-0 font-xs-sm text-center p-1">Subscriptions</th>
+                            <th class="text-muted border-0 font-xs-sm text-center p-1">Resources</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of privateCloudViewData?.privateCloudTableData">
+                            <td>
+                                <img *ngIf="view.privateCloudImgUrl" class="w-80" [src]="view.privateCloudImgUrl"
+                                    [alt]="view.privateCloudName" style="height: 25px;
+                                max-width: -webkit-fill-available;
+                                max-height: -webkit-fill-available;" />
+                                <span *ngIf="!view.privateCloudImgUrl"
+                                    class="text-uppercase font-500 font-lg text-info ml-2">{{view.privateCloudName}}</span>
+                            </td>
+                            <td class="text-center text-primary">{{view.subscriptions}}</td>
+                            <td class="text-center text-primary">{{view.resources}}</td>
+                        </tr>
+                        <tr colspan="3" *ngIf="!privateCloudViewData?.privateCloudTableData?.length"
+                            class="d-flex h-100 justify-content-center align-items-center">
+                            No Private Clouds available.
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 pr-0" *ngIf="publicCloudViewData?.total">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'PublicCloudSummaryLoader'"></app-spinner>
+            <div
+                class="card-header bg-white d-flex justify-content-between align-items-center border-bottom-0 px-2 pt-1 pb-0">
+                <span class="font-lg font-500">Public Clouds</span>
+                <span class="font-lg-xl text-primary font-500">{{publicCloudViewData?.total}}</span>
+            </div>
+            <div class="card-body px-1 py-0 mt--1">
+                <table class="table table-sm mb-0">
+                    <thead class="bg-white">
+                        <tr>
+                            <th class="border-0 p-1 w-30"></th>
+                            <th class="text-muted border-0 font-xs-sm p-1 text-center">Subscriptions</th>
+                            <th class="text-muted border-0 font-xs-sm p-1 text-center">Resources</th>
+                            <!-- <th class="text-muted border-0 font-xs-sm p-1 text-center">Cost($)</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of publicCloudViewData?.clouds">
+                            <td><img class="w-80" [src]="view.imageUrl" [alt]="view.name" style="height: 25px;
+                                max-width: -webkit-fill-available;
+                                max-height: -webkit-fill-available;" /></td>
+                            <td class="text-center text-primary">{{view.subscriptions}}</td>
+                            <td class="text-center text-primary">{{view.resources}}</td>
+                            <!-- <td class="text-center text-primary">{{view.cost}}</td> -->
+                        </tr>
+                        <tr colspan="4" *ngIf="!publicCloudViewData?.clouds.length"
+                            class="d-flex h-100 justify-content-center align-items-center">
+                            No Public Clouds available.
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="pr-0"
+        [ngClass]="!privateCloudViewData?.totalPrivateCloudCount && !publicCloudViewData?.total ? 'col-6' : 'col-4'"
+        [class.mt-2]="privateCloudViewData?.totalPrivateCloudCount && publicCloudViewData?.total">
+        <div class="card round-edge equalize-card" *ngIf="statusByGroupViewData">
+            <app-spinner [name]="statusByGroupViewData?.loader"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                <div class="d-flex align-items-center">
+                    <span class="fas fa-list-ul text-danger"></span>
+                    <span class="ml-2 font-lg font-500">Infrastructure</span>
+                </div>
+                <div class="d-flex">
+                    <form *ngIf="InfrastructureWidgetForm" [formGroup]="InfrastructureWidgetForm">
+                        <div class="form-group mb-0">
+                            <select class="form-control form-control-sm w-100" formControlName="dataType">
+                                <option *ngFor="let option of InfrastructureWidgetOptions" [value]="option.value">
+                                    {{option.label}}
+                                </option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body p-0" style="min-height:150px;max-height:250px;overflow-y: auto;overflow-x: hidden;">
+                <ng-container [ngSwitch]="dataType">
+                    <ng-container *ngSwitchCase="'device_status'">
+                        <ng-container
+                            *ngTemplateOutlet="deviceStatusGroupRef; context:{$implicit: statusByGroupViewData.displayViewData}"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchDefault>
+                        <ng-container
+                            *ngTemplateOutlet="statusByGroupRef; context: { $implicit: statusByGroupViewData.displayViewData, pIndex: null }"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="pr-0 mt-2"
+        [ngClass]="!privateCloudViewData?.totalPrivateCloudCount || !publicCloudViewData?.total ? 'col-12' : 'col-8'">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'AlertsSummaryLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-2">
+                <span class="font-lg font-500">Top 10 Critical Alerts</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="w-10">ID</th>
+                            <th class="w-20">Device Name</th>
+                            <th class="w-10 text-center">Severity</th>
+                            <th class="w-20">Description</th>
+                            <th class="w-10">Source</th>
+                            <th class="w-15">Acknowledged</th>
+                            <th class="w-15">Duration</th>
+                            <th style="width:17px" *ngIf="hasScroll"></th>
+                        </tr>
+                    </thead>
+                    <tbody #scrollableTbody>
+                        <tr *ngFor="let view of alertsDetailsViewData" truncateText>
+                            <td class="tdw-10 text-primary">
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn font-500"
+                                    type="button" [tooltip]="view.id"
+                                    (click)="viewAlertDetails(view.uuid)">{{view.id}}</button>
+                            </td>
+                            <td class="tdw-20">
+                                <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                            </td>
+                            <td class="w-10 text-center">
+                                <div [tooltip]="view.severity">
+                                    <span [class]="view.severityClass"></span>
+                                </div>
+                            </td>
+                            <td class="tdw-20">
+                                <div [tooltip]="view.description">{{view.description}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <div [tooltip]="view.source">{{view.source}}</div>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.acknowledged">{{view.acknowledged}}</div>
+                            </td>
+                            <td class="tdw-15">
+                                <div [tooltip]="view.duration">{{view.duration}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div *ngIf="!alertsDetailsViewData.length"
+                    class="d-flex py-5 justify-content-center align-items-center">
+                    No alerts available.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-0 my-2">
+    <div class="col-9 pr-0">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'InfrastructureAlertTrendLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white p-2">
+                <div class="d-flex justify-content-start">
+                    <span class="font-lg font-500">Alert Trend</span>
+                </div>
+                <div class="d-flex justify-content-end w-80">
+                    <form class="w-100" *ngIf="alertTrendFilterForm" [formGroup]="alertTrendFilterForm">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group mb-0">
+                                    <select class="form-control form-control-sm w-100"
+                                        (change)="onAlertTrendFilterChange()" formControlName="duration">
+                                        <option [value]="''" disabled>Select</option>
+                                        <option [value]="'6'">6 Hour</option>
+                                        <option [value]="'12'">12 Hour</option>
+                                        <option [value]="'24'">24 Hour</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group mb-0">
+                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                        formControlName="datacenters" [options]="datacenterList"
+                                        [settings]="datacenterListSettings" [texts]="datacenterSelectionTexts"
+                                        (dropdownClosed)="onAlertTrendFilterChange()"></multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group mb-0">
+                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                        formControlName="clouds" [options]="cloudList" [settings]="cloudSettings"
+                                        [texts]="cloudSelectionTexts"
+                                        (dropdownClosed)="onAlertTrendFilterChange()"></multiselect-dropdown>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group mb-0">
+                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                        formControlName="deviceTypes" [options]="deviceTypes"
+                                        [settings]="deviceTypeSettings" [texts]="deviceTypeSelectionTexts"
+                                        (dropdownClosed)="onAlertTrendFilterChange()"></multiselect-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-between p-0">
+                <div class="w-40">
+                    <canvas *ngIf="alertTrendPolarChartData && alertTrendPolarChartData.type" baseChart
+                        [chartType]="alertTrendPolarChartData.type" [labels]="alertTrendPolarChartData.lables"
+                        [data]="alertTrendPolarChartData.datasets" [options]="alertTrendPolarChartData.options"
+                        [legend]="alertTrendPolarChartData.legend" height="210"></canvas>
+                    <div *ngIf="!alertTrendPolarChartData">
+                        <div class="text-center text-muted h-100">No data available.</div>
+                    </div>
+                </div>
+                <div class="w-60">
+                    <div *ngIf="alertTrendBarChartData && alertTrendBarChartData.type">
+                        <canvas *ngIf="alertTrendBarChartData && alertTrendBarChartData.type" baseChart
+                            [chartType]="alertTrendBarChartData.type" [labels]="alertTrendBarChartData.lables"
+                            [datasets]="alertTrendBarChartData.bardata" [options]="alertTrendBarChartData.options"
+                            [legend]="alertTrendBarChartData.legend" [colors]="alertTrendBarChartData.colors"
+                            height="150"></canvas>
+                    </div>
+                    <div *ngIf="!alertTrendBarChartData">
+                        <div class="text-center text-muted h-100">No data available.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 pr-0">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'InfrastructureRawEventsLoader'"></app-spinner>
+            <div class="card-body d-flex flex-column justify-content-between">
+                <div class="card round-edge mb-0">
+                    <div class="card-body d-flex flex-column p-2">
+                        <div class="d-flex justify-content-between">
+                            <div class="ml-1">
+                                <span class="font-lg font-500">Raw Events</span>
+                            </div>
+                            <div>
+                                <span class="font-lg-xl text-primary font-500 mx-1">{{alertTrendWidgetViewData?.total ||
+                                    0}}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-start align-items-center mt-1 ml-1">
+                            <span class="fas fa-exclamation-circle text-danger align-self-center"></span>
+                            <span class="font-lg text-primary font-500 ml-1 mr-3">{{alertTrendWidgetViewData?.critical
+                                || 0}}</span>
+                            <span class="fas fa-exclamation-circle text-warning align-self-center"></span>
+                            <span class="font-lg text-primary font-500 ml-1 mr-3">{{alertTrendWidgetViewData?.warning ||
+                                0}}</span>
+                            <span class="fas fa-info-circle text-primary align-self-center"></span>
+                            <span
+                                class="font-lg text-primary font-500 ml-1 mr-3">{{alertTrendWidgetViewData?.information
+                                || 0}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card round-edge mb-0">
+                    <div class="card-body d-flex flex-column  p-2">
+                        <div class="d-flex justify-content-between">
+                            <div class="ml-1">
+                                <span class="font-lg font-500">Noise Deduction</span>
+                            </div>
+                            <div>
+                                <!-- <span class="font-lg-xl text-primary font-500 mx-1">{{0}}%</span> -->
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <div class="ml-1">
+                                <span class="font-md">Dedupe Events</span>
+                            </div>
+                            <div>
+                                <span class="font-lg text-primary font-500 mx-1">{{alertTrendWidgetViewData?.dedupe ||
+                                    0}}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <div class="ml-1">
+                                <span class="font-md">Suppressed Events</span>
+                            </div>
+                            <div>
+                                <span class="font-lg text-primary font-500 mx-1">{{alertTrendWidgetViewData?.suppressed
+                                    || 0}}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <div class="ml-1">
+                                <span class="font-md">Correlated</span>
+                            </div>
+                            <div>
+                                <span class="font-lg text-primary font-500 mx-1">{{alertTrendWidgetViewData?.correlated
+                                    || 0}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card round-edge mb-0">
+                    <div class="card-body d-flex flex-column  p-2">
+                        <div class="d-flex justify-content-between">
+                            <div class="ml-1">
+                                <span class="font-lg font-500">First Response</span>
+                            </div>
+                            <div>
+                                <!-- <span class="font-lg-xl text-primary font-500 mx-1">{{0}}%</span> -->
+                            </div>
+                        </div>
+                        <!-- <div class="d-flex justify-content-between mt-1">
+                            <div class="ml-1">
+                                <span class="font-md">Auto Healed</span>
+                            </div>
+                            <div>
+                                <span
+                                    class="font-lg text-primary font-500 mx-1">{{alertTrendWidgetViewData?.autoHealed}}</span>
+                            </div>
+                        </div> -->
+                        <div class="d-flex justify-content-between mt-1">
+                            <div class="ml-1">
+                                <span class="font-md">Ticket Created</span>
+                            </div>
+                            <div>
+                                <span
+                                    class="font-lg text-primary font-500 mx-1">{{alertTrendWidgetViewData?.ticketCreated
+                                    || 0}}</span>
+                            </div>
+                        </div>
+                        <!-- <div class="d-flex justify-content-between mt-1">
+                            <div class="ml-1">
+                                <span class="font-md">Auto Closed</span>
+                            </div>
+                            <div>
+                                <span
+                                    class="font-lg text-primary font-500 mx-1">{{alertTrendWidgetViewData?.autoClosed}}</span>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-0 mb-2">
+    <div class="col-6 pr-0" *ngIf="cpuUtilizationViewData?.length">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'InfrastructureCpuUtilizationSummaryLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+                <span class="font-lg font-500">Top 10 CPU Utilization</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Host</th>
+                            <th>Name</th>
+                            <th></th>
+                            <th class="text-center w-16">Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of cpuUtilizationViewData" truncateText>
+                            <td class="tdw-25 text-primary">
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                    [tooltip]="view.host.name" (click)="goToDeviceDetails(view.host, view.monitoring)"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="div">{{view.host.name}}</button>
+                            </td>
+                            <td class="tdw-25">
+                                <div [tooltip]="view.name">{{view.name}}</div>
+                            </td>
+                            <td class="custom-border pl-0 tdw-40">
+                                <div class="mt-1">
+                                    <div class="progress progress-sm flex-grow-1"
+                                        (click)="goToGraphDetails(view.host, 'CPU utilization', view.monitoring)"
+                                        accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                        elementType="div">
+                                        <div class="progress-bar" role="progressbar" [style.width.%]="view.lastValue"
+                                            [ngClass]="getProgressClass(view.lastValue)" aria-valuenow="view.lastValue"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center tdw-10">
+                                <button class="btn btn-link text-decoration-none p-0 " type="button"
+                                    (click)="goToGraphDetails(view.host, 'CPU utilization', view.monitoring)"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="div"><span class="font-500"
+                                        [ngClass]="getPercentageClass(view.lastValue)">{{view.lastValue}}%</span></button>
+                            </td>
+                        </tr>
+                        <tr colspan="3" *ngIf="!cpuUtilizationViewData?.length"
+                            class="d-flex h-100 justify-content-center align-items-center">
+                            No data available.
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 pr-0" *ngIf="ramUtilizationViewData?.length">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'InfrastructureRamUtilizationSummaryLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+                <span class="font-lg font-500">Top 10 RAM Utilization</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm text-left mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Host</th>
+                            <th>Name</th>
+                            <th></th>
+                            <th class="text-center w-16">Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of ramUtilizationViewData" truncateText>
+                            <td class="tdw-25 text-primary">
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                    [tooltip]="view.host.name" (click)="goToDeviceDetails(view.host, view.monitoring)"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="div">{{view.host.name}}</button>
+                            </td>
+                            <td class="tdw-25">
+                                <div [tooltip]="view.name">{{view.name}}</div>
+                            </td>
+                            <td class="custom-border pl-0 tdw-40">
+                                <div class="mt-1">
+                                    <div class="progress progress-sm flex-grow-1"
+                                        (click)="goToGraphDetails(view.host, 'I/O: Memory utilization', view.monitoring)"
+                                        accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                        elementType="div">
+                                        <div class="progress-bar" role="progressbar" [style.width.%]="view.lastValue"
+                                            [ngClass]="getProgressClass(view.lastValue)" aria-valuenow="view.lastValue"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center tdw-10">
+                                <button class="btn btn-link text-decoration-none p-0 " type="button"
+                                    (click)="goToGraphDetails(view.host, 'I/O: Memory utilization', view.monitoring)"
+                                    accessControl moduleName="Monitoring" accessType="View Monitoring"
+                                    elementType="div"><span class="font-500"
+                                        [ngClass]="getPercentageClass(view.lastValue)">{{view.lastValue}}%</span></button>
+                            </td>
+                        </tr>
+                        <tr colspan="3" *ngIf="!ramUtilizationViewData?.length"
+                            class="d-flex h-100 justify-content-center align-items-center">
+                            No data available.
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #deviceStatusGroupRef let-groupViewData let-parentIndex="pIndex">
+    <ng-container *ngFor="let data of groupViewData; let i=index">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center border-bottom pointer-link p-2"
+                [ngClass]="getClass(data)" (click)="selectbyGroup(data, parentIndex)">
+                <div class="d-flex align-items-center">
+                    <shared-device-status [status]="data.status" [hideTooltip]="true"
+                        class="mt-1"></shared-device-status>
+                    <button
+                        class="btn btn-link text-decoration-none p-0 text-muted ml-2 text-truncate text-capitalize">{{data.name}}</button>
+                </div>
+                <span class="font-lg-xl" [ngClass]="getColorClass(data.status)">{{data.total}}</span>
+            </div>
+        </div>
+        <ng-container *ngIf="data.selected && data.nodes.length">
+            <div class="col-12" *ngFor="let node of data?.nodes; let i=index">
+                <div class="d-flex align-items-center ml-2" [ngClass]="getClass(node)">
+                    <shared-device-status [status]="node.status" [hideTooltip]="true"
+                        class="mt-1"></shared-device-status>
+                    <div class="text-muted ml-2 p-0 text-truncate" *ngIf="!checkDeviceTypeExist(node)">
+                        {{node.name}}</div>
+                    <button class="btn btn-link text-decoration-none p-0 text-muted ml-2 text-truncate"
+                        (click)="selectbyGroup(node, parentIndex)"
+                        *ngIf="checkDeviceTypeExist(node)">{{node.name}}</button>
+                </div>
+            </div>
+        </ng-container>
+    </ng-container>
+</ng-template>
+
+<ng-template #statusByGroupRef let-groupViewData let-parentIndex="pIndex">
+    <ng-container *ngFor="let data of groupViewData; let i = index">
+        <div class="col-12">
+            <div class="d-flex align-items-center ml-2" [ngClass]="getClass(data)">
+                <shared-device-status [status]="data.status" [hideTooltip]="true" class="mt-1"></shared-device-status>
+                <div class="text-muted ml-2 p-0 text-truncate" *ngIf="!checkDeviceTypeExist(data)">
+                    {{data.name}}</div>
+                <button class="btn btn-link text-decoration-none p-0 text-truncate text-muted ml-2"
+                    (click)="selectbyGroup(data, parentIndex)" *ngIf="checkDeviceTypeExist(data)">{{data.name}}</button>
+            </div>
+        </div>
+        <ng-container *ngIf="data.selected && data.nodes.length">
+            <ng-container
+                *ngTemplateOutlet="statusByGroupRef; context: { $implicit: data.nodes, pIndex: i}"></ng-container></ng-container>
+    </ng-container>
+</ng-template>
+
+<aiml-alert-details></aiml-alert-details>

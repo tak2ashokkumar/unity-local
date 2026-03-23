@@ -1,0 +1,19 @@
+<div class="row">
+  <div class="col-12">
+    <div [ngSwitch]="platformType">
+      <vms-list-vmware *ngSwitchCase="PlatFormMapping.VMWARE"></vms-list-vmware>
+      <vms-list-vmware *ngSwitchCase="PlatFormMapping.UNITED_PRIVATE_CLOUD_VCENTER"></vms-list-vmware>
+      <vms-list-custom *ngSwitchCase="PlatFormMapping.CUSTOM"></vms-list-custom>
+      <vms-list-openstack *ngSwitchCase="PlatFormMapping.OPENSTACK"></vms-list-openstack>
+      <vms-list-vcloud *ngSwitchCase="PlatFormMapping.VCLOUD"></vms-list-vcloud>
+      <vms-list-esxi *ngSwitchCase="PlatFormMapping.ESXI"></vms-list-esxi>
+      <vms-list-proxmox *ngSwitchCase="PlatFormMapping.PROXMOX" [platform]="PlatFormMapping.PROXMOX"
+        [deviceMapping]="DeviceMapping.PROXMOX"></vms-list-proxmox>
+      <vms-list-proxmox *ngSwitchCase="PlatFormMapping.G3_KVM" [platform]="PlatFormMapping.G3_KVM"
+        [deviceMapping]="DeviceMapping.G3_KVM"></vms-list-proxmox>
+      <vms-list-hyperv *ngSwitchCase="PlatFormMapping.HYPER_V" [platform]="PlatFormMapping.HYPER_V"
+        [deviceMapping]="DeviceMapping.HYPER_V"></vms-list-hyperv>
+      <vms-list-nutanix *ngSwitchCase="PlatFormMapping.NUTANIX"></vms-list-nutanix>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,4 @@
+<ng-container *ngIf="chartResponse">
+    <div echarts [options]="chartResponse.options" class="echarts-container"
+        [extentions]="chartResponse.extensions" [defaultHeight]="270"></div>
+</ng-container>

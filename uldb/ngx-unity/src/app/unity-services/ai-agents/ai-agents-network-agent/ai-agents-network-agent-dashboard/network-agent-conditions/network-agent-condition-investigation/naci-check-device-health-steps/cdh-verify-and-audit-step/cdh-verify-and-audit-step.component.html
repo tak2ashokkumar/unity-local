@@ -1,0 +1,96 @@
+<div class="card mb-2">
+    <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1 px-2">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-shield-alt text-primary step-icon rounded-circle pt-2 pl-2 mr-2"></i>
+            <div class="font-500">Verify & Audit</div>
+        </div>
+        <button type="button" class="btn p-0 border-0 bg-transparent shadow-none text-muted"
+            [tooltip]="isVerifyAndAuditOpen ? 'Minimize' : 'Expand'" (click)="toggleVerifyAndAuditAccordion()"
+            [attr.aria-expanded]="isVerifyAndAuditOpen">
+            <i class="fas fa-lg" [ngClass]="isVerifyAndAuditOpen ? 'fa-chevron-up' : 'fa-chevron-down'">
+            </i>
+        </button>
+    </div>
+
+    <div class="card-body" [collapse]="!isVerifyAndAuditOpen">
+        <div class="row">
+            <div class="col pr-0">
+                <div class="card round-edge equalize-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="font-lg-xl text-primary font-500">{{deviceHealthSummaryViewData?.cpu ||
+                                '0%'}}</span>
+                            <span class="font-lg font-500">CPU</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col pr-0">
+                <div class="card round-edge equalize-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="font-lg-xl text-primary font-500">{{deviceHealthSummaryViewData?.memory ||
+                                '0%'}}</span>
+                            <span class="font-lg font-500">Memory</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col pr-0">
+                <div class="card round-edge equalize-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="font-lg-xl text-primary font-500">{{deviceHealthSummaryViewData?.uptime ||
+                                '0'}}</span>
+                            <span class="font-lg font-500">uptime</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col pr-0">
+                <div class="card round-edge equalize-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="font-lg-xl text-primary font-500">{{deviceHealthSummaryViewData?.latency
+                                || '0'}}</span>
+                            <span class="font-lg font-500">Latency</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col pr-0">
+                <div class="card round-edge equalize-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="font-lg-xl text-primary font-500">{{deviceHealthSummaryViewData?.bandwidth
+                                || '0'}}</span>
+                            <span class="font-lg font-500">Bandwidth</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card round-edge equalize-card mb-0">
+                    <div class="card-body p-2">
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="font-lg-xl text-primary font-500">{{deviceHealthSummaryViewData?.interfaceError
+                                || '0'}}</span>
+                            <span class="font-lg font-500">Interface Error</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mt-2" *ngFor="let chartData of deviceHealthMetricWidgetViewData?.chartData;">
+                <div class="card round-edge equalize-card mb-2">
+                    <div class="card-body px-2">
+                        <div echarts [options]="chartData.options" [extentions]="chartData.extensions"
+                            [defaultHeight]="300">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

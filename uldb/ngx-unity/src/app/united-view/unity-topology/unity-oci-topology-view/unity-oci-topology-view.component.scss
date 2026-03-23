@@ -1,0 +1,84 @@
+// @use "sass:math";
+@import "variables";
+
+.topology-card{
+  min-height: calc(100vh - 150px);
+}
+
+#oci-node-details-wrapper {
+  position: absolute !important;
+}
+
+.action-icons {
+  bottom: 0;
+}
+
+$wizard-color-neutral: $secondary !default;
+$wizard-color-active: $primary !default;
+$wizard-step-width-height: 30px !default;
+
+.step-indicator {
+  border-collapse: separate;
+  display: block;
+  position: absolute;
+  bottom: 0px;
+  text-align: center;
+  padding-top: 20px;
+  margin-bottom: 0px;
+  list-style: none;
+
+  li {
+    position: relative;
+    float: none;
+    padding: 0;
+    width: 1%;
+
+    &:after {
+      background-color: $wizard-color-neutral;
+      content: "";
+      display: block;
+      height: 1px;
+      position: absolute;
+      width: 100%;
+      // top: math.div($wizard-step-width-height, 2);
+    }
+
+    &:after {
+      left: 50%;
+    }
+
+    &:last-of-type {
+      &:after {
+        display: none !important;
+      }
+    }
+
+    &.active {
+      .step {
+        border-color: $wizard-color-active;
+        color: $wizard-color-active;
+      }
+
+      .caption {
+        color: $wizard-color-active;
+      }
+    }
+  }
+
+  .step {
+    background-color: #fff;
+    border-radius: 50%;
+    border: 1px solid $wizard-color-neutral;
+    color: $wizard-color-neutral;
+    height: $wizard-step-width-height;
+    line-height: $wizard-step-width-height;
+    margin: 15px auto;
+    position: relative;
+    width: $wizard-step-width-height;
+    z-index: 1;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

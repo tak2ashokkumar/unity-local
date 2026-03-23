@@ -1,0 +1,1068 @@
+<div class="card border-0 mb-2">
+    <div class="card-header border-0 bg-white">
+        <span class="font-lg font-500">{{actionMessage}} Widget</span>
+        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i
+                class="fa fa-arrow-left"></i></button>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="card bg-transparent round-edge border-0 mb-2">
+            <div class="card-body p-0">
+                <div class="row">
+                    <div class="col d-flex flex-wrap">
+                        <ng-container *ngFor="let tab of subTabs">
+                            <div class="card round-edge mr-2 mb-1" (click)="activeTab(tab)"
+                                [ngClass]="{'selected-tab': selectedTab == tab.value}"
+                                style="cursor: pointer; width: 6rem">
+                                <div
+                                    class="card-body d-flex flex-column justify-content-center align-items-center px-0 py-2">
+                                    <div class="d-flex justify-content-center">
+                                        <span class="custom-icon"
+                                            [ngClass]="(selectedTab == tab.value ? 'text-primary ' : 'text-muted ') + tab.icon"></span>
+                                    </div>
+                                    <div class="text-center font-sm mt-2">
+                                        <span
+                                            [ngClass]="selectedTab == tab.value ? 'text-primary' : 'text-muted'">{{tab.name}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card round-edge mb-2">
+            <div class="card-body">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="row form-group">
+                        <div class="col-2 text-right align-self-center">Name<em>* </em>:</div>
+                        <div class="col-3">
+                            <input class="form-control" type="text" formControlName="name" placeholder="Enter Name"
+                                [class.is-invalid]="formErrors.name">
+                            <small class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}
+                            </small>
+                        </div>
+                    </div>
+                    <div *ngIf="form.get('cloud')" class="row form-group">
+                        <div class="col-2 text-right align-self-center">Cloud<em>* </em>:</div>
+                        <div class="col d-flex align-items-center">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('cloud').value == 'private_cloud'">
+                                            <input type="radio" [value]="'private_cloud'" formControlName="cloud">
+                                            <span class="font-sm mr-2">Private Cloud</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link"
+                                            [class.active]="form.get('cloud').value == 'public_cloud'">
+                                            <input type="radio" [value]="'public_cloud'" formControlName="cloud">
+                                            <span class="font-sm mr-2">Public Cloud</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="w-25 ml-2">
+                                <div class="form-group mb-0">
+                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                        formControlName="platform_type" [class.is-invalid]="formErrors.platform_type"
+                                        [options]="selectedCloudList" [settings]="cloudSettings"
+                                        [texts]="cloudSelectionTexts"></multiselect-dropdown>
+                                    <small class="invalid-feedback"
+                                        *ngIf="formErrors.platform_type">{{formErrors.platform_type}}
+                                    </small>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-2 text-right align-self-center">Group By<em>* </em>:</div>
+                        <div class="col-3 align-self-center">
+                            <select class="form-control" formControlName="group_by"
+                                [class.is-invalid]="formErrors.group_by">
+                                <option [value]="''" disabled>Select Group</option>
+                                <option *ngFor="let data of filteredGroupByList" [value]="data.value">{{data.name}}
+                                </option>
+                            </select>
+                            <small class="invalid-feedback" *ngIf="formErrors.group_by">{{formErrors.group_by}}
+                            </small>
+                        </div>
+                        <ng-container *ngIf="showGroupByfliter">
+                            <div class="text-right align-self-center px-2">Group By Filter<em>* </em>:</div>
+                            <div class="col-2 align-self-center">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    formControlName="group_by_filter" [class.is-invalid]="formErrors.group_by_filter"
+                                    [options]="groupByFilterList" [settings]="groupByFilterSettings"
+                                    [texts]="filterSelectionTexts"></multiselect-dropdown>
+                                <small class="invalid-feedback" *ngIf="formErrors.group_by_filter">{{formErrors.group_by_filter}}
+                                </small>
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-2 text-right align-self-center">Status :</div>
+                        <div class="col">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link" [class.active]="form.controls.status.value">
+                                            <input type="radio" [value]="true" formControlName="status">
+                                            <span class="font-sm mr-2">Enable</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link" [class.active]="!form.controls.status.value">
+                                            <input type="radio" [value]="false" formControlName="status">
+                                            <span class="font-sm mr-2">Disable</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form *ngIf="metricsForm" [formGroup]="metricsForm">
+                    <div class="row form-group">
+                        <div class="col-2 text-right align-self-center">Name<em>* </em>:</div>
+                        <div class="col-3">
+                            <input class="form-control" type="text" formControlName="name" placeholder="Enter Name"
+                                [class.is-invalid]="metricsFormErrors.name">
+                            <small class="invalid-feedback" *ngIf="metricsFormErrors.name">{{metricsFormErrors.name}}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 text-right align-self-center">Filter By<em>* </em>:</div>
+                        <div class="col-3">
+                            <select class="form-control" formControlName="filter_by"
+                                [class.is-invalid]="metricsFormErrors.filter_by">
+                                <option [value]="''" disabled>Select Filter</option>
+                                <option *ngFor="let data of filterTypeList" [value]="data.name">{{data.displayName}}
+                                </option>
+                            </select>
+                            <small class="invalid-feedback"
+                                *ngIf="metricsFormErrors.filter_by">{{metricsFormErrors.filter_by}}
+                            </small>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="metricsForm.controls.filter_by.value == 'top'">
+                        <div class="row">
+                            <div class="col offset-2">
+                                <div class="row border round-edge p-4 position-relative mt-4 mx-0">
+                                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Top</div>
+                                    <div class="col">
+                                        <div class="row form-group">
+                                            <div class="col d-flex">
+                                                <div class="w-7">
+                                                    <label for="top_count">Count<em>*</em></label>
+                                                    <input class="form-control" type="number"
+                                                        formControlName="top_count" min="1" max="10"
+                                                        [class.is-invalid]="metricsFormErrors.top_count">
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.top_count">{{metricsFormErrors.top_count}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-15 mx-2">
+                                                    <label for="graph_type">Graph Type<em>*</em></label>
+                                                    <select class="form-control" name="graph_type" id="graph_type"
+                                                        formControlName="graph_type"
+                                                        [class.is-invalid]="metricsFormErrors.graph_type">
+                                                        <option [value]="''" disabled>Select Graph</option>
+                                                        <option *ngFor="let data of graphTypeList" [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <!-- <multiselect-dropdown
+                                                        class="form-control p-0 custom-multiselect-padding"
+                                                        style="height:auto;" formControlName="graph_type"
+                                                        [class.is-invalid]="metricsFormErrors.graph_type"
+                                                        [options]="graphTypeList"
+                                                        [settings]="graphTypeSettings"></multiselect-dropdown> -->
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.graph_type">{{metricsFormErrors.graph_type}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-20">
+                                                    <label for="period">Period<em>*</em></label>
+                                                    <select class="form-control" name="period" id="period"
+                                                        formControlName="period"
+                                                        [class.is-invalid]="metricsFormErrors.period">
+                                                        <option [value]="''" disabled>Select Period</option>
+                                                        <option *ngFor="let data of periodTypeList" [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.period">{{metricsFormErrors.period}}
+                                                    </small>
+                                                </div>
+                                                <div *ngIf="metricsForm.get('period_hour')" class="w-7 mx-2">
+                                                    <input class="form-control custom-margin-period" type="number"
+                                                        formControlName="period_hour" min="0" max="23"
+                                                        [class.is-invalid]="metricsFormErrors.period_hour">
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.period_hour">{{metricsFormErrors.period_hour}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-4 d-flex justify-content-center"
+                                                    *ngIf="metricsForm.get('period_hour')">
+                                                    <div class="custom-margin-top">Hr(s)</div>
+                                                </div>
+                                                <div *ngIf="metricsForm.get('period_min')" class="w-7 mx-2">
+                                                    <input class="form-control custom-margin-period" type="number"
+                                                        formControlName="period_min" min="0" max="59"
+                                                        [class.is-invalid]="metricsFormErrors.period_min">
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.period_min">{{metricsFormErrors.period_min}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-5 d-flex justify-content-center"
+                                                    *ngIf="metricsForm.get('period_hour')">
+                                                    <div class="custom-margin-top">Min(s)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="metricsForm.controls.filter_by.value == 'custom'">
+                        <div class="row">
+                            <div class="col offset-2">
+                                <div class="row border round-edge p-4 position-relative mt-4 mx-0">
+                                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Custom</div>
+                                    <div class="col">
+                                        <div class="row form-group">
+                                            <div class="col d-flex">
+                                                <div class="w-15">
+                                                    <label for="device_type">Device Type<em>*</em></label>
+                                                    <select class="form-control" name="device_type" id="device_type"
+                                                        formControlName="device_type"
+                                                        [class.is-invalid]="metricsFormErrors.device_type">
+                                                        <option [value]="''" disabled>Select Device</option>
+                                                        <option *ngFor="let data of deviceTypeList" [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <!-- <multiselect-dropdown
+                                                        class="form-control p-0 custom-multiselect-padding"
+                                                        style="height:auto;" formControlName="device_type"
+                                                        [class.is-invalid]="metricsFormErrors.device_type"
+                                                        [options]="deviceTypeList"
+                                                        [settings]="deviceTypeSettings"></multiselect-dropdown> -->
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.device_type">{{metricsFormErrors.device_type}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-20 mx-2">
+                                                    <label for="devices">Devices<em>*</em></label>
+                                                    <multiselect-dropdown
+                                                        class="form-control p-0 custom-multiselect-padding"
+                                                        style="height:auto;" formControlName="devices"
+                                                        [class.is-invalid]="metricsFormErrors.devices"
+                                                        [options]="deviceList"
+                                                        [settings]="deviceSettings"></multiselect-dropdown>
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.devices">{{metricsFormErrors.devices}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-15">
+                                                    <label for="graph_type">Graph Type<em>*</em></label>
+                                                    <select class="form-control" name="graph_type" id="graph_type"
+                                                        formControlName="graph_type"
+                                                        [class.is-invalid]="metricsFormErrors.graph_type">
+                                                        <option [value]="''" disabled>Select Graph</option>
+                                                        <option *ngFor="let data of graphTypeList" [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <!-- <multiselect-dropdown
+                                                        class="form-control p-0 custom-multiselect-padding"
+                                                        style="height:auto;" formControlName="graph_type"
+                                                        [class.is-invalid]="metricsFormErrors.graph_type"
+                                                        [options]="graphTypeList"
+                                                        [settings]="graphTypeSettings"></multiselect-dropdown> -->
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.graph_type">{{metricsFormErrors.graph_type}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-15 mx-2">
+                                                    <label for="period">Period<em>*</em></label>
+                                                    <select class="form-control" name="period" id="period"
+                                                        formControlName="period"
+                                                        [class.is-invalid]="metricsFormErrors.period">
+                                                        <option [value]="''" disabled>Select Period</option>
+                                                        <option *ngFor="let data of periodTypeList" [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.period">{{metricsFormErrors.period}}
+                                                    </small>
+                                                </div>
+                                                <div *ngIf="metricsForm.get('period_hour')" class="w-7 mr-2">
+                                                    <input class="form-control custom-margin-period" type="number"
+                                                        formControlName="period_hour" min="0" max="23"
+                                                        [class.is-invalid]="metricsFormErrors.period_hour">
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.period_hour">{{metricsFormErrors.period_hour}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-4 d-flex justify-content-center"
+                                                    *ngIf="metricsForm.get('period_hour')">
+                                                    <div class="custom-margin-top">Hr(s)</div>
+                                                </div>
+                                                <div *ngIf="metricsForm.get('period_min')" class="w-7 mx-2">
+                                                    <input class="form-control custom-margin-period" type="number"
+                                                        formControlName="period_min" min="0" max="59"
+                                                        [class.is-invalid]="metricsFormErrors.period_min">
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.period_min">{{metricsFormErrors.period_min}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-5 d-flex justify-content-center"
+                                                    *ngIf="metricsForm.get('period_hour')">
+                                                    <div class="custom-margin-top">Min(s)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="metricsForm.get('metrics_network_data')">
+                        <div class="row">
+                            <div class="col offset-2">
+                                <div class="row border round-edge p-4 position-relative mt-4 mx-0">
+                                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Network</div>
+                                    <div class="col">
+                                        <div class="row form-group">
+                                            <div class="col d-flex">
+                                                <div class="w-20">
+                                                    <label for="metrics_network_data">Metrices<em>*</em></label>
+                                                    <select class="form-control" name="metrics_network_data"
+                                                        id="metrics_network_data" formControlName="metrics_network_data"
+                                                        [class.is-invalid]="metricsFormErrors.metrics_network_data">
+                                                        <option [value]="''" disabled>Select Metric</option>
+                                                        <option *ngFor="let data of metricTypeList" [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.metrics_network_data">{{metricsFormErrors.metrics_network_data}}
+                                                    </small>
+                                                </div>
+                                                <div class="w-20 mx-2">
+                                                    <label for="network_group_by">Group By<em>*</em></label>
+                                                    <select class="form-control" name="network_group_by"
+                                                        id="network_group_by" formControlName="network_group_by"
+                                                        [class.is-invalid]="metricsFormErrors.network_group_by">
+                                                        <option [value]="''" disabled>Select Group</option>
+                                                        <option *ngFor="let data of groupByTypeList"
+                                                            [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.network_group_by">{{metricsFormErrors.network_group_by}}
+                                                    </small>
+                                                </div>
+                                                <div *ngIf="metricsForm.controls.view_by" class="w-20">
+                                                    <label for="view_by">View By<em>*</em></label>
+                                                    <select class="form-control" name="view_by" id="view_by"
+                                                        formControlName="view_by"
+                                                        [class.is-invalid]="metricsFormErrors.view_by">
+                                                        <option [value]="''" disabled>Select View</option>
+                                                        <option *ngFor="let data of viewByTypeList" [value]="data.name">
+                                                            {{data.displayName}}
+                                                        </option>
+                                                    </select>
+                                                    <small class="invalid-feedback"
+                                                        *ngIf="metricsFormErrors.view_by">{{metricsFormErrors.view_by}}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="metricsForm.controls.filter_by.value == 'metric'">
+                        <form *ngIf="metricesMappingForm" [formGroup]="metricesMappingForm">
+                            <div class="row border round-edge px-2 py-4 position-relative mt-4 mx-0"
+                                [ngClass]="{'border-danger': isMetricesMappingInvalid}">
+                                <div class="pb-2 mb-3 bg-white position-absolute section-name">Metrices Mapping</div>
+                                <div class="col-4 pr-1">
+                                    <div class="card round-edge equalize-card">
+                                        <div
+                                            class="card-header bg-white d-flex justify-content-between align-items-center p-2">
+                                            <div class="d-flex align-items-center font-500 w-28 mr-1">
+                                                <span class="badge badge-secondary font-sm">{{deviceCount}}</span>
+                                                <span class="ml-1 font-sm">Devices</span>
+                                            </div>
+                                            <div class="d-flex w-42 mx-1 flex-shrink-1">
+                                                <div class="form-group w-100 mb-0">
+                                                    <search-box customClass="form-control-sm"
+                                                        [searchValue]="metricesMappingForm.get('device_key').value"
+                                                        (searched)="onDeviceSearch($event)"></search-box>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex w-30">
+                                                <div class="form-group mb-0">
+                                                    <select class="form-control form-control-sm w-100"
+                                                        formControlName="device_type">
+                                                        <option [value]="''">Device Type</option>
+                                                        <option *ngFor="let option of deviceTypeList"
+                                                            [value]="option.name">
+                                                            {{option.displayName}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0"
+                                            style="max-height: 250px; overflow-y: auto; overflow-x: hidden;"
+                                            [ngStyle]="{ 'height': infiniteDeviceList.length ? '250px' : 'auto' }"
+                                            [ngClass]="{'d-flex flex-column justify-content-center': isDeviceBottomLoader || !infiniteDeviceList.length}">
+                                            <div *ngIf="deviceCount" class="h-100 w-100">
+                                                <virtual-scroller #scroll [items]="infiniteDeviceList"
+                                                    (vsEnd)="fetchMoreDevices($event)" class="h-100 w-100"
+                                                    style="overflow-x: hidden">
+                                                    <div class="row border-bottom py-1 px-2"
+                                                        *ngFor="let m of scroll.viewPortItems; let i = index"
+                                                        (click)="selectDevice(m)" style="cursor: pointer">
+                                                        <div class="col d-flex align-items-center">
+                                                            <span [ngClass]="getDeviceClass(m)"></span>
+                                                            <span class="font-sm ml-1">{{m?.name}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="isDeviceBottomLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        <span>Loading</span>
+                                                        <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                                    </div>
+                                                </virtual-scroller>
+                                            </div>
+                                            <div *ngIf="isDeviceLoader"
+                                                class="d-flex align-items-center justify-content-center py-4">
+                                                <span>Loading</span>
+                                                <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                            </div>
+                                            <div *ngIf="!infiniteDeviceList.length && !isDeviceBottomLoader && !isDeviceLoader"
+                                                class="d-flex align-items-center justify-content-center py-4">
+                                                No Devices available.
+                                            </div>
+                                        </div>
+                                        <!-- <div class="card-body p-0" id="deviceScrollContainer"
+                                            style="max-height: 250px; overflow-y: auto; overflow-x: hidden;"
+                                            infiniteScroll [infiniteScrollDistance]="1" [infiniteScrollUpDistance]="1"
+                                            [scrollWindow]="false" [infiniteScrollThrottle]="200"
+                                            (scrolled)="deviceOnScrollDown($event)"
+                                            (scrolledUp)="deviceOnScrollUp($event)"
+                                            [ngClass]="{'d-flex flex-column justify-content-center': isDeviceBottomLoader || !infiniteDeviceList.length}">
+                                            <div *ngFor="let device of infiniteDeviceList; let i = index;"
+                                                class="row border-bottom py-1 px-2" (click)="selectDevice(i, device)"
+                                                style="cursor: pointer">
+                                                <div class="col d-flex align-items-center">
+                                                    <span [ngClass]="getDeviceClass(i)"></span>
+                                                    <div class="ml-1">{{device.name}}</div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="isDeviceBottomLoader"
+                                                class="d-flex align-items-center justify-content-center py-4">
+                                                <span>Loading</span>
+                                                <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                            </div>
+                                            <div *ngIf="!infiniteDeviceList.length && !isDeviceBottomLoader"
+                                                class="d-flex align-items-center justify-content-center py-4">
+                                                No Devices available.
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </div>
+                                <div class="col pl-1">
+                                    <div class="row equalize-card">
+                                        <div class="col-6">
+                                            <div class="card round-edge equalize-card">
+                                                <div
+                                                    class="card-header bg-white d-flex justify-content-between align-items-center p-2">
+                                                    <div
+                                                        class="d-flex justify-content-center align-items-center font-500 mr-2">
+                                                        <span
+                                                            class="badge badge-secondary font-sm">{{metricsCount}}</span>
+                                                        <span class="ml-1 font-sm">Metrices</span>
+                                                    </div>
+                                                    <div class="d-flex w-70 flex-shrink-1">
+                                                        <div class="form-group w-100 mb-0">
+                                                            <search-box customClass="form-control-sm"
+                                                                [searchValue]="metricesMappingForm.get('metrices_key').value"
+                                                                (searched)="onMetricesSearch($event)"></search-box>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-0"
+                                                    style="max-height: 250px; overflow-y: auto; overflow-x: hidden;"
+                                                    [ngClass]="{'d-flex flex-column justify-content-center': isMetricesBottomLoader || !infiniteMetricList.length}">
+                                                    <div *ngIf="metricsCount" class="h-100 w-100">
+                                                        <virtual-scroller #scroll [items]="infiniteMetricList"
+                                                            (vsEnd)="fetchMoreMetrics($event)" class="h-100 w-100"
+                                                            style="overflow-x: hidden">
+                                                            <div class="row border-bottom py-1 px-2"
+                                                                *ngFor="let m of scroll.viewPortItems; let i = index"
+                                                                (click)="selectMetricsToBeAdded(m)"
+                                                                style="cursor: pointer">
+                                                                <div class="col d-flex align-items-center">
+                                                                    <span [ngClass]="getMetricClass(m)"></span>
+                                                                    <span class="font-sm ml-1">{{m?.item_name}}</span>
+                                                                </div>
+                                                            </div>
+                                                            <div *ngIf="isMetricesBottomLoader"
+                                                                class="d-flex align-items-center justify-content-center py-4">
+                                                                <span>Loading</span>
+                                                                <span
+                                                                    class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                                            </div>
+                                                        </virtual-scroller>
+                                                    </div>
+                                                    <div *ngIf="isMetricLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        <span>Loading</span>
+                                                        <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                                    </div>
+                                                    <div *ngIf="!infiniteMetricList.length && !isMetricesBottomLoader && !isMetricLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        No Metrices available.
+                                                    </div>
+                                                </div>
+                                                <!-- <div class="card-body p-0" id="metricScrollContainer"
+                                                    style="max-height: 250px; overflow-y: auto; overflow-x: hidden;"
+                                                    infiniteScroll [infiniteScrollDistance]="1"
+                                                    [infiniteScrollUpDistance]="1" [scrollWindow]="false"
+                                                    (scrolled)="metricOnScrollDown($event)"
+                                                    (scrolledUp)="metricOnScrollUp($event)"
+                                                    [ngClass]="{'d-flex flex-column justify-content-center': isMetricesBottomLoader || !infiniteMetricList.length}">
+                                                    <div *ngFor="let metric of infiniteMetricList; let i = index;"
+                                                        class="row border-bottom py-1 px-2"
+                                                        (click)="selectMetricsToBeAdded(i)" style="cursor: pointer">
+                                                        <div class="col d-flex align-items-center">
+                                                            <span [ngClass]="getMetricClass(i)"></span>
+                                                            <div class="ml-1 text-truncate">{{metric.item_name}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="isMetricesBottomLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        <span>Loading</span>
+                                                        <span class="fas fa-spinner fa-spin text-primary ml-2"></span>
+                                                    </div>
+                                                    <div *ngIf="!infiniteMetricList.length && !isMetricesBottomLoader"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        No Metrices available.
+                                                    </div>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                        <div class="col-1 d-flex flex-column justify-content-center">
+                                            <div class="align-content-center align-items-center d-flex flex-column">
+                                                <span *ngIf="metricesToBeAdded.length"
+                                                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{metricesToBeAdded.length}}</span>
+                                                <span class="fas fa-arrow-right font-lg p-2 pointer-link"
+                                                    [ngClass]="metricesToBeAdded.length ? 'text-primary-500' : 'text-muted'"
+                                                    (click)="addMetrices()" tooltip="Add"></span>
+                                            </div>
+                                            <div class="align-content-center align-items-center d-flex flex-column">
+                                                <span class="fas fa-arrow-left font-lg p-2 pointer-link"
+                                                    [ngClass]="metricesToBeRemoved.length ? 'text-primary-500' : 'text-muted'"
+                                                    (click)="removeMetrices()" tooltip="Remove"></span>
+                                                <span *ngIf="metricesToBeRemoved.length"
+                                                    class="badge badge-sm badge-secondary bg-primary-500 text-white">{{metricesToBeRemoved.length}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-5">
+                                            <div class="card round-edge equalize-card">
+                                                <div
+                                                    class="card-header bg-white d-flex justify-content-between align-items-center p-2">
+                                                    <div
+                                                        class="d-flex justify-content-center align-items-center font-500 mr-2">
+                                                        <span
+                                                            class="badge badge-secondary font-sm">{{selectedMetricesList?.length}}</span>
+                                                        <span class="ml-1 font-sm">Selected</span>
+                                                    </div>
+                                                    <div class="d-flex w-70 flex-shrink-1">
+                                                        <div class="form-group w-100 mb-0">
+                                                            <!-- <search-box customClass="form-control-sm"
+                                                                [searchValue]="metricesMappingForm.get('selected_metrices_key').value"
+                                                                (searched)="onSelectedMetricesSearch($event)"></search-box> -->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body p-0"
+                                                    [ngClass]="{'d-flex flex-column justify-content-center': !selectedMetricesList?.length}"
+                                                    style="max-height: 250px; overflow-y: auto; overflow-x: hidden;">
+                                                    <div *ngFor="let device of selectedMetricesList; let i = index;"
+                                                        class="row border-bottom mx-0 pt-1" style="cursor: pointer">
+                                                        <div class="col-12 d-flex align-items-center pb-1"
+                                                            (click)="selectAllMetricesUnderDevice(i)">
+                                                            <span [ngClass]="getSelectedDevice(i)"></span>
+                                                            <div class="ml-1">{{device.name}}</div>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div *ngFor="let metric of selectedMetricesList[i].items; let j = index;"
+                                                                class="row py-1" [ngClass]="{'border-top': j == 0}"
+                                                                (click)="selectMetricsToBeRemoved(i, j)"
+                                                                style="cursor: pointer">
+                                                                <div class="pl-4 col-12 d-flex align-items-center">
+                                                                    <span
+                                                                        [ngClass]="getSelectedMetricClass(i, j)"></span>
+                                                                    <div class="ml-1">{{metric.item_name}}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="!selectedMetricesList?.length"
+                                                        class="d-flex align-items-center justify-content-center py-4">
+                                                        No Metrices are selected.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="isMetricesMappingInvalid" class="text-danger font-sm-xs mt-1 ml-3">Selection of
+                                metrices is mandatory.
+                            </div>
+                        </form>
+                    </ng-container>
+                    <div class="row form-group mt-3">
+                        <div class="col-2 text-right align-self-center">Status :</div>
+                        <div class="col">
+                            <div class="d-inline-block">
+                                <ul class="d-flex px-0 mb-0">
+                                    <li>
+                                        <label class="pointer-link" [class.active]="metricsForm.controls.status.value">
+                                            <input type="radio" [value]="true" formControlName="status">
+                                            <span class="font-sm mr-2">Enable</span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label class="pointer-link" [class.active]="!metricsForm.controls.status.value">
+                                            <input type="radio" [value]="false" formControlName="status">
+                                            <span class="font-sm mr-2">Disable</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-2">
+                <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                <button class="btn btn-success mx-3" type="button" (click)="togglePreview()">Preview</button>
+                <button class="btn btn-success" type="button" (click)="onSubmit()">{{actionMessage}} Widget</button>
+            </div>
+        </div>
+        <ng-container *ngIf="isPreview">
+            <div class="card round-edge mb-2">
+                <div class="card-header bg-white d-flex align-items-center justify-content-between py-2">
+                    <span class="font-lg font-500">Preview</span>
+                    <button class="action-icons fas fa-times font-sm" tooltip="Close"
+                        (click)="togglePreview()"></button>
+                </div>
+                <div *ngIf="metricsPreview || previewWidgetType" class="card-body"
+                    [ngClass]="{'d-flex align-items-center justify-content-center': !metricsPreview}">
+                    <ng-container *ngIf="metricsPreview">
+                        <div class="row justify-content-center">
+                            <ng-container *ngIf="previewWidgetType== 'metric'">
+                                <ng-container *ngTemplateOutlet="metricesMapping"></ng-container>
+                            </ng-container>
+                            <ng-container *ngFor="let data of metricsPreviewViewData; let i = index">
+                                <div class="col-6 mb-2">
+                                    <div class="card round-edge mb-0">
+                                        <div class="card-header bg-white d-flex align-items-center py-1">
+                                            <span class="font-lg font-500 mr-1">{{ metricsForm.get('name').value
+                                                }}</span>
+                                            <ng-container *ngIf="metricsForm.get('period').value == 'last'">
+                                                <span *ngIf="metricsForm.get('period_hour').value != 0"
+                                                    class="font-lg font-500">- Last
+                                                    {{metricsForm.get('period_hour').value}} hr(s)<span
+                                                        *ngIf="metricsForm.get('period_min').value != 0"
+                                                        class="font-lg font-500 ml-1">and
+                                                        {{metricsForm.get('period_hour').value}} min(s)</span></span>
+                                                <span
+                                                    *ngIf="metricsForm.get('period_min').value != 0 && metricsForm.get('period_hour').value == 0"
+                                                    class="font-lg font-500 ml-1">- Last
+                                                    {{metricsForm.get('period_min').value}} min(s)</span>
+                                            </ng-container>
+                                        </div>
+                                        <ng-container [ngSwitch]="graphTypes[i]">
+                                            <ng-container *ngSwitchCase="'cpuLatest'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="metrices; context: { $implicit: data, columns: metricesColumns[0] }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'memoryLatest'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="metrices; context: { $implicit: data, columns: metricesColumns[1] }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'storageLatest'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="storageMetric; context: { $implicit: data, columns: metricesColumns[2] }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'networkLatest'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="networkInterfacesTable; context: { $implicit: data, columns: metricesColumns[3] }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'networkDevices'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="networkDevices; context: { $implicit: data, columns: metricesColumns[3] }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'bandwidthUtilization'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="bandwidthUtilization; context: { $implicit: data, columns: metricesColumns[3] }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'cpu'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="metricesChart; context: { $implicit: data }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'memory'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="metricesChart; context: { $implicit: data }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'storage'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="metricesChart; context: { $implicit: data }"></ng-container>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'network'">
+                                                <ng-container
+                                                    *ngTemplateOutlet="metricesChart; context: { $implicit: data }"></ng-container>
+                                            </ng-container>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="selectedTab != 'metrices'">
+                        <div class="card round-edge mb-0" [ngClass]="getWidgetWidth(previewWidgetType)">
+                            <div class="card-header bg-white d-flex align-items-center py-1">
+                                <span class="font-lg font-500">{{ form.get('name').value }}</span>
+                            </div>
+                            <ng-container [ngSwitch]="previewWidgetType">
+                                <ng-container *ngSwitchCase="'chart'">
+                                    <ng-container *ngTemplateOutlet="chart"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'hostAvailabilityChart'">
+                                    <ng-container *ngTemplateOutlet="hostAvailabilityChart"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'table'">
+                                    <ng-container *ngTemplateOutlet="table"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'networkInterfacesTable'">
+                                    <ng-container *ngTemplateOutlet="networkInterfacesTable"></ng-container>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="'metrices'">
+                                    <ng-container *ngTemplateOutlet="metrices"></ng-container>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+                <div *ngIf="!previewWidgetType && !metricsPreview"
+                    class="d-flex py-5 justify-content-center align-items-center">
+                    No preview available.
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #chart>
+    <div class="card-body d-flex align-items-center justify-content-center">
+        <canvas *ngIf="chartViewData && chartViewData.type" baseChart [chartType]="chartViewData?.type"
+            [labels]="chartViewData?.lables" [datasets]="chartViewData?.datasets" [options]="chartViewData?.options"
+            [plugins]="chartViewData?.customPlugin" [legend]="chartViewData?.legend"
+            [colors]="chartViewData?.colors"></canvas>
+    </div>
+    <div *ngIf="chartViewData?.type == 'horizontalBar'"
+        class="d-flex flex-wrap justify-content-center align-items-center cus-tags px-3 py-1">
+        <div *ngFor="let lables of chartLengendData; let i = index" class="progress-legend">&nbsp;<span
+                class="badge badge-pill mr-1 round-edge-0">&nbsp;</span>{{lables}}</div>
+    </div>
+</ng-template>
+
+<ng-template #metricesChart let-data>
+    <div class="card-body d-flex align-items-center justify-content-center pb-0 px-2">
+        <canvas *ngIf="data" baseChart [chartType]="data.type" [labels]="data.lables" [datasets]="data.linedata"
+            [options]="data.options" [plugins]="data.plugins" [legend]="data.legend" [colors]="data.colors"
+            height="250"></canvas>
+    </div>
+</ng-template>
+
+<ng-template #hostAvailabilityChart>
+    <div class="card-body d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-50">
+            <canvas *ngIf="chartViewData && chartViewData.type" baseChart [chartType]="chartViewData?.type"
+                [labels]="chartViewData?.lables" [datasets]="chartViewData?.datasets" [options]="chartViewData?.options"
+                [plugins]="chartViewData?.customPlugin" [legend]="chartViewData?.legend"
+                [colors]="chartViewData?.colors"></canvas>
+        </div>
+        <div class="px-1 w-50 overflow-auto" style="max-height: 150px;">
+            <div *ngFor="let legend of chartLengendData; let i = index"
+                class="d-flex align-items-center justify-content-start"
+                [ngClass]="{'pb-1': getDeviceIcon(legend.name) == ''}">
+                <div *ngIf="getDeviceIcon(legend.name)" class="w-10 text-center"><i class="fa fa-sm"
+                        [ngClass]="getDeviceIcon(legend.name)"></i></div>
+                <div class="font-xs font-500 w-30 text-truncate" [tooltip]="getDeviceDisplayNames(legend.name)">
+                    {{getDeviceDisplayNames(legend.name)}}</div>
+                <div class="font-xs font-500 w-11">:&nbsp;{{legend.count}}</div>
+                <div class="font-xs font-500 w-17">&nbsp;<span class="badge badge-success mr-1 badge-pill">&nbsp;</span>
+                    {{legend.Up}}</div>
+                <div class="font-xs font-500 w-16">&nbsp;<span class="badge badge-danger mr-1 badge-pill">&nbsp;</span>
+                    {{legend.Down}}</div>
+                <div class="font-xs font-500 w-16">&nbsp;<span
+                        class="badge badge-secondary mr-1 badge-pill">&nbsp;</span>
+                    {{legend.Unknown}}</div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- we need to make the tables dynamic -->
+<ng-template #table>
+    <div class="card-body d-flex align-items-center justify-content-center py-0">
+        <table class="table table-sm font-sm m-0">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of columns; let i = index" class="border-0 font-500"
+                        [ngClass]="{'text-center': i == 1}">
+                        <span *ngIf="i == 0"
+                            class="badge badge-secondary font-sm mr-1">{{tableViewData?.length}}</span>{{col}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of tableViewData" truncateText>
+                    <td>{{data.name}}</td>
+                    <td class="text-center text-primary">{{data.count}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<ng-template #networkInterfacesTable let-data let-columns="columns">
+    <div class="card-body d-flex justify-content-center">
+        <table class="table table-sm font-sm m-0">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of columns; let i = index" class="border-0 font-500"
+                        [ngClass]="{'text-center': i == 2}">
+                        <span *ngIf="i == 0" class="badge badge-secondary font-sm mr-1">{{data?.length}}</span>{{col}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of data" truncateText>
+                    <td>{{view.interfaceName}}</td>
+                    <td>{{view.host}}</td>
+                    <td class="text-center">{{view.value}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<ng-template #metrices let-data let-columns="columns">
+    <div class="card-body d-flex align-items-center justify-content-center py-0">
+        <table class="table table-sm font-sm m-0">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of columns; let i = index" class="font-500 bg-white border-0"
+                        [ngClass]="(i == 2) ? 'text-center w-60' : 'w-20'">
+                        <span *ngIf="i == 0" class="badge badge-secondary font-sm mr-1">{{data?.length}}</span>{{col}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of data" truncateText>
+                    <td class="text-truncate tdw-20">
+                        <div [tooltip]="view.hostName">{{view.hostName}}</div>
+                    </td>
+                    <td class="text-truncate tdw-20">
+                        <div [tooltip]="view.name">{{view.name}}</div>
+                    </td>
+                    <td class="custom-border tdw-50">
+                        <div class="progress progress-sm flex-grow-1">
+                            <div class="progress-bar" role="progressbar" [style.width.%]="view.count"
+                                [ngClass]="getProgressClass(view.count)" aria-valuenow="view.count" aria-valuemin="0"
+                                aria-valuemax="100"></div>
+                        </div>
+                    </td>
+                    <td class="text-center tdw-10">
+                        <div class="font-500" [ngClass]="getPercentageClass(view.count)">{{view.count}}%</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<ng-template #storageMetric let-data let-columns="columns">
+    <div class="card-body d-flex align-items-center justify-content-center py-0">
+        <table class="table table-sm font-sm m-0">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of columns; let i = index" class="font-500 bg-white border-0"
+                        [ngClass]="(i == 2) ? 'text-center w-60' : 'w-20'">
+                        <span *ngIf="i == 0" class="badge badge-secondary font-sm mr-1">{{data?.length}}</span>{{col}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of data" truncateText>
+                    <td class="tdw-20">
+                        <div [tooltip]="view.name">{{view.name}}</div>
+                    </td>
+                    <td class="tdw-20">
+                        <div [tooltip]="view.disk">{{view.disk}}</div>
+                    </td>
+                    <td class="custom-border tdw-50">
+                        <div class="progress progress-sm flex-grow-1">
+                            <div class="progress-bar" role="progressbar" [style.width.%]="view.count"
+                                [ngClass]="getProgressClass(view.count)" aria-valuenow="view.count" aria-valuemin="0"
+                                aria-valuemax="100"></div>
+                        </div>
+                    </td>
+                    <td class="text-center tdw-10">
+                        <div class="font-500" [ngClass]="getPercentageClass(view.count)">{{view.count}}%</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<ng-template #networkDevices let-data let-columns="columns">
+    <div class="card-body d-flex align-items-center justify-content-center py-0">
+        <table class="table table-sm font-sm m-0">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of columns; let i = index" class="border-0 font-500"
+                        [ngClass]="{'text-center': i == 1}">
+                        <span *ngIf="i == 0" class="badge badge-secondary font-sm mr-1">{{data?.length}}</span>{{col}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of data" truncateText>
+                    <td>{{view.name}}</td>
+                    <td class="text-center">{{view.value}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<ng-template #bandwidthUtilization let-data let-columns="columns">
+    <div class="card-body d-flex align-items-center justify-content-center py-0">
+        <table class="table table-sm font-sm m-0">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of columns; let i = index" class="font-500 bg-white"
+                        [ngClass]="(i == 1) ? 'text-center w-75' : 'w-25'">
+                        <span *ngIf="i == 0" class="badge badge-secondary font-sm mr-1">{{data?.length}}</span>{{col}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of data" truncateText>
+                    <td class="text-truncate tdw-25">
+                        <div [tooltip]="view.name">{{view.name}}</div>
+                    </td>
+                    <td class="custom-border tdw-65">
+                        <div class="progress progress-sm flex-grow-1">
+                            <div class="progress-bar" role="progressbar" [style.width.%]="view.value"
+                                [ngClass]="getProgressClass(view.value)" aria-valuenow="view.value" aria-valuemin="0"
+                                aria-valuemax="100"></div>
+                        </div>
+                    </td>
+                    <td class="text-center tdw-10">
+                        <div [tooltip]="view.value" class="font-500" [ngClass]="getPercentageClass(view.value)">
+                            {{view.value}}%</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-template>
+
+<ng-template #metricesMapping>
+    <div class="col-4 mb-2">
+        <div class="card round-edge mb-0">
+            <div class="card-header bg-white d-flex align-items-center py-1">
+                <span class="font-lg font-500 mr-1">{{ metricsForm.get('name').value}}</span>
+            </div>
+            <div class="card-body round-edge p-0"
+                style="height:210px; max-height: 210px; overflow-y: auto; overflow-x: hidden;"
+                [ngClass]="{'d-flex align-items-center justify-content-center': !metricesMappingViewData.length}">
+                <div *ngFor="let device of metricesMappingViewData; let i = index;" class="row border-bottom mx-2 py-1">
+                    <div class="col-12 d-flex justify-content-between align-items-center px-0"
+                        (click)="onDeviceSelect(i)" style="cursor: pointer;">
+                        <div class="d-flex align-items-center">
+                            <shared-device-status [status]="device.status" [hideTooltip]="true"
+                                class="mr-1"></shared-device-status>
+                            <div class="font-500 text-muted py-1">{{device.name}}</div>
+                        </div>
+                        <span class="text-muted font-500 mr-2">{{device.metrics.length}}</span>
+                    </div>
+                    <ng-container *ngIf="device.isSelected">
+                        <div class="col-12 d-flex justify-content-between align-items-center"
+                            *ngFor="let metric of metricesMappingViewData[i].metrics">
+                            <div class="w-80 d-flex align-items-center">
+                                <div #hideTooltip
+                                    class="text-muted text-truncate font-xs-sm text-truncate font-500 py-1 px-2"
+                                    [tooltip]="metric.name">{{metric.name}}</div>
+                            </div>
+                            <div *ngIf="metric.value || metric.value == 0" class="w-20 d-flex align-items-center">
+                                <span #hideTooltip [tooltip]="metric?.value + metric?.unit"
+                                    class="text-muted text-truncate font-xs-sm text-truncate font-500">
+                                    {{ metric?.value}}{{metric?.unit}}
+                                </span>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <!-- <div *ngIf="device.isSelected" class="col-12">
+                        <div *ngFor="let metric of metricesMappingViewData[i].metrics" class="row">
+                            <div class="pl-4 col-12 d-flex align-items-center justify-content-between">
+                                <div class="d-flex w-88 align-items-center">
+                                    <div #hideTooltip
+                                        class="text-muted text-truncate font-sm-xs text-truncate font-500 py-1 pl-3"
+                                        [tooltip]="metric.name">{{metric.name}}
+                                    </div>
+                                </div>
+                                <div *ngIf="metric.value" class="d-flex w-10 align-items-center">
+                                    <span #hideTooltip [tooltip]="metric?.value + metric?.unit"
+                                        class="text-muted text-truncate font-sm-xs text-truncate font-500">{{
+                                        metric?.value
+                                        +
+                                        metric?.unit }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+                <div class="text-center text-muted p-4 align-self-center" *ngIf="!metricesMappingViewData.length">No
+                    Data found.
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

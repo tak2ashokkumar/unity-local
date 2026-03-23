@@ -1,0 +1,95 @@
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="NIC Details">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Assettag</th>
+          <th>Type</th>
+          <th>Serial number</th>
+          <th>MAC Address</th>
+          <th>Is Allocated</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="nic in nicdet">
+          <td>{{ nic.assettag }}</td>
+          <td>{{ nic.nic_model_details.controller }}</td>
+          <td>{{ nic.serialnumber }}</td>
+          <td>{{ nic.mac_address }}</td>
+          <td>{{ nic.is_allocated }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+  </div>
+</div>
+
+<div class="row">
+
+</div>
+
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="Switch Details">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th>Model</th>
+          <th>Assettag</th>
+          <th>Serial number</th>
+          <th>VTP Mode</th>
+          <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="sw in swresult">
+          <td>{{ sw.name }}</td>
+          <td>{{ sw.switch_model.model }}</td>
+          <td>{{ sw.assettag }}</td>
+          <td>{{ sw.serialnumber }}</td>
+          <td>{{ sw.vtp_mode }}</td>
+          <td>{{ sw.status_details.status_type }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="Connection Details">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Ethernet</th>
+          <th>MAC Address</th>
+          <th>Management Interface</th>
+          <th>Bridge Mode</th>
+          <th>IP Address</th>
+          <th>Default Gateway</th>
+          <th>PXE Interface</th>
+          <th>VLAN</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="eth in ethdet">
+          <td>{{ eth.interface_name }}</td>
+          <td>{{ eth.nic_macaddress }}</td>
+          <td>{{ eth.management_interface }}</td>
+          <td>{{ eth.bridge_mode }}</td>
+          <td>{{ eth.nic_ipaddress }}</td>
+          <td>{{ eth.default_gateway }}</td>
+          <td>{{ eth.pxeinterface }}</td>
+          <td>{{ eth.vlan_tag }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+  </div>
+</div>
+

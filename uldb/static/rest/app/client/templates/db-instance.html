@@ -1,0 +1,265 @@
+<loading object="{{db_instances.results}}"></loading>
+
+<div class="row">
+  <div class="date-wrapper">
+    <div class="col-xs-10 col-sm-8 col-md-8 col-lg-6"> 
+      <form role="form" class="form-horizontal">
+          <label class="col-sm-3" for="selectcloud"><span class="daterange">Select Cloud</span></label>
+          <div class="col-sm-7" style="padding-top : 20px;">
+            <select name="speed" placeholder="Select Sector" id="speed" ng-change="load_db_instance(cloud_list_select)" ng-options="option.long for option in cloud_option_list track by option.short" class="ng-touched" ng-model="cloud_list_select"></select>
+            <span class="select-arrow"></span>
+          </div>
+          <label class="col-sm-1" for="selectcloud" style="margin-left: -8px !important;"><span class="daterange"></span></label>
+      </form>
+    </div> 
+  </div>
+</div>
+
+<div class="margin_top20px page_wrapper" style="float:left">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color" ng-show="db_instances.results !== undefined">
+        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+            <form class="navbar-form">
+                <div class="form-group">
+                    <input class="form-control" type="text" ng-model="searchkey" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}" ng-change="getSearchResults()">
+                    <button class="btn btn-search" type="submit" style="top: 4px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+          <div class="action-bar table-button">
+            <span class="count">
+            {{ db_instances.count}}</span>
+            <span class="count-text"> DB Instances</span>
+            <button class="btn btn-default" type="button" ng-click="createDbInstance()"> + Add </button>
+          </div>
+        </div>
+    </div>
+
+      <div class="bg-color">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="db_instances.results !== undefined">
+            <section id="no-more-tables" class="margintop20">
+              <table infinite-scroll='loadMoreResults()' ng-if="db_instances.results.length > 0" id="example" class="example table  table-condensed cf">
+                <thead class="cf">
+                  <tr>
+                    <th custom-sort order="vm_name" sort="sort" ng-mouseover="order = 'vm_name'">Virtual Machine Name</th>
+                    <th custom-sort order="ram_size" sort="sort" ng-mouseover="order = 'ram_size'">RAM Size (MB)</th>
+                    <th custom-sort order="cpus" sort="sort" ng-mouseover="order = 'cpus'">vCPUs</th>
+                    <th custom-sort order="hostname" sort="sort" ng-mouseover="order = 'hostname'">Hostname</th>
+                    <th custom-sort order="internal_ip" sort="sort" ng-mouseover="order = 'internal_ip'">Internal IP</th>
+                    <th custom-sort order="routable_ip" sort="sort" ng-mouseover="order = 'routable_ip'">Private IP</th>
+                    <th custom-sort order="database" sort="sort" ng-mouseover="order = 'database'">Database</th>
+                    <th>Creation Date</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="d in db_instances.results">
+                      <td>{{ d.vm_name }}</td>
+                      <td>{{ d.ram_size }}</td>
+                      <td>{{ d.cpus }}</td>
+                      <td>{{ d.hostname || 'N/A'}}</td>
+                      <td>{{ d.internal_ip || 'N/A'}}</td>
+                      <td>{{ d.routable_ip || 'N/A'}}</td>
+                      <td>{{ d.database }}</td>
+                      <td>
+                        <span ng-if="d.created_at">{{ d.created_at | unityDate : $root.users_timezone}}</span>
+                        <span ng-if="!d.created_at">{{ d.status }}</span>
+                      </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div  ng-if="db_instances.results.length === 0" class="content-wrapper">
+                  <no-records-found message="No records to display. {{db_instance_unsupported}}"></no-records-found>
+              </div>
+            </section>
+        </div>
+      </div>
+  </div>
+
+
+  <script type="text/ng-template" id="createDbInstance.html">
+    <div class="modal-content">
+       <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && create(request)">
+
+        <div class="modal-header">
+          <h4 class="modal-title">Create DB Instance</h4>
+        </div>
+
+        <div class="modal-body">
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+
+                    <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" >
+                        <div class="form-group">
+                              <label for="database" >
+                                  Database Type<span> *</span>
+                                  <span class="errormsg"  ng-if="!databse_errmsg && (modalform.$submitted && modalform.database.$invalid)" >
+                                      &nbsp; ( This Field is Required )
+                                  </span>
+                                  <span class="errormsg" ng-if="databse_errmsg && (modalform.$submitted)" >
+                                      &nbsp; ( {{ databse_errmsg }} )
+                                  </span>
+                              </label>
+
+                              <select class="form-control"
+                                  ng-model="request.database" required  name ="database" >
+                                  <option value="">-- Select DB type --</option>
+                                  <option value="MYSQL" >MYSQL</option>
+                              </select>
+                        </div>
+                    </div>
+
+
+
+                    <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" >
+                        <div class="form-group">
+                              <label for="vm_name" >
+                                  VM Name <span  > *</span>
+                                  <span class="errormsg"  ng-if="!vm_name_errmsg && (modalform.$submitted && modalform.vm_name.$invalid)" >
+                                      &nbsp; ( Invalid value )
+                                  </span>
+                                  <span class="errormsg" ng-if="vm_name_errmsg && (modalform.$submitted)" >
+                                      &nbsp; ( {{ vm_name_errmsg }} )
+                                  </span>
+                              </label>
+
+                              <input type="text"
+                                 class="form-control"
+                                 name="vm_name"
+                                 ng-model="request.vm_name"
+                                 placeholder="Virtual Machine Name">
+                        </div>
+                    </div>
+
+
+                    <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" >
+                        <div class="form-group">
+                              <label for="hostname" >
+                                  Hostname  <span > *</span>
+                                  <span class="errormsg"  ng-if="!hostname_errmsg && (modalform.$submitted && modalform.hostname.$invalid)" >
+                                      &nbsp; ( This Field is Required )
+                                  </span>
+                                  <span class="errormsg" ng-if="hostname_errmsg && (modalform.$submitted)" >
+                                      &nbsp; ( {{ hostname_errmsg }} )
+                                  </span>
+                              </label>
+
+                              <input type="text"
+                                 class="form-control"
+                                 name="hostname"
+                                 ng-model="request.hostname"
+                                 placeholder="Host Name">
+                        </div>
+                    </div>
+
+                    <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" >
+                        <div class="form-group">
+                              <label for="ram_size" >
+                                  RAM Size  <span > *</span>
+
+                                  <span class="errormsg"  ng-if="(modalform.$submitted && modalform.ram_size.$error.required)" >
+                                      &nbsp; ( This Field is Required )
+                                  </span>
+
+                                  <span class="errormsg" ng-if="ram_size_errmsg && (modalform.$submitted)" >
+                                      &nbsp; ( {{ ram_size_errmsg }} )
+                                  </span>
+                              </label>
+
+                              <input type="number"
+                                 min=0
+                                 class="form-control"
+                                 name="ram_size"
+                                 ng-model="request.ram_size"
+                                 placeholder="RAM Size in GB">
+                        </div>
+                    </div>
+
+
+                    <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" >
+                        <div class="form-group">
+                              <label for="cpus" >
+                                  CPUS  <span > *</span>
+                                  <span class="errormsg"  ng-if="!cpus_errmsg && (modalform.$submitted && modalform.cpus.$invalid)" >
+                                      &nbsp; ( This Field is Required )
+                                  </span>
+                                  <span class="errormsg" ng-if="cpus_errmsg && (modalform.$submitted)" >
+                                      &nbsp; ( {{ cpus_errmsg }} )
+                                  </span>
+                              </label>
+
+                              <input type="number"
+                                 min=0
+                                 name="cpus"
+                                 class="form-control"
+                                 ng-model="request.cpus"
+                                 placeholder="No. of CPU Cores">
+                        </div>
+                    </div>
+
+
+                    <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" >
+                        <div class="form-group">
+                              <label for="internal_ip" >
+                                  Internal IP  <span > *</span>
+                                  <span class="errormsg"  ng-if="!internal_ip_errmsg && (modalform.$submitted && modalform.internal_ip.$invalid)" >
+                                      &nbsp; ( This Field is Required )
+                                  </span>
+                                  <span class="errormsg" ng-if="internal_ip_errmsg && (modalform.$submitted)" >
+                                      &nbsp; ( {{ internal_ip_errmsg }} )
+                                  </span>
+                              </label>
+
+                              <input type="text"
+                                 class="form-control"
+                                 name="internal_ip"
+                                 ng-model="request.internal_ip"
+                                 placeholder="Ex : 192.168.254.60"
+                                 ng-pattern='/^([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})$/'
+                              >
+                        </div>
+                    </div>
+
+
+                    <div class="paddingR col-xs-6 col-sm-6 col-md-6 col-lg-6" >
+                        <div class="form-group">
+                              <label for="routable_ip" >
+                                  Private IP  <span > *</span>
+                                  <span class="errormsg"  ng-if="!routable_ip_errmsg && (modalform.$submitted && modalform.routable_ip.$invalid)" >
+                                      &nbsp; ( This Field is Required )
+                                  </span>
+                                  <span class="errormsg" ng-if="routable_ip_errmsg && (modalform.$submitted)" >
+                                      &nbsp; ( {{ routable_ip_errmsg }} )
+                                  </span>
+                              </label>
+
+                              <input type="text"
+                                 class="form-control"
+                                 name="routable_ip"
+                                 ng-model="request.routable_ip"
+                                 placeholder="Ex : 209.237.238.90"
+                                 ng-pattern='/^([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})[.]([0-9]{1,3})$/'
+                              >
+                        </div>
+                    </div>
+              </div>
+
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancel" ng-click="cancel()">
+            Cancel
+          </button>
+
+          <button type="submit" class="btn btn-default">
+            Save
+          </button>
+        </div>
+       </form>
+
+   </div>
+  </script>

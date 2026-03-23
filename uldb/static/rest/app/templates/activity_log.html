@@ -1,0 +1,193 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:1000}">
+<loading></loading>
+  <span ng-if="loader">
+      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </span>
+  <div class="row">
+    <div class="col-md-6" >
+      <form name="dateForm" class="form-horizontal">
+        <div class="form-group">
+          <div class="col-md-6">
+            <label for="orgName" class="control-label">Organization : </label>
+            <input id="orgName" class="form-control ticketing"
+                   ng-model="org"
+                   placeholder="Type org to search..."
+                   uib-typeahead="org as org.name for org in getOrgs($viewValue)"
+                   force-null="col.nullify"
+                   typeahead-on-select="get_client_activity_logs(selected_log)">
+          </div>
+          <div class="col-md-6">
+            <label for="activity_date_range" class="control-label">Select Date Range: </label>
+            <input options="options" date-range-picker class="form-control date-picker" name= 'activity_date_range' type="text" ng-model="datePicker.date"/>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <div class="col-md-2">
+        <label>
+            <input type="radio" ng-model="selected_log" value="all_logs" ng-change="get_client_activity_logs(selected_log)">
+            All
+        </label>
+      </div>
+
+      <div class="col-md-5">
+        <label>
+            <input type="radio" ng-model="selected_log" value="all_logins" ng-change="get_client_activity_logs(selected_log)">
+            Login Activity (All customers)
+        </label>
+      </div>
+
+      <div class="col-md-3">
+        <label>
+            <input type="radio" ng-model="selected_log" value="customer_logs" ng-change="get_client_activity_logs(selected_log)">
+            Customer Only
+        </label>
+      </div>
+      <div class="col-md-2">
+        <!-- <button class="btn btn-success" ng-click="export_activity_logs()">Export</button> -->
+        <a href="{{downloadUrl}}"><button class="btn btn-success">Export</button></a>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-10"></div>
+      <div ng-if="model.results !== undefined">
+        <table class="table table-condensed" ng-if="model.results.length > 0">
+          <thead>
+            <tr>
+              <th>Model Name</th>
+              <th>Object ID</th>
+              <th>User</th>
+              <th>Action</th>
+              <th>Time</th>
+              <th>Changes</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="result in model.results | filter: searchKeyword as filtered"
+                ng-click="selection.selected = result; selection.index = $index; selectActions(result)"
+                ng-class="classSelectors(result)">
+                <td>{{result.content_type.app_label}}.{{result.content_type.model}} </td>
+                <td>{{ result.object_repr }}</td>
+                <td>{{ result.actor.email }}
+                  <span ng-if="result.actor==null && result.content_type.app_label=='user2'">
+                    {{ result.object_repr }}
+                  </span>
+                  <span ng-if="result.actor==null && result.content_type.app_label!=='user2'">
+                    System
+                  </span>
+                </td>
+                <td ng-bind="change_action_to_text(result.action)"></td>
+                <td>{{ result.timestamp | unityDate : $root.users_timezone }}</td>
+                <td>
+                  <div class="action-icons" style="margin-left:14px;">
+                    <a class="fa fa-info-circle blue-text" tooltip-class="customClass" uib-tooltip="Show Changes"
+                       href="javascript:void(0)" ng-click="changes_modal(result,change_action_to_text(result.action))">
+                    </a></div>
+                </td>
+            </tr>
+          </tbody>
+        </table>
+        <span ng-if="model.results.length === 0 && !loader">
+          <h3 class="align-center">No records to display</h3>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="activityLogChanges.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Log details</h3>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="col-md-4 table_no_top_border">
+                                <div>ModelName</div>
+                            </th>
+                            <td class="table_no_top_border">
+                              <div>{{logObject.content_type.app_label}} . {{logObject.content_type.model}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>User</div>
+                            </th>
+                            <td>
+                              <div>{{ logObject.actor.email }}
+                                  <span ng-if="logObject.actor==null && logObject.content_type.app_label=='user2'">
+                                      {{ logObject.object_repr }}
+                                  </span>
+                                  <span ng-if="logObject.actor==null && logObject.content_type.app_label!='user2'">
+                                    System
+                                  </span>
+                              </div>
+                            </td>
+                        </tr>
+
+                        <tr ng-if="logObject.hijacker">
+                            <th class="col-md-4">
+                                <div>Impersonated By</div>
+                            </th>
+                            <td>
+                              <div>{{ logObject.hijacker.email }}
+                              </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Action</div>
+                            </th>
+                            <td>
+                              <div>{{ action }}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                      Change Details  <span  class="count" style="float: right;"><b>{{changes_log_keys.length}}</b></span>
+                    </div>
+                    <div class="panel-body">
+                        <div style="max-height: 200px; overflow: auto">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th ng-show="action === 'UPDATED'">Old Value</th>
+                                        <th ng-show="action === 'UPDATED'">New Value</th>
+                                        <th ng-show="action !== 'UPDATED'">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(key, value) in logObject.changes">
+                                        <td>{{ key }}</td>
+                                        <td ng-show="action !== 'CREATED'">{{ value[0] }}</td>
+                                        <td ng-show="action !== 'DELETED'">{{ value[1] }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  <div class="modal-footer modal-buttons">
+        <p style="text-align: left;"><span style="color: red">*</span> Time is in GMT.</p>
+        <button type="button" class="btn btn-cancel" ng-click="cancel()">
+          Close
+        </button>
+  </div>
+</script>

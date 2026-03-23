@@ -1,0 +1,539 @@
+<alerts></alerts>
+
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>
+
+<script type="text/ng-template" id="orgDetails.html">
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-lg-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          Company Information
+        </div>
+        <div class="panel-body panelheight">
+          <detailtable cols="orgcols" result="orgresult"></detailtable>
+        </div>
+        <div class="panel-footer">
+          <button class="btn btn-success" ng-click="generate_auth_key()">Generate Auth Key</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          Access List
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed table-hover">
+            <thead>
+            <tr>
+              <th class="col-xs-3">User</th>
+              <th class="col-xs-3">Access Types Granted</th>
+              <th class="col-xs-3">Last Login</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="user in users"
+                ng-click="selection.selected = user; selection.index = $index"
+                ng-class="{'selected': user === selection.selected}">
+              <td><a href="#/user/{{ user.id }}">{{ user.email }}</a></td>
+              <td>{{ transformAccessTypes(user.access_types) }}</td>
+              <td>{{ user.last_login | date : 'MMMM d, y, h:mm:ss a' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer">
+          <button class="btn btn-primary" ng-click="addUser()">Import User from Salesforce</button>
+          <button class="btn btn-primary" ng-click="exportUser()">Export User to Zendesk</button>
+          <button class="btn btn-primary" ng-click="inviteUser()">Invite User</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="assets.html">
+  <span ng-if="collections === undefined">
+      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </span>
+  <div class="row" ng-if="collections !== undefined">
+    <div class="col-sm-12">
+      <div class="panel panel-primary" ng-repeat="collection in collections">
+        <div class="panel-heading">
+          {{ collection.heading }}
+        </div>
+        <div class="panel-body">
+          <table class="table">
+            <thead>
+            <tr>
+              <th ng-repeat="field in asset_fields[collection.heading]" ng-if="field.hidden == undefined">
+                {{ field.description }}
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="object in collection.items"
+                ng-click="select(object, $index, collection)"
+                ng-class="{'success': object === collection.selection.item }">
+              <td ng-repeat="field in asset_fields[collection.heading]" ng-if="field.hidden == undefined">
+                <span ng-if="field.transform == undefined">{{ object[field.name] }}</span>
+                <span ng-if="field.transform === 'accessor'">{{ field.access(object) }}</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer" ng-if="collection.heading == 'Servers' || collection.heading == 'Virtual Machines'">
+          <button ng-if="collection.add" class="btn btn-primary" ng-click="create(collection)">Add New</button>
+          <button ng-if="collection.selection" class="btn btn-info" ng-click="modify(collection)">
+            Edit {{ collection.selection.item[collection.key] }}</button>
+          <button ng-if="collection.selection" class="btn btn-danger" ng-click="remove(collection, collection.selection.index)" confirm>Delete
+            {{ collection.selection.item[collection.key] }}</button>
+          <button ng-if="collection.selection" ng-repeat="custom in collection.custom"
+                  class="btn btn-info" ng-click="custom.func(custom.name, collection)">{{ custom.name }}</button>
+          <div ng-if="!collection.selection">
+            <span>Select an item above to edit/delete.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="colo.html">
+  <span ng-if="colo_collections === undefined">
+      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </span>
+  <div class="row" ng-if="colo_collections !== undefined">
+    <div class="col-sm-12">
+      <div class="panel panel-primary" ng-repeat="collection in colo_collections">
+        <div class="panel-heading">
+          {{ collection.heading }}
+        </div>
+        <div class="panel-body">
+          <table class="table">
+            <thead>
+            <tr>
+              <th ng-repeat="field in asset_fields[collection.heading]" ng-if="field.hidden == undefined">
+                {{ field.description }}
+              </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="object in collection.items"
+                ng-click="select(object, $index, collection)"
+                ng-class="{'success': object === collection.selection.item }">
+              <td ng-repeat="field in asset_fields[collection.heading]" ng-if="field.hidden == undefined">
+                <span ng-if="field.transform == undefined">{{ object[field.name] }}</span>
+                <span ng-if="field.transform === 'accessor'">{{ field.access(object) }}</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer">
+           <!--<button ng-if="collection.add" class="btn btn-primary" ng-click="create(collection)">Add New</button>-->
+          <button ng-if="collection.selection" class="btn btn-info" ng-click="modify(collection)">
+            Edit {{ collection.selection.item[collection.key] }}</button>
+          <button ng-if="collection.selection" class="btn btn-danger" ng-click="remove(collection, collection.selection.index)" confirm>Delete
+            {{ collection.selection.item[collection.key] }}</button>
+          <button ng-if="collection.selection" ng-repeat="custom in collection.custom"
+                  class="btn btn-info" ng-click="custom.func(custom.name, collection)">{{ custom.name }}</button>
+          <div ng-if="!collection.selection">
+            <span>Select an item above to edit/delete.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="orgOppty.html">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          Opportunities
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>SFDC Account</th>
+              <th>Owner</th>
+              <th>MRC</th>
+              <th>NRC</th>
+              <th>Stage</th>
+              <th>Delivery Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="opportunity in assets.opportunities | filter: searchKeyword"
+                ng-click="selectOppty(opportunity, $index)"
+                ng-class="{'success': opportunity === selectedOppty.selected }">
+              <td>
+                <a href="https://na4.salesforce.com/{{ opportunity.sfid }}" target="_blank">
+                    {{ opportunity.name }}
+                </a>
+              </td>
+              <td>{{ opportunity.account_name }}</td>
+              <td>{{ opportunity.owner_name }}</td>
+              <td>{{ opportunity.mrc }}</td>
+              <td>{{ opportunity.nrc }}</td>
+              <td>{{ opportunity.stage_name }}</td>
+              <td>{{ opportunity.committed_delivery_date | date }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-if="selectedOppty.selected" class="row">
+    <div class="col-sm-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          {{ selectedOppty.selected.name }} Invoices
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>Month</th>
+              <th>Year</th>
+              <th>Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="invoice in invoices | filter: searchKeyword"
+                ng-click="selectInvoice(invoice, $index)"
+                ng-class="{'success': invoice === selectedInvoice.selected }">
+              <td>{{ invoice.billing_month }}</td>
+              <td>{{ invoice.billing_year }}</td>
+              <td>{{ invoice.amount_billed | currency:'$' }}</td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="row">
+            <div class="col-sm-12">
+              <button class="btn btn-danger" ng-click="generateInvoice()">Generate Invoice</button>
+              <button class="btn btn-danger" ng-if="selectedInvoice.selected" ng-click="exportInvoice()">Export Invoice</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div ng-if="selectedInvoice.selected" class="col-sm-8">
+      <div class="panel panel-primary" id="invoice_detail">
+        <div class="panel-heading">
+          {{ selectedInvoice.selected.billing_month }} {{ selectedInvoice.selected.billing_year }} Details
+        </div>
+        <div class="panel-body">
+          <h3>Total Amount: {{ selectedInvoice.selected.amount_billed | currency: '$'}}</h3>
+          <div class="panel panel-success">
+            <div class="panel-heading">
+              Line Items
+            </div>
+            <div class="panel-body">
+              <table class="table table-condensed">
+                <thead>
+                <tr>
+                  <th class="col-xs-4">Product</th>
+                  <th class="col-xs-1">Unit Price</th>
+                  <th class="col-xs-1">Qty</th>
+                  <th class="col-xs-1">Total Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="p in selectedInvoice.selected.invoice_line_items">
+                  <td>{{ p.PricebookEntry.Product2.Name }}</td>
+                  <td>{{ p.UnitPrice | number:2 }}</td>
+                  <td>{{ p.Quantity }}</td>
+                  <td>{{ p.TotalPrice | number:2 }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>Created: {{ selectedInvoice.selected.created_at | date:'medium' }}</div>
+          <div>Updated: {{ selectedInvoice.selected.updated_at | date:'medium' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<!--<script type="text/ng-template" id="orgInvoices.html">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          Invoices
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>Opportunity Name</th>
+              <th>SFID</th>
+              <th>Month</th>
+              <th>Year</th>
+              <th>Amount</th>
+              <th>Created</th>
+              <th>Updated</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="invoice in assets.invoices | filter: searchKeyword"
+                ng-click="selectInvoice(invoice, $index)"
+                ng-class="{'success': invoice === selection.selected }">
+              <td>{{ invoice.opportunity.name }}</td>
+              <td>
+                <a href="https://na4.salesforce.com/{{ invoice.opportunity.sfid }}" target="_blank">
+                  {{ invoice.opportunity.sfid }}
+                </a>
+              </td>
+              <td>{{ invoice.billing_month }}</td>
+              <td>{{ invoice.billing_year }}</td>
+              <td>{{ invoice.amount_billed }}</td>
+              <td>{{ invoice.created_at | date:'medium' }}</td>
+              <td>{{ invoice.updated_at | date:'medium' }}</td>
+            </tr>
+            </tbody>
+          </table>
+              <div class="row">
+                <div class="col-sm-12">
+                  <button class="btn btn-danger" ng-click="generateInvoice()">Generate Invoice</button>
+                  <button class="btn btn-danger" ng-if="selection.selected" ng-click="exportInvoice()">Export Invoice</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div ng-if="selection.selected" class="panel panel-primary" id="invoice_detail">
+    <div class="panel-heading">
+      {{ selection.selected.opportunity.name }} - {{ selection.selected.billing_month }} {{ selection.selected.billing_year }}
+    </div>
+    <div class="panel-body">
+      <h3>Total Amount: ${{ selection.selected.amount_billed }}</h3>
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          Line Items
+        </div>
+        <div class="panel-body">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th class="col-xs-4">Product</th>
+              <th class="col-xs-1">UnitPrice</th>
+              <th class="col-xs-1">Qty</th>
+              <th class="col-xs-1">TotalPrice</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="p in selection.selected.invoice_line_items">
+              <td>{{ p.PricebookEntry.Product2.Name }}</td>
+              <td>{{ p.UnitPrice | number:2 }}</td>
+              <td>{{ p.Quantity }}</td>
+              <td>{{ p.TotalPrice | number:2 }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>-->
+
+
+<script type="text/ng-template" id="aclModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Import User from Salesforce
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal" ng-submit="method === 'Edit' && update(obj) || create(obj, list)">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Contact
+        </label>
+        <div class="col-sm-10">
+          <span ng-if="error" style="color:red">{{error}}</span>
+          <img ng-if="!contacts && !error" src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+          <select class="form-control"
+                  ng-model="contact" ng-options="contact as format_name(contact) for contact in contacts ">
+
+          </select>
+        </div>
+      </div>
+      <input type="submit" style="visibility: hidden">
+    </form>
+    <div ng-if="contact"><strong>User will be imported as: </strong>
+      <pre>{{ contact | json }}</pre>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="addContact(contact)">
+      Add user!
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="exportUserModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Export User to Zendesk
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal" ng-submit="method === 'Edit' && update(obj) || create(obj, list)">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Contact
+        </label>
+        <div class="col-sm-10">
+          <span ng-if="error" style="color:red">{{error}}</span>
+          <img ng-if="!contacts && !error" src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+          <select class="form-control"
+                  ng-model="contact" ng-options="contact as format_name(contact) for contact in contacts">
+
+          </select>
+        </div>
+      </div>
+      <input type="submit" style="visibility: hidden">
+    </form>
+    <div ng-if="contact"><strong>User will be exported as: </strong>
+      <pre>{{ contact | json }}</pre>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="exportContact(contact)">
+      Export user!
+    </button>
+  </div>
+</script>
+
+<style type="text/css">
+  .dropdown-menu {
+      right : auto !important;
+  }
+  .multiselect-parent.btn-group {
+      width: 100%;
+  }
+  .dropdown-toggle.btn.btn-default {
+      width: 100%
+  }
+
+  .dropdown-menu.dropdown-menu-form .divider {
+      margin : 5px 0px;
+  }
+
+  .dropdown-menu.dropdown-menu-form .searchField {
+      height: 30px;
+  }
+
+  /*.dropdown-menu.dropdown-menu-form > li {
+      width: 50%;
+      display: inline-block;
+  }*/
+</style>
+
+<script type="text/ng-template" id="inviteUserModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Invite User
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <div ng-dropdown-multiselect="" options="contacts" selected-model="inviteContacts" extra-settings="dropdownExtraSettings"
+         style="width: 40%;"></div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      No, not right now.
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="inviteUser(inviteContacts)">
+      Invite user!
+    </button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="invoiceModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">
+      Generate Invoice
+    </h3>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <!--<div class="form-group" >
+        <label class="col-sm-2 control-label">
+          Opportunity
+        </label>
+        <div class="col-sm-10">
+          <input class="form-control"
+                 ng-model="oppty"
+                 uib-typeahead="oppty as oppty.name for oppty in getOpptys($viewValue)">
+        </div>
+      </div>-->
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Month
+        </label>
+        <div class="col-sm-10">
+          <input ng-model="month" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="col-sm-2 control-label">
+          Year
+        </label>
+        <div class="col-sm-10">
+          <input ng-model="year" class="form-control">
+        </div>
+      </div>
+
+      <input type="submit" style="visibility: hidden">
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-primary" type="button" ng-click="generate(oppty, month, year)">
+      Generate!
+    </button>
+  </div>
+</script>

@@ -1,0 +1,74 @@
+<div class="row" style="min-height: 350px;">
+    <div class="col-12">
+        <div class="card rounded-0 border-top-0">
+            <div class="card-header bg-transparent border-bottom-0 d-flex justify-content-between">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-lg">{{count}}</span>
+                    <span class="ml-1">Ethernet Ports</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center w-50">
+                    <div class="w-40">
+                        <table-search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></table-search-box>
+                    </div>
+                    <!-- <div class="w-40" *ngIf="viewData.length">
+                        <form *ngIf="columnForm" class="col-12" [formGroup]="columnForm">
+                            <div class="form-group mb-0">
+                                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                    formControlName="columns" [options]="tableColumns"
+                                    [settings]="columnSelectionSettings" [texts]="columnSelectionTexts"
+                                    (dropdownClosed)="columnChange()"></multiselect-dropdown>
+                            </div>
+                        </form>
+                    </div> -->
+                    <div class="w-20" *ngIf="viewData.length">
+                        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body py-0">
+                <div class="table-responsive">
+                    <table class="table text-left mb-0">
+                        <thead>
+                            <tr>
+                                <th *ngFor="let col of columnsSelected">{{col.name}}</th>
+                                <th *ngIf="columnsSelected.length">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let view of viewData">
+                                <td *ngFor="let col of columnsSelected">
+                                    <ng-container *ngIf="col.type == 'btn-link'">
+                                        <button class="btn btn-link text-decoration-none p-0 table-column-btn"
+                                            type="button" [tooltip]="view[col.key]"
+                                            (click)="loadDetails(view, col.url)">{{view[col.key]}}</button>
+                                    </ng-container>
+                                    <ng-container *ngIf="col.type == 'status_field'">
+                                        <shared-device-status [status]="view.state"></shared-device-status>
+                                    </ng-container>
+                                    <ng-container *ngIf="!col.type || col.type=='text'">
+                                        <div>{{view[col.key]}}</div>
+                                    </ng-container>
+                                </td>
+                                <td class="action-icons-column" *ngIf="columnsSelected.length">
+                                    <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
+                                        tooltip="Manage by creating support ticket"
+                                        (click)="createTicket(view)"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No Ethernets Data available.</div>
+                <div class="text-center text-muted py-5" *ngIf="viewData.length && !columnsSelected.length">No Columns
+                    selected to display.</div>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count"></table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+            </div>
+        </div>
+    </div>
+</div>

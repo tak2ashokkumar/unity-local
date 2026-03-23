@@ -1,0 +1,55 @@
+<alerts></alerts>
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <a href="tab.url"></a>
+  </uib-tab>
+</uib-tabset>
+
+<div>
+  <div ng-if="!private_clouds">
+    <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </div>
+  <div ng-if="private_clouds.length != 0">
+    <table class="table table-condensed">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Organization</th>
+        <th>Platform Type</th>
+        <th>Servers</th>
+        <th>VMs</th>
+        <th>Manage</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-click="selObj(cloud)"
+          ng-class="{'success': cloud === sel.cloud }"
+          ng-repeat="cloud in private_clouds | filter: searchKeyword">
+        <td><a href="#/cloud/{{ cloud.uuid }}">{{ cloud.name }}</a></td>
+        <td><a href="#/organization/{{ cloud.customer.id }}">{{ cloud.customer.name }}</a></td>
+        <td>{{ cloud.platform_type }}</td>
+        <td>{{ cloud.servers.length }}</td>
+        <td>{{ cloud.vms.length }}</td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+          <ul class="dropdown-menu action-button">
+            <li ng-if="proxy_link(cloud) !== null"><a href="#/{{ proxy_prefix(cloud) }}/{{ proxy_link(cloud)[0].uuid }}">Manage {{ cloud.platform_type }}</a></li>
+          </ul>
+          </div>
+        </td>
+
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div ng-if="private_clouds.length == 0">
+    <h3 class="align-center">No records to display</h3>
+  </div>
+</div>
+
+<div>
+  <button class="btn btn-primary" ng-click="createPrivateCloud()">Add</button>
+</div>

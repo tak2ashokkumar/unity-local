@@ -1,0 +1,124 @@
+<ng-template #template>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Group
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="groupForm" [formGroup]="groupForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="name">Group Name<em>*</em></label>
+          <input class="form-control" id="name" type="text" formControlName="name" [ngClass]="{'is-invalid' : groupFormErrors.name}">
+          <div class="invalid-feedback" *ngIf="groupFormErrors.name">{{groupFormErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="desc">Group Description</label>
+          <input class="form-control" id="desc" type="text" formControlName="desc" [ngClass]="{'is-invalid' : groupFormErrors.desc}">
+          <div class="invalid-feedback" *ngIf="groupFormErrors.desc">{{groupFormErrors.desc}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDeleteGroup()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmDevice>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmDeviceModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete device?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeviceModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #addDeviceView>
+  <div class="card mb-0">
+    <div class="card-header">
+      Add Device
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="deviceForm" [formGroup]="deviceForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="deviceCategory">Device Category</label>
+          <select class="form-control text-capitalize" id="deviceCategory" name="deviceCategory" [(ngModel)]="selectedDeviceCategory"
+            [ngModelOptions]="{standalone: true}" (change)="deviceCategorySelected(selectedDeviceCategory)">
+            <option [value]="''" disabled>Select Device Category</option>
+            <option [value]="'firewall'"> Firewalls </option>
+            <option [value]="'load_balancer'"> Load Balancers </option>
+            <option [value]="'switch'"> Switches </option>
+            <option [value]="'hypervisor'"> Hypervisors</option>
+            <option [value]="'bms'">Bare Metal Servers </option>
+            <option [value]="'storagedevice'"> Storage Devices </option>
+            <option [value]="'macdevice'"> Mac Devices </option>
+            <option [value]="'customdevice'"> Other Devices </option>
+            <option [value]="'vmware'"> VMware Virtual Machines </option>
+            <option [value]="'vcloud'"> vCloud Virtual Machines </option>
+            <option [value]="'esxi'"> ESXi Virtual Machines </option>
+            <option [value]="'hyper-v'"> Hyper-v Virtual Machines </option>
+            <option [value]="'openstack'"> Openstack Virtual Machines </option>
+            <option [value]="'custom_vm'"> Custom Virtual Machines </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="desc">Devices List<em>*</em></label>
+          <!-- <select class="form-control text-capitalize" id="device_category" name="device_category" formControlName="device_category"
+            [ngClass]="{'is-invalid' : deviceForm.device_category}">
+            <option [value]="''" disabled>Select Devices</option>
+            <option *ngFor="let d of devicesByCategory" [ngValue]="d.deviceId">{{d.deviceName}}</option>
+          </select> -->
+          <multiselect-dropdown [options]="devicesByCategory" [isDisabled]="!devicesByCategory.length" [settings]="mySettings"
+            class="form-control p-0" formControlName="devices_selected" [ngClass]="{'is-invalid' : deviceFormErrors.devices_selected}"></multiselect-dropdown>
+          <div class="invalid-feedback" *ngIf="deviceFormErrors.devices_selected">{{deviceFormErrors.devices_selected}}
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onDeviceSubmit()">Add</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

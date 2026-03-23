@@ -1,0 +1,319 @@
+<ng-template #bareMetalServerFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Bare Metal Server
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="bareMetalServerModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="bareMetalServerForm" [formGroup]="bareMetalServerForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="name">Name<em>*</em></label>
+            <input id="name" class="form-control" type="text" formControlName="name"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.name}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.name">{{bareMetalServerFormErrors.name}}
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="management_ip">Management IP</label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'IP Address for SSH/RDP Access'"></i>
+            <input id="management_ip" class="form-control" type="text" formControlName="management_ip"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.management_ip}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.management_ip">
+              {{bareMetalServerFormErrors.management_ip}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="manufacturer">
+            <label class="font-col-form-label" for="manufacturer">Manufacturer<em>*</em></label>
+            <select id="manufacturerid" class="form-control" formControlName="id"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.manufacturer.id}">
+              <option value="" disabled>Select Manufacturer</option>
+              <option *ngFor="let manufacturer of manufacturers" [value]="manufacturer.id">
+                {{manufacturer.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.manufacturer.id">
+              {{bareMetalServerFormErrors.manufacturer.id}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="model">
+            <label class="font-col-form-label" for="modelid">Model<em>*</em></label>
+            <select id="modelid" class="form-control" formControlName="id"
+              [class.is-invalid]="bareMetalServerFormErrors.model.id">
+              <option value="" disabled>Select Model</option>
+              <option *ngFor="let model of models" [value]="model.id"> {{model.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.model.id">
+              {{bareMetalServerFormErrors.model.id}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="num_cpus">Number of CPUs<em>*</em></label>
+            <input id="num_cpus" class="form-control" type="number" min="1" formControlName="num_cpus"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.num_cpus}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.num_cpus">
+              {{bareMetalServerFormErrors.num_cpus}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="num_cores">Number of Cores<em>*</em></label>
+            <input id="num_cores" class="form-control" type="number" min="1" formControlName="num_cores"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.num_cores}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.num_cores">
+              {{bareMetalServerFormErrors.num_cores}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="memory_mb">Memory(MB)<em>*</em></label>
+            <input id="memory_mb" class="form-control" type="number" min="1" formControlName="memory_mb"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.memory_mb}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.memory_mb">
+              {{bareMetalServerFormErrors.memory_mb}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="capacity_gb">Capacity(GB)<em>*</em></label>
+            <input id="capacity_gb" class="form-control" type="number" min="1" formControlName="capacity_gb"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.capacity_gb}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.capacity_gb">
+              {{bareMetalServerFormErrors.capacity_gb}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="datacenter">
+            <label class="form-col-form-label" for="dcId">Datacenter<em>*</em></label>
+            <select id="dcId" class="form-control" formControlName="uuid"
+              [class.is-invalid]="bareMetalServerFormErrors.datacenter.uuid">
+              <option value="" disabled>Select Datacenter</option>
+              <option *ngFor="let dc of datacenters" [value]="dc.uuid">{{dc.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.datacenter.uuid">
+              {{bareMetalServerFormErrors.datacenter.uuid}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="private_cloud">
+            <label class="form-col-form-label" for="private_cloud">Private Cloud</label>
+            <select id="private_cloudid" class="form-control" formControlName="id"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.private_cloud.id}">
+              <option value="">Select Private Cloud</option>
+              <option *ngFor="let cloud of privateclouds" [value]="cloud.id"> {{cloud.name}} </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.private_cloud.id">
+              {{bareMetalServerFormErrors.private_cloud.id}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="cabinet">
+            <label class="font-col-form-label" for="cabinetid">Cabinet</label>
+            <select id="cabinetid" class="form-control" formControlName="id"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.cabinet.id}">
+              <option value="">Select Cabinet</option>
+              <option *ngFor="let cabinet of cabinets" [value]="cabinet.id">
+                {{cabinet.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.cabinet.id">
+              {{bareMetalServerFormErrors.cabinet.id}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="position">Position</label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'Position of device in the cabinet\nEg.1,2,3,4...'"></i>
+            <input id="position" class="form-control" type="number" min="0" formControlName="position"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.position}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.position">
+              {{bareMetalServerFormErrors.position}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="size">Size<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'Size of the Device\nEg.1, 2, 3'"></i>
+            <input id="size" class="form-control" type="number" min="1" formControlName="size"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.size}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.size">{{bareMetalServerFormErrors.size}}
+            </div>
+          </div>
+          <div class="form-group col-6" formGroupName="os">
+            <label class="font-col-form-label" for="osid">OS<em>*</em></label>
+            <select id="osid" class="form-control" formControlName="id"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.os.id}">
+              <option value="" disabled>Select Operating System</option>
+              <option *ngFor="let os of operatingsystems" [value]="os.id"> {{os.full_name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.os.id">{{bareMetalServerFormErrors.os.id}}
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="asset_tag">Asset Tag</label>
+            <input id="asset_tag" class="form-control" type="text" formControlName="asset_tag"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.asset_tag}">
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.asset_tag">
+              {{bareMetalServerFormErrors.asset_tag}}</div>
+          </div>
+          <div *ngIf="bareMetalServerForm.get('collector')" class="form-group col-6"  formGroupName="collector">
+            <label class="font-col-form-label" for="collectoruuid">Collector<em>*</em></label>
+            <select id="collectoruuid" class="form-control" formControlName="uuid"
+              [class.is-invalid]="bareMetalServerFormErrors.collector.uuid">
+              <option value="" disabled>Select Collector</option>
+              <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.collector.uuid">{{bareMetalServerFormErrors.collector.uuid}}</div>
+          </div>
+          
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="life_cycle_stage">Life Cycle Stage</label>
+            <select class="form-control" id="life_cycle_stage" formControlName="life_cycle_stage"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.life_cycle_stage}">
+              <option [value]="''" disabled>Select Life Cycle Stage</option>
+              <option *ngFor="let stage of lifeCycleStageOptions" [value]="stage"> {{stage}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.life_cycle_stage">
+              {{bareMetalServerFormErrors.life_cycle_stage}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="life_cycle_stage_status">Life Cycle Stage Status</label>
+            <select class="form-control" id="life_cycle_stage_status" formControlName="life_cycle_stage_status"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.life_cycle_stage_status}">
+              <option [value]="''" disabled>Select Life Cycle Stage Status</option>
+              <option *ngFor="let status of lifeCycleStageStatusOptions" [value]="status"> {{status}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.life_cycle_stage_status">
+              {{bareMetalServerFormErrors.life_cycle_stage_status}}</div>
+          </div>
+
+          <unity-devices-custom-attributes-crud [deviceType]="deviceType" [deviceAttrs]="bareMetalServerForm?.get('custom_attribute_data')?.value" class="w-100"></unity-devices-custom-attributes-crud>
+          <div class="form-group col-12">
+            <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+              <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+              </tag-input-dropdown>
+            </tag-input>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="bmc_type">BM Controller Type<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'BareMetal Out of Band Management(OBM) Interface\nEx. Dell Server: iDRAC, Supermicro Server: IPMI, Others: None'"></i>
+            <select class="form-control" id="bmc_type" formControlName="bmc_type"
+              [ngClass]="{'is-invalid' : bareMetalServerFormErrors.bmc_type}">
+              <option [value]="''" disabled>Select</option>
+              <option [value]="BMPlatFormMappingEnum.IPMI">{{BMPlatFormMappingEnum.IPMI}}</option>
+              <option [value]="BMPlatFormMappingEnum.DRAC">{{BMPlatFormMappingEnum.DRAC}}</option>
+              <option [value]="BMPlatFormMappingEnum.None">{{BMPlatFormMappingEnum.None}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="bareMetalServerFormErrors.bmc_type">
+              {{bareMetalServerFormErrors.bmc_type}}</div>
+          </div>
+        </div>
+      </form>
+
+      <form *ngIf="IPMIForm" [formGroup]="IPMIForm">
+        <div class="row">
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="ip">IP<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'Out of Band Management Interface IP(IPMI IP)'"></i>
+            <input id="ip" class="form-control" type="text" formControlName="ip"
+              [ngClass]="{'is-invalid' : IPMIFormErrors.ip}">
+            <div class="invalid-feedback" *ngIf="IPMIFormErrors.ip">{{IPMIFormErrors.ip}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="proxy_url">Proxy URL<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'URL to access Outof band Management Interface\nEx: https://example.domain.com'"></i>
+            <input id="proxy_url" class="form-control" type="text" formControlName="proxy_url"
+              [ngClass]="{'is-invalid' : IPMIFormErrors.proxy_url}">
+            <div class="invalid-feedback" *ngIf="IPMIFormErrors.proxy_url">{{IPMIFormErrors.proxy_url}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="username">Username<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'IPMI Username'"></i>
+            <input id="username" class="form-control" type="text" formControlName="username"
+              [ngClass]="{'is-invalid' : IPMIFormErrors.username}">
+            <div class="invalid-feedback" *ngIf="IPMIFormErrors.username">{{IPMIFormErrors.username}}</div>
+          </div>
+          <div class="form-group col-6" *ngIf="IPMIForm.controls.password">
+            <label class="form-col-form-label" for="password">Password<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'IPMI Password'"></i>
+            <input id="password" class="form-control" type="password" formControlName="password"
+              [ngClass]="{'is-invalid' : IPMIFormErrors.password}">
+            <div class="invalid-feedback" *ngIf="IPMIFormErrors.password">{{IPMIFormErrors.password}}</div>
+          </div>
+        </div>
+      </form>
+
+      <form *ngIf="DRACForm" [formGroup]="DRACForm">
+        <div class="row">
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="version">DRAC Version<em>*</em></label>
+            <select class="form-control" id="version" formControlName="version"
+              [ngClass]="{'is-invalid' : DRACFormErrors.version}">
+              <option [value]="''" disabled>Select</option>
+              <option [value]="'5'">5</option>
+              <option [value]="'6'">6</option>
+              <option [value]="'7'">7</option>
+              <option [value]="'8'">8</option>
+              <option [value]="'9'">9</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="DRACFormErrors.version">{{DRACFormErrors.version}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="proxy_url">Proxy URL<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'URL to access Outof band Management Interface\nEx: https://example.domain.com'"></i>
+            <input id="proxy_url" class="form-control" type="text" formControlName="proxy_url"
+              [ngClass]="{'is-invalid' : DRACFormErrors.proxy_url}">
+            <div class="invalid-feedback" *ngIf="DRACFormErrors.proxy_url">{{DRACFormErrors.proxy_url}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="ip">IP<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'Out of Band Management Interface IP(DRAC IP)'"></i>
+            <input id="ip" class="form-control" type="text" formControlName="ip"
+              [ngClass]="{'is-invalid' : DRACFormErrors.ip}">
+            <div class="invalid-feedback" *ngIf="DRACFormErrors.ip">{{DRACFormErrors.ip}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="username">Username<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'DRAC Username'"></i>
+            <input id="username" class="form-control" type="text" formControlName="username"
+              [ngClass]="{'is-invalid' : DRACFormErrors.username}">
+            <div class="invalid-feedback" *ngIf="DRACFormErrors.username">{{DRACFormErrors.username}}</div>
+          </div>
+          <div class="form-group col-6" *ngIf="DRACForm.controls.password">
+            <label class="form-col-form-label" for="password">Password<em>*</em></label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'DRAC Password'"></i>
+            <input id="password" class="form-control" type="password" formControlName="password"
+              [ngClass]="{'is-invalid': DRACFormErrors.password}">
+            <div class="invalid-feedback" *ngIf="DRACFormErrors.password">{{DRACFormErrors.password}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="createBMServer()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="bareMetalServerModelRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmBareMetalServerDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This Bare Metal Server will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmBareMetalServerDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmBareMetalServerDeleteModalRef.hide()"
+        type="button">No</button>
+    </div>
+  </div>
+</ng-template>

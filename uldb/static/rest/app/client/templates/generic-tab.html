@@ -1,0 +1,312 @@
+<div class="page_wrapper" ng-show="(!showConsole)" style="float:left">
+    <loading object="{{model.results}}"></loading>
+    <table-search-widget ng-show="model.results !== undefined"></table-search-widget>
+    <div class="bg-color">
+      <section ng-if="model.results !== undefined" id="no-more-tables" class="margintop20">
+        <table infinite-scroll='loadPageData()' ng-if="model.results.length > 0" id="example" class="example table  table-condensed cf">
+          <thead class="cf">
+          <tr>
+            <th ng-repeat="f in fields" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''"
+              custom-sort order="{{ f.name }}" sortdisabled= "{{f.is_sort_disabled}}" sort="sort">
+              <span ng-if="f.hide === undefined" class="{{f.name}}">{{ f.description }}</span>
+            </th>
+            <th class="numeric">Manage</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="result in model.results">
+            <td ng-repeat="f in fields" ng-if="!(f.hide)" ng-switch="f.opaque">
+              <div ng-switch-when="link">
+                <a ng-click="show_details(result)">{{ linkify(result, f).text }}</a>
+              </div>
+
+              <div ng-if="f.name=='device_status'">
+                <span ng-if="angular.isObject(result.observium_details) && !angular.isDefined(result.observium_details.device_data)">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span>
+
+                <span ng-if="!angular.isObject(result.observium_details)">
+                  <device-not-configured></device-not-configured>
+                </span>
+                <span ng-if="angular.isObject(result.observium_details) && angular.isDefined(result.observium_details.device_data)">
+                    <span ng-if="result.observium_details.device_data.status == 1"> 
+                        <device-up></device-up>
+                    </span>
+                    <span ng-if="result.observium_details.device_data.status == 0"> 
+                        <device-down></device-down>
+                    </span>
+                </span>
+              </div>
+
+
+              <div ng-switch-when="stringTransform" ng-if="is_observium_enabled">
+                  <a ng-if="f.name== 'name'" tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                  popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                  ng-init="get_observium_details(result)" ng-click="show_observium_details(result)">{{ desub(result, f) }}</a>
+
+                  <span ng-if="f.name!= 'name'"> {{ desub(result, f) }} </span>
+              </div>
+
+              <div ng-switch-when="stringTransform" ng-if="!is_observium_enabled">{{ desub(result, f) }}</div>
+              
+              <div ng-switch-when="choices">{{ result[f.name] }}</div>
+              <div ng-switch-when="arbitraryLink">{{ f.func(result) }}</div>
+              <div ng-switch-when="multiple">
+                <div ng-repeat="r in result[f.name]">
+                <p><a ng-if='f.uriPrefix' href="{{ f.uriPrefix }}{{r[f.idField]}}">{{ r.name }}</a><span ng-if='!f.uriPrefix'>{{ r.name }}</span></p>
+                </div>
+              </div>
+              <div ng-switch-when="newType"><uldb-field result="result" field="f"></uldb-field></div>
+              <div ng-switch-default>{{ result[f.name] }}</div>
+            </td>
+            <td>
+                <div class="action-icons">
+                  <span>
+                      <!-- Same Tab Starts -->
+                      <span tooltip-class="customClass" uib-tooltip="{{ result.is_shared ? 'Non Manageable shared Device' : 'Manage in Same Tab' }}" >
+                         <div class="btn-group">
+                             <a class="dropdown-toggle" data-toggle="dropdown" ng-class="{'disabled': result.is_shared}">
+                                 <span class="fa fa-external-link-square" ng-class="{'fa-disabled': result.is_shared }"></span>
+                             </a>
+                             <ul class="dropdown-menu padding12px" role="menu">
+                                 <li>
+                                     <span>
+                                        <span tooltip-class="customClass" tooltip-enable="{{ result.is_shared }}" uib-tooltip="{{ result.is_shared ? 'Non Manageable shared Device' : 'Manage in Same Tab'}}">
+                                            <a class="dropdown-item" ng-class="{'disabled': result.is_shared}" ng-click="updateActivityLog($index, result.uuid, 'firewalls')" href="#/cisco-firewall/{{ p.uuid }}/">Web Access</a>
+                                        </span>
+                                     </span>
+                                 </li>
+                                 <div class="dropdown-divider"></div>
+                                 <li>
+                                     <span tooltip-class="customClass" tooltip-enable="{{ result.is_shared || (!result.is_shared && !result.management_ip)}}" uib-tooltip="{{ result.is_shared ? 'Non Manageable shared Device' : (result.management_ip ? 'Manage in Same Tab' : 'Device not Configured')}}">
+                                         <a class="dropdown-item" ng-click="ConsoleSameTab($index, result.uuid)" ng-class="{'fa-disabled': result.is_shared || ! result.management_ip}">
+                                            Console Access
+                                         </a>
+                                     </span>
+                                 </li>
+                             </ul>
+                         </div>
+                      </span>
+                      <!-- Same Tab Ends -->
+
+                      <!-- New Tab Starts -->
+                      <span tooltip-class="customClass" uib-tooltip="{{ result.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab' }}" >
+                         <div class="btn-group">
+                             <a class="dropdown-toggle" data-toggle="dropdown" ng-class="{'disabled': result.is_shared}">
+                                 <span class="fa fa-external-link" ng-class="{'fa-disabled': result.is_shared}"></span>
+                             </a>
+                             <ul class="dropdown-menu padding12px" role="menu">
+                                 <li>
+                                     <span>
+                                         <span tooltip-class="customClass" tooltip-enable="{{ result.is_shared }}" uib-tooltip="{{ result.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab'}}">
+                                             <a class="dropdown-item" ng-class="{'fa-disabled': result.is_shared}" href="{{ result.proxy.proxy_fqdn }}" ng-click="updateActivityLog($index, result.uuid, 'firewalls')" target="_blank">Web Access</a>
+                                         </span>
+                                     </span>
+                                 </li>
+                                 <div class="dropdown-divider"></div>
+                                 <li>
+                                     <span tooltip-class="customClass" tooltip-enable="{{ result.is_shared || (!result.is_shared && !result.management_ip)}}" uib-tooltip="{{ result.is_shared  ? 'Non Manageable shared Device' : (result.management_ip ? 'Manage in New Tab' : 'Device not Configured')}}">
+                                         <a class="dropdown-item" ng-class="{'fa-disabled': result.is_shared || ! result.management_ip}"
+                                            href="/vm-console-client#/firewalls/webconsole/{{ result.uuid }}/" target="_blank">Console Access</a>
+                                     </span>
+                                 </li>
+                             </ul>
+                         </div>
+                      </span>
+                      <!-- New Tab Ends -->
+
+                      <!-- Obbservium Stats Starts -->
+                      <span tooltip-class="customClass" ng-if="is_observium_enabled" uib-tooltip="{{result.message}}">
+                          <a ng-click="show_firewall_statistics(result.uuid)" ng-if="result.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="result.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                      </span>
+                      <!-- Obbservium Stats Ends -->
+
+                      <!-- Manage by support -->
+                      <span>
+                          <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                             href="" ng-click="ctrl.manage_request(result.name, 'Firewall', result.model, 'Cisco')"></a>
+                      </span>
+                      <!-- Manage by support Ends -->
+                  </span>
+               </div>
+            </td>
+
+          </tr>
+          </tbody>
+        </table>
+        <div ng-if="model.results.length === 0" class="content-wrapper margin_top85px">
+            <no-records-found message="No {{title.plural}} to display"></no-records-found>
+        </div>
+      </section>
+    </div>
+</div>
+
+
+<div ng-show="(showConsole)" class="page_wrapper" style="float:left">
+  <span id="vm_error"  style="color:red"></span>
+
+  <div id="terminal-container" style="position:absolute;width:100%;height:100%;top:0;left:0"><span class="fa fa-times-circle pull-right boxclose" ng-click="close_console()"></span></div>
+</div>
+
+
+
+
+<style type="text/css">
+    .popover{
+        width : 28%;
+        max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    }
+
+    .cg-busy {
+        top : 0px !important;
+        left : 0px !important;
+    }
+</style>
+
+<script type="text/ng-template" id="vmAuthentcicate.html">
+  <div class="modal-content">
+    <form role="form" name="modalform">
+      <div class="modal-header">
+          <h4 class="modal-title">{{device_type}} Authenticate</h4>
+      </div>
+      <div class="modal-body" cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}" style="padding:20px 40px;">
+         <div class="modal-form">
+                <div class="form-group" ng-if="errorMsg">
+                  <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+                </div>
+                <div class="form-group" ng-if="disableAccess != undefined">
+                  <label style="color:red" class="col-sm-10">Management IP Address not Assigned.</label>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="disableAccess == undefined">
+                    <div class="paddingR">
+                        <div class="form-group">
+                          <label for="request.hostname" class="col-sm-2 control-label">
+                            IP Address
+                          </label>
+
+                          <div>
+                             <input type="text"
+                                   class="form-control"
+                                   ng-model="request.hostname"
+                                   placeholder="Hostname" disabled>
+                                   <!-- {#management_ip#} -->
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.port" class="col-sm-2 control-label">
+                            Port Number
+                          </label>
+
+                          <div>
+                            <input type="number"
+                                   min=0
+                                   class="form-control"
+                                   ng-model="request.port"
+                                   placeholder="Port Number">
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.username">
+                            Username*
+                          </label>
+                          <span class="errormsg" ng-if="loginUsernameErrMsg">{{loginUsernameErrMsg}}</span>
+
+                          <div>
+                            <input type="text"
+                                   class="form-control"
+                                   ng-model="request.username"
+                                   placeholder="Username"
+                                   autofocus
+                                   ng-class="{'has-error_inputbox': loginUsernameErr }" />
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="request.password">
+                            Password*
+                          </label>
+                          <span class="errormsg" ng-if="loginPasswordErrMsg">{{loginPasswordErrMsg}}</span>
+
+                          <div>
+                            <input type="password"
+                                   class="form-control"
+                                   ng-model="request.password"
+                                   placeholder="Password"
+                                   ng-class="{'has-error_inputbox': loginPasswordErr}" />
+                          </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+      </div>
+      <div class="modal-footer modal-buttons">  
+          <div class="modal-footer modal-buttons" ng-if="disableAccess == undefined">
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                Close
+              </button>
+              <button type="submit" class="btn btn-default" ng-click="create(request)">
+                Login
+              </button>
+          </div>
+      </div>
+    </form>
+  </div>
+</script>
+
+<script type="text/ng-template" id="devicedetailstemplate.html">
+    <div class="row">
+        <table class="table"  ng-show="device_details.device_data">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div>Uptime</div>
+                    </th>
+                    <td class="table_no_top_border">
+                        <div ng-if="device_details.device_data.status == 1">{{device_details.device_data.uptime | unityObserviumTime}}</div>
+                        <div ng-if="device_details.device_data.status == 0">Down {{device_details.device_data.uptime | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4">
+                        <div>Last reboot</div>
+                    </th>
+                    <td>
+                        <div>{{device_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="angular.isDefined(device_details) && (device_details === null)" style="padding : 20px">
+            <p>{{ $root.monitoring_not_enabled_msg }}</p>
+        </div>
+    </div>
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

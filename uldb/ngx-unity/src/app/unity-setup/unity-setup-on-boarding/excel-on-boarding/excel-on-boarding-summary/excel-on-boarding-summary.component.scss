@@ -1,0 +1,53 @@
+@import "variables";
+
+.summary-icons {
+    &-hypervisor {
+        background-color: $hypervisor;
+        color: $white;
+    }
+    &-bms {
+        background-color: $bms;
+        color: $white;
+    }
+    &-firewalls {
+        background-color: $firewalls;
+        color: $white;
+    }
+    &-lbs {
+        background-color: $lbs;
+        color: $white;
+    }
+    &-switches {
+        background-color: $switches;
+        color: $white;
+    }
+    &-storage {
+        background-color: $storage;
+        color: $white;
+    }
+    &-mac {
+        background-color: $otherdev;
+        color: $white;
+    }
+    &-pdu {
+        background-color: $pdus;
+        color: $white;
+    }
+
+    &-mobile {
+        background-color: $vms;
+        color: $white;
+    }
+    &-dcs {
+        background-color: $database;
+        color: $white;
+    }
+    &-cabinet {
+        background-color: $cabinets;
+        color: $white;
+    }
+    &-database {
+        background-color: $database;
+        color: $white;
+    }
+}

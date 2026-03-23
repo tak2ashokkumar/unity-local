@@ -1,0 +1,154 @@
+<loading loader="{{loader}}"></loading>
+
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="tabstyles tabs-level2">
+            <div id="tabs-ui-171882" class="mytabsclass">
+                <uib-tabset active="activetabindex">
+                    <uib-tab active="activetabindex==$index" ng-repeat="tab in tabs" heading="{{tab.displayName}}" select="manageInventoryTabs(tab,$index)"></uib-tab>
+                </uib-tabset>
+                <div class="bg-color">
+                    <!-- <awsgenerictable ng-if="(activetab.name === 'users')"
+                        heading="Users"
+                        displayheading="Users"
+                        selectedregion="region_name_float"
+                        headers="aws_user_list_headers"
+                        tabledata="aws_user_list_content.data"
+                        addclick="aws_dashboard_add(data)"
+                        addclick1="showUserGroups(data1)"
+                        addclick2="showUserData(data2)"
+                        actions="aws_user_list_content.actions">
+                    </awsgenerictable> -->
+                    <awsuserlist ng-if="(activetab.name === 'users')"></awsuserlist>
+                    <!-- <awsgenerictable ng-show="(activetab.name === 'instances')"
+                        heading="Instances"
+                        displayheading="Instances"
+                        selectedregion="region_name_float"
+                        addbuttonname = "Create Instance"
+                        headers="aws_instance_list_headers"
+                        tabledata="aws_instance_list_content.data"
+                        click="aws_list_click(data)"
+                        modeldata="aws_create_instance_modaldata"
+                        rows="create_aws_instance_dropdowns"
+                        addclick="aws_instance_add(data)"
+                        switches="aws_switches(args)"
+                        actions="aws_instance_list_content.actions"
+                        modeldata1="aws_clone_instance_modaldata"
+                        addclick1="aws_clone_instance_add(data1)"
+                        modeldata3="aws_create_image_modaldata"
+                        addclick3="aws_image_add(data3)"
+                        modeldata4="aws_attachinstance_modaldata"
+                        rows4="aws_attachinstance_dropdowns"
+                        addclick4="attach_autoscaling_group(data4)"
+                        modeldata5="aws_attachinterface_modaldata"
+                        rows5="aws_attachinterface_dropdowns"
+                        addclick5="attach_network_interface(data5)"
+                        modeldata6="aws_attachloadbalancer_modaldata"
+                        rows6="aws_attachloadbalancer_dropdowns"
+                        addclick6="attach_loadbalancer(data6)"
+                        deleteclick="aws_switches(data)"
+                        deleteconfirm="aws_vm_operations"
+                        getobserviumdetails = "get_observium_details(device)"
+                        showobserviumstats = "show_awsvm_statistics(device)">
+                    </awsgenerictable> -->
+                    <awsinstancelist ng-show="(activetab.name === 'instances')"></awsinstancelist>
+                    <!-- <awsgenerictable ng-show="(activetab.name === 'snapshots')"
+                        heading="Snapshots"
+                        displayheading="Snapshots"
+                        selectedregion="region_name_float"
+                        headers="aws_snapshot_list_headers"
+                        tabledata="aws_snapshot_list_content.data"
+                        modeldata1="aws_snapshot_list_modeldata"
+                        rows="aws_snapshot_list_rows"
+                        addclick1="aws_copy_snapshot(data1)"
+                        actions="aws_snapshot_list_content.actions">
+                    </awsgenerictable> -->
+                    <awssnapshotlist ng-show="(activetab.name === 'snapshots')" ></awssnapshotlist>
+                    <!-- <awsgenerictable ng-show="(activetab.name === 'volumes')"
+                        heading="Volumes"
+                        displayheading="Volumes"
+                        selectedregion="region_name_float"
+                        headers="aws_volume_list_headers"
+                        tabledata="aws_volume_list_content.data"
+                        modeldata="aws_dashboard"
+                        rows="aws_dashboard_rows"
+                        addclick="aws_dashboard_add(data)"
+                        actions="aws_volume_list_content.actions">
+                    </awsgenerictable> -->
+                    <awsvolumeslist ng-show="(activetab.name === 'volumes')"></awsvolumeslist>
+                    <awsgenerictable ng-show="(activetab.name === 'availablevolumes')"
+                        heading="Available Volumes"
+                        displayheading="Available Volumes"
+                        selectedregion="region_name_float"
+                        headers="aws_available_volume_list_headers"
+                        tabledata="aws_availablevolume_list_content.data.data"
+                        modeldata="aws_dashboard"
+                        rows="aws_dashboard_rows"
+                        addclick="aws_dashboard_add(data)"
+                        actions="aws_loadbalancer_list_content.actions">
+                    </awsgenerictable>
+
+                    <awss3buckets ng-show="(activetab.name === 's3')"></awss3buckets>
+                    <!-- <awsgenerictable ng-show="(activetab.name === 'policies')"
+                        heading="Policies"
+                        displayheading="Policies"
+                        selectedregion="region_name_float"
+                        headers="aws_policy_list_headers"
+                        tabledata="aws_policy_list_content.data"
+                        addclick1="showUserData(data1)"
+                        switches="aws_switches(args)"
+                        actions="aws_policy_list_content.actions">
+                    </awsgenerictable> -->
+                    <!-- <awsgenerictable ng-show="(activetab.name === 'autoscalinggroups')"
+                        heading="Auto Scaling Groups"
+                        displayheading="Auto Scaling Groups"
+                        selectedregion="region_name_float"
+                        headers="aws_asg_headers"
+                        tabledata="aws_asg_list_content.data"
+                        modeldata=""
+                        rows=""
+                        addclick=""
+                        actions="">
+                    </awsgenerictable> -->
+                    <awsautoscalinggrplist ng-show="(activetab.name === 'autoscalinggroups')"></awsautoscalinggrplist>
+                    <!-- <awsgenerictable ng-show="(activetab.name === 'securitygroups')"
+                        heading="Security Groups"
+                        displayheading="Security Groups"
+                        selectedregion="region_name_float"
+                        headers="aws_security_group_headers"
+                        tabledata="aws_security_group_content.data">
+                    </awsgenerictable> -->
+                    <awssecuritygrplist ng-show="(activetab.name === 'securitygroups')"></awssecuritygrplist>
+                    
+                    <div ng-show="(activetab.name === 'devices')" class="content-wrapper">
+                        <!-- <awsgenerictable 
+                            heading="Load Balancers"
+                            displayheading="Load Balancers"
+                            selectedregion="region_name_float"
+                            headers="aws_load_balancer_list_headers"
+                            tabledata="aws_loadbalancer_list_content.data"
+                            modeldata="aws_dashboard"
+                            rows="aws_dashboard_rows"
+                            addclick="aws_dashboard_add(data)"
+                            actions="aws_loadbalancer_list_content.actions">
+                        </awsgenerictable> -->
+                        <awslblist></awslblist>
+                        <!-- <awsgenerictable
+                            heading="Network Interfaces"
+                            displayheading="Network Interfaces"
+                            selectedregion="region_name_float"
+                            headers="aws_network_interface_headers"
+                            tabledata="aws_netinter_list_content.data"
+                            modeldata=""
+                            rows=""
+                            addclick=""
+                            actions="">
+                        </awsgenerictable> -->
+                        <awsnwinterfacelist></awsnwinterfacelist>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

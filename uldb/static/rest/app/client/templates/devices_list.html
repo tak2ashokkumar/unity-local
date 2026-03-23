@@ -1,0 +1,616 @@
+<style type="text/css">
+
+    .box {
+        /*box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.14);*/
+    }
+
+    .box h3 {
+        color: #e48c11;
+        border-color: #ddd;
+        border-bottom: 1px solid transparent;
+        border-top-right-radius: 3px;
+        border-top-left-radius: 3px;
+        background-repeat: repeat-x;
+        display: block;
+        font-size: 16px;
+        /*padding: 10px;*/
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    /*.box-grey h3 {
+        color: #31708f;
+        background-color: #F4F6F6;
+        border-color: #bce8f1;
+    }*/
+
+   .red-color{
+        color: red;
+        font-size: 8px;
+   }
+
+   .center-align{
+        text-align:center
+   }
+
+   .card {
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        transition: 0.3s;
+        width: 100%;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    }
+
+    .card-container {
+        padding: 4px 4px 4px 4px;
+        text-align: center;
+    }
+
+    .normal {
+        background-color:#007E33;
+    }
+
+    /* light traffic lights*/
+    /*card.danger {
+        background-color:#ff4444;
+    }
+
+    .card.normal {
+        background-color:#00C851;
+    }
+
+    .card.warning {
+        background-color:#ffbb33;
+    }*/
+
+    /* Dark Traffic Lights*/
+    .card.danger {
+        background-color:#CC0000;
+    }
+
+    .card.normal {
+        background-color:#007E33;
+    }
+
+    .card.warning {
+        background-color:#ff8800;
+    }
+
+    /* Unity Green */
+    .card.normal {
+         background-color:#0bbb71;
+    }
+
+    .purple {
+        font-size: 10px;
+        color: #ad7fe9;
+    }
+
+    .yellow {
+        color: #f2b53f;
+        font-size: 10px;
+    }
+
+    .lightcolor {
+        font-size: 10px;
+    }
+
+    .wtitle {
+        font-size: 10px;
+        color: black;
+    }
+
+    .green {
+        color: #009688;
+        font-size: 8px;
+    }
+
+    .section {
+        color: #e48c11;
+        font-size: 12px;
+    }
+
+    .white-text{
+        color: #FFF;
+        font-size: 11px;
+        margin: 0px 0px 3px;
+    }
+
+    .advancedDemo .dropzone .itemlist > li {
+        border: none;
+        border-radius: .25em;
+        color: #fff;
+        font-weight: 700;
+        /*margin: 10px;*/
+        padding-top: 10px;
+        text-align: center;
+        min-width: 80px;
+    }
+
+    .advancedDemo .dropzone ul[dnd-list] {
+        /*background-color: #F4F6F6;
+        margin: 0px;
+        padding-left: 10px;*/
+    }
+
+    .advancedDemo .dropzone li.group_item {
+        display: block;
+        margin-top: 20px;
+    }
+
+    .advancedDemo .dropzone .dndDragging {
+        opacity: 0.7;
+    }
+
+    .advancedDemo .dropzone .dndDraggingSource {
+        opacity: 0.5;
+    }
+
+    .advancedDemo .dropzone .dndPlaceholder {
+        display: block;
+    }
+
+    .advancedDemo .dropzone .itemlist {
+        min-height: 80px !important;
+    }
+
+    .remove_device_icon {
+        background: #a9a9a9 none repeat scroll 0 0 !important;
+        border-radius: 20px;
+        display: block;
+        line-height: 12px;
+        padding: 0.2em 0.5em;
+        position: absolute;
+        right: 9%;
+        top: 20%;
+        color: #FFFFFF;
+        font-size: 9px;
+    }
+
+    .edit_group_icon {
+        background: #a9a9a9
+        none repeat scroll 0 0 !important;
+        border-radius: 20px;
+        padding: 0.2em 0.1em;
+        color: #FFFFFF;
+        font-size: 14px;
+    }
+
+    .edit_group_icon .fa {
+        margin-left: 5px;
+    }
+
+    .remove_group_icon {
+        background: #a9a9a9
+        none repeat scroll 0 0 !important;
+        border-radius: 20px;
+        padding: 0.2em 0.4em;
+        color: #FFFFFF;
+        font-size: 14px;
+        margin-left: 3px;
+    }
+
+    .cg-busy {
+        z-index : 1090;
+    }
+
+    .tooltip.status_time {
+        width: 150%;
+    }
+
+    .col-xs-3 .tooltip.status_time {
+        width: 300%;
+    }
+
+    .fa_loader {
+        padding: 20px;
+    }
+
+    .fa_loader .fa {
+        font-size: 25px;
+        color: black;
+    }
+
+    .itemlist .cards_section .col-xs-3 .white-text{
+        font-size: 9px;
+        margin-bottom: 5px;
+    }
+
+    .dashed_border .dropzone li.group_item {
+        border : 1px dashed #ccc;
+    }
+
+    .dashed_border .dropzone li .container-element{
+        padding : 5px;
+    }
+
+    .cards_section {
+        height: 40px;
+        /*background-color:#009688;*/
+    }
+
+    .margin_top5px {
+        margin-top: -1px;
+    }
+
+    .advancedDemo .dropzone .dndDragging {
+        opacity: 0.7;
+    }
+
+    .advancedDemo .dropzone .dndDraggingSource {
+        opacity: 0.5;
+    }
+
+    /*.advancedDemo .dropzone .dndPlaceholder {
+        background-color: #fff !important;
+        display: inline-block;
+        min-height: 50px;
+        width: 20%
+    }*/
+
+
+
+
+    .panel-group [type="checkbox"]:not(:checked),
+    .panel-group [type="checkbox"]:checked {
+          position: absolute;
+          left: -9999px;
+    }    
+    .panel-group [type="checkbox"]:not(:checked) + label,
+    .panel-group [type="checkbox"]:checked + label {
+          position: relative;
+          padding-left: 1.95em;
+          cursor: pointer;
+          /*cursor: default;*/
+    }    
+    .panel-group [type="checkbox"]:not(:checked) + label:before,
+    .panel-group [type="checkbox"]:checked + label:before {
+          content: '';
+          position: absolute;
+          left: 0; top: -2px;
+          width: 1.50em;
+          height: 1.50em;    
+          border: 2px solid #ccc;
+          background: #fff;
+          border-radius: 4px;
+          box-shadow: inset 0 1px 3px rgba(0,0,0,.1);
+    }    
+    .panel-group [type="checkbox"]:not(:checked) + label:after,
+    .panel-group [type="checkbox"]:checked + label:after {
+          content: '✔';
+          position: absolute;
+          top: .1em;
+          left: .2em;
+          font-size: 1.3em;
+          line-height: 0.8;
+          color: #09ad7e;
+          transition: all .2s;
+    }    
+    .panel-group [type="checkbox"]:not(:checked) + label:after {
+          opacity: 0;
+          transform: scale(0);
+    }
+    .panel-group [type="checkbox"]:checked + label:after {
+          opacity: 1;
+         transform: scale(1);
+    }    
+    .panel-group [type="checkbox"]:disabled:not(:checked) + label:before,
+    .panel-group [type="checkbox"]:disabled:checked + label:before {
+          box-shadow: none;
+          border-color: #bbb;
+          background-color: #ddd;
+    }    
+    .panel-group [type="checkbox"]:disabled:checked + label:after,
+    .panel-group [type="checkbox"]:disabled:checked + label:hover:before:after {
+          color: #999;
+          border: none;
+    }    
+    .panel-group [type="checkbox"]:disabled + label {    
+          color: #aaa;
+          cursor: default;
+    }    
+    .panel-group label {
+        /* margin-top: 20px; */
+       /* margin-left: 20px; */
+       margin-bottom: 10px;
+    }
+
+    .panel-group label span {
+        max-width: 100%;
+        word-break: break-all;
+    }
+
+    /*.modal-lg {
+        width: 70% !important;
+    }*/
+
+    .add_device_modal .modal-content {
+        width: 90%;
+    }
+
+    .add_device_modal .modal-body {
+        /*min-height: 300px;*/
+        padding: 20px 40px;
+        padding-bottom: 0px;
+    }
+
+    ul.dropdown-menu {
+        max-height: 250px;
+    }
+
+    .multi_select .btn-default {
+        color : black !important;
+        background-color: #fff !important;
+        border : 1px solid #ccc !important;
+        border-radius: 0px !important;
+    }
+
+    .multi_select ul li.active {
+        background-color: #ff9400 !important;
+    }
+
+    .multi_select .dropdown-menu>.active>a, .dropdown-menu>.active>a:focus, .dropdown-menu>.active>a:hover{
+        /*background-color: #ff9400 !important;*/
+        background-color: #49546b;
+    }
+
+</style>
+
+<loading loader="{{loader}}"></loading>
+
+<div class="row" ng-if="(groups.length > 0) && (angular.isDefined(view_mode) && !view_mode)">
+    <button class="btn pull-right white-text normal" ng-click="add_new_group_model()"> Add Group </button>
+</div>
+
+<div class="row"  ng-show="(groups.length === 0)">
+    <div style="margin:30px 15px 0 15px;" class="no-record no-record-warning">
+        <span class="no-record-icon fa fa-info-circle"></span>
+        <span class="no-record-text">&nbsp;&nbsp;No Groups Created Yet. 
+            <a ng-click="add_new_group_model()" style="color:#5589d0; cursor:pointer;"> click here</a> 
+        to create</span>
+    </div>
+</div>
+
+<div class="advancedDemo row" style="line-height:unset;margin-top:-20px;" ng-show="groups.length > 0" 
+    ng-class="{'dashed_border' : (angular.isDefined(view_mode) && !view_mode)}">
+    <div class="col-md-12" ng-repeat="dashboard in  dashboards">
+        <div class="dropzone box box-yellow">
+            <ul dnd-list="groups"
+                dnd-allowed-types="['group']"
+                dnd-external-sources="true"
+                dnd-effect-allowed="move"
+                dnd-disable-if="view_mode"
+                dnd-dragover="groupDragoverCallback(index, external, type)"
+                dnd-drop="groupDropCallback(index, item, external, type)"
+                dnd-inserted="groupInsertCallback(dropEffect, index, item, group)">
+                <li ng-repeat="(key, group) in groups"
+                    dnd-draggable="group"
+                    dnd-type="'group'"
+                    dnd-effect-allowed="move"
+                    dnd-dragstart="groupDragStartCallback($index, group)"
+                    dnd-moved="groups.splice($index, 1)"
+                    dnd-callback='group.devices.length'
+                    dnd-dragend="groupDNDCompleteCallback(dropEffect, $index, group)"
+                    class="group_item">
+                    <div class="container-element box box-grey" ng-init="get_devices_for_group(group)">
+                        <div class="row">
+                            <h3 class="section cousor_pointer">
+                                {{group.name}}
+                                <span class="edit_group_icon" ng-if="(angular.isDefined(view_mode) && !view_mode)" ng-click="edit_group_modal(key,group)">
+                                    <i class="fa fa-pencil"></i>
+                                </span>
+                                <span class="remove_group_icon" ng-if="(angular.isDefined(view_mode) && !view_mode)" ng-click="delete_group_modal($index,group)">
+                                    <i class="fa fa-close"></i>
+                                </span>
+                            </h3>
+                        </div>
+                        <ul dnd-list="group.devices"
+                            dnd-allowed-types="['device']"
+                            dnd-horizontal-list="true"
+                            dnd-external-sources="true"
+                            dnd-effect-allowed="move"
+                            dnd-disable-if="view_mode"
+                            dnd-dragover="dragoverCallback()"
+                            dnd-drop="dropCallback($index, item, group)"
+                            dnd-inserted="deviceInsertCallback(dropEffect,index, item, group)"
+                            class="itemlist">
+                                <li class="col-xs-2"
+                                    ng-class="{'cousor_pointer' : (angular.isDefined(view_mode) && !view_mode)}" 
+                                    ng-repeat="device in group.devices"
+                                    dnd-draggable="device"
+                                    dnd-type="'device'"
+                                    dnd-effect-allowed="move"
+                                    dnd-moved="group.devices.splice($index, 1)"
+                                    dnd-dragend="dndCompleteCallback(dropEffect,$index,device,group)" style="display:inline; padding-right : 10px !important;">
+                                    <div class="row page_wrapper" >
+                                        <div class="col-xs-12" style="text-align: left;margin-bottom:-1px;">
+                                            <div class="row" style="padding:5px;">
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                <span ng-if="device.device_category === 'vmware'" ng-init="device_icon = get_device_icon(device.device_category)">
+                                                    <img src="static/fonts/SVGicons/{{ device_icon }}" style="height: 13px;">
+                                                </span>
+                                                <span ng-if="device.device_category !== 'vmware'" ng-init="device_icon = get_device_icon(device.device_category)">
+                                                    <i class="{{device_icon}}" ></i>
+                                                </span>
+                                                <span class="wtitle cousor_pointer" uib-tooltip="{{device.device_name.length > 20 ? device.device_name : ''}}" 
+                                                ng-class="{'no_pointer_events' : ((device.device_category === 'customdevice') || (device.device_category === 'custom_vm'))}">
+                                                    <a ng-click="show_device_stats(device)">{{device.device_name | strLimit: 24}}</a>
+                                                </span>
+                                            </div>
+                                            </div>
+                                            <div class="row cards_section">
+                                                <div ng-if="(device.device_category === 'customdevice')" ng-class="col-xs-12">
+
+                                                    <div  class="card" ng-class="device.status == ERROR_VALUE ? 'warning' : (device.status == 0 ? 'danger' : 'normal')"
+                                                          ng-init="device_uptime = getuptime(device)">
+                                                        <div class="card-container" uib-tooltip="{{ angular.isDefined(device_uptime) ? (device_uptime | unityObserviumTime) : ERROR_MESSAGE }}" tooltip-class="status_time">
+                                                            <p class="white-text" ng-class="margin_top5px">
+                                                                <i class="white" ng-if="device.status != ERROR_VALUE" ng-class="device.status === 0 ? 'fa fa-arrow-circle-down' : 'fa fa-arrow-circle-up' " aria-hidden="true"></i>
+                                                                <span ng-if="device.status == ERROR_VALUE">{{ device.status }}</span>
+                                                            </p>
+                                                            <h2 class="white-text"> Status </h2>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div ng-if="(device.device_category !== 'customdevice')" ng-class="(((device.device_category === 'vmware') || (device.device_category === 'vcloud')) ? 'col-xs-3' : 'col-xs-6')">
+
+                                                    <div  class="card" ng-class="device.device_category === 'vmware' ? (device.status == ERROR_VALUE ? 'warning' :
+                                                    (device.status == '0' ? (device.cpu == 'N/A'  ? 'danger' : 'normal') : 'normal')) :
+                                                    (device.status == ERROR_VALUE ? 'warning' : (device.status == '0' ? 'danger' : 'normal'))"
+                                                          ng-init="device_uptime = getuptime(device)">
+                                                        <div class="card-container" uib-tooltip="{{ angular.isDefined(device_uptime) ? (device_uptime | unityObserviumTime) : ERROR_MESSAGE }}" tooltip-class="status_time">
+                                                            <p class="white-text" ng-class="{'margin_top5px' : (device.device_category !== 'vmware') }">
+                                                                <i class="white" ng-if="device.status != ERROR_VALUE" ng-class="device.device_category === 'vmware' ? (device.status === '0' ? (device.cpu === 'N/A'  ? 'fa fa-arrow-circle-down' : 'fa fa-arrow-circle-up') : 'fa fa-arrow-circle-up') :
+                                                                (device.status === '0' ? 'fa fa-arrow-circle-down' : 'fa fa-arrow-circle-up')" aria-hidden="true"></i>
+                                                                <span ng-if="device.status == ERROR_VALUE">{{ device.status }}</span>
+                                                            </p>
+                                                            <h2 class="white-text"> Status </h2>
+                                                        </div>
+                                                    </div>
+
+                                                </div> 
+
+                                                <div class="col-xs-3" ng-if="(device.device_category === 'vmware') || (device.device_category === 'vcloud')">
+                                                    <div class="card" ng-class="device.cpu == ERROR_VALUE ? 'warning' : (device.status === '0' ? (device.cpu === 0  ? 'nagreybg' : 'normal') : 'normal')">
+                                                        <div class="card-container" uib-tooltip="{{ device.cpu == ERROR_VALUE ? ERROR_MESSAGE : '' }}" tooltip-class="status_time">
+                                                            <p class="white-text">{{device.cpu}} <span style="font-size:7px" ng-if="device.failed_alerts != ERROR_VALUE && (device.cpu!='N/A')">%</span></p>
+                                                            <h2 class="white-text"> CPU </h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-3" ng-if="(device.device_category === 'vmware') || (device.device_category === 'vcloud')">
+                                                    <div class="card" ng-class="device.memory == ERROR_VALUE ? 'warning' : (device.status == '0' ? (device.memory === 0  ? 'nagreybg' : ((device.memory > 90) ? 'danger' : 'normal')) : 'normal')">
+                                                        <div class="card-container" uib-tooltip="{{ device.memory == ERROR_VALUE ? ERROR_MESSAGE : '' }}" tooltip-class="status_time">
+                                                            <p class="white-text">{{device.memory}} <span style="font-size:7px" ng-if="device.failed_alerts != ERROR_VALUE && (device.memory!='N/A')">%</span></p>
+                                                            <h2 class="white-text">Memory</h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div ng-if="(device.device_category !== 'customdevice')" ng-class="(((device.device_category === 'vmware') || (device.device_category === 'vcloud')) ? 'col-xs-3' : 'col-xs-6')">
+                                                    <div class="card" ng-class="device.failed_alerts == ERROR_VALUE ? 'warning' : ((device.failed_alerts > 0) ? 'danger' : 'normal')">
+                                                        <div class="card-container" uib-tooltip="{{ device.failed_alerts == ERROR_VALUE ? ERROR_MESSAGE : '' }}" tooltip-class="status_time">
+                                                             <p class="white-text" ng-class="{'margin_top5px' : (device.device_category !== 'vmware') }">{{device.failed_alerts}}</p>
+                                                            <h2 class="white-text">Errors</h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="remove_device_icon" ng-if="(angular.isDefined(view_mode) && !view_mode)"
+                                         ng-click="delete_device_modal($index, group, device,  key)">
+                                            <i class="fa fa-close"></i>
+                                        </span>
+                                    </div>
+                                </li>
+                               
+                                <li class="col-xs-2" style="display:inline;padding-right:10px !important;"
+                                ng-show="!group.loading && ((angular.isDefined(view_mode) && !view_mode) || (group.devices.length === 0))">
+                                    <div class="row page_wrapper" >
+                                        <div class="col-xs-12" style="text-align: left">
+                                            <div class="row" style="padding:5px;">
+                                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="text-align:center">
+                                                    <span class="wtitle">
+                                                        <b>Add New Device</b>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="row" ng-click="add_device_modal(group)">
+                                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ng-scope" style="">
+                                                    <div class="card normal">
+                                                        <div class="card-container">
+                                                            <p class="white-text" style="padding:4px">
+                                                                <i class="fa fa-plus white" aria-hidden="true" style="font-size:20px;"></i>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+				                <li class="col-xs-12 fa_loader" style="text-align: center" ng-show="group.loading">
+                                	<i class="fa fa-spinner fa-spin"></i>
+                            	</li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<deletemodal visible="show_delete_confirm_modal"></deletemodal>
+
+
+<script type="text/ng-template" id="add_group_modal.html">
+    <form role="form" name="add_group_form" ng-submit="add_group_form.$valid && manage_group_data(group)" novalidate>
+        <div class="modal-header">
+            <h3 class="modal-title">Add Group </h3>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="form-group" ng-class="{'has-error' : add_group_form.$submitted && add_group_form.group_name.$invalid}">
+                    <label for="group_name">Group Name : *</label>
+                    <span ng-if="add_group_form.$submitted && add_group_form.group_name.$invalid" class="errormsg"> &nbsp; Group Name is required </span>
+                    <input type="text" class="form-control" id="group_name" name="group_name" ng-model="group.name" required>
+                </div>
+                <div class="form-group">
+                    <label for="group_desc">Group Description : </label>
+                    <textarea class="form-control" rows="5" id="group_desc" name="group_desc" ng-model="group.desc" style="resize:none;">
+                    </textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-buttons">
+            <button type="button" class="btn btn-cancel" ng-click="cancel()"> Close </button>
+            <button type="submit" class="btn btn-default"> 
+                <span ng-show="method == 'add_group'"> Add </span>
+                <span ng-show="method == 'edit_group'"> Update </span>
+            </button>
+        </div>
+    </form>
+</script>
+
+<script type="text/ng-template" id="add_device_modal.html">
+    <form role="form" name="add_device_form" ng-submit="add_device_form.$valid && add_device(new_device)" novalidate>
+        <div class="modal-header">
+            <h3 class="modal-title">Add Device </h3>
+        </div>
+        <div class="modal-body">
+            <div class="col-xs-12 modal-form">
+                <div class="col-xs-8">
+                    <div class="form-group">
+                        <label for="device_category"> Device Category : </label>
+                        <select class="form-control" id="device_category" name="device_category" ng-model="new_device.device_category" ng-change="get_devices_by_category(new_device)">
+                            <option value="" disabled> Select Device Category </option>
+                            <option value="firewall"> Firewalls </option>
+                            <option value="load_balancer"> Load Balancers </option>
+                            <option value="switch"> Switches </option>
+                            <option value="servers"> Hypervisors/Bare Metal Servers </option>
+                            <option value="vmware"> VMware Virtual Machines </option>
+                            <option value="vcloud"> vCloud Virtual Machines </option>
+                            <option value="openstack"> Openstack Virtual Machines </option>
+                            <option value="custom_vm"> Custom Virtual Machines </option>
+                            <option value="customdevice"> Other Devices </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="devices_list"> Devices List</label>
+                         <multiselect class="multi_select"
+                         ng-model="new_device.selected_devices" placeholder="Choose devices to add"
+                         options="new_device.devices_by_category" ng-disabled="(!new_device.devices_by_category || devices_loading)"
+                         id-prop="id" display-prop="name" show-search="true"></multiselect>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-buttons">
+            <button type="button" class="btn btn-cancel" ng-click="cancel()"> Close </button>
+            <button type="submit" class="btn btn-default"> Add </button>
+        </div>
+    </form>
+</script>

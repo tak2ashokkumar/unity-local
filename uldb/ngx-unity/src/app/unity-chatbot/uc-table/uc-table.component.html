@@ -1,0 +1,31 @@
+<div class="card mb-0">
+    <div class="card-body p-0">
+        <div class="d-flex justify-content-between m-2">
+            <div class="d-flex justify-content-center align-items-center font-500 ml">
+                <span class="badge badge-secondary font-xs-sm">{{filteredTableResponse.length}}</span>
+                <span class="ml-1">Records</span>
+            </div>
+            <div class="w-66">
+                <search-box [searchValue]="searchValue" (searched)="onSearched($event)"
+                    customClass="form-control-sm"></search-box>
+            </div>
+        </div>
+        <table class="table table-sm text-left mb-0">
+            <thead class="bg-light">
+                <th *ngFor="let column of tableResponse.columns">{{column}}</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of filteredTableResponse" truncateText>
+                    <td *ngFor="let data of view" [ngClass]="'tdw-' + ((100 / view.length) | number:'1.0-0')">
+                        <div [tooltip]="data">{{data}}</div>
+                    </td>
+                </tr>
+                <div *ngIf="!filteredTableResponse.length" class="d-flex justify-content-center align-items-center p-4">
+                    No
+                    data
+                    to
+                    display.</div>
+            </tbody>
+        </table>
+    </div>
+</div>

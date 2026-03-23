@@ -1,0 +1,162 @@
+<!-- <div class="row mt--4">
+    <div class="col-12 px-0">
+        <div class="card" style="min-height: 100vh;">
+            <div class="card-header chat-header d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{ workflowName }}</span>
+                <button type="button" class="btn btn-pill btn-warning btn-sm ml-auto" (click)="back()">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+
+            <div class="chat-content">
+                <ng-container *ngIf="!started">
+                    <div class="welcome">
+                        <h3 class="mb-4">{{ welcomeMessage }}</h3>
+
+                        <div class="chat-input-box initial-input" role="search">
+                            <input aria-label="start message" type="text" class="chat-input"
+                                placeholder="Start typing your message..." [(ngModel)]="firstMessage"
+                                (keyup.enter)="send(firstMessage)" />
+                            <button class="send-btn" (click)="send(firstMessage)" aria-label="send">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="started">
+                    <div class="chat-body">
+                        <div class="chat-messages">
+                            <ng-container *ngFor="let msg of chatHistoryData">
+                                <div class="message-row"
+                                    [ngClass]="{'user': msg.sender === 'user', 'bot': msg.sender === 'bot'}">
+                                    <div class="message-box" [ngClass]="{'user-message': msg.sender === 'user'}">
+                                        <markdown *ngIf="msg.sender === 'bot'" [data]="msg.message"></markdown>
+                                        <div *ngIf="msg.sender === 'user'">{{ msg.message }}</div>
+                                    </div>
+                                </div>
+                            </ng-container>
+
+
+                            <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
+                                <div class="message-box bot-message">
+                                    <div class="pulse-loader m-1">
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-fixed" aria-hidden="false">
+                        <div class="chat-input-container">
+                            <div class="chat-input-box">
+                                <input aria-label="type your message" type="text" class="chat-input"
+                                    placeholder="Type your message..." [(ngModel)]="newMessage"
+                                    (keyup.enter)="send(newMessage)" />
+                                <button class="send-btn" (click)="send(newMessage)" aria-label="send">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="row mt--3">
+    <div class="col-12 px-0">
+        <div class="card chat-card">
+            <!-- Header -->
+            <div class="card-header chat-header d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{ workflowName }}</span>
+                <button type="button" class="btn btn-pill btn-warning btn-sm ml-auto" (click)="back()">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+
+            <!-- Main content (flex column) -->
+            <!-- <div class="card-body bg-transparent"> -->
+            <div class="chat-content">
+                <!-- Welcome / initial input -->
+                <!-- <ng-container *ngIf="!started">
+                        <div class="welcome">
+                            <h3 class="mb-4">{{ welcomeMessage }}</h3>
+    
+                            <div class="chat-input-box initial-input">
+                                <input aria-label="start message" type="text" class="chat-input"
+                                    placeholder="Start typing your message..." [(ngModel)]="firstMessage"
+                                    (keyup.enter)="send(firstMessage)" />
+                                <button class="send-btn" (click)="send(firstMessage)" aria-label="send">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container> -->
+                <!-- <div style="margin-left: 249px;">{{ welcomeMessage }}</div> -->
+
+                <!-- Chat view -->
+                <ng-container>
+                    <!-- scrollable messages area -->
+                    <div #chatBody class="chat-body">
+                        <div class="chat-messages">
+                            <ng-container *ngFor="let msg of chatHistoryData">
+                                <div class="message-row"
+                                    [ngClass]="{ 'user': msg.sender === 'user', 'bot': msg.sender === 'bot' }">
+                                    <div class="message-box" [ngClass]="{ 'user-message': msg.sender === 'user' }">
+                                        <markdown *ngIf="msg.sender === 'bot'" [data]="msg.message"></markdown>
+                                        <div *ngIf="msg.sender === 'user'" class="user-text">{{ msg.message }}</div>
+
+                                        <!-- dots inside message box, only for Running bot messages -->
+                                        <span class="dots"
+                                            *ngIf="msg.sender === 'bot' && (!msg.message || msg.status === 'Running')"></span>
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                            <!-- typing indicator -->
+                            <!-- <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
+                                    <div class="message-box bot-message">
+                                        <div class="pulse-loader m-1">
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                </div> -->
+
+                            <div *ngIf="isTyping" class="d-flex mb-2 mx-3 typing-indicator">
+                                <div class="pulse-loader">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- docked input INSIDE the card (not viewport-fixed) -->
+                    <div class="chat-input-bottom" aria-hidden="false">
+                        <div class="chat-input-container mt-3">
+                            <div class="chat-input-box pb-0">
+                                <textarea aria-label="type your message" class="chat-input"
+                                    placeholder="Type your message..." [(ngModel)]="newMessage"
+                                    (keydown.enter)="onEnter($event)"></textarea>
+                                <button class="send-btn mb-2" (click)="send(newMessage)" aria-label="send"
+                                    [ngClass]="{ 'active-send': newMessage?.trim().length > 0 }">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <!-- </div> -->
+        </div>
+    </div>
+</div>

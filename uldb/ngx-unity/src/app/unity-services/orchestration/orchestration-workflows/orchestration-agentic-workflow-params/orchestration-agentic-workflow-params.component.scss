@@ -1,0 +1,466 @@
+/* modal-content.component.css */
+
+@import "variables";
+
+.badge {
+  cursor: grab;
+}
+
+.badge:active {
+  cursor: grabbing;
+}
+
+/* Sidebar */
+.sidebarParam {
+  min-height: 550px;
+  max-height: 550px;
+  overflow-y: auto;
+  background-color: #e7ebf3;
+  border-right: 1px solid #ddd;
+}
+
+.sidebarParam h6 {
+  font-size: 14px;
+  font-weight: 600;
+  // margin-top: 1rem;
+  // margin-bottom: 0.5rem;
+}
+
+/* Draggable items */
+.draggable-item {
+  margin-bottom: 6px;
+  font-size: 13px;
+  cursor: grab;
+  transition: background 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.draggable-item:active {
+  cursor: grabbing;
+}
+
+.key-pill {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 4px;
+  // max-width: 180px;
+  // overflow: hidden;
+}
+
+// .key-text {
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+//   flex: 1;
+// }
+
+// .drag-handle {
+//   font-size: 14px;
+//   opacity: 0.6;
+//   cursor: grab;
+// }
+
+
+.value-text {
+  color: #6c757d;
+}
+
+/* Right form */
+.form-section {
+  padding-left: 1rem;
+  flex: 1;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.form-control {
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+/* Tool blocks */
+.tool-block {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tool-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid #eee;
+  background: #f7f7f7;
+  font-weight: 600;
+}
+
+.tool-body {
+  padding: 10px;
+  font-size: 13px;
+}
+
+.tool-input {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.tool-input span {
+  font-weight: 500;
+}
+
+
+.btn-close-round {
+  position: absolute;
+  top: -26px;
+  right: 35px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: black;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-close-round:hover {
+  background: whitesmoke;
+  color: red;
+}
+
+.btn-tick-round {
+  position: absolute;
+  top: -26px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: black;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-tick-round:hover {
+  background: whitesmoke;
+  color: green;
+}
+
+
+.accordion {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  border-bottom: #ccc 1px solid;
+}
+
+.accordion-headers {
+  // background: #D8ECFF;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  // transition: background 0.3s;
+}
+
+.arrow {
+  font-size: 10px;
+  // transition: transform 0.3s ease;
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  // transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.accordion-body.active {
+  max-height: none;
+  /* Removes height restrictions */
+  height: auto;
+  /* Expands based on content */
+  overflow: visible;
+}
+
+//Nav Tabs
+
+.custom-tabs {
+  border-bottom: 1px solid #e5e7eb; // light gray
+  margin-bottom: 12px;
+}
+
+.custom-tabs .nav-link {
+  border: none;
+  color: #6b7280; // muted text
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px 6px 0 0;
+  transition: all 0.2s ease;
+}
+
+.custom-tabs .nav-link:hover {
+  color: #111827;
+  background-color: #f1f3f9; // light hover
+}
+
+.custom-tabs .nav-link.active {
+  color: #378ad8;
+  background: #f1f3f9;
+  border-bottom: 2px solid #378ad8; // blue underline
+  font-weight: 600;
+}
+
+.bg-header {
+  background: #f1f3f9
+}
+
+.queryParams-toggle-button {
+  background-color: $gray-200;
+  border: 2px solid #a8b2ba;
+  width: 45px;
+  height: 25px;
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+
+  &::before {
+    position: absolute;
+    content: '';
+    background-color: $gray-500;
+    color: $gray-500;
+    width: 19px;
+    height: 18px;
+    border-radius: 10px;
+    margin: 1.5px;
+    transition: 0.3s;
+  }
+}
+
+.queryParams-switch-container {
+  input {
+    &:checked+.queryParams-toggle-button {
+      background-color: $success-100;
+      border-color: $success;
+      color: $success;
+
+      &::before {
+        background-color: $success-500;
+        border-color: $success;
+        color: $success;
+        transform: translateX(100%);
+      }
+    }
+
+    display: none;
+  }
+}
+
+.headers-toggle-button {
+  background-color: $gray-200;
+  border: 2px solid #a8b2ba;
+  width: 45px;
+  height: 25px;
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+
+  &::before {
+    position: absolute;
+    content: '';
+    background-color: $gray-500;
+    color: $gray-500;
+    width: 19px;
+    height: 18px;
+    border-radius: 10px;
+    margin: 1.5px;
+    transition: 0.3s;
+  }
+}
+
+.headers-switch-container {
+  input {
+    &:checked+.headers-toggle-button {
+      background-color: $success-100;
+      border-color: $success;
+      color: $success;
+
+      &::before {
+        background-color: $success-500;
+        border-color: $success;
+        color: $success;
+        transform: translateX(100%);
+      }
+    }
+
+    display: none;
+  }
+}
+
+.body-toggle-button {
+  background-color: $gray-200;
+  border: 2px solid #a8b2ba;
+  width: 45px;
+  height: 25px;
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+
+  &::before {
+    position: absolute;
+    content: '';
+    background-color: $gray-500;
+    color: $gray-500;
+    width: 19px;
+    height: 18px;
+    border-radius: 10px;
+    margin: 1.5px;
+    transition: 0.3s;
+  }
+}
+
+.body-switch-container {
+  input {
+    &:checked+.body-toggle-button {
+      background-color: $success-100;
+      border-color: $success;
+      color: $success;
+
+      &::before {
+        background-color: $success-500;
+        border-color: $success;
+        color: $success;
+        transform: translateX(100%);
+      }
+    }
+
+    display: none;
+  }
+}
+
+.tools-section {
+  max-height: 350px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.form-section-shadow {
+  position: relative;
+  background: #fff;
+  box-shadow: -4px 0 6px -2px rgba(0, 0, 0, 0.2),
+    4px 0 6px -2px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+
+.properties {
+  min-height: 445px;
+  max-height: 445px;
+  overflow-y: auto;
+}
+
+/* WebKit-based browsers (Chrome, Safari, Edge) */
+.properties::-webkit-scrollbar {
+  width: 6px;
+  /* Thin scrollbar */
+}
+
+.properties::-webkit-scrollbar-thumb {
+  background-color: #888;
+  /* Scrollbar color */
+  border-radius: 10px;
+  /* Rounded edges */
+}
+
+.properties::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Darker color on hover */
+}
+
+.properties::-webkit-scrollbar-track {
+  background: transparent;
+  /* Transparent track */
+}
+
+/* Remove arrows from scrollbar */
+.properties::-webkit-scrollbar-button {
+  display: none;
+}
+
+.drag-highlight {
+  border: 2px dashed #007bff;
+  background-color: #eef6ff;
+}
+
+
+
+// .left-sidebar {
+//   background-color: #e7ebf3;
+//   border-right: 1px solid #ddd;
+// }
+
+/* WebKit-based browsers (Chrome, Safari, Edge) */
+.sidebarParam::-webkit-scrollbar {
+  width: 6px;
+  /* Thin scrollbar */
+}
+
+.sidebarParam::-webkit-scrollbar-thumb {
+  background-color: #888;
+  /* Scrollbar color */
+  border-radius: 10px;
+  /* Rounded edges */
+}
+
+.sidebarParam::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Darker color on hover */
+}
+
+.sidebarParam::-webkit-scrollbar-track {
+  background: transparent;
+  /* Transparent track */
+}
+
+/* Remove arrows from scrollbar */
+.sidebarParam::-webkit-scrollbar-button {
+  display: none;
+}
+
+strong {
+  color: green;
+}
+
+.rightbarParam {
+  background-color: #e7ebf3;
+  border-right: 1px solid #ddd;
+}

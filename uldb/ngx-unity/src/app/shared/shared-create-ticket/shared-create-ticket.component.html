@@ -1,0 +1,60 @@
+<ng-template #createTicketRef>
+    <div class="card mb-0 border-0">
+        <div class="card-header">
+            <span class="h6">Create New Ticket</span>
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="create_in">Create In</label>
+                <select class="form-control text-capitalize" id="create_in" name="create_in"
+                    [ngModel]="selectedTcktMgmt | json" (ngModelChange)="tcktMgmtSelected($event)"
+                    [disabled]="instanceId || isFeedback">
+                    <option *ngFor="let tckt of ticketMgmtList" [value]="tckt | json">{{tckt.name}}</option>
+                </select>
+            </div>
+            <ng-container *ngIf="isFeedback">
+                <create-feedback-ticket></create-feedback-ticket>
+            </ng-container>
+            <ng-container *ngIf="!isFeedback">
+                <ng-container [ngSwitch]="selectedTcktMgmt.type">
+                    <ng-container *ngSwitchCase="'DynamicsCrm'">
+                        <create-crm-ticket></create-crm-ticket>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Jira'">
+                        <create-jira-ticket></create-jira-ticket>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'ServiceNow'">
+                        <create-service-now-ticket></create-service-now-ticket>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Zendesk'">
+                        <p> Zendesk is not available now</p>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+            <form *ngIf="attachmentForm" [formGroup]="attachmentForm">
+                <div class="row form-group mb-0">
+                    <div class="col-12 p-3 d-flex align-items-center">
+                        <label class="col-form-label" for="file-multiple-input">Attachments :</label>
+                        <input class="ml-3" id="file-multiple-input" multiple name="file-multiple-input" type="file"
+                            onclick="this.value = null" (change)="detectFiles($event.target.files)">
+                    </div>
+                </div>
+                <span *ngFor="let attachment of attachments">
+                    <span class="btn btn-primary mb-1 mr-1 btn-sm">
+                        {{attachment}}<i class="fas fa-times ml-1" (click)="removeFiles(attachment)"></i>
+                    </span>
+                </span>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Create
+                Ticket</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button" (click)="modalRef.hide()">Cancel</button>
+        </div>
+    </div>
+</ng-template>

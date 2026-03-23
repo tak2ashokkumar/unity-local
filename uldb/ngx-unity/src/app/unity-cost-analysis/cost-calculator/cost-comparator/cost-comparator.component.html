@@ -1,0 +1,84 @@
+<div class="container-fluid cost-calculator">
+  <div class="row">
+    <div class="col-12">
+      <div class="card text-center w-100">
+        <div class="card-header bg-transparent border-bottom-0 ml-0 pb-1 card-title font-lg">
+          <div class="row">
+            <div class="col-12 pr-0">
+              <h5 class="mb-0 float-left d-inline-block">Instance Selection Details with Cost</h5>
+              <button class="btn btn-warning btn-sm pull-right d-inline-block float-right" type="button"
+                (click)="reset()">
+                <i class="fas fa-sync "> Reset </i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 px-2">
+          <table class="table text-left table-bordered">
+            <thead>
+              <tr>
+                <th rowspan="2" colspan="1">Instance Count</th>
+                <th rowspan="1" colspan="4" class="text-center">User Request</th>
+                <th rowspan="1" class="text-center" [attr.colspan]="instances[0].cloudsToCompare">User Selection</th>
+                <th rowspan="2" colspan="1">Actions</th>
+              </tr>
+              <tr class="thead-light">
+                <th>vCPU Range</th>
+                <th>RAM Range(GB)</th>
+                <th>Storage (GB)</th>
+                <th>Term</th>
+                <th *ngIf="instances[0].aws">AWS Cost (USD)</th>
+                <th *ngIf="instances[0].azure">Azure Cost (USD)</th>
+                <th *ngIf="instances[0].gcp">GCP Cost (USD)</th>
+                <th *ngIf="instances[0].g3_cloud">G3 Cost (USD)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let view of instances; let i = index;">
+                <td>{{view.instanceCount}}</td>
+                <td>{{view.cpuMinRange}} to {{view.cpuMaxRange}}</td>
+                <td>{{view.ramMinRange}} to {{view.ramMaxRange}}</td>
+                <td>{{view.storageCount}}</td>
+                <td>{{view.commitment.displayText}}</td>
+                <td class="font-weight-bold" *ngIf="view.aws">
+                  <i class="fa fas fa-dollar-sign"></i> {{view.aws.totalBill | number:'1.2-2'}}
+                  <div class="sub-text text-muted">{{view.aws.instanceName}}</div>
+                  <div class="sub-text text-muted">{{view.aws.storage}}</div>
+                </td>
+                <td class="font-weight-bold" *ngIf="view.azure">
+                  <i class="fa fas fa-dollar-sign"></i> {{view.azure.totalBill | number:'1.2-2'}}
+                  <div class="sub-text text-muted">{{view.azure.instanceName}}</div>
+                  <div class="sub-text text-muted">{{view.azure.storage}}</div>
+                </td>
+                <td class="font-weight-bold" *ngIf="view.gcp">
+                  <i class="fa fas fa-dollar-sign"></i> {{view.gcp.totalBill | number:'1.2-2'}}
+                  <div class="sub-text text-muted">{{view.gcp.instanceName}}</div>
+                  <div class="sub-text text-muted">{{view.gcp.storage}}</div>
+                </td>
+                <td class="font-weight-bold" *ngIf="view.g3_cloud">
+                  <i class="fa fas fa-dollar-sign"></i> {{view.g3_cloud.totalBill | number:'1.2-2'}}
+                  <div class="sub-text text-muted">{{view.g3_cloud.instanceName}}</div>
+                  <div class="sub-text text-muted">{{view.g3_cloud.storage}}</div>
+                </td>
+                <td>
+                  <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" (click)="deleteRecord(i)"
+                    tooltip="Delete"></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="w-100">
+            <button class="btn btn-success pull-right ml-1" type="button" (click)="sendEmail()" accessControl
+              moduleName="Cost Analysis" accessType="Manage Cost Calculator" elementType="btn">
+              <i class="far fa-envelope" aria-hidden="true"></i> Send Email
+            </button>
+            <button class="btn btn-success pull-right mr-1" type="button" (click)="exportToExcel()" accessControl
+              moduleName="Cost Analysis" accessType="Manage Cost Calculator" elementType="btn">
+              <i class="far fa-file-excel" aria-hidden="true"></i> Export Excel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center pl-0 py-2">
+                <div class=" d-flex justify-content-between ml-3">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span
+                            class="badge bg-secondary user-count font-weight-bold rounded-3 align-middle">{{viewData.length}}</span>
+                        <span class="ml-2 font-weight-bold font-lg">Users</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-end">
+                    <button class="btn btn-pill btn-warning btn-sm ml-2" type="button" container="body"
+                        (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                    </button>
+                    <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div class="row my-2 justify-content-end">
+                    <div class="col-2">
+                        <select class="form-control form-control-sm" type="text" [(ngModel)]="selectedAccount"
+                            (ngModelChange)="getUsers()">
+                            <option [value]="''" disabled>Select Account</option>
+                            <option *ngFor="let account of accounts" [value]="account.uuid">{{account.name}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th *ngIf="viewData.length" scope="col" style="font-size:1rem;"
+                                (click)="$event.stopPropagation();selectAll()" accessControl moduleName="Public Cloud"
+                                accessType="Manage Public Cloud" elementType="div-hide">
+                                <span class="ml-2 text-primary">
+                                    <i class="far" [ngClass]="selectedAll? 'fa-check-square':'fa-square'"></i>
+                                </span>
+                            </th>
+                            <th>Email ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of viewData; let i = index" truncateText>
+                            <td class="w-3" (click)="$event.stopPropagation();select(view);" style="font-size:1rem;">
+                                <span class="ml-2 bg-white text-primary" accessControl moduleName="Public Cloud"
+                                    accessType="Manage Public Cloud" elementType="div-hide">
+                                    <i class="far" [ngClass]="view.isSelected? 'fa-check-square':'fa-square'"></i>
+                                </span>
+                            </td>
+                            <td class="tdw-35">
+                                <div [tooltip]="view.email">{{view.email}}</div>
+                            </td>
+                            <td class="tdw-35">
+                                <div [tooltip]="view.firstName">{{view.firstName}}</div>
+                            </td>
+                            <td class="tdw-22">
+                                <div [tooltip]="view.lastName">{{view.lastName}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div *ngIf="!viewData.length" class="py-5 d-flex justify-content-center align-items-center">
+                    No users available.
+                </div>
+            </div>
+            <div *ngIf="selectedUsers.length"
+                class="card-footer bg-white border-top-0 d-flex justify-content-center pt-0 mb-3">
+                <button class="btn btn-primary" type="button" (click)="confirmImport()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

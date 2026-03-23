@@ -1,0 +1,141 @@
+<div class="card">
+    <div class="card-header bg-white py-2">
+        <span *ngIf="isView">View</span>
+        <span *ngIf="ruleId && !isView">Edit</span>
+        <span *ngIf="!ruleId">Add</span> Rule
+        <button class="btn btn-square btn-sm btn-link text-warning text-decoration-none pull-right py-0"
+            (click)="goBack()">
+            <i class="fa fa-arrow-left">&nbsp;</i>To Correlation Rules
+        </button>
+        <button class="btn btn-sm btn-warning btn-pill mr-2 pull-right" type="button" *ngIf="isView">Edit Rule</button>
+    </div>
+    <div class="card-body">
+        <form *ngIf="form" [formGroup]="form">
+            <div class="form-group">
+                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="name">Rule Name<em>*</em></label>
+                        <input class="form-control" id="name" type="text" placeholder="Rule 1" formControlName="name"
+                            [ngClass]="{'is-invalid' : formErrors.name}">
+                        <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="time_window">Specificity<em>*</em></label>
+                        <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+                            [tooltip]="'Specificity is an auto-computed value based on the selected filters and operator combination for the rule.'"></i>
+                        <input class="form-control col-1" id="specificity" name="specificity"
+                            formControlName="specificity" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3 d-flex flex-column">
+                <div class="col-10 d-inline-block mb-3">
+                    <div class="btn-group rounded-pill border" style="border-radius: 50px;">
+                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                            (click)="enableFilter()" [class.active]="form.controls.filter_enabled.value">Enable</button>
+                        <button class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0" type="button"
+                            (click)="disableFilter()"
+                            [class.active]="!form.controls.filter_enabled.value">Disable</button>
+                    </div>
+                </div>
+                <div class="col" *ngIf="form.controls.filter_enabled.value && queryBuilderConfig">
+                    <query-builder #queryBuilder formControlName='filter_rule_meta'
+                        [classNames]='queryBuilderClassNames' [config]='queryBuilderConfig'
+                        [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
+                        [persistValueOnFieldChange]='persistValueOnFieldChange'>
+                        <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+                            <textarea class="text-input text-area" [(ngModel)]="rule.value"
+                                [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                placeholder="Custom Textarea"></textarea>
+                        </ng-container>
+                        <ng-container *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
+                            <div class="col-auto">
+                                <tag-input [clearOnBlur]="true" [(ngModel)]="rule.value"
+                                    [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                    [modelAsStrings]="true" [secondaryPlaceholder]="'Enter tag'"
+                                    (ngModelChange)="onTagInputChange($event)">
+                                    <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200"
+                                        (ngModelChange)="onTagInputChange($event)">
+                                    </tag-input-dropdown>
+                                </tag-input>
+                            </div>
+                        </ng-container>
+                    </query-builder>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="formErrors.filter_rule_meta">
+                    {{formErrors.filter_rule_meta}}</div>
+            </div>
+            <div class="row" *ngIf="form.controls.filter_enabled.value">
+                <div class="col">
+                    <textarea class="form-control" id="description" name="description" formControlName="description"
+                        rows="4" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="correlators">Correlators<em>*</em></label>
+                        <multiselect-dropdown [options]="correlators" [settings]="correlatorSettings"
+                            class="form-control w-100 p-0" style="height:auto;" formControlName="correlators"
+                            [ngClass]="{'is-invalid' : formErrors.correlators}"></multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="formErrors.correlators">{{formErrors.correlators}}</div>
+                    </div>
+                </div>
+                <div class="col-4" *ngIf="form.controls.similarity_rate">
+                    <div class="form-group">
+                        <label for="similarity_rate">Similarity Rate<em>*</em></label>
+                        <input class="form-control" id="similarity_rate" type="text" formControlName="similarity_rate"
+                            [ngClass]="{'is-invalid' : formErrors.similarity_rate}">
+                        <div class="invalid-feedback" *ngIf="formErrors.similarity_rate">{{formErrors.similarity_rate}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="priority">Priority<em>*</em></label>
+                        <div>
+                            <input class="form-control col-4" formControlName="priority" min="1" type="number"
+                                placeholder="Priority" [class.is-invalid]="formErrors.priority">
+                            <div class="mt-1" *ngIf="!ruleId">Previous Max Priority is {{maxPriority}}</div>
+                            <div class="invalid-feedback" *ngIf="formErrors.priority">
+                                {{formErrors.priority}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label for="time_window">Period<em>*</em></label>
+                        <div>
+                            <div class="row col">
+                                <input class="form-control col-4" formControlName="time_window" type="number" min="5"
+                                    max="60" placeholder="Min" [class.is-invalid]="formErrors.time_window">
+                                <span class="align-self-center ml-2">Min(s)</span>
+                                <div class="invalid-feedback" *ngIf="formErrors.time_window">
+                                    {{formErrors.time_window}}</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div class="card-footer d-flex justify-content-center bg-white border-top-0" *ngIf="!isView">
+        <button class="btn btn-sm btn-primary mr-2" type="button" (click)="onSubmit()" *ngIf="!ruleId">Create</button>
+        <button class="btn btn-sm btn-primary mr-2" type="button" (click)="onSubmit()" *ngIf="ruleId">Update</button>
+        <button class="btn btn-sm btn-outline-danger" type="button" (click)="reset()">Reset</button>
+    </div>
+</div>

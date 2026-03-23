@@ -1,0 +1,39 @@
+<div class="card mb-0 border-0 floating-terminal-card" mwlResizable [validateResize]="validate" [enableGhostResize]="true"
+  [ngStyle]="style" [resizeEdges]="{top: true}" (resizeEnd)="onResizeEnd($event)" *ngIf="show">
+  <div class="resize-handle-top" mwlResizeHandle [resizeEdges]="{ top: true }"></div>
+  <div class="card-body terminal-body text-white p-0">
+    <scrollable-tab [selector]="'active'">
+      <div class="nav-item floating-tabs pl-0" #scrollLeft>
+        <a class="nav-link bg-secondary border-bottom-0"><i class="fa fa-angle-left"></i></a>
+      </div>
+      <ul class="nav nav-tabs floating-tabs custom-nav-container border-bottom-0" #tabContent role="tablist">
+        <li class="nav-item floating-tabs-item bg-secondary rounded-top" *ngFor="let term of terms; let i = index;">
+          <a class="nav-link" (click)="goTo(i)" [ngClass]="{'active':activeIndex==i}">
+            <text-wrapper [textToWrap]="term.input.deviceName" [maxChar]="10"></text-wrapper><i class="ml-3 fas fa-times"
+              (click)="close(i)"></i>
+          </a>
+        </li>
+      </ul>
+      <div class="nav-item floating-tabs pr-0" #scrollRight>
+        <a class="nav-link bg-secondary border-bottom-0"><i class="fa fa-angle-right"></i></a>
+      </div>
+      <div class="nav-item floating-tabs nav-actions p-0">
+        <a class="nav-link h-100 border-bottom-0 px-2" (click)="minimize()"><i class="fa fa-window-minimize"></i></a>
+      </div>      
+      <div class="nav-item floating-tabs nav-actions p-0">
+        <a class="nav-link h-100 border-bottom-0 px-2" (click)="restore()"><i class="far fa-window-restore"></i></a>
+      </div>
+      <div class="nav-item floating-tabs nav-actions p-0">
+        <a class="nav-link h-100 border-bottom-0 px-2" (click)="maximize()"><i class="far fa-window-maximize"></i></a>
+      </div>
+      <div class="nav-item floating-tabs nav-actions p-0">
+        <a class="nav-link h-100 border-bottom-0 px-2" (click)="closeTerminal()"><i class="fas fa-times"></i></a>
+      </div>
+    </scrollable-tab>
+    <div class="terminal-container pl-3 pr-3">
+      <div *ngFor="let term of terms; let i = index;" [ngClass]="{'d-none':activeIndex!=i}">
+        <teminal-item [termInput]="term" [index]="i"></teminal-item>
+      </div>
+    </div>
+  </div>
+</div>

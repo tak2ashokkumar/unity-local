@@ -1,0 +1,10 @@
+.table-responsive-no-truncate {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.table-responsive-no-truncate .table td,
+.table-responsive-no-truncate .table th {
+  white-space: nowrap !important;
+  padding-right: 2rem; 
+}

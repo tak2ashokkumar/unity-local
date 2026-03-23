@@ -1,0 +1,194 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card rounded-0 border-top-0">
+      <div class="card-header bg-transparent border-bottom-0 mt-3">
+        <div class="row">
+          <div class="col-3">
+            <table-search-box (searched)="onSearched($event)"></table-search-box>
+          </div>
+          <div class="col ">
+            <span class="text-muted ml-2 font-sm float-right align-middle">
+              <span class="badge badge-pill badge-secondary">{{filteredViewData.length}}</span>&nbsp;S3 Buckets</span>
+            <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+            <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="createBucket()"
+              tooltip="Create Bucket" accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+              elementType="btn">Create
+              S3 Bucket</button>
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+        </div>
+        <div class="card-body">
+          <table class="table text-left" *ngIf="filteredViewData.length">
+            <thead>
+              <tr>
+                <th>Bucket Name</th>
+                <th>Bucket Size</th>
+                <th>Creation Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let view of pagedviewData">
+                <td>{{view.bucketName}}</td>
+                <td>{{view.bucketSize | filesize }}</td>
+                <td>{{view.creationDate}}</td>
+                <td>
+                  <span>
+                    <button class="action-icons mb-0 fa fa-list-ul font-sm ml-1" tooltip="Show Files"
+                      (click)="goToInventory(view)"></button>
+                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                      (click)="deleteBucket(view.uuid)" accessControl moduleName="Datacenter"
+                      accessType="Manage Datacenter" elementType="actionbtn"></button>
+                    <button class="action-icons mb-0 fa fa-upload font-sm ml-1" tooltip="Upload a File"
+                      (click)="uploadFiletoS3(view)" accessControl moduleName="Datacenter"
+                      accessType="Manage Datacenter" elementType="actionbtn"></button>
+                    <button class="action-icons mb-0 fa fa-undo font-sm ml-1" tooltip="File History"
+                      (click)="getFileUploadHistory(view)"></button>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+            [totalCount]="filteredViewData.length"></table-entries>
+          <table-pager *ngIf="filteredViewData.length" [pageNo]="currentCriteria.pageNo"
+            [pageSize]="currentCriteria.pageSize" [totalCount]="filteredViewData.length"
+            (pageChange)="pageChange($event)"></table-pager>
+          <div class="text-center text-muted" *ngIf="!filteredViewData.length">No S3 Buckets to show.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #create>
+  <div class="card mb-0">
+    <div class="card-header">
+      Create S3 Bucket
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="createModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="createForm" [formGroup]="createForm">
+        <div class="form-group">
+          <label class="form-col-form-label">Bucket Name<em>* </em></label>
+          <span tooltip="The bucket name must be unique across all existing bucket names in UL S3.">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+          </span>
+          <input id="bucketName" class="form-control" type="text" formControlName="bucketName"
+            [ngClass]="{'is-invalid' : createFormErrors.bucketName}">
+          <div class="invalid-feedback" *ngIf="createFormErrors.bucketName">{{createFormErrors.bucketName}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmCreate()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="createModalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #uploadFile>
+  <div class="card mb-0">
+    <div class="card-header">
+      Upload File to S3 Bucket
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="uploadFileModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body m-4">
+      <input type="file" #file hidden (change)="detectFileChange($event.target.files)">
+      <button class="btn btn-brand btn-lg btn-light" type="button" (click)="file.click()">
+        <span class="font-sm">Select File to Upload</span>
+        <i class="fa fa-upload pull-right bg-warning ml-3"></i>
+      </button>
+      <span *ngIf="fileToUpload" class="btn btn-warning mt-0 btn-sm ml-4">{{fileToUpload.name}}</span>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmUploadFileToS3()"
+        [disabled]="!fileToUpload">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="uploadFileModalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #fileList>
+  <div class="card mb-0">
+    <div class="card-header">
+      File History
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="filesUploadedModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table text-left">
+        <thead>
+          <tr>
+            <th>Bucket Name</th>
+            <th>File Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let file of filesUploaded">
+            <td>{{file.bucketName}}</td>
+            <td>{{file.fileName}} </td>
+            <td>{{file.uploadStatus }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="text-center text-muted" *ngIf="!filesUploaded.length"> No files available to display.</div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right" (click)="filesUploadedModalRef.hide()"
+        type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deleteBucketTemplate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Delete Bucket
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="deleteBucketModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <label class="text-danger small">*Only authorized users are allowed to perform this action. Please provide your
+        credentials.</label>
+
+      <form *ngIf="authForm" [formGroup]="authForm">
+        <div class="form-group">
+          <label for="access_key" class="form-col-form-label">Access Key<em>* </em></label>
+          <input id="access_key" class="form-control" type="text" formControlName="access_key"
+            [ngClass]="{'is-invalid' : authFormErrors.access_key}">
+          <div class="invalid-feedback" *ngIf="authFormErrors.access_key">{{authFormErrors.access_key}}</div>
+        </div>
+        <div class="form-group">
+          <label for="secretKey" class="form-col-form-label">Secret Key<em>* </em></label>
+          <input id="secret_key" class="form-control" type="text" formControlName="secret_key"
+            [ngClass]="{'is-invalid' : authFormErrors.secret_key}">
+          <div class="invalid-feedback" *ngIf="authFormErrors.secret_key">{{authFormErrors.secret_key}}</div>
+        </div>
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Delete</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="deleteBucketModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,22 @@
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+   
+  .tooltip-box {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: normal;
+    position: absolute;
+    top: -438%;
+    left: -115px;
+    background: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 6px;
+    font-size: 14px;
+    z-index: 1000;
+    white-space: nowrap;
+    line-height: 1.6;
+  }

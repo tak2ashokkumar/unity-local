@@ -1,0 +1,409 @@
+<div class="row" *ngIf="viewData">
+  <div class="col-12">
+    <div class="card rounded">
+      <div class="card-header bg-transparent align-items-center p-2">
+        <div class="row">
+          <div class="col-12 d-flex justify-content-between">
+            <span class="h5 mb-0 font-500 mt-1">{{viewData.catalogName}}</span>
+            <div class="d-flex justify-content-between">
+              <span class="h5 mb-0 font-500 mr-3 mt-1">${{viewData.price}}</span>
+              <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                <i class="fa fa-arrow-left"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-12">
+            <img *ngIf="viewData.logo" [src]="viewData.logo" alt="" height="50" width="100">
+          </div>
+        </div>
+      </div>
+      <div class="card-body py-2">
+        <div *ngIf="viewData.category == 'Provisioning'">
+          <div class="form-group row">
+            <label for="name" class="col-2 ml-5 col-form-label text-right">Cloud Type :</label>
+            <img [src]="viewData.cloudLogo" alt="">
+          </div>
+        </div>
+        <form [formGroup]="ordersForm" *ngIf="ordersForm">
+          <div *ngIf="viewData.category == 'Operational'">
+            <div class="form-group row mb-2">
+              <label for="ip" class="col-2 ml-5 col-form-label text-right">Enter IP Address<em>*</em>
+              </label>
+              <div class="col-4">
+                <input id="ip" class="form-control" type="text" formControlName="ip"
+                  placeholder="Enter IP Address (multiple Allowed, comma seperated)"
+                  [ngClass]="{'is-invalid' : ordersFormErrors.ip}">
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.ip">
+                  {{ordersFormErrors.ip}}</div>
+              </div>
+            </div>
+            <div class="col-2 ml-4 mb-2 col-form-label text-right pr-0">OR</div>
+
+            <div class="form-group row">
+              <label for="host_type" class="col-2 ml-5 col-form-label text-right">Host Type : </label>
+              <div class="col-2">
+                <select id="host_type" class="form-control" formControlName="host_type">
+                  <option value="">Select Host Name</option>
+                  <option value="datacenter">Datacenter</option>
+                  <option value="cloud">Cloud</option>
+                  <option value="tag">Tag</option>
+                  <option value="device_type">Device Type</option>
+                </select>
+                <!-- <div class="invalid-feedback" *ngIf="hostFormErrors.host_type">
+                      {{hostFormErrors.host_type}}</div> -->
+              </div>
+            </div>
+            <div class="form-group row" *ngIf="ordersForm.get('host_type')?.value == 'datacenter'">
+              <label for="datacenter" class="col-2 ml-5 col-form-label text-right">Data Center :
+              </label>
+              <div class="col-2">
+                <select id="datacenter" class="form-control" formControlName="datacenter">
+                  <option value="">Select DC</option>
+                  <option *ngFor="let d of dc" [value]="d.uuid">{{ d.name }}</option>
+                </select>
+                <!-- <div class="invalid-feedback" *ngIf="hostFormErrors.datacenter">
+                      {{hostFormErrors.datacenter}}</div> -->
+              </div>
+            </div>
+            <div class="form-group row" *ngIf="ordersForm.get('host_type')?.value == 'datacenter'">
+              <label for="device_category" class="col-2 ml-5 col-form-label text-right">Device
+                Category :
+              </label>
+              <div class="col-2">
+                <select id="device_category" class="form-control" formControlName="device_category">
+                  <option value="">Select Device Category</option>
+                  <option value="compute">Compute</option>
+                  <option value="network">Network</option>
+                  <option value="storage">Storage</option>
+                </select>
+                <!-- <div class="invalid-feedback" *ngIf="hostFormErrors.device_category">
+                      {{hostFormErrors.device_category}}</div> -->
+              </div>
+            </div>
+            <div class="form-group row" *ngIf="ordersForm.get('host_type')?.value == 'cloud'">
+              <label for="cloud" class="col-2 ml-5 col-form-label text-right">Cloud Name :
+              </label>
+              <div class="col-2">
+                <select id="cloud" class="form-control" formControlName="cloud"
+                  [ngClass]="{'is-invalid' : ordersFormErrors.cloud}">
+                  <option value="">Select Cloud Name</option>
+                  <option *ngFor="let cloud of cloudWithIMg" [value]="cloud.type">{{ cloud.type }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.cloud">
+                  {{ordersFormErrors.cloud}}</div>
+              </div>
+            </div>
+            <div class="form-group row" *ngIf="ordersForm.get('host_type')?.value == 'cloud'">
+              <label for="account_name" class="col-2 ml-5 col-form-label text-right">Account Name :
+              </label>
+              <div class="col-2">
+                <select id="account_name" class="form-control" formControlName="account_name"
+                  [ngClass]="{'is-invalid' : ordersFormErrors.account_name}">
+                  <option value="">Select Account Name</option>
+                  <option *ngFor="let account of cloudAccountNames" [value]="account.uuid">{{
+                    account.account_name }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.account_name">
+                  {{ordersFormErrors.account_name}}</div>
+              </div>
+            </div>
+            <div class="form-group row" *ngIf="ordersForm.get('host_type')?.value == 'tag'">
+              <label for="tag" class="col-2 ml-5 col-form-label text-right">Tag :
+              </label>
+              <div class="col-2">
+                <select id="tag" class="form-control" formControlName="tag"
+                  [ngClass]="{'is-invalid' : ordersFormErrors.tag}">
+                  <option value="">Select Tag</option>
+                  <option *ngFor="let tag of tags" [value]="tag.tag_name">{{ tag.tag_name }}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.tag">
+                  {{ordersFormErrors.tag}}</div>
+              </div>
+            </div>
+            <div class="form-group row" *ngIf="ordersForm.get('host_type')?.value == 'device_type'">
+              <label for="device_type" class="col-2 ml-5 col-form-label text-right">Device Type :
+              </label>
+              <div class="col-4">
+                <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
+                  class="form-control w-100 p-0" style="height:auto;" formControlName="device_type"
+                  [ngClass]="{'is-invalid' : ordersFormErrors.device_type}"></multiselect-dropdown>
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.device_type">
+                  {{ordersFormErrors.device_type}}
+                </div>
+              </div>
+            </div>
+
+
+            <div class="form-group row">
+              <label for="host" class="col-2 ml-5 col-form-label text-right">Select Hosts<em>*</em> :</label>
+              <div class="col-4">
+                <div class="dropdown">
+                  <button class="btn btn-light dropdown-toggle col-12"
+                    style="border: 1px solid #c8ced3; border-radius: 3px;" type="button"
+                    (click)="toggleDropdownHost($event)">
+                    {{ getSelectedHostsText() }}
+                  </button>
+                  <div *ngIf="dropdownOpen" class="dropdown-menu show col-12"
+                    style="display: block; height: auto; overflow-y: auto; max-height: 200px;">
+                    <div class="card-header p-1 dropdown-open" style="position: sticky; top: 0; left: 0; z-index: 1;">
+                      <table-search-box [searchValue]="searchValue" (searched)="onSearchedHost($event)">
+                      </table-search-box>
+                    </div>
+                    <div class="card-body px-2 py-1 dropdown-open">
+                      <table class="table text-left">
+                        <thead class="bg-light">
+                          <tr>
+                            <th></th>
+                            <th>HostName</th>
+                            <th>IP</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let host of filteredHosts" (click)="toggleSelectionHost(host, $event)"
+                            [ngClass]="{'selected': isSelectedHost(host)}">
+                            <td>
+                              <span *ngIf="isSelectedHost(host)" class="fas fa-check text-success mt-2"></span>
+                            </td>
+                            <td>{{ host.name }}</td>
+                            <td>{{ host.ip_address || 'N/A' }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-danger font-xs" *ngIf="ordersFormErrors.host">
+                  {{ordersFormErrors.host}}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label for="cred_type" class="col-2 ml-5 col-form-label text-right">Credentials <em>*</em>
+                :</label>
+              <div class="custom-control custom-radio mt-2">
+                <input id="local_radio" type="radio" class="custom-control-input" value="local"
+                  formControlName="cred_type">
+                <label class="custom-control-label" for="local_radio">Local</label>
+              </div>
+              <div class="col-2" *ngIf="ordersForm.get('cred_type')?.value == 'local'">
+                <select id="credentials" class="form-control" formControlName="credentials"
+                  [ngClass]="{'is-invalid' : ordersFormErrors.credentials}">
+                  <option value="" disabled>Select Credential</option>
+                  <option *ngFor="let cred of credentialList" [value]="cred.uuid"> {{cred.name}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.credentials">
+                  {{ordersFormErrors.credentials}}
+                </div>
+              </div>
+              <div class="custom-control custom-radio ml-3 mt-2">
+                <input id="my_credential_radio" type="radio" class="custom-control-input" value="my_cred"
+                  formControlName="cred_type">
+                <label class="custom-control-label" for="my_credential_radio">My Credential</label>
+              </div>
+              <div class="col-2" *ngIf="ordersForm.get('cred_type')?.value == 'my_cred'">
+                <input id="username" class="form-control" type="text" formControlName="username"
+                  [class.is-invalid]="ordersFormErrors.username" placeholder="Enter UserName">
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.username">
+                  {{ordersFormErrors.username}}
+                </div>
+              </div>
+              <div class="col-2" *ngIf="ordersForm.get('cred_type').value == 'my_cred'">
+                <custom-password-field formControlName="password"
+                  [options]="{errors:ordersFormErrors.password, placeholder:'Enter Password'}"
+                  [isDisabled]="ordersForm.get('password').disabled"></custom-password-field>
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.password">
+                  {{ordersFormErrors.password}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div *ngIf="viewData.category == 'Provisioning'">
+            <div formGroupName="account" class="form-group row">
+              <label class="col-2 ml-5 text-right col-form-label" placeholder="Select account">{{ account.label
+                }}<em>*</em> :</label>
+              <div class="col-4 p-0">
+                <select formControlName="options" class="form-control">
+                  <option value="" disabled selected>{{ account.label }}</option>
+                  <option *ngFor="let option of accountOptions" [value]="option.value">
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Image Dropdown -->
+            <div class="form-group row" *ngIf="viewData.isPrivateCloud">
+              <label for="host" class="col-2 ml-5 col-form-label text-right">Image<em>*</em> :</label>
+              <div class="col-4 p-0">
+                <div class="dropdown">
+                  <button class="btn dropdown-toggle col-12 d-flex justify-content-between align-items-center"
+                    style="border: 1px solid #c8ced3; border-radius: 3px;" type="button"
+                    (click)="toggleDropdown($event, 'image')">
+                    <span>{{ getSelectedText('image') }}</span>
+                  </button>
+                  <div *ngIf="dropdownOpenImage" class="dropdown-menu show col-12"
+                    style="display: block; height: auto; overflow-y: auto; max-height: 210px;">
+                    <div class="card-header p-1 dropdown-open" style="position: sticky; top: 0; left: 0; z-index: 1;">
+                      <table-search-box [searchValue]="searchValue"
+                        (searched)="onSearched($event, 'image')"></table-search-box>
+                    </div>
+                    <div class="card-body px-2 py-1 dropdown-open">
+                      <table class="table text-left">
+                        <tbody>
+                          <tr *ngFor="let host of filteredImage" (click)="toggleSelection('image',host, $event)"
+                            [ngClass]="{'selected': isSelected(host, 'image')}" class="dropdown-item p-1">
+                            {{ host.name }}<br />
+                            <small class="text-muted mr-2">Os Type({{ host.os_type }})</small>
+                            <small class="text-muted  mr-2">Os Name({{ host.os_name }})</small>
+                            <small class="text-muted  mr-2">Os Edition({{ host.os_edition }})</small>
+                            <small class="text-muted">Os Version({{ host.os_version }})</small>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-danger font-xs" *ngIf="ordersFormErrors.image">
+                  {{ordersFormErrors.image}}
+                </div>
+              </div>
+            </div>
+
+            <!-- Resource Model Dropdown -->
+            <div class="form-group row" *ngIf="viewData.isPrivateCloud">
+              <label for="host" class="col-2 ml-5 col-form-label text-right">Resource Model<em>*</em> :</label>
+              <div class="col-4 p-0">
+                <div class="dropdown">
+                  <button class="btn dropdown-toggle col-12 d-flex justify-content-between align-items-center"
+                    style="border: 1px solid #c8ced3; border-radius: 3px;" type="button"
+                    (click)="toggleDropdown($event, 'model')">
+                    <span>{{ getSelectedText('model') }}</span>
+                  </button>
+                  <div *ngIf="dropdownOpenModel" class="dropdown-menu show col-12"
+                    style="display: block; height: auto; overflow-y: auto; max-height: 210px;">
+                    <div class="card-header p-1 dropdown-open">
+                      <table-search-box [searchValue]="searchValue"
+                        (searched)="onSearched($event, 'model')"></table-search-box>
+                    </div>
+                    <div class="card-body px-2 py-1 dropdown-open">
+                      <table class="table text-left">
+                        <tbody>
+                          <tr *ngFor="let model of filteredModel" (click)="onResourceModelChange(model)"
+                            (click)="toggleSelection('model',model, $event)"
+                            [ngClass]="{'selected': isSelected(model, 'model')}" class="dropdown-item p-1">
+                            <div class="d-flex justify-content-between w-100">
+                              <div>{{ model.resource_name }}</div>
+                              <div>${{ model.unit_vice_cost }}</div>
+                            </div>
+                            <small class="text-muted mr-2">CPU({{ model.cpu_size }})</small>
+                            <small class="text-muted  mr-2">Memory({{ model.memory_size }})</small>
+                            <small class="text-muted  mr-2">Storage({{ model.storage_size }})</small>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-danger font-xs" *ngIf="ordersFormErrors.resource_model">
+                  {{ordersFormErrors.resource_model}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div formArrayName="templates">
+            <div *ngFor="let template of templatesFormArray.controls; let i = index" [formGroupName]="i"
+              class="form-group row">
+              <label class="col-2 ml-5 text-right col-form-label">
+                {{ template.get('label').value }}<em>*</em> :
+              </label>
+              <div class="col-4 p-0">
+                <select formControlName="selectedOption" class="form-control"
+                  [ngClass]="{'is-invalid': ordersFormErrors.templates[template.get('label').value]}">
+                  <option value="" disabled selected>{{ template.get('label').value }}</option>
+                  <option *ngFor="let option of getTemplateOptions(i)" [value]="option.value">{{ option.label }}
+                  </option>
+                </select>
+                <div class="invalid-feedback" *ngIf="ordersFormErrors.templates[template.get('label').value]">
+                  {{ ordersFormErrors.templates[template.get('label').value] }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group row" *ngIf="viewData.category == 'Provisioning' && !viewData.isPrivateCloud">
+            <label for="cred_type" class="col-2 ml-5 col-form-label text-right">Credentials <em>*</em>
+              :</label>
+            <div class="custom-control custom-radio mt-2">
+              <input id="local_radio" type="radio" class="custom-control-input" value="local"
+                formControlName="cred_type">
+              <label class="custom-control-label" for="local_radio">Local</label>
+            </div>
+            <div class="col-2" *ngIf="ordersForm.get('cred_type')?.value == 'local'">
+              <select id="credentials" class="form-control" formControlName="credentials"
+                [ngClass]="{'is-invalid' : ordersFormErrors.credentials}">
+                <option value="" disabled>Select Credential</option>
+                <option *ngFor="let cred of credentialList" [value]="cred.uuid"> {{cred.name}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="ordersFormErrors.credentials">
+                {{ordersFormErrors.credentials}}
+              </div>
+            </div>
+            <div class="custom-control custom-radio ml-3 mt-2">
+              <input id="my_credential_radio" type="radio" class="custom-control-input" value="my_cred"
+                formControlName="cred_type">
+              <label class="custom-control-label" for="my_credential_radio">My Credential</label>
+            </div>
+            <div class="col-2" *ngIf="ordersForm.get('cred_type')?.value == 'my_cred'">
+              <input id="username" class="form-control" type="text" formControlName="username"
+                [class.is-invalid]="ordersFormErrors.username" placeholder="Enter UserName">
+              <div class="invalid-feedback" *ngIf="ordersFormErrors.username">
+                {{ordersFormErrors.username}}
+              </div>
+            </div>
+            <div class="col-2" *ngIf="ordersForm.get('cred_type').value == 'my_cred'">
+              <custom-password-field formControlName="password"
+                [options]="{errors:ordersFormErrors.password, placeholder:'Enter Password'}"
+                [isDisabled]="ordersForm.get('password').disabled"></custom-password-field>
+              <div class="invalid-feedback" *ngIf="ordersFormErrors.password">
+                {{ordersFormErrors.password}}
+              </div>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="inputs.length>0">
+            <label for="name" class="col-2 ml-5 text-right col-form-label">Input Parameter :</label>
+            <div class="col-8 mx-0 border rounded p-3 position-relative">
+              <div formArrayName="inputs">
+                <div *ngFor="let input of inputsFormArray.controls; let i = index" [formGroupName]="i"
+                  class="form-group row">
+                  <label class="col-3 ml-5 text-right col-form-label">{{ input.get('param_name').value }}</label>
+                  <div class="col-4">
+                    <input formControlName="default_value" class="form-control" />
+                    <!-- <div class="invalid-feedback" *ngIf="ordersFormErrors.inputs[input.get('default_value')?.value]">
+                      {{ ordersFormErrors.inputs[input.get('default_value')?.value] }}
+                    </div> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="d-flex justify-content-center mb-3 mt-3">
+          <button class="btn btn-md btn-danger" type="button" (click)="goBack()">Cancel</button>
+          <button class="btn btn-outline-primary ml-2" type="button" (click)="saveAsDraft()">Save as Draft</button>
+          <button class="btn btn-md btn-success ml-2" type="button" (click)="onCheckout()">Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

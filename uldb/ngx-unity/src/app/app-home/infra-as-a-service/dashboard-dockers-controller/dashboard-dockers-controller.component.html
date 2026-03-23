@@ -1,0 +1,10 @@
+<h5 *ngIf="dockerControllers.isAvailable">Docker</h5>
+<div class="row" *ngIf="dockerControllers.isAvailable">
+  <div class="col-6 col-card-height" *ngFor="let controller of dockerControllers.dockerSwarms">
+    <dashboard-docker-swarm-widget [controllerDetails]="controller"></dashboard-docker-swarm-widget>
+  </div>
+
+  <div class="col-3 col-card-height" *ngFor="let controller of dockerControllers.nativeDockers">
+    <dashboard-native-docker-widget [controllerDetails]="controller"></dashboard-native-docker-widget>
+  </div>
+</div>

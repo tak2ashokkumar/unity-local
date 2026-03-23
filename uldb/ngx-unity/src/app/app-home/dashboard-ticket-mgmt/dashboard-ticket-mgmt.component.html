@@ -1,0 +1,30 @@
+<div class="card text-center" *ngIf="defaultType" [widgetLazyLoader]="{ttw:500}" (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="spinner"></app-spinner>
+  <div class="card-header bg-transparent border-bottom-0" *ngIf="ticketTabs.length">
+    <ul class="nav nav-tabs card-header-tabs">
+      <li class="nav-item" *ngFor="let tab of ticketTabs" [class.mb-0]="tab === selectedTab" (click)="selectTab(tab)">
+        <a class="nav-link border-top-0 border-left-0 border-right-0 " [class.border-bottom-0]="tab !== selectedTab"
+          [ngClass]="{'active text-success' : tab === selectedTab}">{{tab.title}}</a>
+      </li>
+      <li class="ml-auto full-details" *ngIf="hasTicketMgmtAccess()">
+        <a class="text-decoration-none" (click)="goTo(selectedTab.drillDownLink)" *ngIf="selectedTab">Full Details</a>
+      </li>
+    </ul>
+  </div>
+  <div class="card-body" *ngIf="currentCriteria">
+    <ng-container *ngIf="defaultType.type == 'DynamicsCrm' && currentCriteria">
+      <ms-dynamics-dashboard-tckt-mgmt [currentCriteria]="currentCriteria"
+        [spinnerName]="spinner"></ms-dynamics-dashboard-tckt-mgmt>
+    </ng-container>
+    <ng-container *ngIf="defaultType.type == 'Jira' && currentCriteria">
+      <jira-dashboard-tckt-mgmt [currentCriteria]="currentCriteria" [spinnerName]="spinner"></jira-dashboard-tckt-mgmt>
+    </ng-container>
+    <ng-container *ngIf="defaultType.type == 'ServiceNow' && currentCriteria">
+      <now-dashboard-tckt-mgmt [currentCriteria]="currentCriteria" [spinnerName]="spinner"></now-dashboard-tckt-mgmt>
+    </ng-container>
+    <ng-container *ngIf="defaultType.type == 'Zendesk' && currentCriteria">
+      <dashboard-shared-tckt-mgmt [currentCriteria]="currentCriteria" [spinnerName]="spinner">
+      </dashboard-shared-tckt-mgmt>
+    </ng-container>
+  </div>
+</div>

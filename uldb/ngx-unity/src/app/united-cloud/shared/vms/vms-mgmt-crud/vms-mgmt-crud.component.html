@@ -1,0 +1,31 @@
+<ng-template #ipFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Update Management IP
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="ipModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="ipForm" [formGroup]="ipForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col">
+            <label class="form-col-form-label">Management IP</label>
+            <input id="management_ip" class="form-control" type="text" formControlName="management_ip"
+              [class.is-invalid]="ipFormErrors.management_ip">
+            <div class="invalid-feedback" *ngIf="ipFormErrors.management_ip">{{ipFormErrors.management_ip}}</div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitIp()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="ipModelRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

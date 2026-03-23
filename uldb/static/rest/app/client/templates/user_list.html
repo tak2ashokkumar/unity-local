@@ -1,0 +1,160 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+<loading object={{model.results}}></loading>
+	<page-title title="Users"></page-title>
+	<div class="pagemargin">
+	    <!-- <table-search-widget ng-show="model.results !== undefined"></table-search-widget> -->
+	    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color top_shadow" ng-show="model.results !== undefined">
+	        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+	            <form class="navbar-form">
+	                <div class="form-group width100">
+	                    <input class="form-control" type="text" ng-model="searchKeyword" ng-model-options="{debounce: 1000}" id="searchKeyword" placeholder="Enter keyword" ng-change="getSearchResults()">
+	                    <button class="btn btn-search" type="submit" style="top: 4px;">
+	                       <i class="fa fa-search"></i>
+	                    </button>
+	                </div>
+	            </form>
+	        </div>
+	        <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" ng-class="{'padding_top15px' : disable_action_btn}">
+	            <div class="action-bar pull-right" ng-class="{'table-button' : !disable_action_btn}">
+	                <div style="text-align: left; padding-top: 0px !important;"><label><i class="fa fa-check-circle"></i> Admin user</label></div>
+	                <span class="count">{{model.count}}</span>
+	                <span class="count-text" ng-if="model.count === 1 || model.count === 0"> {{title.singular}}</span>
+	                <span class="count-text" ng-if="model.count > 1"> {{title.plural}}</span>
+	                <span ng-if="!disable_action_btn" tooltip-class="customClass" uib-tooltip="{{disbaleTooltipMsg}}">
+	                	<a class="btn btn-default" ng-click="invokeCreateUserRequestModel()"> Add User</a>
+	                </span>
+	            </div>
+	        </div>
+	    </div>
+	    <model-results></model-results>
+	</div>
+</div>
+
+
+<script type="text/ng-template" id="userCreateRequest.html">
+	<div class="modal-content">
+	  <form role="form" name="adduserform" novalidate ng-submit="adduserform.$valid && checkUserDetails(userObj)">
+	    <div class="modal-header">
+	        <h4 class="modal-title">Create User Request</h4>
+	    </div>
+	    <div class="modal-body" style="padding:20px 40px; padding-bottom: 0px;">
+	        <div class="modal-form">
+	                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	                    <div class="paddingR">
+	                        <div class="form-group">
+	                            <label for="email"> Email <span> *</span>
+		                            <span class="errormsg" ng-if="!userObj.email_err_msg && (adduserform.$submitted && adduserform.email.$invalid)" >
+		                            	&nbsp; ( This Field is Required )
+		                            </span>
+		                            <span class="errormsg" ng-if="userObj.email_err_msg && (adduserform.$submitted)" >
+		                            	&nbsp; ( {{ userObj.email_err_msg }} )
+		                            </span>
+	                            </label>
+	                            <input type="text" class="form-control" ng-model="userObj.email" name="email" required>
+	                        </div>
+	                        <div class="form-group">
+	                            <label for="firstname"> First Name <span> *</span>
+		                            <span class="errormsg" ng-if="!userObj_firstname_err_msg && (adduserform.$submitted && adduserform.firstname.$invalid)" >
+		                            	&nbsp; ( This Field is Required )
+		                            </span>
+		                            <span class="errormsg" ng-if="userObj_firstname_err_msg && (adduserform.$submitted)" >
+		                            	&nbsp; ( {{ userObj_firstname_err_msg }} )
+		                            </span>
+	                            </label>
+	                            <input type="text" class="form-control" ng-model="userObj.firstname" name="firstname" required>
+	                        </div>
+	                        <div class="form-group">
+	                            <label for="lastname">Last Name <span> *</span>
+		                            <span class="errormsg" ng-if="!userObj.lastname_err_msg && (adduserform.$submitted && adduserform.lastname.$invalid)" >
+		                            	&nbsp; ( This Field is Required )
+		                            </span>
+		                            <span class="errormsg" ng-if="userObj.lastname_err_msg && (adduserform.$submitted)" >
+		                            	&nbsp; ( {{ userObj.lastname_err_msg }} )
+		                            </span>
+	                            </label>
+	                            <input type="text" class="form-control" ng-model="userObj.lastname" name="lastname" required>
+	                        </div>
+	                        <div class="form-group">
+	                            <label for="is_customer_admin">Administrator?<span> *</span>
+		                            <span class="errormsg" ng-if="!userObj.is_customer_admin_err_msg && (adduserform.$submitted && adduserform.is_customer_admin.$invalid)" >
+		                            	&nbsp; ( This Field is Required )
+		                            </span>
+		                            <span class="errormsg" ng-if="userObj.is_customer_admin_err_msg && (adduserform.$submitted)" >
+		                            	&nbsp; ( {{ userObj.is_customer_admin_err_msg }} )
+		                            </span>
+	                            </label>
+	                            <div class="form-group" ng-init="userObj.is_customer_admin='no'">
+									<select class="form-control" ng-model="userObj.is_customer_admin">
+									  <option value="no">No</option>
+									  <option value="yes">Yes</option>
+									</select>
+	                       	    </div>
+	                        </div>
+	                    </div>
+	                </div>
+	        </div>
+	    </div>
+	    <div class="modal-footer modal-buttons">
+	        <div class="modal-footer modal-buttons">
+	            <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+	            <button type="submit" class="btn btn-default"> Submit </button>
+	        </div>
+	    </div>
+	  </form>
+	</div>
+</script>
+
+
+
+
+
+<script type="text/ng-template" id="userCreateRequestTest.html">
+    <div class="modal-header">
+     <button type="button" class="close" ng-click="cancel()">&times;</button>
+     <span class="modal-title">Create User Request</span>
+   </div>
+   <div class="modal-form">
+       <form role="form" name="create_ticket_form">
+           <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+               <div class="form-group">
+                   <label for="">Subject*</label>
+                   <span class="errormsg" ng-if="ticket_subject_errmsg">({{ ticket_subject_errmsg }})</span>
+                   <input name="subject" placeholder="What is your issue about?" required="required" class="form-control" type="text" ng-class="{'has-error': ticket_subject_errmsg }" ng-model="request.subject"/>
+               </div>
+               <div class="form-group">
+                   <label for="">Description*</label>
+                   <span class="errormsg" ng-if="ticket_desc_errmsg"> ({{ ticket_desc_errmsg }})</span>
+                   <textarea rows="10"  placeholder="Describe your issue here." required="required" class="form-control" type="text" ng-model="request.description" autofocus></textarea>
+               </div>
+           </div>
+       </form>
+   </div>
+   <div class="modal-footer modal-buttons">
+       <div class="col-md-12">
+           <a class="pull-left" href="{{email_to_link}}"><b>Click here to report via e-mail</b></a>
+           <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+           <button class="btn btn-default" ng-click="createRequest(request)" type="submit"> Send</button>
+       </div>
+   </div>
+</script>
+
+<script type="text/ng-template" id="statusChangeConfirmation.html">
+  <div class="modal-content" >
+    <div class="modal-header" style="text-align: center;">
+      <h4 class="modal-title">{{confirmationMessage}}</h4>
+    </div>
+    <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+      <div class="modal-footer modal-buttons">
+          <div class="modal-footer modal-buttons"  style="text-align: center;">
+              <button type="button" class="btn btn-cancel" ng-click="cancel()">
+                No
+              </button>
+              <button type="button" class="btn btn-default" ng-click="confirm()">
+                Yes
+              </button>
+          </div>
+      </div>
+    </form>
+  </div>
+</script>
+

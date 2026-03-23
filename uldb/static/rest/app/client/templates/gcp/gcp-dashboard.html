@@ -1,0 +1,84 @@
+
+<!-- <no-records-found message=" Coming Soon...."></no-records-found> -->
+
+<loading loader="{{loader}}"></loading>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-md-12">
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="row db-info shadow-btm"> </div>
+            </div>
+
+            <div class="row" ng-show="gcp_content">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" >
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper padding_right5px">
+                        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                            <h1>Google Cloud Accounts</h1>
+                        </div>
+                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                            <div class="action-bar" ng-show="gcp_content_modeldata != undefined">
+                                <button class="btn btn-default" type="button" ng-click="add_account_model()"> 
+                                + <span>Add Account</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                            <form class="navbar-form">
+                                <div class="form-group">
+                                    <input class="form-control" type="text" ng-model="searchKeyword"
+                                    placeholder="Enter keyword" ng-model-options="{debounce: {'default': 100, 'blur': 0 }}"
+                                    ng-disabled="(gcp_content.length === 0)">
+                                    <button class="btn btn-search top5px" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <section id="no-more-tables" class="margintop20 middle-wrapper">
+                        <table id="example" class="example table table-condensed cf">
+                            <thead class="cf">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Project Id</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in gcp_content | filter: searchKeyword">
+                                    <td>{{ row.name}}</td>
+                                    <td>{{ row.email }}</td>
+                                    <td>{{ row.project_id }}</td>                                   
+                                    <td>
+                                        <div class="action-icons">
+                                            <a ng-click="show_inventory(row)" class="fa fa-list-ul" tooltip-class="customClass" uib-tooltip="Show Inventory" ></a>
+                                            <a class="fa fa-pencil" tooltip-class="customClass" uib-tooltip="Edit" 
+                                            ng-click="edit_account_model(row)" ></a>
+                                            <!-- <a class="fa fa-key" tooltip-class="customClass" uib-tooltip="Change password" ng-click="change_password_model(row)"></a> -->
+                                            <a class="fa fa-trash-o" tooltip-class="customClass" uib-tooltip="Delete" 
+                                            ng-click="delete_account_model(row)"></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ng-if="((gcp_content.length) === 0 || ((gcp_content | filter: searchKeyword).length === 0))">
+                                    <td colspan="3" class="no-records-td">
+                                        <no-records-found message="No GCP Accounts available in your account"></no-records-found>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+            <modal visible="showModal">
+                <ng-include src="gcp_content_modeldata.page"></ng-include>
+            </modal>
+            <modal1 visible="showModal1">
+                <ng-include src="gcp_content_change_password.page"></ng-include>
+            </modal1>
+            <deletemodal visible="showDeleteConfirm"></deletemodal>
+        </div> 
+    </div>
+</div>

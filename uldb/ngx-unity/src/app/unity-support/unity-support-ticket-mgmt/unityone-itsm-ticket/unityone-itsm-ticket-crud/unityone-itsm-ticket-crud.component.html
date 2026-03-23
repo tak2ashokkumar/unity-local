@@ -1,0 +1,254 @@
+<div class="row">
+    <div class="col-12 px-3 mt-2">
+        <div class="card" style="min-height: 600px">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{action}} Ticket</span>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-success mr-2" type="button"
+                        (click)="confirmTicketCreate()">{{action}}</button>
+                    <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body py-2 text-muted">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="form-group row" *ngIf="recordUuid">
+                        <label class="col-2 text-right col-form-label">
+                            Ticket ID<em>*</em> :
+                        </label>
+                        <div class="col-3">
+                            <input id="ticket_id" class="form-control text-dark" type="text"
+                                formControlName="ticket_id" />
+                        </div>
+                    </div>
+
+                    <div formArrayName="fields">
+                        <div *ngFor="let f of fields.controls; let i = index" [formGroupName]="i" class="mb-3">
+
+                            <!-- Label: use field_name as requested -->
+                            <div class="form-group row" *ngIf="getFieldType(i) !== 'COMMENTS' || recordUuid">
+                                <label class="col-2 text-right col-form-label">
+                                    {{ fields.at(i).get('label').value }}<em
+                                        *ngIf="fields.at(i).get('is_required').value">*</em> :
+                                </label>
+
+                                <!-- TEXT -->
+                                <div *ngIf="getFieldType(i) === 'TEXT'" class="col-3">
+                                    <input class="form-control text-dark" formControlName="value"
+                                        [attr.placeholder]="('Enter ' + (fields.at(i).get('label')?.value))"
+                                        [class.is-invalid]="formErrors.fields[i]?.value" />
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+                                <!-- TEXTAREA -->
+                                <div *ngIf="getFieldType(i) === 'TEXTAREA'" class="col-6">
+                                    <textarea class="form-control text-dark" rows="3" formControlName="value"
+                                        [attr.placeholder]="('Enter ' + (fields.at(i).get('label')?.value))"
+                                        [class.is-invalid]="formErrors.fields[i]?.value"></textarea>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+                                <!-- NUMBER -->
+                                <div *ngIf="getFieldType(i) === 'NUMBER'" class="col-3">
+                                    <input type="number" class="form-control text-dark" formControlName="value"
+                                        [attr.placeholder]="('Enter ' + (fields.at(i).get('label')?.value))"
+                                        [class.is-invalid]="formErrors.fields[i]?.value">
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+
+                                <!-- BOOLEAN -->
+                                <div *ngIf="getFieldType(i) === 'BOOLEAN'" class="col-3 mt-2">
+                                    <input type="checkbox" class="ut-checkbox" [id]="'bool_' + i"
+                                        [checked]="fields.at(i).get('value').value"
+                                        (change)="fields.at(i).get('value').setValue($event.target.checked)">
+                                    <label [for]="'bool_' + i" class="primary"></label>
+                                </div>
+
+                                <!-- DATE -->
+                                <!-- <input *ngIf="getFieldType(i) === 'DATE'" type="date" class="col-3 form-control"
+                                    formControlName="value"> -->
+
+                                <div *ngIf="getFieldType(i) === 'DATE'" class="col-3">
+                                    <div class="input-group">
+                                        <owl-date-time #datePicker [pickerType]="'calendar'"
+                                            [scrollStrategy]="scrollStrategy">
+                                        </owl-date-time>
+                                        <input type="text" class="form-control rounded-left" placeholder="Select date"
+                                            formControlName="value" [owlDateTimeTrigger]="datePicker"
+                                            [owlDateTime]="datePicker" [class.is-invalid]="formErrors.fields[i]?.value">
+                                        <div class="input-group-append" [owlDateTimeTrigger]="datePicker">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+
+                                <!-- DATETIME -->
+                                <div *ngIf="getFieldType(i) === 'DATETIME'" class="col-3">
+                                    <div class="input-group">
+                                        <owl-date-time #dateTimePicker [pickerType]="'both'"
+                                            [scrollStrategy]="scrollStrategy">
+                                        </owl-date-time>
+                                        <input type="text" class="form-control rounded-left"
+                                            placeholder="Select date & time" formControlName="value"
+                                            [owlDateTimeTrigger]="dateTimePicker" [owlDateTime]="dateTimePicker"
+                                            [class.is-invalid]="formErrors.fields[i]?.value">
+                                        <div class="input-group-append" [owlDateTimeTrigger]="dateTimePicker">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+
+                                <!-- DROPDOWN -->
+                                <div *ngIf="getFieldType(i) === 'DROPDOWN'" class="col-3">
+                                    <select class="form-control text-dark" formControlName="value"
+                                        [class.is-invalid]="formErrors.fields[i]?.value">
+                                        <option value="">Select Value</option>
+                                        <option *ngFor="let optCtrl of optionsAt(i).controls" [value]="optCtrl.value">
+                                            {{ optCtrl.value }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+                                <!-- REFERENCE -->
+                                <div *ngIf="getFieldType(i) === 'REFERENCE'" class="col-3">
+                                    <select class="form-control text-dark" formControlName="value"
+                                        [class.is-invalid]="formErrors.fields[i]?.value">
+                                        <option value="">Select Reference</option>
+                                        <option *ngFor="let ref of refernce" [value]="ref.uuid">
+                                            {{ ref.ticket_id }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+                                <!-- JSON -->
+                                <div *ngIf="getFieldType(i) === 'JSON'" class="col-6">
+                                    <textarea class="form-control text-dark" rows="6" formControlName="value"
+                                        [attr.placeholder]="('Enter JSON')"
+                                        [class.is-invalid]="formErrors.fields[i]?.value"></textarea>
+                                    <div class="invalid-feedback d-block" *ngIf="formErrors.fields[i]?.value">
+                                        {{ formErrors.fields[i].value }}
+                                    </div>
+                                </div>
+
+                                <!-- COMMENT -->
+                                <div *ngIf="getFieldType(i) === 'COMMENTS' && recordUuid" class="col-6">
+                                    <ng-container *ngIf="commentForms[f.get('field_name').value] as commentForm">
+                                        <form [formGroup]="commentForm">
+                                            <textarea class="form-control text-dark" rows="2" placeholder="Add comment"
+                                                formControlName="comment"></textarea>
+                                            <div class="d-flex justify-content-end mt-2">
+                                                <button type="button" class="btn btn-sm btn-primary"
+                                                    (click)="postComment(f.get('field_name').value)">
+                                                    Post
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- ACTIVITY -->
+                <div class="form-group row mt-4" *ngIf="comments.length && hasCommentField && recordUuid">
+                    <label class="col-2 text-right col-form-label">Activities :</label>
+                    <div class="card col-9 p-0">
+                        <div class="card-body activity-box" style="max-height: 600px; overflow-y: auto;"
+                            (scroll)="onActivityScroll($event)" *ngIf="comments?.length; else noActivity">
+                            <div *ngFor="let c of comments" class="activity-item py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="activity-avatar mr-3">
+                                            {{ getInitials(c.username) }}
+                                        </div>
+                                        <div class="text-dark">
+                                            <span *ngIf="c.activity_type === 'TICKET_CREATED'">
+                                                <strong>{{ c.username }} </strong> created the ticket
+                                            </span>
+                                            <span *ngIf="c.activity_type === 'TICKET_UPDATED'">
+                                                <strong>{{ c.username }} </strong> updated the ticket
+                                            </span>
+                                            <span *ngIf="c.activity_type === 'COMMENT_ADDED'">
+                                                <strong>{{ c.username }} </strong> added a comment
+                                            </span>
+                                            <span *ngIf="c.activity_type === 'TICKET_ACTIVITY'">
+                                                <strong>{{ c.username }} </strong>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="small text-dark">
+                                        {{ c.timestamp }}
+                                    </div>
+                                </div>
+
+                                <div *ngIf="c.activity_type === 'COMMENT_ADDED'" class="text-dark mt-1 ml-5">
+                                    {{ c.content?.comment }}
+                                </div>
+                                <div *ngIf="c.activity_type === 'TICKET_UPDATED'" class="text-dark mt-2 ml-5">
+                                    <div *ngFor="let ch of c.content?.changes" class="d-flex align-items-center mb-1">
+                                        <div class="col-2 text-right text-truncate" title="{{ ch.label }}">
+                                            {{ ch.label }}
+                                        </div>
+                                        <div class="col-2 text-left text-truncate"
+                                            title="{{ getDisplayValue(ch.old) }}">
+                                            {{ getDisplayValue(ch.old) }}
+                                        </div>
+                                        <div class="col-1 text-center"> → </div>
+                                        <div class="col-2 text-left text-truncate"
+                                            title="{{ getDisplayValue(ch.new) }}">
+                                            {{ getDisplayValue(ch.new) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="c.activity_type === 'TICKET_ACTIVITY'" class="mt-1 ml-5">
+                                    <div class="font-weight-bold">
+                                        {{ c.content?.event }}
+                                    </div>
+                                    <div class="text-muted">
+                                        {{ c.content?.details }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center py-2 text-muted" *ngIf="isLoading">
+                                Loading...
+                            </div>
+                        </div>
+                        <ng-template #noActivity>
+                            <div class="card-body text-muted">
+                                No activity yet
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

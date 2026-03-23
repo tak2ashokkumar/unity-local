@@ -1,0 +1,107 @@
+<div class="custom-gradient-bg d-flex flex-column overflow-hidden pb-0 pt-1 px-1 border-top"
+    style="height: calc(100%);">
+    <div class="d-flex align-items-center m-2">
+        <button class="action-icons action-icon-small fa fa-arrow-left" container="body" tooltip="Back"
+            (click)="backToHistoryList()"></button>
+        <h6 class="ml-2 mb-1">History Chat</h6>
+    </div>
+    <div #messagesContainer class="d-flex flex-column justify-content-between h-100 overflow-hidden scroll-container">
+        <ng-container *ngIf="!chatHistoryData?.length">
+            <div class="d-flex align-items-center justify-content-center p-5">
+                <span class="fas fa-spinner fa-spin fa-lg"></span>
+                <span class="ml-2 ">Loading</span>
+            </div>
+        </ng-container>
+        <div #chatContainer class="h-100 w-100" style="overflow-y: auto; overflow-x: hidden;" (scroll)="onScroll()">
+            <div *ngFor="let chat of chatHistoryData; let i = index; trackBy: trackByMessage"
+                class="d-flex flex-column w-100" style="max-width: 100%;">
+                <div *ngIf="chat.user == 'bot'" class="d-flex flex-column justify-content-start mb-1 w-100"
+                    style="max-width: 100%;">
+                    <ng-container *ngIf="chat.type == 'text'">
+                        <div class="message-box bot-message ml-2">
+                            <markdown [data]="chat.message"></markdown>
+                            <ng-container *ngIf="chat.suggestedPrompt">
+                                <div class="mt-2 font-500">Suggested Question:</div>
+                                <div class="text-primary suggested-action" (click)="submitQuery(chat.suggestedPrompt)">
+                                    {{chat.suggestedPrompt}}
+                                </div>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+                <div *ngIf="chat.user == 'user'" class="d-flex justify-content-end mb-1" style="max-width: 100%;">
+                    <div class="message-box user-message mr-2">
+                        {{ chat.message }}
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
+                <div class="message-box bot-message d-flex ml-2">
+                    <span>{{waitMessage}}</span>
+                    <div class="pulse-loader ml-1 align-self-end mb-1">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <virtual-scroller #scroll [items]="chatHistoryData" [enableUnequalChildrenSizes]="true" [useMarginInsteadOfTranslate]="true"
+            [scrollDebounceTime]="100" [bufferAmount]="8" (vsChange)="fetchMoreChats($event)" class="h-100 w-100"
+            style="overflow-x: hidden">
+
+            <div *ngFor="let chat of scroll.viewPortItems; let i = index; trackBy: trackByMessage"
+                class="d-flex flex-column w-100" style="max-width: 100%;">
+                <div *ngIf="chat.user == 'bot'" class="d-flex flex-column justify-content-start mb-1 w-100"
+                    style="max-width: 100%;">
+                    <ng-container *ngIf="chat.type == 'text'">
+                        <div class="message-box bot-message ml-2">
+                            <markdown [data]="chat.message"></markdown>
+                            <ng-container *ngIf="chat.suggestedPrompt">
+                                <div class="mt-2 font-500">Suggested Question:</div>
+                                <div class="text-primary suggested-action" (click)="submitQuery(chat.suggestedPrompt)">
+                                    {{chat.suggestedPrompt}}
+                                </div>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+                <div *ngIf="chat.user == 'user'" class="d-flex justify-content-end mb-1" style="max-width: 100%;">
+                    <div class="message-box user-message mr-2">
+                        {{ chat.message }}
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
+                <div class="message-box bot-message d-flex ml-2">
+                    <span>{{waitMessage}}</span>
+                    <div class="pulse-loader ml-1 align-self-end mb-1">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+            </div>
+        </virtual-scroller> -->
+        <form *ngIf="form" [formGroup]="form" class="w-100 mt-auto p-2">
+            <div class="row">
+                <div class="col d-flex align-items-center">
+                    <div class="input-group">
+                        <input class="form-control border-left-radius" type="text" formControlName="chat"
+                            placeholder="Ask me anything..." (keyup.enter)="onSubmit()" style="height: 2.7rem;">
+                        <div class="input-group-append">
+                            <span class="input-group-text bg-white border-right-radius" (click)="onSubmit()"
+                                style="cursor: pointer;">
+                                <i class="fas fa-paper-plane font-lg mr-1"
+                                    [ngClass]="{'text-success': !isTyping, 'text-muted': isTyping}"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- <ng-container *ngIf="chatHistoryData.length > 1">
+                        <button class="action-icons action-icons-big fa fa-plus ml-2"></button>
+                    </ng-container> -->
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

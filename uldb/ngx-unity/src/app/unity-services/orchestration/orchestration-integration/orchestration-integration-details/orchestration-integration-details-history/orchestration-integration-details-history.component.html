@@ -1,0 +1,77 @@
+<div class="card-body p-0">
+  <table class="table table-sm text-left">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Task Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Datetime</th>
+        <th class="text-center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let view of viewData" setTableColumnWidth>
+        <td>{{view.playbookName}}</td>
+        <td>{{view.taskName}}</td>
+        <td>{{view.playbookType}}</td>
+        <td>{{view.playbookDescription}}</td>
+        <td>{{view.datetime}}</td>
+        <td class="action-icons-column text-center">
+          <button class="action-icons mb-0 fa fa-eye font-sm ml-1" tooltip="View" (click)="viewDetails(view)"></button>
+          <button class="action-icons mb-0 fas fa-play font-sm ml-1" tooltip="Execute Task" (click)="executeTask(view)"
+            accessControl moduleName="DevOps Automation" accessType="Manage DevOps Automation"
+            elementType="actionbtn"></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="!viewData.length" class="d-flex py-5 justify-content-center align-items-center">
+    No playbooks available.
+  </div>
+</div>
+
+<!-- <orchestration-tasks-execution (onExec)="refreshPage($event)"></orchestration-tasks-execution> -->
+<!-- <orchestration-task-execute *ngIf="executeTaskFlag"></orchestration-task-execute> -->
+
+<ng-template #viewPlaybook>
+  <div class="card mb-0">
+    <div class="card-header">
+      Playbook Details
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="playbookViewModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="detailsForm" [formGroup]="detailsForm">
+        <div class="row">
+          <div class="form-group col">
+            <label for="name" class="col-3 col-form-label">Name</label>
+            <input id="name" class="form-control" type="text" formControlName="name" readonly>
+          </div>
+          <div class="form-group col">
+            <label for="type" class="col-3 col-form-label">Type</label>
+            <input id="type" class="form-control" type="text" formControlName="type" readonly>
+          </div>
+          <div class="form-group col">
+            <label for="description" class="col-5 col-form-label">Description</label>
+            <input id="description" class="form-control" type="text" formControlName="description" readonly>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col">
+            <label for="content">Playbook</label>
+            <textarea id="content" class="form-control" type="text" rows="20" formControlName="content"
+              readonly></textarea>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="playbookViewModalRef.hide()"
+        type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

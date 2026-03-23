@@ -1,0 +1,7 @@
+<h5 *ngIf="pcFastData.length">Private Cloud</h5>
+<div class="row flex-wrap">
+  <div class="col-6 col-card-height mb-4" *ngFor="let pcData of pcFastData">
+    <private-cloud-widget *ngIf="!isClusterWidget(pcData.platfromType)" [pcData]="pcData"></private-cloud-widget>
+    <private-cloud-widget-clusters *ngIf="isClusterWidget(pcData.platfromType)"  [pcData]="pcData"></private-cloud-widget-clusters>
+  </div>
+</div>

@@ -1,0 +1,274 @@
+<div class="row">
+  <div class="col-sm-6">
+   <span ng-if="breadCrumb">
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<!-- save for later
+<table class="table table-hover table-responsive">
+  <thead>
+  <tr>
+    <th class="col-sm-5">Name</th>
+    <th class="col-sm-7">Block</th>
+  </tr>
+  </thead>
+  <tbody ng-repeat="result in model.results">
+  <tr>
+    <td>{{ result.name }}</td>
+    <td>{{ result.prefix }}/{{ result.prefixlen }}</td>
+  </tr>
+  <tr ng-repeat="location in result.locations">
+    <td class="col-sm-12">
+    <table class="table table-hover table-responsive">
+      <tr>
+        <td class="col-sm-5">
+          {{ location.name }}
+        </td>
+        <td class="col-sm-7">
+          {{ location.prefix }}/{{ location.prefixlen }}
+        </td>
+      </tr>
+    </table>
+    </td>
+  </tr>
+  </tbody>
+</table>
+-->
+
+<div class="row">
+  <div class="col-sm-9">
+    <card>
+      <div class="row" ng-repeat="result in model.results">
+        <div class="col-sm-12">
+          <h4>{{ result.name }}</h4>
+          <div class="row">
+            <div class="col-sm-5">
+              <strong>Name</strong>
+            </div>
+            <div class="col-sm-4">
+              <strong>Description</strong>
+            </div>
+            <div class="col-sm-3">
+              <strong>CIDR</strong>
+            </div>
+          </div>
+          <div ng-repeat="location in result.locations" class="location-table">
+            <div class="row">
+              <div class="col-sm-9">
+                <strong>{{ location.name }}</strong>
+              </div>
+              <div class="col-sm-3">
+                {{ location.prefix }}/{{ location.prefixlen }}
+              </div>
+            </div>
+            <div ng-repeat="zone in location.zones" class="zone-table">
+              <div class="row"
+                   ng-click="selectZone(zone, $index)"
+                   ng-class="{'zone-active': isSelected(zone)}">
+                <div class="col-sm-9">
+                  {{ zone.name }}
+                </div>
+                <div class="col-sm-3">
+                  {{ zone.prefix }}/{{ zone.prefixlen }}
+                </div>
+              </div>
+              <div ng-repeat="assignment in zone.assignments">
+                <div class="row"
+                     ng-click="selectAssignment(assignment, $index, zone)"
+                     ng-class="{'assignment-active': isSelectedAssignment(assignment)}">
+                  <div class="col-sm-4 col-sm-offset-1">
+                    {{ assignment.customer.organization_name || "Unassigned" }}
+                  </div>
+                  <div class="col-sm-4">
+                    {{ assignment.description }}
+                  </div>
+                  <div class="col-sm-3">
+                    {{ assignment.prefix }}/{{ assignment.prefixlen }}
+                  </div>
+                </div>
+                <div ng-repeat="intf in assignment.interfaces">
+                  <div class="row"
+                       ng-click="selectInterface(intf, $index, assignment)"
+                       ng-class="{'assignment-active': isSelectedInterface(intf)}">
+                    <div class="col-sm-3 col-sm-offset-2">
+                      {{ intf.customer.organization_name || "Unassigned" }}
+                    </div>
+                    <div class="col-sm-4">
+                      {{ intf.description }}
+                    </div>
+                    <div class="col-sm-3">
+                      {{ appleCIDR(intf) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </card>
+  </div>
+  <div class="col-sm-3 detail-level">
+    <div ng-if="selectionExists()">
+      <h4>
+        <span ng-if="selectedZone.zone !== null">{{ selectedZone.zone.name }}</span>
+        <span ng-if="selectedAssignment.assignment !== null">
+          {{ selectedAssignment.assignment.customer.organization_name || "Unassigned Block" }}
+        </span>
+        <span ng-if="selectedInterface.interface !== null">
+          {{ selectedInterface.interface.customer.organization_name || "Unassigned Interface" }}
+        </span>
+      </h4>
+
+      <table class="table table-responsive">
+        <tbody>
+        <tr>
+          <th>Type</th>
+          <td>
+            <span ng-if="selectedZone.zone !== null">Zone</span>
+            <span ng-if="selectedAssignment.assignment !== null">Assignment</span>
+            <span ng-if="selectedInterface.interface !== null">Interface</span>
+          </td>
+        </tr>
+        </tbody>
+
+        <tbody ng-if="selectedZone.zone !== null">
+        <tr>
+          <th>Zone Type</th>
+          <td>{{ zoneType(selectedZone.zone) }}</td>
+        </tr>
+        <tr>
+          <th>CIDR</th>
+          <td>{{ appleCIDR(selectedZone.zone) }}</td>
+        </tr>
+        </tbody>
+
+        <tbody ng-if="selectedAssignment.assignment !== null">
+        <tr>
+          <th>Customer</th>
+          <td>{{ selectedAssignment.assignment.customer.organization_name }}</td>
+        </tr>
+        <tr>
+          <th>CIDR</th>
+          <td>{{ appleCIDR(selectedAssignment.assignment) }}</td>
+        </tr>
+        <tr>
+          <th></th>
+          <td>
+
+          </td>
+        </tr>
+        </tbody>
+
+        <tbody ng-if="selectedInterface.interface !== null">
+        <tr>
+          <th>Customer</th>
+          <td>{{ selectedInterface.interface.customer.organization_name }}</td>
+        </tr>
+        <tr>
+          <th>CIDR</th>
+          <td>{{ appleCIDR(selectedInterface.interface) }}</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div ng-if="selectedZone.zone !== null">
+        <p>
+          <button class="btn btn-info" ng-click="create48(selectedZone)">Create /48</button>
+        </p>
+      </div>
+      <div ng-if="selectedAssignment.assignment !== null">
+        <p>
+          <button class="btn btn-info" ng-click="setCustomer()">Set Customer</button>
+        </p>
+        <p>
+          <button class="btn btn-info" ng-click="setDesc(selectedAssignment.assignment)">Set Description</button>
+        </p>
+        <p>
+          <button class="btn btn-success" ng-click="create64(selectedAssignment)">Create /64</button>
+        </p>
+        <p>
+          <button class="btn btn-danger" ng-click="delete48()" confirm>Delete Assignment</button>
+        </p>
+      </div>
+      <div ng-if="selectedInterface.interface !== null">
+        <p>
+          <button class="btn btn-info" ng-click="setCustomer()">Set Customer</button>
+        </p>
+        <p>
+          <button class="btn btn-info" ng-click="setDesc(selectedInterface.interface)">Set Description</button>
+        </p>
+        <p>
+          <button class="btn btn-danger" ng-click="deleteIntf()" confirm>Delete Interface</button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="descModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Set Description for {{ appleCIDR(obj) }}</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="desc" class="col-sm-2 control-label">
+          Description
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control" ng-model="desc">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="setDescription(obj, desc)">
+      Set description
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="customerModal.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Set Customer for {{ appleCIDR(obj) }}</h3>
+  </div>
+  <div class="modal-body" style="height: 300px;">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="org" class="col-sm-2 control-label">
+          Organization
+        </label>
+
+        <div class="col-sm-10">
+          <input type="text" class="form-control"
+                 ng-model="org"
+                 placeholder="Type the name of an Organization to search..."
+                 uib-typeahead="org as org.organization_name for org in getOrgs($viewValue)">
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-success" type="button" ng-click="assign(obj, org)">
+      Assign to this customer!
+    </button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">
+      Never mind, I made a mistake.
+    </button>
+  </div>
+</script>

@@ -1,0 +1,37 @@
+<!-- <div id="myModalone" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+       <div class="modal-content">
+           <div class="modal-header">
+               <button type="button" class="close" data-dismiss="myModalone">&times;</button>
+               <h4 class="modal-title">Delete Confirmation</h4>
+           </div>
+           <div class="modal-footer modal-buttons">
+               <div class="modal-footer modal-buttons" style="text-align: center;">
+                   <button type="button" class="btn btn-cancel" data-dismiss="myModalone" ng-click="cancelmethod()">Cancel</button>
+                   <button type="button" class="btn btn-default" data-dismiss="myModalone" ng-click="remove(selection, idx)">Ok</button>
+               </div>
+           </div>
+       </div>
+   </div>
+</div> -->
+
+<div class="modal-content">
+    <div class="modal-header" style="text-align: center;">
+        <h4 class="modal-title">Confirm Delete</h4>
+    </div>
+  <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+    <div class="modal-body" style="text-align: center;">
+        {{delete_confirmation_msg}}
+    </div>
+    <div class="modal-footer modal-buttons">
+        <div class="modal-footer modal-buttons"  style="text-align: center;">
+            <button type="button" class="btn btn-cancel" ng-click="ctrl.confirm_cancel()">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-default" ng-click="ctrl.remove(selection, idx)">
+              Confirm
+            </button>
+        </div>
+    </div>
+  </form>
+</div>

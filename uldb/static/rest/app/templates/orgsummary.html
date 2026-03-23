@@ -1,0 +1,224 @@
+<h1>Organization Summary</h1>
+
+<div class="row">
+  <div class="col-sm-6">
+    <h3>{{ title.plural }}</h3>
+   <span ng-if="breadCrumb">
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+  <div class="col-sm-6">
+    <button class="btn btn-primary" ng-click="ctrl.add()" style="float:right;">Add</button>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<input type="text"
+       ng-model="org"
+       placeholder="Type company name to search"
+       uib-typeahead="org as org.organization_name for org in getOrgs($viewValue)"
+       typeahead-loading="loadingLocations"
+       typeahead-no-results="noResults"
+       class="form-control">
+<button class="btn btn-primary" type="button" ng-click="getOrgSummary(org)">Search</button>
+
+<div ng-if="model !== null">
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Servers
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Server Name</th>
+        <th>at</th>
+        <th>mobo</th>
+        <th>cab</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="server in model.servers">
+        <td>{{ server.system_name }}</td>
+        <td>{{ server.system_assettag }}</td>
+        <td>{{ server.motherboard }}</td>
+        <td>{{ server.cabinet }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    VMs
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>vm name</th>
+        <th>vcpu</th>
+        <th>memory</th>
+        <th>disk</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="vm in model.vms">
+        <td>{{ vm.name }}</td>
+        <td>{{ vm.vcpu }}</td>
+        <td>{{ vm.memory }} + {{ vm.memory_measuretype }}</td>
+        <td>{{ vm.disk }} + {{ vm.disk_measuretype }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Switches
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>vm name</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="switch in model.switches">
+        <td>{{ switch }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Firewalls
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>name</th>
+        <th>at</th>
+        <th>public_ip</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="firewall in model.firewalls">
+        <td>{{ firewall.name }}</td>
+        <td>{{ firewall.assettag }}</td>
+        <td>{{ firewall.public_ipaddress }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Load balancers
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>name</th>
+        <th>at</th>
+        <th>public_ip</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="load_balancer in model.load_balancers">
+        <td>{{ load_balancer.name }}</td>
+        <td>{{ load_balancer.assettag }}</td>
+        <td>{{ load_balancer.public_ipaddress }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Cabinets
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>name</th>
+        <th>at</th>
+        <th>public_ip</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="load_balancer in model.load_balancers">
+        <td>{{ load_balancer.name }}</td>
+        <td>{{ load_balancer.assettag }}</td>
+        <td>{{ load_balancer.public_ipaddress }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Cages
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>name</th>
+        <th>at</th>
+        <th>public_ip</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="load_balancer in model.load_balancers">
+        <td>{{ load_balancer.name }}</td>
+        <td>{{ load_balancer.assettag }}</td>
+        <td>{{ load_balancer.public_ipaddress }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    PDUs
+  </div>
+  <div class="panel-body">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>name</th>
+        <th>at</th>
+        <th>public_ip</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="load_balancer in model.load_balancers">
+        <td>{{ load_balancer.name }}</td>
+        <td>{{ load_balancer.assettag }}</td>
+        <td>{{ load_balancer.public_ipaddress }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<pre>{{ model | json }}</pre>
+</div>

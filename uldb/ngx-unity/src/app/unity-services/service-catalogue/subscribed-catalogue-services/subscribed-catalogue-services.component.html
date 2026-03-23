@@ -1,0 +1,48 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card text-center">
+      <div class="card-header bg-transparent border-bottom-0 mt-3">
+        <div class="row">
+          <div class="col-3">
+            <table-search-box (searched)="onSearched($event)"></table-search-box>
+          </div>
+          <div class="col ">
+            <span class="ml-2 text-muted font-sm float-right align-middle"><span class="badge badge-pill badge-secondary">{{filteredCatalogueServices.length}}</span>&nbsp;Services</span>
+            <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="filteredCatalogueServices.length"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table text-left" *ngIf="filteredCatalogueServices.length">
+          <thead>
+            <tr>
+              <th>Service Category</th>
+              <th>Provider</th>
+              <th>Service Name</th>
+              <th>Charge </th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let view of pagedviewData">
+              <td>{{view.serviceCategory}}</td>
+              <td>{{view.provider}}</td>
+              <td>{{view.serviceName}}</td>
+              <td>{{view.charge}}</td>
+              <td class="action-icons-column">
+                <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+                  (click)="createTicket(view)"></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="filteredCatalogueServices.length"></table-entries>
+        <table-pager *ngIf="filteredCatalogueServices.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="filteredCatalogueServices.length" (pageChange)="pageChange($event)"></table-pager>
+        <div *ngIf="!filteredCatalogueServices.length" class="text-center text-muted"> No Services available !! </div>
+      </div>
+    </div>
+  </div>
+</div>

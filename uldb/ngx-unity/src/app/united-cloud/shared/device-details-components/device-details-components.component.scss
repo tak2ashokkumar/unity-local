@@ -1,0 +1,43 @@
+.status {
+  .value {
+    color: #378ad8 !important;
+  }
+
+  .card.active {
+    border: 1px solid #378ad8 !important;
+    font-weight: bold !important;
+
+    background-color: #378ad8 !important;
+    color: #fff !important;
+
+    // color: #378ad8 !important;
+
+    .value {
+      color: #fff !important;
+    }
+  }
+}
+
+.performance-overview-bg-color {
+  background-color: #f0f3f5;
+}
+
+.tab-scroll-wrapper {
+  scroll-behavior: smooth;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.tab-scroll-wrapper ::ng-deep .nav-tabs {
+  flex-wrap: nowrap !important;
+}
+
+.tab-content-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+#tabset-container{
+  width: 100%;
+}

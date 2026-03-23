@@ -1,0 +1,195 @@
+@use "sass:math";
+
+@import "variables";
+
+$wizard-color-neutral: $secondary !default;
+$wizard-color-active: $primary !default;
+$wizard-color-complete: $success !default;
+$wizard-step-width-height: 40px !default;
+
+.step-indicator {
+    border-collapse: separate;
+    display: block;
+    margin-left: 0px;
+    position: relative;
+    table-layout: fixed;
+    text-align: center;
+    // vertical-align: middle;
+    padding-left: 0;
+    // padding-top: 20px;
+    margin-bottom: 0;
+    overflow-x: auto;
+
+    li {
+        display: table-cell;
+        position: relative;
+        float: none;
+        padding: 0;
+        width: 1%;
+
+        &:after {
+            background-color: $wizard-color-neutral;
+            content: "";
+            display: block;
+            height: 1px;
+            position: absolute;
+            width: 100%;
+            top: math.div($wizard-step-width-height, 2);
+        }
+
+        &:after {
+            left: 50%;
+        }
+
+        &:last-of-type {
+            &:after {
+                display: none !important;
+            }
+        }
+
+        &.active {
+            .step {
+                border-color: $wizard-color-active;
+                color: $wizard-color-active;
+            }
+
+            .caption {
+                color: $wizard-color-active;
+            }
+        }
+
+        &.complete {
+            &:after {
+                background-color: $wizard-color-complete;
+            }
+
+            .step {
+                border-color: $wizard-color-complete;
+                color: $wizard-color-complete;
+            }
+
+            .caption {
+                color: $wizard-color-complete;
+            }
+        }
+    }
+
+    .step {
+        background-color: #fff;
+        border-radius: 50%;
+        border: 1px solid $wizard-color-neutral;
+        color: $wizard-color-neutral;
+        height: $wizard-step-width-height;
+        line-height: $wizard-step-width-height;
+        margin: 0 auto;
+        position: relative;
+        width: $wizard-step-width-height;
+        z-index: 1;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .caption {
+        color: $wizard-color-neutral;
+        padding: 11px 16px;
+        span {
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}
+.set-min-height {
+    min-height: calc(100vh - 1.75rem - 100px);
+}
+
+ul,
+#myUL {
+    list-style-type: none;
+}
+
+#myUL {
+    margin: 0;
+    padding: 0;
+}
+.highlight-node {
+    background-color: $primary;
+    color: $white;
+}
+.network-wrapper {
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    .row-item {
+        display: flex;
+        .label-wrapper {
+            width: 250px;
+            background-color: #f0f3f5;
+            padding: 8px 10px;
+        }
+        .value-wrapper {
+            width: calc(100% - 250px);
+            // .extra-field {
+            //     // width: 130px;
+            // }
+            .select-md {
+                width: 175px;
+            }
+        }
+    }
+    .table-wrapper {
+        display: flex;
+        .table-item {
+            flex: 1;
+            .heading {
+                background-color: #f0f3f5;
+            }
+            // .content {
+            //     li {
+            //     }
+            // }
+        }
+    }
+    .drag-drop-file {
+        border-style: dashed !important ;
+        .file-upload {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    }
+}
+.modal-dialog {
+    height: calc(100vh - 1.75vh - 100px);
+    overflow-y: scroll;
+}
+
+.dnd-container {
+    max-height: 100%;
+    padding: 2rem;
+    text-align: center;
+    border: dashed 1px #979797;
+    position: relative;
+    margin: 0 auto;
+    input {
+        opacity: 0;
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+    
+    h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #38424c;
+    }
+}

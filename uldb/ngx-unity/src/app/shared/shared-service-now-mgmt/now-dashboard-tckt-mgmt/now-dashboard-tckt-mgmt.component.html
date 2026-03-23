@@ -1,0 +1,48 @@
+<table class="table text-left" *ngIf="viewData.length">
+  <thead class="">
+    <tr>
+      <th>Ticket ID</th>
+      <th class="ticket-subject">Short Description</th>
+      <th>State</th>
+      <th>Priority</th>
+      <!-- <th>Urgency</th> -->
+      <!-- <th>Severity</th> -->
+      <th>Created On</th>
+      <th>Updated On</th>
+      <th>Resolved On</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let ticket of viewData" setTableColumnWidth>
+      <td>
+        <a class="btn btn-link text-primary text-decoration-none p-0 table-column-btn" [tooltip]="ticket.ticketId"
+          (click)="goToDetails(ticket)">{{ticket.ticketId}}</a>
+      </td>
+      <td>
+        <div [tooltip]="ticket.shortDescription">{{ticket.shortDescription}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.state">{{ticket.state}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.priority">{{ticket.priority}}</div>
+      </td>
+      <!-- <td>
+          <div [tooltip]="ticket.urgency">{{ticket.urgency}}</div>
+        </td> -->
+      <!-- <td>
+          <div [tooltip]="ticket.severity">{{ticket.severity}}</div>
+        </td> -->
+      <td>
+        <div [tooltip]="ticket.openedAt">{{ticket.openedAt}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.updatedOn">{{ticket.updatedOn}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.resolvedAt">{{ticket.resolvedAt}}</div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="text-center text-muted" *ngIf="!viewData.length">No Tickets To Display.</div>

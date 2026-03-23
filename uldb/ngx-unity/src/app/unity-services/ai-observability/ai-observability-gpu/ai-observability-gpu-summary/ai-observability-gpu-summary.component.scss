@@ -1,0 +1,16 @@
+.move-dropdowns-up-end-of-top-tabs {
+    position: relative;
+    z-index: 100;
+    margin-top: -65px;
+    margin-bottom: 0.8rem;
+    padding-top: 0.1rem;
+    pointer-events: none;
+}
+
+.move-dropdowns-up-end-of-top-tabs * {
+    pointer-events: auto;
+}
+
+.chart-min-height {
+    min-height: 280px;
+}

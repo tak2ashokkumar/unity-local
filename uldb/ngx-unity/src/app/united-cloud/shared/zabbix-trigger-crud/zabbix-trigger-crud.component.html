@@ -1,0 +1,238 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center py-2">
+                <div class="w-75">{{action}} Trigger</div>
+                <div class="w-25">
+                    <a class="nav-link py-0 text-right text-warning" (click)="goBack()">
+                        <i class="fa fa-arrow-left">&nbsp;</i>Trigger List</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form *ngIf="triggerForm" [formGroup]="triggerForm">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <label for="name" class="form-col-form-label">Name<em>*</em></label>
+                            <input id="name" class="form-control" type="text" formControlName="name" autocomplete="off"
+                                [class.is-invalid]="triggerFormErrors.name">
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.name">{{triggerFormErrors.name}}
+                            </div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="severity" class="font-col-form-label" for="severity">Severity<em>*</em></label>
+                            <select id="severity" class="form-control" formControlName="severity"
+                                [class.is-invalid]="triggerFormErrors.severity">
+                                <option value="" disabled>Select Severity</option>
+                                <option value="information">Information</option>
+                                <option value="warning">Warning</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.severity">
+                                {{triggerFormErrors.severity}}</div>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="mode" class="form-col-form-label" for="mode">Mode</label>
+                            <i class="fa fa-info-circle text-muted ml-2" container="body"
+                                containerClass="info-multi-line" [tooltip]="'Event Generation Mode'"></i>
+                            <select id="mode" class="form-control" formControlName="mode"
+                                [class.is-invalid]="triggerFormErrors.mode">
+                                <option value="0">Single</option>
+                                <option value="1">Multiple</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.mode">{{triggerFormErrors.mode}}
+                            </div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="problem_expression" class="form-col-form-label"
+                                for="problem_expression">Rules<em>*</em></label>
+                            <ng-container *ngTemplateOutlet="triggerRuleFormRef"></ng-container>
+                            <textarea id="problem_expression" rows="4" class="form-control"
+                                formControlName="problem_expression"
+                                [class.is-invalid]="triggerFormErrors.problem_expression"></textarea>
+                            <div class="invalid-feedback" *ngIf="triggerFormErrors.problem_expression">
+                                {{triggerFormErrors.problem_expression}}</div>
+                        </div>
+
+                        <div class="col-12 " *ngIf="device?.deviceType !== 'GCP'">
+                            <div class="form-group col-12" *ngIf="triggerForm.controls.auto_remediation">
+                                <input id="auto_remediation" class="form-check-form-input" type="checkbox"
+                                    formControlName="auto_remediation">
+                                <label for="auto_remediation" class="form-col-form-label">
+                                    <span class="checkbox-text">Auto Remediation</span>
+                                </label>
+                            </div>
+                            <div class="col-12 d-flex p-0 m-0">
+                                <div class="form-group col-3" *ngIf="triggerForm.controls.script">
+                                    <label for="script" class="form-col-form-label">Select Script</label>
+                                    <select id="script" class="form-control" formControlName="script"
+                                        [class.is-invalid]="triggerFormErrors.script">
+                                        <option value="" disabled>Select Script</option>
+                                        <option *ngFor="let script of scripts" [value]="script.uuid">{{script.name}}
+                                        </option>
+                                        <option value="view_all_scripts">View All</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="triggerFormErrors.script">
+                                        {{triggerFormErrors.script}}</div>
+                                </div>
+
+                                <div class="form-group col-3" *ngIf="triggerForm.controls.credential">
+                                    <label for="credential" class="form-col-form-label">Select Credential</label>
+                                    <select class="form-control" id="credential" formControlName="credential"
+                                        [class.is-invalid]="triggerFormErrors.credential">
+                                        <option value="" disabled>Select Credential</option>
+                                        <option *ngFor="let c of credentials" [value]="c.id">{{c.name}} - {{c.type}}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="triggerFormErrors.credential">
+                                        {{triggerFormErrors.credential}}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                    (click)="confirmTriggerCreate()">Submit</button>
+                <button *ngIf="triggerForm && triggerForm.controls.disabled" class="btn btn-sm btn-warning pull-right"
+                    (click)="switchTriggerState()" type="button">
+                    <span *ngIf="triggerForm.controls.disabled.value"> Enable</span>
+                    <span *ngIf="!triggerForm.controls.disabled.value"> Disable</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #triggerRuleFormRef>
+    <div class="">
+        <form class="form-inline" [formGroup]="triggerRulesForm" *ngIf="triggerRulesForm">
+            <div class="col-3 pl-0">
+                <div class="form-group mb-2">
+                    <select id="item_key" class="form-control" formControlName="item_key"
+                        [class.is-invalid]="triggerRulesFormErrors.item_key">
+                        <option value="" disabled>Select Metric</option>
+                        <option *ngFor="let item of items" [ngValue]="item">{{item.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.item_key">
+                        {{triggerRulesFormErrors.item_key}}</div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="form-group mb-2">
+                    <select id="function" class="form-control" formControlName="function"
+                        [class.is-invalid]="triggerRulesFormErrors.function">
+                        <option *ngFor="let func of zabbixTriggerFunctions" [ngValue]="func">{{func.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.function">
+                        {{triggerRulesFormErrors.function}}</div>
+                </div>
+            </div>
+            <div class="col-2 px-0" *ngIf="triggerRulesForm.controls.function_value">
+                <div class="form-group mb-2">
+                    <div class="input-group">
+                        <input id="function_value" class="form-control" type="text" formControlName="function_value"
+                            [class.is-invalid]="triggerRulesFormErrors.function_value">
+                        <div class="input-group-addon input-select" *ngIf="triggerRulesForm.controls.function_unit">
+                            <select id="function_unit" class="form-control px-0" formControlName="function_unit"
+                                [class.is-invalid]="triggerRulesFormErrors.function_value">
+                                <option *ngFor="let unit of zabbixTriggerFunctionUnits" [value]="unit">{{unit}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback d-block" *ngIf="triggerRulesFormErrors.function_value">
+                        {{triggerRulesFormErrors.function_value}}</div>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="triggerRulesForm.controls.function_in">
+                <div class="form-group mb-2">
+                    <input id="value" class="form-control" type="number" placeholder="Values"
+                        formControlName="function_in" [class.is-invalid]="triggerRulesFormErrors.function_in">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.function_in">
+                        {{triggerRulesFormErrors.function_in}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="triggerRulesForm.controls.min_value">
+                <div class="form-group mb-2">
+                    <input id="min_value" class="form-control" type="number" placeholder="Min Value"
+                        formControlName="min_value" [class.is-invalid]="triggerRulesFormErrors.min_value">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.min_value">
+                        {{triggerRulesFormErrors.min_value}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="triggerRulesForm.controls.max_value">
+                <div class="form-group mb-2">
+                    <input id="max_value" class="form-control" type="number" placeholder="Max Value"
+                        formControlName="max_value" [class.is-invalid]="triggerRulesFormErrors.max_value">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.max_value">
+                        {{triggerRulesFormErrors.max_value}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="triggerRulesForm.controls.pattern">
+                <div class="form-group mb-2">
+                    <input id="pattern" class="form-control" type="text" placeholder="Pattern" formControlName="pattern"
+                        [class.is-invalid]="triggerRulesFormErrors.pattern">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.pattern">
+                        {{triggerRulesFormErrors.pattern}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="triggerRulesForm.controls.detect_period">
+                <div class="form-group mb-2">
+                    <input id="value" class="form-control" type="text" placeholder="Detect Period"
+                        formControlName="detect_period" [class.is-invalid]="triggerRulesFormErrors.detect_period">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.detect_period">
+                        {{triggerRulesFormErrors.detect_period}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="triggerRulesForm.controls.season">
+                <div class="form-group mb-2">
+                    <input id="value" class="form-control" type="text" placeholder="Season" formControlName="season"
+                        [class.is-invalid]="triggerRulesFormErrors.season">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.season">
+                        {{triggerRulesFormErrors.season}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2" *ngIf="triggerRulesForm.controls.deviation">
+                <div class="form-group mb-2">
+                    <input id="value" class="form-control" type="number" placeholder="Deviation"
+                        formControlName="deviation" [class.is-invalid]="triggerRulesFormErrors.deviation">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.deviation">
+                        {{triggerRulesFormErrors.deviation}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="form-group mb-2">
+                    <select id="operator" class="form-control w-100" formControlName="operator"
+                        [class.is-invalid]="triggerRulesFormErrors.operator">
+                        <option *ngFor="let op of zabbixTriggerOperators" [ngValue]="op">{{op.name}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.operator">
+                        {{triggerRulesFormErrors.operator}}</div>
+                </div>
+            </div>
+            <div class="col-2">
+                <div class="form-group mb-2">
+                    <input id="value" class="form-control" type="text" formControlName="value"
+                        [class.is-invalid]="triggerRulesFormErrors.value">
+                    <div class="invalid-feedback" *ngIf="triggerRulesFormErrors.value">{{triggerRulesFormErrors.value}}
+                    </div>
+                </div>
+            </div>
+            <div class="col text-right pr-0">
+                <button type="button" class="btn btn-sm btn-success mb-2" (click)="confirmTriggerRuleCreate()"> Add
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>

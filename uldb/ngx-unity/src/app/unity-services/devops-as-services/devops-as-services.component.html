@@ -1,0 +1,155 @@
+<app-main-tab [tabItems]="tabItems"></app-main-tab>
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <div class="col-12">
+            <div class="card rounded-0 border-top-0">
+              <div class="card-header bg-transparent border-bottom-0 mt-3">
+                <div class="row">
+                  <div class="col-3">
+                    <table-search-box (searched)="onSearched($event)"></table-search-box>
+                  </div>
+                  <div class="col">
+                    <span class="ml-2 text-muted font-sm float-right align-middle"><span class="badge badge-pill badge-secondary">{{count}}</span>&nbsp;DevOps
+                      Controllers</span>
+                    <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" [tooltip]="addServerTooltipMessage"
+                      [class.disabled]="!managementEnabled" (click)="addController()">Add
+                      Server</button>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count" (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <table class="table text-left" sortableTable (sorted)="onSorted($event)" *ngIf="viewData.length">
+                  <thead>
+                    <tr>
+                      <th sortable-column="device_name">Server</th>
+                      <th sortable-column="platform_type">Platform Type</th>
+                      <th sortable-column="os">Operating System</th>
+                      <th sortable-column="ip_address">Management IP</th>
+                      <th sortable-column="port">Port</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let view of viewData" setTableColumnWidth>
+                      <td>
+                        <div [tooltip]="view.serverName">{{view.serverName}}</div>
+                      </td>
+                      <td>
+                        <div [tooltip]="view.platformType">{{view.platformType}}</div>
+                      </td>
+                      <td>
+                        <div [tooltip]="view.os">{{view.os}}</div>
+                      </td>
+                      <td>
+                        <div [tooltip]="view.managementIP">{{view.managementIP}}</div>
+                      </td>
+                      <td>
+                        <div [tooltip]="view.port">{{view.port}}</div>
+                      </td>
+                      <td class="action-icons-column">
+                        <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit" (click)="editController(view)"></button>
+                        <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete" (click)="deleteController(view.deviceId)"></button>
+
+                        <button id="button-container" class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
+                          (click)="consoleAccessSameTab(view)" [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"></button>
+
+                        <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1" (click)="consoleAccessNewTab(view)"
+                          [tooltip]="view.newTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}"></button>
+
+                        <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+                          (click)="createTicket(view)"></button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count"></table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                  [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted" *ngIf="!viewData.length">No associated DevOps Controllers were
+                  found.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+<ng-template #create>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Server
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="createModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="createForm" [formGroup]="createForm">
+        <div class="form-group">
+          <label class="form-col-form-label">Name<em>* </em></label>
+          <input id="device_name" class="form-control" type="text" formControlName="device_name" [ngClass]="{'is-invalid' : createFormErrors.device_name}">
+          <div class="invalid-feedback" *ngIf="createFormErrors.device_name">{{createFormErrors.device_name}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="region"> Platform Type<em>*</em></label>
+          <select id="platform_type" class="form-control" type="text" formControlName="platform_type"
+            [class.is-invalid]="createFormErrors.platform_type">
+            <option [value]="'Linux'">Linux</option>
+            <option [value]="'Windows'">Windows</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="createFormErrors.platform_type">{{createFormErrors.platform_type}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="region"> OS<em>*</em></label>
+          <input id="os" class="form-control" type="text" formControlName="os" [ngClass]="{'is-invalid' : createFormErrors.os}">
+          <div class="invalid-feedback" *ngIf="createFormErrors.os">{{createFormErrors.os}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="ip_address"> IP Address<em>*</em></label>
+          <input id="ip_address" class="form-control" type="text" formControlName="ip_address" [ngClass]="{'is-invalid' : createFormErrors.ip_address}">
+          <div class="invalid-feedback" *ngIf="createFormErrors.ip_address">{{createFormErrors.ip_address}}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="port"> Port<em>*</em></label>
+          <input id="port" class="form-control" type="text" formControlName="port" [ngClass]="{'is-invalid' : createFormErrors.port}">
+          <div class="invalid-feedback" *ngIf="createFormErrors.port">{{createFormErrors.port}}</div>
+        </div>
+
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmCreate()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="createModalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

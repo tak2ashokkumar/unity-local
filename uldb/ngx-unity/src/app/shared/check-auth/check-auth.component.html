@@ -1,0 +1,64 @@
+<ng-template #checkAuthForm>
+  <div class="card mb-0" *ngIf="authForm">
+    <div class="card-header">
+      <strong>{{input.label}}</strong> Authentication
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeModal()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="authForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="formErrors.invalidCred">{{formErrors.invalidCred}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="host">IP Address</label>
+          <input class="form-control" id="host" type="text" formControlName="host" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="port">Port Number<em>*</em></label>
+          <input class="form-control" id="port" type="number" formControlName="port" min="1" [ngClass]="{'is-invalid' : formErrors.port}">
+          <div class="invalid-feedback" *ngIf="formErrors.port">{{formErrors.port}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" type="text" formControlName="username" [ngClass]="{'is-invalid' : formErrors.username}">
+          <div class="invalid-feedback" *ngIf="formErrors.username">{{formErrors.username}}</div>
+        </div>
+        <div class="form-group row">
+          <div class="col-3 col-form-label">
+            <div class="form-check form-check-inline mr-1"><input type="radio" formControlName="authtype" [value]="'password'"
+                class="form-check-input">
+              <label class="form-check-label">Password</label>
+            </div>
+          </div>
+          <div class="col-6 col-form-label">
+            <div class="form-check form-check-inline mr-1"><input type="radio" formControlName="authtype" [value]="'pkey'"
+                class="form-check-input">
+              <label class="form-check-label">Private Key</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" *ngIf="authForm.controls.password">
+          <label class="form-col-form-label" for="password">Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password" [ngClass]="{'is-invalid' : formErrors.password}">
+          <div class="invalid-feedback" *ngIf="formErrors.password">{{formErrors.password}}</div>
+        </div>
+      </form>
+      <form *ngIf="privateKeyForm" [formGroup]="privateKeyForm">
+        <div class="form-group">
+          <label class="form-col-form-label" for="file-pem-input">Private Key<em>*</em></label>
+          <input class="form-control" id="file-pem-input" name="file-pem-input" type="file" accept=".pem" [ngClass]="{'is-invalid' : privateKeyFormErrors.pkey}"
+            (change)="handlePrivateKeyInput($event.target.files)">
+          <div class="invalid-feedback" *ngIf="privateKeyFormErrors.pkey">{{privateKeyFormErrors.pkey}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Login</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="closeModal()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>

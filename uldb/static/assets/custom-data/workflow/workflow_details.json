@@ -1,0 +1,113 @@
+{
+    "workflow_name": "My Workflow",
+    "description": "My first workflow",
+    "tasks": [
+        {
+            "name": "Start",
+            "name_id": "start",
+            "type": "Start Task"
+        },
+        {
+            "name": "Approval",
+            "name_id": "approval",
+            "type": "Integration Task",
+            "task_id": "bmc-helix",
+            "inputs": [
+                {
+                    "name": "service_name",
+                    "value": "request-approval"
+                },
+                {
+                    "name": "description",
+                    "value": "${params.description}"
+                },
+                {
+                    "name": "approver",
+                    "value": "approver-dl@example.com"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "approval"
+                }
+            ],
+            "dependencies": [
+                "start"
+            ]
+        },
+        {
+            "name": "Condition",
+            "name_id": "condition",
+            "type": "Condition Task",
+            "conditions": [
+                {
+                    "expression": "${task.approval.outputs.approval} == true",
+                    "execute": "vm_provision"
+                },
+                {
+                    "expression": "${task.approval.outputs.approval} == false",
+                    "execute": "end"
+                }
+            ],
+            "dependencies": [
+                "approval"
+            ]
+        },
+        {
+            "name": "VM Provision",
+            "name_id": "vm_provision",
+            "type": "Ansible Playbook",
+            "task_id": "vm-provision",
+            "inputs": [
+                {
+                    "name": "vm_name",
+                    "value": "${params.vm_name}"
+                },
+                {
+                    "name": "mem_size",
+                    "value": "${params.mem_size}"
+                },
+                {
+                    "name": "vcpu",
+                    "value": "${params.vcpu}"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "ip_address"
+                }
+            ],
+            "dependencies": [
+                "condition"
+            ]
+        },
+        {
+            "name": "User Creation",
+            "name_id": "user_creation",
+            "type": "Bash Script",
+            "task_id": "user-create",
+            "inputs": [
+                {
+                    "name": "host",
+                    "value": "${tasks.vm_provision.outputs.ip_address}"
+                },
+                {
+                    "name": "user_name",
+                    "value": "${params.user_name}"
+                }
+            ],
+            "dependencies": [
+                "vm_provision"
+            ]
+        },
+        {
+            "name": "End",
+            "name_id": "end",
+            "type": "End Task",
+            "dependencies": [
+                "user_creation",
+                "condition"
+            ]
+        }
+    ]
+}

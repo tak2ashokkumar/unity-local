@@ -1,0 +1,132 @@
+@import "variables";
+
+.user-profile-table {
+	width: 100%;
+}
+
+.autoRemediation-toggle-button {
+	background-color: $gray-200;
+	border: 2px solid #a8b2ba;
+	width: 45px;
+	height: 25px;
+	border-radius: 20px;
+	cursor: pointer;
+	position: relative;
+
+	&::before {
+		position: absolute;
+		content: '';
+		background-color: $gray-500;
+		color: $gray-500;
+		width: 19px;
+		height: 18px;
+		border-radius: 10px;
+		margin: 1.5px;
+		transition: 0.3s;
+	}
+}
+
+.autoRemediation-switch-container {
+	input {
+		&:checked+.autoRemediation-toggle-button {
+			background-color: $success-100;
+			border-color: $success;
+			color: $success;
+
+			&::before {
+				background-color: $success-500;
+				border-color: $success;
+				color: $success;
+				transform: translateX(100%);
+			}
+		}
+
+		display: none;
+	}
+}
+
+.autoTicketing-toggle-button {
+	background-color: $gray-200;
+	border: 2px solid #a8b2ba;
+	width: 45px;
+	height: 25px;
+	border-radius: 20px;
+	cursor: pointer;
+	position: relative;
+	margin-bottom: 0px;
+
+	&::before {
+		position: absolute;
+		content: '';
+		background-color: $gray-500;
+		color: $gray-500;
+		width: 19px;
+		height: 18px;
+		border-radius: 10px;
+		margin: 1.5px;
+		margin-bottom: 0px;
+		transition: 0.3s;
+	}
+}
+
+.autoTicketing-switch-container {
+	input {
+		display: none;
+
+		&:checked+.autoTicketing-toggle-button {
+			background-color: $success-100;
+			border-color: $success;
+			color: $success;
+
+			&::before {
+				background-color: $success;
+				border-color: $success;
+				color: $success;
+				transform: translateX(100%);
+			}
+		}
+	}
+}
+
+.rcaAI-toggle-button {
+	background-color: $gray-200;
+	border: 2px solid #a8b2ba;
+	width: 45px;
+	height: 25px;
+	border-radius: 20px;
+	cursor: pointer;
+	position: relative;
+	margin-bottom: 0px;
+
+	&::before {
+		position: absolute;
+		content: '';
+		background-color: $gray-500;
+		color: $gray-500;
+		width: 19px;
+		height: 18px;
+		border-radius: 10px;
+		margin: 1.5px;
+		margin-bottom: 0px;
+		transition: 0.3s;
+	}
+}
+
+.rcaAI-switch-container {
+	input {
+		display: none;
+
+		&:checked+.rcaAI-toggle-button {
+			background-color: $success-100;
+			border-color: $success;
+			color: $success;
+
+			&::before {
+				background-color: $success;
+				border-color: $success;
+				color: $success;
+				transform: translateX(100%);
+			}
+		}
+	}
+}

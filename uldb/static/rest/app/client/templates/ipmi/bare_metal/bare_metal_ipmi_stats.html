@@ -1,0 +1,56 @@
+<div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	 	<div class="middle-wrapper Dashwrap" style="padding : 0px !important;" ng-if="!server_details_error && server_details">
+	 		<div class="row table-responsive" style="padding-top: 10px;">
+	 			<h1 style="padding-left: 15px;">Server Sensor Data</h1>
+ 		        <table class="table" style="margin-top:10px;">
+ 		        	<thead>
+ 		        		<tr>
+ 		        			<th>Sensor</th>
+ 		        			<th>Sensor Id</th>
+ 		        			<th>Status</th>
+ 		        			<th>Entity Id</th>
+ 		        			<th>Reading</th>
+ 		        		</tr>
+ 		        	</thead>
+ 		        	<tbody>
+ 		        		<tr ng-repeat="server in server_details track by $index">
+ 		        			<td>{{server.sensor || 'NA'}}</td>
+ 		        			<td>{{server.sensor_id || 'NA'}}</td>
+ 		        			<td>{{server.status || 'NA'}}</td>
+ 		        			<td>{{server.entity_id || 'NA'}}</td>
+ 		        			<td>{{server.reading || 'NA'}}</td>
+ 		        		</tr>
+ 		        	</tbody>
+ 		        </table>
+	 		</div>
+	 	</div>
+	</div>
+
+	<!-- <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+	 	<div class="middle-wrapper Dashwrap" style="padding : 0px !important;" ng-if="!server_details_error && server_details_begin">
+	 		<div class="row table-responsive">
+ 		        <table class="table">
+ 		        	<thead>
+ 		        		<tr>
+ 		        			<th>Sensor</th>
+ 		        			<th>Sensor Id</th>
+ 		        			<th>Status</th>
+ 		        			<th>Entity Id</th>
+ 		        			<th>Reading</th>
+ 		        		</tr>
+ 		        	</thead>
+ 		        	<tbody>
+ 		        		<tr ng-repeat="server in server_details_begin track by $index">
+ 		        			<td>{{server.sensor}}</td>
+ 		        			<td>{{server.sensor_id}}</td>
+ 		        			<td>{{server.status}}</td>
+ 		        			<td>{{server.entity_id}}</td>
+ 		        			<td>{{server.reading}}</td>
+ 		        		</tr>
+ 		        	</tbody>
+ 		        </table>
+ 		    </div>
+ 		</div>
+	</div> -->
+</div>

@@ -1,0 +1,55 @@
+<div class="modal-header">
+    <h3 class="modal-title">Activate Management Console for devices </h3>
+</div>
+<div class="modal-body">
+    <div class="row content-wrapper">
+        <div class="col-xs-12" ng-if="!user_obj.onb_status.manage_error && !user_obj.onb_status.manage_end">
+            <ul style="text-align:center">
+                <li> Activating Managenment Console for a device requires management IP of the device. </li>
+                <li>So please make sure that you have provided Management IP's for all the devices onboarded.</li>
+            </ul>
+            <p style="margin-top:20px;text-align:center;"> 
+                <!-- Activating Managenment Console for a device requires management IP of the device. <br>
+                So Please make sure to provide Management Ip's for all the devices onboarded.<br><br> -->
+
+                Click on the button below to activate management console access for onboarded devices.
+            </p>
+            <div class="col-xs-5"></div>
+                <div class="col-xs-2"><button class="btn btn-default" ng-click="activate_mgmt_console()"> Activate </button></div>
+            <div class="col-xs-5"></div>
+        </div> 
+
+        <div class="col-xs-12" style="text-align : center" ng-if="user_obj.onb_status.manage_error">
+            <!-- Connectivity Status show modal -->
+            <span class="badge error_badge"> 
+                <i class="fa fa-close"></i>
+            </span> 
+            <p class="content-wrapper" style="font-size : 16px;text-align:center"> 
+                We encountered issues while activating management console for devices. <br>
+                Please try again or contact support. <br>
+                <button class="btn btn-default" ng-click="activate_mgmt_console()" style="margin-top:20px;"> Try again </button>
+            </p>
+            <!-- <div class="row content-wrapper" style="text-align : left">
+                <p style="font-size : 14px;margin-bottom:0px;"> 
+                     Click on the button below to start process of activating management console for devices again.
+                </p>
+                <button class="btn btn-default pull-left" ng-click="activate_mgmt_console()" style="margin-top:20px;"> Try again </button>
+            </div> -->
+        </div>
+
+        <div class="col-xs-12" style="text-align : center" ng-if="user_obj.onb_status.manage_end">
+            <!-- Connectivity Status show modal -->
+            <span class="badge success_badge"> 
+                <i class="fa fa-check"></i>
+            </span> 
+            <p class="content-wrapper" style="font-size : 16px;text-align:center"> 
+                Management Console access is enabled for all the onboared devices. 
+            </p>
+        </div>
+    </div>
+</div>
+<div class="modal-footer modal-buttons">
+    <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+      Close
+    </button>
+</div>

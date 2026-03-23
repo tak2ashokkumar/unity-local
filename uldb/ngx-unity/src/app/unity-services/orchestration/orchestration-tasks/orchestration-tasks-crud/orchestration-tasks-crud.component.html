@@ -1,0 +1,848 @@
+<div class="row">
+    <div class="col-12 px-0 mt--3">
+        <div class="card" style="min-height: 600px">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{action}} Task</span>
+                <button class="btn btn-pill btn-warning btn-sm" tooltip="Back" (click)="goBack()">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body py-2 text-muted">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="form-group col-12 text-center">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="name" class="col-2 text-right col-form-label">Name<em>* </em> :</label>
+                        <div class="col-4">
+                            <input id="name" class="form-control text-dark" type="text" formControlName="name"
+                                [class.is-invalid]="formErrors.name" placeholder="Enter Name">
+                            <div class="invalid-feedback" *ngIf="formErrors.name">
+                                {{formErrors.name}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="description" class="col-2 text-right col-form-label">Description :</label>
+                        <div class="col-8">
+                            <textarea id="description" class="form-control static text-dark" rows='2'
+                                formControlName="description" [class.is-invalid]="formErrors.description"
+                                placeholder="Description"></textarea>
+                            <div class="invalid-feedback" *ngIf="formErrors.description">
+                                {{formErrors.description}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-2 text-right col-form-label ">Category<em>*</em> : </label>
+                        <div class="col-4">
+                            <search-dropdown [values]="categoryList" [defaultLabel]="'Category'" [displayField]="''"
+                                (selectedDropdownValue)="getCategoryDropdown($event)" [editCaseValue]="categoryValue"
+                                [hasError]="formErrors.category"></search-dropdown>
+                            <div class="invalid" *ngIf="formErrors.category">
+                                {{ formErrors.category }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="script_type" class="col-2 text-right col-form-label">
+                            Type<em>*</em> :
+                        </label>
+                        <div class="col-10">
+                            <div class="btn-group btn-group-toggle d-flex flex-wrap">
+                                <ng-container *ngFor="let option of scriptOptions">
+                                    <label class="border rounded mr-2 px-2 py-1 d-inline-flex align-items-center"
+                                        [class.border-primary]="form.get('script_type')?.value === option.label"
+                                        [class.bg-light]="form.get('script_type')?.value === option.label">
+                                        <!-- <custom-radio [value]="option.label" formControlName="script_type"
+                                            [name]="'script_type'">
+                                        </custom-radio> -->
+                                        <div class="radio-group">
+                                            <div class="radio-btn">
+                                                <input type="radio" name="script_type" formControlName="script_type"
+                                                    [value]="option.label" />
+                                                <span class="radio-icon">
+                                                    <svg viewBox="0 0 24 24">
+                                                        <polyline points="6 12 10 16 18 8" />
+                                                    </svg>
+                                                </span>
+                                                <img [src]="option.icon" width="20" height="20" class="mx-1" />
+                                                <span class="text-dark">{{ option.label }}</span>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </ng-container>
+                            </div>
+                            <div class="invalid-feedback d-block" *ngIf="formErrors.script_type">
+                                {{ formErrors.script_type }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row"
+                        *ngIf="taskType == taskTypes.AnsibleBook || taskType == taskTypes.PythonScript || taskType == taskTypes.BashScript || taskType == taskTypes.PowershellScript || taskType == taskTypes.TerraformScript">
+                        <label for="target_type" class="col-2 text-right col-form-label">Target Type<em>*</em> :</label>
+                        <div class="col-4">
+                            <select id="target_type" class="form-control text-dark" type="text"
+                                formControlName="target_type" [class.is-invalid]="formErrors.target_type">
+                                <option [value]="''" disabled>Select Target Type</option>
+                                <option
+                                    *ngIf="taskType === taskTypes.TerraformScript || taskType === taskTypes.AnsibleBook"
+                                    value="Cloud">Cloud</option>
+                                <option value="Host">Host</option>
+                                <option value="Local">Local</option>
+                            </select>
+
+                            <div class="invalid-feedback" *ngIf="formErrors.target_type">
+                                {{formErrors.target_type}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row"
+                        *ngIf="(taskType == taskTypes.AnsibleBook || taskType == taskTypes.PythonScript || taskType == taskTypes.BashScript || taskType == taskTypes.PowershellScript) && form.get('target_type').value == 'Host'">
+                        <label for="targets" class="col-2 text-right col-form-label">Targets :</label>
+                        <div class="col">
+                            <!-- <input id="target" class="form-control static text-dark" formControlName="targets"
+                                [class.is-invalid]="formErrors.targets"
+                                placeholder="Enter IP Address (Multiple Allowed, Comma Seperated)"> -->
+                            <app-auto-complete-multi formControlName="targets" [apiFn]="searchTargets"
+                                placeholder="Search Targets by IP Address or Ip Name"></app-auto-complete-multi>
+                        </div>
+                    </div>
+                    <div class="form-group row"
+                        *ngIf="(taskType == taskTypes.AnsibleBook || taskType == taskTypes.PythonScript || taskType == taskTypes.BashScript || taskType == taskTypes.PowershellScript) && form.get('target_type').value == 'Host'">
+                        <label for="task_name" class="col-2 col-form-label text-right">Credential :</label>
+                        <div class="custom-control custom-radio mt-2 ml-2">
+                            <input id="local_radio" type="radio" class="custom-control-input" value="local"
+                                formControlName="cred">
+                            <label class="custom-control-label" for="local_radio">Local</label>
+                        </div>
+                        <div class="col-2" *ngIf="form.get('cred')?.value == 'local'">
+                            <select id="credentials" class="form-control text-dark" formControlName="credentials">
+                                <option value="" disabled>Select Credential</option>
+                                <option *ngFor="let cred of credentialList" [value]="cred.uuid"> {{cred.name}}</option>
+                            </select>
+                        </div>
+                        <div class="custom-control custom-radio ml-3 mt-2">
+                            <input id="my_credential_radio" type="radio" class="custom-control-input" value="my_cred"
+                                formControlName="cred">
+                            <label class="custom-control-label" for="my_credential_radio">My Credential</label>
+                        </div>
+                        <div class="col-2" *ngIf="form.get('cred')?.value == 'my_cred'">
+                            <input id="username" class="form-control text-dark" type="text" formControlName="username"
+                                placeholder="Enter UserName">
+
+                        </div>
+                        <div class="col-2" *ngIf="form.get('cred').value == 'my_cred'">
+                            <custom-password-field class="text-dark" formControlName="password"
+                                [options]="{placeholder:'Enter Password'}"
+                                [isDisabled]="form.get('password').disabled"></custom-password-field>
+                        </div>
+                    </div>
+
+                    <div class="form-group row"
+                        *ngIf="(taskType == taskTypes.TerraformScript || taskType == taskTypes.AnsibleBook) && form.get('target_type').value == 'Cloud'">
+                        <label for="cloud_type" class="col-2 text-right col-form-label">Cloud Type<em>* </em> :</label>
+                        <div class="col-4">
+                            <search-dropdown [values]="cloudType" [defaultLabel]="'Cloud Type'" [displayField]="'type'"
+                                (selectedDropdownValue)="getCloudTypeDropdown($event)" [editCaseValue]="cloudTypeValue"
+                                [hasError]="formErrors.cloud_type"></search-dropdown>
+                            <div class="invalid" *ngIf="formErrors.cloud_type">
+                                {{formErrors.cloud_type}}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row"
+                        *ngIf="(taskType == taskTypes.TerraformScript || taskType == taskTypes.AnsibleBook) && form.get('target_type').value == 'Cloud'">
+                        <label for="cloud_account" class="col-2 text-right col-form-label">Cloud Account :</label>
+                        <div class="col-4">
+                            <search-dropdown [values]="cloudAccount" [defaultLabel]="'Cloud Account'"
+                                [displayField]="'account_name'" [editCaseValue]="cloudAccountValue"
+                                (selectedDropdownValue)="getCloudAccountDropdown($event)"></search-dropdown>
+                        </div>
+                    </div>
+
+                    <div class="form-group row"
+                        *ngIf="taskType == taskTypes.AnsibleBook || taskType == taskTypes.TerraformScript || taskType == taskTypes.BashScript || taskType == taskTypes.PythonScript || taskType == taskTypes.PowershellScript">
+                        <label for="source" class="col-2 text-right col-form-label">Source<em>* </em> :</label>
+                        <div class="col-4">
+                            <search-dropdown [values]="repos" [displayField]="'name'" [defaultLabel]="'Source'"
+                                (selectedDropdownValue)="getSourceDropdown($event)" [editCaseValue]="sourceValue"
+                                [hasError]="formErrors.source">
+                            </search-dropdown>
+                            <div class="invalid" *ngIf="formErrors.source">
+                                {{ formErrors.source }}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group row"
+                        *ngIf="taskType == taskTypes.AnsibleBook || taskType == taskTypes.TerraformScript || taskType == taskTypes.BashScript || taskType == taskTypes.PythonScript || taskType == taskTypes.PowershellScript  ">
+                        <label for="playbook" class="col-2 text-right col-form-label">Script<em>* </em> :</label>
+                        <div class="col-4">
+                            <search-dropdown [values]="script" [defaultLabel]="'Script'" [displayField]="'name'"
+                                (selectedDropdownValue)="getScriptDropdown($event)" [editCaseValue]="scriptValue"
+                                [hasError]="formErrors.script"></search-dropdown>
+                            <div class="invalid" *ngIf="formErrors.script">
+                                {{formErrors.script}}</div>
+                        </div>
+                    </div>
+
+                    <!-- for rest api -->
+                    <div class="form-group row" *ngIf="taskType == taskTypes.RestApi">
+                        <label for="url_type" class="col-2 text-right col-form-label">URL Type<em>* </em> :</label>
+                        <div class="col-8 d-flex align-items-center">
+                            <div class="form-check form-check-inline">
+                                <input type="radio" formControlName="url_type" value="public" id="url_type_public"
+                                    class="form-check-input">
+                                <label class="form-check-label" for="url_type_public">Public</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" formControlName="url_type" value="private" id="url_type_private"
+                                    class="form-check-input">
+                                <label class="form-check-label" for="url_type_private">Private</label>
+                            </div>
+                            <div *ngIf="form.get('url_type')?.value == 'private'" class="ml-1">
+                                <select id="collectorid" class="form-control text-dark" formControlName="collector"
+                                    [class.is-invalid]="formErrors.collector?.uuid">
+                                    <option value="" disabled>Select Collector</option>
+                                    <option *ngFor="let collector of collectors" [value]="collector.ip_address">
+                                        {{collector.name}}
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.collector">
+                                    {{formErrors.collector}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="taskType == taskTypes.RestApi">
+                        <div class="form-group row">
+                            <label for="url" class="col-2 text-right col-form-label">Connection:</label>
+                            <div class="col-4">
+                                <select class="form-control text-dark" formControlName="connection"
+                                    (change)="connectionResult">
+                                    <option value="">Select Connection</option>
+                                    <option *ngFor="let connection of connections" [value]="connection.uuid">
+                                        {{connection.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="taskType == taskTypes.RestApi">
+                        <label for="url" class="col-2 text-right col-form-label">URL<em>*</em> :</label>
+                        <div class="col-10 d-flex">
+                            <select class="form-control col-2 text-dark" formControlName="method"
+                                [class.is-invalid]="formErrors.method">
+                                <option *ngFor="let method of methods" [value]="method">{{method}}</option>
+                            </select>
+                            <div class="invalid-feedback d-block" *ngIf="formErrors.method">
+                                {{formErrors.method}}</div>
+                            <div class="input-group col-8" *ngIf="form.get('connection').value === ''">
+                                <input id="url" class="form-control text-dark" type="text" formControlName="url"
+                                    [ngClass]="urlBlockStatus ? !connectionResult ? 'failedHighlight' : '' : ''"
+                                    [class.is-invalid]="formErrors.url" placeholder="https://www.example.com">
+                                <span *ngIf="urlBlockStatus">
+                                    <i class="fas fa-exclamation-triangle text-danger icon"
+                                        *ngIf="!connectionResult"></i>
+                                    <i class="fas fa-check text-success icon" *ngIf="connectionResult"></i>
+                                </span>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-primary" type="button"
+                                        (click)="testConnection()">Test Connection</button>
+                                </div>
+                            </div>
+                            <div class="col-8" *ngIf="form.get('connection').value">
+                                <div class="input-group">
+                                    <div class="input-group-prepend baseUrl">
+                                        <span class="input-group-text" id="basic-addon3">{{connectionBaseUrl}}</span>
+                                    </div>
+                                    <input type="text" class="form-control text-dark" id="basic-url"
+                                        formControlName="url" aria-describedby="basic-addon3"
+                                        [ngClass]="urlBlockStatus ? !connectionResult ? 'failedHighlight' : '' : ''"
+                                        [class.is-invalid]="formErrors.url">
+                                    <span *ngIf="urlBlockStatus">
+                                        <i class="fas fa-exclamation-triangle text-danger icon"
+                                            *ngIf="!connectionResult"></i>
+                                        <i class="fas fa-check text-success icon" *ngIf="connectionResult"></i>
+                                    </span>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-primary" type="button"
+                                            (click)="testConnection()">Test Connection</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback d-block" *ngIf="formErrors.url">
+                                {{formErrors.url}}
+                            </div>
+                            <div class="col-2 align-content-center">
+                                <input id="verify_ssl" class="ut-checkbox" type="checkbox" formControlName="verify_ssl">
+                                <label for="verify_ssl" class="primary mb-0">Verify SSL</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-0" *ngIf="taskType == taskTypes.RestApi && !showRestApiHeaders">
+                        <label for="headers" class="col-2 text-right col-form-label">Headers :</label>
+                        <div class="col-8 align-content-center">
+                            <button type="button" class="btn btn-sm text-primary border-primary"
+                                (click)="addHeadersRestApi()">
+                                + Add Headers
+                            </button>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="taskType == taskTypes.RestApi">
+                        <div class="form-group row">
+                            <ng-container *ngIf="showRestApiHeaders">
+                                <label for="headers" class="col-2 text-right col-form-label">Headers:</label>
+                                <div class="col-8">
+                                    <div class="row mx-0 border rounded p-2">
+                                        <div id="headers" class="col-12" formArrayName="headers">
+                                            <div class="row mb-2">
+                                                <div class="col-4">Header Name</div>
+                                                <div class="col-4">Header Value</div>
+                                            </div>
+                                            <div *ngFor="let control of form.get('headers').controls; let i = index; let attrLast=last; let attrFirst=first;"
+                                                class="py-0">
+                                                <div class="row mb-3" [formGroupName]="i">
+                                                    <div class="col-4">
+                                                        <!-- <label for="header_name" class="col-form-label">Header
+                                                            Name</label> -->
+                                                        <input id="header_name" class="form-control text-dark"
+                                                            type="text" formControlName="header_name"
+                                                            [class.is-invalid]="formErrors.headers[i].header_name"
+                                                            placeholder="Name">
+                                                        <div class="invalid-feedback"
+                                                            *ngIf="formErrors.headers[i].header_name">
+                                                            {{formErrors.headers[i].header_name}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <!-- <label for="header_value" class="col-form-label">Header
+                                                            Value</label> -->
+                                                        <input id="header_value" class="form-control text-dark"
+                                                            type="text" formControlName="header_value"
+                                                            [class.is-invalid]="formErrors.headers[i].header_value"
+                                                            placeholder="Value">
+                                                        <div class="invalid-feedback"
+                                                            *ngIf="formErrors.headers[i].header_value">
+                                                            {{formErrors.headers[i].header_value}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <div
+                                                            class="w-100 d-flex justify-content-start align-items-center">
+                                                            <button tooltip="Remove Parameter"
+                                                                (click)="removeHeadersData(i)"
+                                                                class="action-icons fas fa-minus font-sm ml-1"></button>
+                                                            <button tooltip="Add Parameter"
+                                                                class="action-icons fas fa-plus font-sm ml-1"
+                                                                *ngIf="attrLast" (click)="addHeadersData(i)"></button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="taskType == taskTypes.RestApi">
+                        <div class="form-group row">
+                            <label for="body_type" class="col-2 text-right col-form-label">Request Body<em>* </em>
+                                :</label>
+                            <div class="col-4">
+                                <select id="body_type" class="form-control text-dark" type="text"
+                                    formControlName="body_type" [class.is-invalid]="formErrors.body_type">
+                                    <option [value]="null">None</option>
+                                    <option value="json">JSON</option>
+                                    <option value="form">Form</option>
+                                </select>
+                                <div class="invalid-feedback" *ngIf="formErrors.body_type">
+                                    {{formErrors.body_type}}</div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div class="form-group row align-items-center"
+                        *ngIf="((taskType == taskTypes.AnsibleBook || taskType == taskTypes.TerraformScript || taskType == taskTypes.BashScript || taskType == taskTypes.PythonScript || taskType == taskTypes.PowershellScript || taskType == taskTypes.RestApi) && !showRestApiInputParameters)">
+                        <label for="inputs" class="col-2 text-right col-form-label">Input Parameters :</label>
+                        <div class="col-8">
+                            <button *ngIf="taskType === taskTypes.RestApi" type="button"
+                                class="btn btn-sm text-primary border-primary" (click)="addInputParametersRestApi()">
+                                + Add Input Parameter
+                            </button>
+                            <button *ngIf="taskType !== taskTypes.RestApi" type="button"
+                                class="btn btn-sm text-primary border-primary" (click)="addInputParameterTask()">
+                                + Add Input Parameter
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Input Parameter Form Array -->
+                    <ng-container>
+                        <div class="form-group row"
+                            *ngIf="(showRestApiInputParameters && (taskType === taskTypes.RestApi || taskType === taskTypes.AnsibleBook || taskType === taskTypes.TerraformScript || taskType === taskTypes.BashScript || taskType === taskTypes.PythonScript || taskType === taskTypes.PowershellScript)) && form.get('inputs')">
+                            <label for="inputs" class="col-2 text-right col-form-label">Input Parameters :</label>
+                            <div class="col-9">
+                                <div class="row mx-0 border rounded p-3 position-relative">
+                                    <div id="input_parameters" class="col-12" formArrayName="inputs">
+                                        <div class="row mb-2">
+                                            <div class="col-3">Param Name</div>
+                                            <div class="col-2">Param Type</div>
+                                            <div class="col-5" *ngIf="shouldShowDefaultValueHeader">Default Value</div>
+                                        </div>
+                                        <div *ngFor="let parameter of form.get('inputs').controls; let i = index; let attrLast=last; let attrFirst=first;"
+                                            class="py-2">
+                                            <div class="row" [formGroupName]="i">
+                                                <div class="col-3"
+                                                    *ngIf="taskType == taskTypes.AnsibleBook || taskType == taskTypes.TerraformScript || taskType == taskTypes.RestApi">
+                                                    <input id="param_name" class="form-control text-dark" type="text"
+                                                        formControlName="param_name"
+                                                        [class.is-invalid]="formErrors.inputs[i].param_name"
+                                                        placeholder="Name">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].param_name">
+                                                        {{formErrors.inputs[i].param_name}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-3"
+                                                    *ngIf="taskType == taskTypes.BashScript || taskType == taskTypes.PythonScript || taskType == taskTypes.PowershellScript">
+                                                    <input id="param_name" class="form-control text-dark" type="text"
+                                                        formControlName="param_name"
+                                                        [class.is-invalid]="formErrors.inputs[i].param_name"
+                                                        placeholder="Name">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].param_name">
+                                                        {{formErrors.inputs[i].param_name}}
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex pt-1">:</div>
+                                                <div class="col-2">
+                                                    <select class="form-control text-dark" type="text"
+                                                        formControlName="param_type"
+                                                        [class.is-invalid]="formErrors.inputs[i].param_type">
+                                                        <option [value]="''" disabled>Select Datatype</option>
+                                                        <option *ngFor="let dataType of paramDataTypes"
+                                                            [value]="dataType">
+                                                            {{dataType}}
+                                                        </option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].param_type">
+                                                        {{formErrors.inputs[i].param_type}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-5"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'String'">
+                                                    <input class="form-control text-dark" type="text"
+                                                        formControlName="default_value"
+                                                        [class.is-invalid]="formErrors.inputs[i].default_value"
+                                                        placeholder="Default value">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].default_value">
+                                                        {{formErrors.inputs[i].default_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-5"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Number'">
+                                                    <input class="form-control text-dark" type="number"
+                                                        formControlName="default_value"
+                                                        [class.is-invalid]="formErrors.inputs[i].default_value"
+                                                        placeholder="Default value">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].default_value">
+                                                        {{formErrors.inputs[i].default_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-5"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Boolean'">
+                                                    <select class="form-control text-dark" type="text"
+                                                        formControlName="default_value"
+                                                        [class.is-invalid]="formErrors.inputs[i].default_value">
+                                                        <option [value]="''" disabled>Select Boolean</option>
+                                                        <option [value]="true">True</option>
+                                                        <option [value]="false">False</option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].default_value">
+                                                        {{formErrors.inputs[i].default_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-5"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'List'">
+                                                    <input class="form-control text-dark" type="text"
+                                                        formControlName="default_value"
+                                                        [class.is-invalid]="formErrors.inputs[i].default_value"
+                                                        placeholder="Default value e.g. [&quot;abc&quot;, &quot;def&quot;, &quot;ghi&quot;]">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].default_value">
+                                                        {{formErrors.inputs[i].default_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-5"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Dictionary'">
+                                                    <input class="form-control text-dark" type="text"
+                                                        formControlName="default_value"
+                                                        [class.is-invalid]="formErrors.inputs[i].default_value"
+                                                        placeholder="Default value e.g. {&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: &quot;value2&quot;}">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].default_value">
+                                                        {{formErrors.inputs[i].default_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-5"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Secret'">
+                                                    <custom-password-field formControlName="default_value"
+                                                        class="text-dark"
+                                                        [options]="{errors:formErrors.inputs[i].default_value, placeholder:'Default Value'}"></custom-password-field>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].default_value">
+                                                        {{formErrors.inputs[i].default_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-3"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Input Template'">
+                                                    <select class="form-control text-dark" type="text"
+                                                        formControlName="template"
+                                                        [class.is-invalid]="formErrors.inputs[i].template"
+                                                        (change)="onSelectTemplate(i,$event.target.value)">
+                                                        <option [value]="''" disabled>Select Template</option>
+                                                        <option *ngFor="let template of inputTemplate"
+                                                            [value]="template.uuid">
+                                                            {{template.name}}
+                                                        </option>
+                                                    </select>
+                                                    <div class="invalid-feedback" *ngIf="formErrors.inputs[i].template">
+                                                        {{formErrors.inputs[i].template}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-2"
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Input Template' && attributeList[i]?.length > 0">
+                                                    <select class="form-control text-dark" type="text"
+                                                        formControlName="attribute"
+                                                        [class.is-invalid]="formErrors.inputs[i].attribute">
+                                                        <option [value]="''" disabled>Select Attribute</option>
+                                                        <option *ngFor="let attribute of attributeList[i]"
+                                                            [value]="attribute">
+                                                            {{attribute}}
+                                                        </option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.inputs[i].attribute">
+                                                        {{formErrors.inputs[i].attribute}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-1 p-0">
+                                                    <div class="w-100 d-flex justify-content-start align-items-center">
+                                                        <button tooltip="Remove Parameter" (click)="removeParameter(i)"
+                                                            class="action-icons fas fa-minus font-sm ml-1"
+                                                            *ngIf="form.get('inputs')?.value?.length"></button>
+                                                        <button tooltip="Add Parameter"
+                                                            class="action-icons fas fa-plus font-sm ml-1"
+                                                            *ngIf="attrLast" (click)="addParameter(i)"></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <!-- Response form array -->
+                    <ng-container *ngIf="taskType == taskTypes.RestApi">
+                        <div class="form-group row">
+                            <label for="response" class="col-2 text-right col-form-label">Response Validation<em>* </em>
+                                :</label>
+                            <div class="col-8">
+                                <div class="row mx-0 border rounded p-2">
+                                    <div id="responseData" class="col-12" formArrayName="responseData">
+                                        <div *ngFor="let control of form.get('responseData').controls; let i = index; let attrLast=last; let attrFirst=first;"
+                                            class="py-0">
+                                            <div class="row" [formGroupName]="i">
+                                                <div class="col-3">
+                                                    <label for="response_type" class="col-form-label">Type<em>*
+                                                        </em></label>
+                                                    <select id="response_type" class="form-control text-dark"
+                                                        type="text" formControlName="response_type"
+                                                        [class.is-invalid]="formErrors.responseData[i].response_type">
+                                                        <!-- <option value="''">Select Type</option> -->
+                                                        <option value="response_code">Response Code</option>
+                                                        <option value="response_body">Response Body</option>
+                                                        <option value="json_query">JSON Query</option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.responseData[i].response_type">
+                                                        {{formErrors.responseData[i].response_type}}</div>
+                                                </div>
+                                                <div class="col-2"
+                                                    *ngIf="form.controls.responseData.controls[i].get('response_type')?.value == 'json_query'">
+                                                    <label for="response_key" class="col-form-label">Key<em>*
+                                                        </em></label>
+                                                    <input id="jsonquery" class="form-control text-dark" type="text"
+                                                        formControlName="response_key"
+                                                        [class.is-invalid]="formErrors.responseData[i].response_key"
+                                                        placeholder="key">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.responseData[i].response_key">
+                                                        {{formErrors.responseData[i].response_key}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-3">
+                                                    <label for="response_operator" class="col-form-label">Operator<em>*
+                                                        </em></label>
+                                                    <select id="response_operator" class="form-control text-dark"
+                                                        type="text" formControlName="response_operator"
+                                                        [class.is-invalid]="formErrors.responseData[i].response_operator">
+                                                        <option [value]="''">Select Operator</option>
+                                                        <option *ngFor="let operator of operators"
+                                                            [value]="operator.nameValue">{{operator.name}}</option>
+                                                    </select>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.responseData[i].response_operator">
+                                                        {{formErrors.responseData[i].response_operator}}</div>
+                                                </div>
+                                                <div class="col-3"
+                                                    *ngIf="form.controls.responseData.controls[i].get('response_type')?.value == 'response_code'">
+                                                    <label for="response_value"
+                                                        class="col-form-label">Value<em>*</em></label>
+                                                    <input id="json_query" class="form-control text-dark" type="text"
+                                                        formControlName="response_value"
+                                                        [class.is-invalid]="formErrors.responseData[i].response_value"
+                                                        placeholder="Value">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.responseData[i].response_value">
+                                                        {{formErrors.responseData[i].response_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-4"
+                                                    *ngIf="form.controls.responseData.controls[i].get('response_type')?.value == 'response_body'">
+                                                    <label for="response_value" class="col-form-label">Response
+                                                        Body<em>*
+                                                        </em></label>
+                                                    <input id="response_body" class="form-control" type="text"
+                                                        formControlName="response_value"
+                                                        [class.is-invalid]="formErrors.responseData[i].response_value"
+                                                        placeholder="Value">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.responseData[i].response_value">
+                                                        {{formErrors.responseData[i].response_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-2"
+                                                    *ngIf="form.controls.responseData.controls[i].get('response_type')?.value == 'json_query'">
+                                                    <label for="value" class="col-form-label">JSON Query<em>*
+                                                        </em></label>
+                                                    <input id="json_query" class="form-control" type="text"
+                                                        formControlName="response_value"
+                                                        [class.is-invalid]="formErrors.responseData[i].response_value"
+                                                        placeholder="Value">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.responseData[i].response_value">
+                                                        {{formErrors.responseData[i].response_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-2 mt-4 pt-1">
+                                                    <div
+                                                        class="w-100 d-flex justify-content-start align-items-center mt-2">
+                                                        <button tooltip="Remove Parameter"
+                                                            (click)="removeResponseData(i)"
+                                                            class="action-icons fas fa-minus font-sm ml-1"
+                                                            *ngIf="form.get('responseData').controls.length > 1"></button>
+                                                        <button tooltip="Add Parameter"
+                                                            class="action-icons fas fa-plus font-sm ml-1"
+                                                            *ngIf="attrLast" (click)="addResponseData(i)"></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div class="form-group row" *ngIf="taskType == taskTypes.PythonScript">
+                        <label for="requirements" class="col-2 text-right col-form-label">Package Requirements :</label>
+                        <div class="col-8">
+                            <textarea id="requirements" class="form-control static text-dark" rows='2'
+                                formControlName="requirements" placeholder="Package requirements"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row"
+                        *ngIf="taskType == taskTypes.AnsibleBook || taskType == taskTypes.PythonScript || taskType == taskTypes.BashScript || taskType == taskTypes.PowershellScript || taskType == taskTypes.TerraformScript || taskType == taskTypes.RestApi">
+                        <label for="output_type" class="col-2 text-right col-form-label">Output Type<em>*</em> :</label>
+                        <div class="col-4">
+                            <select id="output_type" class="form-control text-dark" type="text"
+                                formControlName="output_type" [class.is-invalid]="formErrors.output_type">
+                                <option value="" disabled>Select Type</option>
+                                <option *ngFor="let ot of scriptOutputTypes" [value]="ot">{{ot}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.output_type">
+                                {{formErrors.output_type}}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row align-items-center"
+                        *ngIf="(form.get('output_type')?.value === 'JSON' || form.get('output_type')?.value === 'Key-Value' || taskType == taskTypes.TerraformScript) && !showOutputParameters">
+                        <label for="inputs" class="col-2 text-right col-form-label">Output Parameters :</label>
+                        <div class="col-8">
+                            <button type="button" class="btn btn-sm text-primary border-primary"
+                                (click)="addOutputParameters()">
+                                + Add Output Parameter
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group row" formArrayName="outputs"
+                        *ngIf="(form.get('output_type')?.value === 'JSON' || form.get('output_type')?.value === 'Key-Value' || taskType == taskTypes.TerraformScript) && showOutputParameters">
+                        <label for="output_type" class="col-2 text-right col-form-label">Output Parameter:</label>
+                        <div class="col-4 mx-0 border rounded py-3 position-relative ml-2">
+                            <div class="row m-0 p-3">
+                                <div *ngFor="let param of outputParameterArray.controls; let i = index"
+                                    [formGroupName]="i" class="mb-2 col-12 p-0">
+                                    <div class="row">
+                                        <input type="text" formControlName="param_name"
+                                            class="form-control col-9 text-dark" placeholder="Enter output parameter" />
+                                        <div class="col-3 d-flex p-0">
+                                            <button type="button" tooltip="Remove Parameter"
+                                                class="action-icons fas fa-minus font-sm ml-1"
+                                                (click)="removeOutputParam(i)">
+                                            </button>
+                                            <button *ngIf="i === outputParameterArray.length - 1" type="button"
+                                                tooltip="Add Parameter" class="action-icons fas fa-plus font-sm ml-1"
+                                                (click)="addOutputParam()">
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Callback request validation form array -->
+                    <ng-container *ngIf="taskType == taskTypes.RestApi">
+                        <div class="form-group row">
+                            <div class="col-2 col-form-label text-right">Request Type <em>*</em> :</div>
+                            <div class="col-8 pt-2">
+                                <input type="radio" formControlName="request_type" value="sync" id="request_type">
+                                Synchronous
+                                <input type="radio" formControlName="request_type" value="async" id="request_type"
+                                    class="ml-2">
+                                Asynchronous
+                                <div class="col mt-3" *ngIf="form.get('request_type')?.value == 'async'">
+                                    <div class="row mt-2 small">
+                                        Callback URL to update the status in UnityOne : <span
+                                            class="bg-light ml-2">{{callbackUrl}}</span>
+                                    </div>
+                                    <div class="row mt-1 small">
+                                        Execution ID will be shared in "execution_id" field along with the request data.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group" *ngIf="form.get('request_type')?.value == 'async'">
+                            <div class="col-2 col-form-label text-right">Request Validation <em>*</em> :</div>
+                            <div class="col-8 pt-2">
+                                <div class="col mx-0 border rounded p-2 position-relative">
+                                    <div id="requestData" class="col-12" formArrayName="callback_request_validation">
+                                        <div *ngFor="let control of form.get('callback_request_validation').controls; let k = index; let attrLast=last; let attrFirst=first;"
+                                            class="py-0">
+                                            <div class="row" [formGroupName]="k">
+                                                <div class="col-3">
+                                                    <label for="request_type" class="col-form-label">Type<em>*
+                                                        </em></label>
+                                                    <select id="request_type" class="form-control text-dark" type="text"
+                                                        formControlName="request_type"
+                                                        [class.is-invalid]="formErrors.callback_request_validation[k].request_type">
+                                                        <!-- <option value="''">Select Type</option> -->
+                                                        <option value="request_body">Request Body</option>
+                                                        <option value="json_query">JSON Query</option>
+                                                    </select>
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.callback_request_validation[k].request_type">
+                                                        {{formErrors.callback_request_validation[k].request_type}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-2"
+                                                    *ngIf="form.controls.callback_request_validation.controls[k].get('request_type').value == 'json_query'">
+                                                    <label for="request_key" class="col-form-label">Key<em>*
+                                                        </em></label>
+                                                    <input id="request_key" class="form-control text-dark" type="text"
+                                                        formControlName="request_key"
+                                                        [class.is-invalid]="formErrors.callback_request_validation[k].request_key"
+                                                        placeholder="key">
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.callback_request_validation[k].request_key">
+                                                        {{formErrors.callback_request_validation[k].request_key}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-3">
+                                                    <label for="request_operator" class="col-form-label">Operator<em>*
+                                                        </em></label>
+                                                    <select id="request_operator" class="form-control text-dark"
+                                                        type="text" formControlName="request_operator"
+                                                        [class.is-invalid]="formErrors.callback_request_validation[k].request_operator">
+                                                        <option [value]="''">Select Operator</option>
+                                                        <option *ngFor="let operator of operators"
+                                                            [value]="operator.nameValue">{{operator.name}}
+                                                        </option>
+                                                    </select>
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.callback_request_validation[k].request_operator">
+                                                        {{formErrors.callback_request_validation[k].request_operator}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-4"
+                                                    *ngIf="form.controls.callback_request_validation.controls[k].get('request_type').value == 'request_body'">
+                                                    <label for="request_value" class="col-form-label">Value<em>*
+                                                        </em></label>
+                                                    <input id="request_value" class="form-control text-dark" type="text"
+                                                        formControlName="request_value"
+                                                        [class.is-invalid]="formErrors.callback_request_validation[k].request_value"
+                                                        placeholder="Value">
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.callback_request_validation[k].request_value">
+                                                        {{formErrors.callback_request_validation[k].request_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-2"
+                                                    *ngIf="form.controls.callback_request_validation.controls[k].get('request_type').value == 'json_query'">
+                                                    <label for="request_value" class="col-form-label">Value<em>*
+                                                        </em></label>
+                                                    <input id="request_value" class="form-control text-dark" type="text"
+                                                        formControlName="request_value"
+                                                        [class.is-invalid]="formErrors.callback_request_validation[k].request_value"
+                                                        placeholder="Value">
+                                                    <div class="invalid-feedback d-block"
+                                                        *ngIf="formErrors.callback_request_validation[k].request_value">
+                                                        {{formErrors.callback_request_validation[k].request_value}}
+                                                    </div>
+                                                </div>
+                                                <div class="col-2 mt-4 pt-1">
+                                                    <div
+                                                        class="w-100 d-flex justify-content-start align-items-center mt-2">
+                                                        <button tooltip="Remove Parameter"
+                                                            (click)="removeRequestData(k)"
+                                                            class="action-icons fas fa-minus font-sm ml-1"
+                                                            *ngIf="form.get('callback_request_validation').controls.length > 1"></button>
+                                                        <button tooltip="Add Parameter"
+                                                            class="action-icons fas fa-plus font-sm ml-1"
+                                                            *ngIf="attrLast" (click)="addRequestData(k)"></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                </form>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-md btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                    <button class="btn btn-md btn-success ml-2" type="button"
+                        (click)="confirmTaskCreate()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

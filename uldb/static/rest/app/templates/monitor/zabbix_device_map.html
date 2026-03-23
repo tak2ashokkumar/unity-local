@@ -1,0 +1,115 @@
+<uib-tabset active="activeTabNumber" type="pills">
+    <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+        <a href="tab.url"></a>
+    </uib-tab>
+</uib-tabset>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+    <loading object={{device_mappings}}></loading>
+    <div class="pagemargin">
+        <div class="col-xs-12 content-wrapper bg-color top_shadow" ng-if="device_mappings" style="padding-left:0px;">
+            <div class="col-xs-4 pull-right">
+                <div class="action-bar pull-right table-button">
+                    <button class="btn btn-primary" type="button" ng-click="add()" style="margin-left:20px;"> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="page_wrapper" style="float:left">
+            <section ng-if="device_mappings" id="no-more-tables" class="margintop20">
+                <table class="example table  table-condensed cf">
+                    <thead class="cf">
+                        <tr>
+                            <th>Customer/Instance</th>
+                            <th>Device</th>
+                            <th>Host Id</th>
+                            <th>Templates</th>
+                            <th class="numeric">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="mapping in device_mappings">
+                            <td>{{mapping.zabbix_customer.customer.name}} -
+                                {{mapping.zabbix_customer.zabbix_instance.account_name}}</td>
+                            <td>{{mapping.device.display_name}}</td>
+                            <td>{{mapping.host_id}}</td>
+                            <td>
+                                <div ng-repeat="template in mapping.zabbix_templates">{{template}}</div>
+                            </td>
+                            <td>
+                                <div class="action-icons">
+                                    <a class="fa fa-pencil blue-text" tooltip-class="customClass" uib-tooltip="Edit"
+                                        ng-click="edit(mapping)"></a>
+                                    <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete"
+                                        ng-click="delete(mapping)"></a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="!device_mappings.length" class="content-wrapper text-center">
+                    <span class="no-record-text">No Device Mappings to display</span>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="deviceMapping.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> {{method}} Device Mapping</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+            <div class="col-xs-12">
+                <label style="color:red" ng-if="err">{{ error }}</label><br>
+                <div class="form-group col-xs-6">
+                    <label for="instance">Instance *</label>
+                    <input class="form-control" id="instance" ng-model="obj.zabbix_customer" required
+                    uib-typeahead="instance as instance.customer_zabbix_name for instance in get_instances($viewValue)"
+                    typeahead-on-select="onInstanceSelect($item)">
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="device">{{activeTab.name}} *</label>
+                    <input class="form-control" id="device" ng-model="obj.device" required
+                    uib-typeahead="device as device.display_name for device in get_devices($viewValue)"
+                    typeahead-on-select="onDeviceSelect($item)">
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="host_id">Host Id *</label>
+                    <input id="host_id" class="form-control" ng-model="obj.host_id">
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="templates">Templates *</label>
+                    <multiselect id-prop="template_id" ng-model="obj.templates" show-search="true"
+                    display-prop="template_name" options="templates"></multiselect>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-danger" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-success" ng-click="onSubmit()" type="submit"> Submit</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="deleteDeviceMapping.html">
+    <div class="modal-content">
+        <div class="modal-header" style="text-align: center;">
+            <h4 class="modal-title">Confirm Delete</h4>
+        </div>
+      <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+        <div class="modal-body" style="text-align: center;">
+            Are you sure you want to delete mapping for device {{obj.device.name}} ?
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons"  style="text-align: center;">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+                <button type="button" class="btn btn-default" ng-click="confirmDelete()"> Confirm </button>
+            </div>
+        </div>
+      </form>
+    </div>
+</script>

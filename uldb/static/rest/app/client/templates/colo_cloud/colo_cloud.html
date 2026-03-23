@@ -1,0 +1,127 @@
+<style type="text/css">
+    .table>thead>tr>th {
+        border-top: 0 !important;
+    }
+</style>
+
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 main-content-wrapper" style="padding:0px;">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span></button> 
+    </div>
+
+    <!--Content Start-->
+
+    <!--Tabs Level 1 Start-->
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 tabs-level1" ng-if="colo_clouds && (colo_clouds.length > 0)">
+        <div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+            <loading loader="{{loader}}"></loading>
+            <div class="ui-selectee">
+                <nav class="column">
+                    <uib-tabset active="active_cloud_index">
+                        <uib-tab ng-repeat="cloud in colo_clouds" index="$index" heading="{{cloud.name}}"
+                        ng-click="switch_active_cloud(cloud,$index)">
+                            <uib-tab-heading class="tab-heading">
+                                <span ng-show="!(cloud.fa || cloud.svg)">{{cloud.name}}</span>
+                                <span ng-show="cloud.fa">
+                                    <i class="fa {{cloud.fa}}"></i> {{cloud.name}}
+                                </span>
+                                <span ng-show="cloud.svg">
+                                    <img class="svg leftnavsubhead2icon" src="static/fonts/SVGicons/{{ cloud.svg }}"> {{cloud.name}}
+                                </span>
+                            </uib-tab-heading>
+                        </uib-tab>
+                        <span ng-if="action_enabled" class="pull-right cousor_pointer" style="padding : 10px;">
+                            <a class="dropdown-toggle" data-toggle="dropdown">
+                                <span class="fa fa-ellipsis-h" style="font-size: 20px;"></span>
+                            </a>
+                            <ul class="dropdown-menu padding12px" role="menu">
+                                <li ng-click="add_device(active_cloud_index)">
+                                    <span>
+                                        <span tooltip-class="customClass">
+                                            <a class="dropdown-item" href="">Add</a>
+                                        </span>
+                                    </span>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                                <li ng-click="edit_device(active_cloud_index)">
+                                    <span>
+                                        <span tooltip-class="customClass">
+                                            <a class="dropdown-item" href="">Edit</a>
+                                        </span>
+                                    </span>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                                <li ng-click="delete_device(active_cloud_index)">
+                                    <span>
+                                        <span tooltip-class="customClass">
+                                            <a class="dropdown-item" href="">Delete</a>
+                                        </span>
+                                    </span>
+                                </li>
+                            </ul>
+                        </span>
+                    </uib-tabset>
+                </nav>
+                <div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="row db-info shadow-btm"> </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="tabstyles tabs-level2">
+                                <div id="tabs-ui-171882" class="mytabsclass">
+                                    <uib-tabset active="active_cloud_elem_index" class="elem_active">
+                                        <uib-tab ng-repeat="elem in cloud_elems" index="$index" heading="{{elem.display_name}}"
+                                        ng-click="get_cloud_elements(active_cloud, elem, $index);">
+                                            <uib-tab-heading class="tab-heading">
+                                                <span ng-show="!(elem.fa || elem.svg)">{{elem.display_name}}</span>
+                                                <span ng-show="elem.fa">
+                                                    <i class="fa {{elem.fa}}"></i> {{elem.display_name}}
+                                                </span>
+                                                <span ng-show="elem.svg">
+                                                    <img class="svg leftnavsubhead3icon" src="static/fonts/SVGicons/{{ elem.svg }}"> {{elem.display_name}}
+                                                </span>
+                                            </uib-tab-heading>
+                                        </uib-tab>
+                                    </uib-tabset>
+                                    <div id="tabsui-1" class="pull-left width100">
+                                        <p ng-if="selectedThirdlevelMenuItem.submenu"></p>
+                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 Tabs3-wrapper">
+                                            <ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header" ng-class="{'Tabs3 tabs-level3' : (selectedThirdlevelMenuItem.submenu)}">
+                                                <uib-tabset ng-if="false" active="activeTabIndex">
+                                                    <uib-tab ng-repeat="item in selectedThirdlevelMenuItem.submenu" index="$index" heading="{{item.name}}" ng-click="getFourthlevelMenuItemUrl(item,$index);">
+                                                        <uib-tab-heading class="tab-heading">
+                                                            <span ng-show="!(item.fa || item.svg)">{{item.name}}</span>
+                                                            <span ng-show="item.fa">
+                                                                <i class="fa {{item.fa}}"></i> {{item.name}}
+                                                            </span>
+                                                            <span ng-show="item.svg">
+                                                                <img class="svg leftnavsubhead3icon" src="static/fonts/SVGicons/{{ item.svg }}"> {{item.name}}
+                                                            </span>
+                                                        </uib-tab-heading>
+                                                    </uib-tab>
+                                                </uib-tabset>
+                                                <div ui-view></div>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="padding20px margin_top85px" ng-if="colo_clouds.length === 0">
+        <div style="margin:30px 15px 0 15px;" class="no-record no-record-warning">
+            <span class="no-record-icon fa fa-info-circle"></span>
+            <span class="no-record-text">&nbsp;&nbsp;No Datacenter Configured for this user. 
+                <a ng-click="add_device(active_cloud_index)" style="color:#5589d0; cursor:pointer;"> Click here</a> 
+            to create.</span>
+        </div>
+    </div>
+
+</div>

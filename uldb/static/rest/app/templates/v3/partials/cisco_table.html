@@ -1,0 +1,77 @@
+<div class="row dashboard-admin">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-6 pinnewcustitle pull-left"><i class="fa fa-clock-o fa-fw"></i> {{heading}}</div>
+                    <div ng-if="modeldata != undefined" >
+                        <div class="col-md-1" >
+                            <a class="fa fa-plus-square fa-2x pull-right" aria-hidden="true" ng-click="openModal('Add')"></a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 pinnewcus pull-right">
+                        <input class="form-control custom_search_field" type="text" ng-model="searchKeyword"
+                               placeholder="Search.." ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+                    </div>
+                </div>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body fixed_panel">
+                <span ng-if="!tabledata">
+                  <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+                </span>
+
+                <div class="dataTable_wrapper content_settings">
+                    <span ng-if="tabledata.length == 0">
+                      <h3 class="align-center">No records to display</h3>
+                    </span>
+                    <span ng-if="tabledata.length != 0">
+                        <table class="table table-bordered table-hover" id="dataTables-example" float-thead="{top: 20, position: 'absolute', scrollContainer: true};" ng-model="tabledata">
+                            <thead>
+                            <tr>
+                                <th ng-repeat="row in headers" class="fixed_th">{{ row.title }}</th>
+                                <th ng-if="actions != undefined" class="fixed_th">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in tabledata | filter: searchKeyword">
+                                    <td ng-repeat="row_data in headers">
+                                        <span ng-if="row_data.key == 'proxy_url'">
+                                            <a href="#/cisco-proxy/{{ row.uuid }}" class="btn btn-success">Internal</a>
+                                        </span>
+                                        <span ng-if="row_data.key == 'proxy_url'">
+                                            <a href="{{ row.proxy_url }}" class="btn btn-success" target="_blank">External</a>
+                                        </span>
+                                        <span ng-if="row_data.key != 'proxy_url'">
+                                            {{row[row_data.key]}}
+                                        </span>
+                                    </td>
+                                    <td ng-if="actions != undefined">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Actions <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu actions_menu action-button">
+                                                <li ng-repeat="action in actions">
+                                                    <a ng-if="(action.link != undefined) && (heading == 'AWS Accounts')" href="" ng-click="listall(row)">{{action.name}}</a>
+                                                    <a ng-if="action.button != undefined" ng-click="openModal(action.button,row)">{{action.name}}</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<modal visible="showModal">
+    <ng-include src="modeldata.page"></ng-include>
+</modal>
+<modal1 visible="showModal1">
+    <ng-include src="modeldata1.page"></ng-include>
+</modal1>
+<deletemodal visible="showDeleteConfirm"></deletemodal>
+<rebuildmodal visible="showRebuildConfirm"></rebuildmodal>

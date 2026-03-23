@@ -1,0 +1,76 @@
+<div class="modal-header">
+    <h3 class="modal-title">Other Device details</h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th class="col-md-4 table_no_top_border">
+                                <div>Name</div>
+                            </th>
+                            <td class="table_no_top_border">
+                              <div>{{customdevice.name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Friendly Name</div>
+                            </th>
+                            <td>
+                              <div>{{customdevice.details.friendly_name}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Up since</div>
+                            </th>
+                            <td>
+                              <div>{{customdevice.details.up_since | unityObserviumTime}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Down Since</div>
+                            </th>
+                            <td>
+                              <div>{{customdevice.details.down_since | unityObserviumTime}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Paused Since</div>
+                            </th>
+                            <td>
+                              <div>{{customdevice.details.paused_since | unityObserviumTime}}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Average Response Time</div>
+                            </th>
+                            <td>
+                              <div>{{customdevice.details.average_response_time + ' ms'}} </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="col-md-4">
+                                <div>Custom Uptime ratio</div>
+                            </th>
+                            <td>
+                              <div>{{customdevice.details.custom_uptime_ratio + '%' || 'N/A'}} </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer modal-buttons">
+    <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+      Close
+    </button>
+</div>

@@ -1,0 +1,172 @@
+<div class="row mt-2">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card rounded-0">
+                <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span> Details</span>
+                    </div>
+                    <div class="w-25">                        
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row align-items-center">
+                                <label for="name" class="col-3 col-form-label">Name<em>*</em></label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="detailFormErrors.name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                        {{detailFormErrors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="replication_factor" class="col-3 col-form-label">Replication Factor</label>
+                                <div class="col-9">
+                                    <input id="replication_factor" class="form-control" type="text" formControlName="replication_factor"
+                                        [class.is-invalid]="detailFormErrors.replication_factor">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.replication_factor">
+                                        {{detailFormErrors.replication_factor}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="compression" class="col-3 col-form-label">Compression</label>
+                                <div class="col-9">
+                                    <input id="compression" class="form-control" type="text"
+                                        formControlName="compression" [class.is-invalid]="detailFormErrors.compression">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.compression">
+                                        {{detailFormErrors.compression}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="erasure_code" class="col-3 col-form-label">Erasure Code</label>
+                                <div class="col-9">
+                                    <input id="availability_status" class="form-control" type="text"
+                                        formControlName="erasure_code" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.erasure_code">
+                                        {{detailFormErrors.erasure_code}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="cache_deduplication" class="col-3 col-form-label">Cache Deduplication</label>
+                                <div class="col-9">
+                                    <input id="cache_deduplication" class="form-control" type="text" formControlName="cache_deduplication"
+                                        readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cache_deduplication">
+                                        {{detailFormErrors.cache_deduplication}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="max_capacity" class="col-3 col-form-label">Total Space</label>
+                                <div class="col-9">
+                                    <input id="max_capacity" class="form-control" type="text" formControlName="max_capacity" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.max_capacity">
+                                        {{detailFormErrors.max_capacity}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="free_space" class="col-3 col-form-label">Free Space</label>
+                                <div class="col-9">
+                                    <input id="free_space" class="form-control" type="text" formControlName="free_space" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.free_space">
+                                        {{detailFormErrors.free_space}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="used_space" class="col-3 col-form-label">Used Space</label>
+                                <div class="col-9">
+                                    <input id="used_space" class="form-control" type="text" formControlName="used_space" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.used_space">
+                                        {{detailFormErrors.used_space}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="reserved_capacity" class="col-3 col-form-label">Reserved Capacity</label>
+                                <div class="col-9">
+                                    <input id="reserved_capacity" class="form-control" type="text" formControlName="reserved_capacity" readonly>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.reserved_capacity">
+                                        {{detailFormErrors.reserved_capacity}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group row align-items-center">
+                                <label for="controller_iops" class="col-3 col-form-label">Controller Iops</label>
+                                <div class="col-9">
+                                    <input id="controller_iops" class="form-control" type="text" formControlName="controller_iops"
+                                        [class.is-invalid]="detailFormErrors.controller_iops">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.controller_iops">
+                                        {{detailFormErrors.controller_iops}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="controller_bw" class="col-3 col-form-label">Controller Bandwidth</label>
+                                <div class="col-9">
+                                    <input id="controller_bw" class="form-control" type="text"
+                                        formControlName="controller_bw" [class.is-invalid]="detailFormErrors.controller_bw">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.controller_bw">
+                                        {{detailFormErrors.controller_bw}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="controller_latency" class="col-3 col-form-label">Controller Latency</label>
+                                <div class="col-9">
+                                    <input id="controller_latency" class="form-control" type="text"
+                                        formControlName="controller_latency" [class.is-invalid]="detailFormErrors.controller_latency">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.controller_latency">
+                                        {{detailFormErrors.controller_latency}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="data_reduction_ratio" class="col-3 col-form-label">Data Reductionation Ratio</label>
+                                <div class="col-9">
+                                    <input id="data_reduction_ratio" class="form-control" type="text"
+                                        formControlName="data_reduction_ratio" [class.is-invalid]="detailFormErrors.data_reduction_ratio">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.data_reduction_ratio">
+                                        {{detailFormErrors.data_reduction_ratio}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="overall_efficiency" class="col-3 col-form-label">Overall Efficiency</label>
+                                <div class="col-9">
+                                    <input id="overall_efficiency" class="form-control" type="text"
+                                        formControlName="overall_efficiency" [class.is-invalid]="detailFormErrors.overall_efficiency">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.overall_efficiency">
+                                        {{detailFormErrors.overall_efficiency}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="data_reduction_savings" class="col-3 col-form-label">Data Reduction Savings</label>
+                                <div class="col-9">
+                                    <input id="data_reduction_savings" class="form-control" type="text"
+                                        formControlName="data_reduction_savings" [class.is-invalid]="detailFormErrors.data_reduction_savings">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.data_reduction_savings">
+                                        {{detailFormErrors.data_reduction_savings}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="effective_free" class="col-3 col-form-label">Effective Free</label>
+                                <div class="col-9">
+                                    <input id="effective_free" class="form-control" type="text"
+                                        formControlName="effective_free" [class.is-invalid]="detailFormErrors.effective_free">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.effective_free">
+                                        {{detailFormErrors.effective_free}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-center">
+                                <label for="controller_bw" class="col-3 col-form-label">Filesystem Whitelists</label>
+                                <div class="col-9">
+                                    <input id="controller_bw" class="form-control" type="text"
+                                        formControlName="controller_bw" [class.is-invalid]="detailFormErrors.controller_bw">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.controller_bw">
+                                        {{detailFormErrors.controller_bw}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="card mb-2 mt-0" *ngIf="isCabinetGraphs">
+  <div class="card-header pt-1 pb-1 px-2 border-bottom-0">
+    <span>{{device.name}} </span>
+    <shared-device-status [status]="device.status.status" class="small-icon"></shared-device-status>
+  </div>
+  <div class="card-body pt-1 pb-1 px-0">
+    <div class="px-3" *ngIf="graphData.observium">
+      <strong>{{graphData.name}}</strong>
+    </div>
+    <div class="mt-0 graph_div" *ngIf="graphData.observium">
+      <img class="img-fluid graph" [src]="graphData.graph">
+    </div>
+    <div class="mt-0" *ngIf="graphData.zabbix">
+        <img class="img-fluid graph" [src]="graphData.graph">
+      </div>
+  </div>
+</div>
+
+<div class="card mb-2 mt-0" *ngIf="!isCabinetGraphs">
+  <div class="card-header pt-1 pb-0 px-2 border-bottom-0" *ngIf="graphData.observium">
+    {{graphData.name}}
+  </div>
+  <div class="card-body pt-1 pb-0 px-0">
+    <div class="mt-0 graph_div" *ngIf="graphData.observium">
+      <img class="img-fluid graph" [src]="graphData.graph">
+    </div>
+
+    <div class="mt-0" *ngIf="graphData.zabbix">
+      <img class="img-fluid graph" [src]="graphData.graph">
+    </div>
+  </div>
+</div>

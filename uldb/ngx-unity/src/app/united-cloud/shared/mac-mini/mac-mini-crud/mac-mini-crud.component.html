@@ -1,0 +1,183 @@
+<ng-template #macMiniFormRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{action}} Mac Mini
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="macMiniModelRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form *ngIf="macMiniForm" [formGroup]="macMiniForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="row">
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="name">Name<em>*</em></label>
+            <input id="name" class="form-control" type="text" formControlName="name"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.name}">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.name">{{macMiniFormErrors.name}}
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label">Serial Number<em>*</em></label>
+            <input id="serial_number" class="form-control" type="text" formControlName="serial_number"
+              [class.is-invalid]="macMiniFormErrors.serial_number">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.serial_number">
+              {{macMiniFormErrors.serial_number}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="os">
+            <label class="font-col-form-label" for="osid">OS<em>*</em></label>
+            <select id="osid" class="form-control" formControlName="id"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.os.id}">
+              <option value="" disabled>Select Operating System</option>
+              <option *ngFor="let os of operatingsystems" [value]="os.id">
+                {{os.full_name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.os.id">{{macMiniFormErrors.os.id}}
+            </div>
+          </div>
+          <div class="form-group col-6" formGroupName="manufacturer">
+            <label class="font-col-form-label" for="manufacturer">Manufacturer<em>*</em></label>
+            <select id="manufacturerid" class="form-control" formControlName="id"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.manufacturer.id}">
+              <option value="" disabled>Select Manufacturer</option>
+              <option *ngFor="let manufacturer of manufacturers" [value]="manufacturer.id">
+                {{manufacturer.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.manufacturer.id">
+              {{macMiniFormErrors.manufacturer.id}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="model">
+            <label class="font-col-form-label" for="modelid">Model<em>*</em></label>
+            <select id="modelid" class="form-control" formControlName="id"
+              [class.is-invalid]="macMiniFormErrors.model.id">
+              <option value="" disabled>Select Model</option>
+              <option *ngFor="let model of models" [value]="model.id"> {{model.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.model.id">
+              {{macMiniFormErrors.model.id}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="num_cpus">Number of CPUs<em>*</em></label>
+            <input id="num_cpus" class="form-control" type="number" min="1" formControlName="num_cpus"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.num_cpus}">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.num_cpus">
+              {{macMiniFormErrors.num_cpus}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="num_cores">Number of Cores<em>*</em></label>
+            <input id="num_cores" class="form-control" type="number" min="1" formControlName="num_cores"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.num_cores}">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.num_cores">
+              {{macMiniFormErrors.num_cores}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="memory_mb">Memory(MB)<em>*</em></label>
+            <input id="memory_mb" class="form-control" type="number" min="1" formControlName="memory_mb"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.memory_mb}">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.memory_mb">
+              {{macMiniFormErrors.memory_mb}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="capacity_gb">Capacity(GB)<em>*</em></label>
+            <input id="capacity_gb" class="form-control" type="number" min="1" formControlName="capacity_gb"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.capacity_gb}">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.capacity_gb">
+              {{macMiniFormErrors.capacity_gb}}</div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="management_ip">Management IP</label>
+            <i class="fa fa-info-circle text-muted ml-2" container="body" containerClass="info-multi-line"
+              [tooltip]="'IP Address for SSH/RDP Access'"></i>
+            <input id="management_ip" class="form-control" type="text" formControlName="management_ip"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.management_ip}">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.management_ip">
+              {{macMiniFormErrors.management_ip}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="datacenter">
+            <label class="form-col-form-label" for="dcId">Datacenter<em>*</em></label>
+            <select id="dcId" class="form-control" formControlName="uuid"
+              [class.is-invalid]="macMiniFormErrors.datacenter.uuid">
+              <option value="" disabled>Select Datacenter</option>
+              <option *ngFor="let dc of datacenters" [value]="dc.uuid">{{dc.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.datacenter.uuid">
+              {{macMiniFormErrors.datacenter.uuid}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="private_cloud">
+            <label class="form-col-form-label" for="private_cloud">Private Cloud</label>
+            <select id="private_cloudid" class="form-control" formControlName="id"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.private_cloud.id}">
+              <option value="">Select Private Cloud</option>
+              <option *ngFor="let private_cloud of privateclouds" [value]="private_cloud.id">
+                {{private_cloud.name}} </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.private_cloud.id">
+              {{macMiniFormErrors.private_cloud.id}}</div>
+          </div>
+          <div class="form-group col-6" formGroupName="cabinet">
+            <label class="font-col-form-label" for="cabinetid">Cabinet</label>
+            <select id="cabinetid" class="form-control" formControlName="id"
+              [class.is-invalid]="macMiniFormErrors.cabinet.id">
+              <option value="">Select Cabinet</option>
+              <option *ngFor="let cabinet of cabinets" [value]="cabinet.id">
+                {{cabinet.name}}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.cabinet.id">{{macMiniFormErrors.cabinet.id}}
+            </div>
+          </div>
+          <div class="form-group col-6">
+            <label class="form-col-form-label" for="asset_tag">Asset Tag</label>
+            <input id="asset_tag" class="form-control" type="text" formControlName="asset_tag"
+              [ngClass]="{'is-invalid' : macMiniFormErrors.asset_tag}">
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.asset_tag">{{macMiniFormErrors.asset_tag}}</div>
+          </div>
+          <div *ngIf="macMiniForm.get('collector')" class="form-group col-6" formGroupName="collector">
+            <label class="font-col-form-label" for="collectoruuid">Collector<em>*</em></label>
+            <select id="collectoruuid" class="form-control" formControlName="uuid"
+              [class.is-invalid]="macMiniFormErrors.collector.uuid">
+              <option value="" disabled>Select Collector</option>
+              <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="macMiniFormErrors.collector.uuid">{{macMiniFormErrors.collector.uuid}}</div>
+          </div>
+          <div class="form-group col-12">
+            <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+              <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+              </tag-input-dropdown>
+            </tag-input>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="createMacMini()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="macMiniModelRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmDelete>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmMacMiniDeleteModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This Mac Mini will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmMacMiniDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmMacMiniDeleteModalRef.hide()"
+        type="button">No</button>
+    </div>
+  </div>
+</ng-template>

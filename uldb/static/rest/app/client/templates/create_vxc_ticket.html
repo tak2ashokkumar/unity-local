@@ -1,0 +1,34 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="cancel()">&times;</button>
+  <span class="modal-title"> VXC Request</span>
+</div>
+<div class="modal-form">
+    <form role="form" name="create_ticket_form">
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="form-group">
+                <label for="">VXC Type*</label>
+                <span class="errormsg" ng-if="ticket_subject_errmsg">({{ ticket_vxc_errmsg }})</span>
+                <select name="vxc" placeholder="Select VXC Type" id="vxc" ng-change="change_subject()" ng-options="value for (key, value) in request.connection_type_list" class="ng-touched" ng-model="request.connection_type">
+                    <option value="" disabled>Select VXC Type</option>
+                </select>
+                <span class="select-arrow"></span>
+
+            </div>
+            <div class="form-group">
+                <label for="">Subject*</label>
+                <span class="errormsg" ng-if="ticket_subject_errmsg">({{ ticket_subject_errmsg }})</span>
+                <input name="subject" required="required" ng-readonly="true" class="form-control" type="text" ng-class="{'has-error': ticket_subject_errmsg }" ng-model="request.subject"/>
+            </div>
+            <div class="form-group">
+                <label for="">Description </label>
+                <span class="errormsg" ng-if="ticket_desc_errmsg"> ({{ ticket_desc_errmsg }})</span>
+                <textarea rows="10" placeholder="Describe VXC details here" class="form-control" type="text" ng-model="request.description"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer modal-buttons">
+    <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+    <button class="btn btn-default" ng-click="createRequest(request, 'task')" type="submit"> Create Ticket</button>
+</div>

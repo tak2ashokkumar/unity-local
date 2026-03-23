@@ -1,0 +1,16 @@
+<div *ngFor="let item of items; let last = last;" [ngClass]="{'mb-3':last}">
+    <div class="card border-0 rounded-0">
+        <app-spinner [name]="item.loader"></app-spinner>
+        <div class="card-body">
+            <h5 class="card-title text-warning">{{item.name}}</h5>
+            <div class="row">
+                <div class="col-12">
+                    <img *ngIf="item.graph" class="img-fluid pointer-link" [src]="'data:image/png;base64,'+item.graph">
+                    <div *ngIf="!item.graph" class="d-flex justify-content-center align-items-center" style="min-height: 150px;">
+                        <span class="fa fa-spinner fa-spin fa-2x"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

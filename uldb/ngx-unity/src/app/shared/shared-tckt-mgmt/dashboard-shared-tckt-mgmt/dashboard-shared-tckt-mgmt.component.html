@@ -1,0 +1,48 @@
+<table class="table text-left" *ngIf="viewData.length">
+  <thead class="">
+    <tr>
+      <th>Ticket ID</th>
+      <th class="ticket-subject">Subject</th>
+      <th>Status</th>
+      <th>Priority</th>
+      <th>Created On</th>
+      <th>Acknowledged On</th>
+      <th>Resolved On</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let ticket of viewData" setTableColumnWidth>
+      <td><a class="btn btn-link text-decoration-none p-0 table-column-btn" [routerLink]="ticket.detailsUrl"
+          [tooltip]="ticket.id">{{ticket.id}}</a></td>
+      <td>
+        <div [tooltip]="ticket.subject">{{ticket.subject}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.status">{{ticket.status}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.priority">{{ticket.priority}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.created_at">{{ticket.created_at}}</div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.assignedOn">
+          <span *ngIf="ticket.metricsAvailable">{{ticket.assignedOn}}</span>
+          <span *ngIf="!ticket.metricsAvailable">
+            <i class="fa fa-spinner fa-spin"></i>
+          </span>
+        </div>
+      </td>
+      <td>
+        <div [tooltip]="ticket.resolvedOn">
+          <span *ngIf="ticket.metricsAvailable">{{ticket.resolvedOn}}</span>
+          <span *ngIf="!ticket.metricsAvailable">
+            <i class="fa fa-spinner fa-spin"></i>
+          </span>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="text-center text-muted" *ngIf="!viewData.length">No Tickets To Display.</div>

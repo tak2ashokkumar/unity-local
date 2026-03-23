@@ -1,0 +1,198 @@
+<!--Content Start-->
+<!--Tabs Level 1 Start-->
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 tabs-level1">
+    <div class="ui-selectee">
+        <nav class="column">
+            <ul class="nav nav-tabs">
+                <span class="ulheading">Profile Settings</span>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!--Tabs Level 1 End-->
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="row db-info shadow-btm"> </div>
+</div>
+
+<!--Tabs Level 1 End - Content Start-->
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+        <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 paddingright">
+            <div class=" middle-wrapper">
+                <div class="row  userbox">
+                    <div class="row">
+                        <h4>{{ user.first_name + ' ' + user.last_name }}</h4>
+                    </div>
+                    <div class="row barpaddingtop">{{user.email}}</div>
+                </div>
+
+                <div class="row userbox-inner">
+                    <div class="row">
+                        <h6>Security Settings </h6>
+                    </div>
+                    <div class="row paddingtop"><button class="btn btn-default" type="button" ng-click="changePassword()">Change Password</button></div>
+                </div>
+                <div class="row userbox-inner">
+                    <div class="row">
+                        <h6>Timezone Settings </h6>
+                    </div>
+                    <div class="row paddingtop">{{user.timezone}}</div>
+                    <div class="row paddingtop"><button class="btn btn-default" type="button" ng-click="changeTimezone()">Change Timezone</button></div>
+                </div>
+                <div class="row userbox-inner">
+                    <div class="row">
+                        <h6>Two-Factor Authentication:</h6>
+                    </div>
+                    <div class="row barpaddingtop">{{ user.has_two_factor? 'Enabled' : 'Disabled' }}</div>
+                    <div class="row paddingtop"><button class="btn btn-default" type="button" ng-click="manageTwoFactor()">Manage</button></div>
+                </div>
+
+                <div class="row userbox-inner">
+                    <div class="row">
+                        <h6>Last Login:</h6>
+                    </div>
+                    <div class="row barpaddingtop">{{ user.last_login | date : 'medium' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7 paddingleft">
+            <div class="row middle-wrapper">
+                <div class="row cardbox-header">Roles</div>
+                <div class="row Dashwrap">
+                    <div class="row profile">
+                        <ul>
+                            <!-- Have to change when we introduce role based access -->
+                            <li ng-repeat="item in roles">{{ item }}</li>
+                            <li ng-if="roles.length == 0 ">No Roles Assigned</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row paddingtop">
+                <div class="row middle-wrapper">
+                    <div class="row cardbox-header">Groups</div>
+                    <div class="row Dashwrap">
+                        <div class="row profile">
+                            <ul>
+                                <li ng-repeat="item in user.groups">{{ item.name }}</li>
+                                <li ng-if="user.groups.length == 0 ">No Groups Assigned</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row paddingtop">
+                <div class="row middle-wrapper">
+                    <div class="row cardbox-header">
+                        Access Types Granted
+                    </div>
+                    <section id="no-more-tables" class="margintop20 middle-wrapper">
+                        <table class="table table-condensed">
+                            <thead class="cf">
+                                <tr>
+                                    <th ng-repeat="item in headers">
+                                        {{item.name}}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in user.access_types">
+                                    <td>
+                                        {{item.name}}
+                                    </td>
+                                    <td>
+                                        {{item.description}}
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+            <div class="row paddingtop">
+                <div class="row middle-wrapper">
+                    <div class="row cardbox-header">
+                        Zendesk Integration Status
+                    </div>
+                    <section id="no-more-tables" class="margintop20 middle-wrapper">
+                        <table class="table table-condensed">
+                            <tbody>
+                                <tr>
+                                    <td> {{ zendesk_status }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="changePassword.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> Change Your Password</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label style="color:red" ng-if="err">{{ error }}</label><br>
+                <div class="form-group ">
+                    <label for="">Old Password*</label><input required="required" class="form-control" type="password" ng-model="request.old_pass" autocomplete="new-password" autofocus/>
+                </div>
+                <div class="form-group">
+                    <label for="">New Password*</label><input required="required" class="form-control" type="password" ng-model="request.pass1" autocomplete="new-password" />
+                </div>
+                <div class="form-group">
+                    <label for="">Confirm New Password*</label><input required="required" class="form-control" type="password" ng-model="request.pass2" autocomplete="new-password" ng-change="check(true)"/>
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-default" ng-click="change()" type="submit"> Change Password</button>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="changeTimezone.html">
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="cancel()">&times;</button>
+        <span class="modal-title"> Change Your Timezone</span>
+    </div>
+    <div class="modal-form">
+        <form role="form">
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="form-group " ng-class="{'has-error':(timezone_list_errmsg)}">
+                    <label for="timezone" >
+                        Timezone  <span > *</span>
+                        <span class="errormsg"  ng-if="timezone_list_errmsg" >
+                            &nbsp; ( This Field is Required )
+                        </span>
+
+                    </label>
+                    <select  ng-options="option for option in timezone_list " class="form-control"
+                              ng-model="request.timezone" required name="timezone">
+                        <option value=""> Select Timezone</option>
+                    </select>
+
+                </div>
+
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-default" ng-click="change_timezone(request,user.uuid)" type="submit"> Change Timezone</button>
+    </div>
+</script>

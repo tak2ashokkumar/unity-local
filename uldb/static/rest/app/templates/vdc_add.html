@@ -1,0 +1,126 @@
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4>Add Virtual Datacenter</h4>
+	</div>
+	<div class="panel-body">
+		<!--<form role="form" method="post" id="postform">-->
+		<form role="form"id="postform" action="" method="post">
+    			<input type='hidden' name='csrfmiddlewaretoken' id="csrf_token" value={{csrf_token}} />
+ 		</form>
+ 		<form role="form" id="virtualdatacenter_add" action="" method="post" enctype='application/json'>
+			
+			<div class="form-group">
+				
+				<label for="id_cloud_customer" class="required">Customer *</label>
+				<div class="form-group">				
+			      	 	<input type="text" id="orgName" class="form-control"
+					     ng-model="vdc.customer"
+					     placeholder="Type customer to filter..."
+				             typeahead-on-select="AddVDCDet($item)"
+					     typeahead="org as org.organization_name for org in getOrgs($viewValue)" data4="" 						     ng-keypress="ClearValidation()">
+
+				 	<label class="errormsg" ng-if="customererr">{{ customerMsg }}</label>				
+				</div>
+			</div>
+			<div class="form-group">				
+				<label for="id_cloud_name" class="required">Virtual Datacenter Name * </label>				
+				<input type="text" id="id_cloud_name" name="name" placeholder="Name" class="form-control" ng-model="vdc.name"  					data4="alphanumeric" ng-keypress="ClearValidation()">
+				<label class="errormsg" ng-if="nameerr">{{ nameMsg }}</label>
+			</div>
+			<div class="form-group">
+				<label for="id_cloud_type" class="required">Cloud Type * </label>					
+				<select id="id_cloud_type" class="form-control" name="cloud_type" ng-model="vdc.cloud_type" 					ng-change="ShowVCenter(vdc.cloud_type)">
+					<option value="" style="display:none" selected="selected">Please select</option>
+					<option value="VMware">VMware</option>
+					<option value="OpenStack">OpenStack</option>
+					<option value="Custom">Custom</option>
+ 				 </select>
+				<label class="errormsg" ng-if="cloudtypeerr">{{ cloudtypeMsg }}</label>
+			</div>
+
+			<div class="form-group" ng-if="VisibleVCenter">
+				
+				<label for="id_vcenter" class="opional">vCenter </label>
+						
+				<select id="id_admin_id" class="form-control" ng-model="vdc.vcenter" 				 					ng-options="vc as vc.name for vc in virtualcenter" style="width:100%;">
+						<option  value="">Please select</option>
+				</select>
+			</div>
+
+			<div class="panel panel-success" ng-if="AhowAddDiv">
+			   <div class="panel-heading">
+				<h3 class="panel-title">Add</h3>
+			   </div>
+			   <div class="panel-body">
+				<div class="form-group form-inline">
+					<input class="ckeckbox cbox_view" type="checkbox" ng-click="ShowServerDiv()"> Servers</input>
+					<input class="ckeckbox cbox_view" type="checkbox" ng-click="ShowSANDiv()"> Storage Servers</input>
+					<input class="ckeckbox cbox_view" type="checkbox" ng-click="ShowFirewallDiv()"> Firewalls</input>
+					<input class="ckeckbox cbox_view" type="checkbox" ng-click="ShowLBDiv()"> Loadbalancers</input>
+					<input class="ckeckbox cbox_view" type="checkbox" ng-click="ShowSwitchDiv()"> Switches</input>
+				</div>
+				<div ng-if="ShowServer" class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Server </h3>
+					</div>
+					<div class="panel-body">						
+						<div class="col-sm-12">
+						  <select  class="form-control" ng-model="vdc.servers" 				 			  			  		ng-options="invser as invser.instance_name for invser in inv_servers" multiple> 						  	  </select>		
+				
+						</div>
+					</div>
+				 </div>	
+				 <div ng-if="ShowSAN" class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Storage Servers </h3>
+					</div>
+					<div class="panel-body">						
+						<div class="col-sm-12">
+						  <select class="form-control" ng-model="vdc.storage_servers" 				 		   				   		ng-options="is as is.instance_name for is in inv_san" multiple>	
+						  </select>
+						</div>
+					</div>
+				 </div>
+				 <div ng-if="ShowFirewall" class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Firewalls </h3>
+					</div>
+					<div class="panel-body">						
+						<div class="col-sm-12">
+						  <select class="form-control" ng-model="vdc.firewalls" 				 		   				   		ng-options="inf as inf.name for inf in inv_firewall" multiple> 	
+						  </select>
+						</div>
+					</div>
+				 </div>
+				 <div ng-if="ShowLoadbalancer" class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Loadbalancers </h3>
+					</div>
+					<div class="panel-body">						
+						<div class="col-sm-12">
+						  <select class="form-control" ng-model="vdc.loadbalancers" 				 		   					ng-options="inl as inl.name for inl in inv_loadbalancer" multiple>	
+						  </select>
+						</div>
+					</div>
+				 </div>
+				 <div ng-if="ShowSwitch" class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Switches </h3>
+					</div>
+					<div class="panel-body">						
+						<div class="col-sm-12">
+						  <select class="form-control" ng-model="vdc.switches" 				 		   					ng-options="insw as insw.name for insw in inv_switch" multiple> 	
+						  </select>
+						</div>
+					</div>
+				 </div>
+			   </div>
+			</div>
+			
+			<button type="button" class="btn btn-danger" id="wizardcancelbutton" ng-click="CancelVDCAdd()">Cancel</button>
+			<button type="button" class="btn btn-success" id="finishbutton" ng-click="SaveVDCAdd()">Save</button>
+		</form>
+	</div>
+</div>
+

@@ -1,0 +1,267 @@
+<div class="toolbox left-sidebar">
+    <div class="p-2 mb-1">
+        <table-search-box [searchValue]="searchQuery" (searched)="onSearched($event)">
+        </table-search-box>
+    </div>
+    <div [ngSwitch]="menuType">
+        <div *ngSwitchCase="'main'">
+            <div *ngFor="let menu of mainMenu"
+                class="row m-0 p-0 mb-3 align-items-center pointer-link custom-hover-effect">
+                <div class="col-1">
+                    <img loading="eager" [src]="menu.icon" height="25" width="25">
+                </div>
+                <div class="col-10">
+                    <div (click)="goToSubMenu(menu.name)" class="px-2">
+                        <h5 class="m-0" style="color: #2F353A;font-weight: 400;">{{ menu.name }}</h5>
+                        <span class="text-muted description">
+                            {{ menu.description }}</span>
+                    </div>
+                </div>
+                <div class="col-1">
+                    <i class="fas text-muted fa-arrow-right fa-sm"></i>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'Trigger'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">Trigger</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Start workflows manually, on a schedule, or when a chat message arrives.
+                </span>
+            </div>
+            <div *ngFor="let menu of triggerMenu"
+                [ngClass]="menu.name !== 'Event' ? 'custom-hover-effect drag-item' : ''"
+                class="d-flex align-items-center justify-content-between p-2 pointer-link">
+                <img loading="eager" [src]="menu.icon" height="20" width="20" class="mr-2 ml-3">
+                <div class="px-2" draggable="true" (dragstart)="onDragStart($event, menu)"
+                    *ngIf="menu.name !== 'Event'">
+                    <h5 class="m-0 sub-headers">{{ menu.name }}</h5>
+                    <span class="text-muted description">
+                        {{ menu.description }}</span>
+                </div>
+                <!-- <div class="px-2" *ngIf="menu.name === 'Event'">
+                    <h5 class="m-0 sub-headers">{{ menu.name }}</h5>
+                    <span class="text-muted description">
+                        {{ menu.description }}</span>
+                    <div *ngFor="let t of menu.triggers"
+                        class="drag-item row p-1 mb-1 d-flex align-items-center custom-hover-effect drag-item"
+                        style="border-bottom: #ccc 1px solid;" draggable="true" (dragstart)="onDragStart($event, t)">
+                        <div class="ml-4">
+                            <img [src]="t.icon" class="mx-2" alt="Icon" height="16" width="16" />
+                        </div>
+                        <span style="width: 13rem;" class="text-truncate sub-headers" [title]="t.name">{{t.name}}</span>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+        <div *ngSwitchCase="'Advanced AI'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">Advanced AI</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Add intelligent processing using AI models for reasoning, automation and analysis.
+                </span>
+            </div>
+            <div *ngFor="let menu of llmList"
+                class="d-flex align-items-center justify-content-between p-2 pointer-link custom-hover-effect drag-item"
+                draggable="true" (dragstart)="onDragStart($event, menu)">
+                <img loading="eager" [src]="menu.icon" height="20" width="20" class="mr-2 ml-3">
+                <div class="px-2">
+                    <h5 class="m-0 sub-headers">{{ menu.name }}</h5>
+                    <span class="text-muted description">
+                        {{ menu.description }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'Task'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">Task</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Use a predefined automation task from the Task module within the workflow.
+                </span>
+            </div>
+            <div *ngFor="let cat of filteredCategoryList">
+                <div class="accordion mb-1">
+                    <div class="accordion-headers" (click)="toggleTaskAccordion(cat.category)">
+                        <span class="sub-headers">{{ cat.category }}</span>
+                        <i class="text-muted"
+                            [ngClass]="isOpenTasks[cat.category] ? 'fas fa-chevron-up fa-sm' : 'fas fa-chevron-down fa-sm'"></i>
+                    </div>
+                    <div class="accordion-body"
+                        [ngClass]="{'active': isOpenTasks[cat.category] || autoOpenTasks[cat.category]}">
+                        <div *ngFor="let t of cat.tasks; let taskFirst = first; let lastTask = last; "
+                            class="drag-item row p-1 mb-1 d-flex align-items-center" draggable="true"
+                            (dragstart)="onDragStart($event, t)">
+                            <div class="ml-4">
+                                <img [src]="t.image" class="mx-2" alt="Icon" height="16" width="16" />
+                            </div>
+                            <span style="width: 13rem;" class="text-truncate sub-headers"
+                                [title]="t.name">{{t.name}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'Flow Controls'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">Flow Controls</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Evaluate a condition and execute different branches based on outcomes.
+                </span>
+            </div>
+            <div *ngFor="let menu of conditionList"
+                class="d-flex align-items-center justify-content-between p-2  pointer-link custom-hover-effect drag-item"
+                draggable="true" (dragstart)="onDragStart($event, menu)">
+                <img loading="eager" [src]="menu.icon" height="20" width="20" class="mr-2  text-muted ml-3">
+                <div class="px-2">
+                    <h5 class="m-0 sub-headers">{{ menu.name }}</h5>
+                    <span class="text-muted description">
+                        {{ menu.description }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'Output'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">Output</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Send results through email or display them as charts in the workflow logs.
+                </span>
+            </div>
+            <div *ngFor="let menu of outputList"
+                class="d-flex align-items-center justify-content-between p-1 mb-1  pointer-link custom-hover-effect drag-item"
+                draggable="true" (dragstart)="onDragStart($event, menu)">
+                <i class="text-muted fa-lg mr-2 ml-3" [ngClass]="menu.icon"></i>
+                <div class="px-2">
+                    <h5 class="m-0 sub-headers">{{ menu.name }}</h5>
+                    <span class="text-muted description">
+                        {{ menu.description }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'Sources'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">Sources</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Fetch data from APIs, databases, or external services to use in your workflow.
+                </span>
+            </div>
+            <div *ngFor="let cat of filteredSourceCategoryList">
+                <div class="accordion mb-1">
+                    <div class="accordion-headers" (click)="toggleTaskAccordion(cat.category)">
+                        <span class="sub-headers">{{ cat.category }}</span>
+                        <i class="text-muted"
+                            [ngClass]="isOpenTasks[cat.category] ? 'fas fa-chevron-up fa-sm' : 'fas fa-chevron-down fa-sm'"></i>
+                    </div>
+                    <div class="accordion-body"
+                        [ngClass]="{'active': isOpenTasks[cat.category] || autoOpenTasks[cat.category]}">
+                        <div *ngFor="let t of cat.tasks; let taskFirst = first; let lastTask = last; "
+                            class="drag-item row p-1 mb-1 d-flex align-items-center" draggable="true"
+                            (dragstart)="onDragStart($event, t)">
+                            <div class="ml-3">
+                                <img [src]="t.image" class="mx-2" alt="Icon" height="16" width="16" />
+                            </div>
+                            <span style="width: 13rem;" class="text-truncate sub-headers"
+                                [title]="t.name">{{t.name}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'Actions'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">Actions</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Fetch data from APIs, databases, or external services to use in your workflow.
+                </span>
+            </div>
+            <div *ngFor="let cat of filteredActionCategoryList">
+                <div class="accordion mb-1">
+                    <div class="accordion-headers" (click)="toggleTaskAccordion(cat.category)">
+                        <span class="sub-headers">{{ cat.category }}</span>
+                        <i class="text-muted"
+                            [ngClass]="isOpenTasks[cat.category] ? 'fas fa-chevron-up fa-sm' : 'fas fa-chevron-down fa-sm'"></i>
+                    </div>
+                    <div class="accordion-body"
+                        [ngClass]="{'active': isOpenTasks[cat.category] || autoOpenTasks[cat.category]}">
+                        <div *ngFor="let t of cat.tasks; let taskFirst = first; let lastTask = last; "
+                            class="drag-item row p-1 mb-1 d-flex align-items-center" draggable="true"
+                            (dragstart)="onDragStart($event, t)">
+                            <div class="ml-3">
+                                <img [src]="t.image" class="mx-2" alt="Icon" height="16" width="16" />
+                            </div>
+                            <span style="width: 13rem;" class="text-truncate sub-headers"
+                                [title]="t.name">{{t.name}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'UnityOne ITSM'">
+            <div (click)="backToMainMenu()" class="p-2 pointer-link">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-lg fa-arrow-left fa-sm p-2 text-muted"></i>
+                    <h5 class="mb-0" style="color: #2F353A;font-weight: 400;">UnityOne ITSM</h5>
+                </div>
+                <span class="text-muted mt-1 ml-2 d-block description">
+                    Actions to manage ITSM tickets within the UnityOne ITSM platform.
+                </span>
+            </div>
+            <div *ngFor="let menu of unityItsm"
+                class="d-flex align-items-center justify-content-between p-2 pointer-link custom-hover-effect drag-item"
+                draggable="true" (dragstart)="onDragStart($event, menu)">
+                <img loading="eager" [src]="menu.icon" height="20" width="20" class="mr-2 ml-3">
+                <div class="px-2">
+                    <h5 class="m-0 sub-headers">{{ menu.name }}</h5>
+                    <span class="text-muted description">
+                        {{ menu.description }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div *ngSwitchCase="'Search'">
+            <div *ngIf="globalSearchResults.length > 0; else noResults">
+                <div *ngFor="let item of globalSearchResults" draggable="true" (dragstart)="onDragStart($event, item)"
+                    class="d-flex align-items-center p-1 mb-3 pointer-link custom-hover-effect">
+
+                    <ng-container *ngIf="item.icon">
+                        <i *ngIf="item.icon.startsWith('fa')" class="mr-2 ml-3 fa-lg text-muted"
+                            [ngClass]="item.icon"></i>
+                        <img *ngIf="!item.icon.startsWith('fa')" [src]="item.icon" height="20" width="20"
+                            class="mr-2 ml-3" />
+                    </ng-container>
+
+                    <div class="pl-1 pr-2" style="max-width: 18rem;">
+                        <span class="d-inline-block text-truncate w-100" [innerHTML]="highlightMatch(item.name)">
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <ng-template #noResults>
+                <div class="text-muted ml-3 small">No results found.</div>
+            </ng-template>
+        </div>
+    </div>
+</div>

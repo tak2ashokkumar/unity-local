@@ -1,0 +1,58 @@
+<div class="dropdown">
+  <button class="dropbtn form-control" [ngClass]="customClass" (click)="toggleDrop($event)">
+    <ng-container *ngIf="selected">
+      <span>{{selected}}</span>
+    </ng-container>
+    <i class="fas fa-chevron-down fa-xs arrow-down-icon"></i>
+  </button>
+  <div [ngClass]="clickFlag ? 'dropdownClick' : 'dropdown-content'">
+    <span class="img-container text-dark font-sm" *ngFor="let opt of options">
+      <div (click)="onSelectPeriod(opt)">
+        <span>{{opt.label}}</span>
+      </div>
+    </span>
+    <div class="row mx-0 mb-1" *ngIf="enableCustomDateRange">
+      <div class="dropdown-item m-1 p-1 border" #customDate>
+        <div class="text-dark pl-1 font-sm">Custom Range</div>
+        <form class="px-1" [formGroup]="drForm" *ngIf="drForm">
+          <div class="d-flex align-items-center">
+            <div class="row">
+              <div class="col-12 px-2 py-1">
+                <div class="input-group">
+                  <owl-date-time #from [hour12Timer]="true" [scrollStrategy]="scrollStrategy"
+                    [style.position]="'absolute'" [style.zIndex]="'9999'"></owl-date-time>
+                  <input class="form-control form-control-sm rounded-left" formControlName="from"
+                    [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from" placeholder="From"
+                    (change)="onDateChange('from')" [class.in-valid]="drFormErrors?.from || drForm.errors?.fromSameAsOrAfterTo">
+                  <div class="input-group-append" [owlDateTimeTrigger]="from">
+                    <span class="input-group-text bg-white">
+                      <i class="fas fa-calendar-alt"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 px-2 pb-1">
+                <div class="input-group">
+                  <owl-date-time #to [hour12Timer]="true" [scrollStrategy]="scrollStrategy"
+                    [style.position]="'absolute'" [style.zIndex]="'9999'"></owl-date-time>
+                  <input class="form-control form-control-sm rounded-left" formControlName="to"
+                    [owlDateTimeTrigger]="to" [owlDateTime]="to" type="text" name="to" placeholder="To"
+                    [min]="drForm.controls.from.value" (change)="onDateChange('to')" [class.in-valid]="drFormErrors?.to || drForm.errors?.fromSameAsOrAfterTo">
+                  <div class="input-group-append" [owlDateTimeTrigger]="to">
+                    <span class="input-group-text bg-white">
+                      <i class="fas fa-calendar-alt"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center">
+            <button type="button" class="btn btn-success btn-sm" (click)="onSelectCustomRange()">Apply</button>
+            <button type="button" class="btn btn-light btn-sm" (click)="resetCustomRange()">Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

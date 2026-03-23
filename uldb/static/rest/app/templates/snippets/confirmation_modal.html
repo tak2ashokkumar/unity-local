@@ -1,0 +1,25 @@
+<loading loader="{{loader}}"></loading>
+
+<div class="modal-content" >
+    <div class="modal-header" style="text-align: center;">
+        <h4 class="modal-title">Are you sure to <b>{{vm_power_state}}</b> this VM?</h4>
+    </div>
+  <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+    <div class="modal-footer modal-buttons">
+        <div class="modal-footer modal-buttons"  style="text-align: center;">
+            <button type="button" class="btn btn-cancel" ng-click="cancel()">
+              No
+            </button>
+            <button ng-if="cloud_type=='VMware'" type="button" ng-class="{'disabled': power_loader}" class="btn btn-default" ng-click="showVMWareAuthModal()">
+              Yes
+            </button>
+            <button ng-if="cloud_type=='vCloud Director'" type="button" ng-class="{'disabled': power_loader}" class="btn btn-default" ng-click="showVMWareAuthModal()">
+              Yes
+            </button>
+            <button ng-if="cloud_type=='OpenStack'" type="button" ng-class="{'disabled': power_loader}" class="btn btn-default" ng-click="showVMWareAuthModal()">
+              Yes
+            </button>
+        </div>
+    </div>
+  </form>
+</div>

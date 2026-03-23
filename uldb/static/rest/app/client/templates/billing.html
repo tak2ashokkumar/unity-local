@@ -1,0 +1,142 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+  <loading object="{{ opptys }}"></loading>
+  <page-title title="Billing"></page-title>
+  <div class="well">
+    <p><em>This billing view is in beta status. </em>
+      For urgent support requests, please contact us via: </p>
+    <ul>
+      <li>Email: <samp>support@unityonecloud.com</samp></li>
+      <li>Phone: <samp>1-415-349-2102</samp></li>
+      <li>Toll-free: <samp>1-888-853-7733</samp></li>
+    </ul>
+  </div>
+  <div class="pagemargin">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+        <form class="navbar-form">
+          <div class="form-group">
+            <input class="form-control" type="text" ng-model="searchKeyword" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+            <button class="btn btn-search" type="submit" style="top: 4px;">
+            <i class="fa fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div>
+      <section id="no-more-tables" class="margintop20 middle-wrapper">
+        <table class="display bg-color" cellspacing="0" width="100%" ng-if="opptys.length != 0">
+          <tr>
+            <td>
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Sales Rep.</th>
+                    <th>MRC</th>
+                    <th>NRC</th>
+                    <th>Delivery Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="opportunity in opptys | filter: searchKeyword"
+                      ng-click="selectOppty(opportunity, $index)"
+                      ng-class="{'success': opportunity === selectedOppty.selected }">
+                    <td>{{ opportunity.name }}</td>
+                    <td>{{ opportunity.owner_name }}</td>
+                    <td>{{ opportunity.mrc }}</td>
+                    <td>{{ opportunity.nrc }}</td>
+                    <td>{{ opportunity.committed_delivery_date | date:'medium' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <div ng-if="opptys.length == 0 || ((opptys | filter: searchKeyword).length) == 0" class="content-wrapper">
+          <no-records-found message="No records to display"></no-records-found>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div ng-if="selectedOppty.selected" class="row paddingtop">
+  <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 billing-invoice-class">
+    <section id="no-more-tables" class="margintop20 middle-wrapper">
+      <div class="billing-invoice-heading ulheading">
+        {{ selectedOppty.selected.name }} Invoices
+      </div>
+      <br>
+        <table class="table table-condensed">
+          <thead>
+          <tr>
+            <th>Month</th>
+            <th>Year</th>
+            <th>Amount</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="invoice in invoices | filter: searchKeyword"
+              ng-click="selectInvoice(invoice, $index)"
+              ng-class="{'success': invoice === selectedInvoice.selected }">
+            <td>{{ invoice.billing_month }}</td>
+            <td>{{ invoice.billing_year }}</td>
+            <td>{{ invoice.amount_billed | currency:'$' }}</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="row">
+          <div class="col-sm-12 billing-export-button-container">
+            <button class="btn btn-default billing-export-button" ng-if="selectedInvoice.selected" ng-click="exportInvoice()">Export Invoice</button>
+          </div>
+        </div>
+    </section>
+  </div>
+  <div ng-if="selectedInvoice.selected" class="col-xs-7 col-sm-7 col-md-7 col-lg-7 billing-invoice-class">
+    <section id="no-more-tables" class="margintop20 middle-wrapper">
+      <div class="billing-invoice-heading ulheading">
+        {{ selectedInvoice.selected.billing_month }} {{ selectedInvoice.selected.billing_year }} Line Items Details
+      </div>
+      <br>
+      <div>
+
+        <div class="panel">
+
+          <div  >
+            <table class="table table-condensed">
+              <thead>
+              <tr>
+                <th>Product</th>
+                <th>Unit Price</th>
+                <th>Qty</th>
+                <th>Total Price</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="p in selectedInvoice.selected.invoice_line_items">
+                <td>{{ p.PricebookEntry.Product2.Name }}</td>
+                <td>{{ p.UnitPrice | number:2 }}</td>
+                <td>{{ p.Quantity }}</td>
+                <td>{{ p.TotalPrice | number:2 }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="row billing-bottom-panel  ">
+               <div style="float:right; margin-right:40px;">Total Amount: {{ selectedInvoice.selected.amount_billed | currency: '$'}}</div>
+            </div>
+            <div class="row billing-bottom-panel  ">
+              <div style="float:left; margin: 0 0 5px 10px;">Created at : {{ selectedInvoice.selected.created_at | date:'medium' }} Updated at: {{ selectedInvoice.selected.updated_at | date:'medium' }}</div>
+            </div>
+
+          </div>
+
+
+        </div>
+
+
+      </div>
+    </section>
+  </div>
+</div>
+

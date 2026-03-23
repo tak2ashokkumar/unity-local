@@ -1,0 +1,51 @@
+<div class="card" [class.border-danger]="dataError" appWidgetLazyLoader (lazyLoad)="onLazyLoad($event)">
+  <app-spinner [name]="ociData.loaderName"></app-spinner>
+  <div class="card-body ">
+    <div class="row">
+      <div class="col-12">
+        <a class="d-inline-block font-lg text-dark text-decoration-none h4"
+          (click)="goTo(ociData.drillDownLink)">{{ociData.accountName}}
+          - <small class="text-muted font-sm">OCI</small></a>
+
+        <span class="pull-right fas fa-exclamation-triangle text-warning font-lg" [tooltip]="dataError" container="body"
+          *ngIf="dataError"></span>
+      </div>
+    </div>
+    <div class="row mt-2" [class.disabled-widget]="dataError">
+      <div class="col-sm-5 border-right">
+        <div style="display:flex; flex-direction:column">
+          <div style="flex-grow:1; height:100px; position:relative">
+            <canvas baseChart class="chart" [chartType]="defaultChartType" [plugins]="defaultChartPlugins"
+              [options]="vmChartOptions" [data]="vmChartData" [colors]="vmChartColor" [labels]="vmChartLabels"></canvas>
+          </div>
+        </div>
+        <div class="text-center">
+          <small class="text-muted font-weight-bold">{{ociWidgetViewData.vmInstances}} VM Instances</small>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="row">
+          <div class="col-6 text-center">
+            <div class="text-value">{{ociWidgetViewData.databaseCount}}</div>
+            <div class="text-muted small">Managed Databases</div>
+          </div>
+          <div class="col-6 text-center">
+            <div class="text-value">{{ociWidgetViewData.bucketsCount}}</div>
+            <div class="text-muted small">Buckets</div>
+          </div>
+          <div class="col-6 text-center">
+            <div class="text-value">{{ociWidgetViewData.httpMonitorCount}}</div>
+            <div class="text-muted small">Http Monitors</div>
+          </div>
+          <div class="col-6 text-center">
+            <div class="text-value">{{ociWidgetViewData.vmInstances}}</div>
+            <div class="text-muted small">VM Count</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- <public-cloud-widget></public-cloud-widget> -->

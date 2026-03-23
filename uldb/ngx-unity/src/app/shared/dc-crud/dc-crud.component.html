@@ -1,0 +1,56 @@
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      All associated devices will be deleted. Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #create>
+  <div class="card mb-0">
+    <div class="card-header">
+      {{actionMessage}} Datacenter
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="onModalClose()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="datacenterForm">
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label for="name">Name<em>*</em></label>
+          <input class="form-control" id="name" formControlName="name" type="text" placeholder="name" [ngClass]="{'is-invalid' : formErrors.name}">
+          <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
+        </div>
+        <div class="form-group">
+          <label for="location">Location<em>*</em></label>
+          <input class="form-control" id="location" type="text" placeholder="location" [ngClass]="{'is-invalid' : formErrors.searchlocation || formErrors.location || formErrors.lat }"
+            formControlName="searchlocation">
+          <div class="invalid-feedback" *ngIf="formErrors.searchlocation">{{formErrors.searchlocation}}</div>
+          <div class="invalid-feedback" *ngIf="!formErrors.searchlocation && formErrors.location">{{formErrors.location}}</div>
+          <div class="invalid-feedback" *ngIf="formErrors.lat">{{formErrors.lat}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" (click)="onSubmit()" type="button">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="onModalClose()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

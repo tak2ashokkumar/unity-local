@@ -1,0 +1,16 @@
+<form role="form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group ng-scope">
+            <label for="blockName">Auto Scaling Group ** </label>
+            <select ng-if="(!angular.isDefined(rows4.autoscaling_group)) || (rows4.autoscaling_group.length === 0 )" ng-options="row.auto_scaling_group as row.auto_scaling_group for row in rows4.autoscaling_group" class="form-control" ng-model="obj.group" disabled>
+                <option selected="selected" value="">-- no auto scaling group present --</option>
+            </select>
+            <select ng-if="angular.isDefined(rows4.autoscaling_group) && (rows4.autoscaling_group.length > 0)" ng-options="row.auto_scaling_group as row.auto_scaling_group for row in rows4.autoscaling_group" class="form-control" ng-model="obj.group">
+                <option selected="selected" value="">-- choose an auto scaling group --</option>
+            </select>
+            <label class="errormsg" ng-if="obj['grouperr']">{{ obj['groupMsg'] }}</label>
+        </div>
+        <p ng-show = "obj.group" class="text-center">Are you sure you want to attach to this instance <b>{{obj.instance_id}}</b> ?</p>
+    </div>
+</form>
+    

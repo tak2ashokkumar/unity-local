@@ -1,0 +1,10 @@
+<div class="row datacenter-limit">
+  <div class="col-lg-6">
+    <datacenter-widget ng-repeat="(index, dcenter) in datacenternames.data.info" ng-if="$index % 2 === 0"
+                       dcenter="dcenter"></datacenter-widget>
+  </div>
+  <div class="col-lg-6">
+    <datacenter-widget ng-repeat="(index, dcenter) in datacenternames.data.info" ng-if="$index % 2 === 1"
+                       dcenter="dcenter"></datacenter-widget>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+<div class="row">
+    <app-spinner [name]="'unity-topology'"></app-spinner>
+    <div #visGraphContainer class="graph-container my-0 border-0">
+        <div *ngIf="!showGraph" class="d-flex justify-content-center align-items-center text-muted h-100">
+            No Data Available
+        </div>
+    </div>
+
+    <div *ngIf="hoveredNode" class="node-tooltip" (mouseenter)="tooltipHovered = true; showNodeInfo = true"
+        (mouseleave)="tooltipHovered = false; showNodeInfo = false">
+        <!-- <div class="tooltip-arrow"></div> -->
+        <div class="card border-0 mb-0">
+            <!-- <div class="card-body p-0 pt-1" *ngFor="let item of hoveredNode.metadata | keyvalue">
+                <p class="card-text mb-1">{{ item.key }}: <span class="text-muted">{{ item.value }}</span></p>
+            </div> -->
+            <div class="card-body p-0 pt-1">
+                <p class="card-text mb-1">Name: <span class="text-muted">{{hoveredNode.name}}</span></p>
+                <p class="card-text mb-1">Type: <span class="text-muted">{{ hoveredNode.type}}</span></p>
+                <p class="card-text mb-1">Device Type: <span class="text-muted">{{ hoveredNode.device_type || 'N/A'}}</span></p>
+                <p class="card-text mb-1" *ngIf="hoveredNode.subtype">Subtype: <span
+                        class="text-muted">{{hoveredNode.subtype}}</span></p>
+                <ng-container *ngFor="let item of hoveredNode.metadata | keyvalue">
+                    <p class="card-text mb-1" *ngIf="item.value">
+                        {{ item.key }}: <span class="text-muted">{{ item.value }}</span>
+                    </p>
+                </ng-container>
+            </div>
+            <div class="d-flex justify-content-center bg-transparent" *ngIf="hoveredNode.type != 'application'">
+                <button class="btn btn-primary btn-sm" (click)="goToApplication(hoveredNode)">View Details</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="graph-legend d-flex justify-content-center" *ngIf="showGraph">
+        <div class="legend-item">
+            <span class="legend-circle healthy"></span> Up
+        </div>
+        <div class="legend-item">
+            <span class="legend-circle down"></span> Down
+        </div>
+        <div class="legend-item">
+            <span class="legend-circle unknown"></span> Unknown
+        </div>
+    </div>
+</div>

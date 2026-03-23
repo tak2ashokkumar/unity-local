@@ -1,0 +1,7 @@
+<alerts></alerts>
+
+<uib-tabset active="active" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}">
+    <ng-include src="tab.url"></ng-include>
+  </uib-tab>
+</uib-tabset>

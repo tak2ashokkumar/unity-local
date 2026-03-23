@@ -1,0 +1,11 @@
+<div class="row neg-mt mb-2">
+  <div class="col">
+    <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+  </div>
+</div>
+<div class="row">
+  <div class="col-6 mb-2" *ngFor="let pdu of pdus">
+    <monitoring-datacenter-widget [pdu]="pdu"></monitoring-datacenter-widget>
+  </div>
+</div>
+<coming-soon *ngIf="!pdus.length" [message]="'No devices configured for datacenter.'"></coming-soon>

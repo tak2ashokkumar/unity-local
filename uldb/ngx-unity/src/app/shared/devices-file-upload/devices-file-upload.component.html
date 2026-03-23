@@ -1,0 +1,28 @@
+<div class="d-flex justify-content-end align-items-center ml-1 mr-1">
+    <div class="btn-group" dropdown>
+        <button id="button-animated" dropdownToggle type="button" class="btn btn-warning btn-sm dropdown-toggle"
+            aria-controls="dropdown-animated">
+            Download CSV <span class="caret"></span>
+        </button>
+        <ul id="dropdown-animated" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-animated">
+            <li role="menuitem">
+                <a class="dropdown-item" (click)="downlaodCSV(0)">Download all</a>
+            </li>
+            <li role="menuitem" *ngIf="uuids?.length">
+                <a class="dropdown-item" (click)="downlaodCSV(1)">Download Selected</a>
+            </li>
+        </ul>
+    </div>
+    <label *ngIf="!fileToUpload" for="myFileInput" class="btn btn-sm btn-outline-dark m-0 ml-1 pointer-link"
+        tooltip="Select CSV file">Import CSV</label>
+    <input *ngIf="!fileToUpload" type="file" id="myFileInput"
+        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        (change)="detectFiles($event.target.files)" />
+    <div *ngIf="fileToUpload" class="d-flex align-items-center border flex-grow-1 ml-1 px-2 rounded">
+        <span class="pr-2 text-left">{{fileToUpload?.name}}</span>
+        <i class="fas fa-times" (click)="removeFile()"></i>
+    </div>
+    <button *ngIf="fileToUpload" class="btn bg-warning fa fa-upload flex-grow-1" type="button" tooltip="Upload File"
+        (click)="uploadFile()">
+    </button>
+</div>

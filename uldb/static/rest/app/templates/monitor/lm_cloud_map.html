@@ -1,0 +1,139 @@
+<uib-tabset active="activeTab" type="pills">
+  <uib-tab ng-repeat="tab in tabs" index="$index" heading="{{ tab.name }}" ng-click="updateTab($index)">
+    <a href="tab.url"></a>
+  </uib-tab>
+</uib-tabset>
+
+<alerts></alerts>
+<generic-panel heading="Logic Monitor" panel-type="primary">
+  <panel-body>
+  	<div>
+	  <span ng-if="model.results === undefined">
+	      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+	  </span>
+	  <div ng-if="model.results !== undefined">
+	    <table class="table table-condensed" ng-if="model.results.length > 0">
+	      <thead>
+	      <tr>
+	        <th ng-repeat="f in fields" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''">
+	          <div ng-if="f.hide === undefined">{{ f.description }}</div>
+	        </th>
+	        <th>Actions</th>
+	      </tr>
+	      </thead>
+
+	      <tbody>
+	      <tr ng-repeat="result in model.results | filter: searchKeyword as filtered"
+	          ng-click="selection.selected = result; selection.index = $index; selectActions(result)"
+	          ng-class="classSelectors(result)">
+	        <td ng-repeat="f in fields" ng-if="!(f.hide)" ng-switch="f.opaque">
+	          <div ng-switch-when="link">
+	            <a href="{{ linkify(result, f).url }}">{{ linkify(result, f).text }}</a>
+	          </div>
+	          <div ng-switch-when="stringTransform">{{ desub(result, f) }}</div>
+	          <div ng-switch-when="choices">{{ result[f.name] }}</div>
+	          <div ng-switch-when="arbitraryLink">{{ f.func(result) }}</div>
+	          <div ng-switch-when="multiple">
+	            <div ng-repeat="r in result[f.name]">
+	            <p><a ng-if='f.uriPrefix' href="{{ f.uriPrefix }}{{r[f.idField]}}">{{ r.name }}</a><span ng-if='!f.uriPrefix'>{{ r.name }}</span></p>
+	            </div>
+	          </div>
+	          <div ng-switch-when="newType"><uldb-field result="result" field="f"></uldb-field></div>
+	          <div ng-switch-default>{{ result[f.name] }}</div>
+	        </td>
+	        <td>
+	          <div class="btn-group">
+	            <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	              <span class="caret"></span>
+	            </button>
+	            <ul class="dropdown-menu action-button">
+	              <li><a href ng-click="editCloudMap(result, $index)">Edit</a></li>
+	              <li><a href ng-click="removeCloudMap(result, $index)" confirm>Delete</a></li>
+	              <li ng-repeat="act in additional_actions"><a href ng-click="act['func'](result, $index)">{{ act.name }}</a></li>
+	            </ul>
+	          </div>
+	        </td>
+	      </tr>
+	      </tbody>
+	    </table>
+	    <span ng-if="model.results.length === 0">
+	      <h3 class="align-center">No records to display</h3>
+	    </span>
+	  </div>
+	</div>
+  </panel-body>
+    <panel-footer>
+    <button class="btn btn-primary" ng-click="addCloudMap()">Add</button>
+    <!-- <button ng-show="iframe.src !== null" class="btn btn-info" ng-click="clearIframe()">Clear iframe</button> -->
+  </panel-footer>
+</generic-panel>
+
+<script type="text/ng-template" id="cloudGroupMaping.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Cloud - Group Mapping </h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="request.account" class="col-sm-2 control-label">
+          Account
+        </label>
+        <div class="col-sm-10">
+          <label class="errormsg">{{ request.accountMsg }}</label>
+          <input id="account" class="form-control ticketing"
+               ng-model="request.account"
+               typeahead-on-select="loadGroups(request.account)"
+               placeholder="Type account to search..."
+               uib-typeahead="rel as rel.org for rel in getAccounts($viewValue)"
+               force-null="col.nullify">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.cloud" class="col-sm-2 control-label">
+          Cloud
+        </label>
+
+        <div class="col-sm-10">
+          <label class="errormsg">{{ request.cloudMsg }}</label>
+           <input id="cloud" class="form-control ticketing"
+               ng-model="request.cloud"
+               placeholder="Type org to search..."
+               uib-typeahead="rel as rel.name for rel in getClouds($viewValue)"
+               force-null="col.nullify">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.group_data" class="col-sm-2 control-label">
+          Group
+          <!-- <span ng-if="!group_list">
+	      		<img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+	  		</span> -->
+        </label>
+
+        <div class="col-sm-10">
+        	<label class="errormsg">{{ request.group_dataMsg }}</label>
+          <select ng-options="option.name for option in group_list track by option.id"
+                  class="form-control ng-touched" ng-model="request.group_data"
+                         >
+              <option value="">-- Select Logic Monitor Group --</option>
+          </select>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-cancel" ng-click="cancel()">
+      Cancel
+    </button>
+  	<button ng-if="method === 'Edit'" class="btn btn-default" type="button" ng-click="update(request)">
+    	Save changes!
+  	</button>
+  	<button ng-if="method === 'Add'" class="btn btn-default" type="button" ng-click="create(request)">
+    	Save
+  	</button>
+  </div>
+</script>

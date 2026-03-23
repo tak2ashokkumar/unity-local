@@ -1,0 +1,25 @@
+@import "variables";
+
+#terminal {
+  background-color: $black;
+}
+
+.terminal-container {
+  border-style: ridge;
+  border-width: 15px;
+  border-color: $gray-400;
+}
+.boxclose {
+  background: $gray-700;
+  border: 1px solid $gray-400;
+  border-radius: 25px;
+  color: $white;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 0;
+  margin-right: -25px;
+  margin-top: -25px;
+  padding: 11px 3px;
+}

@@ -1,0 +1,132 @@
+@import '../../../../unity-chatbot/unity-chatbot.component.scss';
+
+.wrapper {
+    display: flex;
+}
+
+.custom-hover-effect:hover {
+    background-color: #e0f1fc !important;
+    // border-color: #58a0cf !important;
+}
+
+.toolbox.left-sidebar {
+    min-height: 75vh !important;
+    height: calc(100vh - 155px);
+    width: 361px;
+    /* fixed toolbox width */
+    background-color: #fff;
+    max-height: 46.18rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+    position: relative;
+    box-shadow: 2px 0 0 0 rgba(0, 0, 0, 0.1);
+}
+
+/* WebKit-based browsers (Chrome, Safari, Edge) */
+.toolbox::-webkit-scrollbar {
+    width: 6px;
+    /* Thin scrollbar */
+}
+
+.toolbox::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Scrollbar color */
+    border-radius: 10px;
+    /* Rounded edges */
+}
+
+.toolbox::-webkit-scrollbar-thumb:hover {
+    background: #555;
+    /* Darker color on hover */
+}
+
+.toolbox::-webkit-scrollbar-track {
+    background: transparent;
+    /* Transparent track */
+}
+
+/* Remove arrows from scrollbar */
+.toolbox::-webkit-scrollbar-button {
+    display: none;
+}
+
+.right-button {
+    background-color: white;
+    /* Set a height limit (adjust as needed) */
+}
+
+/* Left Sidebar */
+.left-sidebar {
+    left: 0;
+    width: 22rem;
+    /* Align to the left */
+}
+
+/* Right Sidebar */
+.right-sidebar {
+    right: 0;
+    /* Align to the right */
+    width: 300px !important;
+}
+
+.drag-item {
+    color: black;
+    text-align: left;
+    cursor: grab !important;
+    // border: 1px solid black
+}
+
+.accordion {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.accordion-headers {
+    // background: #D8ECFF;
+    padding: 6px;
+    margin-left: 12px;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: #ccc 1px solid;
+    // transition: background 0.3s;
+}
+
+.arrow {
+    font-size: 10px;
+    // transition: transform 0.3s ease;
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    // transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.accordion-body.active {
+    max-height: none;
+    /* Removes height restrictions */
+    height: auto;
+    /* Expands based on content */
+    overflow: visible;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ccc;
+}
+
+.description {
+    display: inline-block;
+    max-width: 20rem;
+    font-size: 13px;
+}
+
+.sub-headers {
+    color: #2F353A;
+    font-size: 15px;
+}

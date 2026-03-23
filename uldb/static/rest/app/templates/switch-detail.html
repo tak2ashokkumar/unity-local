@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h3>{{ result.name }}</h3>
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <panelhalf heading="Properties"><detailtable cols="cols" result="result"></detailtable></panelhalf>
+  </div>
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <panelhalf heading="Inherited Properties"><inheritedtable cols="inheritedCols" model="inheritedColumnsModel"></inheritedtable></panelhalf>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <panelhalf heading="Ports">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>port number</th>
+          <th>port type</th>
+          <th>port mode</th>
+          <th>customer</th>
+          <th>edit</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="port in result.ports">
+          <td>{{ port.port_number }}</td>
+          <td>{{ port.port_type }}</td>
+          <td>{{ port.port_mode }}</td>
+          <td>{{ port.customer.organization_name }}</td>
+          <td><button class="btn btn-primary" ng-click="editPort(port, $index)">Edit</button></td>
+        </tr>
+        </tbody>
+      </table>
+    </panelhalf>
+  </div>
+  <div class="col-sm-12 col-md-12 col-lg-6">
+    <panelhalf heading="Related">
+      <table class="table table-striped">
+          <thead>
+            <tr>
+              <th ng-repeat="col in relatedCols">{{ col.description }}</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr ng-repeat="vm in server.vms">
+              <td ng-repeat="col in relatedCols">
+                <div ng-if="col.opaque === undefined">{{ vm[col.name] }}</div>
+                <div ng-if="col.opaque === 'stringTransform'">
+                  {{ col.read(vm) }}
+                </div>
+                <div ng-if="col.opaque === 'link'">
+                  <a href="{{ col.read(vm).url }}">{{ col.read(vm).innerText }}</a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+    </panelhalf>
+  </div>
+</div>

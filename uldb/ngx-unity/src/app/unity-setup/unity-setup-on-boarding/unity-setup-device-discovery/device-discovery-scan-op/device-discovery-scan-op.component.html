@@ -1,0 +1,118 @@
+<div class="card text-center">
+  <div class="card-header bg-white border-0 pb-0 mt-3">
+    <div class="row">
+      <!-- <div class="col-3">
+        <div class="input-prepend input-group custom-input-group">
+          <div class="input-group-prepend"><span class="input-group-text bg-transparent border-right-0">
+              <i class="fa fa-search"></i></span>
+          </div>
+          <input placeholder="Enter keyword" class="form-control  form-control-sm border-left-0 custom-search-input" id="prependedInput"
+            size="16" type="text" tableSeachBox>
+        </div>
+      </div> -->
+      <div class="col ">
+        <span class="text-muted ml-2 font-sm float-right align-middle"><span
+            class="badge badge-pill badge-secondary">{{count}}</span>&nbsp;
+          Devices</span>
+        <a class="btn btn-pill btn-warning pull-right btn-sm pointer-link" href="{{downloadScanResultUrl}}"
+          accessControl moduleName="Onboarding" accessType="Manage Onboarding" elementType="btn">Download</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th>IP</th>
+          <th>Hostname</th>
+          <th>Make</th>
+          <th>Model</th>
+          <th>Operating System</th>
+          <th>Version</th>
+          <th>Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of viewData;let i = index">
+          <td>{{view.ip}}</td>
+          <td>{{view.hostname}}</td>
+          <td>{{view.manufaturer}}</td>
+          <td>{{view.model}}</td>
+          <td>{{view.os}}</td>
+          <td>{{view.version}}</td>
+          <td>
+            <select [formControl]="view.select" (change)="onDeviceTypeChange($event.target.value, i)"
+              class="form-control form-control-sm" accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+              elementType="formelem">
+              <option [value]="''" disabled>Select Device Type</option>
+              <option [value]="'firewall'" [selected]="view.isSelected('firewall')">Firewall</option>
+              <option [value]="'network'" [selected]="view.isSelected('network')">Switch</option>
+              <option [value]="'loadbalancer'" [selected]="view.isSelected('loadbalancer')">Load Balancer</option>
+              <option [value]="'server'" [selected]="view.isSelected('server')">Bare Metal Server</option>
+              <option [value]="'hypervisor'" [selected]="view.isSelected('hypervisor')">Hypervisor</option>
+              <option [value]="'mac'" [selected]="view.isSelected('mac')">MacMini</option>
+              <option [value]="'storage'" [selected]="view.isSelected('storage')">Storage</option>
+              <option [value]="'power'" [selected]="view.isSelected('power')">Power</option>
+            </select>
+          </td>
+          <td>
+            <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" (click)="onScanOpDelete(i)" tooltip="Remove"
+              accessControl moduleName="Onboarding" accessType="Manage Onboarding" elementType="actionbtn">
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center text-muted" *ngIf="!viewData.length">No devices available as scan results.</div>
+        <br>
+      </div>
+      <div class="col">
+        <next-prev></next-prev>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #confirmchange>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="cancelDeviceTypeChange()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      This device type will be updated to {{selectedType}}. Are you sure you want to update?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmDeviceTypeChange()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="cancelDeviceTypeChange()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

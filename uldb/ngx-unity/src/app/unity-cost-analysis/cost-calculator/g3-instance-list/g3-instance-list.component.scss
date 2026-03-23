@@ -1,0 +1,22 @@
+@import "variables";
+
+.card {
+  background-color: $body-bg;
+
+  .g3InstanceFiltersForm label {
+    font-size: 0.65rem;
+    color: #666565;
+  }
+}
+
+ul.instances {
+  height: 11rem;
+  margin-top: -3px;
+  overflow-y: auto;
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.14);
+  font-size: 0.82rem;
+  background-color: $white;
+  .list-group-item {
+    flex-shrink: 0;
+  }
+}

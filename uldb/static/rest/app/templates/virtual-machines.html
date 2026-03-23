@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="col-sm-12">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-12">
+          <input class="form-control ng-valid ng-dirty"
+                 type="text" id="searchKeyword"
+                 ng-model="searchKeyword" placeholder="Search by server name, type, OS, etc."
+                 ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<alerts></alerts>
+
+
+<nested-model-results ctrl="ctrl" handler="handler" config="config"></nested-model-results>
+
+<div>
+  <button class="btn btn-primary" ng-click="ctrl.add()">Add</button>
+</div>
+
+<div style="height: 50px;"></div>

@@ -1,0 +1,113 @@
+<div class="page_wrapper" style="float:left">
+  <loading object="{{loadBalancersData}}"></loading>
+  <div class="row content-wrapper bg-color">
+    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+      <form class="navbar-form">
+        <div class="form-group width100">
+          <input class="form-control" type="text" ng-model="searchKeyword1" id="searchKeyword" placeholder="Enter keyword">
+          <button class="btn btn-search" type="submit" style="top: 4px;">
+          <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 padding_top15px">
+      <div class="action-bar pull-right">
+          <span class="count">{{ ((loadBalancersData | filter: searchKeyword1).length) || 0 }} of {{ ((loadBalancersData | filter: searchKeyword1).length) || 0 }}</span>
+          <span class="count-text"> Load Balancers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+      <section ng-if="loadBalancersData.length !== 0" id="no-more-tables" class="margintop20 middle-wrapper">
+          <table class="table  table-condensed table-hover" ng-if="load_balancers">
+              <thead>
+                  <tr>
+                      <th> Name </th>
+                      <th> Model</th>
+                      <th> Type </th>
+                      <th> Action </th>
+                  </tr>
+              </thead>
+              <tbody>
+
+                  <tr ng-repeat="row in loadBalancersData | filter: searchKeyword1">
+                      <td><a tabindex="0"  popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl"
+                              popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left"
+                              ng-init="get_observium_details('load_balancer', row)" ng-click="show_observium_details(row)">
+                                {{row.name}}
+                          </a>
+                      </td>
+                      <td ng-if= "row.model != ''" >{{row.model}}</td>
+                      <td ng-if= "row.model == ''" > N/A</td>
+                      <td ng-if= "row.netscaler_proxy.length != 0 && row.f5lb_proxy.length == 0" >Netscaler</td>
+                      <td ng-if= "row.netscaler_proxy.length == 0 && row.f5lb_proxy.length != 0" >F5 LoadBalancer</td>
+                      <td ng-if= "row.netscaler_proxy.length == 0 && row.f5lb_proxy.length == 0" > N/A</td>
+
+                      <td ng-if="row.f5lb_proxy || row.netscaler_proxy">
+                <div class="action-icons">
+                    <span ng-repeat="p in row.f5lb_proxy" ng-if="row.f5lb_proxy.length !== 0">
+                      <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (F5 LB)'}}">
+                        <a class="fa fa-external-link" href="{{ p.proxy_fqdn }}" target="_blank" ng-class="{'fa-disabled': row.is_shared}"></a>
+                      </span>
+                    </span>
+                    <span ng-if="row.f5lb_proxy.length !== 0">
+                        <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                        </span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket"
+                           href="" ng-click="ctrl.manage_request(row.name, 'LoadBalancer', row.model, 'F5 LoadBalancer')"></a>
+                    </span>
+                    <span ng-repeat="p in row.netscaler_proxy" ng-if="row.netscaler_proxy.length !== 0">
+                      <span tooltip-class="customClass" uib-tooltip="{{ row.is_shared ? 'Non Manageable shared Device' : 'Manage in New Tab (Citrix)'}}">
+                        <a class="fa fa-external-link" href="{{p.proxy_fqdn}}" target="_blank" ng-class="{'fa-disabled': row.is_shared}"></a>
+                      </span>
+                    </span>
+                    <span ng-if="row.netscaler_proxy.length !== 0">
+                        <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                        </span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" href=""
+                           ng-click="ctrl.manage_request(row.name, 'LoadBalancer', row.model, 'Netscaler')"></a>
+                    </span>
+                    <span ng-if="row.netscaler_proxy.length === 0 && row.f5lb_proxy.length === 0">
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link-square fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="Device Not Configured">
+                        <a class="fa fa-external-link fa-disabled" href="#/cisco-firewall/{{ p.uuid }}/"></a>
+                      </span>
+                      <span tooltip-class="customClass" uib-tooltip="{{row.message}}">
+                          <a ng-click="show_device_statistics(row.uuid)" ng-if="row.observium_details !== null">
+                              <i class="fa fa-line-chart" aria-hidden="true"></i>
+                          </a>
+                          <a ng-if="row.observium_details === null">
+                              <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                          </a>
+                      </span>
+                        <a class="fa fa-ticket"  tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" href=""
+                           ng-click="ctrl.manage_request(row.name, 'LoadBalancer', row.model, '')"></a>
+                    </span>
+               </div>
+            </td>
+                  </tr>
+              </tbody>
+            </table>
+      </section>
+      <div ng-if="load_balancers_loaded && loadBalancersData.length===0 || (((loadBalancersData | filter: searchKeyword1).length) == 0)" class="content-wrapper">
+        <no-records-found message="No associated Load Balancers were found !!"></no-records-found>
+      </div>
+
+  </div>
+</div>

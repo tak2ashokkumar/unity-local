@@ -1,0 +1,98 @@
+<div class="card" *ngIf="summaryData.dataExists">
+  <div class="card-body">
+
+    <div class="row">
+      <div class="col-5">
+        <div class="card">
+          <div class="card-header bg-white content-center border-0">
+            <div class="text-muted text-uppercase font-weight-bold text-center">Month-to-date cost</div>
+          </div>
+          <div class="card-body row text-center">
+            <div class="col">
+              <div class="mb-1">
+                <span class="fa fab fa-aws font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.aws.monthToDateCostDisplayValue}}</div>
+            </div>
+            <div class="col">
+              <div class="mb-1">
+                <span class="fa cfa-azure font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.azure.monthToDateCostDisplayValue}}</div>
+            </div>
+            <div class="col">
+              <div>
+                <span class="fa cfa-gcp font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.gcp.monthToDateCostDisplayValue}}</div>
+            </div>
+            <div class="col">
+              <div>
+                <span class="fa cfa-oci font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.oci.monthToDateCostDisplayValue}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-5">
+        <div class="card">
+          <div class="card-header bg-white content-center border-0">
+            <div class="text-muted text-uppercase font-weight-bold text-center">Trailing Twelve Months</div>
+          </div>
+          <div class="card-body row text-center">
+            <div class="col">
+              <div class="mb-1">
+                <span class="fa fab fa-aws font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.aws.trailingTwelveMonthsCostDisplayValue}}</div>
+            </div>
+            <div class="col">
+              <div class="mb-1">
+                <span class="fa cfa-azure font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.azure.trailingTwelveMonthsCostDisplayValue}}</div>
+            </div>
+            <div class="col">
+              <div>
+                <span class="fa cfa-gcp font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.gcp.trailingTwelveMonthsCostDisplayValue}}</div>
+            </div>
+            <div class="col">
+              <div>
+                <span class="fa cfa-oci font-weight-bold fa-2x text-muted"></span>
+              </div>
+              <div class="text-muted text-value font-weight-bold">{{summaryData.oci.trailingTwelveMonthsCostDisplayValue}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col-7" *ngIf="costByMonthChartLabels.length">
+        <h3 class="text-muted d-inline-block mb-4">COST BREAKDOWN BY MONTH</h3>
+        <canvas baseChart [chartType]="costByMonthChartType" [labels]="costByMonthChartLabels" [datasets]="costByMonthChartData"
+          [options]="costByMonthChartOptions" [plugins]="costByMonthChartPlugins" [legend]="costByMonthChartLegend"
+          height="115"></canvas>
+      </div>
+      <div class="col-5 text-center" *ngIf="averageCostByCloudChartLabels.length">
+        <h3 class="text-muted d-inline-block mb-4">AVERAGE COST BY CLOUD</h3>
+        <canvas baseChart [chartType]="averageCostByCloudChartType" [labels]="averageCostByCloudChartLabels" [data]="averageCostByCloudChartData"
+          [options]="averageCostByCloudChartOptions" [plugins]="averageCostByCloudChartPlugins" [legend]="averageCostByCloudChartLegend"
+          [colors]="averageCostByCloudChartColors" height="140"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card" *ngIf="!summaryData.dataExists">
+  <div class="card-body py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="empty-clouds text-center py-5"> No Summary Data available.</div>
+      </div>
+    </div>
+  </div>
+</div>

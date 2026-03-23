@@ -1,0 +1,114 @@
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row db-info shadow-btm"> </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper"  ng-show="azure_vm_content">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper padding_right5px">
+            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <h1>Virtual Machine</h1>
+            </div>
+            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <div class="action-bar">
+                    <button class="btn btn-default" type="button" ng-click="hidevirtualmachinetable()">Close</button>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                <form class="navbar-form">
+                    <div class="form-group">
+                        <input class="form-control" type="text" ng-model="searchKeyword1"
+                        placeholder="Enter keyword" ng-model-options="{debounce: {'default': 100, 'blur': 0 }}"
+                        ng-disabled="(azure_vm_content.length === 0)">
+                        <button class="btn btn-search top5px" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table id="example" class="example table table-condensed cf">
+                <thead class="cf">
+                    <tr>
+                        <th ng-repeat="row in azure_vm_headers"> {{ row.title }} </th>
+                        <th ng-if="azure_vm_content.actions != undefined">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="azure_vm in azure_vm_content | filter: searchKeyword1" ng-show="azure_vm_content.length > 0">
+                        <td ng-repeat="vm_header in azure_vm_headers">
+                            <span ng-if="vm_header.key != 'region'">
+                                <span ng-if="vm_header.key != 'tags' ">
+                                  {{azure_vm[vm_header.key] || 'NA'}}
+                                </span>
+                                <span ng-if="vm_header.key == 'tags'">
+                                    {{ azure_vm[vm_header.key].display || 'NA'}}
+                                </span>
+                            </span>
+                        </td>
+                        <td ng-if="azure_vm_content.actions != undefined">
+                            <div class="action-icons">
+                                <a ng-if="(azure_vm.power_state == 'VM running')" tooltip-class="customClass" uib-tooltip="Power Off"
+                                 class="fa fa-power-off poweredOnCss" ng-click="instance_power_toggle_model(azure_vm, 'powerOff')"></a>
+                                 <a ng-if="(azure_vm.power_state != 'VM running')" tooltip-class="customClass" uib-tooltip="Power On"
+                                 class="fa fa-power-off " ng-click="instance_power_toggle_model(azure_vm, 'start')"></a>
+                                <a class="fa fa-trash-o" tooltip-class="customClass" uib-tooltip="Delete"
+                                    ng-click="delete_vm_model(azure_vm)"></a>
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-show="((azure_vm_content.length) === 0 || ((azure_vm_content | filter: searchKeyword1).length === 0))" class="content-wrapper">
+                <no-records-found message="No Virtual Machine available in your account"></no-records-found>
+            </div>
+        </section>
+    </div>
+
+
+<modal2 visible="showModal2" >
+    <ng-include src="azure_attach_load_balancer.page"></ng-include>
+</modal2>
+<!-- <deletemodal visible="showDeleteConfirm"></deletemodal> -->
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,180 @@
+<div class="row">
+    <style type="text/css">
+        .poweredOnCss {
+            background-color: #378ad8 !important;
+            color: #FFFFFF !important;
+            border: 1px solid #378ad8;
+        }
+    </style>
+
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row db-info shadow-btm"> </div>
+    </div>
+
+    <div class="row page_wrapper">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <h1>{{region_name_float}} </h1>
+                    <span><span ng-if="region_name_float">-</span> Instances</span>
+                </div>
+                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <div class="action-bar">
+                        <button class="btn btn-default" type="button" ng-click="add_account_model()"> Create Instance</button>
+                    </div>
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                    <form class="navbar-form">
+                        <div class="form-group">
+                            <input class="form-control" style="max-width: 100%" type="text" placeholder="Enter keyword" ng-model="searchKeyword" ng-disabled="(aws_instance_list_content.data.length === 0)">
+                            <button class="btn btn-search" type="submit" style="top: 3px;">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <section id="no-more-tables" class="margintop20 middle-wrapper table-responsive">
+                <table id="example" class="example table table-condensed cf" ng-show="aws_instance_list_content.data.length > 0">
+                    <thead class="cf">
+                        <tr>
+                            <th ng-repeat="aws_instance_list_header in aws_instance_list_headers" class="padding_left_right8px"
+                            custom-sort order="{{aws_instance_list_header.key}}" sort="sort">{{ aws_instance_list_header.title }}</th>
+                            <th class="padding_left_right0">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(index, aws_instance) in aws_instance_list_content.data | filter: searchKeyword | orderBy: sortkey ">
+                            <td class="normal padding_left_right8px">
+                                <a ng-init="get_observium_details(aws_instance)" tabindex="0" popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover" href="javascript:void(0)"
+                                popover-placement="top-left" ng-click="show_observium_details(aws_instance)">{{aws_instance.instance_id || 'NA'}}</a>
+                            </td>
+
+                            <td class="normal padding_left_right8px"> {{ aws_instance.instance_type || 'NA' }}</td>
+                            <td class="normal padding_left_right8px"> {{ aws_instance.public_ip || 'NA' }}</td>
+                            <td class="normal padding_left_right8px"> {{ aws_instance.availability_zone || 'NA' }}</td>
+                            <td class="normal padding_left_right8px"> {{ aws_instance.instance_state | powerState }}</td>
+                            <td class="normal padding_left_right8px"> {{ aws_instance.launch_time | unityDate : $root.users_timezone }}</td>
+
+                            <td class="padding_left_right0">
+                                <div class="action-icons">
+                                    <span ng-repeat="action in aws_instance_list_content.actions">
+
+                                        <a ng-if="((aws_instance.instance_state == 'running') && (action.button == 'awspoweroff')) || ((aws_instance.instance_state == 'stopped') && (action.button == 'awspoweron'))" ng-click="aws_instance_ops_modal(action.button,aws_instance)" tooltip-class="customClass" uib-tooltip="{{action.name}}" class="fa fa-power-off blue-text" ng-class="{'poweredOnCss white_text':(aws_instance.instance_state == 'running')}"></a>
+
+                                        <a ng-if="(aws_instance.instance_state != 'running') && (aws_instance.instance_state != 'stopped') && (action.button == 'awsdisabled')" tooltip-class="customClass" uib-tooltip="{{action.name}}" class="fa fa-power-off fa-disabled"></a>
+
+                                        <a ng-if="((aws_instance.instance_state == 'running') && (action.button == 'awsterminate')) || ((aws_instance.instance_state == 'stopped') && (action.button == 'awsterminate'))"
+                                        ng-click="aws_instance_ops_modal(action.button,aws_instance)" class="fa fa-ban" tooltip-class="customClass" uib-tooltip="{{action.name}}"></a>
+
+                                        <a ng-if="(aws_instance.instance_state != 'running') && (aws_instance.instance_state != 'stopped') && (action.button == 'awsterminate')" tooltip-class="customClass" uib-tooltip="{{action.name}}" class="fa fa-ban fa-disabled"></a>
+
+                                        <a ng-if="(action.button == 'createimage')" class="fa fa-picture-o" tooltip-class="customClass" ng-click="create_instance_image_modal(action.button,aws_instance)" uib-tooltip="{{action.name}}"
+                                        ng-class="{'fa-disabled':(aws_instance.instance_state == 'terminated')}"></a>
+
+<!--                                         <a ng-if="(action.button == 'cloneinstance')" class="fa fa-clone" tooltip-class="customClass" ng-click="clone_instance_modal(action.button,aws_instance)" uib-tooltip="{{action.name}}"
+                                        ng-class="{'fa-disabled':(aws_instance.instance_state == 'terminated')}"></a>
+ -->
+                                        <a ng-if="(action.button == 'attachinstance')" class="fa fa-object-group" tooltip-class="customClass" ng-click="asg_modal(action.button,aws_instance)" uib-tooltip="{{action.name}}"
+                                        ng-class="{'fa-disabled':(aws_instance.instance_state == 'terminated')}"></a>
+
+                                        <a ng-if="(action.button == 'attachinterface')" class="fa fa-connectdevelop" tooltip-class="customClass" ng-click="attach_nw_interface_modal(action.button,aws_instance)" uib-tooltip="{{action.name}}" ng-class="{'fa-disabled':(aws_instance.instance_state == 'terminated')}"></a>
+
+                                        <a ng-if="(action.button == 'attachloadbalancer')" class="fa fa-balance-scale" tooltip-class="customClass" ng-click="attch_lb_modal(action.button,aws_instance)" uib-tooltip="{{action.name}}" ng-class="{'fa-disabled':(aws_instance.instance_state == 'terminated')}"></a>
+
+                                        <a ng-if="((action.link != undefined))" class="fa fa-info-circle"
+                                         tooltip-class="customClass" uib-tooltip="{{action.name}}" ng-click="instance_deatils_modal('showinstancedetails',aws_instance)"
+                                         ng-class="{'fa-disabled':(aws_instance.instance_state == 'terminated')}"></a>
+
+                                        <span ng-if="(action.button == 'observiumdetails') && (aws_instance.observium_details !== null)" tooltip-class="customClass" uib-tooltip="Show VM Statistics">
+                                            <a ng-click="show_awsvm_statistics(aws_instance)">
+                                                <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+
+                                        <span ng-if="(action.button == 'observiumdetails') && (aws_instance.observium_details === null)" tooltip-class="customClass" 
+                                        uib-tooltip="{{ $root.monitoring_not_enabled_msg }}">
+                                            <a>
+                                                <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+
+                                        <a ng-if="(action.button == 'manage_support')" class="fa fa-ticket" tooltip-class="customClass" ng-click="manage_request(aws_instance.availability_zone,aws_instance.instance_id)" uib-tooltip="{{action.name}}"></a>
+
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="((aws_instance_list_content.data.length) === 0 || ((aws_instance_list_content.data | filter: searchKeyword).length === 0))" class="content-wrapper">
+                    <no-records-found message="No Instances available in this region"></no-records-found>
+                </div>
+            </section>
+        </div>
+    </div>
+
+
+
+    <modal visible="show_create_instance_modal">
+        <ng-include src="modeldata.page"></ng-include>
+    </modal>
+    <modal1 visible="show_clone_instance_modal">
+        <ng-include src="modeldata1.page"></ng-include>
+    </modal1>
+    <modal2 visible="showModal2">
+        <ng-include src="modeldata2.page"></ng-include>
+    </modal2>
+    <modal3 visible="show_create_image_modal">
+        <ng-include src="modeldata3.page"></ng-include>
+    </modal3>
+    <modal4 visible="show_asg_modal">
+        <ng-include src="modeldata4.page"></ng-include>
+    </modal4>
+    <modal5 visible="show_nw_interface_modal">
+        <ng-include src="modeldata5.page"></ng-include>
+    </modal5>
+    <modal6 visible="show_lb_modal">
+        <ng-include src="modeldata6.page"></ng-include>
+    </modal6>
+    <confirmationmodal visible="show_delete_confirm"></confirmationmodal>
+
+
+    <style type="text/css">
+        .popover{
+            width : 28%;
+            max-width: 100%; /* Max Width of the popover (depending on the container!) */
+        }
+    </style>
+
+    <script type="text/ng-template" id="instancedetailstemplate.html">
+        <div class="row">
+            <table class="table"  ng-show="instance_details.device_data">
+                <tbody>
+                    <tr>
+                        <th class="col-md-4 table_no_top_border">   
+                            <div>Uptime</div>
+                        </th>
+                        <td class="table_no_top_border">
+                            <div ng-if="instance_details.device_data.status == 1">{{instance_details.device_data.uptime | unityObserviumTime}}</div>
+                            <div ng-if="instance_details.device_data.status == 0">Down {{instance_details.device_data.uptime | unityObserviumTime}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="col-md-4">
+                            <div>Last reboot</div>
+                        </th>
+                        <td>
+                            <div>{{instance_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="col-xs-12" ng-show="(instance_details === null)" style="padding : 20px">
+                <p>{{ $root.monitoring_not_enabled_msg }}</p>
+            </div>
+        </div>
+    </script>
+
+</div>

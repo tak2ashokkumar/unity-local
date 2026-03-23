@@ -1,0 +1,207 @@
+<div class="row">
+<style type="text/css">
+    .poweredOnCss {
+        background-color: #378ad8 !important;
+        color: #FFFFFF !important;
+        border: 1px solid #378ad8;
+    }
+</style>
+
+
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="row db-info shadow-btm"> </div>
+</div>
+
+<div class="row page_wrapper" ng-class="{'margin_top20px aws_top_shadow' : (heading === 'Network Interfaces'), 'margin_top10px aws_top_shadow' : (heading === 'Load Balancers')}">
+    <!--Tabs Level 1 End-->
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper" ng-show="((heading !== 'USER GROUP'))">
+            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <h1>{{selectedregion}} </h1>
+                <span ng-if="displayheading"> <span ng-if="selectedregion">-</span> {{displayheading}}</span>
+            </div>
+            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" ng-if="addbuttonname">
+                <div class="action-bar">
+                    <button class="btn btn-default" type="button" ng-click="openModal('Add')"> {{addbuttonname}}</button>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                <form class="navbar-form">
+                    <div class="form-group">
+                        <input class="form-control" style="max-width: 100%" type="text" placeholder="Enter keyword" ng-model="searchKeyword"ng-disabled="(tabledata.length === 0)">
+                        <button class="btn btn-search" type="submit" style="top: 3px;">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <section id="no-more-tables" class="margintop20 middle-wrapper table-responsive">
+            <table id="example" class="example table table-condensed cf" ng-show="tabledata.length > 0">
+                <thead class="cf">
+                    <tr>
+                        <th ng-repeat="row in headers" ng-class="{'padding_left_right8px' : (heading === 'Instances')}">{{ row.title }}</th>
+                        <th ng-if="actions != undefined" ng-class="{'padding_left_right0' : (heading === 'Instances')}">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in tabledata | filter: searchKeyword">
+                        <td ng-repeat="row_data in headers" ng-class="{'padding_left_right8px' : (heading === 'Instances')}" class="normal">
+                            <div ng-if = "row_data.decorator == undefined">
+                                <span ng-if="row_data.key === 'launch_time' || row_data.key === 'create_date' || row_data.key === 'update_date' || row_data.key === 'create_time' || row_data.key === 'CreateDate' || row_data.key === 'StartTime' || row_data.key === 'CreatedTime'">{{row[row_data.key] | unityDate : $root.users_timezone}}</span>
+
+                                <span ng-if="row_data.key !== 'launch_time' && row_data.key !== 'create_date' && row_data.key !== 'update_date' && row_data.key !== 'create_time' && row_data.key !== 'CreateDate' && row_data.key !== 'StartTime' && row_data.key == 'instance_state' && row_data.key != 'CreatedTime'">{{row[row_data.key] | powerState}}</span>
+
+                                <span ng-if="row_data.key !== 'launch_time' && row_data.key !== 'create_date' && row_data.key !== 'update_date' && row_data.key !== 'create_time' && row_data.key !== 'CreateDate' && row_data.key !== 'StartTime' && row_data.key != 'instance_state' && row_data.key != 'CreatedTime' && row_data.key != 'instance_id'" >
+                                    <span>{{row[row_data.key] || 'NA'}}</span>
+                                </span>
+
+                                <span ng-if="row_data.key !== 'launch_time' && row_data.key !== 'create_date' && row_data.key !== 'update_date' && row_data.key !== 'create_time' && row_data.key !== 'CreateDate' && row_data.key !== 'StartTime' && row_data.key != 'instance_state' && row_data.key != 'CreatedTime' && row_data.key == 'instance_id'">
+                                    <a ng-init="get_observium_config(row)" tabindex="0" popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover" href="javascript:void(0)"
+                                    popover-placement="top-left" ng-click="show_observium_details(row)">{{row[row_data.key] || 'NA'}}</a>
+                                </span>
+                            </div>
+                            <div ng-if = "row_data.decorator">
+                                {{decorate(row_data.decorator,row[row_data.key])}}
+                            </div>
+                        </td>
+
+                        <td ng-if="(heading === 'Users') && (actions != undefined)">
+                            <div class="action-icons">
+                                <span ng-repeat="action in actions">
+                                    <a ng-if="(action.name === 'Show User Groups')" class="fa fa-object-group" tooltip-class="customClass" uib-tooltip="{{action.name}}" ng-click="openModal('showusergroups',row)"></a>
+                                    <a ng-if="(action.name === 'Show User Details')" class="fa fa-info-circle" tooltip-class="customClass" uib-tooltip="{{action.name}}" ng-click="openModal('showuserdetails',row)"></a>
+                                </span>
+                            </div>
+                        </td>
+
+                        <td ng-if="(heading === 'Instances') && (actions != undefined)" class="padding_left_right0">
+                            <div class="action-icons">
+                                <span ng-repeat="action in actions">
+
+                                    <a ng-if="((row.instance_state == 'running') && (action.button == 'awspoweroff')) || ((row.instance_state == 'stopped') && (action.button == 'awspoweron'))" ng-click="openModal(action.button,row)" tooltip-class="customClass" uib-tooltip="{{action.name}}" class="fa fa-power-off blue-text" ng-class="{'poweredOnCss white_text':(row.instance_state == 'running')}"></a>
+
+                                    <a ng-if="(row.instance_state != 'running') && (row.instance_state != 'stopped') && (action.button == 'awsdisabled')" tooltip-class="customClass" uib-tooltip="{{action.name}}" class="fa fa-power-off fa-disabled"></a>
+
+                                    <a ng-if="((row.instance_state == 'running') && (action.button == 'awsterminate')) || ((row.instance_state == 'stopped') && (action.button == 'awsterminate'))"
+                                    ng-click="openModal(action.button,row)" class="fa fa-ban" tooltip-class="customClass" uib-tooltip="{{action.name}}"></a>
+
+                                    <a ng-if="(row.instance_state != 'running') && (row.instance_state != 'stopped') && (action.button == 'awsterminate')" tooltip-class="customClass" uib-tooltip="{{action.name}}" class="fa fa-ban fa-disabled"></a>
+
+                                    <a ng-if="(action.button == 'createimage')" class="fa fa-picture-o" tooltip-class="customClass" ng-click="openModal(action.button,row)" uib-tooltip="{{action.name}}"
+                                    ng-class="{'fa-disabled':(row.instance_state == 'terminated')}"></a>
+
+                                    <a ng-if="(action.button == 'cloneinstance')" class="fa fa-clone" tooltip-class="customClass" ng-click="openModal(action.button,row)" uib-tooltip="{{action.name}}"
+                                    ng-class="{'fa-disabled':(row.instance_state == 'terminated')}"></a>
+                                    <a ng-if="(action.button == 'attachinstance')" class="fa fa-object-group" tooltip-class="customClass" ng-click="openModal(action.button,row)" uib-tooltip="{{action.name}}"
+                                    ng-class="{'fa-disabled':(row.instance_state == 'terminated')}"></a>
+                                    <a ng-if="(action.button == 'attachinterface')"class="fa fa-connectdevelop" tooltip-class="customClass" ng-click="openModal(action.button,row)" uib-tooltip="{{action.name}}" ng-class="{'fa-disabled':(row.instance_state == 'terminated')}"></a>
+                                    <a ng-if="(action.button == 'attachloadbalancer')"class="fa fa-balance-scale" tooltip-class="customClass" ng-click="openModal(action.button,row)" uib-tooltip="{{action.name}}" ng-class="{'fa-disabled':(row.instance_state == 'terminated')}"></a>
+                                    <a ng-if="((action.link != undefined) && (heading == 'Instances'))" class="fa fa-info-circle" tooltip-class="customClass" uib-tooltip="{{action.name}}" ng-click="openModal('showinstancedetails',row)" ng-class="{'fa-disabled':(row.instance_state == 'terminated')}"></a>
+                                    <a ng-if="(action.button == 'manage_support')"class="fa fa-ticket" tooltip-class="customClass" ng-click="openModal(action.button,row)" uib-tooltip="{{action.name}}"></a>
+
+                                    <span ng-if="(action.button == 'observiumdetails') && (row.observium_details !== null)" tooltip-class="customClass" uib-tooltip="Show VM Statistics">
+                                        <a ng-click="openModal(action.button,row)">
+                                            <i class="fa fa-line-chart" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+
+                                    <span ng-if="(action.button == 'observiumdetails') && (row.observium_details === null)" tooltip-class="customClass" 
+                                    uib-tooltip="{{ $root.monitoring_not_enabled_msg }}">
+                                        <a>
+                                            <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                                        </a>
+                                    </span>
+                                </span>
+                            </div>
+                        </td>
+                        <td ng-if="(heading === 'Snapshots') && (actions != undefined)">
+                            <div class="action-icons">
+                                <span ng-repeat="action in actions">
+                                    <a class="fa fa-clone" tooltip-class="customClass" uib-tooltip="{{action.name}}" ng-click="openModal(action.button,row)"></a>
+                                </span>
+                            </div>
+                        </td>
+                        <td ng-if="(heading === 'Policies') && (actions != undefined)">
+                            <div class="action-icons">
+                                <span ng-repeat="action in actions">
+                                    <a class="fa fa-clone" tooltip-class="customClass" uib-tooltip="{{action.name}}" ng-click="openModal(action.button,row)"></a>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="((tabledata.length) === 0 || ((tabledata | filter: searchKeyword).length === 0))" class="content-wrapper">
+                <no-records-found message="No {{heading}} available in this region"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+
+<modal visible="showModal">
+    <ng-include src="modeldata.page"></ng-include>
+</modal>
+<modal1 visible="showModal1">
+    <ng-include src="modeldata1.page"></ng-include>
+</modal1>
+<modal2 visible="showModal2">
+    <ng-include src="modeldata2.page"></ng-include>
+</modal2>
+<modal3 visible="showModal3">
+    <ng-include src="modeldata3.page"></ng-include>
+</modal3>
+<modal4 visible="showModal4">
+    <ng-include src="modeldata4.page"></ng-include>
+</modal4>
+<modal5 visible="showModal5">
+    <ng-include src="modeldata5.page"></ng-include>
+</modal5>
+<modal6 visible="showModal6">
+    <ng-include src="modeldata6.page"></ng-include>
+</modal6>
+<confirmationmodal visible="showDeleteConfirm"></confirmationmodal>
+
+
+
+
+<style type="text/css">
+    .popover{
+        width : 28%;
+        max-width: 100%; /* Max Width of the popover (depending on the container!) */
+    }
+</style>
+
+<script type="text/ng-template" id="instancedetailstemplate.html">
+    <div class="row">
+        <table class="table"  ng-show="instance_details.device_data">
+            <tbody>
+                <tr>
+                    <th class="col-md-4 table_no_top_border">   
+                        <div>Uptime</div>
+                    </th>
+                    <td class="table_no_top_border">
+                        <div ng-if="instance_details.device_data.status == 1">{{instance_details.device_data.uptime | unityObserviumTime}}</div>
+                        <div ng-if="instance_details.device_data.status == 0">Down {{instance_details.device_data.uptime | unityObserviumTime}}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="col-md-4">
+                        <div>Last reboot</div>
+                    </th>
+                    <td>
+                        <div>{{instance_details.device_data.last_rebooted *1000 | unityDate : $root.users_timezone }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-xs-12" ng-show="(instance_details === null)" style="padding : 20px">
+            <p>{{ $root.monitoring_not_enabled_msg }}</p>
+        </div>
+    </div>
+</script>
+
+
+</div>

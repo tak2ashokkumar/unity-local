@@ -1,0 +1,91 @@
+<ng-template #accountFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="accountModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="accountForm" [formGroup]="accountForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Name<em>*</em></label>
+                    <input id="name" class="form-control" type="text" formControlName="name"
+                        [class.is-invalid]="accountFormErrors.name">
+                    <div class="invalid-feedback" *ngIf="accountFormErrors.name">{{accountFormErrors.name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">User ID<em>*</em></label>
+                    <input id="user_ocid" class="form-control" type="text" formControlName="user_ocid"
+                        [class.is-invalid]="accountFormErrors.user_ocid">
+                    <div class="invalid-feedback" *ngIf="accountFormErrors.user_ocid">{{accountFormErrors.user_ocid}}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Tenancy ID<em>*</em></label>
+                    <input id="tenancy_ocid" class="form-control" type="text" formControlName="tenancy_ocid"
+                        [class.is-invalid]="accountFormErrors.tenancy_ocid">
+                    <div class="invalid-feedback" *ngIf="accountFormErrors.tenancy_ocid">
+                        {{accountFormErrors.tenancy_ocid}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Region<em>*</em></label>
+                    <multiselect-dropdown [options]="regions" [settings]="regionSettings" class="form-control p-0"
+                        style="height:auto;" formControlName="region"
+                        [ngClass]="{'is-invalid' : accountFormErrors.region}"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="accountFormErrors.region">{{accountFormErrors.region}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label">Finger Print<em>*</em></label>
+                    <input id="fingerprint" class="form-control" type="text" formControlName="fingerprint"
+                        [class.is-invalid]="accountFormErrors.fingerprint">
+                    <div class="invalid-feedback" *ngIf="accountFormErrors.fingerprint">
+                        {{accountFormErrors.fingerprint}}</div>
+                </div>
+            </form>
+            <form *ngIf="privateKeyForm" [formGroup]="privateKeyForm">
+                <div class="form-group">
+                    <label class="col-3 col-form-label" for="file-pem-input">Private Key<em>*</em></label>
+                    <input class="form-control" id="file-pem-input" name="file-pem-input" type="file" accept=".pem"
+                        [ngClass]="{'is-invalid' : privateKeyFormErrors.key_content}"
+                        (change)="handlePrivateKeyInput($event.target.files)">
+                    <div class="invalid-feedback" *ngIf="privateKeyFormErrors.key_content">
+                        {{privateKeyFormErrors.key_content}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmAccountCreate()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="accountModelRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmFirewallDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Account will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmAccountDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

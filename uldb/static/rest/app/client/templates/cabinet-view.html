@@ -1,0 +1,641 @@
+<style type="text/css">
+      /*label {
+            margin-top: 20px;
+            margin-left: 70px;
+            margin-bottom: 20px;
+      }*/
+
+      aside {
+            z-index: 1060;
+      }
+
+      .modal.cabinet_view_modal {
+          z-index : 1000 !important;
+      }
+
+      p {
+            display: inline-block;
+      }
+
+      body {
+            overflow: hidden;
+      }
+
+      ol, ul {
+           margin: 0px auto;
+          -webkit-padding-start: 0;
+          padding-start: 0px;
+          -moz-padding-start: 0;
+      }
+
+      .cabinet_view_modal.modal-content {
+            border : none;
+      }
+
+      .cabinet_view_modal.modal-dialog {
+            height: calc(100vh - 80px);
+      }
+
+      .page_wrapper {
+            box-shadow: 0px 2px 5px 7px rgba(0,0,0,0.14);
+      }
+
+      table thead tr th:first-child{
+            font-weight: 600;
+      }
+
+      .ngn-custom {
+            z-index: 2000;
+      }
+
+      .icon_size {
+        font-size: 20px;
+      }
+
+      .checkbox_div {
+        margin-top: 2px;
+      }
+
+      .checkbox_div label{
+        font-size: 11px;
+        margin-top: 0px;
+        padding-left: 0px;
+        margin-bottom: 0px !important;
+        margin-left: -90%;
+      }
+
+      .checkbox_div input[type=checkbox]{
+        /*margin-left: -90%;*/
+        margin: 1px 0px 0px 0px;
+        position: relative;
+      }
+
+      input[type=checkbox], input[type=radio]{
+        margin: 1px 0 0;
+      }
+
+      *:focus {
+          outline: none !important;
+          border: 0 !important;
+      }
+
+      .cabinet_legends_gradient .progress{
+        height: 20px;
+        background-image: linear-gradient(to right, #0000b3, #99ccff, #33cc33, #ffff99, #eab43c, #d10d0d);
+      }
+
+      .cabinet_legends_gradient .progress .progress-bar{
+        background-color: initial !important;
+        color: #3f3b3b;
+        font-size: 10px !important;
+        font-weight: 800;
+        text-shadow: 6px 6px 20px #fff;
+      }
+
+</style>
+<div class="cabinet_view page_wrapper modal-background" ng-class="{'big_cabinet' : (cabinet_details.devices_list.length > 35)}">
+      <div class="modal-body" ng-if="cabinet_details">
+            <div class="row">
+                  <div class="col-xs-12">
+                  <div class="col-xs-5 cabinet-container">
+                      <div class="row" style="padding-bottom: 5px;">
+                        <div class="col-xs-9 cabinet_legends_gradient" style="padding-right: 6% !important;">
+                            <div class="progress">
+                              <div class="progress-bar" role="progressbar" style="width:16.6%">
+                                < 10&#8451;
+                              </div>
+                              <div class="progress-bar" role="progressbar" style="width:16.6%">
+                                20&#8451;
+                              </div>
+                              <div class="progress-bar" role="progressbar" style="width:16.6%">
+                                40&#8451;
+                              </div>
+                              <div class="progress-bar" role="progressbar" style="width:16.6%">
+                                60&#8451;
+                              </div>
+                              <div class="progress-bar" role="progressbar" style="width:17%">
+                                80&#8451;
+                              </div>
+                              <div class="progress-bar" role="progressbar" style="width:16.6%">
+                                > 90&#8451;
+                              </div>
+                            </div>
+                        </div>
+                        <div class="checkbox_div col-xs-2" style="margin-top: 0px;text-align: center;">
+                          <label>
+                            <input type="checkbox" ng-model="show_heat_map_layer" ng-change="manage_heatmap_layer(show_heat_map_layer)" > 
+                            <p style="vertical-align: super">Heatmap </p>
+                          </label>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="Cabinets-header col-xs-6 col-xs-offset-2">
+                              <img class="img-responsive" ng-src="static/images/cabinets/cabinet-top.png"/>
+                        </div>
+                        <ul dnd-list="cabinet_details.devices_list"
+                          dnd-allowed-types="['device']"
+                          dnd-external-sources="true"
+                          dnd-effect-allowed="move"
+                          dnd-disable-if="view_mode"
+                          dnd-dragover="dragoverCallback()"
+                          dnd-drop="dropCallback(index, item)"
+                          dnd-inserted="deviceInsertCallback(dropEffect, index, item)"
+                          class="Cabinets-widget itemlist row">
+                            <li class="Cabrow cousor_pointer" ng-repeat="device in cabinet_details.devices_list"
+                              dnd-draggable="device"
+                              dnd-type="'device'"
+                              dnd-effect-allowed="move"
+                              dnd-dragstart="dndStartCallback($index, device)"
+                              dnd-moved="dndMovedCallback($index, device)"
+                              dnd-dragend="dndCompleteCallback(dropEffect, $index, device)" 
+                              style="display:inline;height:13px;z-index:100;" ng-mouseover="select_device_details(device)"
+                              ng-mouseleave="deselect_device(device)" ng-click="clicked_on_device(device)" class="col-xs-12">
+                                <div class="col-xs-2" style="margin-right:-30px;">
+                                    <div ng-if="($index == 0)" class="left_pdu_div pull-left">
+                                        <ul dnd-list="cabinet_details.vertical_lpdu_list"
+                                          dnd-allowed-types="['device']"
+                                          dnd-external-sources="true"
+                                          dnd-effect-allowed="move"
+                                          dnd-disable-if="view_mode"
+                                          dnd-dragover="VLPDUDragoverCallback()"
+                                          dnd-drop="VLPDUDropCallback(index, item)"
+                                          dnd-inserted="VLPDUInsertCallback(dropEffect, index, item)"
+                                          class="itemlist row" style="z-index:1000">
+                                            <li class="cousor_pointer bucket_device col-xs-2" ng-repeat="device in cabinet_details.vertical_lpdu_list"
+                                              dnd-draggable="device"
+                                              dnd-type="'device'"
+                                              dnd-effect-allowed="move"
+                                              dnd-dragstart="VLPDUDragStartCallback($index, device)"
+                                              dnd-moved="VLPDUMovedCallback($index, device)"
+                                              dnd-dragend="VLPDUDragCompleteCallback(dropEffect, $index, device)" 
+                                              ng-class="{'marginleft3px' : ($index == 1), 'empty_lvpdu': !device.device, 'filled_lvpdu':device.device}"
+                                              ng-click="get_observium_stats(device)">
+                                                <div ng-if="($index === 1)" style="height:16px; margin-bottom:2px;">
+                                                      <h2 class="slot_name" ng-if="device.device">A</h2>
+                                                      <h2 class="slot_name" ng-if="!device.device">&nbsp;</h2>
+                                                </div>
+
+                                                <div ng-if="($index === 0)" style="height:16px; margin-bottom:2px;">
+                                                      <h2 class="slot_name" ng-if="device.device">C</h2>
+                                                      <h2 class="slot_name" ng-if="!device.device">&nbsp;</h2>
+                                                </div>
+
+                                                <div style="height:14px; font-family:'Orbitron',sans-serif;">
+                                                      <h2 class="pdu_meter" ng-if="device.device">
+                                                        {{device.device.device_current || 'NA'}}
+                                                      </h2>
+                                                      <h2 ng-if="!device.device">&nbsp;</h2>
+                                                </div>
+
+                                                <div class="left_pdu_device">
+                                                      <img class="left_pdu pdu_start cousor_pointer img-responsive"
+                                                      src="static/images/cabinets/pdu_start.png"  alt=""
+                                                      ng-if="device.device" draggable="false"/>
+
+                                                      <img class="left_pdu cousor_pointer single_socket img-responsive"
+                                                      ng-repeat="x in [].constructor(24) track by $index"
+                                                      ng-if="device.device"
+                                                      id="{{'pdu-' + device.device.id + $index}}"
+                                                      src="static/images/cabinets/single_socket.png" draggable="false"/>
+
+                                                      <img class="left_pdu pdu_end cousor_pointer img-responsive"
+                                                      src="static/images/cabinets/pdu_end.png"  alt="" ng-if="device.device"
+                                                      draggable="false"/>
+
+                                                      <h2 class="left_pdu" ng-if="!device.device"> &nbsp; </h2>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 Cabinets">
+                                      <div class="Cab-numbers col-xs-1 {{$index}}" draggable="false">
+                                            <span class="{{cabinet_details.capacity}}">{{cabinet_details.capacity - $index }}</span>
+                                      </div>
+                                      <div class="col-xs-10 cab-devices">
+                                            <img class="img-responsive cab-left-cell" 
+                                            src="static/images/cabinets/cabinet-cell-left-side.png" alt=""/>
+
+                                            <img class="cabinet-device {{'unit_' + device.device.size}}" ng-if="device.device_type == 'servers'"
+                                            src="static/images/cabinets/server.png"  alt="" 
+                                            ng-style="device.device.heat_map_temperature && {'opacity':'0.7'}"
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="cabinet-device {{'unit_' + device.device.size}}" ng-if="device.device_type == 'switches'"
+                                            src="static/images/cabinets/switch.png"  alt="" 
+                                            ng-style="device.device.heat_map_temperature && {'opacity':'0.7'}"
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="unit_1 hpdu_start"
+                                            ng-if="(device.device_type == 'pdus') && device.device && (device.device.size == 1)"
+                                            src="static/images/cabinets/hpdu_start.png"  alt=""
+                                            ng-class="{'eightsockets' : (device.device.sockets == 8)}"
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="unit_1 hpdu_single_socket" 
+                                            ng-if="(device.device_type == 'pdus') && device.device && (device.device.size == 1)"
+                                            ng-repeat="x in [].constructor(device.device.sockets) track by $index"
+                                            ng-class="{'marginleft4minus': ($index == 0), 'eightsockets' : (device.device.sockets == 8),'twelvesockets' : (device.device.sockets == 12)}" sglclick="get_observium_stats(device)"
+                                            id="{{'pdu-' + device.device.id + $index}}"
+                                            src="static/images/cabinets/hpdu_single_socket.png"/>
+
+                                            <img class="unit_1 hpdu_end"
+                                            ng-if="(device.device_type == 'pdus') && device.device && (device.device.size == 1)"  
+                                            src="static/images/cabinets/hpdu_end.png"  alt=""
+                                            ng-class="{'eightsockets' : (device.device.sockets == 8)}"
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="cabinet-device unit_1 one_unit_eight_socket_full_img {{'pdu-' + device.device.id + $index}}" 
+                                            ng-if="(device.device_type == 'pdus') && (device.device.size == 1)" 
+                                            sglclick="get_observium_stats(device)" 
+                                            draggable="true" ondragstart="on_hpdu_drag_start(event)"
+                                            ondragend="on_hpdu_drag_end(event)"
+                                            src="static/images/cabinets/PDU.png"  alt="" />
+
+                                            <img class="cabinet-device unit_2"  
+                                            ng-if="(device.device_type == 'pdus') && device.device && (device.device.size == 2)"
+                                            src="static/images/cabinets/PDU_2U.png"  alt="" 
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="cabinet-device {{'unit_' + device.device.size}}" ng-if="device.device_type == 'firewalls'"
+                                            ng-style="device.device.heat_map_temperature && {'opacity':'0.7'}"
+                                            src="static/images/cabinets/Firewalls-Cabinete.png"  alt="" 
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="cabinet-device {{'unit_' + device.device.size}}" ng-if="device.device_type == 'load_balancers'"
+                                            ng-style="device.device.heat_map_temperature && {'opacity':'0.7'}"
+                                            src="static/images/cabinets/Load-Balancers-Cabinete-back.png"  alt="" 
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="cabinet-device {{'unit_' + device.device.size}}" ng-if="device.device_type == 'custom_devices'"
+                                            src="static/images/cabinets/other_device.png"  alt="" 
+                                            ng-style="device.device.heat_map_temperature && {'opacity':'0.7'}"
+                                            sglclick="get_observium_stats(device)"/>
+
+                                            <img class="img-responsive cab-right-cell" 
+                                            src="static/images/cabinets/cabinet-cell-right-side.png" alt=""/> 
+
+                                            <span class="{{device.device_type}} heat_map_indicator {{device.device.heat_map_state}}" 
+                                            ng-if="isImagesLoaded && show_heat_map_layer && device.device.heat_map_temperature"
+                                            ng-style="{'height': (device.device.size*13) + 'px', 'top' :'-' + ((device.device.size-1)*13) + 'px'}"
+                                            sglclick="get_observium_stats(device)"
+                                            ></span>
+
+                                            <span class="badge badge-pill badge-success device_status_indicator {{'unit_' + device.device.size}}"
+                                            ng-if="isImagesLoaded && device.device" tooltip-class="customClass" 
+                                            uib-tooltip="{{(device.device.observium_status == 1) ? 'power on' : ((device.device.observium_status == 0) ? 'power off' : '')}}"
+                                            ng-class="(device.device.observium_status == 1) ? 'device_on' : ((device.device.observium_status == 0) ? 'device_off' : 'device_not_configured') "
+                                            ng-style="{'top' : '-' + ((device.device.size-1)*13) + 'px'}">
+                                                <a ng-click="manage_power_status(device)">
+                                                    <i class="fa fa-power-off device_status"></i>
+                                                </a>
+                                            </span>
+                                      </div>
+
+                                      <div class="col-xs-1 cabinet_right_border">
+                                            &nbsp;
+                                      </div>
+                                </div>
+                                <div class="col-xs-4 Cabinets-title tooltip-back">
+                                      <div class="row">
+                                            <div class="col-xs-12">
+                                                  <div class="col-xs-4 right_pdu_div marginleft3px" ng-if="($index == 0)">
+                                                  <ul dnd-list="cabinet_details.vertical_rpdu_list"
+                                                    dnd-allowed-types="['device']"
+                                                    dnd-external-sources="true"
+                                                    dnd-effect-allowed="move"
+                                                    dnd-disable-if="view_mode"
+                                                    dnd-dragover="VRPDUDragoverCallback()"
+                                                    dnd-drop="VRPDUDropCallback(index, item)"
+                                                    dnd-inserted="VRPDUInsertCallback(dropEffect, index, item)"
+                                                    class="itemlist row" style="z-index:1000">
+                                                        <li class="cousor_pointer bucket_device col-xs-5" ng-repeat="device in cabinet_details.vertical_rpdu_list"
+                                                        dnd-draggable="device"
+                                                        dnd-type="'device'"
+                                                        dnd-effect-allowed="move"
+                                                        dnd-dragstart="VRPDUDragStartCallback($index, device)"
+                                                        dnd-moved="VRPDUMovedCallback($index, device)"
+                                                        dnd-dragend="VRPDUDragCompleteCallback(dropEffect, $index, device)"
+                                                        ng-class="{'marginleft2px' : ($index == 1), 'empty_rvpdu': !device.device, 'filled_rvpdu':device.device}"
+                                                        ng-click="get_observium_stats(device)">
+
+                                                              <div ng-if="($index === 1)" style="height:16px; margin-bottom:2px;">
+                                                                    <h2 class="slot_name" ng-if="device.device">D</h2>
+                                                                    <h2 class="slot_name" ng-if="!device.device">&nbsp;</h2>
+                                                              </div>
+
+                                                              <div ng-if="($index === 0)" style="height:16px; margin-bottom:2px;">
+                                                                    <h2 class="slot_name" ng-if="device.device">B</h2>
+                                                                    <h2 class="slot_name" ng-if="!device.device">&nbsp;</h2>
+                                                              </div>
+
+                                                              <div style="height:14px; font-family:'Orbitron',sans-serif;">
+                                                                    <h2 class="pdu_meter" ng-if="device.device">
+                                                                      {{device.device.device_current || 'NA'}}
+                                                                    </h2>
+                                                                    <h2 ng-if="!device.device">&nbsp;</h2>
+                                                              </div>
+
+                                                              <div class="right_pdu_device img-responsive">
+                                                                    <img class="right_pdu pdu_start cousor_pointer"
+                                                                    src="static/images/cabinets/pdu_start.png"  alt=""
+                                                                    ng-if="device.device" draggable="false"/>
+
+                                                                    <img class="right_pdu cousor_pointer single_socket img-responsive"
+                                                                    ng-repeat="x in [].constructor(24) track by $index"
+                                                                    ng-if="device.device"
+                                                                    style="top:-2px"
+                                                                    src="static/images/cabinets/single_socket.png"
+                                                                    id="{{'pdu-' + device.device.id + $index}}"
+                                                                    draggable="false"/>
+
+                                                                    <img class="right_pdu pdu_end cousor_pointer img-responsive"
+                                                                    src="static/images/cabinets/pdu_end.png"  alt="" ng-if="device.device" draggable="false"/>
+
+                                                                    <h2 class="right_pdu" ng-if="!device.device"> &nbsp; </h2>
+                                                              </div>
+                                                        </li>
+                                                  </ul>
+                                                  </div>
+                                                  <div class="col-xs-8 col-xs-offset-4" style="position:absolute;float:left;text-align:left">
+                                                        <span class="device-name" 
+                                                        ng-class="{'no_pdu' : (cabinet_details.vertical_rpdu_list.length <      2), 
+                                                        'device_hover' : (device_selected && angular.equals(device.device.uuid, device_selected.device.uuid)), 
+                                                        'device_selected':(device_selected_to_monitor && angular.equals(device.device.uuid, device_selected_to_monitor.device.uuid))}" href="" ng-if="device.device_display_type" sglclick="get_observium_stats(device)">
+                                                              {{device.device.name}}
+                                                              <a ng-if="(device.device_type == 'firewalls') || (device.device_type == 'switches') || (device.device_type == 'load_balancers') || ((device.device_type == 'servers') && !device.device.bm_server)" 
+                                                              ng-class="{'fa-disabled': (!device.device.management_ip)}">
+                                                                    <span class="fa fa-external-link"></span>
+                                                              </a>
+                                                        </span>
+                                                  </div>
+                                            </div>
+                                      </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="Cabinets-footer col-xs-6 col-xs-offset-2" style="margin-top:-2px;">
+                          <img class="img-responsive" src="static/images/cabinets/cabinet-bottom.png"  alt="" />
+                        </div>
+                      </div>
+                  </div>
+
+                  <div class="col-xs-6 col-xs-offset-5 cabinet_details_div" style="position : absolute;">
+                        <div class="Dashwrap">
+                              <uib-accordion close-others="false">
+                                    <div uib-accordion-group class="panel-default information_div" is-open="true">
+                                          <uib-accordion-heading>
+                                                <span ng-if="!device_selected_to_monitor">Cabinet&nbsp;</span>
+                                                <span ng-if="device_selected_to_monitor">Device&nbsp;</span>
+                                                <span>
+                                                      Information
+                                                </span>
+                                          </uib-accordion-heading>
+                                          <div class="col-xs-12">
+                                                <div class="row" ng-if="!device_selected_to_monitor">
+                                                      <div class="col-xs-12">
+                                                            <h2 style="margin:10px 0px 5px 0px;display : inline">Cabinet Name :&nbsp;&nbsp; <span>{{cabinet_details.name}}</span></h2> 
+                                                      </div>
+                                                      <div class="col-xs-6">
+                                                            <h2 style="margin:10px 0px 5px 0px;">Cabinet Type :&nbsp; <span>{{cabinet_details.type}}</span></h2> 
+                                                            <h2 style="margin:10px 0px 5px 0px;">Cabinet Size :&nbsp;&nbsp; <span class="badge">{{cabinet_details.capacity}}U</span></h2>
+                                                      </div>
+                                                      <div class="col-xs-6">
+                                                            <h2 style="margin:10px 0px 5px 0px;">Cabinet Model :&nbsp;&nbsp; <span>{{cabinet_details.model}}</span></h2> 
+                                                            <h2 style="margin:10px 0px 5px 0px;">Available RU  : &nbsp;&nbsp; <span class="badge">{{cabinet_details.available_size}}U</span></h2>
+                                                      </div>
+                                                </div>
+
+                                                <div class="row" ng-if="device_selected_to_monitor">
+                                                      <div class="col-xs-6">
+                                                            <h2 style="margin:10px 0px 5px 0px;display : inline">Device Name :&nbsp;<span>{{device_selected_to_monitor.device.name}}</span></h2> 
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" ng-if="(device_selected_to_monitor.device_type != 'servers')">
+                                                                  Model :&nbsp;
+                                                                  <span ng-if="(device_selected_to_monitor.device_type != 'pdus')">
+                                                                    {{device_selected_to_monitor.device.model || 'NA'}}
+                                                                  </span>
+                                                                  <span ng-if="(device_selected_to_monitor.device_type == 'pdus')">
+                                                                    {{device_selected_to_monitor.device.pdu_model || 'NA'}}
+                                                                  </span>
+                                                            </h2>
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" ng-if="(device_selected_to_monitor.device_type == 'servers')"> OS  : &nbsp;
+                                                                  <span ng-if="device_selected_to_monitor.device.instance">{{device_selected_to_monitor.device.instance.os.full_name || 'N/A'}}</span>
+                                                                  <span ng-if="!device_selected_to_monitor.device.instance">{{device_selected_to_monitor.device.bm_server.os.full_name || 'N/A'}}</span>
+                                                            </h2>
+
+                                                            <h2 style="margin:10px 0px 5px 0px;">
+                                                                  Temperature :&nbsp; 
+                                                                  <span> 
+                                                                   {{device_selected_to_monitor.device.heat_map_temperature || 'NA'}}
+                                                                   <span ng-if="device_selected_to_monitor.device.heat_map_temperature">&#8451;</span>
+                                                                 </span>
+                                                            </h2>
+                                                      </div>
+                                                      <div class="col-xs-6">
+                                                            <h2 style="margin:10px 0px 5px 0px;display : inline">Device Type :&nbsp; 
+                                                                  <span ng-if="(device_selected_to_monitor.device_type != 'servers')">{{device_selected_to_monitor.device_display_type}}</span>
+                                                                  <span ng-if="(device_selected_to_monitor.device_type == 'servers') && 
+                                                                  (!device_selected_to_monitor.device.instance)"> Bare Metal</span>
+                                                                  <span ng-if="(device_selected_to_monitor.device_type == 'servers') && 
+                                                                  (device_selected_to_monitor.device.instance)"> Hypervisor</span>
+                                                            </h2> 
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" 
+                                                            ng-if="(device_selected_to_monitor.device_type != 'servers') && (device_selected_to_monitor.device_type != 'pdus')">
+                                                                  Management IP  : &nbsp;
+                                                                  <span>{{device_selected_to_monitor.device.management_ip || 'N/A'}}</span>
+                                                            </h2>
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" ng-if="(device_selected_to_monitor.device_type == 'servers') && (!device_selected_to_monitor.device.instance)"> Management IP  : &nbsp;
+                                                                  <span>{{device_selected_to_monitor.device.bm_server.management_ip || 'N/A'}}</span>
+                                                            </h2>
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" ng-if="(device_selected_to_monitor.device_type == 'servers') && (device_selected_to_monitor.device.instance)"> Virtualization Type  : &nbsp;
+                                                                  <span ng-if="device_selected_to_monitor.device.instance">{{device_selected_to_monitor.device.instance.virtualization_type || 'N/A'}}</span>
+                                                            </h2>
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" ng-if="(device_selected_to_monitor.device_type == 'pdus')"> Max Current  : &nbsp;
+                                                                  <span>
+                                                                    {{device_selected_to_monitor.device.max_amps || 'N/A'}}
+                                                                    <span ng-if="device_selected_to_monitor.device.max_amps">amps</span>
+                                                                  </span>
+                                                            </h2>
+
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" ng-if="(device_selected_to_monitor.device_type != 'pdus')">Manufacturer :&nbsp; <span>{{device_selected_to_monitor.device.manufacturer|| 'NA'}}</span></h2>
+
+                                                            <h2 style="margin:10px 0px 5px 0px;" ng-if="(device_selected_to_monitor.device_type == 'pdus')">Current :&nbsp; 
+                                                              <span>
+                                                                {{device_selected_to_monitor.device.device_current|| 'NA'}}
+                                                                <span ng-if="device_selected_to_monitor.device.device_current">amps</span>
+                                                              </span>
+                                                            </h2>
+                                                      </div>
+                                                </div>
+                                          </div>
+                                          <!-- This Is to display Cabinet and device information -->
+                                    </div>
+                                    <div uib-accordion-group class="panel-default" is-open="true" ng-class="device_selected_to_monitor ? 'graphs_div' : 'details_div'" ng-if="view_mode">
+                                          <uib-accordion-heading>
+                                                <span ng-if="!device_selected_to_monitor">PDU&nbsp;</span>
+                                                <span ng-if="device_selected_to_monitor">Device&nbsp;</span>
+                                                <span>Monitoring</span>
+                                          </uib-accordion-heading>
+                                          <div class="row monitoring_div">
+                                              <div class="col-xs-12 cabinet_pdu_monitoring" ng-if="!device_selected_to_monitor">
+                                                  <div ng-repeat="pdu in cabinet_details.all_pdus_list" class="col-xs-6" style="padding:10px 20px !important">
+                                                      <div class="row">
+                                                          <div class="col-xs-12 pdu_graphs">
+                                                              <div class="col-xs-11 ellipsis">
+                                                                  <span ng-if="pdu.observium_details.device_data.status == 1">
+                                                                      <i class="fa fa-arrow-circle-up green padding_right5px fontsize20px" aria-hidden="true"></i>
+                                                                  </span>
+                                                                  <span ng-if="pdu.observium_details.device_data.status == 0">
+                                                                      <i class="fa fa-arrow-circle-down padding_right5px fontsize20px red" aria-hidden="true"></i>
+                                                                  </span>
+                                                                  <span ng-if="!pdu.observium_details.device_data.status" style="font-size:15px;">
+                                                                      <i class="fa fa-warning padding_right5px yellow" aria-hidden="true"></i>
+                                                                  </span>
+                                                                  <a href="">
+                                                                      <h5 class="fontsize14px">{{pdu.device.name}}</h5>
+                                                                  </a>
+                                                              </div>
+                                                              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                                          <table class="table">
+                                                                              <tbody>
+                                                                                  <tr>
+                                                                                      <td ng-if="pdu.cab_view_graph_obj" ng-repeat="graph_obj in pdu.cab_view_graph_obj track by $index">
+                                                                                          <sub-title title="{{graph_obj.displayName}}"></sub-title>
+                                                                                          <img class="pduhealthgraphsimg" ng-src="data:image/png;base64,{{ graph_obj.graph }}">
+                                                                                      </td>
+                                                                                      <td ng-if="!pdu.cab_view_graph_obj" style="padding:30% 0 10% 25% !important;">
+                                                                                          <span class="yellow"> Not Configured</span>
+                                                                                      </td>
+                                                                                  </tr>
+                                                                              </tbody>
+                                                                          </table>
+                                                                      </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                                  <div ng-if="(cabinet_details.all_pdus_list.length === 0)" class="content-wrapper">
+                                                      <no-records-found message="No PDUs were found !!"></no-records-found>
+                                                  </div>
+                                              </div>
+                                              <div ng-if="device_selected_to_monitor.device.uptimeRobotStatus" style="text-align: center; padding-top:200px">
+                                                <table class="table" ng-if="device_selected_to_monitor.device.uptimeRobotStatus">
+                                                  <span class="icon_size" ng-if="device_selected_to_monitor.device.uptimeRobotStatus.status == 'down'"> 
+                                                    <device-down></device-down>
+                                                  </span>
+                                                  <span class="icon_size" ng-if="device_selected_to_monitor.device.uptimeRobotStatus.status == 'up'"> 
+                                                    <device-up></device-up>
+                                                  </span>
+                                                  <span class="icon_size" ng-if="device_selected_to_monitor.device.uptimeRobotStatus.status == 'paused'"> 
+                                                    <i class="fa fa-pause-circle-o yellow"></i> Paused
+                                                  </span>
+                                                </table>
+                                              </div>
+
+                                              <div ng-if="!device_selected_to_monitor.device.observium_status && !device_selected_to_monitor.device.uptimeRobotStatus && device_selected_to_monitor">
+                                                <no-records-found message="Monitoring is not enabled for the device !!"></no-records-found>
+                                              </div>
+
+                                              <div class="col-xs-12 selected_divice_monitoring" ng-if="device_selected_to_monitor.device.observium_status">
+                                                  <div ng-repeat="graph_obj in device_selected_to_monitor.graph_obj track by $index" >
+                                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" ng-if="graph_obj" style="padding-left:20px !important">
+                                                        <div class="ulsubheading" style="border-bottom: 1px solid lightgray;">{{graph_obj.displayName}}</div>
+                                                        <img class="pduhealthgraphsimg" ng-src="data:image/png;base64,{{ graph_obj.graph }}">
+                                                    </div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                    </div>
+                                    <div uib-accordion-group class="panel-default available_devices_div" heading="Available Devices" is-open="edit_mode">
+                                          <div class=" temp_storage col-md-12">
+                                              <ul dnd-list="bucket_devices_list"
+                                            dnd-allowed-types="['device']"
+                                            dnd-external-sources="true"
+                                            dnd-effect-allowed="move"
+                                            dnd-disable-if="view_mode"
+                                            dnd-dragover="bucketDragoverCallback()"
+                                            dnd-drop="bucketDropCallback(index, item)"
+                                            dnd-inserted="bucketInsertCallback(dropEffect, index, item)"
+                                            class="itemlist row">
+                                                      <li class="cousor_pointer bucket_device col-xs-4" ng-repeat="device in bucket_devices_list"
+                                                dnd-draggable="device"
+                                                dnd-type="'device'"
+                                                dnd-effect-allowed="move"
+                                                dnd-dragstart="bucketDNDStartCallback($index, device)"
+                                                dnd-moved="bucketDNDMovedCallback($index, device)"
+                                                dnd-dragend="bucketDNDCompleteCallback(dropEffect, $index, device)">
+                                                      <span class="device-name" href="" ng-if="device.device_display_type">
+                                                            <span>
+                                                                  <span ng-if="(device.device_type == 'firewalls')"><i class="fa fa-fire white"></i></span>
+                                                                  <span ng-if="(device.device_type == 'switches')"><i class="fa fa-sitemap green"></i></span>
+                                                                  <span ng-if="(device.device_type == 'load_balancers')"><i class="fa fa-balance-scale brown"></i></span>
+                                                                  <span ng-if="(device.device_type == 'pdus')"><i class="fa fa-plug teal"></i></span>
+                                                                  <span ng-if="(device.device_type == 'servers')"><i class="fa fa-server yellow"></i></span>
+                                                                  <span ng-if="(device.device_type == 'custom_devices')"><i class="fa fa-sliders yellow"></i></span>
+                                                                  {{device.device.name}}
+                                                            </span>
+                                                <a ng-if="(device.device_type == 'firewalls') || (device.device_type == 'switches') || (device.device_type == 'load_balancers')" 
+                                                ng-class="{'fa-disabled': (!device.device.management_ip)}"
+                                                href="/vm-console-client#/{{device.device_type}}/webconsole/{{ device.device.uuid }}/" target="_blank" >
+                                                      <span class="fa fa-external-link"></span>
+                                                </a>
+                                                      </span>
+                                                      </li>
+                                                      <li ng-if="(cabinet_details.size > cabinet_details.available_size) && (bucket_devices_list.length == 0)">
+                                                            <no-records-found message="All devices have been added to the Cabinet"></no-records-found>
+                                                      </li>
+                                                      <li ng-if="(cabinet_details.size = cabinet_details.available_size)&& (bucket_devices_list.length == 0)">
+                                                            <no-records-found message="No devices available"></no-records-found>
+                                                      </li>
+                                                </ul>
+                                          </div>
+                                    </div>
+                              </uib-accordion>
+                        </div>
+                        <span class="close_device_details cursor_pointer" ng-if="device_selected_to_monitor"
+                        ng-click="show_cabinet_details()">
+                              <i class="fa fa-times"></i>
+                        </span>
+                        <a ng-class="{'fa-disabled': (!device_selected_to_monitor.device.management_ip)}" class="pull-left console_icon"
+                        ng-if="(device_selected_to_monitor.device_type == 'firewalls') || (device_selected_to_monitor.device_type == 'switches') || (device_selected_to_monitor.device_type == 'load_balancers') || ((device_selected_to_monitor.device_type == 'servers') && !device_selected_to_monitor.device.bm_server)" 
+                        href="/vm-console-client#/{{device_selected_to_monitor.device_type}}/webconsole/{{ device_selected_to_monitor.device.uuid }}/"target="_blank" uib-tooltip="login to device" tooltip-class="customClass" tooltip-placement="bottom">
+                        <span class="fa fa-external-link"></span>
+                        </a>
+                  </div>
+
+                  <div class="col-xs-1 pull-right">
+                        <button type="button" class="close" ng-click="cancel()"> 
+                              <span>
+                                    <i class="fa fa-times"></i>
+                              </span>
+                        </button>
+                        <button type="button" class="close" ng-click="toggle_view_mode()" style="margin-right : 5px;"> 
+                              <span ng-if="view_mode" class="edit_icon">
+                                    <i class="fa fa-edit"></i>
+                              </span>
+                              <span ng-if="!view_mode">
+                                    <i class="fa fa-eye"></i>
+                              </span>
+                        </button>
+                  </div>
+            </div>
+      </div>
+
+      <script type="text/javascript">
+            function on_hpdu_drag_start(pdu){
+                  pdu.target.style.opacity =  "1";
+            }
+
+            function on_hpdu_drag_end(pdu){
+                  pdu.target.style.opacity =  "0";
+            }
+      </script>
+</div>
+
+

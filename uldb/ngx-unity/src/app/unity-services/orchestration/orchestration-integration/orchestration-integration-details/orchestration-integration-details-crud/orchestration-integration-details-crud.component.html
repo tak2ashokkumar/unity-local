@@ -1,0 +1,104 @@
+<div class="row mt--3">
+    <div class="col-12 p-0">
+        <div class="card">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <span class="h6 mb-0 font-500">{{action}} script</span>
+                <button class="btn btn-pill btn-warning btn-sm" (click)="goBack()" tooltip="Back">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+            <div class="card-body py-2">
+                <form *ngIf="form" [formGroup]="form">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="name" class="col-2 ml-5 col-form-label text-right">Name<em>*</em>
+                            :</label>
+                        <div class="col-5">
+                            <input id="name" class="form-control" type="text" formControlName="name"
+                                placeholder="Enter Name" [class.is-invalid]="formErrors.name">
+                            <div class="invalid-feedback" *ngIf="formErrors.name">
+                                {{formErrors.name}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="description" class="col-2 ml-5 col-form-label text-right">Description
+                            :</label>
+                        <div class="col-8">
+                            <textarea id="description" class="form-control" type="text" formControlName="description"
+                                placeholder="Enter description"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="script_type" class="col-2 ml-5 col-form-label text-right">Script type<em>*</em> :
+                        </label>
+                        <div class="col-2">
+                            <select id="script_type" class="form-control" formControlName="script_type"
+                                [class.is-invalid]="formErrors.script_type">
+                                <option value="">Select script type</option>
+                                <option value="Ansible Playbook">Ansible Playbook</option>
+                                <option value="Terraform Script">Terraform Script</option>
+                                <option value="Bash Script">Bash Script</option>
+                                <option value="Python Script">Python Script</option>
+                                <option value="Powershell Script">Powershell Script</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.script_type">
+                                {{formErrors.script_type}}</div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="is_source_code" class="col-2 ml-5 text-right col-form-label">Upload Option<em>*</em>
+                            :</label>
+                        <div class="col-5 d-inline-block">
+                            <ul class="d-flex px-0 mb-0 mt-1">
+                                <li>
+                                    <label class="pointer-link" [class.active]="uploadOption === 'false'">
+                                        <input type="radio" [value]="true" (click)="toggleStatus('false')">
+                                        <span class="font-sm">Script File</span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="pointer-link" [class.active]="uploadOption === 'true'">
+                                        <input type="radio" [value]="false" (click)="toggleStatus('true')">
+                                        <span class="font-sm">Source Code</span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="uploadOption === 'false'">
+                        <label class="col-2 ml-5 text-right col-form-label" for="script_file">Upload Script<em>*</em> :
+                        </label>
+                        <div class="col-5 mt-1">
+                            <input id="file" class="form-control" type="file"
+                                (change)="playbookFile($event.target.files)" formControlName="script_file"
+                                name="script_file" [class.is-invalid]="formErrors.script_file"
+                                style="height: 29px; padding:0px">
+                            <span *ngIf="scriptData && scriptData.file_name"
+                                target="_blank">{{scriptData.file_name}}</span>
+                            <div class="invalid-feedback" *ngIf="formErrors.script_file">
+                                {{formErrors.script_file}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" *ngIf="uploadOption === 'true'">
+                        <label for="source_code" class="col-2 ml-5 col-form-label text-right">Source Code<em>*</em>
+                            :</label>
+                        <div class="col-8">
+                            <textarea id="source_code" class="form-control" type="text" formControlName="source_code"
+                                placeholder="Enter source code" [class.is-invalid]="formErrors.source_code"
+                                style="height: 300px; overflow-y: auto;"></textarea>
+                            <div class="invalid-feedback" *ngIf="formErrors.source_code">
+                                {{formErrors.source_code}}</div>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-md btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                    <button class="btn btn-md btn-success ml-2" type="button" (click)="addScript()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

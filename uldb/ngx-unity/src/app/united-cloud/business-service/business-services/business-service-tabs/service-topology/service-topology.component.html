@@ -1,0 +1,89 @@
+<div class="d-flex justify-content-end align-items-center"
+    style="position: absolute; top: -64px; right: 1px; z-index: 100;">
+    <form [formGroup]="form" *ngIf="form" class="d-flex">
+        <div class="form-group">
+            <label for="businessUnit" class="form-label mb-1">Business Unit</label>
+            <select id="businessUnit" class="form-control" formControlName="businessUnit" style="width: 122px;">
+                <option value="">Select</option>
+                <option value="all">All</option>
+                <option *ngFor="let bu of businessUnits" [value]="bu.business_unit_id">{{ bu.business_unit_name }}
+                </option>
+            </select>
+        </div>
+        <div class="ml-2 form-group">
+            <label for="licenseCostCenter" class="form-label mb-1">License Cost Center</label>
+            <select id="licenseCostCenter" class="form-control" formControlName="licenseCostCenter">
+                <option value="">Select</option>
+                <option value="all">All</option>
+                <option *ngFor="let lcc of licenseCostCenters" [value]="lcc.license_centre_id">{{
+                    lcc.license_centre__name }}</option>
+            </select>
+        </div>
+        <div class="ml-2 form-group">
+            <label for="application" class="form-label mb-1">Application</label>
+            <select id="application" class="form-control" formControlName="application">
+                <option value="">Select</option>
+                <option value="all">All</option>
+                <option *ngFor="let app of applications" [value]="app.app_name_id">{{ app.app_name__name }}</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+<div class="row card" *ngIf="selectedApps?.length && form">
+    <div class="row no-gutters d-flex flex-shrink-1">
+        <div class="col-3 border-right d-flex flex-column">
+            <div *ngFor="let tab of tabs; let i = index; let isLast = last" class="tab-card mb-0"
+                [ngClass]="{ 'active-tab-card': selectedTabIndex === i }" (click)="selectTab(i)"
+                style="cursor: pointer;" [style.border-bottom]="!isLast ? '1px solid #dee2e6' : 'none'">
+
+                <!-- Label -->
+                <div [ngClass]="{ 'text-primary': selectedTabIndex === i }" class="ml-2 font-lg font-500">
+                    {{ tab.label }}
+                </div>
+
+                <!-- Active tab summary -->
+                <div *ngIf="selectedTabIndex === i && activeSummary" class="small mt-1 ml-2 d-flex">
+                    <span class="text-success mr-3 font-sm">Active: {{ activeSummary.active }}</span>
+                    <span class="text-muted font-sm">Inactive: {{ activeSummary.inactive }}</span>
+                    <!-- <span class="text-warning font-sm">Unknown: {{ activeSummary.unknown }}</span> -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-9 px-2 d-flex flex-column h-80">
+            <!-- Header row -->
+            <div class="row align-items-center border-bottom py-2">
+                <div class="col d-flex align-items-center">
+                    <span class="fw-bold">{{ pageTitle }}</span>
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <form [formGroup]="nodeStatusFilterForm" *ngIf="nodeStatusFilterForm" class="d-flex">                    
+                        <div class="m-0 form-group">
+                            <!-- <label for="nodeStatus" class="form-label mb-1">Node Status</label> -->
+                            <select id="nodeStatus" class="form-control form-control-sm" formControlName="nodeStatus">
+                                <option value="" disabled>Select</option>
+                                <option value="all">All</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <!-- <option value="unknown">Unknown</option> -->
+                            </select>
+                        </div>
+                    </form>
+                    <div class="border-start ps-3 ms-3">
+                        <data-refresh-btn></data-refresh-btn>
+                    </div>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goBack()"><i class="fa fa-arrow-left"></i></button>
+                </div>
+            </div>
+
+            <!-- Fill remaining height -->
+            <div class="flex-grow-1 d-flex flex-column min-vh-0">
+                <app-common-topology [buId]="buId" [appIds]="selectedApps"
+                    [selectedView]="selectedView" [selectedNodeStatus]="selectedNodeStatus" (statusSummaryChange)="handleStatusSummary($event)"
+                    class="flex-grow-1 d-flex flex-column min-vh-0 flex-shrink-1">
+                </app-common-topology>
+            </div>
+        </div>
+    </div>
+</div>

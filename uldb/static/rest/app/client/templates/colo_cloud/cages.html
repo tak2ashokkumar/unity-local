@@ -1,0 +1,31 @@
+<div class="page_wrapper" style="float:left">
+    <!-- <table-search-widget ng-show="cages !== undefined"></table-search-widget> -->
+    <loading object="{{cages}}"></loading>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="cages !== undefined">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table class="table table-condensed table-hover margin0">
+                <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Data Center</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="cage in cages">
+                        <!-- <td>{{cabinet.name}}</td> -->
+
+                        <td>
+                            <a href="" ng-click="showDetails(cage.uuid, 'Cage')">{{ cage.name }}</a>
+                        </td>
+
+                        <td>{{cage.datacenter.name}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="cages.length === 0" class="content-wrapper">
+                <no-records-found message="No Cages to display"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>

@@ -1,0 +1,253 @@
+<div class="row mx-1 my-2">
+    <div class="col-12 pr-0">
+        <div class="card round-edge mb-2">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex align-items-center justify-content-center">
+                    <span *ngIf="interfaceViewData?.deviceStatusIcon" class="fas font-xl"
+                        [ngClass]="interfaceViewData?.deviceStatusIcon"></span>
+                    <span class="ml-2 font-weight-bold mt-1">{{interfaceViewData?.interfaceName}}</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-end">
+                    <button class="btn btn-pill btn-warning pull-right btn-sm" tooltip="Back" container="body"
+                        (click)="goBack()">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                    <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-container>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-4">
+                        <span class="font-sm text-muted">Receive</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span class="text-primary font-lg font-500">{{interfaceViewData?.receive.convertedValue}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-4">
+                        <span class="font-sm text-muted">Transmit</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span
+                            class="text-primary font-lg font-500">{{interfaceViewData?.transmit?.convertedValue}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-4">
+                        <span class="font-sm text-muted">Bandwidth</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span
+                            class="text-primary font-lg font-500">{{interfaceViewData?.bandwidth?.convertedValue}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-4">
+                        <span class="font-sm text-muted">Speed</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span class="text-primary font-lg font-500">{{interfaceViewData?.speed?.convertedValue}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-1">
+                        <span class="font-sm text-muted">Inbound Package discarded</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span
+                            class="text-primary font-lg font-500">{{interfaceViewData?.inboundDiscarded?.value}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-1">
+                        <span class="font-sm text-muted">Inbound Package with error</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span
+                            class="text-primary font-lg font-500">{{interfaceViewData?.inboundWithError?.value}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-1">
+                        <span class="font-sm text-muted">Outboud Package discarded</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span
+                            class="text-primary font-lg font-500">{{interfaceViewData?.outboundDiscarded?.value}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col pr-0">
+            <div class="card mb-2 pointer-link">
+                <div class="card-body d-flex flex-column px-2 py-1">
+                    <div class="text-left mb-1">
+                        <span class="font-sm text-muted">Outboud Package with error</span>
+                    </div>
+                    <div class="d-flex justify-content-start align-items-baseline">
+                        <span
+                            class="text-primary font-lg font-500">{{interfaceViewData?.outboundWithError?.value}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <div class="col-12 mb-2">
+        <div class="row">
+            <div class="col-3 pr-0">
+                <div class="card round-edge equalize-card">
+                    <div class="card-header d-flex align-items-center bg-white py-1 pl-2">
+                        <span class="font-lg font-500">Alert Details</span>
+                    </div>
+                    <div class="card-body d-flex justify-content-center align-items-center p-0 pt-2">
+                        <canvas *ngIf="alertsChartData" baseChart [chartType]="alertsChartData.type"
+                            [labels]="alertsChartData.lables" [data]="alertsChartData.piedata"
+                            [options]="alertsChartData.options" [plugins]="alertsChartData.customPlugin"
+                            [legend]="alertsChartData.legend" [colors]="alertsChartData.colors" height="200"></canvas>
+                        <div *ngIf="!alertsChartData">
+                            <div class="text-center text-muted">No data available.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="card round-edge equalize-card">
+                    <div class="card-header d-flex align-items-center bg-white py-1 pl-2">
+                        <span class="font-lg font-500">Recent Alerts</span>
+                    </div>
+                    <div class="card-body p-0"
+                        style="min-height:200px;max-height:250px;overflow-y: auto;overflow-x: hidden;">
+                        <table *ngIf="recentAlertsViewData.length" class="table table-sm text-left mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Description</th>
+                                    <th>Duration</th>
+                                    <th class="text-center">Severity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let view of recentAlertsViewData" truncateText>
+                                    <td class="text-primary">{{view.id}}</td>
+                                    <td class="tdw-30">
+                                        <div [tooltip]="view.description">{{view.description}}</div>
+                                    </td>
+                                    <td>{{view.duration}}</td>
+                                    <td class="text-center">
+                                        <div [tooltip]="view.severity">
+                                            <span [class]="view.severityClass"></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div *ngIf="!recentAlertsViewData.length"
+                            class="d-flex h-100 justify-content-center align-items-center">
+                            No alerts available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 pr-0">
+        <div class="card round-edge mb-2">
+            <div class="card-header bg-transparent border-0 px-3 pt-2">
+                <form class="form" [formGroup]="filterForm" *ngIf="filterForm">
+                    <div class="row w-100">
+                        <div class="form-group mb-0 col-2">
+                            <label for="from font-weight-bold">Duration :&nbsp;</label>
+                            <select class="form-control w-100" formControlName="period"
+                                [class.is-invalid]="formErrors.period">
+                                <option [value]="graphRange.LAST_24_HOURS">Last 24 Hours</option>
+                                <option [value]="graphRange.YESTERDAY">Yesterday</option>
+                                <option [value]="graphRange.LAST_WEEK">Last Week</option>
+                                <option [value]="graphRange.LAST_MONTH">Last Month</option>
+                                <option [value]="graphRange.LAST_YEAR">Last Year</option>
+                                <option [value]="graphRange.CUSTOM">Custom</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.period">{{formErrors.period}}</div>
+                        </div>
+                        <div class="form-group mb-0 col-3">
+                            <label for="from">From :&nbsp;</label>
+                            <div class="d-flex">
+                                <owl-date-time #from [hour12Timer]="true"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="from"
+                                    [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from"
+                                    placeholder="from" [max]="now">
+                                <div class="input-group-append " [owlDateTimeTrigger]="from">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-0 col-3">
+                            <label for="to">To :&nbsp;</label>
+                            <div class="d-flex">
+                                <owl-date-time #to [hour12Timer]="true"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="to" [owlDateTimeTrigger]="to"
+                                    [owlDateTime]="to" type="text" name="to" placeholder="to"
+                                    [min]="filterForm.controls.from.value" [max]="now">
+                                <div class="input-group-append " [owlDateTimeTrigger]="to">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-1 d-flex align-items-end">
+                            <button class="btn btn-warning btn-pill px-3" (click)="onSubmit()">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 pr-0">
+        <div class="card border-0 rounded-0 graph-card mb-2" *ngFor="let view of graphViewData"
+            style="min-height: 250px;">
+            <app-spinner [name]="view.graphid"></app-spinner>
+            <div class="card-body">
+                <h5 class="card-title text-warning">{{view.name}}</h5>
+                <div class="row">
+                    <img class="img-fluid pointer-link" *ngIf="view.image" [src]="'data:image/png;base64,'+view.image">
+                </div>
+            </div>
+        </div>
+        <div class="card border-0 rounded-0 graph-card" *ngIf="!graphViewData.length">
+            <div class="card-body">
+                <coming-soon [message]="'No graphs were found'"></coming-soon>
+            </div>
+        </div>
+    </div>
+</div>

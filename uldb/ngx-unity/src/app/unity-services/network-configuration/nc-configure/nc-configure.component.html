@@ -1,0 +1,181 @@
+<div class="card">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+        <div class="font-500">NCM Configuration</div>
+        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+    <div class="card-body py-2">
+        <form *ngIf="form" [formGroup]="form">
+            <div class="row mb-2">
+                <div class="col-2">
+                    <search-box customClass="form-control-sm" [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div class="col-2">
+                    <select name="device_type" id="device_type" class="form-control form-control-sm"
+                        formControlName="device_type">
+                        <option [value]="''">Select Device Type</option>
+                        <option *ngFor="let device of deviceTypeList" [value]="device.name">{{device.displayName}}
+                        </option>
+                    </select>
+                </div>
+                <div class="col d-flex justify-content-end">
+                    <ng-container *ngIf="isBulkSelected">
+                        <div class="w-20">
+                            <select name="ncm_credentials" id="ncm_credentials"
+                                [ngClass]="{'is-invalid' : formErrors.ncm_credentials}"
+                                class="form-control form-control-sm" formControlName="ncm_credentials">
+                                <option [value]="''" disabled>Select Credential</option>
+                                <option *ngFor="let credential of credentialList" [value]="credential.uuid">
+                                    {{credential.name}}
+                                </option>
+                            </select>
+                            <small class="invalid-feedback" *ngIf="formErrors.ncm_credentials">
+                                {{formErrors.ncm_credentials}}</small>
+                        </div>
+                        <div class="w-20 mx-3">
+                            <custom-password-field formControlName="enable_or_encrypted_password"
+                                [options]="{ placeholder:'', class: 'form-control-sm'}"></custom-password-field>
+                        </div>
+                        <div class="w-20 mr-3">
+                            <select class="form-control form-control-sm" formControlName="config_device_type"
+                                [ngClass]="{'is-invalid' : formErrors.config_device_type}">
+                                <option [value]="''" disabled>Select Config Device Type</option>
+                                <option *ngFor="let cdt of configDeviceTypeList" [value]="cdt.value">
+                                    {{cdt.label}}
+                                </option>
+                            </select>
+                            <small class="text-danger" *ngIf="formErrors.config_device_type">
+                                {{formErrors.config_device_type}}</small>
+                        </div>
+                        <div class="w-auto">
+                            <button class="btn btn-sm btn-success" type="button" (click)="onSubmit()">Submit</button>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </form>
+        <table class="table table-sm text-left">
+            <thead class="bg-light">
+                <tr>
+                    <th class="text-primary text-center pl-3 w-4" scope="col"
+                        (click)="$event.stopPropagation();selectAll()" style="font-size:1rem" accessControl
+                        moduleName="Network Configuration" accessType="Manage Network Configuration"
+                        elementType="div-hide">
+                        <i class="far" [ngClass]="selectedAll? 'fa-check-square':'fa-square'"></i>
+                    </th>
+                    <th class="w-14">Name</th>
+                    <th class="w-10">Device Type</th>
+                    <th class="w-10">IP</th>
+                    <th class="w-17">Credentials</th>
+                    <th class="w-17">Enable / Encrypted Password</th>
+                    <th class="w-17">Config Device Type</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let view of deviceList; let i = index" truncateText>
+                    <ng-container [formGroup]="view.form" *ngIf="view.form">
+                        <td class="text-primary pl-1 text-center tdw-4" (click)="$event.stopPropagation();select(view)"
+                            style="font-size:1rem" accessControl moduleName="Network Configuration"
+                            accessType="Manage Network Configuration" elementType="div-hide">
+                            <i class="far" [ngClass]="view.isSelected? 'fa-check-square':'fa-square'"></i>
+                        </td>
+                        <td class="tdw-14">
+                            <div [tooltip]="view.name">{{view.name}}</div>
+                        </td>
+                        <td calss="tdw-10">{{view.deviceTypeDisplayName}}</td>
+                        <td class="tdw-10">{{view.ip}}</td>
+                        <td class="tdw-17">
+                            <div>
+                                <select class="form-control" formControlName="ncm_credentials"
+                                    [ngClass]="{'is-invalid' : view.formErrors.ncm_credentials}">
+                                    <option [value]="''" disabled>Select Credential</option>
+                                    <option *ngFor="let credential of credentialList" [value]="credential.uuid">
+                                        {{credential.name}}
+                                    </option>
+                                </select>
+                                <small class="text-danger" *ngIf="view.formErrors.ncm_credentials">
+                                    {{view.formErrors.ncm_credentials}}</small>
+                            </div>
+                        </td>
+                        <td class="tdw-17">
+                            <div>
+                                <input [id]="i + '-enable_or_encrypted_password'" type="password" class="form-control"
+                                    formControlName="enable_or_encrypted_password"
+                                    [disabled]="view.form.get('enable_or_encrypted_password').disabled">
+                            </div>
+                        </td>
+                        <td class="tdw-17">
+                            <div>
+                                <select class="form-control" formControlName="config_device_type"
+                                    [ngClass]="{'is-invalid' : view.formErrors.config_device_type}">
+                                    <option [value]="''" disabled>Select Config Device Type</option>
+                                    <option *ngFor="let cdt of configDeviceTypeList" [value]="cdt.value">
+                                        {{cdt.label}}
+                                    </option>
+                                </select>
+                                <small class="text-danger" *ngIf="view.formErrors.config_device_type">
+                                    {{view.formErrors.config_device_type}}</small>
+                            </div>
+                        </td>
+                        <td class="action-icons-column text-center">
+                            <button class="action-icons mb-0 fas fa-sync font-sm ml-1" (click)="syncConfiguration(view)"
+                                [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
+                                [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress,'action-icons-disabled':!view.isConfigured}"
+                                accessControl moduleName="Network Configuration"
+                                accessType="Manage Network Configuration" elementType="actionbtn">
+                            </button>
+                            <button class="action-icons mb-0 font-sm ml-1" [ngClass]="getIconForValidateCred(view)"
+                                [tooltip]="getTooltipMsgForValidateCred(view)" (click)="validateCredentials(view)"
+                                container="body" accessControl moduleName="Network Configuration"
+                                accessType="Manage Network Configuration" elementType="actionbtn">
+                            </button>
+                            <button class="action-icons mb-0 font-sm ml-1" [ngClass]="getIcon(view)"
+                                [tooltip]="getTooltipMessage(view)" (click)="manageRecord(view)" container="body"
+                                accessControl moduleName="Network Configuration"
+                                accessType="Manage Network Configuration" elementType="actionbtn">
+                            </button>
+                            <button class="action-icons mb-0 fas fa-trash-alt font-sm ml-1" tooltip="Delete"
+                                (click)="deleteDeviceConfig(view)"
+                                [ngClass]="{'action-icons-disabled':!view.isConfigured}" accessControl
+                                moduleName="Network Configuration" accessType="Manage Network Configuration"
+                                elementType="actionbtn">
+                            </button>
+                        </td>
+                    </ng-container>
+                </tr>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <table-page-size *ngIf="deviceList.length" [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+            <table-pager *ngIf="deviceList.length" [pageNo]="currentCriteria.pageNo"
+                [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                (pageChange)="pageChange($event)"></table-pager>
+        </div>
+        <div *ngIf="!deviceList.length" class="d-flex align-items-center justify-content-center p-4">No devices
+            available.</div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div>Are you sure you want to delete this Device configuration?</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteDeviceConfig()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

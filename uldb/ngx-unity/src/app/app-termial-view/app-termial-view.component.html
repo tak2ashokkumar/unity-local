@@ -1,0 +1,23 @@
+<app-header [fixed]="true" [navbarBrandFull]="{src: unityLogo, alt: 'UL Logo'}"
+  [navbarBrandMinimized]="{src: unityLogo, alt: 'UL Logo'}" [sidebarToggler]="'lg'" [asideMenuToggler]="'lg'">
+  <ul class="nav navbar-nav ml-auto">
+    <li class="nav-item dropdown">
+      <a class="nav-link">
+        &nbsp;
+      </a>
+    </li>
+  </ul>
+</app-header>
+
+<div class="app-body">
+  <app-sidebar [fixed]="true" [display]="'lg'">
+    <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="sidebarMinimized"></app-sidebar-nav>
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+  <app-notification></app-notification>
+  <app-spinner [name]="'main'"></app-spinner>
+  <main class="main">
+    <check-auth></check-auth>
+    <console-access (inputLoaded)="menuInput($event)"></console-access>
+  </main>
+</div>

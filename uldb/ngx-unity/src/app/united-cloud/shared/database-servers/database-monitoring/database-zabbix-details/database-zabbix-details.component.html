@@ -1,0 +1,166 @@
+<div class="row">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card">
+                <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span> Details</span>
+                    </div>
+                    <!-- <div class="w-25">
+                        <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1"
+                            (click)="manageDetailsForm()" [tooltip]="'Edit'" container="body" accessControl
+                            moduleName="Monitoring" accessType="Manage Monitoring" elementType="actionbtn"></button>
+                    </div> -->
+                </div>
+                <div class="card-body">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="instance_name" class="col-3 h-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="instance_name" class="form-control" type="text" formControlName="instance_name"
+                                        [class.is-invalid]="detailFormErrors.instance_name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.instance_name">
+                                        {{detailFormErrors.instance_name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="port" class="col-3 h-form-label">Port</label>
+                                <div class="col-9">
+                                    <input id="port" class="form-control" type="text" formControlName="port"
+                                        [class.is-invalid]="detailFormErrors.port">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.port">
+                                        {{detailFormErrors.port}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="cloud" class="col-3 h-form-label">Cloud</label>
+                                <div class="col-9">
+                                    <input id="cloud" class="form-control" type="text" formControlName="cloud"
+                                        [class.is-invalid]="detailFormErrors.cloud">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cloud">
+                                        {{detailFormErrors.cloud}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="server_name" class="col-3 h-form-label">Server Name</label>
+                                <div class="col-9">
+                                    <input id="server_name" class="form-control" type="text" formControlName="server_name"
+                                        [class.is-invalid]="detailFormErrors.server_name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.server_name">
+                                        {{detailFormErrors.server_name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="os" class="col-3 h-form-label">Operating System</label>
+                                <div class="col-9">
+                                    <input id="os" class="form-control" type="text" formControlName="os"
+                                        [class.is-invalid]="detailFormErrors.os">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os">
+                                        {{detailFormErrors.os}}</div>
+                                </div>
+                            </div>
+                            <!-- <div class="form-group row">
+                                <label for="tags" class="col-3 col-form-label">Tags</label>
+                                <div class="col-9">
+                                    <input id="tags" class="form-control" type="text" formControlName="tags"
+                                        [class.is-invalid]="detailFormErrors.tags">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.tags">
+                                        {{detailFormErrors.tags}}</div>
+                                </div>
+                            </div> -->
+                            
+                            <div class="form-group row">
+                                <label for="life_cycle_stage" class="col-3 col-form-label">Life Cycle Stage</label>
+                                <div class="col-9">
+                                    <select id="life_cycle_stage" class="form-control" formControlName="life_cycle_stage"
+                                        [class.is-invalid]="detailFormErrors.life_cycle_stage">
+                                        <option value="''" disabled>Select Life Cycle Stage</option>
+                                        <option *ngFor="let opt of lifeCycleStageOptions" [value]="opt">
+                                            {{opt}}</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.life_cycle_stage">
+                                        {{detailFormErrors.life_cycle_stage}}</div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-6">                                     
+                            <div class="form-group row">
+                                <label for="type" class="col-3 h-form-label">Type</label>
+                                <div class="col-9">
+                                    <input id="type" class="form-control" type="text" formControlName="type"
+                                        [class.is-invalid]="detailFormErrors.type">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.type">
+                                        {{detailFormErrors.type}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="management_ip" class="col-3 h-form-label">management IP</label>
+                                <div class="col-9">
+                                    <input id="management_ip" class="form-control" type="text" formControlName="management_ip"
+                                        [class.is-invalid]="detailFormErrors.management_ip">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.management_ip">
+                                        {{detailFormErrors.management_ip}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="cloud_type" class="col-3 h-form-label">Cloud Type</label>
+                                <div class="col-9">
+                                    <input id="cloud_type" class="form-control" type="text" formControlName="cloud_type"
+                                        [class.is-invalid]="detailFormErrors.cloud_type">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.cloud_type">
+                                        {{detailFormErrors.cloud_type}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="server_type" class="col-3 h-form-label">Server Type</label>
+                                <div class="col-9">
+                                    <input id="server_type" class="form-control" type="text" formControlName="server_type"
+                                        [class.is-invalid]="detailFormErrors.server_type">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.server_type">
+                                        {{detailFormErrors.server_type}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="os_type" class="col-3 h-form-label">Operating System Type</label>
+                                <div class="col-9">
+                                    <input id="os_type" class="form-control" type="text" formControlName="os_type"
+                                        [class.is-invalid]="detailFormErrors.os_type">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.os_type">
+                                        {{detailFormErrors.os_type}}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label for="life_cycle_stage_status" class="col-3 mt--1 mb-0">Life Cycle Stage Status</label>
+                                <div class="col-9">
+                                    <select id="life_cycle_stage_status" class="form-control" formControlName="life_cycle_stage_status"
+                                        [class.is-invalid]="detailFormErrors.life_cycle_stage_status">
+                                        <option value="''" disabled>Select Life Cycle Stage</option>
+                                        <option *ngFor="let opt of lifeCycleStageStatusOptions" [value]="opt">
+                                            {{opt}}</option>
+                                    </select>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.life_cycle_stage_status">
+                                        {{detailFormErrors.life_cycle_stage_status}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12 text-center" *ngIf="detailForm.dirty">
+                            <button type="button" class="btn btn-primary" (click)="submitDetailForm()">Update</button>
+                            <button type="button" class="btn btn-danger ml-2" (click)="buildDetailForm()">Reset</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </form>
+        <ng-container *ngIf="view">
+            <unity-devices-custom-attributes-crud [deviceType]="device?.deviceType" [deviceId]="deviceId"
+                [deviceAttrs]="view?.custom_attribute_data" [isOutBound]="true"></unity-devices-custom-attributes-crud>
+        </ng-container>
+    </div>
+
+    <div class="col-12 mb-4" *ngIf="deviceId && device?.deviceType && view">
+        <device-details-components [deviceType]="device?.deviceType" [deviceId]="deviceId"></device-details-components>        
+    </div>
+</div>

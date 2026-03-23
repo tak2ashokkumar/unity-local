@@ -1,0 +1,19 @@
+.icon-wrapper {
+    position: relative;
+    width: 1.5em;
+    height: 1.5em;
+    display: inline-block;
+}
+
+.icon-wrapper .base {
+    font-size: 1.5em;
+    color: green;
+}
+
+.icon-wrapper .overlay {
+    position: absolute;
+    top: 35%;
+    left: 35%;
+    font-size: 0.6em;
+    color: white;
+}

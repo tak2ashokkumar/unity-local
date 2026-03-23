@@ -1,0 +1,288 @@
+<div class="card round-edge">
+    <div class="card-header bg-white rounded-3 py-2">
+        <div class="row">
+            <div class="col-6">
+                <div class="mt-1">
+                    <span class="font-lg font-weight-bold">Add</span>
+                </div>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back"><i
+                        class="fa fa-arrow-left" (click)="goBack()"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <form *ngIf="otherDevicesForm" [formGroup]="otherDevicesForm">
+            <div class="form-group" *ngIf="nonFieldErr">
+                <div class="invalid-credentials">{{nonFieldErr}}</div>
+            </div>
+            <div class="row">
+                <div class="col-2 form-group">
+                    <label class="form-col-form-label">Category<em>*</em></label>
+                    <select id="type" class="form-control" type="text" formControlName="type"
+                        [class.is-invalid]="otherDevicesFormErrors.type">
+                        <option [value]="'URL'" selected>URL</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.type">
+                        {{otherDevicesFormErrors.type}}</div>
+                </div>
+                <div class="col-4 form-group">
+                    <label class="form-col-form-label">Name<em>*</em></label>
+                    <input id="name" class="form-control" type="text" formControlName="name" placeholder="Enter Name"
+                        [class.is-invalid]="otherDevicesFormErrors.name">
+                    <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.name">
+                        {{otherDevicesFormErrors.name}}</div>
+                </div>
+                <div class="col-2 form-group">
+                    <label class="form-col-form-label">Polling Interval</label>
+                    <div class="row">
+                        <div class="col-6 pr-0">
+                            <input class="form-control" id="polling_interval_min" type="number"
+                                formControlName="polling_interval_min" min="0" max="59" placeholder="minutes"
+                                [class.is-invalid]="otherDevicesFormErrors.polling_interval_min">
+                            <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.polling_interval_min">
+                                {{otherDevicesFormErrors.polling_interval_min}}</div>
+                        </div>
+                        <div class="col-6 pl-0">
+                            <input class="form-control ml-2" formControlName="polling_interval_sec"
+                                id="polling_interval_sec" type="number" min="0" max="59" placeholder="seconds"
+                                [class.is-invalid]="otherDevicesFormErrors.polling_interval_sec">
+                            <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.polling_interval_sec">
+                                {{otherDevicesFormErrors.polling_interval_sec}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 form-group" formGroupName="collector">
+                    <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+                    <select id="collectorid" class="form-control" formControlName="uuid"
+                        [class.is-invalid]="otherDevicesFormErrors.collector.uuid">
+                        <option value="" disabled>Select Collector</option>
+                        <option *ngFor="let collector of collectors" [value]="collector.uuid">{{collector.name}}
+                        </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.collector">
+                        {{otherDevicesFormErrors.collector.uuid}}</div>
+                </div>
+                <unity-devices-custom-attributes-crud [deviceType]="deviceType" [deviceAttrs]="otherDevicesForm?.get('custom_attribute_data')?.value" class="w-100"></unity-devices-custom-attributes-crud>
+                <div class="col-6 form-group">
+                    <label class="form-col-form-label">Tag</label>
+                    <tag-input [clearOnBlur]="true" formControlName="tags" [modelAsStrings]="true">
+                        <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200">
+                        </tag-input-dropdown>
+                    </tag-input>
+                </div>
+                <div class="col-6 form-group">
+                    <label class="form-col-form-label">Description<em>*</em></label>
+                    <textarea class="form-control no-resize" id="description" rows="3" placeholder="Enter Description"
+                        formControlName="description"
+                        [class.is-invalid]="otherDevicesFormErrors.description"></textarea>
+                    <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.description">
+                        {{otherDevicesFormErrors.description}}</div>
+                </div>
+            </div>
+            <div class="row mt--4">
+                <div class="col-12">
+                    <label class="d-inline-block">Monitoring Configuration :</label>
+                    <div class="d-inline-block ml-2">
+                        <ul class="d-flex px-0 mb-0">
+                            <li>
+                                <label class="pointer-link"
+                                    [class.active]="otherDevicesForm.controls.is_monitoring.value">
+                                    <input type="radio" [value]="true" formControlName="is_monitoring">
+                                    <span class="font-sm mr-2">Enable</span>
+                                </label>
+                            </li>
+                            <li>
+                                <label class="pointer-link"
+                                    [class.active]="!otherDevicesForm.controls.is_monitoring.value">
+                                    <input type="radio" [value]="false" formControlName="is_monitoring">
+                                    <span class="font-sm mr-2">Disable</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row mx-0 mt-4 bordered-container font-xs-sm" *ngIf="otherDevicesForm.controls.is_monitoring.value">
+                <div class="col pb-2 px-0 border rounded position-relative">
+                    <div class="bg-white position-absolute section-name-one text-muted font-sm">Monitoring Configuration
+                    </div>
+                    <i class="fas fa-plus action-icons section-name-two font-sm" (click)="addMonitoringConfiguration()"></i>
+                    <div class="row px-4 pt-4lg" formArrayName="urls"
+                        *ngFor="let urls of otherDevicesForm.controls.urls.controls; let i = index;">
+                        <div class="col border rounded pt-3 position-relative">
+                            <div class="bg-white position-absolute section-name-one text-muted font-sm">
+                                URL {{i+1}}
+                            </div>
+                            <i class="far fa-trash-alt action-icons section-name-two font-sm"
+                                *ngIf="otherDevicesForm.controls.urls.length > 1" (click)="removeUrl(i)"></i>
+                            <div class="row" [formGroupName]="i">
+                                <div class="col-2 form-group">
+                                    <label for="name" class="form-col-form-label">URL Name
+                                        <em>*</em></label>
+                                    <input type="text" class="form-control" placeholder="Enter Url Name"
+                                        formControlName="name" [class.is-invalid]="otherDevicesFormErrors.urls[i].name">
+                                    <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.urls[i].name">
+                                        {{otherDevicesFormErrors.urls[i].name}}</div>
+                                </div>
+                                <div class="col-3 pl-0 form-group">
+                                    <label for="url" class="form-col-form-label">URL <em>*</em></label>
+                                    <input type="text" class="form-control" placeholder="Enter Url"
+                                        formControlName="url" [class.is-invalid]="otherDevicesFormErrors.urls[i].url">
+                                    <div class="invalid-feedback" *ngIf="otherDevicesFormErrors.urls[i].url">
+                                        {{otherDevicesFormErrors.urls[i].url}}</div>
+                                </div>
+                                <div class="col-2 pl-0 form-group">
+                                    <label for="url_availabilty" class="form-col-form-label">URL
+                                        Availability</label><br>
+                                    <div class="d-inline-block">
+                                        <ul class="d-flex px-0 mb-0">
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="otherDevicesForm.controls.urls.controls[i].controls.url_availabilty.value">
+                                                    <input type="radio" [value]="true"
+                                                        formControlName="url_availabilty">
+                                                    <span class="font-sm mr-2">Enable</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="!otherDevicesForm.controls.urls.controls[i].controls.url_availabilty.value">
+                                                    <input type="radio" [value]="false"
+                                                        formControlName="url_availabilty">
+                                                    <span class="font-sm mr-2">Disable</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-2 pl-0 form-group">
+                                    <label for="response_availability" class="form-col-form-label">Response
+                                        Code Availability</label>
+                                    <div class="d-inline-block">
+                                        <ul class="d-flex px-0 mb-0">
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="otherDevicesForm.controls.urls.controls[i].controls.response_availability.value">
+                                                    <input type="radio" [value]="true"
+                                                        formControlName="response_availability">
+                                                    <span class="font-sm mr-2">Enable</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="!otherDevicesForm.controls.urls.controls[i].controls.response_availability.value">
+                                                    <input type="radio" [value]="false"
+                                                        formControlName="response_availability">
+                                                    <span class="font-sm mr-2">Disable</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-2 form-group">
+                                    <label for="string_availabilty" class="form-col-form-label">String
+                                        Pattern Availability</label>
+                                    <div class="d-inline-block">
+                                        <ul class="d-flex px-0 mb-0">
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="otherDevicesForm.controls.urls.controls[i].controls.string_availabilty.value">
+                                                    <input type="radio" [value]="true"
+                                                        formControlName="string_availabilty">
+                                                    <span class="font-sm mr-2">Enable</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="!otherDevicesForm.controls.urls.controls[i].controls.string_availabilty.value">
+                                                    <input type="radio" [value]="false"
+                                                        formControlName="string_availabilty">
+                                                    <span class="font-sm mr-2">Disable</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-2 form-group">
+                                    <label for="login_availability" class="form-col-form-label">Login
+                                        Availability</label><br>
+                                    <div class="d-inline-block">
+                                        <ul class="d-flex px-0 mb-0">
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="otherDevicesForm.controls.urls.controls[i].controls.login_availability.value">
+                                                    <input type="radio" [value]="true"
+                                                        formControlName="login_availability">
+                                                    <span class="font-sm mr-2">Enable</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="!otherDevicesForm.controls.urls.controls[i].controls.login_availability.value">
+                                                    <input type="radio" [value]="false"
+                                                        formControlName="login_availability">
+                                                    <span class="font-sm mr-2">Disable</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-3 pl-0">
+                                    <div class="form-group"
+                                        *ngIf="otherDevicesForm.get('urls').controls[i].get('login_availability').value">
+                                        <label class="form-col-form-label">Login User Name<em>*</em></label>
+                                        <input id="login_username-{{i}}" class="form-control" type="text"
+                                            formControlName="login_username" placeholder="Enter Name"
+                                            [class.is-invalid]="otherDevicesFormErrors.urls[i].login_username">
+                                        <div class="invalid-feedback"
+                                            *ngIf="otherDevicesFormErrors.urls[i].login_username">
+                                            {{otherDevicesFormErrors.urls[i].login_username}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-2 pl-0">
+                                    <div class="form-group"
+                                        *ngIf="otherDevicesForm.get('urls').controls[i].get('login_availability').value">
+                                        <label class="form-col-form-label">Login Password<em>*</em></label>
+                                        <custom-password-field formControlName="login_password"
+                                            [options]="{errors:otherDevicesFormErrors.urls[i].login_password, placeholder:'Enter Password'}"></custom-password-field>
+                                        <div class="invalid-feedback"
+                                            *ngIf="otherDevicesFormErrors.urls[i].login_password">
+                                            {{otherDevicesFormErrors.urls[i].login_password}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-2 px-0">
+                                    <div class="form-group"
+                                        *ngIf="otherDevicesForm.get('urls').controls[i].get('response_availability').value">
+                                        <label class="form-col-form-label">Response Code<em>*</em></label>
+                                        <input id="response_status-{{i}}" class="form-control" type="text"
+                                            formControlName="response_status" placeholder="Enter Response Code"
+                                            [class.is-invalid]="otherDevicesFormErrors.urls[i].response_status">
+                                        <div class="invalid-feedback">
+                                            {{otherDevicesFormErrors.urls[i].response_status}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group"
+                                        *ngIf="otherDevicesForm.get('urls').controls[i].get('string_availabilty').value">
+                                        <label class="form-col-form-label">String Pattern<em>*</em></label>
+                                        <input id="string_pattern-{{i}}" class="form-control" type="text"
+                                            formControlName="string_pattern" placeholder="Enter String Pattern"
+                                            [class.is-invalid]="otherDevicesFormErrors.urls[i].string_pattern">
+                                        <div class="invalid-feedback">
+                                            {{otherDevicesFormErrors.urls[i].string_pattern}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer bg-white border-top-0 d-flex justify-content-center py-3">
+        <button class="btn btn-primary" type="button" (click)="onSubmit()">Submit</button>
+        <button class="btn btn-outline-danger ml-3" type="button" (click)="goBack()">Back</button>
+    </div>
+</div>

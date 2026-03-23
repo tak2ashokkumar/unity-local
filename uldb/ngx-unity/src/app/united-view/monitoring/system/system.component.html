@@ -1,0 +1,191 @@
+<div class="row">
+    <div class="col-12" *ngIf="!widgets.length">
+        <div class="card">
+            <div class="empty-clouds text-center py-5">No widgets configured for this user. <span
+                    class="btn-link pointer-link" (click)="addWidget()" accessControl moduleName="Monitoring"
+                    accessType="Manage Monitoring" elementType="div">Click here</span> to add.</div>
+        </div>
+    </div>
+    <div class="col-12" *ngIf="widgets.length">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form class="form-inline" [formGroup]="dateRangeFilterForm" *ngIf="dateRangeFilterForm">
+                            <div class="row w-100">
+                                <div class="form-group col-2">
+                                    <select class="form-control w-100" formControlName="period"
+                                        [class.is-invalid]="dateRangeFilterFormErrors.period">
+                                        <option [value]="dateRangeOptions.LAST_24_HOURS">Last 24 Hours</option>
+                                        <option [value]="dateRangeOptions.YESTERDAY">Yesterday</option>
+                                        <option [value]="dateRangeOptions.LAST_WEEK">Last Week</option>
+                                        <option [value]="dateRangeOptions.LAST_MONTH">Last Month</option>
+                                        <option [value]="dateRangeOptions.LAST_YEAR">Last Year</option>
+                                        <option [value]="dateRangeOptions.CUSTOM">Custom</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="dateRangeFilterFormErrors.period">
+                                        {{dateRangeFilterFormErrors.period}}</div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <label for="from">From :&nbsp;</label>
+                                        <owl-date-time #from [hour12Timer]="true"></owl-date-time>
+                                        <input class="form-control rounded-left" formControlName="from"
+                                            [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from"
+                                            placeholder="from" [max]="now">
+                                        <div class="input-group-append " [owlDateTimeTrigger]="from">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <label for="to">To :&nbsp;</label>
+                                        <owl-date-time #to [hour12Timer]="true"></owl-date-time>
+                                        <input class="form-control rounded-left" formControlName="to"
+                                            [owlDateTimeTrigger]="to" [owlDateTime]="to" type="text" name="to"
+                                            placeholder="to" [min]="dateRangeFilterForm.controls.from.value"
+                                            [max]="now">
+                                        <div class="input-group-append " [owlDateTimeTrigger]="to">
+                                            <span class="input-group-text bg-white">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-1 pt-1">
+                                    <button class="btn btn-pill btn-warning btn-sm pull-left"
+                                        [disabled]="dateRangeFilterForm.pristine"
+                                        (click)="onSubmitDateRangeFilterForm()">Update</button>
+                                </div>
+                                <div class="col pt-1">
+                                    <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                                    <button class="btn btn-pill btn-warning btn-sm pull-right ml-2" type="button"
+                                        (click)="addWidget()" accessControl moduleName="Monitoring"
+                                        accessType="Manage Monitoring" elementType="btn">Add Widget</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card graph-card mb-3" *ngFor="let view of widgets">
+            <app-spinner [name]="view.widgetId "></app-spinner>
+            <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                <div class="w-55 py-1">
+                    <span> {{view.device.name}} - {{view.deviceType.type}}</span>
+                </div>
+                <div class="w-35 text-right">
+                    <span *ngIf="view.device && view.device.monitoring.zabbix" class="text-warning font-xs"> *graphs
+                        are shown as per UTC time standards.</span>
+                </div>
+                <div class="w-10">
+                    <button class="action-icons ml-1 far fa-trash-alt font-sm pull-right" (click)="deleteWidget(view)"
+                        tooltip="Delete" container="body" accessControl moduleName="Monitoring"
+                        accessType="Manage Monitoring" elementType="actionbtn"></button>
+                    <button class="action-icons ml-1 fas fa-pencil-alt font-sm pull-right" (click)="editWidget(view)"
+                        tooltip="Edit" container="body" accessControl moduleName="Monitoring"
+                        accessType="Manage Monitoring" elementType="actionbtn"></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6 my-2 widget-graph" *ngFor="let graph of view.graphs">
+                        <h5 class="card-title text-warning">{{graph.name}}</h5>
+                        <div class="text-center mt-5" *ngIf="!graph.isLoaded">
+                            <i class="fa fa-spinner fa-spin"></i>
+                        </div>
+                        <div *ngIf="graph.isLoaded">
+                            <img class="img-fluid pointer-link" *ngIf="graph.image"
+                                [src]="'data:image/png;base64,'+graph.image">
+                            <div class="m-5" *ngIf="!graph.image">
+                                <span class="text-danger"> Invalid Graph </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #widgetFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{action}} Widget
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="widgetFormModelRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="widgetForm" [formGroup]="widgetForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label class="font-col-form-label" for="device_type">Device Type<em>*</em></label>
+                        <select id="device_type" class="form-control" formControlName="device_type"
+                            [class.is-invalid]="widgetFormErrors.device_type">
+                            <option value="" disabled>Select Device Type</option>
+                            <option *ngFor="let deviceType of deviceTypes" [ngValue]="deviceType">{{deviceType.type}}
+                            </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="widgetFormErrors.device_type">
+                            {{widgetFormErrors.device_type}}</div>
+                    </div>
+                    <div class="form-group col-6" *ngIf="widgetForm.controls.device">
+                        <label class="font-col-form-label" for="device">Device Name<em>*</em></label>
+                        <select id="device" class="form-control" formControlName="device"
+                            [class.is-invalid]="widgetFormErrors.device">
+                            <option value="" disabled>Select Device</option>
+                            <option *ngFor="let d of devices" [ngValue]="d">{{d.name}}</option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="widgetFormErrors.device">{{widgetFormErrors.device}}</div>
+                    </div>
+                    <div class="form-group col-12" *ngIf="widgetForm.controls.graphs">
+                        <label class="font-col-form-label" for="graphs">Graph<em>*</em></label>
+                        <multiselect-dropdown [options]="deviceGraphs" [settings]="mySettings"
+                            class="form-control p-0 w-100" style="height:auto;" formControlName="graphs"
+                            [ngClass]="{'is-invalid' : widgetFormErrors.graphs}">
+                        </multiselect-dropdown>
+                        <div class="invalid-feedback" *ngIf="widgetFormErrors.graphs">{{widgetFormErrors.graphs}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmWidgetCreate()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="widgetFormModelRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Widget will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

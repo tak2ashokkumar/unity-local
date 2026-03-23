@@ -1,0 +1,144 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card round-edge mt-3 w-100">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div id="count" class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{count}}</span>
+                    <span class="ml-1 font-lg">History</span>
+                </div>
+                <div>
+                    <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData()"></data-refresh-btn>
+                    <button class="btn btn-pill btn-warning btn-sm" (click)="goBack()" tooltip="Back">
+                        <i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="col-12 p-0 mb-2">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <div class="w-80">
+                            <div class="w-20">
+                                <table-search-box [searchValue]="currentCriteria.searchValue"
+                                    (searched)="onSearched($event)"></table-search-box>
+                            </div>
+                        </div>
+                        <div class="w-10">
+                            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-sm text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Device Name</th>
+                            <th>Device Type</th>
+                            <th>IP Address</th>
+                            <th>Description</th>
+                            <th>Event Time</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Duration</th>
+                            <th>Acknowledge</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let view of viewData;let i=index;">
+                            <tr>
+                                <td class="tdw-9">
+                                    <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                                </td>
+                                <td class="tdw-9">
+                                    <div [tooltip]="view.deviceType">{{view.deviceType}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div>{{view.ipAddress}}</div>
+                                </td>
+                                <td class="tdw-13">
+                                    <div [tooltip]="view.description">{{view.description}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="view.eventDatetime">{{view.eventDatetime}}</div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div class="ml-2">
+                                        <i class="fa status-icon" [ngClass]="view.severityIcon"
+                                            [tooltip]="view.severity" container="body"></i>
+                                    </div>
+                                </td>
+                                <td class="tdw-5">
+                                    <div [ngClass]="view.statusTextColor">{{view.status}}</div>
+                                </td>
+                                <td class="tdw-9">
+                                    <div [tooltip]="view.duration">{{view.duration}}</div>
+                                </td>
+                                <td class="tdw-5 no-truncate">
+                                    <div class="pl-3 tooltip-wrapper" *ngIf="view.isAcknowledged">
+                                        <span *ngIf="view.acknowledgedTime"
+                                            class="fas fa-check-circle fa-lg text-success" container="body"
+                                            (mouseenter)="onMouseEnterTooltip(i, $event.target)"
+                                            (mouseleave)="hoveredIndex = -1">
+                                            <div #tooltipRef class="tooltip-box" *ngIf="hoveredIndex === i"
+                                                [ngClass]="tooltipDirection === 'bottom' ? 'tooltip-bottom' : 'tooltip-top'"
+                                                [innerHTML]="alert.acknowledgedTooltipMsg"></div>
+                                        </span>
+                                        <span *ngIf="!view.acknowledgedTime">
+                                            <i class="fa fa-spinner fa-spin">&nbsp;</i>
+                                        </span>
+                                    </div>
+                                    <div class="pl-2" *ngIf="!view.isAcknowledged">
+                                        <button class="action-icons mb-0 fas fa-comment-dots font-sm"
+                                            (click)="onCloseAcknowledge(); acknowledge(i); $event.stopPropagation(); $event.preventDefault();"
+                                            [popover]="acknowledgeFormRef" [tooltip]="'Acknowledge'" container="body"
+                                            [outsideClick]="true"></button>
+                                    </div>
+                                </td>
+                                <td class="action-icons-column">
+                                    <button class="action-icons mb-0 fas fa-toggle-on font-sm"
+                                        [tooltip]="view.triggerDisableBtnTooltipMsg" container="body"
+                                        [ngClass]="{'action-icons-disabled':view.isStatusResolved || !view.isSourceUnity}"
+                                        (click)="disable(view)" accessControl moduleName="AIML Event Management"
+                                        accessType="Manage AIML Event Management" elementType="actionbtn"></button>
+                                    <button class="action-icons mb-0 fa fa-times font-sm ml-1"
+                                        [tooltip]="view.resolveBtnTooltipMsg" container="body"
+                                        [ngClass]="{'action-icons-disabled':view.isStatusResolved}"
+                                        (click)="resolve(view)" accessControl moduleName="AIML Event Management"
+                                        accessType="Manage AIML Event Management" elementType="actionbtn"></button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No associated History found.</div>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count">
+                </table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-container>
+    <ng-template #acknowledgeFormRef>
+        <form *ngIf="acknowledgeForm" [formGroup]="acknowledgeForm" [style.width.px]="250">
+            <div class="form-group">
+                <label for="comments" class="form-col-form-label">Comments</label>
+                <textarea id="comments" class="form-control static" rows='3' formControlName="ack_comment"
+                    [class.is-invalid]="acknowledgeFormErrors.ack_comment" placeholder="Enter Comments"></textarea>
+                <div class="invalid-feedback d-flex mb-3" *ngIf="acknowledgeFormErrors.ack_comment">
+                    {{acknowledgeFormErrors.ack_comment}}
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-sm btn-primary pull-right ml-2" type="button"
+                    (click)="onAcknowledge()">Acknowledge</button>
+                <button class="btn btn-sm btn-danger pull-right mb-2" type="button"
+                    (click)="onCloseAcknowledge()">Cancel</button>
+            </div>
+        </form>
+    </ng-template>
+</ng-container>

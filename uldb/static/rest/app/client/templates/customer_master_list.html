@@ -1,0 +1,13 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+<loading object="{{model.results}}"></loading>
+	<page-title title="Maintenance Schedules"></page-title>
+	<div class="pagemargin">
+	  <table-search-widget ng-show="model.results !== undefined"></table-search-widget>
+	  <model-results></model-results>
+	</div>
+</div>
+
+
+
+
+

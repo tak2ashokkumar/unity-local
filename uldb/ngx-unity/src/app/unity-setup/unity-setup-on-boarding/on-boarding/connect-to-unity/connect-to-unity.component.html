@@ -1,0 +1,243 @@
+<div class="onb-wrap mb-2">
+  <div class="onb-links">
+    <button class="btn" [ngClass]="viewData.vpnBtnClass" type="button" (click)="requestConnection()"><i class="far fa-envelope"></i></button>
+  </div>
+</div>
+
+
+<ng-template #requested>
+  <div class="modal-content">
+    <div class="modal-header" [ngClass]="viewData.backgroundColor">
+      <div class="icon-box">
+        <i class="fa" [ngClass]="viewData.icon"></i>
+      </div>
+      <button type="button" class="close" data-dismiss="modal" (click)="requestedModalRef.hide()" aria-hidden="true">×</button>
+    </div>
+    <div class="modal-body text-center">
+      <h4>Great!</h4>
+      <p>{{viewData.message}}</p>
+      <button class="btn btn-warning" (click)="requestAnotherConnection()"><span>Request another Connection(Collector/VPN)</span></button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #createRequest>
+  <div class="card mb-0">
+    <div class="card-header">
+      Request to create connectivity
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="createRequestModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <ul class="nav nav-tabs border-0 nav-justified" role="tablist">
+        <li class="nav-item font-weight-bolder" [class.active]="selectedTab=='request-connection'" (click)="selectTab('request-connection')">
+          <a class="nav-link border-0 h6 mb-0">Request VPN Connection</a>
+        </li>
+        <li class="nav-item" [class.active]="selectedTab=='agent-config'" (click)="selectTab('agent-config')">
+          <a class="nav-link border-0 h6 mb-0">Collector Configuration</a>
+        </li>
+      </ul>
+      <div [ngSwitch]="selectedTab">
+        <div *ngSwitchCase="'request-connection'" class="pt-2">
+          <form *ngIf="requestForm" [formGroup]="requestForm">
+            <table class="table text-left table-responsive-sm table-bordered">
+              <thead>
+                <tr>
+                  <th [style.width]="'15%'"></th>
+                  <th>Customer</th>
+                  <th>Unity</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="align-middle">Contact Info</td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-6 mb-0">
+                        <label for="cust_email">Email<em>*</em></label>
+                        <input class="form-control" id="cust_email" type="text" placeholder="Email" formControlName="cust_email"
+                          [ngClass]="{'is-invalid' : formErrors.cust_email}">
+                        <div class="invalid-feedback" *ngIf="formErrors.cust_email">{{formErrors.cust_email}}</div>
+                      </div>
+                      <div class="form-group col-6 mb-0">
+                        <label for="cust_contact_number">Contact Number<em>*</em></label>
+                        <input class="form-control" id="cust_contact_number" type="text" placeholder="Contact Number"
+                          formControlName="cust_contact_number" [ngClass]="{'is-invalid' : formErrors.cust_contact_number}">
+                        <div class="invalid-feedback" *ngIf="formErrors.cust_contact_number">{{formErrors.cust_contact_number}}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-6 mb-0">
+                        <label for="unity-email">Email</label>
+                        <input class="form-control" id="unity-email" [value]="unityConstants.email" type="text"
+                          disabled>
+                      </div>
+                      <div class="form-group col-6 mb-0">
+                        <label for="unity-contact">Contact Number</label>
+                        <input class="form-control" id="unity-contact" type="text" [value]="unityConstants.contact_number"
+                          disabled>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="align-middle">Firewall Info</td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-4 mb-0">
+                        <label for="manufacturer">Manufacturer</label>
+                        <input class="form-control" id="manufacturer" type="text" placeholder="Manufacturer"
+                          formControlName="manufacturer" [ngClass]="{'is-invalid' : formErrors.manufacturer}">
+                        <div class="invalid-feedback" *ngIf="formErrors.manufacturer">{{formErrors.manufacturer}}</div>
+                      </div>
+                      <div class="form-group col-4 mb-0">
+                        <label for="model">Model</label>
+                        <input class="form-control" id="model" type="text" placeholder="Model" formControlName="model"
+                          [ngClass]="{'is-invalid' : formErrors.model}">
+                        <div class="invalid-feedback" *ngIf="formErrors.model">{{formErrors.model}}</div>
+                      </div>
+                      <div class="form-group col-4 mb-0">
+                        <label for="version">Version</label>
+                        <input class="form-control" id="version" type="text" placeholder="Version" formControlName="version"
+                          [ngClass]="{'is-invalid' : formErrors.version}">
+                        <div class="invalid-feedback" *ngIf="formErrors.version">{{formErrors.version}}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-4 mb-0">
+                        <label for="unity-manufacturer">Manufacturer</label>
+                        <input class="form-control" id="unity-manufacturer" type="text" [value]="unityConstants.firewall_manufacturer"
+                          disabled>
+                      </div>
+                      <div class="form-group col-4 mb-0">
+                        <label for="unity-model">Model</label>
+                        <input class="form-control" id="unity-model" type="text" [value]="unityConstants.firewall_model"
+                          disabled>
+                      </div>
+                      <div class="form-group col-4 mb-0">
+                        <label for="unity-version">Version</label>
+                        <input class="form-control" id="unity-version" type="text" [value]="unityConstants.firewall_version"
+                          disabled>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="align-middle">IP addressing</td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-12 mb-0">
+                        <label for="peer_ip_addresses">Peer IP Addresses</label>
+                        <input class="form-control" id="peer_ip_addresses" type="text" formControlName="peer_ip_addresses"
+                          [ngClass]="{'is-invalid' : formErrors.peer_ip_addresses}">
+                        <div class="invalid-feedback" *ngIf="formErrors.peer_ip_addresses">{{formErrors.peer_ip_addresses}}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-12 mb-0">
+                        <label for="unity-peer_ip_addresses">Peer IP Addresses</label>
+                        <input class="form-control" id="unity-peer_ip_addresses" type="text" [value]="unityConstants.ip_address"
+                          disabled>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="align-middle">Inside Hosts or Subnets</td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-12 mb-0">
+                        <label for="subnets">Hosts or Subnets</label>
+                        <textarea class="form-control" id="subnets" type="text" formControlName="subnets" [ngClass]="{'is-invalid' : formErrors.subnets}"></textarea>
+                        <div class="invalid-feedback" *ngIf="formErrors.subnets">{{formErrors.subnets}}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="row">
+                      <div class="form-group col-12 mb-0">
+                        <label for="unity-subnets">Hosts or Subnets</label>
+                        <textarea class="form-control" id="unity-subnets" type="text" disabled>{{unityConstants.hosts}}</textarea>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="align-middle">Settings</td>
+                  <td colspan="2">
+                    <div class="row">
+                      <div class="form-group col-4">
+                        <label for="auth_method">Authentication Method</label>
+                        <input class="form-control" id="auth_method" type="text" formControlName="auth_method">
+                      </div>
+                      <div class="form-group col-5">
+                        <label for="pre_shared_secret">Pre-Shared Secret</label>
+                        <input class="form-control" id="pre_shared_secret" type="text" formControlName="pre_shared_secret">
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="dh_group_identifier">DH Group Identifier</label>
+                        <select class="form-control" id="dh_group_identifier" formControlName="dh_group_identifier">
+                          <option [value]="''">Please Select</option>
+                          <option [value]="'2 (1024bit)'">2 (1024bit)</option>
+                          <option [value]="'No PFS'">No PFS</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group col-4">
+                        <label for="ike_encryption_algorithm">IKE Encryption Algorithm</label>
+                        <input class="form-control" id="ike_encryption_algorithm" type="text" formControlName="ike_encryption_algorithm">
+                      </div>
+                      <div class="form-group col-5">
+                        <label for="ike_security_lifetime">IKE Security Lifetime</label>
+                        <input class="form-control" id="ike_security_lifetime" type="text" formControlName="ike_security_lifetime">
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="ike_hash_algorithm">IKE Hash ALgorithm</label>
+                        <input class="form-control" id="ike_hash_algorithm" type="text" formControlName="ike_hash_algorithm">
+                      </div>
+
+                      <div class="form-group col-4">
+                        <label for="ipsec_encryption_algorithm">IPSEC Encryption Algorithm</label>
+                        <input class="form-control" id="ipsec_encryption_algorithm" type="text" formControlName="ipsec_encryption_algorithm">
+                      </div>
+                      <div class="form-group col-5">
+                        <label for="ipsec_security_lifetime">IPSEC Security Lifetime <small>(range - 460 secs to 28,800
+                            secs)</small></label>
+                        <input class="form-control" id="ipsec_security_lifetime" type="number" min="460" max="28800"
+                          formControlName="ipsec_security_lifetime" [ngClass]="{'is-invalid' : formErrors.ipsec_security_lifetime}">
+                        <div class="invalid-feedback" *ngIf="formErrors.ipsec_security_lifetime">{{formErrors.ipsec_security_lifetime}}</div>
+                      </div>
+                      <div class="form-group col-3">
+                        <label for="ipsec_hash_algorithm">IPSEC Hash Algorithm</label>
+                        <input class="form-control" id="ipsec_hash_algorithm" type="text" formControlName="ipsec_hash_algorithm">
+                      </div>
+
+                      <div class="form-group col-3">
+                        <label for="ipsec_security_protocol">IPSEC Security Protocol</label>
+                        <input class="form-control" id="ipsec_security_protocol" type="text" formControlName="ipsec_security_protocol">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+        <agent-configuration *ngSwitchCase="'agent-config'" (toggleModal)="toggleModalShow($event)"></agent-configuration>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="submitRequest()" *ngIf="selectedTab=='request-connection'">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="createRequestModalRef.hide()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

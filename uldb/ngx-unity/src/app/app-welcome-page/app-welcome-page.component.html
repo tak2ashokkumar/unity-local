@@ -1,0 +1,45 @@
+<app-main-tab [tabItems]="tabItems">
+  <ng-template>
+    <form class="form-horizontal">
+      <div class="form-group mb-0 row">
+        <div class="col col-form-label">
+          <div class="form-check form-check-inline align-middle">
+            <input class="form-check-input" id="inline-checkbox1" type="checkbox" [(ngModel)]="welcomePage"
+              [ngModelOptions]="{standalone: true}" (change)="onChangeWelcomePage()">
+            <label class="form-check-label" for="inline-checkbox1">Show&nbsp;Next&nbsp;Time</label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+</app-main-tab>
+
+<div class="container-fluid">
+  <div class="animated fadeIn">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body welcome-card-body pb-0">
+            <div class="row justify-content-around pb-3">
+              <div class="col-6 text-center">
+                <span class="text-success h2">
+                  Welcome to {{brandName}}
+                </span>
+                <p class="font-weight-normal text-center p-3">
+                  {{brandName}} is a SaaS product<span *ngIf="!userSvc.selfBrandedOrgName"> from UnityOne</span>. A Cloud Management, Monitoring and Orchestration platform.
+                  With help of {{brandName}} you can increase the utilization efficiency of your Private Cloud and as well
+                  Public Cloud instances.
+                </p>
+                <a *ngIf="!userSvc.selfBrandedOrgName" class="btn btn-outline-primary btn-pill" routerLink="/support/documentation/releases/current">Release
+                  Notes</a>
+              </div>
+            </div>
+            <!-- <div accessControl moduleName="Onboarding" accessType="View Onboarding" elementType="div-hide">
+              <asset-onboarding-status></asset-onboarding-status>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

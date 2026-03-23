@@ -1,0 +1,130 @@
+<div class="modal-header">
+  <h3 class="modal-title">
+    Create Private Cloud
+  </h3>
+</div>
+
+<div class="modal-body">
+  <form class="form-horizontal">
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">
+        Private Cloud Name
+      </label>
+      <div class="col-sm-10">
+        <input class="form-control"
+               ng-model="obj.name"
+               placeholder="Cloud 9">
+      </div>
+    </div>
+
+    <div class="form-group" >
+      <label class="col-sm-2 control-label">
+        Organization
+      </label>
+      <div class="col-sm-10">
+        <input class="form-control"
+               ng-model="obj.customer"
+               uib-typeahead="org as org.name for org in getOrgs($viewValue)">
+      </div>
+    </div>
+
+    <div class="form-group" >
+      <label class="col-sm-2 control-label">
+        Data Center
+      </label>
+      <div class="col-sm-10">
+        <input class="form-control"
+               ng-model="obj.datacenter"
+               uib-typeahead="dc as dc.name for dc in getDcs($viewValue)">
+      </div>
+    </div>
+
+    <div class="form-group" >
+      <label class="col-sm-2 control-label">
+        Platform Type
+      </label>
+      <div class="col-sm-10">
+        <select class="form-control"
+               ng-model="obj.platform_type"
+               ng-options="platform_type for platform_type in platform_types"></select>
+      </div>
+    </div>
+
+
+    <hr>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">
+        Hostname
+      </label>
+      <div class="col-sm-10">
+        <input class="form-control"
+               ng-model="obj.hostname"
+               placeholder="Ex: https://example-cloud.com">
+      </div>
+    </div>
+
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">
+        Username
+      </label>
+      <div class="col-sm-10">
+        <input class="form-control"
+               ng-model="obj.username"
+               placeholder="Username">
+      </div>
+    </div>
+
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">
+        Password
+      </label>
+      <div class="col-sm-10">
+        <input type="password" class="form-control"
+               ng-model="obj.password"
+               placeholder="Password">
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">
+        Proxy Name
+      </label>
+      <div class="col-sm-10">
+        <input class="form-control"
+               ng-model="obj.proxy_name"
+               placeholder="Proxy Name">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">
+        Proxy Hostname
+      </label>
+      <div class="col-sm-10">
+        <input class="form-control"
+               ng-model="obj.proxy_hostname"
+               placeholder="Hostname">
+      </div>
+    </div>
+
+
+    <input type="submit" style="visibility: hidden">
+  </form>
+</div>
+
+
+
+<div class="modal-footer">
+  <button class="btn btn-danger" type="button" ng-click="cancel()">
+    Cancel
+  </button>
+  <button class="btn btn-primary" type="button" ng-click="create(obj, private_clouds)">
+    Create
+  </button>
+</div>

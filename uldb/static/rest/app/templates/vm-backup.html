@@ -1,0 +1,266 @@
+<alerts></alerts>
+<div>
+  <form class="form-inline">
+    <div class="form-group leftpan">
+      <label for="orgName">Organization : </label>
+        <input id="orgName" class="form-control ticketing"
+               ng-model="org"
+               placeholder="Type org to search..."
+               uib-typeahead="org as org.name for org in getOrgs($viewValue)"
+               force-null="col.nullify">
+    </div>
+    <button type="button" class="btn btn-success ticketing" ng-click="getClouds(org)">Get Clouds</button>
+    <div class="form-group rightpan" ng-show="cloud_list_select">
+      <div class="col-sm-4"></div>
+      <div class="col-sm-4" >
+          <select ng-change="load_vm_list(cloud_list_select)" ng-options="option.long for option in cloud_list track by option.short.uuid"
+                  class="form-control ng-touched" ng-model="cloud_list_select"
+                         >
+              <option value="">-- Select Cloud --</option>
+          </select>
+      </div>
+    </div>
+  </form>
+</div>
+
+<br/>
+<br/>
+
+<span ng-if="cloud_list && !vm_snapshots && !vm_list_message">
+  <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+</span>
+<span ng-if="vm_snapshots.length == 0">
+  <h3 class="align-center">{{vm_list_message}}</h3>
+</span>
+<span ng-if="vm_snapshots.length != 0">
+    <table
+        class="table table-hover"
+        id="dataTables-example"
+        ng-model="vm_snapshots">
+        <thead>
+        <tr>
+            <th ng-repeat="row in vm_backup_headers" class="fixed_th">{{ row.title }}</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in vm_snapshots">
+                <td ng-repeat="row_data in vm_backup_headers">
+                    <span ng-if="row_data.key == 'updated_at' || row_data.key == 'backup_date'">
+                      {{ row[row_data.key]| date:'medium'}}
+                    </span>
+                    <span ng-if="row_data.key == 'size'">
+                        {{(row[row_data.key]/(1024*1024))|number: 1}}
+                    </span>
+                    <span ng-if="row_data.key == 'state' || row_data.key == 'last_known_state'">
+                      {{ row[row_data.key]| powerState}}
+                    </span>
+                    <span
+                        ng-if="row_data.key != 'updated_at' && row_data.key != 'backup_date' && row_data.key != 'openstack_actions' && row_data.key != 'size' && row_data.key != 'vmware_actions' && row_data.key != 'state' && row_data.key != 'last_known_state'">
+                      {{ row[row_data.key]}}
+                    </span>
+                    <span ng-if="row_data.key == 'openstack_actions'">
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true"
+                                  aria-expanded="false">
+                              <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu action-button">
+                              <li><a href ng-click="backupOpenStackVm(row.id, 'AWS', $index)">AWS S3 Backup</a></li>
+                              <li><a href ng-click="backupOpenStackVm(row.id, 'Azure', $index)">Azure Backup</a></li>
+                              <li><a href ng-click="backupHistory(row.id, 'OpenStack', $index)">Backup History</a></li>
+                          </ul>
+                        </div>
+                    </span>
+                    <span ng-if="row_data.key == 'vmware_actions'">
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true"
+                                  aria-expanded="false">
+                              <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu action-button">
+                              <li><a href ng-click="backupVMWareVm(row.instance_id, 'AWS', $index)">AWS S3 Backup</a></li>
+                              <li><a href ng-click="backupVMWareVm(row.instance_id, 'Azure', $index)">Azure Backup</a></li>
+                              <li><a href ng-click="backupHistory(row.id, 'VMware', $index)">Backup History</a></li>
+                          </ul>
+                        </div>
+                    </span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</span>
+
+<script type="text/ng-template" id="awsAccountSelection.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Select AWS Bucket</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="request.account_name" class="col-sm-2 control-label">
+          AWS Account
+        </label>
+        <div class="col-sm-10">
+          <select ng-change="loadAwsRegionList(request.aws_account_list)" ng-options="option.long for option in aws_account_list track by option.short" class="form-control"
+                  ng-model="request.aws_account_list" required >
+                  <option value="">-- Select aws account --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Region
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="loadAwsBucketList(request.aws_region_list)" ng-options="option.long for option in aws_region_list track by option.short" class="form-control"
+                  ng-model="request.aws_region_list" required>
+                  <option value="">-- Select Region --</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Bucket
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="" ng-options="option.long for option in aws_bucket_list track by option.short" class="form-control"
+                  ng-model="request.aws_bucket_list" required>
+                  <option value="">-- Select bucket --</option>
+          </select>
+        </div>
+      </div>
+
+
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success pull-right" type="button" ng-click="create(request)">
+      Create
+    </button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="azureAccountSelection.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Select Azure Bucket</h3>
+  </div>
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="request.account_name" class="col-sm-2 control-label">
+          Azure Account
+        </label>
+        <div class="col-sm-10">
+              <select  ng-change="loadAzureResourceList(request.azure_account_list)"  ng-options="option.long for option in azure_account_list track by option.short" class="form-control" ng-model="request.azure_account_list" required>
+                  <option value="">-- Select azure account --</option>
+              </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Resource group
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="loadAzureStorageList(request.azure_resource_list)" ng-options="option.long for option in azure_resource_list track by option.short" class="form-control"
+                  ng-model="request.azure_resource_list" required>
+                  <option value="">-- Select resource group --</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Storage Account
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-change="loadAzureContainerList(request.azure_storage_list)" ng-options="option.long for option in azure_storage_list track by option.short" class="form-control"
+                  ng-model="request.azure_storage_list" required>
+                  <option value="">-- Select storage account --</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="request.ram_size" class="col-sm-2 control-label">
+          Container
+        </label>
+
+        <div class="col-sm-10">
+          <select ng-options="option.long for option in azure_container_list track by option.short" class="form-control"
+                  ng-model="request.azure_container_list" required>
+                  <option value="">-- Select container account --</option>
+          </select>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Cancel
+    </button>
+    <button class="btn btn-success pull-right" type="button" ng-click="create(request)">
+      Create
+    </button>
+  </div>
+</script>
+
+<script type="text/ng-template" id="backupHistory.html">
+  <div class="modal-header">
+    <h3 class="modal-title">Backup History</h3>
+  </div>
+  <div class="modal-body">
+    <span ng-if="!backup_history">
+        <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+    </span>
+    <div class="row">
+      <table class="table">
+        <thead>
+        <tr ng-if="backup_history.length!==0">
+          <th>File Name</th>
+          <th>Backup Date</th>
+          <th>Target Type</th>
+          <th>Target Account Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="d in backup_history">
+          <td>{{ d.file_name }}</td>
+          <td>{{ d.backup_date | date : 'medium' }}</td>
+          <td>{{ d.target_type }}</td>
+          <td>
+            <span ng-if="d.target_type == 'Azure'">{{ d.azure_account__account_name }}</span>
+            <span ng-if="d.target_type == 'AWS'">{{ d.aws_account__aws_user }}</span>
+          </td>
+        </tr>
+        <tr ng-if="backup_history.length===0">
+          <h3 class="align-center">{{backup_history_message}}</h3>
+        </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger pull-left" type="button" ng-click="cancel()">
+      Ok
+    </button>
+  </div>
+</script>

@@ -1,0 +1,89 @@
+[
+    {
+        "uuid": "66a1d006-d4b1-489a-9230-63bd868279aa",
+        "network_topology": {
+            "nodes": [
+                {
+                    "id": 0,
+                    "hostname": "Aerys",
+                    "device_type": "organization",
+                    "onboarded": false
+                },
+                {
+                    "id": 1,
+                    "hostname": "Private Cloud 1",
+                    "device_type": "private_cloud",
+                    "onboarded": false
+                },
+                {
+                    "id": 2,
+                    "hostname": "Private Cloud 2",
+                    "device_type": "private_cloud",
+                    "onboarded": false
+                },
+                {
+                    "id": 3,
+                    "hostname": "Private Cloud 3",
+                    "device_type": "private_cloud",
+                    "onboarded": false
+                },
+                {
+                    "id": 4,
+                    "hostname": "Private Cloud 4",
+                    "device_type": "private_cloud",
+                    "onboarded": false
+                },
+                {
+                    "id": 5,
+                    "hostname": "Private Cloud 5",
+                    "device_type": "private_cloud",
+                    "onboarded": false
+                },
+                {
+                    "id": 6,
+                    "hostname": "Private Cloud 6",
+                    "device_type": "private_cloud",
+                    "onboarded": false
+                }
+            ],
+            "links": [
+                {
+                    "source_id": 0,
+                    "source_hostname": "Aerys",
+                    "target_id": 1,
+                    "target_hostname": "Private Cloud 1"
+                },
+                {
+                    "source_id": 0,
+                    "source_hostname": "Aerys",
+                    "target_id": 2,
+                    "target_hostname": "Private Cloud 2"
+                },
+                {
+                    "source_id": 0,
+                    "source_hostname": "Aerys",
+                    "target_id": 3,
+                    "target_hostname": "Private Cloud 3"
+                },
+                {
+                    "source_id": 0,
+                    "source_hostname": "Aerys",
+                    "target_id": 4,
+                    "target_hostname": "Private Cloud 4"
+                },
+                {
+                    "source_id": 0,
+                    "source_hostname": "Aerys",
+                    "target_id": 5,
+                    "target_hostname": "Private Cloud 5"
+                },
+                {
+                    "source_id": 0,
+                    "source_hostname": "Aerys",
+                    "target_id": 6,
+                    "target_hostname": "Private Cloud 6"
+                }
+            ]
+        }
+    }
+]

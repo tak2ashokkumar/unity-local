@@ -1,0 +1,8 @@
+.custom-blockquote-footer{
+    font-size: 100%;
+    color: inherit;
+}
+
+.custom-blockquote-footer::before {
+    content: "\2014\00A0";
+}

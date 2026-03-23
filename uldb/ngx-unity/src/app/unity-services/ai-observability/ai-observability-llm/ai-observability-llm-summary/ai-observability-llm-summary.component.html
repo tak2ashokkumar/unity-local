@@ -1,0 +1,249 @@
+<div class="d-flex justify-content-end move-dropdowns-up-end-of-top-tabs">
+    <div class="w-16">
+        <multiselect-dropdown class="form-control px-0 py-1" [options]="llmList" [settings]="llmSettings"
+            [texts]="llmTexts" (dropdownClosed)="onLlmFilterChange()"
+            [(ngModel)]="dropdownsViewData.selectedLlmValue"></multiselect-dropdown>
+    </div>
+    <div>
+        <custom-date-dropdown [options]="durationDropdownViewData.dropdownOptions" [enableCustomDateRange]="true"
+            [default]="durationDropdownViewData.defaultSelected" (onSubmit)="ondurationDropdownChanged($event)">
+        </custom-date-dropdown>
+    </div>
+    <div style="padding-top: 0.2rem;">
+        <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col pr-1">
+        <div class="card round-edge mb-0">
+            <app-spinner [name]="llmSummaryWidgetData.totalRequestLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Total Requests</div>
+                <div class="d-flex align-items-center mt-1">
+                    <div class="font-500 text-primary font-lg-xl ml-1">
+                        {{llmSummaryWidgetData?.totalRequest?.currentTotal || 0 }}
+                    </div>
+                    <div class="d-flex align-items-center ml-2"
+                        [ngClass]="llmSummaryWidgetData?.totalRequest?.changePercentTextClass || 'text-success'">
+                        <i class="fas mt-1 font-sm"
+                            [ngClass]="llmSummaryWidgetData?.totalRequest?.changePercentIconClass || 'fa-caret-up'"></i>
+                        <span class="ml-1 font-xs-sm">{{llmSummaryWidgetData?.totalRequest?.changePercent || 0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col px-1">
+        <div class="card round-edge mb-0">
+            <app-spinner [name]="llmSummaryWidgetData.avgRequestDurationLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Avg Request Duration</div>
+                <div class="d-flex align-items-center mt-1">
+                    <div class="font-500 text-primary font-lg-xl ml-1">
+                        {{llmSummaryWidgetData?.avgRequestDuration?.currentAverage || 0}}</div>
+                    <div class="d-flex align-items-center ml-2"
+                        [ngClass]="llmSummaryWidgetData?.avgRequestDuration?.changePercentTextClass || 'text-success'">
+                        <i class="fas font-sm"
+                            [ngClass]="llmSummaryWidgetData?.avgRequestDuration?.changePercentIconClass || 'fa-caret-up'"></i>
+                        <span class="ml-1 font-xs-sm">{{llmSummaryWidgetData?.avgRequestDuration?.changePercent ||
+                            0}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col px-1">
+        <div class="card round-edge mb-0">
+            <app-spinner [name]="llmSummaryWidgetData.avgTokensPerRequestLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Avg Tokens per Request</div>
+                <div class="d-flex align-items-center mt-1">
+                    <div class="font-500 text-primary font-lg-xl ml-1">
+                        {{llmSummaryWidgetData?.avgTokensPerRequest?.currentAverage || 0}}</div>
+                    <div class="d-flex align-items-center ml-2"
+                        [ngClass]="llmSummaryWidgetData?.avgTokensPerRequest?.changePercentTextClass || 'text-success'">
+                        <i class="fas mt-1 font-sm"
+                            [ngClass]="llmSummaryWidgetData?.avgTokensPerRequest?.changePercentIconClass || 'fa-caret-up'"></i>
+                        <span class="ml-1 font-xs-sm">{{llmSummaryWidgetData?.avgTokensPerRequest?.changePercent ||
+                            0}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col px-1">
+        <div class="card round-edge mb-0">
+            <app-spinner [name]="llmSummaryWidgetData.totalCostLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Total Cost</div>
+                <div class="d-flex align-items-center mt-1">
+                    <div class="font-500 text-primary font-lg-xl ml-1">
+                        {{llmSummaryWidgetData?.totalCost?.currentTotal || 0}}</div>
+                    <div class="d-flex align-items-center ml-2"
+                        [ngClass]="llmSummaryWidgetData?.totalCost?.changePercentTextClass || 'text-success'">
+                        <i class="fas font-sm"
+                            [ngClass]="llmSummaryWidgetData?.totalCost?.changePercentIconClass || 'fa-caret-up'"></i>
+                        <span class="ml-1 font-xs-sm">{{llmSummaryWidgetData?.totalCost?.changePercent || 0}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col pl-1">
+        <div class="card round-edge mb-0">
+            <app-spinner [name]="llmSummaryWidgetData.avgCostPerRequestLoader"></app-spinner>
+            <div class="card-body p-2">
+                <div class="font-lg ml-1">Avg Cost per Request</div>
+                <div class="d-flex align-items-center mt-1">
+                    <div class="font-500 text-primary font-lg-xl ml-1">
+                        {{llmSummaryWidgetData?.avgCostPerRequest?.currentAverage || 0}}</div>
+                    <div class="d-flex align-items-center ml-2"
+                        [ngClass]="llmSummaryWidgetData?.avgCostPerRequest?.changePercentTextClass || 'text-success'">
+                        <i class="fas font-sm"
+                            [ngClass]="llmSummaryWidgetData?.avgCostPerRequest?.changePercentIconClass || 'fa-caret-up'"></i>
+                        <span class="ml-1 font-xs-sm">{{llmSummaryWidgetData?.avgCostPerRequest?.changePercent ||
+                            0}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row my-2 section-2">
+    <div class="col-12 d-flex flex-column pr-2">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="requestsByTimeWidgetData.loader"></app-spinner>
+            <div class="card-body"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!requestsByTimeWidgetData?.chartData}">
+                <ng-container *ngIf="requestsByTimeWidgetData?.chartData">
+                    <div echarts [options]="requestsByTimeWidgetData?.chartData.options"
+                        [extentions]="requestsByTimeWidgetData?.chartData.extensions" [defaultHeight]="200"></div>
+                </ng-container>
+                <div *ngIf="!requestsByTimeWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row my-2 section-3">
+    <div class="col-3 d-flex flex-column pr-2">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="generationByCategoryWidgetData.loader"></app-spinner>
+            <div class="card-body p-2"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!generationByCategoryWidgetData?.chartData}">
+                <ng-container *ngIf="generationByCategoryWidgetData?.chartData">
+                    <div echarts [options]="generationByCategoryWidgetData?.chartData.options"
+                        [extentions]="generationByCategoryWidgetData?.chartData.extensions" [defaultHeight]="280"></div>
+                </ng-container>
+                <div *ngIf="!generationByCategoryWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 d-flex flex-column pl-0 pr-2">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="generationByProviderWidgetData.loader"></app-spinner>
+            <div class="card-body p-2"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!generationByProviderWidgetData?.chartData}">
+                <ng-container *ngIf="generationByProviderWidgetData?.chartData">
+                    <div echarts [options]="generationByProviderWidgetData?.chartData.options"
+                        [extentions]="generationByProviderWidgetData?.chartData.extensions" [defaultHeight]="280"></div>
+                </ng-container>
+                <div *ngIf="!generationByCategoryWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 d-flex flex-column pl-0">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="costByEnvironmentWidgetData.loader"></app-spinner>
+            <div class="card-body p-2"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!costByEnvironmentWidgetData?.chartData}">
+                <ng-container *ngIf="costByEnvironmentWidgetData?.chartData">
+                    <div echarts [options]="costByEnvironmentWidgetData?.chartData.options"
+                        [extentions]="costByEnvironmentWidgetData?.chartData.extensions" [defaultHeight]="280">
+                    </div>
+                </ng-container>
+                <div *ngIf="!costByEnvironmentWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3 d-flex flex-column pl-0">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="costByApplicationWidgetData.loader"></app-spinner>
+            <div class="card-body p-2"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!costByApplicationWidgetData?.chartData}">
+                <ng-container *ngIf="costByApplicationWidgetData?.chartData">
+                    <div echarts [options]="costByApplicationWidgetData?.chartData.options"
+                        [extentions]="costByApplicationWidgetData?.chartData.extensions" [defaultHeight]="280">
+                    </div>
+                </ng-container>
+                <div *ngIf="!costByApplicationWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2 section-4">
+    <div class="col-3 d-flex flex-column align-items-stretch pr-2">
+        <div class="card round-edge flex-fill mb-2">
+            <app-spinner [name]="avgTokensSummaryWidgetData.AvgPromptTokensLoader"></app-spinner>
+            <div class="card-body d-flex flex-column justify-content-around">
+                <div class="font-lg-xl">Avg prompt tokens/requests</div>
+                <div class="font-xl text-primary">{{avgTokensSummaryWidgetData?.AvgPromptTokens || 0}}</div>
+            </div>
+        </div>
+        <div class="card round-edge flex-fill mb-0">
+            <app-spinner [name]="avgTokensSummaryWidgetData.AvgCompletionTokensLoader"></app-spinner>
+            <div class="card-body d-flex flex-column justify-content-around">
+                <div class="font-lg-xl">Avg completion tokens/requests</div>
+                <div class="font-xl text-primary">{{avgTokensSummaryWidgetData?.AvgCompletionTokens || 0}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-9 pl-0">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="tokensUsageWidgetData.loader"></app-spinner>
+            <div class="card-body pt-2 pb-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!tokensUsageWidgetData?.chartData}">
+                <ng-container *ngIf="tokensUsageWidgetData?.chartData">
+                    <div echarts [options]="tokensUsageWidgetData?.chartData.options"
+                        [extentions]="tokensUsageWidgetData?.chartData.extensions" [defaultHeight]="200">
+                    </div>
+                </ng-container>
+                <div *ngIf="!tokensUsageWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-2 section-5">
+    <div class="col-5 pr-2">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="topAIModelsWidgetData.loader"></app-spinner>
+            <div class="card-body pt-2 pb-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!topAIModelsWidgetData?.chartData}">
+                <ng-container *ngIf="topAIModelsWidgetData?.chartData">
+                    <div echarts [options]="topAIModelsWidgetData?.chartData.options"
+                        [extentions]="topAIModelsWidgetData?.chartData.extensions" [defaultHeight]="200">
+                    </div>
+                </ng-container>
+                <div *ngIf="!topAIModelsWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-7 pl-0">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="modelsByTimeWidgetData.loader"></app-spinner>
+            <div class="card-body"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!modelsByTimeWidgetData?.chartData}">
+                <ng-container *ngIf="modelsByTimeWidgetData?.chartData">
+                    <div echarts [options]="modelsByTimeWidgetData?.chartData.options"
+                        [extentions]="modelsByTimeWidgetData?.chartData.extensions" [defaultHeight]="200"></div>
+                </ng-container>
+                <div *ngIf="!modelsByTimeWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>

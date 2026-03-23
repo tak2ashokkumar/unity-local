@@ -1,0 +1,138 @@
+<div class="row">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card rounded-0">
+                <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span> Details</span>
+                    </div>
+                    <div class="w-25">
+                        <!-- <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1"
+                            (click)="manageDetailsForm()" [tooltip]="'Edit'" container="body" accessControl
+                            moduleName="Monitoring" accessType="Manage Monitoring" elementType="actionbtn"></button> -->
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row text-right">
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="name" class="col-3 h-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="detailFormErrors.name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                        {{detailFormErrors.name}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="service-type" class="col-3 h-form-label">Service Type</label>
+                                <div class="col-9">
+                                    <input id="service-type" class="form-control" type="text"
+                                        formControlName="service_type"
+                                        [class.is-invalid]="detailFormErrors.service_type">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.service_type">
+                                        {{detailFormErrors.service_type}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="db-collection-names" class="col-3 h-form-label">DB Collection Names</label>
+                                <div class="col-9">
+                                    <input id="db-collection-names" class="form-control" type="text" formControlName="db_collection_names"
+                                        [class.is-invalid]="detailFormErrors.db_collection_names">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.db_collection_names">
+                                        {{detailFormErrors.db_collection_names}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="db-operation-names" class="col-3 h-form-label">DB Operation Names</label>
+                                <div class="col-9">
+                                    <input id="db-operation-names" class="form-control" type="text" formControlName="db_operation_names"
+                                        [class.is-invalid]="detailFormErrors.db_operation_names">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.db_operation_names">
+                                        {{detailFormErrors.db_operation_names}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="vector-db-types" class="col-3 h-form-label">Vector DB Types</label>
+                                <div class="col-9">
+                                    <input id="vector-db-types" class="form-control" type="text" formControlName="vector_db_types"
+                                        [class.is-invalid]="detailFormErrors.vector_db_types">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.vector_db_types">
+                                        {{detailFormErrors.vector_db_types}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="total-db-vector-count" class="col-3 h-form-label">Total DB Vector Count</label>
+                                <div class="col-9">
+                                    <input id="total-db-vector-count" class="form-control" type="text" formControlName="total_db_vector_count"
+                                        [class.is-invalid]="detailFormErrors.total_db_vector_count">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.total_db_vector_count">
+                                        {{detailFormErrors.total_db_vector_count}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="server-addresses" class="col-3 h-form-label">Server Addresses</label>
+                                <div class="col-9">
+                                    <input id="server-addresses" class="form-control" type="text" formControlName="server_addresses"
+                                        [class.is-invalid]="detailFormErrors.server_addresses">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.server_addresses">
+                                        {{detailFormErrors.server_addresses}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="server-ports" class="col-3 h-form-label">Server Ports</label>
+                                <div class="col-9">
+                                    <input id="server-ports" class="form-control" type="text" formControlName="server_ports"
+                                        [class.is-invalid]="detailFormErrors.server_ports">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.server_ports">
+                                        {{detailFormErrors.server_ports}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="created-at" class="col-3 h-form-label">Created At</label>
+                                <div class="col-9">
+                                    <input id="created-at" class="form-control" type="text" formControlName="created_at"
+                                        [class.is-invalid]="detailFormErrors.created_at" formControlNameDateFormatter>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.created_at">
+                                        {{detailFormErrors.created_at}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="row">
+                                <label for="updated-at" class="col-3 h-form-label">Updated At</label>
+                                <div class="col-9">
+                                    <input id="updated-at" class="form-control" type="text"
+                                        formControlName="updated_at"
+                                        [class.is-invalid]="detailFormErrors.updated_at" formControlNameDateFormatter>
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.updated_at">
+                                        {{detailFormErrors.updated_at}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="col-12 text-center">
+                            <button type="button" class="btn btn-primary" (click)="submitDetailForm()">Update</button>
+                            <button type="button" class="btn btn-danger ml-2" (click)="buildDetailForm()">Reset</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

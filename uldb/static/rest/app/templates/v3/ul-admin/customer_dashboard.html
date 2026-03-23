@@ -1,0 +1,39 @@
+<div class="row dashboard-admin">
+    <div class="col-xs-12">
+        <div class="pull-right">
+            <a href="javascript:history.go(0)">
+                <i class="fa refresh-dashboard fa-refresh" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+    <!-- <div class="col-xs-12">
+        <input type="text" id="orgName" class="form-control mb-5" ng-model="server.customer"
+        placeholder="Type customer to filter...">
+    </div> -->
+    <div class="col-md-5">
+        <div class="dashboard-map">
+            <customermapview map="map" map_markers="map_markers" polylines="polylines"></customermapview>
+        </div>
+        <customerdashboardwidgets></customerdashboardwidgets>
+        <datacenter></datacenter>
+    </div>
+    <div class="col-md-7">
+        <maintenancedashboard
+            heading="MAINTENANCE SCHEDULES (TOP 10)"
+            headers="ms_headers"
+            addbutton="ms_add"
+            tabledata="ms_content.data.info">
+        </maintenancedashboard>
+        <zendesktickets
+            heading="TICKETS  - Latest 10"
+            headers="tickets_headers" ,
+            tabledata="tickets_content.data.info">
+        </zendesktickets>
+        <generic-panel heading="ALERTS">
+          <panel-body>
+            <nested-model-results model="nagios_model" ctrl="nagios_ctrl" config="nagios_ctrl_config"></nested-model-results>
+          </panel-body>
+          <panel-footer></panel-footer>
+        </generic-panel>
+    </div>
+</div>

@@ -1,0 +1,85 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-0 border-bottom-0">
+            <div class="card-header border-0 pl-1 pr-0">
+                <form class="form-inline" [formGroup]="filterForm" *ngIf="filterForm">
+                    <div class="row w-100">
+                        <div class="form-group col-3">
+                            <multiselect-dropdown [options]="graphList" [settings]="mySettings"
+                                class="form-control p-0 w-100" style="height:auto;" formControlName="graph_list"
+                                [ngClass]="{'is-invalid' : formErrors.graph_list}"></multiselect-dropdown>
+                            <div class="invalid-feedback" *ngIf="formErrors.graph_list">{{formErrors.graph_list}}</div>
+                        </div>
+                        <div class="form-group col-2">
+                            <select class="form-control w-100" formControlName="period"
+                                [class.is-invalid]="formErrors.period">
+                                <option [value]="graphRange.LAST_24_HOURS">Last 24 Hours</option>
+                                <option [value]="graphRange.YESTERDAY">Yesterday</option>
+                                <option [value]="graphRange.LAST_WEEK">Last Week</option>
+                                <option [value]="graphRange.LAST_MONTH">Last Month</option>
+                                <option [value]="graphRange.LAST_YEAR">Last Year</option>
+                                <option [value]="graphRange.CUSTOM">Custom</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.period">{{formErrors.period}}</div>
+                        </div>
+                        <div class="col-3">
+                            <div class="input-group">
+                                <label for="from">From :&nbsp;</label>
+                                <owl-date-time #from [hour12Timer]="true"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="from"
+                                    [owlDateTimeTrigger]="from" [owlDateTime]="from" type="text" name="from"
+                                    placeholder="from" [max]="now">
+                                <div class="input-group-append " [owlDateTimeTrigger]="from">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="input-group">
+                                <label for="to">To :&nbsp;</label>
+                                <owl-date-time #to [hour12Timer]="true"></owl-date-time>
+                                <input class="form-control rounded-left" formControlName="to" [owlDateTimeTrigger]="to"
+                                    [owlDateTime]="to" type="text" name="to" placeholder="to"
+                                    [min]="filterForm.controls.from.value" [max]="now">
+                                <div class="input-group-append " [owlDateTimeTrigger]="to">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-1 pr-0">
+                            <button class="btn btn-warning btn-pill pull-left" [disabled]="filterForm.invalid" (click)="onSubmit()">Update</button>
+                        </div>
+                    </div>
+                    <div class="row w-100 offset-6 invalid-credentials" *ngIf="filterForm.errors && filterForm.errors.fromSameAsOrAfterTo">
+                        Start date and time should be less than end date and time
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card border-0 rounded-0 graph-card">
+            <!-- <app-spinner [name]="view.graphid"></app-spinner> -->
+            <div class="card-body">
+                <!-- <h5 class="card-title text-warning">{{view.name}}</h5>
+                <div class="row">
+                    <img class="img-fluid pointer-link" *ngIf="view.image" [src]="'data:image/png;base64,'+view.image">
+                </div> -->
+                <div *ngFor="let chart of chartConfigs" class="mb-5">
+                    <div echarts [options]="chart.options" [style.height]="'400px'">
+                    </div>
+                </div>
+                <div *ngIf="!chatConfigLength" class="d-flex align-items-center justify-content-center" style="min-height: 250px">No Graphs Available.</div>
+            </div>
+        </div>
+        <!-- <div class="card border-0 rounded-0 graph-card" *ngIf="!viewData.length">
+            <div class="card-body">
+                <coming-soon [message]="'No graphs were found'"></coming-soon>
+            </div>
+        </div> -->
+    </div>
+</div>

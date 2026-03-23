@@ -1,0 +1,1125 @@
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card text-center" *ngIf="viewData.dcs.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.dcs?.length}}</span>
+                    <span class="ml-1 font-lg">Datacenters</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Location</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let dc of viewData.dcs; let i = index">
+                                <td>
+                                    <div>{{dc.name}}</div>
+                                </td>
+                                <td>
+                                    <div>{{dc.location}}</div>
+                                </td>
+                                <td>
+                                    <div>{{dc.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(dc.name, dc.unique_id, dc.uuid, 'Datacenters', dc.onboarding_status)"
+                                        *ngIf="dc.onboarding_status!='Onboarded'" [tooltip]="'Delete'" container="body"
+                                        accessControl moduleName="Datacenter" accessType="Manage Datacenter"
+                                        elementType="formelem">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="dc.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.cabinets.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.cabinets?.length}}</span>
+                    <span class="ml-1 font-lg">Cabinets</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Datacenter</th>
+                                <th>Size</th>
+                                <th>Model</th>
+                                <th>Contract Start Date</th>
+                                <th>Contract End Date</th>
+                                <th>Renewal</th>
+                                <th>Annual Escalation</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let cabinet of viewData.cabinets; let i = index">
+                                <td>
+                                    <div>{{cabinet.name}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.datacenter}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.size}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.model}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.contract_start_date}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.contract_end_date}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.renewal}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.annual_escalation}}</div>
+                                </td>
+                                <td>
+                                    <div>{{cabinet.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(cabinet.name, cabinet.unique_id, cabinet.uuid, 'Cabinets', cabinet.onboarding_status)"
+                                        *ngIf="cabinet.onboarding_status!='Onboarded'" [tooltip]="'Delete'"
+                                        container="body" accessControl moduleName="Datacenter"
+                                        accessType="Manage Datacenter" elementType="formelem">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="cabinet.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.firewalls.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.firewalls?.length}}</span>
+                    <span class="ml-1 font-lg">Firewalls</span>
+                </div>
+            </div>
+            <div class="card-body border-bottom p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Cabinet</th>
+                                <th>Position</th>
+                                <th>Size</th>
+                                <th>Cloud</th>
+                                <th>Asset Tag</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let firewall of viewData.firewalls; let i = index">
+                                <td>
+                                    <div>
+                                        {{firewall.name}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.management_ip}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.manufacturer}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.model}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.cabinet}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.position}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.size}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.cloud}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{firewall.asset_tag}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>{{firewall.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{firewall.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(firewall.name, firewall.unique_id, firewall.uuid, 'Firewalls', firewall.onboarding_status)"
+                                        *ngIf="firewall.onboarding_status!='Onboarded'" [tooltip]="'Delete'"
+                                        container="body" accessControl moduleName="Onboarding"
+                                        accessType="Manage Onboarding" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="firewall.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.switches.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.switches?.length}}</span>
+                    <span class="ml-1 font-lg">Switches</span>
+                </div>
+            </div>
+            <div class="card-body border-bottom p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Cabinet</th>
+                                <th>Position</th>
+                                <th>Size</th>
+                                <th>Cloud</th>
+                                <th>Asset Tag</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let sw of viewData.switches; let i = index">
+                                <td>
+                                    <div>
+                                        {{sw.name}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.management_ip}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.manufacturer}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.model}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.cabinet}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.position}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.size}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.cloud}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{sw.asset_tag}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>{{sw.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{sw.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(sw.name, sw.unique_id, sw.uuid, 'Switches', sw.onboarding_status)"
+                                        *ngIf="sw.onboarding_status!='Onboarded'" [tooltip]="'Delete'" container="body"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="sw.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.lbs.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.lbs?.length}}</span>
+                    <span class="ml-1 font-lg">Load Balancers</span>
+                </div>
+            </div>
+            <div class="card-body border-bottom p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Cabinet</th>
+                                <th>Position</th>
+                                <th>Size</th>
+                                <th>Cloud</th>
+                                <th>Asset Tag</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let lb of viewData.lbs; let i = index">
+                                <td>
+                                    <div>
+                                        {{lb.name}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.management_ip}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.manufacturer}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.model}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.cabinet}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.position}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.size}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.cloud}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{lb.asset_tag}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>{{lb.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{lb.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(lb.name, lb.unique_id, lb.uuid, 'Load_Balancers', lb.onboarding_status)"
+                                        *ngIf="lb.onboarding_status!='Onboarded'" [tooltip]="'Delete'" container="body"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="lb.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.bms.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.bms?.length}}</span>
+                    <span class="ml-1 font-lg">Bare Metals</span>
+                </div>
+            </div>
+            <div class="card-body border-bottom p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Cabinet</th>
+                                <th>Position</th>
+                                <th>Size</th>
+                                <th>Cloud</th>
+                                <th>CPUs</th>
+                                <th>Cores</th>
+                                <th>Memory</th>
+                                <th>Capacity</th>
+                                <th>OS</th>
+                                <th>Asset Tag</th>
+                                <th>BMC Type</th>
+                                <th>Version</th>
+                                <th>IP</th>
+                                <th>Proxy URL</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let bm of viewData.bms; let i = index">
+                                <td>
+                                    <div>
+                                        {{bm.name}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.management_ip}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.manufacturer}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.model}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.cabinet}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.position}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.size}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.cloud}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.num_cpus}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.num_cores}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.memory_mb}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.capacity_gb}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.os}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.asset_tag}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.bmc_type}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.version}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.ip}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.proxy_url}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.username}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{bm.password}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>{{bm.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{bm.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(bm.name, bm.unique_id, bm.uuid, 'Bare_Metals', bm.onboarding_status)"
+                                        *ngIf="bm.onboarding_status!='Onboarded'" [tooltip]="'Delete'" container="body"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="bm.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.hypervisors.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.hypervisors?.length}}</span>
+                    <span class="ml-1 font-lg">Hypervisors</span>
+                </div>
+            </div>
+            <div class="card-body border-bottom p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Cabinet</th>
+                                <th>Position</th>
+                                <th>Size</th>
+                                <th>Cloud</th>
+                                <th>CPUs</th>
+                                <th>Cores</th>
+                                <th>Memory</th>
+                                <th>Capacity</th>
+                                <th>OS</th>
+                                <th>Asset Tag</th>
+                                <th>Virtualization Type</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let hyp of viewData.hypervisors; let i = index">
+                                <td>
+                                    <div>
+                                        {{hyp.name}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.management_ip}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.manufacturer}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.model}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.cabinet}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.position}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.size}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.private_cloud}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.num_cpus}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.num_cores}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.memory_mb}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.capacity_gb}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.os}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.asset_tag}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        {{hyp.virtualization_type}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>{{hyp.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{hyp.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(hyp.name, hyp.unique_id, hyp.uuid, 'Hypervisors', hyp.onboarding_status)"
+                                        *ngIf="hyp.onboarding_status!='Onboarded'" [tooltip]="'Delete'" container="body"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="hyp.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.pdus.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.pdus?.length}}</span>
+                    <span class="ml-1 font-lg">PDUs</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Model</th>
+                                <th>PDU Type</th>
+                                <th>Power Circuit</th>
+                                <th>Sockets</th>
+                                <th>Cabinet</th>
+                                <th>Position</th>
+                                <th>Size</th>
+                                <th>Asset Tag</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let pdu of viewData.pdus; let i = index">
+                                <td>
+                                    <div>{{pdu.name}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.ip_address}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.model}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.pdu_type}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.power_circuit}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.sockets}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.cabinet}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.position}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.size}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.asset_tag}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{pdu.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(pdu.name, pdu.unique_id, pdu.uuid, 'PDUs', pdu.onboarding_status)"
+                                        *ngIf="pdu.onboarding_status!='Onboarded'" [tooltip]="'Delete'" container="body"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="pdu.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.storage.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.storage?.length}}</span>
+                    <span class="ml-1 font-lg">Storage Devices</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Cabinet</th>
+                                <th>Position</th>
+                                <th>Size</th>
+                                <th>Cloud</th>
+                                <th>OS</th>
+                                <th>Asset Tag</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let storage of viewData.storage; let i = index">
+                                <td>
+                                    <div>{{storage.name}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.management_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.manufacturer}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.model}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.cabinet}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.position}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.size}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.private_cloud}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.os}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.asset_tag}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{storage.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(storage.name, storage.unique_id, storage.uuid, 'Storage', storage.onboarding_status)"
+                                        *ngIf="storage.onboarding_status!='Onboarded'" [tooltip]="'Delete'"
+                                        container="body" accessControl moduleName="Onboarding"
+                                        accessType="Manage Onboarding" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="storage.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.mobiles.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.mobiles?.length}}</span>
+                    <span class="ml-1 font-lg">Mobile Devices</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Serial Number</th>
+                                <th>Model</th>
+                                <th>IP Address</th>
+                                <th>Platform</th>
+                                <th>Device Type</th>
+                                <th>Tagged Device</th>
+                                <!-- <th>SNMP IP</th> -->
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let mobile of viewData.mobiles; let i = index">
+                                <td>
+                                    <div>{{mobile.name}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mobile.serial_number}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mobile.model}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mobile.ip_address}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mobile.platform}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mobile.device_type}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mobile.tagged_device}}</div>
+                                </td>
+                                <!-- <td>
+                                    <div>{{mobile.snmp_ip}}</div>
+                                </td> -->
+                                <td>
+                                    <div>{{mobile.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(mobile.name, mobile.unique_id, mobile.uuid, 'Mobile_Devices', mobile.onboarding_status)"
+                                        *ngIf="mobile.onboarding_status!='Onboarded'" [tooltip]="'Delete'"
+                                        container="body" accessControl moduleName="Onboarding"
+                                        accessType="Manage Onboarding" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="mobile.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.database.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.database?.length}}</span>
+                    <span class="ml-1 font-lg">Databases</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Type</th>
+                                <th>Port</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let database of viewData.database; let i = index">
+                                <td>
+                                    <div>{{database.name}}</div>
+                                </td>
+                                <td>
+                                    <div>{{database.management_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{database.db_type}}</div>
+                                </td>
+                                <td>
+                                    <div>{{database.port}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(database.name, database.unique_id, database.uuid, 'Databases', database.onboarding_status)"
+                                        *ngIf="database.onboarding_status!='Onboarded'" [tooltip]="'Delete'"
+                                        container="body" accessControl moduleName="Onboarding"
+                                        accessType="Manage Onboarding" elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="database.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card text-center" *ngIf="viewData.mac.length">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{viewData?.mac?.length}}</span>
+                    <span class="ml-1 font-lg">Mac Devices</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Management IP</th>
+                                <th>Manufacturer</th>
+                                <th>Model</th>
+                                <th>Cabinet</th>
+                                <th>Cloud</th>
+                                <th>CPUs</th>
+                                <th>Cores</th>
+                                <th>Memory</th>
+                                <th>Capacity</th>
+                                <th>OS</th>
+                                <th>Serial number</th>
+                                <th>Asset Tag</th>
+                                <th>SNMP IP</th>
+                                <th>File Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let mc of viewData.mac; let i = index">
+                                <td>
+                                    <div>{{mc.name}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.management_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.manufacturer}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.model}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.cabinet}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.private_cloud}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.num_cpus}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.num_cores}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.memory_mb}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.capacity_gb}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.os}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.serial_number}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.asset_tag}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.snmp_ip}}</div>
+                                </td>
+                                <td>
+                                    <div>{{mc.file_name}}</div>
+                                </td>
+                                <td>
+                                    <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1"
+                                        (click)="deleteDevice(mc.name, mc.unique_id, mc.uuid, 'MAC_Mini', mc.onboarding_status)"
+                                        *ngIf="mc.onboarding_status!='Onboarded'" [tooltip]="'Delete'" container="body"
+                                        accessControl moduleName="Onboarding" accessType="Manage Onboarding"
+                                        elementType="actionbtn">
+                                    </button>
+                                    <button class="action-icons mb-0 fa fa-check font-sm ml-1"
+                                        *ngIf="mc.onboarding_status=='Onboarded'" [tooltip]="'Already Onboarded'"
+                                        container="body">
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12" *ngIf="!viewData.total">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="text-center text-muted py-4">No devices available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 mb-3">
+        <excel-on-boarding-next-prev></excel-on-boarding-next-prev>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {{selectedDevice.name}} will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

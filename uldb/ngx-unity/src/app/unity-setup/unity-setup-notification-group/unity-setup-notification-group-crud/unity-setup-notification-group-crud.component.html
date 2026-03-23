@@ -1,0 +1,367 @@
+<div class="container-fluid mt-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12 ">
+                <div class="card round-edge mb-0">
+                    <div class="card-header bg-white">
+                        <span class="font-lg font-weight-bold">{{addEdit}} Group Notification</span>
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back"
+                            (click)="goBack()"><i class="fa fa-arrow-left"></i></button>
+                    </div>
+
+                    <div class="card-body">
+                        <form *ngIf="createForm" [formGroup]="createForm">
+                            <div class="col-12 form-group d-flex">
+                                <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                            </div>
+                            <div class="col-12 form-group d-flex">
+                                <label class="col-2 col-form-label text-right">Group Name<em>*</em></label>
+                                <div class="col-4">
+                                    <input id="group_name" class="form-control" type="text" formControlName="group_name"
+                                        placeholder="Type Name"
+                                        [ngClass]="{'is-invalid' : createFormErrors.group_name}">
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.group_name">
+                                        {{createFormErrors.group_name}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 form-group d-flex">
+                                <label class="col-2 col-form-label text-right">Mode<em>*</em></label>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="modeOptions" [settings]="modeSettings"
+                                        class="form-control p-0" style="height:auto;" formControlName="mode"
+                                        [ngClass]="{'is-invalid' : createFormErrors.mode}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.mode">
+                                        {{createFormErrors.mode}}</div>
+                                </div>
+                            </div>
+                            <div class="col-12 form-group d-flex">
+                                <label class="col-2 col-form-label text-right">Module<em>*</em></label>
+                                <div class="col-4">
+                                    <select id="module" class="form-control" formControlName="module"
+                                        [class.is-invalid]="createFormErrors.module">
+                                        <option value="" disabled>Select Module</option>
+                                        <option *ngFor="let a of moduleOptions" [value]="a.value">{{a.label}}</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.module">
+                                        {{createFormErrors.module}}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 form-group d-flex"
+                                *ngIf="createForm?.get('module')?.value === 'devops_automation'">
+                                <label class="col-2 col-form-label text-right">Execution Status<em>*</em></label>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="devopsAlertOptions" [settings]="alertTypeSettings"
+                                        class="form-control p-0" style="height:auto;" formControlName="alert_type"
+                                        [ngClass]="{'is-invalid' : createFormErrors.alert_type}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.alert_type">
+                                        {{createFormErrors.alert_type}}</div>
+                                </div>
+                            </div>
+                            <!-- <div class="col-12 form-group d-flex" *ngIf="createForm?.get('module')?.value === 'aiml'">
+                                <label class="col-2 col-form-label text-right">Alert Type<em>*</em></label>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="typeOptions" [settings]="alertTypeSettings"
+                                        class="form-control p-0" style="height:auto;" formControlName="alert_type"
+                                        [ngClass]="{'is-invalid' : createFormErrors.alert_type}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.alert_type">
+                                        {{createFormErrors.alert_type}}</div>
+                                </div>
+                            </div>  -->
+
+                            <div class="col-12 form-group d-flex"
+                                *ngIf="createForm?.get('module')?.value === 'deprecation'">
+                                <label class="col-2 col-form-label text-right">Alert Type<em>*</em></label>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="depricationOptions" [settings]="alertTypeSettings"
+                                        class="form-control p-0" style="height:auto;" formControlName="alert_type"
+                                        [ngClass]="{'is-invalid' : createFormErrors.alert_type}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.alert_type">
+                                        {{createFormErrors.alert_type}}</div>
+                                </div>
+                            </div>
+                            <div class="col-12 form-group d-flex" *ngIf="createForm?.get('module')?.value === 'aiml'">
+                                <label class="col-2 col-form-label text-right">Alert Type<em>*</em></label>
+                                <div class="col-4">
+                                    <multiselect-dropdown [options]="typeOptions" [settings]="alertTypeSettings"
+                                        class="form-control p-0" style="height:auto;" formControlName="alert_type"
+                                        [ngClass]="{'is-invalid' : createFormErrors.alert_type}">
+                                    </multiselect-dropdown>
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.alert_type">
+                                        {{createFormErrors.alert_type}}</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 form-group d-flex"
+                                *ngIf="createForm?.get('module')?.value === 'deprecation'">
+                                <label class="col-2 col-form-label text-right" for="notify">Notify<em>*</em></label>
+                                <!-- placeholder="Type Days" -->
+                                <div class="col-2">
+                                    <input id="notify" type="number" class="form-control" min="1" max="999"
+                                        placeholder="Type range (0 - 999)" formControlName="notify"
+                                        [ngClass]="{'is-invalid' : createFormErrors.notify}">
+                                    <div class="invalid-feedback d-block" *ngIf="createFormErrors.notify">
+                                        {{createFormErrors.notify}}</div>
+                                </div>
+                                <div class="col-1 align-content-center pl-0">Days</div>
+                            </div>
+                            <div *ngIf="createForm.controls.users" class="col-12 form-group d-flex">
+                                <label class="col-2 col-form-label text-right">Users<em>*</em></label>
+                                <div class="col-4">
+                                    <input id="users" class="form-control" autocomplete="off"
+                                        placeholder="Type username or email"
+                                        [ngClass]="{'is-invalid' : createFormErrors.users}" formControlName="users"
+                                        [typeahead]="userList" typeaheadOptionField="full_name"
+                                        (typeaheadOnSelect)="typeaheadOnSelect($event)"
+                                        (typeaheadNoResults)="typeaheadNoResults($event)">
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.users">
+                                        {{createFormErrors.users}}
+                                    </div>
+                                    <div class="alert alert-secondary" *ngIf="noUsers">No Results Found</div>
+                                    <div *ngIf="selectedUsers.length">
+                                        <span *ngFor="let user of selectedUsers; let i = index;"
+                                            class="badge badge-pill badge-secondary font-xs py-1 my-2 mx-1">
+                                            {{user['full_name']}}
+                                            <span class="fas fa-times pointer-link pl-1"
+                                                (click)="manageSelectedUsers(i)"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="createForm.controls.webhook_url" class="col-12 form-group d-flex">
+                                <label class="col-2 col-form-label text-right">Webhook URL<em>*</em></label>
+                                <div class="col-4">
+                                    <input id="webhook_url" class="form-control" type="text"
+                                        formControlName="webhook_url" placeholder="Type URL"
+                                        [ngClass]="{'is-invalid' : createFormErrors.webhook_url}">
+                                    <div class="invalid-feedback" *ngIf="createFormErrors.webhook_url">
+                                        {{createFormErrors.webhook_url}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 form-group d-flex" *ngIf="createForm?.get('module')?.value">
+                                <label class="col-2 col-form-label text-right"
+                                    *ngIf="['aiml','deprecation'].includes(createForm?.get('module')?.value)">Select
+                                    Device<em>*</em></label>
+                                <label class="col-2 col-form-label text-right"
+                                    *ngIf="createForm?.get('module')?.value === 'devops_automation'">Select
+                                    Task/Workflow<em>*</em></label>
+                                <div class="col-4 pt-2">
+                                    <div class="form-check d-inline pr-2">
+                                        <input class="form-check-input form-check-inline" type="radio" id="all"
+                                            name="filter_type" formControlName="filter_type" value="all">
+                                        <label class="form-check-label" for="all">All</label>
+                                    </div>
+                                    <div class="form-check d-inline pr-2">
+                                        <input class="form-check-input form-check-inline" type="radio" id="custom"
+                                            name="filter_type" formControlName="filter_type" value="custom"
+                                            [attr.disabled]="hasAlertTypeSelected ? null : hasAlertTypeSelected">
+                                        <label class="form-check-label" for="custom">Custom</label>
+                                    </div>
+                                    <div class="form-check d-inline"
+                                        *ngIf="createForm?.get('module')?.value === 'aiml'">
+                                        <input class="form-check-input form-check-inline" type="radio" id="filters"
+                                            name="filter_type" formControlName="filter_type" value="filters"
+                                            [attr.disabled]="isLifeCycleRelatedAlertTypeSelected ? isLifeCycleRelatedAlertTypeSelected : null">
+                                        <label class="form-check-label" for="filters">Filters</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <ng-container
+                                *ngIf="createForm.controls.filter_type.value == 'custom' && ['aiml','deprecation'].includes(createForm?.get('module')?.value)">
+                                <div class="col-12 form-group d-flex">
+                                    <label class="col-2 col-form-label text-right"></label>
+                                    <div formGroupName="custom_filter_meta" class="col-8 pt-2">
+                                        <div class="row d-flex justify-content-start">
+                                            <div class="col-4 form-group">
+                                                <label class="form-col-form-label">Device Type<em>*</em></label>
+                                                <multiselect-dropdown [options]="deviceTypes"
+                                                    [settings]="devicesTypeSettings"
+                                                    [ngClass]="{'is-invalid' : createFormErrors.custom_filter_meta.device_types}"
+                                                    class="form-control p-0" style="height:auto;"
+                                                    formControlName="device_types"
+                                                    (dropdownClosed)="onDeviceTypeClose()"></multiselect-dropdown>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="createFormErrors.custom_filter_meta.device_types">
+                                                    {{createFormErrors.custom_filter_meta.device_types}}</div>
+                                            </div>
+                                            <div class="col-4 form-group">
+                                                <label class="form-col-form-label">Devices<em>*</em></label>
+                                                <multiselect-dropdown [options]="devicesList"
+                                                    [settings]="devicesListSettings"
+                                                    [ngClass]="{'is-invalid' : createFormErrors.custom_filter_meta.device_list}"
+                                                    class="form-control p-0" style="height:auto;"
+                                                    formControlName="device_list"
+                                                    (dropdownClosed)="onDevicesSelectionClose()"></multiselect-dropdown>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="createFormErrors.custom_filter_meta.device_list">
+                                                    {{createFormErrors.custom_filter_meta.device_list}}</div>
+                                            </div>
+                                            <div class="col-4 form-group"
+                                                *ngIf="createForm.get('custom_filter_meta.triggers')">
+                                                <label class="form-col-form-label">Trigger</label>
+                                                <multiselect-dropdown [options]="triggerList"
+                                                    [settings]="devicesListSettings" class="form-control p-0"
+                                                    style="height:auto;"
+                                                    formControlName="triggers"></multiselect-dropdown>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-container
+                                *ngIf="createForm.controls.filter_type.value == 'filters' && createForm?.get('module')?.value === 'aiml'">
+                                <div class="col-12 form-group d-flex">
+                                    <label class="col-2 col-form-label text-right"></label>
+                                    <div class="col-8 pt-2">
+                                        <div class="col" *ngIf="queryBuilderConfig">
+                                            <query-builder #queryBuilder formControlName='filter_rule_meta'
+                                                [classNames]='queryBuilderClassNames' [config]='queryBuilderConfig'
+                                                [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
+                                                [persistValueOnFieldChange]='persistValueOnFieldChange'>
+                                                <ng-container
+                                                    *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+                                                    <textarea class="text-input text-area" [(ngModel)]="rule.value"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [disabled]=getDisabledState()
+                                                        placeholder="Custom Textarea"></textarea>
+                                                </ng-container>
+                                                <ng-container
+                                                    *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
+                                                    <div class="col-auto">
+                                                        <tag-input [clearOnBlur]="true" [(ngModel)]="rule.value"
+                                                            [ngModelOptions]="{standalone: true}"
+                                                            [disabled]=getDisabledState() [modelAsStrings]="true"
+                                                            [secondaryPlaceholder]="'Enter tag'"
+                                                            (ngModelChange)="onTagInputChange($event)">
+                                                            <tag-input-dropdown
+                                                                [autocompleteItems]="tagsAutocompleteItems"
+                                                                [zIndex]="2200"
+                                                                (ngModelChange)="onTagInputChange($event)">
+                                                            </tag-input-dropdown>
+                                                        </tag-input>
+                                                    </div>
+                                                </ng-container>
+                                            </query-builder>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 form-group d-flex">
+                                    <label class="col-2 col-form-label text-right"></label>
+                                    <div class="col-8 pt-2">
+                                        <div class="col">
+                                            <textarea class="form-control" id="description" name="description"
+                                                formControlName="description" rows="4" readonly></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-container
+                                *ngIf="createForm.controls.filter_type.value == 'custom' && createForm?.get('module')?.value === 'devops_automation'  && customMeta">
+                                <div class="col-12 form-group d-flex">
+                                    <label class="col-2 col-form-label text-right"></label>
+                                    <div formGroupName="custom_filter_meta" class="col-8 pt-2">
+                                        <div class="row">
+                                            <div class="col-4 form-group">
+                                                <label>Execution Type<em>*</em></label>
+                                                <select class="form-control" formControlName="execution_type"
+                                                    [ngClass]="{'is-invalid' : createFormErrors.custom_filter_meta.execution_type}">
+                                                    <option value="" disabled>Select Type</option>
+                                                    <option value="task">Task</option>
+                                                    <option value="workflow">Workflow</option>
+                                                </select>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="createFormErrors.custom_filter_meta.execution_type">
+                                                    {{createFormErrors.custom_filter_meta.execution_type}}</div>
+                                            </div>
+                                            <div class="col-4 form-group"
+                                                *ngIf="customMeta?.get('execution_type')?.value">
+                                                <label>Scope<em>*</em></label>
+                                                <select class="form-control" formControlName="scope"
+                                                    [ngClass]="{'is-invalid' : createFormErrors.custom_filter_meta.scope}">
+                                                    <option value="" disabled>Select Scope</option>
+                                                    <ng-container
+                                                        *ngIf="customMeta?.get('execution_type')?.value === 'task'">
+                                                        <option value="all">All Tasks</option>
+                                                        <option value="specific">Specific Task</option>
+                                                    </ng-container>
+                                                    <ng-container
+                                                        *ngIf="customMeta?.get('execution_type')?.value === 'workflow'">
+                                                        <option value="all">All Workflows</option>
+                                                        <option value="specific">Specific Workflow</option>
+                                                    </ng-container>
+                                                </select>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="createFormErrors.custom_filter_meta.scope">
+                                                    {{createFormErrors.custom_filter_meta.scope}}</div>
+                                            </div>
+                                            <div class="col-4 form-group" *ngIf="customMeta?.get('execution_type')?.value === 'task'
+                && customMeta?.get('scope')?.value === 'specific'">
+                                                <label>Select Tasks<em>*</em></label>
+                                                <multiselect-dropdown [options]="taskData" [settings]="taskListSettings"
+                                                    formControlName="tasks" class="form-control p-0"
+                                                    style="height:auto;"
+                                                    [ngClass]="{'is-invalid' : createFormErrors.custom_filter_meta.tasks}">
+                                                </multiselect-dropdown>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="createFormErrors.custom_filter_meta.tasks">
+                                                    {{createFormErrors.custom_filter_meta.tasks}}</div>
+                                            </div>
+                                            <div class="col-4 form-group" *ngIf="customMeta?.get('execution_type')?.value === 'workflow'
+                && customMeta?.get('scope')?.value === 'specific'">
+                                                <label>Select Workflows<em>*</em></label>
+                                                <multiselect-dropdown [options]="workflowData"
+                                                    [settings]="workflowListSettings" formControlName="workflows"
+                                                    class="form-control p-0" style="height:auto;"
+                                                    [ngClass]="{'is-invalid' : createFormErrors.custom_filter_meta.workflows}">
+                                                </multiselect-dropdown>
+                                                <div class="invalid-feedback"
+                                                    *ngIf="createFormErrors.custom_filter_meta.workflows">
+                                                    {{createFormErrors.custom_filter_meta.workflows}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <div class="col-12 form-group d-flex">
+                                <label class="col-2 text-right col-form-label">Status<em>*</em></label>
+                                <div class="col-4">
+                                    <div class="d-inline-block">
+                                        <ul class="d-flex px-0 mb-0">
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="createForm.controls.is_enabled.value">
+                                                    <input type="radio" [value]="true" formControlName="is_enabled">
+                                                    <span class="font-sm mr-2">Enable</span>
+                                                </label>
+                                            </li>
+                                            <li>
+                                                <label class="pointer-link"
+                                                    [class.active]="!createForm.controls.is_enabled.value">
+                                                    <input type="radio" [value]="false" formControlName="is_enabled">
+                                                    <span class="font-sm mr-2">Disable</span>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-center mb-3">
+                        <button class="btn btn-md btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
+                        <button class="btn btn-success ml-2" type="button" (click)="submitForm()">
+                            {{ addEdit === 'Edit' ? 'Update':'Submit' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

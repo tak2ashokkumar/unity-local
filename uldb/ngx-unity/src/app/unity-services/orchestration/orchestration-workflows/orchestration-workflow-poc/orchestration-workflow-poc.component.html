@@ -1,0 +1,1516 @@
+<div class="row p-2">
+    <div class="col-12">
+        <div class="card rounded mb-0">
+            <!-- First Row Header Start -->
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+                <div class="d-flex align-items-center pl-3">
+                    <span class="font-lg-xl font-500">{{workFlowViewData?.workflow_name}}</span>
+                </div>
+                <div class="pr-3">
+                    <span *ngIf="workFlowViewData?.isInProgress" class="text-success font-500">Workflow is being
+                        saved.</span>
+                    <button class="btn btn-sm btn-success font-500" type="button"
+                        [disabled]="workFlowViewData?.isInProgress" (click)="saveWorkFlow()">
+                        <span class="fas fa-spinner fa-spin" *ngIf="workFlowViewData?.isInProgress"></span>
+                        <span class="font-xs-sm mx-1">Save Changes</span>
+                    </button>
+                    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" container="body"
+                        (click)="goBack()"><i class="fa fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- First Row Header End -->
+
+            <!-- Second Row Header Start -->
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-0">
+                <div class="d-flex align-items-center w-40">
+                    <div class="p-1" style="width: 248px;">
+                        <table-search-box [searchValue]="searchQuery" (searched)="onSearched($event)">
+                        </table-search-box>
+                    </div>
+                    <div class="zoom-controls d-flex">
+                        <div class="border-right border-1 border-secondary" style="height: 50px;"></div>
+                        <div class="p-1">
+                            <button class="icon-btn btn btn-null" (click)="changeZoom(1)">
+                                <i class="fa fa-search-plus text-muted"></i>
+                            </button>
+                            <button class="icon-btn btn btn-null" (click)="changeZoom(-1)">
+                                <i class="fa fa-search-minus text-muted"></i>
+                            </button>
+                        </div>
+                        <div class="border-right border-1 border-secondary" style="height: 50px;"></div>
+                        <button class="icon-btn btn btn-null workflow-icon" (click)="openWorkflowParams()">
+                            <i class="fas fa-info-circle text-primary"></i>
+                        </button>
+                        <div class="border-right border-1 border-secondary" style="height: 50px;"></div>
+                        <!-- <button class="icon-btn btn btn-null workflow-icon" (click)="openWorkflowAssistant()">
+                            <i class="fas fa fa-magic text-primary"></i>
+                        </button>
+                        <div class="border-right border-1 border-secondary" style="height: 50px;"></div> -->
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between" style="width: 301px;"
+                    *ngIf="showTaskDetails">
+                    <div class="d-flex align-items-center">
+                        <div class="border-left border-1 border-secondary" style="height: 50px;"></div>
+                        <div class="pl-2">
+                            <img [src]="selectedTaskImg">
+                        </div>
+                        <div class="pl-2">
+                            {{selectedTask.type}}
+                        </div>
+                    </div>
+                    <div class="pr-2">
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeTaskDetails()"></a>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between" style="width: 301px;"
+                    *ngIf="showIfConditionDetails || showSwitchConditionDetails">
+                    <div class="d-flex align-items-center">
+                        <div class="border-left border-1 border-secondary" style="height: 50px;"></div>
+                        <div class="pl-2">
+                            <img [src]="selectedTaskImg" height="30" width="30">
+                        </div>
+                        <div class="pl-2">
+                            {{selectedCondition.type}}
+                        </div>
+                    </div>
+                    <div class="pr-2">
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeConditionDetails()"></a>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between" style="width: 301px;"
+                    *ngIf="showEmailOutputDetails || showChartOutputDetails">
+                    <div class="d-flex align-items-center">
+                        <div class="border-left border-1 border-secondary" style="height: 50px;"></div>
+                        <div class="pl-2">
+                            <i [class]="selectedTaskImg"></i>
+                        </div>
+                        <div class="pl-2">
+                            {{selectedOutput.type}}
+                        </div>
+                    </div>
+                    <div class="pr-2">
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeOutputDetails()"></a>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between" style="width: 301px;"
+                    *ngIf="showSourceTaskDetails">
+                    <div class="d-flex align-items-center">
+                        <div class="border-left border-1 border-secondary" style="height: 50px;"></div>
+                        <div class="pl-2">
+                            <i [class]="selectedTaskImg"></i>
+                        </div>
+                        <div class="pl-2">
+                            {{selectedSourceTask.type}}
+                        </div>
+                    </div>
+                    <div class="pr-2">
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeOutputDetails()"></a>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between" style="width: 301px;"
+                    *ngIf="showLLMDetails">
+                    <div class="d-flex align-items-center">
+                        <div class="border-left border-1 border-secondary" style="height: 50px;"></div>
+                        <div class="pl-2">
+                            <img [src]="selectedTaskImg" height="30" width="30">
+                        </div>
+                        <div class="pl-2">
+                            {{selectedLLM.type}}
+                        </div>
+                    </div>
+                    <div class="pr-2">
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeLLMDetails()"></a>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between" style="width: 301px;"
+                    *ngIf="showWorkFlowParams">
+                    <div class="d-flex align-items-center">
+                        <div class="border-left border-1 border-secondary pl-2"
+                            style="height: 50px; align-content: center;">
+                            Workflow Parameters
+                        </div>
+                    </div>
+                    <div class="pr-2">
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeWorkflowParams()"></a>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between" style="width: 301px;"
+                    *ngIf="showWorkflowAssistant">
+                    <div class="d-flex align-items-center">
+                        <div class="border-left border-1 border-secondary" style="height: 50px;"></div>
+                        <img [src]="assistantImageURL" [alt]="'Logo'"
+                            style="height: 50px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;">
+                        <h5 class="m-0">Workflow Assistant</h5>
+                    </div>
+                    <div class="pr-2">
+                        <a class="fas fa-times font-xl pointer-link p-0 ml-2" (click)="closeWorkflowAssistant()"></a>
+                    </div>
+                </div>
+            </div>
+            <!-- Second Row Header End -->
+
+            <!-- Container Start -->
+            <div class="card-body row m-0 p-0 d-flex font-sm">
+                <!-- *************************************** Left side panel code Start *************************************** -->
+                <div class="toolbox left-sidebar">
+                    <!-- Tasks Section start-->
+                    <div class="accordion">
+                        <div class="accordion-header" (click)="toggleAccordion()">
+                            Tasks
+                            <i [ngClass]="isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                class="arrow text-primary"></i>
+                        </div>
+                        <div class="accordion-body" [ngClass]="{'active px-1': isOpen}">
+                            <div *ngFor="let cat of filteredCategoryList; let last = last">
+                                <div class="accordion">
+                                    <div class="accordion-header"
+                                        style="background: white !important; padding: 5px 10px;"
+                                        (click)="toggleTaskAccordion(cat.category)"
+                                        [ngClass]="{'auto-open': autoOpenTasks[cat.category]}">
+                                        <span class="text-truncate" [innerHTML]="highlightMatch(cat.category)"></span>
+                                        <i [ngClass]="isOpenTasks[cat.category] ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                            class="arrow text-secondary"></i>
+                                    </div>
+                                    <div class="accordion-body"
+                                        [ngClass]="{'active': isOpenTasks[cat.category] || autoOpenTasks[cat.category]}">
+                                        <div *ngFor="let t of cat.tasks; let taskFirst = first; let lastTask = last; "
+                                            class="drag-item row pl-2" draggable="true"
+                                            (dragstart)="dragStart($event, cat, t)">
+                                            <div class="col-1 pt-1 pb-1">
+                                                <img [src]="t.image" alt="Icon" height="15" width="15" />
+                                            </div>
+                                            <div class="col-11 pt-1 pb-1">
+                                                <div class="pl-1 text-truncate text-dark" [title]="t.taskName"
+                                                    [innerHTML]="highlightMatch(t.taskName)">
+                                                </div>
+                                            </div>
+                                            <hr class="col-12 p-0 m-0" *ngIf="!lastTask">
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="p-0 m-0" *ngIf="!last">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Task Section End -->
+
+                    <hr class="p-0 m-0" style="background: #ccc;">
+
+                    <!-- Condition Section Start-->
+                    <div class="accordion">
+                        <div class="accordion-header" (click)="toggleConditionAccordion()"
+                            [ngClass]="{'auto-open': autoOpenCondition}">
+                            Condition
+                            <i [ngClass]="isOpenCondition || autoOpenCondition ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                class="arrow text-primary"></i>
+                        </div>
+                        <div class="accordion-body" [ngClass]="{'active': isOpenCondition || autoOpenCondition}">
+                            <div *ngFor="let con of filteredConditionList; let last = last" class="drag-item"
+                                draggable="true" (dragstart)="dragStart($event, con)">
+                                <div class="pl-3 pt-2 pb-2">
+                                    <img loading="eager" [src]="con.icon" height="20" width="20">
+                                    <span class="pl-3 pt-2 pb-2 text-truncate"
+                                        [innerHTML]="highlightMatch(con.condition)">
+                                    </span>
+                                </div>
+                                <hr class="p-0 m-0" *ngIf="!last">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Condition Section End -->
+
+                    <hr class="p-0 m-0" style="background: #ccc;">
+
+                    <!-- Output Section Start -->
+                    <div class="accordion">
+                        <div class="accordion-header" (click)="toggleOutputAccordion()"
+                            [ngClass]="{'auto-open': autoOpenOutput}">
+                            Output
+                            <i [ngClass]="isOpenOutput || autoOpenOutput ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                class="arrow text-primary"></i>
+                        </div>
+                        <div class="accordion-body" [ngClass]="{'active': isOpenOutput || autoOpenOutput}">
+                            <div *ngFor="let o of filteredOutputList; let last = last" class="drag-item"
+                                draggable="true" (dragstart)="dragStart($event, o)">
+                                <div class="pl-3 pt-2 pb-2">
+                                    <i [ngClass]="o.icon" style="color: grey"></i>
+                                    <span class="pl-3 pt-2 pb-2 text-truncate"
+                                        [innerHTML]="highlightMatch(o.output)"></span>
+                                </div>
+                                <hr class="p-0 m-0" *ngIf="!last">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Output section End -->
+
+                    <hr class="p-0 m-0" style="background: #ccc;">
+
+                    <!-- Source Tasks Section start-->
+                    <div class="accordion">
+                        <div class="accordion-header" (click)="toggleSourcesAccordion()">
+                            Sources
+                            <i [ngClass]="isOpenSource ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                class="arrow text-primary"></i>
+                        </div>
+                        <div class="accordion-body" [ngClass]="{'active px-1': isOpenSource}">
+                            <div *ngFor="let cat of filteredSourceCategoryList; let last = last">
+                                <div class="accordion">
+                                    <div class="accordion-header"
+                                        style="background: white !important; padding: 5px 10px;"
+                                        (click)="toggleSourceTaskAccordion(cat.category)"
+                                        [ngClass]="{'auto-open': autoOpenSourceTasks[cat.category]}">
+                                        <span class="text-truncate" [innerHTML]="highlightMatch(cat.category)"></span>
+                                        <i [ngClass]="isOpenSourceTasks[cat.category] ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                            class="arrow text-secondary"></i>
+                                    </div>
+                                    <div class="accordion-body"
+                                        [ngClass]="{'active': isOpenSourceTasks[cat.category] || autoOpenSourceTasks[cat.category]}">
+                                        <div *ngFor="let t of cat.tasks; let taskFirst = first; let lastTask = last; "
+                                            class="drag-item row pl-2" draggable="true"
+                                            (dragstart)="dragStart($event, cat, t, 'Source')">
+                                            <div class="pl-3 pt-2 pb-2">
+                                                <i [ngClass]="t.icon" style="color: grey"></i>
+                                                <span class="pl-3 pt-2 pb-2 text-truncate"
+                                                    [innerHTML]="highlightMatch(t.taskName)"></span>
+                                            </div>
+                                            <hr class="col-12 p-0 m-0" *ngIf="!lastTask">
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="p-0 m-0" *ngIf="!last">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Source Task Section End -->
+
+                    <hr class="p-0 m-0" style="background: #ccc;">
+
+                    <!-- LLM Section Start -->
+                    <div class="accordion">
+                        <div class="accordion-header" (click)="toggleLLMAccordion()"
+                            [ngClass]="{'auto-open': autoOpenLLM}">
+                            Advanced AI
+                            <i [ngClass]="isOpenLLM || autoOpenLLM ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                class="arrow text-primary"></i>
+                        </div>
+                        <div class="accordion-body" [ngClass]="{'active': isOpenLLM || autoOpenLLM}">
+                            <div *ngFor="let llm of filteredLLMList; let last = last" class="drag-item" draggable="true"
+                                (dragstart)="dragStart($event, llm)">
+                                <div class="pl-3 pt-2 pb-2">
+                                    <img loading="eager" [src]="llm.icon" height="20" width="20">
+                                    <span class="pl-3 pt-2 pb-2 text-truncate"
+                                        [innerHTML]="highlightMatch(llm.block)"></span>
+                                </div>
+                                <hr class="p-0 m-0" *ngIf="!last">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- LLM section End -->
+
+                    <hr class="p-0 m-0" style="background: #ccc;">
+
+                </div>
+                <!-- *************************************** Left side panel code End *************************************** -->
+
+                <!-- Drawflow Plot Start -->
+                <div id="drawflow" (drop)="drop($event)" (dragover)="allowDrop($event)">
+                </div>
+                <!-- Drawflow Plot End   -->
+
+                <!-- *************************************** Right side panel code Start *************************************** -->
+                <!-- Task Right Panel Start  -->
+                <form [formGroup]="selectedTask.inputForm" *ngIf="selectedTask" class="form-position">
+                    <div class="toolbox right-sidebar pb-2" *ngIf="showTaskDetails">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleTaskNameAccordion()">
+                                Name
+                                <i [ngClass]="isOpenTaskName ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenTaskName}">
+                                <div class="px-2 mt-2 mb-2">
+                                    <input type="text" formControlName="task_name"
+                                        class="form-control form-control-sm pr-1" placeholder="Enter value">
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleInputParamAccordion()">
+                                Input Parameters
+                                <i [ngClass]="isOpenInputParam ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenInputParam}">
+                                <div formArrayName="inputs" class="p-2">
+                                    <div *ngFor="let inputGroup of selectedTask.inputForm.get('inputs').controls; let i = index;"
+                                        [formGroupName]="i" class="mb-2">
+                                        <div class="align-items-center pr-1">
+                                            <label class="mb-1" [title]="inputGroup.get('param_name')?.value">
+                                                {{inputGroup.get('param_name')?.value }}:
+                                            </label>
+                                        </div>
+                                        <div class="d-flex align-items-center pr-1"
+                                            *ngIf="inputGroup.get('param_type')?.value === 'Input Template'">
+                                            <input *ngIf="inputGroup.get('param_type')?.value === 'Input Template'"
+                                                type="text" formControlName="template_name"
+                                                class="form-control form-control-sm pr-1"
+                                                [title]="inputGroup.get('template_name')?.value">
+                                            <input
+                                                *ngIf="inputGroup.get('attribute')?.value && inputGroup.get('param_type')?.value === 'Input Template'"
+                                                type="text" formControlName="attribute"
+                                                class="form-control form-control-sm ml-1"
+                                                [title]="inputGroup.get('attribute')?.value">
+                                        </div>
+                                        <div *ngIf="inputGroup.get('param_type')?.value !== 'Input Template'">
+                                            <input *ngIf="inputGroup.get('param_type')?.value === 'String' || 
+                                                inputGroup.get('param_type')?.value === 'Boolean' || 
+                                                inputGroup.get('param_type')?.value === 'Number' ||
+                                                inputGroup.get('param_type')?.value === 'List' || 
+                                                inputGroup.get('param_type')?.value === 'Dictionary'" type="text"
+                                                formControlName="default_value" id="input-{{ i }}" #inputField
+                                                class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                                (click)="onInputClick($event, inputField, i)"
+                                                (focus)="onKeyUp($event, i)">
+                                            <!-- Dropdown Menu -->
+                                            <div *ngIf="showDropdownIndex === i && filteredSuggestions.length" #dropdown
+                                                class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                [ngClass]="{ 'show': showDropdownIndex === i }"
+                                                [ngStyle]="dropdownPosition">
+                                                <a class="dropdown-item p-2"
+                                                    *ngFor="let suggestion of filteredSuggestions"
+                                                    (click)="selectSuggestion(i, suggestion, 'task')">
+                                                    {{ suggestion }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="inputGroup.get('param_type')?.value !== 'Input Template'">
+                                            <input *ngIf="inputGroup.get('param_type')?.value === 'Secret'"
+                                                type="password" formControlName="default_value" id="input-{{ i }}"
+                                                #inputField class="form-control form-control-sm pr-1"
+                                                placeholder="Enter value">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleOutputParamAccordion()">
+                                Output Parameter
+                                <i [ngClass]="isOpenOutputParam ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenOutputParam}">
+                                <div class=" p-2 mt-2 mb-2">
+                                    <input type="text" formControlName="outputs"
+                                        class="form-control form-control-sm pr-1" placeholder="Enter value">
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleTriggerRule()">
+                                Trigger Rule
+                                <i [ngClass]="isOpenTriggerRule ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenTriggerRule}">
+                                <div class=" p-2 mt-2 mb-2">
+                                    <select class="form-control form-control-sm pr-1" formControlName="triggerRule">
+                                        <option *ngFor="let t of triggerRules" [value]="t.value">
+                                            {{t.name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleConfiguration()">
+                                Configuration
+                                <i [ngClass]="isOpenConfiguration ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenConfiguration}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <div class="d-flex justify-content-between pr-1">
+                                        <label>Timeouts:</label>
+                                        <input type="number" formControlName="timeouts"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                    <div class="d-flex justify-content-between pr-1 mt-1">
+                                        <label>Retries:</label>
+                                        <input type="number" formControlName="retries"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-button mt-2 pr-1 pb-4" *ngIf="showTaskDetails">
+                            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                                (click)="saveTaskDetails(selectedTask.inputForm)">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Task Right Panel End  -->
+
+                <!-- Condition Forms Start -->
+                <ng-container *ngIf="selectedCondition">
+                    <!-- If Form Start -->
+                    <form [formGroup]="selectedCondition.ifConditionForm" class="form-position"
+                        *ngIf="selectedCondition.ifConditionForm">
+                        <div class="toolbox right-sidebar" *ngIf="showIfConditionDetails">
+                            <div class="accordion">
+                                <div class="accordion-header" (click)="toggleIfConditionNameAccordion()">
+                                    Name
+                                    <i [ngClass]="isOpenIfConditionName ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                        class="arrow text-primary"></i>
+                                </div>
+                                <div class="accordion-body" [ngClass]="{'active': isOpenIfConditionName}">
+                                    <div class="p-2 mt-2 mb-2">
+                                        <input type="text" formControlName="name"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value">
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="p-0 m-0" style="background: #ccc;">
+                            <div class="accordion">
+                                <div class="accordion-header" (click)="toggleRightPanelInsideConditionsAccordion()">
+                                    Conditions
+                                    <i [ngClass]="isOpenConditions ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                        class="arrow text-primary"></i>
+                                </div>
+                                <div class="accordion-body text-muted" [ngClass]="{'active': isOpenConditions}"
+                                    *ngIf="selectedCondition?.data?.name === 'If Else' || selectedCondition?.type === 'If Else'">
+                                    <div class="row p-2">
+                                        <div class="form-group col-12">
+                                            <label for="ifKey" class="mb-1">Key<em>*</em></label>
+                                            <input type="text" formControlName="ifKey" id="input-1" #inputField
+                                                class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                                (click)="onInputClick($event, inputField, 1)"
+                                                (focus)="onKeyUp($event, 1, 'if')">
+                                            <!-- Dropdown Menu -->
+                                            <div *ngIf="showDropdownIndex === 1 && filteredSuggestions.length" #dropdown
+                                                class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                [ngClass]="{ 'show': showDropdownIndex === 1 }"
+                                                [ngStyle]="dropdownPosition">
+                                                <a class="dropdown-item p-2"
+                                                    *ngFor="let suggestion of filteredSuggestions"
+                                                    (click)="selectSuggestion(1, suggestion, 'if')">
+                                                    {{ suggestion }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-6 pr-1">
+                                            <label for="operator" class="mb-1">Operator<em>*</em></label>
+                                            <select id="operator" class="form-control form-control-sm"
+                                                formControlName="operator">
+                                                <option value="" disabled> Select Operator </option>
+                                                <option *ngFor="let c of conditionOperators" [value]="c.value">
+                                                    {{c.label}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-6 pl-1">
+                                            <label for="updatedValue" class="mb-1">Value<em>*</em></label>
+                                            <input type="text" formControlName="updatedValue"
+                                                class="form-control form-control-sm" placeholder="Enter value">
+                                        </div>
+                                        <div class="form-group col-6 pr-1">
+                                            <label for="execute" class="mb-1">If<em>*</em></label>
+                                            <input type="text" formControlName="executeIf"
+                                                [value]="selectedCondition.ifConditionForm.get('executeIf').value.key"
+                                                class="form-control form-control-sm">
+                                        </div>
+                                        <div class="form-group col-6 pl-1">
+                                            <label for="execute" class="mb-1">Else<em>*</em></label>
+                                            <input type="text" formControlName="executeElse"
+                                                [value]="selectedCondition.ifConditionForm.get('executeElse').value.key"
+                                                class="form-control form-control-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="right-button pr-1 mt-2 pb-5" *ngIf="showIfConditionDetails">
+                                <button class="btn btn-sm btn-success pull-right mr-3" type="button"
+                                    (click)="saveConditionDetails(selectedCondition.ifConditionForm)">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- If Form End -->
+
+                    <!-- Switch Form Start -->
+                    <form [formGroup]="selectedCondition.switchConditionForm" class="form-position"
+                        *ngIf="selectedCondition.switchConditionForm">
+                        <div class="toolbox right-sidebar" *ngIf="showSwitchConditionDetails">
+                            <div class="accordion">
+                                <div class="accordion-header" (click)="toggleSwitchConditionNameAccordion()">
+                                    Name
+                                    <i [ngClass]="isOpenSwitchConditionName ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                        class="arrow text-primary"></i>
+                                </div>
+                                <div class="accordion-body" [ngClass]="{'active': isOpenSwitchConditionName}">
+                                    <div class="p-2 mt-2 mb-2">
+                                        <input type="text" formControlName="name"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value">
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="p-0 m-0" style="background: #ccc;">
+                            <div class="accordion">
+                                <div class="accordion-header" (click)="toggleRightPanelInsideConditionsAccordion()">
+                                    Conditions
+                                    <i [ngClass]="isOpenConditions ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                        class="arrow text-primary"></i>
+                                </div>
+                                <div class="accordion-body text-muted" [ngClass]="{'active': isOpenConditions}"
+                                    *ngIf="selectedCondition?.data?.name === 'Switch Case' || selectedCondition?.type === 'Switch Case'">
+                                    <div formArrayName="switchConditions" class="p-2">
+                                        <div *ngFor="let switchGroup of switchConditions.controls; let i = index"
+                                            [formGroupName]="i" class="row mb-2">
+                                            <div class="form-group col-12">
+                                                <label for="switchKey" class="mb-1">Key<em>*</em></label>
+                                                <input type="text" formControlName="switchKey" id="input-{{i}}"
+                                                    #inputField class="form-control form-control-sm pr-1"
+                                                    placeholder="Enter value"
+                                                    (click)="onInputClick($event, inputField, i)"
+                                                    (focus)="onKeyUp($event, i, 'switch')">
+                                                <div *ngIf="showDropdownIndex === i && filteredSuggestions.length"
+                                                    #dropdown class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                    [ngClass]="{ 'show': showDropdownIndex === i }"
+                                                    [ngStyle]="dropdownPosition">
+                                                    <a class="dropdown-item p-2"
+                                                        *ngFor="let suggestion of filteredSuggestions"
+                                                        (click)="selectSuggestion(i, suggestion, 'switch')">
+                                                        {{ suggestion }}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-6 pr-1">
+                                                <label class="mb-1">Operator</label>
+                                                <select class="form-control form-control-sm" formControlName="operator">
+                                                    <option value="" disabled>Select Operator</option>
+                                                    <option *ngFor="let c of conditionOperators" [value]="c.value">
+                                                        {{c.label}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group col-6 pl-1">
+                                                <label class="mb-1">Value</label>
+                                                <input type="text" formControlName="updatedValue"
+                                                    class="form-control form-control-sm" placeholder="Enter value">
+                                            </div>
+                                            <div class="form-group col-10">
+                                                <label class="mb-1">Execute</label>
+                                                <input type="text" formControlName="execute"
+                                                    class="form-control form-control-sm"
+                                                    [value]="switchConditions.at(i).get('execute')?.value?.key">
+                                            </div>
+                                            <div class="form-group col-2 mt-4">
+                                                <button *ngIf="switchConditions.length > 1" type="button"
+                                                    class="action-icons fas fa-minus ml-1"
+                                                    (click)="switchConditions.removeAt(i);removeNodeFromSwitch(i)"></button>
+                                            </div>
+                                            <div class="col-12">
+                                                <hr>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="button" class="btn btn-primary ml-2" (click)="addSwitchCondition()">
+                                        Add Condition</button>
+                                </div>
+                            </div>
+                            <div class="right-button pr-1 mt-2 pb-5" *ngIf="showSwitchConditionDetails">
+                                <button class="btn btn-sm btn-success pull-right" type="button"
+                                    (click)="saveConditionDetails(selectedCondition.switchConditionForm)">Save</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- Switch Form End -->
+                </ng-container>
+                <!-- Conditions Form End -->
+
+                <!-- Email Form Start -->
+                <form [formGroup]="selectedOutput.outputForm"
+                    *ngIf="selectedOutput?.type === 'Notification Task' || selectedOutput?.type === 'Email'"
+                    class="form-position">
+                    <div class="toolbox right-sidebar" *ngIf="showEmailOutputDetails">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleEmailNameAccordion()">
+                                Name
+                                <i [ngClass]="isOpenEmailName ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenEmailName}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <input type="text" formControlName="name" class="form-control form-control-sm pr-1"
+                                        placeholder="Enter value">
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleEmailDetailsAccordion()">
+                                Parameters
+                                <i [ngClass]="isOpenEmailDetails ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenEmailDetails}">
+                                <div class="p-2">
+                                    <div class="form-group">
+                                        <label for="to" class="mb-1">To<em>*</em></label>
+                                        <!-- <input type="text" formControlName="to"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                                        <input type="text" formControlName="to" id="input-1" #inputField
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                            (click)="onInputClick($event, inputField, 1)"
+                                            (focus)="onKeyUp($event, 1, 'emailTo')">
+                                        <div *ngIf="showDropdownIndex === 1 && filteredSuggestions.length" #dropdown
+                                            class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                            [ngClass]="{ 'show': showDropdownIndex === 1 }"
+                                            [ngStyle]="dropdownPosition">
+                                            <a class="dropdown-item p-2" *ngFor="let suggestion of filteredSuggestions"
+                                                (click)="selectSuggestion(1, suggestion, 'emailTo')">
+                                                {{ suggestion }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="subject" class="mb-1">Subject<em>*</em></label>
+                                        <!-- <input type="text" formControlName="subject"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                                        <input type="text" formControlName="subject" id="input-2" #inputField1
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                            (click)="onInputClick($event, inputField1, 2)"
+                                            (focus)="onKeyUp($event, 2, 'emailSubject')">
+                                        <div *ngIf="showDropdownIndex === 2 && filteredSuggestions.length" #dropdown
+                                            class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                            [ngClass]="{ 'show': showDropdownIndex === 2 }"
+                                            [ngStyle]="dropdownPosition">
+                                            <a class="dropdown-item p-2" *ngFor="let suggestion of filteredSuggestions"
+                                                (click)="selectSuggestion(2, suggestion, 'emailSubject')">
+                                                {{ suggestion }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="subject" class="mb-1">Body<em>*</em></label>
+                                        <textarea formControlName="body" class="form-control form-control-sm pr-1"
+                                            placeholder="Enter value" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleTriggerRule()">
+                                Trigger Rule
+                                <i [ngClass]="isOpenTriggerRule ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenTriggerRule}">
+                                <div class=" p-2 mt-2 mb-2">
+                                    <select class="form-control form-control-sm pr-1" formControlName="triggerRule">
+                                        <option *ngFor="let t of triggerRules" [value]="t.value">
+                                            {{t.name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleConfiguration()">
+                                Configuration
+                                <i [ngClass]="isOpenConfiguration ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenConfiguration}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <div class="d-flex justify-content-between pr-1">
+                                        <label>Timeouts:</label>
+                                        <input type="number" formControlName="timeouts"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                    <div class="d-flex justify-content-between pr-1 mt-1">
+                                        <label>Retries:</label>
+                                        <input type="number" formControlName="retries"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-button pr-1 mt-2 pb-5" *ngIf="showEmailOutputDetails">
+                            <button class="btn btn-sm btn-success pull-right mr-2" type="button"
+                                (click)="saveOutputDetails(selectedOutput.outputForm)">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Email Form End -->
+
+                <!-- Chart Form Start -->
+                <form [formGroup]="selectedOutput.outputForm"
+                    *ngIf="selectedOutput?.type === 'Chart Task' || selectedOutput?.type === 'Chart'"
+                    class="form-position">
+                    <div class="toolbox right-sidebar" *ngIf="showChartOutputDetails">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleChartNameAccordion()">
+                                Name
+                                <i [ngClass]="isOpenChartName ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenChartName}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <input type="text" formControlName="name" class="form-control form-control-sm pr-1"
+                                        placeholder="Enter value">
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleChartDetailsAccordion()">
+                                Input Parameter
+                                <i [ngClass]="isOpenChartDetails ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenChartDetails}">
+                                <div class="p-2">
+                                    <div class="form-group">
+                                        <label for="to" class="mb-1">Chart Type</label>
+                                        <select id="c" class="form-control form-control-sm pr-1" type="text"
+                                            formControlName="chart_type" [class.is-invalid]="formErrors.output_type">
+                                            <option value="Pie">Pie</option>
+                                            <option value="Bar">Bar</option>
+                                            <option value="Line">Line</option>
+                                            <option value="Area">Area</option>
+                                        </select>
+                                    </div>
+                                    <ng-container
+                                        *ngIf="selectedOutput?.outputForm?.get('chart_type')?.value === 'Pie'">
+                                        <div class="form-group">
+                                            <label for="x_values" class="mb-1">Labels<em>*</em></label>
+                                            <!-- <input type="text" formControlName="x_values"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                                            <input type="text" formControlName="x_values" id="input-1" #inputField1
+                                                class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                                (click)="onInputClick($event, inputField1, 1)"
+                                                (focus)="onKeyUp($event, 1, 'x_values')">
+                                            <div *ngIf="showDropdownIndex === 1 && filteredSuggestions.length" #dropdown
+                                                class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                [ngClass]="{ 'show': showDropdownIndex === 1 }"
+                                                [ngStyle]="dropdownPosition">
+                                                <a class="dropdown-item p-2"
+                                                    *ngFor="let suggestion of filteredSuggestions"
+                                                    (click)="selectSuggestion(1, suggestion, 'x_values')">
+                                                    {{ suggestion }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="y_values" class="mb-1">Values<em>*</em></label>
+                                            <!-- <input type="text" formControlName="y_values"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                                            <input type="text" formControlName="y_values" id="input-2" #inputField2
+                                                class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                                (click)="onInputClick($event, inputField2, 2)"
+                                                (focus)="onKeyUp($event, 2, 'y_values')">
+                                            <div *ngIf="showDropdownIndex === 2 && filteredSuggestions.length" #dropdown
+                                                class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                [ngClass]="{ 'show': showDropdownIndex === 2 }"
+                                                [ngStyle]="dropdownPosition">
+                                                <a class="dropdown-item p-2"
+                                                    *ngFor="let suggestion of filteredSuggestions"
+                                                    (click)="selectSuggestion(2, suggestion, 'y_values')">
+                                                    {{ suggestion }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container
+                                        *ngIf="selectedOutput?.outputForm?.get('chart_type')?.value !== 'Pie'">
+                                        <div class="form-group">
+                                            <label for="x_label" class="mb-1">X-axis Label<em>*</em></label>
+                                            <input formControlName="x_label" class="form-control form-control-sm pr-1"
+                                                placeholder="Enter value">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="x_values" class="mb-1">X-axis Value<em>*</em></label>
+                                            <!-- <input type="text" formControlName="x_values"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                                            <input type="text" formControlName="x_values" id="input-3" #inputField3
+                                                class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                                (click)="onInputClick($event, inputField3, 3)"
+                                                (focus)="onKeyUp($event, 3, 'x_values')">
+                                            <div *ngIf="showDropdownIndex === 3 && filteredSuggestions.length" #dropdown
+                                                class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                [ngClass]="{ 'show': showDropdownIndex === 3 }"
+                                                [ngStyle]="dropdownPosition">
+                                                <a class="dropdown-item p-2"
+                                                    *ngFor="let suggestion of filteredSuggestions"
+                                                    (click)="selectSuggestion(3, suggestion, 'x_values')">
+                                                    {{ suggestion }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="y_label" class="mb-1">Y-axis Label<em>*</em></label>
+                                            <input formControlName="y_label" class="form-control form-control-sm pr-1"
+                                                placeholder="Enter value" rows="3">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="y_values" class="mb-1">Y-axis Value<em>*</em></label>
+                                            <!-- <input type="text" formControlName="y_values"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                                            <input type="text" formControlName="y_values" id="input-4" #inputField4
+                                                class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                                (click)="onInputClick($event, inputField4, 4)"
+                                                (focus)="onKeyUp($event, 4, 'y_values')">
+                                            <div *ngIf="showDropdownIndex === 4 && filteredSuggestions.length" #dropdown
+                                                class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                [ngClass]="{ 'show': showDropdownIndex === 4 }"
+                                                [ngStyle]="dropdownPosition">
+                                                <a class="dropdown-item p-2"
+                                                    *ngFor="let suggestion of filteredSuggestions"
+                                                    (click)="selectSuggestion(4, suggestion, 'y_values')">
+                                                    {{ suggestion }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <hr class="p-0 m-0" style="background: #ccc;"> -->
+                        <!-- <div class="accordion">
+                            <div class="accordion-header" (click)="toggleTriggerRule()">
+                                Trigger Rule
+                                <i [ngClass]="isOpenTriggerRule ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenTriggerRule}">
+                                <div class=" p-2 mt-2 mb-2">
+                                    <select class="form-control form-control-sm pr-1" formControlName="triggerRule">
+                                        <option *ngFor="let t of triggerRules" [value]="t.value">
+                                            {{t.name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div> -->
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleConfiguration()">
+                                Configuration
+                                <i [ngClass]="isOpenConfiguration ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenConfiguration}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <div class="d-flex justify-content-between pr-1">
+                                        <label>Timeouts:</label>
+                                        <input type="number" formControlName="timeouts"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                    <div class="d-flex justify-content-between pr-1 mt-1">
+                                        <label>Retries:</label>
+                                        <input type="number" formControlName="retries"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-button pr-1 mt-2 pb-5" *ngIf="showChartOutputDetails">
+                            <button class="btn btn-sm btn-success pull-right mr-2" type="button"
+                                (click)="saveOutputDetails(selectedOutput.outputForm)">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Chart Form End -->
+
+                <!-- Source Task Right Panel Start  -->
+                <form [formGroup]="selectedSourceTask.sourceTaskForm" *ngIf="selectedSourceTask" class="form-position">
+                    <div class="toolbox right-sidebar pb-2" *ngIf="showSourceTaskDetails">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleSourceTaskNameAccordion()">
+                                Name
+                                <i [ngClass]="isOpenSourceTaskName ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenSourceTaskName}">
+                                <div class="px-2 mt-2 mb-2">
+                                    <input type="text" formControlName="task_name"
+                                        class="form-control form-control-sm pr-1" placeholder="Enter value">
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleSourceTaskInputParamAccordion()">
+                                Input Parameters
+                                <i [ngClass]="isOpenSourceTaskInputParam ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenSourceTaskInputParam}">
+                                <div formArrayName="inputs" class="p-2">
+                                    <div *ngFor="let sourceTaskGroup of selectedSourceTask.sourceTaskForm.get('inputs').controls; let i = index;"
+                                        [formGroupName]="i" class="mb-2">
+                                        <div class="align-items-center pr-1">
+                                            <label class="mb-1" [title]="sourceTaskGroup.get('param_name')?.value">
+                                                {{sourceTaskGroup.get('param_name')?.value }}:
+                                            </label>
+                                        </div>
+                                        <div class="d-flex align-items-center pr-1"
+                                            *ngIf="sourceTaskGroup.get('param_type')?.value === 'Input Template'">
+                                            <input *ngIf="sourceTaskGroup.get('param_type')?.value === 'Input Template'"
+                                                type="text" formControlName="template_name"
+                                                class="form-control form-control-sm pr-1"
+                                                [title]="sourceTaskGroup.get('template_name')?.value">
+                                            <input
+                                                *ngIf="sourceTaskGroup.get('attribute')?.value && sourceTaskGroup.get('param_type')?.value === 'Input Template'"
+                                                type="text" formControlName="attribute"
+                                                class="form-control form-control-sm ml-1"
+                                                [title]="sourceTaskGroup.get('attribute')?.value">
+                                        </div>
+                                        <div *ngIf="sourceTaskGroup.get('param_type')?.value !== 'Input Template'">
+                                            <input
+                                                *ngIf="sourceTaskGroup.get('param_type')?.value === 'String' || sourceTaskGroup.get('param_type')?.value === 'Boolean' || sourceTaskGroup.get('param_type')?.value === 'Number'"
+                                                type="text" formControlName="default_value" id="input-{{ i }}"
+                                                #inputField class="form-control form-control-sm pr-1"
+                                                placeholder="Enter value" (click)="onInputClick($event, inputField, i)"
+                                                (focus)="onKeyUp($event, i, 'source')">
+                                            <!-- Dropdown Menu -->
+                                            <div *ngIf="showDropdownIndex === i && filteredSuggestions.length" #dropdown
+                                                class="suggestion-drop dropdown-menu dropdown-menu-right"
+                                                [ngClass]="{ 'show': showDropdownIndex === i }"
+                                                [ngStyle]="dropdownPosition">
+                                                <a class="dropdown-item p-2"
+                                                    *ngFor="let suggestion of filteredSuggestions"
+                                                    (click)="selectSuggestion(i, suggestion, 'source')">
+                                                    {{ suggestion }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleSourceTaskOutputParamAccordion()">
+                                Output Parameters
+                                <i [ngClass]="isOpenSourceTaskOutputParam ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenSourceTaskOutputParam}">
+                                <div formArrayName="outputs" class="p-2">
+                                    <div *ngFor="let sourceTaskGroup of selectedSourceTask.sourceTaskForm.get('outputs').controls; let i = index;"
+                                        [formGroupName]="i" class="mb-2">
+                                        <div class="align-items-center pr-1">
+                                            <input type="text" formControlName="param_name"
+                                                class="form-control form-control-sm ml-1"
+                                                [title]="sourceTaskGroup.get('param_name')?.value">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleSourceTaskTriggerRule()">
+                                Trigger Rule
+                                <i [ngClass]="isOpenSourceTaskTriggerRule ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenSourceTaskTriggerRule}">
+                                <div class=" p-2 mt-2 mb-2">
+                                    <select class="form-control form-control-sm pr-1" formControlName="triggerRule">
+                                        <option *ngFor="let t of triggerRules" [value]="t.value">
+                                            {{t.name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleSourceTaskConfiguration()">
+                                Configuration
+                                <i [ngClass]="isOpenSourceTaskConfiguration ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted"
+                                [ngClass]="{'active': isOpenSourceTaskConfiguration}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <div class="d-flex justify-content-between pr-1">
+                                        <label>Timeouts:</label>
+                                        <input type="number" formControlName="timeouts"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                    <div class="d-flex justify-content-between pr-1 mt-1">
+                                        <label>Retries:</label>
+                                        <input type="number" formControlName="retries"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-button mt-2 pr-1 pb-4" *ngIf="showSourceTaskDetails">
+                            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                                (click)="saveSourceTaskDetails(selectedSourceTask.sourceTaskForm)">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Source Task Right Panel End  -->
+
+                <!-- LLM Form Start -->
+                <form [formGroup]="selectedLLM.llmForm" *ngIf="selectedLLM" class="form-position">
+                    <div class="toolbox right-sidebar" *ngIf="showLLMDetails">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleLLMNameAccordion()">
+                                Name
+                                <i [ngClass]="isOpenLLMName ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenLLMName}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <input type="text" formControlName="name" class="form-control form-control-sm pr-1"
+                                        placeholder="Enter value">
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleLLMPropertiesAccordion()">
+                                Properties
+                                <i [ngClass]="isOpenLLMProperties ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body" [ngClass]="{'active': isOpenLLMProperties}">
+                                <div class="pl-1 pr-2 pt-2">
+                                    <div class="form-group">
+                                        <label for="subject" class="mb-1">User Prompt<em>*</em></label>
+                                        <textarea formControlName="user_prompt"
+                                            class="form-control form-control-sm pr-1" placeholder="Enter value"
+                                            rows="6"></textarea>
+                                    </div>
+                                </div>
+                                <div class="pl-1 pr-2 pb-2">
+                                    <label for="output_type" class="mb-1">Output Type<em>*</em></label>
+                                    <div>
+                                        <select id="c" class="form-control form-control-sm pr-1" type="text"
+                                            formControlName="output_type" [class.is-invalid]="formErrors.output_type">
+                                            <option value="Text">Text</option>
+                                            <option value="JSON">JSON</option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="formErrors.output_type">
+                                            {{formErrors.output_type}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleLLMOutputParamAccordion()">
+                                Output Parameters
+                                <i [ngClass]="isOpenLLMOutputParam ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenLLMOutputParam}">
+                                <div formArrayName="outputs" class="p-2">
+                                    <div *ngFor="let llmGroup of selectedLLM.llmForm.get('outputs').controls; let i = index;"
+                                        [formGroupName]="i" class="mb-2">
+                                        <div class="align-items-center pr-1">
+                                            <input type="text" formControlName="param_name"
+                                                class="form-control form-control-sm ml-1"
+                                                [title]="llmGroup.get('param_name')?.value">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleConfiguration()">
+                                Configuration
+                                <i [ngClass]="isOpenConfiguration ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenConfiguration}">
+                                <div class="p-2 mt-2 mb-2">
+                                    <div class="d-flex justify-content-between pr-1">
+                                        <label>Timeouts:</label>
+                                        <input type="number" formControlName="timeouts"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                    <div class="d-flex justify-content-between pr-1 mt-1">
+                                        <label>Retries:</label>
+                                        <input type="number" formControlName="retries"
+                                            class="form-control form-control-sm custom-input" placeholder="Enter value">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-button pr-1 mt-2 pb-5" *ngIf="showLLMDetails">
+                            <button class="btn btn-sm btn-success pull-right mr-2" type="button"
+                                (click)="saveLLMDetails(selectedLLM.llmForm)">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- LLM Form End -->
+
+                <!-- WorkFLow Param form Start -->
+                <form [formGroup]="workflowParamsForm" *ngIf="workflowParamsForm" class="form-position">
+                    <div class="toolbox right-sidebar" *ngIf="showWorkFlowParams">
+                        <div class="accordion">
+                            <div class="accordion-header" (click)="toggleWorkflowParamDetails()">
+                                Workflow Properties
+                                <i [ngClass]="isOpenWorkflowParamDetails ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenWorkflowParamDetails}">
+                                <div class="form-group">
+                                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                                </div>
+                                <div class="row pr-2 pb-2 pl-2">
+                                    <div class="form-group col-12">
+                                        <label for="workflow_name" class="form-col-form-label">Name<em>*</em></label>
+                                        <input id="workflow_name" class="form-control form-control-sm" type="text"
+                                            formControlName="workflow_name"
+                                            [class.is-invalid]="workflowDetailsFormErrors.workflow_name">
+                                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.workflow_name">
+                                            {{workflowDetailsFormErrors.workflow_name}}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-12">
+                                        <label for="description" class="form-col-form-label">Description</label>
+                                        <textarea id="description" class="form-control form-control-sm static" rows='2'
+                                            formControlName="description"
+                                            [class.is-invalid]="workflowDetailsFormErrors.description"
+                                            placeholder="Description"></textarea>
+                                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.description">
+                                            {{workflowDetailsFormErrors.description}}
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-12">
+                                        <label for="category" class="font-col-form-label">Category<em>*</em></label>
+                                        <select id="category" class="form-control form-control-sm"
+                                            formControlName="category"
+                                            [class.is-invalid]="workflowDetailsFormErrors.category">
+                                            <option value="" disabled> Select Category </option>
+                                            <option *ngFor="let c of workflowMetadata?.category" [value]="c">{{c}}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.category">
+                                            {{workflowDetailsFormErrors.category}}</div>
+                                    </div>
+                                    <div class="form-group col-12">
+                                        <label for="target_type" class="font-col-form-label">Target
+                                            Type<em>*</em></label>
+                                        <select id="target_type" class="form-control form-control-sm"
+                                            formControlName="target_type"
+                                            [class.is-invalid]="workflowDetailsFormErrors.target_type">
+                                            <option value="" disabled> Select Target Type </option>
+                                            <option *ngFor="let tt of targetTypeOptions" [value]="tt">{{tt}}
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.target_type">
+                                            {{workflowDetailsFormErrors.target_type}}</div>
+                                    </div>
+                                    <div class="form-group col-12" *ngIf="workflowParamsForm.get('cloud')">
+                                        <label for="cloud" class="font-col-form-label">Cloud<em>*</em></label>
+                                        <select id="cloud" class="form-control form-control-sm" formControlName="cloud"
+                                            [class.is-invalid]="workflowDetailsFormErrors.cloud">
+                                            <option value="" disabled> Select Cloud Type </option>
+                                            <option *ngFor="let c of workflowMetadata?.cloud" [value]="c.type">
+                                                {{c.type}} </option>
+                                        </select>
+                                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.cloud">
+                                            {{workflowDetailsFormErrors.cloud}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="p-0 m-0" style="background: #ccc;">
+                        <div class="accordion pb-2">
+                            <div class="accordion-header" (click)="toggleWorkflowParameters()">
+                                Parameter Mapping
+                                <i [ngClass]="isOpenWorkflowParameters ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"
+                                    class="arrow text-primary"></i>
+                            </div>
+                            <div class="accordion-body text-muted" [ngClass]="{'active': isOpenWorkflowParameters}">
+                                <div formArrayName="parameters" class="p-2" *ngIf="parameters">
+                                    <div *ngFor="let parameter of workflowParamsForm.get('parameters').controls; let i = index"
+                                        [formGroupName]="i" class="row mb-2">
+                                        <div class="form-group col-6">
+                                            <input id="param_name" class="form-control form-control-sm" type="text"
+                                                formControlName="param_name"
+                                                [class.is-invalid]="formErrors.parameters[i]?.param_name"
+                                                placeholder="Name">
+                                            <div class="invalid-feedback" *ngIf="formErrors.parameters[i]?.param_name">
+                                                {{formErrors.parameters[i]?.param_name}}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-6">
+                                            <select class="form-control form-control-sm" type="text"
+                                                formControlName="param_type"
+                                                [class.is-invalid]="formErrors.parameters[i]?.param_type">
+                                                <option [value]="''" disabled>Select Datatype</option>
+                                                <option *ngFor="let dataType of paramDataTypes" [value]="dataType">
+                                                    {{dataType}}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="formErrors.parameters[i]?.param_type">
+                                                {{formErrors.parameters[i]?.param_type}}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-6"
+                                            *ngIf="parameter.get('param_type').value == 'String' || parameter.get('param_type').value == 'Number' || parameter.get('param_type').value == 'Boolean'">
+                                            <input class="form-control form-control-sm" type="text"
+                                                formControlName="default_value"
+                                                [class.is-invalid]="formErrors.parameters[i]?.default_value"
+                                                placeholder="Default value">
+                                            <div class="invalid-feedback"
+                                                *ngIf="formErrors.parameters[i]?.default_value">
+                                                {{formErrors.parameters[i]?.default_value}}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-6"
+                                            *ngIf="parameter.get('param_type').value == 'Input Template'">
+                                            <select class="form-control form-control-sm" type="text"
+                                                formControlName="template"
+                                                [class.is-invalid]="formErrors.parameters[i]?.template"
+                                                (change)="onSelectTemplate(i,$event.target.value)">
+                                                <option [value]="''" disabled>Select Template</option>
+                                                <option *ngFor="let template of taskInputTemplates"
+                                                    [value]="template.uuid">
+                                                    {{template.name}}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="formErrors.parameters[i]?.template">
+                                                {{formErrors.parameters[i]?.template}}
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-6"
+                                            *ngIf="parameter.get('param_type').value == 'Input Template' && attributeList[i]?.length > 0">
+                                            <select class="form-control form-control-sm" type="text"
+                                                formControlName="attribute"
+                                                [class.is-invalid]="formErrors.parameters[i]?.attribute">
+                                                <option [value]="''" disabled>Select Attribute</option>
+                                                <option *ngFor="let attribute of attributeList[i]" [value]="attribute">
+                                                    {{attribute}}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="formErrors.parameters[i]?.attribute">
+                                                {{formErrors.parameters[i]?.attribute}}
+                                            </div>
+                                        </div>
+                                        <!-- <div class="form-group col-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input form-check-sm bg-primary" type="checkbox"
+                                                    formControlName="is_visible">
+                                                <label class="form-check-label">
+                                                    Is Visible
+                                                </label>
+                                            </div>
+                                        </div> -->
+                                        <div class="form-group col-6">
+                                            <button *ngIf="parameters.length > 1" type="button"
+                                                class="action-icons fas fa-minus ml-1"
+                                                (click)="parameters.removeAt(i)"></button>
+                                        </div>
+                                        <div class="col-12">
+                                            <hr>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-sm btn-success pull-right mr-3"
+                                    (click)="addWorkflowParams()">
+                                    Parameter +</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- Workflow Param form End -->
+
+                <!-- WorkFLow Assistant form Start -->
+                <div class="toolbox right-sidebar" *ngIf="showWorkflowAssistant">
+                    <div class="custom-gradient-bg d-flex flex-column h-85 pb-0 pt-1 px-1 border-top">
+                        <div #messagesContainer class="messages-container d-flex flex-column justify-content-between">
+                            <div class="d-flex flex-column mb-2">
+                                <div class="d-flex flex-column align-items-center justify-content-center">
+                                    <div class="text-muted text-center font-500">Welcome to Workflow Assistant</div>
+                                    <div class="text-muted text-center font-500">How can I assist you today?</div>
+                                </div>
+                                <div id="defaultQueries" class="d-flex flex-column mt-2 queries-container">
+                                    <div *ngFor="let query of queries" class="card round-edge mb-2">
+                                        <div class="card-body p-2 default-query" style="cursor: pointer"
+                                            (click)="sumbitQuery(query)">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div>
+                                                    <div class="text-muted font-sm ml-2 hover-text">{{query}}</div>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center rounded-circle angle-icon"
+                                                    [ngClass]="{'disable': isTyping}">
+                                                    <i class="fas fa-angle-right font-sm"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column w-100" style="max-width: 100%;">
+                                <div *ngFor="let chat of chatHistoryData;let i = index" class="d-flex flex-column w-100"
+                                    style="max-width: 100%;">
+                                    <div *ngIf="chat.user == 'user'" class="d-flex justify-content-end mb-1"
+                                        style="max-width: 100%;">
+                                        <div class="message-box user-message">
+                                            {{ chat.message }}
+                                        </div>
+                                    </div>
+                                    <div *ngIf="chat.user == 'bot'" class="d-flex justify-content-end mb-1"
+                                        style="max-width: 100%;">
+                                        <div class="message-box bot-message">
+                                            {{ chat.message }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
+                                    <div class="message-box bot-message">
+                                        <div class="pulse-loader m-1">
+                                            <div></div>
+                                            <div></div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form *ngIf="assistantForm" [formGroup]="assistantForm" class="w-99 mt-auto p-2">
+                        <div class="row">
+                            <div class="col">
+                                <div class="input-group">
+                                    <input class="form-control border-left-radius" type="text" formControlName="chat"
+                                        placeholder="Ask me anything..." (keyup.enter)="onSubmit()"
+                                        style="height: 2.7rem;">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text bg-white border-right-radius" (click)="onSubmit()"
+                                            style="cursor: pointer;">
+                                            <i class="fas fa-paper-plane font-lg mr-1"
+                                                [ngClass]="{'text-success': !isTyping, 'text-muted': isTyping}"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- WorkFLow Assistant form End -->
+                <!-- *************************************** Right side panel code End *************************************** -->
+            </div>
+            <!-- Container End -->
+        </div>
+    </div>
+</div>
+
+<!-- <button *ngIf="!showWorkflowAssistant" class="ask-ai-btn" (click)="openWorkflowAssistant()">
+    <img [src]="askAIIcon" alt="Stars" class="icon" />
+    Ask AI
+</button> -->
+
+<button *ngIf="!showWorkflowAssistant" class="ask-ai-btn btn btn-null" (click)="openWorkflowAssistant()">
+    <img [src]="askAIIcon" alt="Ask AI" />
+</button>
+
+<!-- Workflow Modal Start -->
+<ng-template #workflowDetailsFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            Workflow Details
+        </div>
+        <div class="card-body">
+            <form *ngIf="workflowDetailsForm" [formGroup]="workflowDetailsForm">
+                <div class="form-group">
+                    <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-12">
+                        <label for="workflow_name" class="form-col-form-label">Name<em>*</em></label>
+                        <input id="workflow_name" class="form-control" type="text" formControlName="workflow_name"
+                            [class.is-invalid]="workflowDetailsFormErrors.workflow_name">
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.workflow_name">
+                            {{workflowDetailsFormErrors.workflow_name}}
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="description" class="form-col-form-label">Description</label>
+                        <textarea id="description" class="form-control static" rows='2' formControlName="description"
+                            [class.is-invalid]="workflowDetailsFormErrors.description"
+                            placeholder="Description"></textarea>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.description">
+                            {{workflowDetailsFormErrors.description}}
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="category" class="font-col-form-label">Category<em>*</em></label>
+                        <select id="category" class="form-control" formControlName="category"
+                            [class.is-invalid]="workflowDetailsFormErrors.category">
+                            <option value="" disabled> Select Category </option>
+                            <option *ngFor="let c of workflowMetadata?.category" [value]="c">{{c}} </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.category">
+                            {{workflowDetailsFormErrors.category}}</div>
+                    </div>
+                    <div class="form-group col-12">
+                        <label for="target_type" class="font-col-form-label">Target Type<em>*</em></label>
+                        <select id="target_type" class="form-control" formControlName="target_type"
+                            [class.is-invalid]="workflowDetailsFormErrors.target_type">
+                            <option value="" disabled> Select Target Type </option>
+                            <option *ngFor="let tt of targetTypeOptions" [value]="tt">{{tt}} </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.target_type">
+                            {{workflowDetailsFormErrors.target_type}}</div>
+                    </div>
+                    <div class="form-group col-12" *ngIf="workflowDetailsForm.get('cloud')">
+                        <label for="cloud" class="font-col-form-label">Cloud<em>*</em></label>
+                        <select id="cloud" class="form-control" formControlName="cloud"
+                            [class.is-invalid]="workflowDetailsFormErrors.cloud">
+                            <option value="" disabled> Select Cloud Type </option>
+                            <option *ngFor="let c of workflowMetadata?.cloud" [value]="c.type">{{c.type}} </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="workflowDetailsFormErrors.cloud">
+                            {{workflowDetailsFormErrors.cloud}}</div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="onSubmitWorkflowDetails()">Start</button>
+            <button class="btn btn-sm btn-danger pull-right" type="button"
+                (click)="onCloseWorkFlowDetails()">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+<!-- Workflow Modal End -->
+
+<!-- Svg for Arrow Start -->
+<!-- <svg width="0" height="0">
+    <defs>
+        <marker id="arrow" markerWidth="16" markerHeight="16" refX="8" refY="8" orient="auto"
+            markerUnits="userSpaceOnUse">
+            <path d="M0,0 L8,8 L0,16 L8,8 Z" fill="#86C3FC" stroke="#86C3FC" stroke-width="2" />
+        </marker>
+    </defs>
+</svg> -->
+<!-- Svg For Arrow End -->
+
+
+<svg width="0" height="0">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <!-- Filled triangle -->
+      <path d="M0,0 L10,5 L0,10 Z" fill="#5C6873" />
+    </marker>
+  </defs>
+</svg>

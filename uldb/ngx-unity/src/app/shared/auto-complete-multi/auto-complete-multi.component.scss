@@ -1,0 +1,75 @@
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    height: calc(1.5em + 0.75rem + 2px)
+}
+
+.tag {
+    display: flex;
+    align-items: center;
+    background-color: #007bff;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.remove {
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.tags-container input {
+    border: none;
+    outline: none;
+    flex: 1;
+    min-width: 120px;
+    padding: 4px;
+    background: transparent;
+}
+
+.dropdown {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 10;
+    width: 50%;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 4px;
+    border-radius: 4px;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #007bff;
+    cursor: pointer;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.dropdown-item:hover label {
+    color: #fff;
+}

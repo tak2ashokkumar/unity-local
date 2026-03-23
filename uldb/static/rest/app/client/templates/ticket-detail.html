@@ -1,0 +1,177 @@
+<!--Content Start-->
+
+<!--Tabs Level 1 Start-->
+
+<style type="text/css">
+    .btn.attachment_btn {
+      margin-right: 5px; 
+      padding:5px 10px;
+    }
+    .btn.attachment_btn a {
+      color : #fff; 
+      text-decoration : none;
+    }
+    .btn.attachment_btn:hover, .btn.attachment_btn:focus {
+      background-color: #204d74 !important;
+    }
+    .download_icon {
+        margin-left: 10px;
+        font-weight: bold;
+    }
+</style>
+
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+
+<loading loader="{{loader }}"></loading>
+
+
+<div class="row tabs-level1">
+    <div class="ui-selectee">
+        <nav class="column">
+            <ul class="nav nav-tabs">
+                <span class="ulheading">Customer Support</span>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!--Tabs Level 1 End-->
+<div class="row">
+    <div class="row db-info shadow-btm"> </div>
+</div>
+<div class="row content-wrapper">
+    <!--Left Table Start-->
+
+    <div class="row support-box">
+        <div class="row">This customer support portal is in beta status. For urgent support requests, please contact us via: </div>
+        <div class="row paddingtopbar">
+            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4"><i class="fa fa-envelope-o fa-lg neongreen"></i>Email: <a href="mailto:support@unityonecloud.com">support@unityonecloud.com</a></div>
+            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8"><i class="fa-phone fa fa-envelope-o fa-lg neongreen"></i>Phone: 1-415-349-2102 <span class="lightcolor paddingleft paddingright">| </span> Toll-free: 1-888-853-7733</div>
+        </div>
+    </div>
+    <div class="row paddingtop">
+        <div class="row middle-wrapper">
+            <div class="row cardbox-header">Ticket Details</div>
+            <div class="row Dashwrap" >
+                <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9 paddingright">
+                    <div class="row">
+                        <strong> Ticket ID:</strong>
+                        <p class="">{{request.id}}</p>
+                    </div>
+                    <div class="row paddingtop">
+                        <strong> Subject:</strong>
+                        <p class="">{{request.subject | returnNaWhenEmpty}}</p>
+
+                    </div>
+                    <div class="row paddingtop">
+                        <strong>Description: </strong>
+                        <div class="" ng-bind-html="request.description"> </div>
+                    </div>
+                    <div class="row paddingtop">
+                        <strong>Zendesk URL:</strong>
+                        <p class=""> <a href="{{ zendeskRequestUrlBase }}{{ request.id }} " target="_blank">{{ zendeskRequestUrlBase }}{{ request.id }}</a></p>
+                    </div>
+
+                    <div class="row paddingtop" ng-if="comments">
+                        <strong>Attachments:</strong>
+                        <ul>
+                            <li class="btn btn-primary attachment_btn" ng-repeat="attachment in comments[0].attachments">
+                                <a href="{{attachment.content_url}}" target="_blank">{{attachment.file_name}}
+                                    <span class="fa fa-download download_icon"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 paddingleft">
+                    <div class="row">
+                        <strong> Priority:</strong>
+                        <p ng-show="request.status != 'closed'">
+                            <select class="form-control" style="width:60%; height:80%; margin-top:5px;"
+                            ng-model="ticket_priority" ng-change="change_priority_req(ticket_priority)">
+                                <option ng-repeat="priority in ticket_priority_list" value="{{priority.short}}">{{priority.long}}</option>
+                            </select>
+                        </p>
+                        <p ng-show="request.status == 'closed'">{{request.priority | returnNaWhenEmpty}}</p>
+                    </div>
+                    <div class="row paddingtop">
+                        <strong> Created at:</strong>
+                        <p class="">{{request.created_at | unityDate : $root.users_timezone}}</p>
+                    </div>
+                    <div class="row paddingtop">
+                        <strong>Ticket Status: </strong>
+                        <p class="">{{request.status | returnNaWhenEmpty}}</p>
+                    </div>
+                    <div class="row paddingtop">
+                        <strong> Created via:</strong>
+                        <p class="">{{request.via.channel | returnNaWhenEmpty}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row paddingtop">
+            <div class="row middle-wrapper">
+                <div class="row cardbox-header">Comments</div>
+                <div class="row">
+                    <div class="row Dashwrap" ng-if="request.status != 'closed'">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Post New Comment</label>
+                            <textarea class="form-control" rows="3" id="comment"
+                                      placeholder="Add your comment here" ng-model="currentPost.body">
+                            </textarea>
+                            <div class="row paddingtop"><button class="btn btn-default" style="float:right;" type="button" ng-click='postComment(currentPost.body)'>Post</button></div>
+                        </div>
+                    </div>
+                    <div class="row userbox-inner">
+                         Comments  ({{commentsCount}})
+                    </div>
+                    <div class="row Dashwrap comment-box-border" ng-repeat="comment in comments">
+                        <div class="row">
+                            <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 paddingright">
+                                <strong> {{ users[comment.author_id].name}}  <span ng-if="userIsAdmin(comment.author_id)">(Agent)</span> </strong>
+                                <span class="comment-date-style">{{comment.created_at | unityDate : $root.users_timezone}}</span>
+                            </div>
+                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 paddingleft textright lightcolor"> </div>
+                        </div>
+                        <div class="row paddingtopbar" ng-bind-html="comment.body"> </div>
+                        <div class="row paddingtopbar" ng-if="$index !== 0">
+                            <strong>Attachments:</strong>
+                            <ul>
+                                <li class="btn btn-primary attachment_btn" ng-repeat="attachment in comment.attachments">
+                                    <a href="{{attachment.content_url}}">{{attachment.file_name}}
+                                        <span class="fa fa-download download_icon"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/ng-template" id="changePriorityConfirm.html">
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="cancel()">&times;</button>
+      <span class="modal-title">
+            Are you sure to change the Ticket priority from <strong>{{ticket_priority_old}}</strong> to
+             <strong>{{ticket_priority}} </strong> ?
+      </span>
+    </div>
+    <div class="modal-form">
+        <p>
+        </p>
+    </div>
+    <div class="modal-footer modal-buttons">
+        <button class="btn btn-cancel" ng-click="cancel()" type="button">Cancel</button>
+        <button class="btn btn-default" ng-click="change_priority()" type="submit"> Change Priority</button>
+    </div>
+</script>
+
+</div>
+
+

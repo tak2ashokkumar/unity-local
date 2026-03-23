@@ -1,0 +1,170 @@
+<div class="row mb-2">
+    <div class="col-6 pr-0" style="min-height: 250px;">
+        <div class="card round-edge mb-0">
+            <!-- <app-spinner [name]="'cluster_details'"></app-spinner> -->
+            <div class="card-header py-2 bg-white">SVM Details</div>
+            <div class="card-body d-flex flex-column font-sm" *ngIf="view">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="text-muted w-30 text-right">Name :</span>
+                    <span class="font-500 ml-2">{{view.name}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Language :</span>
+                    <span class="font-500 ml-2">{{view.language || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">State :</span>
+                    <span class="font-500 ml-2">
+                        <span class="fa" [ngClass]="view.stateIcon"></span>
+                        <span class="ml-2">[ {{view.state}} ]</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Configured protocols :</span>
+                    <span class="ml-2">
+                        <!-- <span class="badge badge-secondary badge-pill px-2 py-1 mb-2 mr-2"
+                            *ngFor="let protocol of view.configuredProtocols; let l = last;">{{protocol}}</span> -->
+                        <span *ngIf="!view.configuredProtocols || !view.configuredProtocols.length">NA</span>
+                        <span *ngIf="view.configuredProtocols">view.configuredProtocols</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">DNS Domains :</span>
+                    <span class="ml-2">
+                        <span class="badge badge-secondary badge-pill p-2 mb-2 mr-2"
+                            *ngFor="let domain of view.dnsDomains; let f = first;" [ngClass]="f ? '' : 'ml-2'">{{domain}}</span>
+                        <span *ngIf="!view.dnsDomains || !view.dnsDomains.length">NA</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">DNS Servers :</span>
+                    <span class="ml-2">
+                        <span class="badge badge-secondary badge-pill p-2 mb-2 mr-2"
+                            *ngFor="let server of view.dnsServers;">{{server}}</span>
+                        <span *ngIf="!view.dnsServers || !view.dnsServers.length">NA</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="text-muted w-30 text-right">Subtype :</span>
+                    <span class="font-500 ml-2">{{view.subtype || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">IP Interfaces :</span>
+                    <div class="w-65 ml-2">
+                        <div class="card mb-2" *ngFor="let inf of view.ipInterfaces">
+                            <div class="card-header py-1">{{inf.name}} - {{inf.ip_address}} </div>
+                            <div class="card-body px-2 pb-0 pt-2" *ngIf="inf.services">
+                                <span class="badge badge-secondary badge-pill px-2 py-1 mb-2 mr-2"
+                                *ngFor="let service of inf.services;">{{service}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">FC Interfaces :</span>
+                    <span class="pl-2 w-60">
+                        <span class="badge badge-secondary badge-pill p-2 mb-2 mr-2"
+                            *ngFor="let inf of view.fcInterfaces;">{{inf}}</span>
+                        <span *ngIf="!view.fcInterfaces || !view.fcInterfaces.length">NA</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">nis enabled :</span>
+                    <span class="font-500 ml-2">{{view.nisEnabled || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">nis :</span>
+                    <span class="pl-2 w-60">
+                        <span class="badge badge-secondary badge-pill p-2 mb-2 mr-2"
+                            *ngFor="let sv of view.nisServers;">{{sv}}</span>
+                        <span *ngIf="!view.nisServers || !view.nisServers.length">NA</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">s3 enabled :</span>
+                    <span class="font-500 ml-2">{{view.s3Enabled || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">s3 :</span>
+                    <span class="font-500 ml-2">{{view.s3Name || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">iscsi enabled :</span>
+                    <span class="font-500 ml-2">{{view.iscsiEnabled || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Aggregates :</span>
+                    <span class="ml-2">
+                        <span class="badge badge-secondary badge-pill p-2 mb-2 mr-2"
+                            *ngFor="let ag of view.aggregates;">{{ag}}</span>
+                        <span *ngIf="!view.aggregates || !view.aggregates.length">NA</span>
+                    </span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">fcp enabled :</span>
+                    <span class="font-500 ml-2">{{view.fcpEnabled || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">ldap enabled :</span>
+                    <span class="font-500 ml-2">{{view.ldapEnabled || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">nvme enabled :</span>
+                    <span class="font-500 ml-2">{{view.nvmeEnabled || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">IP Space :</span>
+                    <span class="font-500 ml-2">{{view.ipSpace || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Snapmirror is Protected :</span>
+                    <span class="font-500 ml-2">{{view.snapMirrorProtected || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Snapmirror Protected Volumes Count :</span>
+                    <span class="font-500 ml-2">{{view.snapMirrorProtectedVolumesCount || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Anti Ransomeware Default Volume State :</span>
+                    <span class="font-500 ml-2">{{view.antiRansomewareDefaultVolumeState || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mb-2 mt-1">
+                    <span class="text-muted w-30 text-right">Number of Volumes in recovery Queue :</span>
+                    <span class="font-500 ml-2">{{view.numberOfVolumesinRecoveryQueue || 'NA'}}</span>
+                </div>
+                <div class="d-flex align-items-center mt-1">
+                    <span class="text-muted w-30 text-right">Max Volumes :</span>
+                    <span class="font-500 ml-2">{{view.maxVolumes || 'NA'}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card round-edge mb-2">
+            <app-spinner [name]="'top_volumes'"></app-spinner>
+            <div class="card-header py-2 bg-white">Top 5 Volumes</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3 py-2">
+                <canvas *ngIf="volumeChartData" baseChart [chartType]="volumeChartData.type"
+                    [labels]="volumeChartData.lables" [datasets]="volumeChartData.bardata"
+                    [options]="volumeChartData.options" [plugins]="volumeChartData.plugins"
+                    [legend]="volumeChartData.legend" [colors]="volumeChartData.colors" height="120"></canvas>
+                <div *ngIf="!volumeChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+        <div class="card round-edge">
+            <app-spinner [name]="'top_luns'"></app-spinner>
+            <div class="card-header py-2 bg-white">Top 5 LUNs</div>
+            <div class="card-body d-flex flex-column justify-content-center px-3 py-2">
+                <canvas *ngIf="lunChartData" baseChart [chartType]="lunChartData.type"
+                    [labels]="lunChartData.lables" [datasets]="lunChartData.bardata"
+                    [options]="lunChartData.options" [plugins]="lunChartData.plugins" [legend]="lunChartData.legend"
+                    [colors]="lunChartData.colors" height="120"></canvas>
+                <div *ngIf="!lunChartData">
+                    <div class="text-center text-muted py-5">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

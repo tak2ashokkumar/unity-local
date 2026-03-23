@@ -1,0 +1,291 @@
+<style type="text/css">
+  .cg-busy {
+    top: 50px;
+    height: 90%;
+    position: fixed;
+    left: 0px; 
+    transition-property: left;
+    transition-duration: 0.2s;
+}
+</style>
+
+<div class="page_wrapper" style="float:left">
+  <loading object="{{gcp_result}}"></loading>
+  <loading loader="{{loader}}"></loading>
+  <div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color">
+      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 search-widget">
+          <form class="navbar-form">
+              <div class="form-group">
+                  <input class="form-control" type="text" ng-model="searchKeyword" ng-change="getSearchResults(searchKeyword)" id="searchKeyword" placeholder="Enter keyword" ng-model-options="{debounce: 1000}">
+                  <button class="btn btn-search" type="submit" style="top: 4px;">
+                      <i class="fa fa-search"></i>
+                  </button>
+              </div>
+          </form>
+      </div>
+      <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+          <div class="action-bar" >
+              <button class="btn btn-default" type="button" ng-click="invokeVirtualMachineForm(account_id)"> 
+              + <span>Create Instance</span>
+              </button>
+          </div>
+      </div>
+      <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 padding_top15px">
+          <div class="action-bar pull-right">
+              <span class="count">{{model_count}}</span>
+              <span class="count-text"> Virtual Machines</span>
+          </div>
+      </div>
+    </div>
+    <section id="no-more-tables" class="margintop20 middle-wrapper" ng-if="gcp_result.length > 0">
+      <div infinite-scroll='loadPageData()' infinite-scroll-disabled='!gcp_loaded'>
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="{{ row.col_class }}" ng-repeat="row in gcp_rows" custom-sort sortdisabled= "{{row.is_sort_disabled}}" order="{{ row.name }}" sort="sort">{{ row.description }}</th>
+            <th> Actions </th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr ng-repeat="result in gcp_result | filter: gcpSearch as filtered"
+              ng-class="{'active success': result === selection.selected}">
+              <td>
+                  <a tabindex="0" popover-trigger="'focus'" uib-popover-template="popoverobj.templateUrl" popover-class="pdu_popover" href="javascript:void(0)" popover-placement="top-left" ng-init="get_gcp_observium_details(result)" ng-click="show_observium_details(result)" class="ng-binding ng-scope">{{result.name}}</a>
+              </td>
+              <!-- Power status column start-->
+              <td>
+                <span ng-if="result.status == 'RUNNING'">
+                  <device-up></device-up>
+                </span>
+
+                <span ng-if="result.status == 'TERMINATED'">
+                  <device-down></device-down>
+                </span>
+
+                <span ng-if="(result.status != 'RUNNING') && (result.status != 'TERMINATED')">
+                  <span ng-if="angular.isObject(result.observium_details) && !angular.isDefined(result.observium_details.device_data)">
+                    <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+
+                  <span ng-if="!angular.isObject(result.observium_details)">
+                    <device-not-configured></device-not-configured>
+                  </span>
+                  <span ng-if="angular.isObject(result.observium_details) && angular.isDefined(result.observium_details.device_data)">
+                      <span ng-if="result.observium_details.device_data.status == 1"> 
+                          <device-up></device-up>
+                      </span>
+                      <span ng-if="result.observium_details.device_data.status == 0"> 
+                          <device-down></device-down>
+                      </span>
+                  </span>
+                </span>
+              </td>
+              <!-- Power status column end -->
+
+            <td class="normal">{{result.zone}}</td>
+            <td class="normal">{{result.cpu_platform}}</td>
+            <!-- <td class="normal">{{result.machine_type}}</td> -->
+            <td class="normal">{{result.operating_system}}</td>
+            <td class="normal"><ul ng-repeat="ip in result.internal_ip">{{ip || 'N.A'}}</ul></td>
+            <td class="normal"><ul ng-repeat="ip in result.external_ip">{{ip || 'N.A'}}</ul></td>
+            <!-- <td>{{result.management_ip || 'NA'}}</td> -->
+            <td>
+              <div class="action-icons">
+                <span ng-if="!result.powerStateLoading" tooltip-class="customClass" uib-tooltip="{{ (result.status === 'RUNNING') ? 'Power Off' : 'Power On'}}">
+                    <a ng-click="confirmationCheck($index, result.uuid, result.status)">
+                        <i class="fa fa-power-off" ng-class="{'poweredOnCss': result.status === 'RUNNING'}" aria-hidden="true"></i>
+                    </a>
+                </span>
+                <span ng-if="result.powerStateLoading">
+                  <i class="fa fa-spinner fa-spin"></i>
+                </span>
+                <!-- <span>
+                    <a class="fa fa-info-circle"  tooltip-class="customClass" uib-tooltip="VM Info"
+                         href="" ng-click="show_vm_details(result)"></a>
+                </span> -->
+
+                <!-- <span ng-if="(result.status === 'RUNNING')">
+                    <span tooltip-class="customClass" ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0" uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in same tab'}}">
+                        <a ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0" ng-click="vmConsoleSameTab($index, result.uuid, result.cloud.platform_type)" ng-class="{'fa-disabled': (!result.management_ip)}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip)}"></i>
+                        </a>
+                    </span>
+
+                    <span tooltip-class="customClass" ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0" uib-tooltip="Open in Same tab option is not available for windows based machines.">
+                        <a ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0" ng-click="vmConsoleSameTab($index, result.uuid, result.cloud.platform_type)" ng-class="{'fa-disabled': true}">
+                          <i class="fa fa-external-link-square" aria-hidden="true" ng-class="{'fa-disabled': true}"></i>
+                        </a>
+                    </span>
+
+                    <span tooltip-class="customClass" uib-tooltip="{{ !result.management_ip ? 'Management IP not Configured' : 'Open in new tab'}}">
+
+                        <a href="/rdp?ip={{result.management_ip}}&domain=unitedlayer.com" target="_blank" ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0" >
+                          <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip)}"></i>
+                        </a>
+
+                        <a ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0" href="/vm-console-client#/gcp-vm/webconsole/{{ result.uuid }}/" target="_blank" ng-class="{'fa-disabled': (!result.management_ip)}">
+                          <i class="fa fa-external-link" aria-hidden="true" ng-class="{'fa-disabled': (!result.management_ip)}"></i>
+                        </a>
+                    </span>
+                </span>
+
+                <span ng-if="(result.status !== 'RUNNING')">
+                    <span tooltip-class="customClass" uib-tooltip="VM is Powered Off" ng-if="result.os_name.lastIndexOf('Microsoft', 0) !== 0">
+                        <a class="fa-disabled">
+                          <i class="fa fa-external-link-square fa-disabled" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    <span tooltip-class="customClass" uib-tooltip="Open in Same tab option is not available for windows based machines." ng-if="result.os_name.lastIndexOf('Microsoft', 0) === 0">
+                        <a class="fa-disabled">
+                          <i class="fa fa-external-link-square fa-disabled" aria-hidden="true"></i>
+                        </a>
+                    </span>
+
+                    <span tooltip-class="customClass" uib-tooltip="VM is Powered Off">
+                        <a class="fa-disabled">
+                            <i class="fa fa-external-link fa-disabled" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                </span> -->
+
+               <!--  <span tooltip-class="customClass" uib-tooltip="Show Device Statistics"
+                 ng-show="(result.observium_details !== null)">
+                  <a ng-click="show_vcloud_device_statistics(result.uuid)">
+                      <i class="fa fa-line-chart" aria-hidden="true"></i>
+                  </a>
+                </span>
+                <span tooltip-class="customClass" ng-show="(result.observium_details === null)"
+                uib-tooltip="{{ $root.monitoring_not_enabled_msg }}">
+                    <a>
+                        <i class="fa fa-line-chart fa-disabled" aria-hidden="true"></i>
+                    </a>
+                </span> -->
+
+                <span tooltip-class="customClass" uib-tooltip="Manage by creating support ticket">
+                    <a ng-click="manage_request_vm(result.name, 'GCP Virtual Machine', result)" href="">
+                        <i class="fa fa-ticket" aria-hidden="true"></i>
+                    </a>
+                </span>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <div ng-if="gcp_loaded && gcp_result.length === 0" class="content-wrapper  ">
+    <div class="margin_top85px">
+      <no-records-found message="No GCP VMs to display"></no-records-found>
+    </div>
+  </div>
+</div>
+<script type="text/ng-template" id="confirmationCheck.html">
+<div class="modal-content" >
+    <div class="modal-header" style="text-align: center;">
+        <h4 class="modal-title">Are you sure to <b>{{action}}</b> this VM?</h4>
+    </div>
+  <form role="form" name="modalform" novalidate ng-submit="modalform.$valid && wrap(obj, list)">
+    <div class="modal-footer modal-buttons">
+        <div class="modal-footer modal-buttons"  style="text-align: center;">
+            <button type="button" class="btn btn-cancel" ng-click="cancel()">
+              No
+            </button>
+            <button type="button" ng-class="{'disabled': power_loader}" class="btn btn-default" ng-click="confirm()">
+              Yes
+            </button>
+        </div>
+    </div>
+  </form>
+</div>
+</script>
+<script type="text/ng-template" id="inputVirtualMachineForm.html">
+    <div class="modal-content">
+        <form role="form" name="userForm">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="close_modal()">&times;</button>
+                <h4 class="modal-title">Create Virtual Machine</h4>
+            </div>
+            <div class="modal-body" id="authentication_loader" style="padding:20px 40px;">
+                <div class="modal-form">
+                    <div class="form-group" ng-if="errorMsg">
+                        <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-show="disableAccess == undefined">
+                        <div class="paddingR">
+                            <div class="form-group">
+                                <label for="request.name" class="col-sm-3 control-label">
+                                    Name
+                                </label>
+
+                                <div>
+                                    <input type="text" class="form-control" ng-model="request.name" placeholder="VM Name" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.zone" class="col-sm-3 control-label">
+                                    Zone
+                                    <span ng-if="zone_images_loader">
+                                      <i class="fa fa-spinner fa-spin"></i>
+                                    </span>
+
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.zone" ng-options="zn for zn in zones_list" ng-change="loadZoneSpecificMachines(account_id, request.zone)" required>
+                                        <option value="">Select Zone</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.image" class="col-sm-3 control-label">
+                                    Image
+                                    <span ng-if="zone_images_loader">
+                                      <i class="fa fa-spinner fa-spin"></i>
+                                    </span>
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.image" ng-options="a.selfLink as a.name for a in images_list" required>
+                                        <option value="">Select Image</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="request.ami" class="col-sm-3 control-label">
+                                    Machine Type
+                                    <span ng-if="machine_loader">
+                                      <i class="fa fa-spinner fa-spin"></i>
+                                    </span>
+                                </label>
+
+                                <div>
+                                    <select class="form-control" ng-model="request.machine_type" ng-options="mn.name as (mn.name + ' --- ' +mn.description) for mn in machine_list" required>
+                                        <option value="">Select Machine Type</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- </div> -->
+            <!-- <div class="modal-footer modal-buttons"> -->
+            <div class="modal-footer modal-buttons" ng-show="disableAccess == undefined">
+                <button type="button" class="btn btn-cancel" ng-click="close_modal()">
+                    Close
+                </button>
+                <button type="submit" class="btn btn-default" ng-click="create_instance(account_id, request)">
+                    Create VM
+                </button>
+            </div>
+            <!-- </div> -->
+        </form>
+    </div>
+</script>

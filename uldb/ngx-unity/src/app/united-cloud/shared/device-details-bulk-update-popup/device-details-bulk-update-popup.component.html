@@ -1,0 +1,121 @@
+<div class="card mb-0">
+  <div class="card-header">Bulk Update
+    <div class="card-header-actions">
+      <a class="card-header-action btn-close" (click)="closePopup()">
+        <i class="fas fa-times"></i>
+      </a>
+    </div>
+  </div>
+  <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+    <form *ngIf="form" [formGroup]="form">
+      <div class="form-group">
+        <div class="invalid-credentials" *ngIf="dependencyError">{{dependencyError}}</div>
+      </div>
+      <div class="form-group"></div>
+      <div formArrayName="fields">
+        <div *ngFor="let fieldGroup of fields?.controls;  let i = index;let first = first; let last = last;"
+          [formGroupName]="i" class="edit-item">
+          <div class="row form-group">
+            <div class="col-6">
+              <label for="name" class="form-col-form-label">Field<em>*</em></label>
+              <select class="form-control" formControlName="field" [class.is-invalid]="formErrors.fields[i]?.field"
+                (change)="onFieldChange($event.target.value, i)">
+                <option [value]="''" disabled>Select Attribute</option>
+                <option *ngFor="let field of fieldsList" [value]="field.field_name"
+                  [disabled]="isFieldAlreadySelected(field.field_name, i)">
+                  {{ field.display_name }}
+                </option>
+              </select>
+
+              <div class="invalid-feedback" *ngIf="formErrors.fields[i]?.field">
+                {{formErrors.fields[i].field}}
+              </div>
+            </div>
+
+            <div class="col-4" *ngIf="fieldGroup.get('edit_value')">
+              <label class="form-col-form-label">
+                {{ getFieldDisplayName(fieldGroup.get('field')?.value) }}<em>*</em>
+              </label>
+              <ng-container [ngSwitch]="getFieldType(fieldGroup.get('field')?.value)">
+
+                <!-- Text Input -->
+                <input *ngSwitchCase="'text'" class="form-control" type="text" formControlName="edit_value"
+                  placeholder="Enter value" [class.is-invalid]="formErrors.fields[i]?.edit_value" />
+
+                <!-- Integer Input -->
+                <input *ngSwitchCase="'Integer'" class="form-control" type="number" formControlName="edit_value"
+                  placeholder="Enter number" [min]="0" [max]="fieldGroup.get('field')?.value === 'size' ? 20 : null"
+                  [class.is-invalid]="formErrors.fields[i]?.edit_value" />
+
+                <!-- Char Input (as text) -->
+                <input *ngSwitchCase="'Char'" class="form-control" type="text" formControlName="edit_value"
+                  placeholder="Enter value" [class.is-invalid]="formErrors.fields[i]?.edit_value" />
+
+                <!-- Dropdown -->
+                <select *ngSwitchCase="'dropdown'" class="form-control" [formControl]="fieldGroup.get('edit_value')"
+                  (change)="onDropdownChange($event.target.value, i)"
+                  [class.is-invalid]="formErrors.fields[i]?.edit_value">
+                  <option [value]="''" disabled>Select option</option>
+                  <option *ngFor="let opt of getFieldOptions(fieldGroup.get('field')?.value)"
+                    [value]="opt.id || opt.uuid || opt.name">
+                    {{ opt.name }}
+                  </option>
+                </select>
+
+                <!-- Choice -->
+                <select *ngSwitchCase="'Choice'" class="form-control" [formControl]="fieldGroup.get('edit_value')"
+                  (change)="onDropdownChange($event.target.value, i)"
+                  [class.is-invalid]="formErrors.fields[i]?.edit_value">
+                  <option [value]="''" disabled>Select option</option>
+                  <option *ngFor="let opt of getFieldOptions(fieldGroup.get('field')?.value)"
+                    [value]="opt.id || opt.uuid || opt.name">
+                    {{ opt.name }}
+                  </option>
+                </select>
+
+                <!-- Boolean -->
+                <select *ngSwitchCase="'Boolean'" class="form-control" [formControl]="fieldGroup.get('edit_value')"
+                  (change)="onDropdownChange($event.target.value, i)"
+                  [class.is-invalid]="formErrors.fields[i]?.edit_value">
+                  <option [value]="false">False</option>
+                   <option [value]="true">True</option>
+                </select>
+
+                <!-- Multi Select Dropdown -->
+                <multiselect-dropdown *ngSwitchCase="'multi_select_dropdown'"
+                  [options]="getFieldOptions(fieldGroup.get('field')?.value)" [settings]="selectionSettings"
+                  class="form-control p-0" style="height:auto;" formControlName="edit_value"
+                  [class.is-invalid]="formErrors.fields[i]?.edit_value"></multiselect-dropdown>
+
+                <select *ngSwitchCase="'dependent_dropdown'" class="form-control"
+                  [formControl]="fieldGroup.get('edit_value')" [class.is-invalid]="formErrors.fields[i]?.edit_value">
+                  <option [value]="''" disabled>Select option</option>
+                  <option *ngFor="let opt of dependentOptionsMap[rowIdMap.get(i)]" [ngValue]="opt">
+                    {{ opt.name }}
+                  </option>
+                </select>
+
+                <div class="invalid-feedback" *ngIf="formErrors.fields[i]?.edit_value">
+                  {{formErrors.fields[i]?.edit_value}}
+                </div>
+              </ng-container>
+            </div>
+
+            <div class="mt-4 pt-1">
+              <span class="form-control border-0 p-0">
+                <button tooltip="Remove Parameter" class="action-icons fas fa-minus font-sm ml-1"
+                  (click)="removeField(i)" *ngIf="form.get('fields').controls.length > 1"></button>
+                <button tooltip="Add Parameter" class="action-icons fas fa-plus font-sm ml-1" *ngIf="last"
+                  (click)="addField(i)"></button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="card-footer text-right">
+    <button class="btn btn-outline-danger btn-sm" type="button" (click)="closePopup()">Cancel</button>
+    <button class="btn btn-sm btn-primary  ml-2" type="button" (click)="submit()">Submit</button>
+  </div>
+</div>

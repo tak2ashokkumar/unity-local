@@ -1,0 +1,26 @@
+
+<form role="form">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="form-group ng-scope">
+            <label for="blockName">Instance Id *</label>
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" ng-model="obj.instance_id" disabled>
+            <label class="errormsg" ng-if="obj['instance_iderr']">{{ obj['instance_idMsg'] }}</label>
+        </div>
+        <div class="form-group ng-scope">
+            <label for="blockName">Image Name *</label>
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" required="" value="" ng-model="obj.name">
+            <label class="errormsg" ng-if="obj['nameerr']">{{ obj['nameMsg'] }}</label>
+        </div>
+        <div class="form-group ng-scope">
+            <label for="blockName">Image Description *</label>
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" required="" value="" ng-model="obj.description">
+            <label class="errormsg" ng-if="obj['descriptionerr']">{{ obj['descriptionMsg'] }}</label>
+        </div>
+        <div class="form-group ng-scope">
+            <label for="blockName">No reboot</label>
+            <label class="ng-binding">
+                <input class="ckeckbox cbox_view ng-pristine ng-untouched ng-valid ng-empty" type="checkbox" name="No reboot" ng-model="obj.reboot">
+            </label>
+        </div>
+    </div>
+</form>

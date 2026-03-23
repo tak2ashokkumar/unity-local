@@ -1,0 +1,62 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card rounded-0">
+            <div class="card-body">
+                <form [formGroup]="form" *ngIf="form">
+                    <div class="form-group">
+                        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label class="font-col-form-label" for="connection_type">Connection Type<em>*</em></label>
+                            <select id="connection_type" class="form-control" formControlName="connection_type"
+                                [class.is-invalid]="formErrors.connection_type">
+                                <option [value]="null" disabled>Select Connection Type</option>
+                                <option [value]="'API'">API</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="formErrors.connection_type">
+                                {{formErrors.connection_type}}</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <button class="btn btn-sm btn-success pull-right ml-1" type="button" [disabled]="form && form.pristine"
+                    (click)="activateMonitoring()">Activate Monitoring</button>
+
+                <button class="btn btn-sm btn-warning pull-right ml-1" type="button" *ngIf="monitoringDetails"
+                    [disabled]="form && form.pristine" (click)="buildForm()">Reset</button>
+
+                <button class="btn btn-sm btn-danger pull-right ml-1" type="button" (click)="deleteMonitoringConfig()"
+                    *ngIf="monitoring && monitoring.configured">Delete</button>
+
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="toggleMonitoring()"
+                    *ngIf="monitoring && monitoring.configured && !monitoring.enabled">Enable</button>
+                <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="toggleMonitoring()"
+                    *ngIf="monitoring && monitoring.configured && monitoring.enabled">Disable</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This monitoring configuration will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteConfig()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

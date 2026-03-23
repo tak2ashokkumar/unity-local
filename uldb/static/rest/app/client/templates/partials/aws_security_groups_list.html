@@ -1,0 +1,50 @@
+<div class="row">
+
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row db-info shadow-btm"> </div>
+    </div>
+
+    <div class="row page_wrapper">
+        <!--Tabs Level 1 End-->
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <h1>{{region_name_float}} </h1>
+                    <span><span ng-if="region_name_float">-</span> Security Groups</span>
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                    <form class="navbar-form">
+                        <div class="form-group">
+                            <input class="form-control" style="max-width: 100%" type="text" placeholder="Enter keyword" ng-model="searchKeyword"ng-disabled="(aws_security_group_content.data.length === 0)">
+                            <button class="btn btn-search" type="submit" style="top: 3px;">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <section id="no-more-tables" class="margintop20 middle-wrapper table-responsive">
+                <table id="example" class="example table table-condensed cf" ng-show="aws_security_group_content.data.length > 0">
+                    <thead class="cf">
+                        <tr>
+                            <th ng-repeat="aws_security_group_header in aws_security_group_headers"
+                            custom-sort order="{{aws_security_group_header.key}}" sort="sort">{{ aws_security_group_header.title }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(index, aws_security_group) in aws_security_group_content.data | filter: searchKeyword | orderBy: sortkey">
+                            <td class="normal">{{aws_security_group.group_name}}</td>
+                            <td class="normal">{{aws_security_group.group_id}}</td>
+                            <td class="normal">{{aws_security_group.description}}</td>
+                            <td class="normal">{{aws_security_group.vpc_id}}</td>
+                            <td class="normal">{{aws_security_group.owner_id}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="((aws_security_group_content.data.length) === 0 || ((aws_security_group_content.data | filter: searchKeyword).length === 0))" class="content-wrapper">
+                    <no-records-found message="No Security Groups available in this region"></no-records-found>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

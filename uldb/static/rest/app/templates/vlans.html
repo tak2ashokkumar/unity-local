@@ -1,0 +1,23 @@
+{% include 'include_frame.html' %}
+<!--<h3>Monitored Hosts</h3>-->
+
+<div class="divpad" ng-app="uldb" ng-controller="VlanController">
+  <div class="table-response">
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Domain name</th>
+        <th>VLANs</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr ng-repeat="domain for domain in vtp_domains">
+        <td>{{ domain.domain_name }}</td>
+        <td>{{ domain.vlans }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

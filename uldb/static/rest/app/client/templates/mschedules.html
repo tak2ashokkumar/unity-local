@@ -1,0 +1,20 @@
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <mschedules
+                heading="Maintenance Schedules"
+                headers="mschedules_headers"
+                tabledata="mschedules_content.data"
+                modeldata="mschedules_content_modeldata"
+                switches="mschedules_switches(args)"
+                rows="mschedules_content_rows"
+                addclick="mschedules_add(data)"
+                editclick = "mschedules_edit(data)"
+                deleteclick = "mschedules_delete(data)"
+                deleteconfirm = "mschedules_delete_modal"
+                completeclick = "mschedules_complete(data)"
+                actions="mschedules_content.actions">
+            </mschedules>
+        </div>
+    </div>
+</div>

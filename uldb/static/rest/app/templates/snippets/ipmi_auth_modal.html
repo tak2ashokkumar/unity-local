@@ -1,0 +1,53 @@
+<div class="modal-content">
+  <form role="form" name="modalform">
+    <div class="modal-header" style="text-align: center;">
+      <h4 class="modal-title">Please provide credentials to <strong>{{bm_server_power_state}}</strong> this server.</h4>
+    </div>
+    <div class="modal-body" style="padding:20px 40px;">
+      <div class="modal-form" >
+        <label style="color: red;">*Only authorized users are allowed to perform this action. Please provide your credentials.</label>
+        <div class="form-group" ng-if="errorMsg">
+          <label style="color:red" class="col-sm-10">{{ errorMsg }}</label>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="paddingR">
+            <div class="form-group">
+              <label for="ipmi_username">
+              Username*
+              </label>
+              <span class="errormsg" ng-if="ipmiUsernameErrMsg">{{ipmiUsernameErrMsg}}</span>
+              <div>
+                <input type="text"
+                  class="form-control" ng-model="ipmi_username" disabled />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="ipmi_password">
+              Password*
+              </label>
+              <span class="errormsg" ng-if="ipmiPasswordErrMsg">{{ipmiPasswordErrMsg}}</span>
+              <div>
+                <input
+                  type="password"
+                  class="form-control"
+                  ng-model="ipmi_password"
+                  placeholder="Password"
+                  ng-class="{'has-error_inputbox': ipmiPasswordErr}" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer modal-buttons">
+      <div class="modal-footer modal-buttons">
+        <button type="button" class="btn btn-cancel" ng-click="close_confirm()">
+        Cancel
+        </button>
+        <button type="submit" class="btn btn-default" ng-click="confirm_action(ipmi_username, ipmi_password)">
+        Submit
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

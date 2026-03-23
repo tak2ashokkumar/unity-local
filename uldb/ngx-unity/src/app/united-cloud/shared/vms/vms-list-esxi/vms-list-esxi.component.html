@@ -1,0 +1,216 @@
+<div class="card rounded-0 border-top-0">
+  <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+    <div class="d-flex justify-content-center align-items-center font-500">
+      <span class="badge badge-secondary font-sm">{{count}}</span>
+      <span class="ml-1 font-lg">Virtual Machines</span>
+    </div>
+    <div class="d-flex justify-content-end align-items-center">
+      <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+  </div>
+  <div class="card-body py-2">
+    <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+      <div class="w-25">
+        <search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)"></search-box>
+      </div>
+      <div>
+        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+          (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+      </div>
+    </div>
+    <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+      <thead class="bg-light">
+        <tr>
+          <th sortable-column="name">Name</th>
+          <th>Status</th>
+          <th sortable-column="os_name">Operating System</th>
+          <th sortable-column="host_name">Host Name</th>
+          <th *ngIf="showDevicesColumns">Cloud</th>
+          <th sortable-column="management_ip">Management IP</th>
+          <th>Tags</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of viewData;let i = index" truncateText>
+          <td class="tdw-15">
+            <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button" [tooltip]="view.name"
+              (click)="goToDetails(view)" accessControl moduleName="Monitoring" accessType="View Monitoring"
+              elementType="div">{{view.name}}</button>
+          </td>
+          <td class="tdw-10">
+            <shared-device-status [status]="view.powerStatus"></shared-device-status>
+          </td>
+          <td class="tdw-20">
+            <div [tooltip]="view.osName">{{view.osName}}</div>
+          </td>
+          <td class="tdw-15">
+            <div [tooltip]="view.hostName">{{view.hostName}}</div>
+          </td>
+          <td *ngIf="showDevicesColumns" class="tdw-10">
+            <div [tooltip]="view.cloud">{{view.cloud}}</div>
+          </td>
+          <td class="tdw-15">
+            <div [tooltip]="view.managementIp">{{view.managementIp}}</div>
+          </td>
+          <td class="tdw-10">
+            <ng-container [ngTemplateOutlet]='tagsList' [ngTemplateOutletContext]="{tags:view.tags}"></ng-container>
+          </td>
+          <td class="action-icons-column">
+            <button class="action-icons mb-0 fa font-sm ml-1" [class]="view.powerIcon"
+              [ngClass]="{'action-icons-disabled':!view.powerIconEnabled,'action-icons-on':view.powerStatusOn}"
+              [tooltip]="view.powerIconMsg" (click)="powerToggle(view)" accessControl moduleName="Private Cloud"
+              accessType="Manage Private Cloud" elementType="actionbtn"></button>
+
+            <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
+              [tooltip]="view.sameTabTootipMessage" [ngClass]="{'action-icons-disabled':!view.isSameTabEnabled}"
+              (click)="consoleSameTab(view)" accessControl moduleName="Private Cloud" accessType="Remote Management"
+              elementType="actionbtn"></button>
+
+            <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1" [tooltip]="view.newTabToolipMessage"
+              [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" (click)="consoleNewTab(view)" accessControl
+              moduleName="Private Cloud" accessType="Remote Management" elementType="actionbtn"></button>
+
+            <button class="action-icons mb-0 fas fa-chart-line font-sm ml-1" (click)="goToStats(view)"
+              [tooltip]="view.statsTooltipMessage" accessControl moduleName="Monitoring" accessType="View Monitoring"
+              elementType="actionbtn">
+            </button>
+
+            <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+              (click)="createTicket(view)"></button>
+
+            <span dropdown placement="bottom right" container="body">
+              <button id="button-container" class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle (click)="false"
+                [tooltip]="'More Actions'" container="body" accessControl moduleName="Private Cloud"
+                accessType="Manage Private Cloud" elementType="actionbtn"></button>
+              <div container="body" id="icons-dropdown-container"
+                class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                aria-labelledby="button-container">
+                <button class="action-icons mt-2 fa fa-info-circle font-sm" tooltip="VM Info" container="body"
+                  (click)="showInfo(view)"></button>
+                <button class="action-icons mt-2 fas fa-pencil-alt font-sm" tooltip="Update Management Ip"
+                  container="body" (click)="updateIp(view)"></button>
+                <button class="action-icons mt-2 mb-1 fas fa-tag font-sm" tooltip="Update Tags" container="body"
+                  (click)="updateTags(view)"></button>
+              </div>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count">
+    </table-entries>
+    <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+      [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+    <div class="text-center text-muted py-4" *ngIf="!viewData.length">There are no VMs associated with this account.
+    </div>
+  </div>
+</div>
+<ng-template #tagsList let-tags="tags">
+  <div [popoverContext]="{ tags: tags }" [popover]="tagsTooltipTmpl" triggers="mouseenter:mouseleave" placement="top">
+    <span *ngFor="let tag of tags" class="badge badge-pill badge-primary">{{tag}}</span>
+  </div>
+  <div *ngIf="!tags.length">N/A</div>
+</ng-template>
+
+<ng-template #tagsTooltipTmpl let-tags="tags">
+  <div class="font-weight-bold">
+    <span *ngFor="let tag of tags" class="badge badge-pill badge-primary m-1 font-sm">{{tag}}</span>
+  </div>
+</ng-template>
+
+<vms-mgmt-crud (onCrud)="onCrud($event)"></vms-mgmt-crud>
+<vms-tags-crud (onCrud)="onCrud($event)"></vms-tags-crud>
+
+<ng-template #serverinfo>
+  <div class="card mb-0">
+    <div class="card-header">
+      Virtual Machine details
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table text-left">
+        <tr>
+          <td><strong>Virtual Machine</strong></td>
+          <td>{{info?.name}}</td>
+        </tr>
+        <tr>
+          <td><strong>CPU Cores</strong></td>
+          <td>{{info?.cpucores}}</td>
+        </tr>
+        <tr>
+          <td><strong>VCPUs</strong></td>
+          <td>{{info?.vcpus}}</td>
+        </tr>
+        <tr>
+          <td><strong>Memory</strong></td>
+          <td>{{info?.memory}}</td>
+        </tr>
+        <tr>
+          <td><strong>Storage</strong></td>
+          <td>{{info?.storage}}</td>
+        </tr>
+        <tr>
+          <td><strong>Hypervisor</strong></td>
+          <td>{{info?.hypervisor}}</td>
+        </tr>
+        <tr>
+          <td><strong>Tags</strong></td>
+          <td>
+            <span *ngFor="let tag of info.tags" class="badge badge-pill badge-primary mr-1">{{tag}}</span>
+            <span *ngIf="!info.tags.length">N/A</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-danger pull-right" (click)="modalRef.hide()" type="button">Close</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #authenticate>
+  <div class="card mb-0">
+    <div class="card-header">
+      Please provide credentials to <strong>{{action}}</strong>
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="closeAuthModal()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="authForm">
+
+        <div class="form-group">
+          <div class="invalid-credentials">Only authorized users are allowed to perform this action. Please provide
+            your credentials.</div>
+        </div>
+        <div class="form-group">
+          <div class="invalid-credentials" *ngIf="authFormErrors.nonFieldErr">{{authFormErrors.nonFieldErr}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="username">Username<em>*</em></label>
+          <input class="form-control" id="username" type="text" formControlName="username"
+            [ngClass]="{'is-invalid' : authFormErrors.username}">
+          <div class="invalid-feedback" *ngIf="authFormErrors.username">{{authFormErrors.username}}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-col-form-label" for="password">Password<em>*</em></label>
+          <input class="form-control" id="password" type="password" formControlName="password"
+            [ngClass]="{'is-invalid' : authFormErrors.password}">
+          <div class="invalid-feedback" *ngIf="authFormErrors.password">{{authFormErrors.password}}</div>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="onSubmit()">Submit</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="closeAuthModal()" type="button">Cancel</button>
+    </div>
+  </div>
+</ng-template>

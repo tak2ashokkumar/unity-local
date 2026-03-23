@@ -1,0 +1,154 @@
+<div class="card mb-2">
+    <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1 px-2">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-shield-alt text-primary step-icon rounded-circle pt-2 pl-2 mr-2"></i>
+            <div class="font-500">Verify & Audit</div>
+        </div>
+        <button type="button" class="btn p-0 border-0 bg-transparent shadow-none text-muted"
+            [tooltip]="isVerifyAndAuditOpen ? 'Minimize' : 'Expand'" (click)="toggleVerifyAndAuditAccordion()"
+            [attr.aria-expanded]="isVerifyAndAuditOpen">
+            <i class="fas fa-lg" [ngClass]="isVerifyAndAuditOpen ? 'fa-chevron-up' : 'fa-chevron-down'">
+            </i>
+        </button>
+    </div>
+
+    <div class="card-body" [collapse]="!isVerifyAndAuditOpen">
+        <div class="card mb-3">
+            <div class="card-header bg-white p-0">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+                    <span class="font-lg font-500">Alerts</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" *ngIf="centralizedLogsViewData?.alerts?.length">
+                    <table class="table">
+                        <thead class="font-500">
+                            <tr>
+                                <th>ID</th>
+                                <th>Device Name</th>
+                                <th>Device Type</th>
+                                <th>Alert Time</th>
+                                <th class="text-center">Severity</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Host</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let alert of centralizedLogsViewData?.alerts" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="alert.id">
+                                        {{ alert.id }}
+                                    </div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="alert.deviceName"> {{ alert.deviceName }}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="alert.deviceTypeMapping">
+                                        {{alert.deviceTypeMapping}}
+                                    </div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="alert.timestamp">
+                                        {{ alert.timestamp }}
+                                    </div>
+                                </td>
+                                <td class="w-10 text-center">
+                                    <i class="fa status-icon" [ngClass]="alert.severityIcon" [tooltip]="alert.severity"
+                                        container="body"></i>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="alert.description">
+                                        {{ alert.description }}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="alert.status"
+                                        [ngClass]="[alert.statusTextColor, 'text-capitalize']">{{alert.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="alert.host">
+                                        {{ alert.host }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center text-muted py-4" *ngIf="!centralizedLogsViewData?.alerts?.length">No data
+                    available.
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header bg-white p-0">
+                <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+                    <span class="font-lg font-500">Events</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive" *ngIf="centralizedLogsViewData?.events?.length">
+                    <table class="table">
+                        <thead class="font-500">
+                            <tr>
+                                <th>ID</th>
+                                <th>Device Name</th>
+                                <th>Device Type</th>
+                                <th>Event Time</th>
+                                <th class="text-center">Severity</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Host</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let event of centralizedLogsViewData?.events" truncateText>
+                                <td class="tdw-10">
+                                    <div [tooltip]="event.id">
+                                        {{ event.id }}
+                                    </div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.deviceName"> {{ event.deviceName }}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.deviceTypeMapping">
+                                        {{event.deviceTypeMapping}}
+                                    </div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.timestamp">
+                                        {{ event.timestamp }}
+                                    </div>
+                                </td>
+                                <td class="w-10 text-center">
+                                    <i class="fa status-icon" [ngClass]="event.severityIcon" [tooltip]="event.severity"
+                                        container="body"></i>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="event.description">
+                                        {{ event.description }}
+                                    </div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="event.status"
+                                        [ngClass]="[event.statusTextColor, 'text-capitalize']">{{event.status}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <div [tooltip]="event.host">
+                                        {{ event.host }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center text-muted py-4" *ngIf="!centralizedLogsViewData?.events?.length">No data
+                    available.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

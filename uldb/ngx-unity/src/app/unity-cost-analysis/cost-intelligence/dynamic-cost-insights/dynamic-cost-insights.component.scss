@@ -1,0 +1,16 @@
+.table-responsive {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Hide scrollbar for all browsers */
+.table-responsive::-webkit-scrollbar {
+    display: none;
+}
+
+.table-responsive {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}

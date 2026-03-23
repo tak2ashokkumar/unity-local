@@ -1,0 +1,85 @@
+
+
+<div class="row">
+  <div class="col-sm-6">
+    <h3>Host Overview</h3>
+    <nvd3 options="widget1_opts" data="widget1_data"></nvd3>
+  </div>
+  <div class="col-sm-6">
+
+    <h3>Hosts</h3>
+    <table class="table table-hover table-condensed">
+      <thead>
+      <tr>
+        <th ng-repeat="row in rows">{{ row.description }}</th>
+        <th>State</th>
+        <!--<th>Description</th>-->
+        <th>Last Check</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr ng-repeat="result in model.results"
+          ng-click="select(result, $index)"
+          ng-class="{'success': result.state === 'OK', 'danger': result.state === 'CRITICAL'}">
+        <td ng-repeat="row in rows">
+          <div ng-if="row.opaque === undefined">{{ result[row.name] }}</div>
+          <div ng-if="row.opaque !== undefined">
+            {{ row.read(result) }}
+          </div>
+        </td>
+        <td>
+          {{ result.last_known_state | nagios_host_state }}
+        </td>
+        <!--<td>
+          {{ result.last_known_output }}
+        </td>-->
+        <td>
+          {{ result.last_checked | date : 'medium' }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div ng-if="selection.selected == null">
+      <h3>Select a host to view details</h3>
+    </div>
+    <div ng-if="selection.selected != null">
+      <h3>{{ selection.selected.remote_hostname }}</h3>
+
+    </div>
+
+    <div ng-if="selection.selected != null"><h3>Services</h3>
+      <table class="table table-condensed">
+        <thead>
+        <tr>
+          <th class="col-sm-2">Name</th>
+          <th class="col-sm-1">State</th>
+          <th class="col-sm-6">Output</th>
+          <th class="col-sm-3">Last Checked</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="service in services"
+            ng-class="{'success': service.status === 2,
+                        'info': service.status === 1,
+                      'danger': service.status === 16}">
+          <td class="col-sm-2">{{ service.name }}</td>
+          <td class="col-sm-1">{{ service.status | nagios_service_state }}</td>
+          <td class="col-sm-6">{{ service.output }}</td>
+          <td class="col-sm-3">{{ service.last_check | date : 'short' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--
+<uib-pagination total-items="model.count" items-per-page="pageSize"
+                ng-model="model.currentPage" ng-change="pageChanged()"></uib-pagination>
+-->

@@ -1,0 +1,20 @@
+<div class="card">
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title ">
+    <h4 class="card-title font-lg">Status</h4>
+  </div>
+  <div class="card-body pt-0">
+    <div class="row align-items">
+      <div class="col">
+        <table class="table text-left table-responsive-sm">
+          <tbody>
+            <tr *ngFor="let item of input | keyvalue">
+              <td>{{item.key}}</td>
+              <td><img [src]="'data:image/png;base64,'+item.value.graph"></td>
+              <td>{{item.value.status_name}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

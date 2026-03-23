@@ -1,0 +1,310 @@
+<div class="row">
+    <div class="col">
+        <a class="pull-right text-warning" (click)="goBack()"><i class="fa fa-arrow-left">&nbsp;</i>Go
+            Back</a>
+    </div>
+</div>
+<div class="row pt-3">
+    <div class="col-6">
+        <div class="row">
+            <div class="col-12">
+                <div class="card rounded mb-2">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div>
+                            <span class="font-500 font-lg">Summary</span>
+                        </div>
+                        <div>
+                            <span class="bg-primary text-white p-1 rounded text-truncate">Ticket ID:
+                                {{viewData.ticketNumber}}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 mb-2 pb-2 border-bottom">
+                                <span class="text-muted mr-1">Title :</span>
+                                <div class="d-inline">{{viewData.title}}</div>
+                            </div>
+                            <div class="col-12 mb-2 pb-2 border-bottom">
+                                <span class="text-muted">Priority :</span>
+                                <span>
+                                    {{viewData.priority}}
+                                </span>
+                            </div>
+                            <div class="col-12 mb-2 pb-2 border-bottom">
+                                <span class="text-muted">Status :</span>
+                                <span>
+                                    {{viewData.status}}
+                                </span>
+                            </div>
+                            <div class="col-12 mb-2 pb-2 border-bottom">
+                                <span class="text-muted">Source :</span>
+                                <span>
+                                    {{viewData.source}}
+                                </span>
+                            </div>
+                            <div class="col-12 mb-2 pb-2 border-bottom">
+                                <span class="text-muted">SOP & KB Article :</span>
+                                <a class="kb-link pl-1" [href]="viewData.kbArticle" target="_blank"
+                                    *ngIf="viewData.kbArticle">{{viewData.kbArticle}}</a>
+                                <span class="pl-1" *ngIf="!viewData.kbArticle">N/A</span>
+                            </div>
+                            <div class="col-12 pb-2 border-bottom">
+                                <span class="text-muted pr-1">Description :</span>
+                                <span [innerHTML]="viewData.description">
+                                </span>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <span class="text-muted pr-1">Attachments :</span>
+                                <a *ngFor="let attachment of attachments" [href]="attachment.downloadLink"
+                                    target="_blank" class="btn btn-primary mb-1 mr-1 btn-sm" accessControl
+                                    moduleName="Ticket Management" accessType="Manage Tickets"
+                                    elementType="btn">{{attachment.fileName}}&nbsp;<i class="fa fa-download"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card rounded">
+                    <div class="card-header bg-transparent py-0">
+                        <div class="d-flex align-items-center ">
+                            <img [src]="aiRecomendationImg" class="w-6 mr-1"
+                                style="height: 20px; max-width: -webkit-fill-available; max-height: -webkit-fill-available;" />
+                            <div>
+                                <div class="font-500">
+                                    <span class="font-lg">AI Assisted Recommendation Engine</span>
+                                </div>
+                                <div>
+                                    <span class="text-muted font-xs-sm">{{viewData.sopStepsReasonBySource}}</span>
+                                    <span class="ml-2" [ngClass]="viewData.userVerfiedRelatedIcon"
+                                        [tooltip]="viewData.userVerfiedRelatedMsg"></span>
+                                    <span class="text-muted font-xs-sm ml-2"
+                                        *ngIf="viewData.isUserVerified">{{viewData.userVerfiedRelatedMsg}} By
+                                        {{viewData.verifiedBy}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item d-flex align-items-start"
+                                *ngFor="let sopStep of viewData.sopStepsConverted;let i = index; let l = last;">
+                                <div class="timeline-icon">
+                                    <span class="badge">
+                                        <button class="action-icons mb-0 font-sm nopointerevents custom-badge-btn"><i
+                                                class="fa fa-circle" style="color:#2D8F56"></i></button>
+                                    </span>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="card sop-step-card" [ngClass]="l ? 'mb-0' : 'mb-2'">
+                                        <div class="card-body d-flex flex-column p-1 px-2">
+                                            <div class="font-md">Step {{i+1}}</div>
+                                            <div class="font-xs-sm text-truncate text-muted text-wrap mb-1"
+                                                [innerHTML]="sopStep">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent text-center" accessControl moduleName="Ticket Management"
+                        accessType="Manage Tickets" elementType="div-hide">
+                        <button class="btn btn-sm btn-success" type="button" (click)="buildSopForm()">
+                            <span class="font-xs-sm mx-1">Edit & Verify SOP</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="row">
+            <div class="col-6">
+                <div class="row">
+                    <div class="col-12 px-0">
+                        <div class="card rounded mb-2">
+                            <div class="card-header bg-transparent py-2 pl-2">
+                                <div>
+                                    <span class="font-500 font-lg">Actionable Steps</span>
+                                </div>
+                            </div>
+                            <div class="card-body p-2">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="card mb-0">
+                                            <div class="card-body p-2">
+                                                <div class="row">
+                                                    <div class="col-12 py-2">
+                                                        <span class="text-muted mr-1">Auto Assigned to Group :</span>
+                                                        <div class="d-inline">{{viewData.assignmentGroup}}</div>
+                                                        <span class="ml-2" *ngIf="viewData.assignmentGroup"
+                                                            [tooltip]="viewData.defaultAssignmentGroupReason ? viewData.defaultAssignmentGroupReason : 'Auto Assigned to Group Successfully.'"><i
+                                                                class="fas fa-check text-success"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 px-0">
+                        <div class="card rounded">
+                            <div class="card-header bg-transparent" style="padding:6px">
+                                <span class="font-500 font-lg">Comments <span *ngIf="comments?.length">-
+                                        ({{comments?.length}})</span></span>
+                                <button type="button" class="btn btn-sm btn-outline-primary float-right border"
+                                    (click)="reply()" accessControl moduleName="Ticket Management"
+                                    accessType="Manage Tickets" elementType="btn">
+                                    <i class="fas fa-reply mr-1"></i> Reply
+                                </button>
+                            </div>
+                            <div class="card-body p-2">
+                                <div class="row border-bottom" *ngIf="commentForm">
+                                    <div class="col-12 mb-2">
+                                        <form [formGroup]="commentForm">
+                                            <div class="form-group">
+                                                <label for="comments">Post New Comment<em>*</em></label>
+                                                <textarea class="form-control" id="comments" name="comments" rows="5"
+                                                    formControlName="comments"
+                                                    [ngClass]="{'is-invalid' : commentFormErrors.comments}"
+                                                    placeholder="Add your comment here"></textarea>
+                                                <div class="invalid-feedback" *ngIf="commentFormErrors.comments">
+                                                    {{commentFormErrors.comments}}</div>
+                                            </div>
+                                            <div class="form-group form-actions">
+                                                <button class="btn btn-sm btn-success float-right ml-1" type="button"
+                                                    (click)="onCommentSubmit()">Post</button>
+                                                <button class="btn btn-sm btn-danger float-right" type="button"
+                                                    (click)="cancelComment()">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 text-center mb-2" *ngIf="commentPostedLoader">
+                                        <i class="fa fa-spinner fa-spin fa-2x"></i>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="row" *ngFor="let comment of comments; let last = last"
+                                            [ngClass]="{'border-bottom':!last}">
+                                            <div class="col-12">
+                                                <strong class="card-title mb-0">{{comment.createdBy}} - </strong><small
+                                                    class="text-muted">{{comment.createdOn}}</small>
+                                            </div>
+                                            <div class="col-12 mb-2" [innerHTML]="comment.value"></div>
+                                        </div>
+                                        <div class="text-center text-muted py-4" *ngIf="!comments?.length">No
+                                            Comments were found!!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card rounded">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2 pl-2">
+                        <div>
+                            <span class="font-500 font-lg">Similar Tickets</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-2 similar-tickets-card-body">
+                        <div class="row h-100">
+                            <div class="col h-100" [perfectScrollbar]="{suppressScrollX: true}"
+                                [ngClass]="{'d-flex align-items-center':!viewData.similarTickets?.length}">
+                                <div *ngFor="let st of viewData.similarTickets" class="pb-2">
+                                    <div class="card pb-0 mb-0">
+                                        <div class="card-body p-2">
+                                            <div class="card-title mb-1 font-lg">Title : {{st.title}}
+                                            </div>
+                                            <div class="pb-1">
+                                                <span class="text-muted text-truncate">Ticket ID :
+                                                    <span class="text-primary pointer-link"
+                                                        (click)="goToSimilarTicketsDetails(st)">{{st.ticketNumber}}</span></span>
+                                            </div>
+                                            <div>
+                                                <span class="text-muted pr-1">Description :</span>
+                                                <span [innerHTML]="st.description">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center text-muted flex-grow-1"
+                                    *ngIf="!viewData.similarTickets?.length">
+                                    No
+                                    Similar tickets were found!!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #sopFormFormRef>
+    <div class="card mb-0">
+        <div class="card-header">
+            <div class="row justify-content-between">
+                <div class="col-5 font-weight-bold">
+                    <span class="badge bg-secondary acc-count font-weight-bold rounded-3 align-middle"></span>
+                    <span class="font-weight-bold align-middle">SOP Edit & Verify</span>
+                </div>
+                <div class="col">
+                    <div class="card-header-actions float-right">
+                        <a class="card-header-action btn-close" (click)="modalRef.hide()">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <form *ngIf="sopForm" [formGroup]="sopForm">
+                        <div class="form-group" *ngIf="nonFieldErr">
+                            <div class="invalid-credentials">{{nonFieldErr}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mx-0 scrollable-steps" formArrayName="sop_steps">
+                                <label for="sop_steps" class="form-col-form-label">SOP Steps</label>
+                                <ng-container *ngFor="let step of sopSteps?.controls; let i = index; let l=last;">
+                                    <div class="mb-4 position-relative">
+                                        <i class="fas fa-minus action-icons section-name-one font-sm"
+                                            (click)="removeSopStep(i)" *ngIf="sopForm.controls.sop_steps.length > 1"
+                                            [tooltip]="'Remove SOP Step'"></i>
+                                        <i class="fas fa-plus action-icons section-name-two font-sm"
+                                            (click)="addSopStep(i)" [tooltip]="'Add SOP Step'"></i>
+                                        <textarea class="form-control" id="sop_steps-{{i}}" rows="2"
+                                            placeholder="Enter SOP Step {{i+1}}" [formControlName]="i"
+                                            [class.is-invalid]="sopFormErrors.sop_steps[i]"></textarea>
+                                        <div class="invalid-feedback" *ngIf="sopFormErrors.sop_steps[i]">
+                                            {{sopFormErrors.sop_steps[i]}}</div>
+                                    </div>
+                                </ng-container>
+                            </div>
+                            <div class="col-6 form-group mb-0 mt-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="user_verified"
+                                        formControlName="user_verified">
+                                    <label class="form-check-label" for="user_verified">Mark as
+                                        Verified</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-center py-3">
+            <button class="btn btn-outline-danger" type="button" (click)="modalRef.hide()">Cancel</button>
+            <button class="btn btn-success ml-3" type="button" (click)="editAndVerfiySop()">Submit</button>
+        </div>
+    </div>
+</ng-template>

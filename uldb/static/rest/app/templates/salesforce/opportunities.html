@@ -1,0 +1,76 @@
+<span>
+  <small ng-repeat="crumb in bread.crumbs">
+    <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+  </small>
+</span>
+
+<div class="row">
+  <div class="col-sm-12">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="col-xs-12">
+          <input class="form-control ng-valid ng-dirty"
+                 type="text" id="searchKeyword"
+                 ng-model="searchKeyword" placeholder="Search by server name, type, OS, etc."
+                 ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<div>
+  <div ng-if="!model">
+      <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+  </div>
+  <div ng-if="model.results.length && model.results.length == 0">
+    <h3 class="align-center">No records to display</h3>
+  </div>
+  <div ng-if="model.results.length != 0">
+    <table class="table table-condensed">
+      <thead>
+      <tr>
+        <th ng-repeat="f in fields" class="{{ f.class }}" ng-if="!(f.hide)" ng-class="(f.cls)||''">
+          <div ng-if="f.hide === undefined">{{ f.description }}</div>
+        </th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr ng-repeat="result in model.results | filter: searchKeyword as filtered"
+          ng-click="selection.selected = result; selection.index = $index; selectActions(result)"
+          ng-class="classSelectors(result)">
+        <td ng-repeat="f in fields" ng-if="!(f.hide)" >
+          <div ng-if="f.opaque === undefined && f.hide === undefined">
+            {{ result[f.name] }}
+          </div>
+          <div ng-if="f.opaque === 'stringTransform'">
+            {{ desub(result, f) }}
+          </div>
+          <div ng-if="f.opaque === 'link' && f.hide === undefined">
+            <a href="{{ linkify(result, f).url }}">{{ linkify(result, f).text }}</a>
+          </div>
+          <div ng-if="f.opaque === 'salesforce' && f.hide === undefined">
+            <a href="https://na4.salesforce.com/{{ result[f.sfId] }}">{{ result[f.name] }}</a>
+          </div>
+        </td>
+        <td>
+          <div class="btn-group">
+            <button type="button" class="btn btn-dropdown btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu action-button">
+              <li><a href="#/sf_opportunity/{{ result.id }}/">View invoices</a></li>
+              <li><a href ng-click="ctrl.remove(result, $index)" confirm>Delete</a></li>
+              <li ng-repeat="act in additional_actions"><a href ng-click="act['func'](result, $index)">{{ act.name }}</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,117 @@
+<div class="card" *ngIf="accounts.length">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-2 text-center">
+        <span class="cloud-icon fab fa-aws text-muted"></span>
+        <form class="mt-4">
+          <select class="custom-select mr-sm-2 py-0" [ngModel]="selectedAccount" (ngModelChange)="changeAccount($event)"
+            name="awsAccountSelection">
+            <option [ngValue]="account" *ngFor="let account of accounts">{{account.accountName}}</option>
+          </select>
+        </form>
+      </div>
+      <div class="col-4" *ngIf="selectedAccount.cloudAssets">
+        <div class="card equalize-card border-0">
+          <div class="card-body px-1 py-0">
+            <div class="row">
+              <div class="col-4 text-center pl-0">
+                <span class="badge badge-light w-100">
+                  <div class="text-center py-3">
+                    <div class="text-value">{{selectedAccount.cloudAssets.ec2Instances}}</div>
+                    <div class="text-muted mt-2">EC2</div>
+                  </div>
+                </span>
+              </div>
+              <div class="col-4 text-center pl-0">
+                <span class="badge badge-light w-100">
+                  <div class="text-center py-3">
+                    <div class="text-value">{{selectedAccount.cloudAssets.rdsInstances}}</div>
+                    <div class="text-muted mt-2">RDS</div>
+                  </div>
+                </span>
+              </div>
+              <div class="col-4 text-center pl-0">
+                <span class="badge badge-light w-100">
+                  <div class="text-center py-3">
+                    <div class="text-value">{{selectedAccount.cloudAssets.s3Buckets}}</div>
+                    <div class="text-muted mt-2 text-truncate">S3 Bucket</div>
+                  </div>
+                </span>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-4 text-center pl-0">
+                <span class="badge badge-light w-100">
+                  <div class="text-center py-3">
+                    <div class="text-value">{{selectedAccount.cloudAssets.elasticIps}}</div>
+                    <div class="text-muted mt-2 text-truncate">Elastic IPs</div>
+                  </div>
+                </span>
+              </div>
+              <div class="col-4 text-center pl-0">
+                <span class="badge badge-light w-100">
+                  <div class="text-center py-3">
+                    <div class="text-value">{{selectedAccount.cloudAssets.loadBalancers}}</div>
+                    <div class="text-muted mt-2 text-truncate">Load Balancers</div>
+                  </div>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-4" *ngIf="selectedAccount.totalCostData">
+        <div class="card equalize-card">
+          <div class="card-body pb-2 text-center">
+            <div class="text-muted small text-uppercase font-weight-bold">Month-to-date cost</div>
+            <div class="text-value-lg pb-3 pt-1">{{selectedAccount.totalCostData.currentMonthCost}}</div>
+            <div class="brand-card border-0 mb-0">
+              <div class="brand-card-body py-0">
+                <div>
+                  <div class="text-muted text-value-sm">{{selectedAccount.totalCostData.previousMonthCost}}</div>
+                  <div class="text-muted small">Previous Month</div>
+                </div>
+                <div>
+                  <div class="text-muted text-value-sm">{{selectedAccount.totalCostData.currentMonthEstimatedCost}}</div>
+                  <div class="text-muted small">Estimated Current Month</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-2" *ngIf="selectedAccount.totalCostData">
+        <div class="card equalize-card">
+          <div class="card-body pb-0">
+            <div class="row">
+              <div class="col-12">
+                <div class="text-value">{{selectedAccount.totalCostData.averageCost}}</div>
+                <div class="text-muted small">Average Monthly Cost</div>
+              </div>
+              <div class="col-12 mt-4">
+                <div class="text-value">{{selectedAccount.totalCostData.pastTwelveMonthsCost}}</div>
+                <div class="text-muted small">Trailing Twelve Months</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 mt-5" *ngIf="selectedAccount.accountId">
+        <public-cloud-cost-analysis-charts [cloudType]="'aws'" [target]="'service'" [account]="selectedAccount.accountId"></public-cloud-cost-analysis-charts>
+      </div>
+      <div class="col-12 mt-5" *ngIf="selectedAccount.accountId">
+        <public-cloud-cost-analysis-charts [cloudType]="'aws'" [target]="'region'" [account]="selectedAccount.accountId"></public-cloud-cost-analysis-charts>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card" *ngIf="!accounts.length">
+  <div class="card-body py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="empty-clouds text-center py-5"> No AWS accounts available.</div>
+      </div>
+    </div>
+  </div>
+</div>

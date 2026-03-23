@@ -1,0 +1,188 @@
+<div class="card round-edge" minHeighFull [ignore]="1.5">
+    <div class="card-header bg-transparent border-bottom-0 py-2 d-flex justify-content-between align-items-center">
+        <div>
+            <unity-rounded-tab [tabItems]="tabItems"></unity-rounded-tab>
+        </div>
+        <div class="col pull-right" *ngIf="selectedScheduleIds.length == 0; else multipleSelectButton">
+            <div class="d-flex justify-content-end align-items-center">
+                <search-box [searchValue]="currentCriteria.searchValue" [customClass]="'form-control-sm'"
+                    (searched)="onSearched($event)" class="w-25"></search-box>
+                <button class="btn btn-sm btn-pill btn-warning pull-right ml-2" type="button" (click)="goToCreate()"
+                    accessControl moduleName="Unity Report" accessType="Manage Unity Report" elementType="btn">Create
+                    Schedule</button>
+            </div>
+        </div>
+        <!-- <div class="row">
+            <div class="col-6 mb-2">
+                <unity-rounded-tab [tabItems]="tabItems"></unity-rounded-tab>
+            </div>
+            <div class="col pull-right mb-2" *ngIf="selectedScheduleIds.length == 0; else multipleSelectButton">
+                <div class="d-flex justify-content-end align-items-center">
+                    <table-search-box [searchValue]="currentCriteria.searchValue" (searched)="onSearched($event)">
+                    </table-search-box>
+                    <button class="btn btn-sm btn-pill btn-warning pull-right ml-2" type="button" (click)="goToCreate()"
+                        accessControl moduleName="Unity Report" accessType="Manage Unity Report"
+                        elementType="btn">Create
+                        Schedule</button>
+                </div>
+            </div>
+        </div> -->
+    </div>
+    <div class="card-body pt-0 custom-card-body">
+        <div class="row no-gutters flex-grow-1 custom-row">
+            <div class="col-2 pr-1 custom-column">
+                <div class="overflow-auto border rounded h-100" [perfectScrollbar]>
+                    <div class="list-group list-group-flush" *ngIf="scheduleReportSummaryData">
+                        <!-- <button type="button" class="list-group-item list-group-item-action active" aria-current="true"
+                            [class.active]="feature == 'datacenter'" (click)="selectFeautre('datacenter')">Datacenter
+                            ({{scheduleReportSummaryData.datacenter}})
+                        </button>
+                        <button type="button" class="list-group-item list-group-item-action"
+                            [class.active]="feature == 'public'" (click)="selectFeautre('public')">Public Cloud
+                            ({{scheduleReportSummaryData.public}})</button>
+                        <button type="button" class="list-group-item list-group-item-action"
+                            [class.active]="feature == 'private'" (click)="selectFeautre('private')">Private Cloud
+                            ({{scheduleReportSummaryData.private}})</button>
+                        <button type="button" class="list-group-item list-group-item-action"
+                            [class.active]="feature == 'events'" (click)="selectFeautre('events')">Event Management
+                            ({{scheduleReportSummaryData.events}})</button>
+                        <button type="button" class="list-group-item list-group-item-action"
+                            [class.active]="feature == 'ITSM'" (click)="selectFeautre('ITSM')">ITSM
+                            ({{scheduleReportSummaryData.ITSM}})</button> -->
+                        <button type="button" class="list-group-item list-group-item-action py-2"
+                            [class.active]="feature == 'Cloud Inventory'"
+                            (click)="selectFeautre('Cloud Inventory')">Cloud Inventory
+                            ({{scheduleReportSummaryData.cloudInventory}})</button>
+                        <button type="button" class="list-group-item list-group-item-action py-2"
+                            [class.active]="feature == 'DC Inventory'" (click)="selectFeautre('DC Inventory')">DC
+                            Inventory
+                            ({{scheduleReportSummaryData.DCInventory}})</button>
+                        <button type="button" class="list-group-item list-group-item-action py-2"
+                            [class.active]="feature == 'Cost Analysis'" (click)="selectFeautre('Cost Analysis')">Cost
+                            Analysis
+                            ({{scheduleReportSummaryData.costAnalysis}})</button>
+                        <button type="button" class="list-group-item list-group-item-action py-2"
+                            [class.active]="feature == 'sustainability'"
+                            (click)="selectFeautre('sustainability')">Sustainability
+                            ({{scheduleReportSummaryData.sustainability}})</button>
+                        <button type="button" class="list-group-item list-group-item-action py-2"
+                            [class.active]="feature == 'Performance'" (click)="selectFeautre('Performance')">Performance
+                            ({{scheduleReportSummaryData?.Performance}})</button>
+                        <button type="button" class="list-group-item list-group-item-action py-2"
+                            [class.active]="feature == 'DevOps Automation'" (click)="selectFeautre('DevOps Automation')">DevOps Automation
+                            ({{scheduleReportSummaryData?.DevOpsAutomation}})</button>
+                            <button type="button" class="list-group-item list-group-item-action py-2"
+                            [class.active]="feature == 'UnityOne ITSM'" (click)="selectFeautre('UnityOne ITSM')">UnityOne ITSM
+                            ({{scheduleReportSummaryData?.UnityOneITSM}})</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-10 pl-1 custom-column">
+                <div class="overflow-auto border rounded h-100" [perfectScrollbar]>
+                    <div class="card border-0 mb-0">
+                        <div class="card-body p-0">
+                            <table class="table table-sm text-left mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="mr-0" scope="col" style="font-size:1rem;"
+                                            (click)="$event.stopPropagation();selectAll()" accessControl
+                                            moduleName="Unity Report" accessType="Manage Unity Report"
+                                            elementType="div-hide">
+                                            <span class="bg-white text-primary">
+                                                <i class="far"
+                                                    [ngClass]="selectedAll? 'fa-check-square':'fa-square'"></i>
+                                            </span>
+                                        </th>
+                                        <th>Schedule Name</th>
+                                        <th>Schedule Type</th>
+                                        <th>Schedule</th>
+                                        <th>Name of the Report</th>
+                                        <th>Recipients</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let view of viewData" setTableColumnWidth>
+                                        <td class="w-3" (click)="$event.stopPropagation();select(view);"
+                                            style="font-size:1rem;" accessControl moduleName="Unity Report"
+                                            accessType="Manage Unity Report" elementType="div-hide">
+                                            <span class="bg-white text-primary">
+                                                <i class="far"
+                                                    [ngClass]="view.isSelected? 'fa-check-square':'fa-square'"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div [tooltip]="view.scheduleName">
+                                                {{view.scheduleName}}
+                                            </div>
+                                        </td>
+                                        <td>{{view.scheduleType}}</td>
+                                        <td>{{view.recurrencePattren}}</td>
+                                        <td>
+                                            <div [tooltip]="view.reportName">
+                                                {{view.reportName}}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div [tooltip]="view.recipients.join(',')">
+                                                {{view.recipients.join(',')}}
+                                            </div>
+                                        </td>
+                                        <td class="action-icons-column">
+                                            <button class="action-icons ml-1 fas fa-pencil-alt font-sm" container="body"
+                                                tooltip="Edit" (click)="goToEdit(view)" accessControl
+                                                moduleName="Unity Report" accessType="Manage Unity Report"
+                                                elementType="actionbtn"></button>
+                                            <button class="action-icons ml-1 far fa-trash-alt font-sm" container="body"
+                                                tooltip="Delete" (click)="deleteSchedule(view)" accessControl
+                                                moduleName="Unity Report" accessType="Manage Unity Report"
+                                                elementType="actionbtn"></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="text-center text-muted py-5" *ngIf="!viewData.length">No Schedules available.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-body text-center">
+            Are you sure you want to delete this schedule ? Deleted schedule cannot be recovered.
+        </div>
+        <div class="d-flex justify-content-center mb-3">
+            <button class="btn btn-sm btn-pill btn-warning px-4 mr-2 pull-right" (click)="confirmDelete()"
+                type="button">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning px-4 pull-right" (click)="modalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #multipleSelectButton>
+    <div class="col">
+        <button class="action-icons btn mr-2  btn-sm far fa-trash-alt font-sm pull-right" container="body"
+            tooltip="Delete" (click)="multipleDelete()"></button>
+    </div>
+</ng-template>
+
+<ng-template #multiconfirm>
+    <div class="card mb-0">
+        <div class="card-body text-center">
+            Are you sure you want to delete this schedule? Deleted schedule cannot be recovered.
+        </div>
+        <div class="d-flex justify-content-center mb-3">
+            <button class="btn btn-sm btn-pill btn-warning px-4 mr-2 pull-right" (click)="confirmMultipleDelete()"
+                type="button">Delete</button>
+            <button class="btn btn-sm btn-pill btn-outline-warning px-4 pull-right" (click)="modalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

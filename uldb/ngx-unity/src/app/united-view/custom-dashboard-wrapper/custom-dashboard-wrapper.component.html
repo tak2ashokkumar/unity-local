@@ -1,0 +1,26 @@
+<div class="container-fluid">
+    <div class="animated fadeIn">
+        <div class="row mb-3">
+            <div class="col-12">
+
+                <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+                <button class="btn btn-warning btn-pill btn-sm pull-right" (click)="createWidget()">Create
+                    Widget</button>
+                <select class="form-control col-2 mr-2 pull-right" style="width: 110px;" [(ngModel)]="duration"
+                    (ngModelChange)="durationChanged()">
+                    <option value="1">Last 1 Hr</option>
+                    <option value="24">Last 24 Hr</option>
+                </select>
+            </div>
+        </div>
+        <div class="row" *ngIf="viewData.length">
+            <div class="col-12" *ngFor="let view of viewData">
+                <custom-dashboard-widget [data]="view"></custom-dashboard-widget>
+            </div>
+        </div>
+        <p class="text-center text-muted pt-5" *ngIf="!viewData.length">
+            No widgets created yet.
+        </p>
+    </div>
+</div>
+<custom-dashboard-widget-crud (onCrud)="onCrud($event)"></custom-dashboard-widget-crud>

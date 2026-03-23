@@ -1,0 +1,154 @@
+<div class="row dashboard-admin">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-md-6 pinnewcustitle pull-left"><i class="fa fa-clock-o fa-fw"></i> <span ng-if='displayheading'>{{displayheading}}</span><span ng-if='!displayheading'>{{heading}}</span></div>
+                    <div ng-if="modeldata != undefined" >
+                        <div class="col-md-1" >
+                            <a class="fa fa-plus-square fa-2x pull-right" aria-hidden="true" ng-click="openModal('Add')"></a>
+                            <!--<a class="fa fa-plus-square fa-2x pull-right" aria-hidden="true" ng-click="click({data:{method:'Add',callback:heading,rowdata:row}})"></a>-->
+                        </div>
+                    </div>
+                    <div class="col-md-4 pinnewcus pull-right">
+                        <input class="form-control custom_search_field" type="text" ng-model="searchKeyword"
+                               placeholder="Search.." ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+                    </div>
+                </div>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body fixed_panel">
+                <span ng-if="!tabledata">
+                  <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+                </span>
+                <div class="dataTable_wrapper content_settings">
+                    <span ng-if="tabledata.length == 0">
+                      <h3 class="align-center">No records to display</h3>
+                    </span>
+                    <span ng-if="tabledata.length != 0">
+                        <table class="table table-bordered table-hover" id="dataTables-example" float-thead="{top: 20, position: 'absolute', scrollContainer: true};" ng-model="tabledata">
+                            <thead>
+                            <tr>
+                                <th ng-repeat="row in headers" class="fixed_th">{{ row.title }}</th>
+                                <th ng-if="actions != undefined" class="fixed_th">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in tabledata | filter: searchKeyword">
+                                    <td ng-repeat="row_data in headers">
+
+                                        <div ng-if = "row_data.decorator == undefined && row_data.key !== 'instance_state'">
+                                            {{row[row_data.key]}}
+                                        </div>
+                                        <div ng-if = "row_data.decorator == undefined && row_data.key === 'instance_state'">
+                                            {{row[row_data.key] | powerState }}
+                                        </div>
+                                        <div ng-if = "row_data.decorator">
+                                            {{decorate(row_data.decorator,row[row_data.key])}}
+                                        </div>
+
+                                    </td>
+                                    <td ng-if="actions != undefined">
+                                        <!--<div>-->
+                                        <div class="btn-group" ng-if="row.instance_state != 'terminated'">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Actions <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu actions_menu action-button">
+                                                <li ng-repeat="action in actions">
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading != 'AWS Accounts') &&
+                                                        (heading != 'Instances') &&
+                                                        (heading != 'Snapshots') &&
+                                                        (heading != 'Users')"
+                                                        href="{{action.link}}">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading == 'Instances')"
+                                                        href="{{action.link}}{{row.instance_id}}">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading == 'AWS Accounts')"
+                                                        ng-click="show_region(row.id)">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.link != undefined) &&
+                                                        (heading == 'Snapshots')"
+                                                        href="{{action.link}}{{row.SnapshotId}}">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.link1 != undefined) &&
+                                                        (heading == 'Users')"
+                                                        href="{{action.link1}}{{row.UserName}}{{action.link2}}">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.button != undefined) &&
+                                                        (heading != 'Instances')"
+                                                        ng-click="openModal(action.button,row)">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.callback != undefined)"
+                                                        ng-click="click({data:{method:action.method,callback:action.callback,rowdata:row}})">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.button != undefined) &&
+                                                        (heading == 'Instances') &&
+                                                        ( ((row.instance_state == 'running') && (action.button == 'awspoweroff')) ||
+                                                          ((row.instance_state == 'running' && action.button == 'awsterminate')) ||
+                                                          ((row.instance_state == 'stopped' && action.button == 'awspoweron')) ||
+                                                          ((row.instance_state == 'stopped' && action.button == 'awsterminate')))"
+                                                        ng-click="openModal(action.button,row)">
+                                                        {{action.name}}
+                                                    </a>
+                                                    <a ng-if="
+                                                        (action.button == 'cloneinstance') ||
+                                                        (action.button == 'createimage') ||
+                                                        (action.button == 'attachinstance') ||
+                                                        (action.button == 'attachloadbalancer') ||
+                                                        (action.button == 'attachinterface')"
+                                                        ng-click="openModal(action.button,row)">
+                                                        {{action.name}}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<modal visible="showModal">
+    <ng-include src="modeldata.page"></ng-include>
+</modal>
+<modal1 visible="showModal1">
+    <ng-include src="modeldata1.page"></ng-include>
+</modal1>
+<modal2 visible="showModal2">
+    <ng-include src="modeldata2.page"></ng-include>
+</modal2>
+<modal3 visible="showModal3">
+    <ng-include src="modeldata3.page"></ng-include>
+</modal3>
+<modal4 visible="showModal4">
+    <ng-include src="modeldata4.page"></ng-include>
+</modal4>
+<modal5 visible="showModal5">
+    <ng-include src="modeldata5.page"></ng-include>
+</modal5>
+<modal6 visible="showModal6">
+    <ng-include src="modeldata6.page"></ng-include>
+</modal6>

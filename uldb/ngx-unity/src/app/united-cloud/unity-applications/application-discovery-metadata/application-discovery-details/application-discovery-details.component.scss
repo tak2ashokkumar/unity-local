@@ -1,0 +1,19 @@
+.table-responsive-no-truncate {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.table-responsive-no-truncate .table td,
+.table-responsive-no-truncate .table th {
+  white-space: nowrap !important; /* Keep this to avoid truncation */
+  padding-right: 2rem; 
+}
+
+// .table-responsive-no-truncate .table td,
+// .table-responsive-no-truncate .table th {
+//   white-space: nowrap !important; /* Still prevents wrapping */
+// }
+
+#node-details-wrapper{
+  position: absolute !important;
+}

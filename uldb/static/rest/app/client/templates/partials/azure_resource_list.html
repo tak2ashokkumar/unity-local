@@ -1,0 +1,96 @@
+<div class="row" >
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row db-info shadow-btm"> </div>
+    </div>
+
+    
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper" ng-show="azure_resource_content">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper" style="padding-right:5px !important">
+            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                <h1>Resources</h1>
+            </div>
+            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <div class="action-bar">
+                    <button class="btn btn-default" type="button" ng-click="hideresourcetable()">Close</button>
+                </div>
+            </div>
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                <form class="navbar-form">
+                    <div class="form-group">
+                        <input class="form-control" type="text" ng-model="searchKeywordForResources"
+                        placeholder="Enter keyword" ng-model-options="{debounce: {'default': 100, 'blur': 0 }}"
+                        ng-disabled="(azure_resource_content.length === 0)">
+                        <button class="btn btn-search" type="submit" style="top:5px">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table id="example" class="example table table-condensed cf">
+                <thead class="cf">
+                    <tr>
+                        <th ng-repeat="row in azure_resource_headers"> {{ row.title }} </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in azure_resource_content | filter: searchKeywordForResources" ng-show="azure_resource_content.length > 0">
+                        <td ng-repeat="row_data in azure_resource_headers">
+                            <span ng-if="row_data.key != 'region'">
+                                <span ng-if="row_data.key != 'tags' ">
+                                  {{row[row_data.key] || 'NA'}}
+                                </span>
+                                <span ng-if="row_data.key == 'tags'">
+                                    {{ row[row_data.key].display || 'NA'}}
+                                </span>
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-show="((azure_resource_content.length) === 0 || ((azure_resource_content | filter: searchKeywordForResources).length === 0))" class="content-wrapper">
+                <no-records-found message="No Resource available in your account"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

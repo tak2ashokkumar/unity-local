@@ -1,0 +1,137 @@
+<div class="card text-center">
+  <div class="card-header bg-white border-0 pb-0 mt-3">
+    <div class="row">
+      <div class="col-12">
+        <form class="form-horizontal" *ngIf="scanForm" [formGroup]="scanForm">
+          <div class="form-group">
+            <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}</div>
+          </div>
+          <div class="row">
+            <div class="col-4">
+              <div class="form-group row">
+                <label class="col-4 col-form-label" for="network_range">Subnet Range
+                  <i class="fa fa-info-circle text-muted" container="body" containerClass="info-multi-line"
+                    [tooltip]="'10.10.10.1/24'"></i>
+                  <em>*</em></label>
+                <div class="col-8">
+                  <input class="form-control" id="network_range" type="text" formControlName="network_range"
+                    [ngClass]="{'is-invalid' : formErrors.network_range}">
+                  <small class="help-block text-danger"
+                    *ngIf="formErrors.network_range">{{formErrors.network_range}}</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group row">
+                <label class="col-5 col-form-label" for="snmp_community">SNMP Read-only Community<em>*</em> </label>
+                <div class="col-7">
+                  <input class="form-control" id="snmp_community" type="text" formControlName="snmp_community"
+                    [ngClass]="{'is-invalid' : formErrors.snmp_community}">
+                  <small class="help-block text-danger"
+                    *ngIf="formErrors.snmp_community">{{formErrors.snmp_community}}</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-1">
+              <button class="btn btn-sm btn-success" (click)="startScan()" accessControl moduleName="Onboarding"
+                accessType="Manage Onboarding" elementType="btn">Scan</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- <div class="col-3">
+        <div class="input-prepend input-group custom-input-group">
+          <div class="input-group-prepend"><span class="input-group-text bg-transparent border-right-0">
+              <i class="fa fa-search"></i></span>
+          </div>
+          <input placeholder="Enter keyword" class="form-control  form-control-sm border-left-0 custom-search-input" id="prependedInput"
+            size="16" type="text" tableSeachBox>
+        </div>
+      </div> -->
+      <div class="col">
+        <span class="text-muted ml-2 font-sm float-right align-middle"><span
+            class="badge badge-pill badge-secondary">{{viewData.length}}</span>&nbsp;
+          Networks</span>
+        <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th>SNo</th>
+          <th>Subnet</th>
+          <th>SNMP Community</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let view of viewData; let  i = index">
+          <td>{{i+1}}</td>
+          <td>{{view.nwRange}}</td>
+          <td>{{view.snmp}}</td>
+          <td>
+            {{view.scanStatus}}
+            <i class="fas fa-sync fa-spin fa-xs ml-1" *ngIf="view.scanStatusInProgress"></i>
+          </td>
+          <td class="action-icons-column">
+            <button class="action-icons mb-0 fas fa-ban font-sm ml-1" *ngIf="view.scanStatusInProgress" tooltip="Cancel"
+              (click)="cancel(view)"></button>
+            <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" *ngIf="!view.scanStatusInProgress"
+              tooltip="Delete" (click)="delete(view)"></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <div class="col-12">
+        <div class="text-center text-muted" *ngIf="!viewData.length">No networks are provided to scan.</div>
+        <br>
+      </div>
+      <div class="col">
+        <next-prev></next-prev>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #confirm>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #confirmCancelRef>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Cancel
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to cancel?
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmCancel()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+    </div>
+  </div>
+</ng-template>

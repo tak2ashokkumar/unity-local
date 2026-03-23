@@ -1,0 +1,34 @@
+
+<!-- <p>in crm create ticket form</p> -->
+<form *ngIf="ticketForm" [formGroup]="ticketForm">
+    <div class="form-group">
+        <label for="subject">Subject<em>*</em></label>
+        <input class="form-control" id="subject" type="text" formControlName="subject" placeholder="Subject"
+            [ngClass]="{'is-invalid' : formErrors.subject}">
+        <div class="invalid-feedback" *ngIf="formErrors.subject">{{formErrors.subject}}</div>
+    </div>
+    <div class="form-group">
+        <label for="collaborators">CC</label>
+        <input class="form-control" id="cc" type="text" formControlName="collaborators" placeholder="example@unity.com"
+            [ngClass]="{'is-invalid' : formErrors.collaborators}">
+    </div>
+    <div class="form-group">
+        <label for="priority">Priority<em>*</em></label>
+        <select class="form-control text-capitalize" id="priority" name="priority" formControlName="priority"
+            [ngClass]="{'is-invalid' : formErrors.priority}">
+            <option [value]="''" disabled>Select Priority</option>
+            <option *ngFor="let prt of ticketPriorityList">{{prt}}</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="formErrors.priority">{{formErrors.priority}}</div>
+    </div>
+    <div class="form-group">
+        <label for="description">Description<em>*</em></label>
+        <textarea class="form-control" id="description" name="description" rows="5" formControlName="description"
+            [ngClass]="{'is-invalid' : formErrors.description}" placeholder="Describe your issue here"></textarea>
+        <div class="invalid-feedback" *ngIf="formErrors.description">{{formErrors.description}}</div>
+    </div>
+    <div class="form-group" *ngIf="metadata.metadata">
+        <label for="metadata">Metadata (Uneditable)</label>
+        <textarea class="form-control" id="metadata" name="metadata" formControlName="metadata" readonly></textarea>
+    </div>
+</form>

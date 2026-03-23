@@ -1,0 +1,124 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+<loading></loading>
+    <div class="row">
+      <div class="col-sm-6">
+       <span ng-if="breadCrumb">
+          <small ng-repeat="crumb in bread.crumbs">
+            <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+          </small>
+        </span>
+      </div>
+    </div>
+    <div class="row dashboard-admin">
+        <div class="col-md-12">
+            <div class="col-md-12">
+               
+                <div class="row page_wrapper">
+                    <!--Tabs Level 1 End-->
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+                            <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                                <h1>AWS Accounts</h1>
+                            </div>
+                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                <div class="action-bar">
+                                    <button class="btn btn-default" type="button" ng-click="add_account_model()"> + Add Account</button>
+                                </div>
+                            </div>
+                            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                                <form class="navbar-form">
+                                    <div class="form-group">
+                                        <input class="form-control" type="text" placeholder="Enter keyword">
+                                        <button class="btn btn-search" type="submit" style="top: 3px;">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <section id="no-more-tables" class="margintop20 middle-wrapper">
+                            <table id="example" class="table table-condensed cf">
+                                <thead class="cf">
+                                    <tr>
+                                        <th ng-repeat="row in aws_account_headers">{{ row.title }}</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="account_details in aws_dashboard_content.data">
+                                        <td>{{account_details.aws_user}}</td>
+                                        <td>{{account_details.account_name}}</td>
+                                        <td>
+                                            <form role="form">
+                                                <div class="barpaddingtop">
+                                                    <select name="speed" id="speed" ng-options="region as region for region in account_details.region" ng-model="account_details.selected_region">
+                                                        <option value="" disabled selected>Select a region</option>
+                                                    </select>
+                                                    <span class="select-arrow"></span>
+                                                </div>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <div class="action-icons">
+                                                <a class="fa fa-list-ul" tooltip-class="customClass" uib-tooltip="Show Inventory" ng-click="listall(account_details)"></a>
+                                                <a class="fa fa-object-group" tooltip-class="customClass" uib-tooltip="Virtual Machines" ng-click="listvms(account_details)"></a>
+                                                <a class="fa fa-map-marker" tooltip-class="customClass" uib-tooltip="Add Region" ng-click="add_region_model(account_details)"></a>
+                                                <a class="fa fa-key" tooltip-class="customClass" uib-tooltip="Change API Keys" ng-click="change_password_model(account_details)"></a>
+                                                <a class="fa fa-pencil" tooltip-class="customClass" uib-tooltip="Edit" ng-click="edit_account_model(account_details)"></a>
+                                                <a class="fa fa-ticket" tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" ng-click="manage_request(account_details.aws_user)"></a>
+
+                                                <a class="fa fa-trash" tooltip-class="customClass" uib-tooltip="Delete Account" ng-click="delete_account_modal(account_details)"></a>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ng-if="aws_dashboard_content.data && aws_dashboard_content.data.length == 0">
+                                        <td colspan="3" class="no-records-td">
+                                            <no-records-found message="No records found"></no-records-found>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <awsaccounts
+    heading="AWS Accounts"
+    headers="aws_account_headers"
+    tabledata="aws_dashboard_content.data"
+    modeldata="aws_dashboard_content_modeldata"
+    switches="aws_switches(args)"
+    rows="aws_dashboard_content_rows"
+    rows1="aws_add_region_rows"
+    rows2="aws_change_password_row"
+    addclick="aws_dashboard_add(data)"
+    actions="aws_dashboard_content.actions"
+    listall = "listall(details)"
+    listvms = "listvms(details)"
+    modeldata1="aws_add_region_modaldata"
+    modeldata2="aws_content_change_password"
+    addclick1="aws_add_region(data1)"
+    addclick2="aws_change_password(data2)"
+    support="manage_request(awsaccount)"
+    editclick = "aws_edit(data)"
+    deleteclick = "aws_account_delete(data)"
+    deleteconfirm = "account_delete_modal">
+</awsaccounts> -->
+
+<modal visible="show_create_instance_modal">
+    <ng-include src="modeldata.page"></ng-include>
+</modal>
+
+<modal1 visible="show_add_region_modal">
+    <ng-include src="modeldata1.page"></ng-include>
+</modal1>
+
+<modal2 visible="show_change_password_modal" >
+    <ng-include src="modeldata2.page"></ng-include>
+</modal2>
+
+<deletemodal visible="show_delete_confirm_modal"></deletemodal>

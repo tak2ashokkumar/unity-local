@@ -1,0 +1,193 @@
+<div class="row">
+    <style type="text/css">
+        .popover{
+            width : 28%;
+            max-width: 100%; /* Max Width of the popover (depending on the container!) */
+        }
+    </style>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="row db-info shadow-btm"> </div>
+    </div>
+    <div class="row page_wrapper">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper">
+                <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+                    <h1>All Regions </h1>
+                    <span><span ng-if="region_name_float">-</span> S3 Buckets</span>
+                </div>
+                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                    <div class="action-bar">
+                        <button class="btn btn-default" type="button" ng-click="create_s3_bucket_modal()"> Create S3 Bucket</button>
+                    </div>
+                </div>
+                <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3 search-widget pull-right">
+                    <form class="navbar-form">
+                        <div class="form-group">
+                            <input class="form-control" style="max-width: 100%" type="text" placeholder="Enter keyword" ng-model="searchKeyword" ng-disabled="(aws_s3_buckets.data.length === 0)">
+                            <button class="btn btn-search" type="submit" style="top: 3px;">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <section id="no-more-tables" class="margintop20 middle-wrapper table-responsive">
+                <table id="example" class="example table table-condensed cf" ng-show="aws_s3_buckets.data.length > 0">
+                    <thead class="cf">
+                        <tr>
+                            <th ng-repeat="aws_s3_buckets_header in aws_s3_buckets_headers" class="padding_left_right8px"
+                            custom-sort order="{{aws_s3_buckets_header.key}}" sort="sort">{{ aws_s3_buckets_header.title }}</th>
+                            <th class="padding_left_right0">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(index, s3_bucket) in aws_s3_buckets.data | filter: searchKeyword | orderBy: sortkey ">
+                            <td class="normal padding_left_right8px"> {{ s3_bucket.bucket_name || 'NA' }}</td>
+                            <td class="normal padding_left_right8px"> {{ s3_bucket.region | AWSRegionFilter : AWS_REGIONS_CONSTANT}}</td>
+                            <td class="normal padding_left_right8px"> {{ s3_bucket.bucket_size | Filesize }}</td>
+                            <td class="normal padding_left_right8px"> {{ s3_bucket.creation_date | unityDate : $root.users_timezone }}</td>
+                            <td class="padding_left_right0">
+                                <div class="action-icons">
+                                    <span>
+                                        <a ng-click="delete_s3_bucket_confirmation(s3_bucket)" tooltip-class="customClass" uib-tooltip="Delete Bucket" class="fa fa-trash"></a>
+                                    </span>
+                                    <span>
+                                        <a ng-click="upload_file_s3_bucket_confirmation(s3_bucket)" tooltip-class="customClass" uib-tooltip="Upload a File" class="fa fa-upload"></a>
+                                    </span>
+                                    <span>
+                                        <a ng-click="get_s3_uploaded_file_modal(s3_bucket)" tooltip-class="customClass" uib-tooltip="Upload File History" class="fa fa-undo"></a>
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="((aws_s3_buckets.data.length) === 0 || ((aws_s3_buckets.data | filter: searchKeyword).length === 0))" class="content-wrapper">
+                    <no-records-found message="No S3 Buckets available to display."></no-records-found>
+                </div>
+            </section>
+        </div>
+    </div>
+    <confirmationmodal visible="show_delete_confirm"></confirmationmodal>
+    <script type="text/ng-template" id="createBucketModal.html">
+    <div class="modal-content">
+      <form role="form" name="createbucketform" novalidate ng-submit="createbucketform.$valid && create_s3_bucket(bucket_name, selected_region)">
+        <div class="modal-header">
+            <h4 class="modal-title">Create S3 Bucket</h4>
+        </div>
+        <div class="modal-body" style="padding:20px 40px; padding-bottom: 0px;">
+            <div class="modal-form">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="paddingR">
+                        <div class="form-group">
+                            <label for="bucket_name"> Bucket Name <span> *</span>
+                                <span uib-tooltip="The bucket name must be unique across all existing bucket names in Amazon S3.">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                </span> 
+                                <span class="errormsg" ng-if="(createbucketform.$submitted && createbucketform.bucket_name.$invalid)" >
+                                    &nbsp; ( This Field is Required )
+                                </span>
+                            </label>
+                            <input type="text" class="form-control" ng-model="bucket_name" name="bucket_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="region"> Region <span> *</span></label>
+                            <select ng-options="option.long for option in AWS_REGIONS_CONSTANT track by option.short" class="form-control" ng-model="selected_region" required>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+                <button type="submit" class="btn btn-default"> Submit </button>
+            </div>
+        </div>
+      </form>
+    </div>
+    </script>
+    <script type="text/ng-template" id="uploadFileBucketModal.html">
+    <div class="modal-content">
+      <form role="form" name="uploadfilebucketform" novalidate ng-submit="uploadfilebucketform.$valid && upload_file_s3_bucket(aws_file)">
+        <div class="modal-header">
+            <h4 class="modal-title">Upload File to S3 Bucket</h4>
+        </div>
+        <div class="modal-body" style="padding:20px 40px; padding-bottom: 0px;">
+            <div class="modal-form">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="paddingR">
+                        <div class="form-group">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn"
+                                style="pointer-events:none;">Select File </button>
+                                <button type="button" class="btn btn-primary"
+                                ngf-select ng-model="aws_file" ngf-model-invalid="errorFile"
+                                name="aws_file" required>
+                                    <i class="fa fa-upload"></i>
+                                </button>
+                                <span ng-if="uploadfilebucketform.aws_file.$valid"> &nbsp; &nbsp; {{aws_file.name}} </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-buttons">
+            <div class="modal-footer modal-buttons">
+                <button type="button" class="btn btn-cancel" ng-click="cancel()"> Cancel </button>
+                <button type="submit" class="btn btn-default" ng-disabled="!uploadfilebucketform.aws_file.$valid"> Submit </button>
+            </div>
+        </div>
+      </form>
+    </div>
+    </script>
+    <script type="text/ng-template" id="bucketDeleteConfirmation.html">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" ng-click="cancel()" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title ng-binding">AWS S3 Bucket</h4>
+            </div>
+            <div class="modal-body ng-binding">Are you sure you want to continue with this action?</div>
+            <div class="modal-footer modal-button">
+                <button class="btn btn-cancel" type="button" ng-click="cancel()">No</button>
+                <button class="btn btn-default" type="submit" ng-click="delete_s3_bucket()">Yes</button>
+            </div>
+        </div>
+    </script>
+    <script type="text/ng-template" id="uploadFileHistoryModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Uploaded File History</h3>
+        </div>
+        <div class="modal-body">
+            <span ng-if="!s3_bucket_files">
+                <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+            </span>
+            <section id="no-more-tables-history" class="margintop20 middle-wrapper table-responsive">
+                <table id="example-history" class="example table table-condensed cf" ng-show="s3_bucket_files.length > 0">
+                    <thead class="cf">
+                        <tr>
+                            <th class="padding_left_right8px">Bucket Name</th>
+                            <th class="padding_left_right8px">File Name</th>
+                            <th class="padding_left_right8px">Upload Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                  <tr ng-repeat="d in s3_bucket_files">
+                    <td class="normal padding_left_right8px">{{ d.bucket_name }}</td>
+                    <td class="normal padding_left_right8px">{{ d.file_name }}</td>
+                    <td class="normal padding_left_right8px">{{ d.upload_status }}</td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div ng-if="(s3_bucket_files.length === 0)" class="content-wrapper">
+                    <no-records-found message="No Files available to display."></no-records-found>
+                </div>
+            </section>
+        </div>
+        <div class="modal-footer modal-button">
+            <button class="btn btn-cancel" type="button" ng-click="cancel()">Close</button>
+        </div>
+    </script>
+</div>

@@ -1,0 +1,558 @@
+<div class="card-header bg-white border-bottm-0 pb-0">
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs tabs-level1 custom-nav-container">
+                <li class="nav-item rounded-top tabs-level1-item">
+                    <a class="nav-link tabs-level1-link border-0 text-success mt-3 py-0">Summary</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-2 pull-right">
+            <div class="form-group">
+                <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                    [(ngModel)]="currentCriteria.multiValueParam.datacenter" [options]="datacenterList"
+                    [settings]="datacenterListSettings" (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mx-1 my-3">
+    <div class="col pr-1">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="networkSummaryViewData.totalDevicesLoader"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <div class="text-truncate text-muted pt-1">Total Devices</div>
+                        <div class="d-flex align-items-baseline pb-1">
+                            <span class="text-value">{{networkSummaryViewData?.totalDevices?.total}}</span>
+                        </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div>
+                        <div class="mt-1">
+                            <span class="fas fa-long-arrow-alt-up text-success align-self-center mr-1"></span>
+                            <span class="text-truncate text-muted pt-1">Up</span>
+                        </div>
+                        <div class="d-flex align-items-baseline pb-1">
+                            <span class="text-value">{{networkSummaryViewData?.totalDevices?.up}}</span>
+                        </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div>
+                        <div class="mt-1">
+                            <span class="fas fa-long-arrow-alt-down text-danger align-self-center mr-1"></span>
+                            <span class="text-truncate text-muted pt-1">Down</span>
+                        </div>
+                        <div class="d-flex align-items-baseline pb-1">
+                            <span class="text-value">{{networkSummaryViewData?.totalDevices?.down}}</span>
+                        </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div>
+                        <div class="text-truncate text-muted pt-1">Unknown</div>
+                        <div class="d-flex align-items-baseline pb-1">
+                            <span class="text-value">{{networkSummaryViewData?.totalDevices?.unknown}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col pl-1">
+        <div class="card round-edge equalize-card mb-0">
+            <app-spinner [name]="networkSummaryViewData.devicesLoader"></app-spinner>
+            <div class="card-body d-flex flex-column p-2">
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <div class="text-truncate text-muted pt-1 text-left">Switches</div>
+                        <div class="d-flex align-items-baseline pb-1">
+                            <span class="fas fa-long-arrow-alt-up text-success align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.switches?.up}}</span>
+                            <span class="fas fa-long-arrow-alt-down text-danger align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.switches?.down}}</span>
+                            <span class="fas fa-ban text-muted align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.switches?.unknown}}</span>
+                        </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div>
+                        <div class="text-truncate text-muted pt-1 text-left">Firewalls</div>
+                        <div class="d-flex align-items-baseline pb-1">
+                            <span class="fas fa-long-arrow-alt-up text-success align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.firewalls?.up}}</span>
+                            <span class="fas fa-long-arrow-alt-down text-danger align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.firewalls?.down}}</span>
+                            <span class="fas fa-ban text-muted align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.firewalls?.unknown}}</span>
+                        </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div>
+                        <div class="text-truncate text-muted pt-1 text-left">Load Balancers</div>
+                        <div class="d-flex align-items-baseline pb-1">
+                            <span class="fas fa-long-arrow-alt-up text-success align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.loadBalancers?.up}}</span>
+                            <span class="fas fa-long-arrow-alt-down text-danger align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.loadBalancers?.down}}</span>
+                            <span class="fas fa-ban text-muted align-self-center mt-1"></span>
+                            <span class="text-value mx-1">{{networkSummaryViewData?.loadBalancers?.unknown}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-1">
+    <div class="col-4 pr-1">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'NetworkSummaryStatusByGroupLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+                <div class="d-flex align-items-center justify-content-center">
+                    <h5>Status by Group</h5>
+                </div>
+                <div class="d-flex align-items-center justify-content-end mt-1">
+                    <div class="form-group mb-2">
+                        <select class="form-control form-control-sm w-100" [(ngModel)]="statusByGroup">
+                            <option [value]="'Manufacturer'">Manufacturer</option>
+                            <option [value]="'Model'">Model</option>
+                            <option [value]="'Device'">Device</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0 pt-2"
+                style="min-height:240px;max-height:288px;overflow-y: auto;overflow-x: hidden;">
+                <ng-container [ngSwitch]="statusByGroup">
+                    <ng-container *ngSwitchCase="'Manufacturer'">
+                        <ng-container [ngTemplateOutlet]="manufacturer"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Model'">
+                        <ng-container [ngTemplateOutlet]="model"></ng-container>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'Device'">
+                        <ng-container [ngTemplateOutlet]="device"></ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+    <div class="col-8 pl-1">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="alertsBySeverityViewData.loader"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-1 pl-2">
+                <h5>Alert Details</h5>
+            </div>
+            <div class="card-body p-0 pt-2 pr-2">
+                <div class="row">
+                    <div class="col-5">
+                        <canvas *ngIf="alertsBySeverityViewData.chartData" baseChart
+                            [chartType]="alertsBySeverityViewData.chartData.type"
+                            [labels]="alertsBySeverityViewData.chartData.lables"
+                            [datasets]="alertsBySeverityViewData.chartData.datasets"
+                            [options]="alertsBySeverityViewData.chartData.options"
+                            [plugins]="alertsBySeverityViewData.chartData.plugins"
+                            [legend]="alertsBySeverityViewData.chartData.legend"
+                            [colors]="alertsBySeverityViewData.chartData.colors" height="250"></canvas>
+                        <div *ngIf="!alertsBySeverityViewData.chartData">
+                            <div class="text-center text-muted">No data available.</div>
+                        </div>
+                    </div>
+                    <div class="col-7 d-flex align-items-center pl-0">
+                        <div class="row">
+                            <div class="col-6 pr-0 mb-2">
+                                <div class="card round-edge equalize-card mb-2">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="text-truncate">Total Alerts</div>
+                                        <div class="d-flex align-items-baseline">
+                                            <div class="text-primary font-xl font-500">
+                                                {{alertsBySeverityViewData?.total}}</div>
+                                            <div class="font-xs text-muted font-500 ml-1 text-truncate">
+                                                <span *ngIf="alertsBySeverityViewData?.lastWeekTotal != 0"
+                                                    class="font-lg"
+                                                    [ngClass]="getSeverityDetailsClass(alertsBySeverityViewData?.lastWeekTotal)"></span>
+                                                {{alertsBySeverityViewData?.lastWeekTotal}} since last
+                                                week
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <div class="card round-edge equalize-card mb-2">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="text-truncate">Critical</div>
+                                        <div class="d-flex align-items-baseline">
+                                            <div class="text-primary font-xl font-500">
+                                                {{alertsBySeverityViewData?.critical}}</div>
+                                            <div class="font-xs text-muted font-500 ml-1 text-truncate">
+                                                <span *ngIf="alertsBySeverityViewData?.lastWeekCritical != 0"
+                                                    class="font-lg"
+                                                    [ngClass]="getSeverityDetailsClass(alertsBySeverityViewData?.lastWeekCritical)"></span>
+                                                {{alertsBySeverityViewData?.lastWeekCritical}} since last
+                                                week
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 pr-0">
+                                <div class="card round-edge equalize-card mb-2">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="text-truncate">Warning</div>
+                                        <div class="d-flex align-items-baseline">
+                                            <div class="text-primary font-xl font-500">
+                                                {{alertsBySeverityViewData?.warning}}</div>
+                                            <div class="font-xs text-muted font-500 ml-1 text-truncate">
+                                                <span *ngIf="alertsBySeverityViewData?.lastWeekWarning != 0"
+                                                    class="font-lg"
+                                                    [ngClass]="getSeverityDetailsClass(alertsBySeverityViewData?.lastWeekWarning)"></span>
+                                                {{alertsBySeverityViewData?.lastWeekWarning}} since last
+                                                week
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="card round-edge equalize-card mb-2">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="text-truncate">Information</div>
+                                        <div class="d-flex align-items-baseline">
+                                            <div class="text-primary font-xl font-500">
+                                                {{alertsBySeverityViewData?.information}}</div>
+                                            <div class="font-xs text-muted font-500 ml-1 text-truncate">
+                                                <span *ngIf="alertsBySeverityViewData?.lastWeekInformation != 0"
+                                                    class="font-lg"
+                                                    [ngClass]="getSeverityDetailsClass(alertsBySeverityViewData?.lastWeekInformation)"></span>
+                                                {{alertsBySeverityViewData?.lastWeekInformation}} since last
+                                                week
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-1 my-3">
+    <div class="col pr-1">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'NetworkSummaryCpuUtilizationLoader'"></app-spinner>
+            <div class="card-header bg-white pb-1 pl-2">
+                <h5>Top 10 CPU Utilization</h5>
+            </div>
+            <div class="card-body p-0 pt-2">
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Host</th>
+                            <th></th>
+                            <th class="text-center">Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of cpuUtilizationViewData" truncateText>
+                            <td class="tdw-20">
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                    [tooltip]="'Host 1'" (click)="goToDeviceDetails('sampleData')">Host 1</button>
+                            </td>
+                            <td class="custom-border pl-0 tdw-70">
+                                <div class="mt-2">
+                                    <div class="progress progress-sm flex-grow-1">
+                                        <div class="progress-bar" role="progressbar" [style.width.%]="view.lastValue"
+                                            [ngClass]="getProgressClass(view.lastValue)" aria-valuenow="view.lastValue"
+                                            aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center tdw-10">
+                                <span class="font-500"
+                                    [ngClass]="getPercentageClass(view.lastValue)">{{view.lastValue}}%</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col pl-1">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'NetworkSummaryMemoryUtilizationLoader'"></app-spinner>
+            <div class="card-header bg-white pb-1 pl-2">
+                <h5>Top 10 Memory Utilization</h5>
+            </div>
+            <div class="card-body p-0 pt-2">
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Host</th>
+                            <th>Memory name</th>
+                            <th class="text-right">Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn" type="button"
+                                    [tooltip]="'Host 1'" (click)="goToDeviceDetails('sampleData')">Host 1</button>
+                            </td>
+                            <td>Memory</td>
+                            <td class="custom-border pl-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="progress progress-sm flex-grow-1">
+                                        <div class="progress-bar" role="progressbar" [style.width.%]="78"
+                                            [ngClass]="getProgressClass(78)" aria-valuenow="78" aria-valuemin="0"
+                                            aria-valuemax="100"></div>
+                                    </div>
+                                    <span class="ml-2 font-500" [ngClass]="getPercentageClass(78)">78%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-1">
+    <div class="col pr-1">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="interfaceSummaryViewData.loader"></app-spinner>
+            <div class="card-header bg-white pb-1 pl-2">
+                <h5>Interface Summary</h5>
+            </div>
+            <div class="card-body d-flex align-items-center p-0 pt-2">
+                <canvas *ngIf="interfaceSummaryViewData.chartData" baseChart
+                    [chartType]="interfaceSummaryViewData.chartData.type"
+                    [labels]="interfaceSummaryViewData.chartData.lables"
+                    [data]="interfaceSummaryViewData.chartData.piedata"
+                    [options]="interfaceSummaryViewData.chartData.options"
+                    [plugins]="interfaceSummaryViewData.chartData.plugins"
+                    [legend]="interfaceSummaryViewData.chartData.legend"
+                    [colors]="interfaceSummaryViewData.chartData.colors" height="150"></canvas>
+                <div *ngIf="!interfaceSummaryViewData.chartData">
+                    <div class="text-center text-muted">No data available.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col pl-1">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'NetworkSummaryAlertsDetailsLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white pb-1 pl-2">
+                <div class="d-flex align-items-center justify-content-center">
+                    <h5>Alerts Details</h5>
+                </div>
+                <div class="d-flex align-items-center justify-content-end">
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="1"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <div class="card-body p-0 pt-2"
+                style="min-height:360px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Device Name</th>
+                            <th class="text-center">Severity</th>
+                            <th>Description</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of alertsDetailsViewData" truncateText>
+                            <td class="text-primary">{{view.id}}</td>
+                            <td class="tdw-20">
+                                <div [tooltip]="view.name">{{view.name}}</div>
+                            </td>
+                            <td class="text-center">
+                                <div [tooltip]="view.severity">
+                                    <span [class]="view.severityClass"></span>
+                                </div>
+                            </td>
+                            <td class="tdw-30">
+                                <div [tooltip]="view.description">{{view.description}}</div>
+                            </td>
+                            <td>{{view.duration}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mx-1 my-3">
+    <div class="col">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="'NetworkSummaryInterfaceDetailsLoader'"></app-spinner>
+            <div class="card-header d-flex justify-content-between align-items-center bg-white pb-1 pl-2">
+                <div class="d-flex align-items-center justify-content-center">
+                    <h5>Interface Details</h5>
+                </div>
+                <div class="d-flex align-items-center justify-content-end">
+                    <div class="form-group mb-2">
+                        <select class="form-control form-control-sm w-100" [(ngModel)]="interfaceDetail"
+                            (ngModelChange)="onInterfaceDetailFilterChange()">
+                            <option value="">Select</option>
+                            <option [value]="'Receive'">Receive</option>
+                            <option [value]="'Transmit'">Transmit</option>
+                            <option [value]="'Bandwidth'">Bandwidth</option>
+                            <option value="'Speed'">Speed</option>
+                            <option value="'Inbound Discarded'">Inbound Discarded</option>
+                            <option value="'Outbound Discarded'">Outbound Discarded</option>
+                            <option value="'Outbound with error'">Outbound with error</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0 pt-2">
+                <table class="table text-left">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Host</th>
+                            <th>Device Type</th>
+                            <th>Interface Name</th>
+                            <th>Receive</th>
+                            <th>Transmit</th>
+                            <th>Bandwidth</th>
+                            <th>Speed</th>
+                            <th>Inbound Discarded</th>
+                            <th>Inbound with error</th>
+                            <th>Outbound Discarded</th>
+                            <th>Outbound with error</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let view of interfaceDetailsViewData">
+                            <td>
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn pb-1"
+                                    type="button" [tooltip]="'Host 1'"
+                                    (click)="goToDeviceDetails(view.host)">{{view.host.name}}</button>
+                            </td>
+                            <td>{{view.host.type}}</td>
+                            <td>
+                                <button class="btn btn-link text-decoration-none p-0 table-column-btn pb-1"
+                                    type="button" [tooltip]="'interface'"
+                                    (click)="goToInterface(view.itemId)">{{view.name}}</button>
+                            </td>
+                            <td>{{view.receive.value}}</td>
+                            <td>{{view.transmit.value}}</td>
+                            <td>{{view.bandwidth.convertedValue}}</td>
+                            <td>{{view.speed.convertedValue}}</td>
+                            <td class="text-center">{{view.inboundDiscarded.value}}</td>
+                            <td class="text-center">{{view.inboundWithError.value}}</td>
+                            <td class="text-center">{{view.outboundDiscarded.value}}</td>
+                            <td class="text-center">{{view.outboundWithError.value}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #manufacturer>
+    <ng-container *ngFor="let data of statusByGroupList; let i = index">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex align-items-center ml-3 mb-2">
+                    <shared-device-status [status]="2" class="mt-1"></shared-device-status>
+                    <button class="btn btn-link text-decoration-none p-0 text-muted ml-2"
+                        (click)="showModals(i)">{{data.name}}</button>
+                </div>
+                <ng-container *ngIf="data.isSelected">
+                    <div class="row">
+                        <div class="col-12">
+                            <ng-conatiner *ngFor="let model of modelList[i]; let j = index">
+                                <div class="d-flex align-items-center model-margin mb-2">
+                                    <shared-device-status [status]="2" class="mt-1"></shared-device-status>
+                                    <button class="btn btn-link text-decoration-none p-0 text-muted ml-2"
+                                        (click)="showDevices(i, j)">{{model.name}}</button>
+                                </div>
+                                <ng-container *ngIf="model.isSelected">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <ng-conatiner *ngFor="let device of manfDeviceList[i][j]">
+                                                <div class="d-flex align-items-center device-margin mb-2">
+                                                    <shared-device-status
+                                                        [status]="device.status" class="mt-1"></shared-device-status>
+                                                    <button
+                                                        class="btn btn-link text-decoration-none p-0 text-muted ml-2"
+                                                        (click)="goToDeviceDetails(device)">{{device.name}}</button>
+                                                </div>
+                                            </ng-conatiner>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </ng-conatiner>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </ng-container>
+    <div *ngIf="!statusByGroupList.length" class="d-flex py-5 justify-content-center align-items-center">
+        No Manufacturers available.
+    </div>
+</ng-template>
+
+<ng-template #model>
+    <ng-conatiner *ngFor="let model of models; let i = index">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex align-items-center ml-3 mb-2">
+                    <shared-device-status [status]="2" class="mt-1"></shared-device-status>
+                    <button class="btn btn-link text-decoration-none p-0 text-muted ml-2"
+                        (click)="showModelDevices(i)">{{model.name}}</button>
+                </div>
+                <ng-container *ngIf="model.isSelected">
+                    <div class="row">
+                        <div class="col-12">
+                            <ng-conatiner *ngFor="let device of modelDeviceList[i]">
+                                <div class="d-flex align-items-center model-margin mb-2">
+                                    <shared-device-status [status]="2" class="mt-1"></shared-device-status>
+                                    <button class="btn btn-link text-decoration-none p-0 text-muted ml-2"
+                                        (click)="goToDeviceDetails(device)">{{device.name}}</button>
+                                </div>
+                            </ng-conatiner>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </ng-conatiner>
+    <div *ngIf="!models.length" class="d-flex py-5 justify-content-center align-items-center">
+        No Models available.
+    </div>
+</ng-template>
+
+<ng-template #device>
+    <ng-conatiner *ngFor="let device of deviceList">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex align-items-center ml-3 mb-2">
+                    <shared-device-status [status]="2" class="mt-1"></shared-device-status>
+                    <button class="btn btn-link text-decoration-none p-0 text-muted ml-2"
+                        (click)="goToDeviceDetails(device)">{{device.name}}</button>
+                </div>
+            </div>
+        </div>
+    </ng-conatiner>
+    <div *ngIf="!deviceList.length" class="d-flex py-5 justify-content-center align-items-center">
+        No Devices available.
+    </div>
+</ng-template>

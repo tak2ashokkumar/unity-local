@@ -1,0 +1,78 @@
+<div cg-busy="{promise:myPromise, message:'Loading...', backdrop:true, delay:0, minDuration:500}">
+  <loading loader="{{loader}}"></loading>
+  <page-title title="DevOps Controllers"></page-title>
+  <div class="pagemargin">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 content-wrapper bg-color top_shadow">
+      <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 search-widget">
+        <form class="navbar-form ng-pristine ng-valid">
+          <div class="form-group width100">
+            <input class="form-control" type="text" ng-model="serversSearchKeyword" ng-model-options="{debounce: 1000}" id="serversSearchKeyword" placeholder="Enter keyword">
+            <button class="btn btn-search" type="submit" style="top: 4px;">
+             <i class="fa fa-search"></i>
+           </button>
+         </div>
+       </form>
+      </div>
+      <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4" ng-class="{'padding_top15px' : disable_action_btn}">
+        <div class="action-bar pull-right table-button" ng-class="{'table-button' : !disable_action_btn}">
+        <span class="count ng-binding" style="margin-right: 10px;">{{(devices.results | filter:serversSearchKeyword).length}}</span>
+        <span>
+          <a class="btn btn-default" ng-click="addDevice('server')">  + Add Server </a>
+        </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row content-wrapper">
+    <div class="col-xs-12 page_wrapper" ng-if="!showConsole">
+      <section id="no-more-tables">
+        <div>
+          <table class="Summary-box table table-condensed table-hover">
+            <thead>
+              <tr>
+                <th custom-sort order="device_name" sort="sort" ng-mouseover="order = 'device_name'">Server</th>
+                <th custom-sort order="platform_type" sort="sort" ng-mouseover="order = 'platform_type'">Platform Type</th>
+                <th custom-sort order="os" sort="sort" ng-mouseover="order = 'os'">Operating System </th>
+                <th custom-sort order="ip_address" sort="sort" ng-mouseover="order = 'ip_address'">Management IP </th>
+                <th custom-sort order="port" sort="sort" ng-mouseover="order = 'port'"> Port </th>
+                <th>Actions </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr ng-repeat="device in devices.results | orderBy: sortkey | filter: serversSearchKeyword">
+                <td>{{device.device_name}} </td>
+                <td>{{device.platform_type}} </td>
+                <td>{{device.os}} </td>
+                <td>{{device.ip_address}} </td>
+                <td>{{device.port}} </td>
+                <td>
+                  <div class="action-icons">
+                    <a class="fa fa-pencil" tooltip-class="customClass" uib-tooltip="Edit" ng-click="updateDevice(device, $index)"></a>
+
+                    <a class="fa fa-trash-o blue-text" tooltip-class="customClass" uib-tooltip="Delete" ng-click="deleteDevice(device, $index)"></a>
+
+                    <span tooltip-class="customClass"
+                    uib-tooltip="{{(device.platform_type == 'Linux') ? 'Manage in Same Tab' : 'Open in same tab option is not available for windows machines' }}">
+                    <a ng-click="device.platform_type == 'Linux'?manageInSameTab(device):''">
+                      <i class="fa fa-external-link-square" ng-class="{'fa-disabled': (device.platform_type == 'Windows')}"></i>
+                    </a>
+                  </span>
+                  <a tooltip-class="customClass" uib-tooltip="Manage in New Tab" ng-click="manageInNewTab(device)" class="fa fa-external-link blue-text ng-scope"></a>
+
+                  <a tooltip-class="customClass" uib-tooltip="Manage by creating support ticket" ng-click="manageByRequest(device)" class="fa fa-ticket blue-text"></a>
+                </div>
+              </td>
+            </tr>
+            <tr ng-if="devices.results && devices.results.length == 0">
+              <td colspan="5" class="no-records-td">
+                <no-records-found message="No servers added"></no-records-found>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+

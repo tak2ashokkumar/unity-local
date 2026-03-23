@@ -1,0 +1,28 @@
+<div class="col-12 p-0 my--3">
+    <div class="card border-0">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+            <div class="form-group mb-0 w-20">
+                <select class="form-control" [ngModel]="activeScriptType"
+                    (change)="onSelectScriptType($event.target.value)">
+                    <option [value]="scriptTypes.ANSIBLE">Ansible (YAML)</option>
+                    <option [value]="scriptTypes.TERRAFORM">Terraform</option>
+                    <option [value]="scriptTypes.BASH">Bash</option>
+                    <option [value]="scriptTypes.POWERSHELL">PowerShell</option>
+                    <option [value]="scriptTypes.PYTHON">Python</option>
+                </select>
+            </div>
+            <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+            <div class="d-flex align-items-center justify-content-end">
+                <button class="btn btn-warning btn-sm" (click)="formatScript()">Format Script</button>
+                <button class="btn btn-pill btn-warning btn-sm ml-2" (click)="goBack()" tooltip="Back">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body border-0 p-0">
+            <div class="form-group mb-0">
+                <textarea #codeEditor></textarea>
+            </div>
+        </div>
+    </div>
+</div>

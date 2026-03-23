@@ -1,0 +1,117 @@
+<ng-template #createacc>
+    <div class="card mb-0">
+        <div class="card-header">
+            Add Azure Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="createAzureAccountModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="createAzureAccountForm" [formGroup]="createAzureAccountForm">
+                <div class="form-group">
+                    <label class="form-col-form-label"> Account Name<em>* </em></label>
+                    <input id="account_name" class="form-control" type="text" formControlName="account_name"
+                        [ngClass]="{'is-invalid' : createAzureAccountFormErrors.account_name}">
+                    <div class="invalid-feedback" *ngIf="createAzureAccountFormErrors.account_name">
+                        {{createAzureAccountFormErrors.account_name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label"> Email<em>* </em></label>
+                    <input id="user_name" class="form-control" type="text" formControlName="user_name"
+                        [ngClass]="{'is-invalid' : createAzureAccountFormErrors.user_name}">
+                    <div class="invalid-feedback" *ngIf="createAzureAccountFormErrors.user_name">
+                        {{createAzureAccountFormErrors.user_name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label"> Password<em>* </em></label>
+                    <input id="password" class="form-control" type="password" formControlName="secret_key"
+                        [ngClass]="{'is-invalid' : createAzureAccountFormErrors.secret_key}">
+                    <div class="invalid-feedback" *ngIf="createAzureAccountFormErrors.secret_key">
+                        {{createAzureAccountFormErrors.secret_key}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="form-col-form-label"> Subscription ID <em>*</em></label>
+                    <input id="subscription_id" class="form-control" type="text" formControlName="subscription_id"
+                        [ngClass]="{'is-invalid' : createAzureAccountFormErrors.subscription_id}">
+                    <div class="invalid-feedback" *ngIf="createAzureAccountFormErrors.subscription_id">
+                        {{createAzureAccountFormErrors.subscription_id}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmAzureAccountCreate()">Submit</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="createAzureAccountModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="deleteAzureModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Azure account will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmDeleteAzureAccount()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="deleteAzureModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+
+<ng-template #editazureacc>
+    <div class="card mb-0">
+        <div class="card-header">
+            Edit Azure Account
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="editAzureAccountModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form *ngIf="editAzureAccountForm" [formGroup]="editAzureAccountForm">
+                <div class="form-group">
+                    <label class="form-col-form-label"> Account Name<em>* </em></label>
+                    <input id="account_name" class="form-control" type="text" formControlName="account_name"
+                        [ngClass]="{'is-invalid' : editAzureAccountFormErrors.account_name}">
+                    <div class="invalid-feedback" *ngIf="editAzureAccountFormErrors.account_name">
+                        {{editAzureAccountFormErrors.account_name}}</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-col-form-label"> User Name<em>* </em></label>
+                    <input id="user_name" class="form-control" type="text" formControlName="user_name"
+                        [ngClass]="{'is-invalid' : editAzureAccountFormErrors.user_name}">
+                    <div class="invalid-feedback" *ngIf="editAzureAccountFormErrors.user_name">
+                        {{editAzureAccountFormErrors.user_name}}</div>
+                </div>
+                <div class="form-group">
+                    <label for="form-col-form-label"> Subscription ID <em>*</em></label>
+                    <input id="subscription_id" class="form-control" type="text" formControlName="subscription_id"
+                        [ngClass]="{'is-invalid' : editAzureAccountFormErrors.subscription_id}">
+                    <div class="invalid-feedback" *ngIf="editAzureAccountFormErrors.subscription_id">
+                        {{editAzureAccountFormErrors.subscription_id}}</div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="saveAzureAccount()">Update</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="editAzureAccountModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,115 @@
+<alerts></alerts>
+<div class="row">
+    <div class="col-sm-12">
+        <generictable
+            heading="Tenant"
+            headers="general_tenant"
+            tabledata="tenant_content.data.data"
+            modeldata="create_tenant_modeldata"
+            rows="create_tenant_rows"
+            addclick="create_tenant_add(data)"
+            actions="tenant_actions"
+            delete-operation="delete_info(args)"
+            modeldata2="update_tenant_modeldata"
+            rows2="update_tenant_rows"
+            addclick2="update_tenant(args)"
+            update-operation="update_info(args)"
+            modeldata8="tenant_volumes_modeldata"
+            rows8="create_volume_dropdowns"
+            addclick8="create_tenant_volumes_add(data)"
+            modeldatavmtenant="vm_tenant_content_modeldata"
+            rowsvmtenant="vm_tenant_rows"
+            addclickvmtenant="vm_tenant_add(data)">
+        </generictable>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+        <generictable
+            heading="Regions"
+            headers="regions_headers"
+            tabledata="regions_content.data.data">
+        </generictable>
+    </div>
+    <div class="col-sm-6">
+        <generictable
+            heading="Availability Zone "
+            headers="availability_zone_headers"
+            tabledata="availability_zone_content.data.data">
+        </generictable>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <generictable
+            heading="Hypervisors"
+            headers="hypervoiser_headers"
+            tabledata="hy_content.data.data"
+            actions="hypervisor_actions">
+        </generictable>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <generictable
+            heading="Server (VM)"
+            headers="tenant_table_headers"
+            tabledata="vm_tenant_content.data.data"
+            modeldata9="update_server_vm_modeldata"
+            actions="vm_tenant_actions"
+            rows9="update_vm_name_rows"
+            addclick9="update_vm_name(args)">
+        </generictable>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <generictable
+            heading="Subnet"
+            headers="subnet_headers"
+            tabledata="subnet_content.data.data"
+            modeldata="subnet_modeldata"
+            rows="subnet_rows"
+            addclick="subnet_add(data)">
+        </generictable>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <generictable
+            heading="Flavors"
+            headers="flavor_headers"
+            tabledata="flavor_content.data.data"
+            modeldata="flavor_content_modaldata"
+            rows="flavor_rows"
+            addclick="flavor_add(data)"
+            actions="flavor_actions"
+            delete-operation="delete_info(args)"
+            navigate-operation="navigate_to(args)">
+        </generictable>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <generictable
+            heading="Images"
+            headers="imagelist_headers"
+            tabledata="tenant_images_content.data.data"
+            modeldata="tenant_images_modeldata"
+            rows="create_tenant_dropdown"
+            addclick="tenant_images_add(data)"
+            actions="images_actions"
+            delete-operation="delete_info(args)">
+        </generictable>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <generictable
+            heading="OS Hosts"
+            headers="hosts_tenant_headers"
+            tabledata="os_hosts_tenant_content.data.data">
+        </generictable>
+    </div>
+</div>

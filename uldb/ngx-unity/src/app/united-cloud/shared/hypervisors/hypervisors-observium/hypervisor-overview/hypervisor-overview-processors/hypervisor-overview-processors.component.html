@@ -1,0 +1,13 @@
+<div class="card" *ngIf="graph">
+  <app-spinner [name]="'hyopr'"></app-spinner>
+  <div class="card-header bg-transparent border-bottom-0 ml-0 card-title ">
+    <h4 class="card-title font-lg">Processors</h4>
+  </div>
+  <div class="card-body pt-0">
+    <div class="row align-items">
+      <div class="col">
+        <img class="img-fluid" *ngIf="graph" [src]="'data:image/png;base64,'+graph.graph">
+      </div>
+    </div>
+  </div>
+</div>

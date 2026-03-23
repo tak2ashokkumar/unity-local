@@ -1,0 +1,98 @@
+<div class="row mx-2 mt-3">
+  <div class="col-12">
+    <div class="card rounded-2 border-top-0">
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-1">
+        <div class="d-flex align-items-center">
+          <span class="mx-2 text-left align-middle"><span class="badge badge-secondary font-sm">{{count}}</span></span>
+          <div class="font-lg font-500">Connections</div>
+        </div>
+        <div class="d-flex align-items-center">
+          <div style="min-width: 250px;"><search-box [searchValue]="currentCriteria.searchValue"
+              (searched)="onSearched($event)"></search-box></div>
+          <div></div>
+          <div class="ml-2">
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+              (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+          </div>
+          <button class="btn btn-pill btn-warning btn-sm mx-3" type="button" (click)="addConnection()" accessControl
+            moduleName="Connections" accessType="Manage Connections" elementType="btn"><i
+              class="fas fa-plus mr-2"></i>Connection</button>
+        </div>
+      </div>
+      <div class="card-body py-2">
+        <table class="table table-sm text-left">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Base URL</th>
+              <th>Auth Type</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let view of viewData">
+              <td>{{view.name}}</td>
+              <td>{{view.baseUrl}}</td>
+              <td>{{view.authType}}</td>
+              <td class="action-icons-column">
+                <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
+                  (click)="editConnection(view)" accessControl moduleName="Connections" accessType="Manage Connections"
+                  elementType="actionbtn"></button>
+                <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
+                  (click)="deleteConnection(view.uuid)" accessControl moduleName="Connections"
+                  accessType="Manage Connections" elementType="actionbtn"></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count"></table-entries>
+        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+          [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        <div *ngIf="!viewData.length" class="d-flex py-5 justify-content-center align-items-center">
+          No Connections available.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #edit>
+  <div class="card mb-0">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-12 text-center">
+          Are you sure want to edit the Connection?
+        </div>
+      </div>
+      <div class="col-12 text-align-center text-center mt-3">
+        <button class="btn btn-pill btn-warning btn-sm pl-3 pr-3" type="button" (click)="confirmEdit()">Yes
+        </button>
+        <button class="btn btn-pill btn-outline-warning btn-sm ml-2" type="button" (click)="editModelRef.hide()">Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #deleteconnection>
+  <div class="card mb-0">
+    <div class="card-header">
+      Confirm Delete
+      <div class="card-header-actions">
+        <a class="card-header-action btn-close" (click)="deleteConnectionModalRef.hide()">
+          <i class="fas fa-times"></i>
+        </a>
+      </div>
+    </div>
+    <div class="card-body">
+      Are you sure you want to delete the Connection?
+    </div>
+    <div class="card-footer text-center">
+      <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+        (click)="confirmConnectionDelete()">Yes</button>
+      <button class="btn btn-sm btn-danger pull-right" (click)="deleteConnectionModalRef.hide()"
+        type="button">No</button>
+    </div>
+  </div>
+</ng-template>

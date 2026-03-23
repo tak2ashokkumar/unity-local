@@ -1,0 +1,117 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-0 border-bottom-0">
+            <div class="card-body p-2 border-bottom-0">
+                <div class="row d-flex">
+                    <div class="col-7">
+                        <div class="card mb-0">
+                            <div class="card-body py-2">
+                                <div class="row">
+                                    <div class="col d-flex justify-content-around">
+                                        <div>
+                                            <div class="text-truncate font-sm">All Resources</div>
+                                            <div class="text-primary font-lg-xl font-500">{{clusterResources?.total ||
+                                                0}}</div>
+                                        </div>
+                                        <div class="my-2 border border-secondary"></div>
+                                        <div>
+                                            <div class="text-truncate font-sm">Host</div>
+                                            <div class="text-primary font-lg-xl font-500">{{clusterResources?.host ||
+                                                0}}</div>
+                                        </div>
+                                        <div class="my-2 border border-secondary"></div>
+                                        <div>
+                                            <div class="text-truncate font-sm">Virtual Machines</div>
+                                            <div class="text-primary font-lg-xl font-500">{{clusterResources?.vm || 0}}
+                                            </div>
+                                        </div>
+                                        <div class="my-2 border border-secondary"></div>
+                                        <div>
+                                            <div class="text-truncate font-sm">Datastores</div>
+                                            <div class="text-primary font-lg-xl font-500">{{clusterResources?.datastore
+                                                || 0}}
+                                            </div>
+                                        </div>
+                                        <div class="my-2 border border-secondary"></div>
+                                        <div>
+                                            <div class="text-truncate">Networks</div>
+                                            <div class="text-primary font-lg-xl font-500">{{clusterResources?.network ||
+                                                0}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 pl-0">
+                        <div class="card mb-0">
+                            <div class="card-body py-2">
+                                <div class="row">
+                                    <div class="col d-flex justify-content-around">
+                                        <div>
+                                            <div class="text-truncate font-sm">Alerts</div>
+                                            <div class="d-flex align-items-baseline">
+                                                <span
+                                                    class="text-primary font-lg-xl font-500">{{clusterAlertSummary?.total
+                                                    || 0}}</span>
+                                                <span class="ml-3">
+                                                    <span class="mt-1 mr-1">
+                                                        <span
+                                                            class="fas fa-exclamation-triangle font-xs-sm text-danger"></span>
+                                                        <span
+                                                            class="text-primary font-sm font-500 pl-1">{{clusterAlertSummary?.critical
+                                                            || 0}}</span>
+                                                    </span>
+                                                    <span class="mt-1 mx-1">
+                                                        <span
+                                                            class="fas fa-exclamation-circle font-xs-sm text-warning"></span>
+                                                        <span
+                                                            class="text-primary font-sm font-500 pl-1">{{clusterAlertSummary?.warning
+                                                            || 0}}</span>
+                                                    </span>
+                                                    <span class="mt-1 ml-1">
+                                                        <span class="fas fa-info-circle font-xs-sm text-primary"></span>
+                                                        <span
+                                                            class="text-primary font-sm font-500 pl-1">{{clusterAlertSummary?.information
+                                                            || 0}}</span>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="tab-content border-top-0">
+            <div class="tab-pane active p-2">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link pl-0 py-0 border-right">
+                            <span class="pl-1 font-xl">{{device?.name}}</span>
+                            <span class="pl-1 font-md text-muted">({{device?.deviceType}})</span>
+                        </a>
+                    </li>
+                    <li class="nav-item pt-1" *ngFor="let tab of tabData">
+                        <a class="nav-link py-0" [ngClass]="isActive(tab)" (click)="goTo(tab.url)">{{tab.name}}</a>
+                    </li>
+                    <li class="nav-item pt-1 float-right text-warning ml-auto">
+                        <a class="nav-link py-0 " (click)="goBack()">
+                            <i class="fa fa-arrow-left"></i>
+                            <span class="ml-1">Cluster List</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mt-3">
+        <router-outlet></router-outlet>
+    </div>
+</div>

@@ -1,0 +1,236 @@
+<form *ngIf="form" [formGroup]="form">
+    <div class="form-group">
+        <div class="invalid-credentials" *ngIf="nonFieldErr">{{nonFieldErr}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6 form-group d-flex">
+            <label class="col-4 col-form-label-sm text-right">Business
+                Unit<em>*</em></label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.business_unit"
+                    [items]="dropdownData?.business_unit" formControlName="business_unit" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [addTag]="addTag('business_unit')"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.business_unit">
+                    {{formErrors.business_unit}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label class="col-4 col-form-label-sm text-right">License
+                Model<em>*</em></label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.license_model"
+                    [items]="dropdownData?.license_model" formControlName="license_model" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [addTag]="addTag('license_model')"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.license_model">
+                    {{formErrors.license_model}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label class="col-4 col-form-label-sm text-right">License Cost Center<em>*</em>
+            </label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.license_cost_center"
+                    [items]="dropdownData?.license_cost_center" formControlName="license_cost_center"
+                    placeholder="Select" [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                    [addTag]="addTag('license_cost_center')"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.license_cost_center">
+                    {{formErrors.license_cost_center}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="license_cost_per_core_vm" class="col-4 col-form-label-sm text-right">License Cost Per
+                Core / VM</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <input id="license_cost_per_core_vm" class="form-control form-control-sm" type="number"
+                    placeholder="Enter License Cost Per Core" formControlName="license_cost_per_core_vm"
+                    [class.is-invalid]="formErrors.license_cost_per_core_vm">
+                <div class="invalid-feedback" *ngIf="formErrors.license_cost_per_core_vm">
+                    {{formErrors.license_cost_per_core_vm}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="tags" class="col-4 col-form-label-sm text-right">Tags</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <input id="tags" class="form-control form-control-sm" type="text" placeholder="Enter Tags"
+                    formControlName="tags" [class.is-invalid]="formErrors.tags">
+                <div class="invalid-feedback" *ngIf="formErrors.tags">
+                    {{formErrors.tags}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="purchase_cost_per_server" class="col-4 col-form-label-sm text-right">Purchase Cost Per
+                Server</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <input id="purchase_cost_per_server" class="form-control form-control-sm" type="number"
+                    placeholder="Enter Purchase Cost Per Core" formControlName="purchase_cost_per_server"
+                    [class.is-invalid]="formErrors.purchase_cost_per_server">
+                <div class="invalid-feedback" *ngIf="formErrors.purchase_cost_per_server">
+                    {{formErrors.purchase_cost_per_server}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="environment" class="col-4 col-form-label-sm text-right">Environment<em>*</em></label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">                
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.environment"
+                    [items]="dropdownData?.environment" formControlName="environment" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [clearable]="false"></ng-select>
+
+                <div class="invalid-feedback" *ngIf="formErrors.environment">
+                    {{formErrors.environment}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="maintenance_cost_per_host" class="col-4 col-form-label-sm text-right">Support/Maintenance Cost Per
+                Host</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <input id="maintenance_cost_per_host" class="form-control form-control-sm" type="number"
+                    placeholder="Enter Maintenance Cost Per Core" formControlName="maintenance_cost_per_host"
+                    [class.is-invalid]="formErrors.maintenance_cost_per_host">
+                <div class="invalid-feedback" *ngIf="formErrors.maintenance_cost_per_host">
+                    {{formErrors.maintenance_cost_per_host}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label class="col-4 col-form-label-sm text-right">Workload Type</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.workload_type"
+                    [items]="dropdownData?.workload_type" formControlName="workload_type" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [addTag]="addTag('workload_type')"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.workload_type">
+                    {{formErrors.workload_type}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="billing_currency" class="col-4 col-form-label-sm text-right">Billing
+                Currency<em>*</em></label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.billing_currency"
+                    [items]="currencyList" bindLabel="name" bindValue="name" formControlName="billing_currency" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [clearable]="false"></ng-select>
+
+                <div class="invalid-feedback" *ngIf="formErrors.billing_currency">
+                    {{formErrors.billing_currency}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="host_deployment_type" class="col-4 col-form-label-sm text-right">Host Deployment
+                Type</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.host_deployment_type"
+                    [items]="dropdownData?.host_deployment_type" formControlName="host_deployment_type" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [clearable]="false"></ng-select>
+
+                <div class="invalid-feedback" *ngIf="formErrors.host_deployment_type">
+                    {{formErrors.host_deployment_type}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="budget_amount" class="col-4 col-form-label-sm text-right">Budget
+                Amount</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <input id="budget_amount" class="form-control form-control-sm" type="number"
+                    placeholder="Enter Budget Amount" formControlName="budget_amount"
+                    [class.is-invalid]="formErrors.budget_amount">
+                <div class="invalid-feedback" *ngIf="formErrors.budget_amount">
+                    {{formErrors.budget_amount}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label class="col-4 col-form-label-sm text-right">Virtualization
+                Type</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.virtualization_type"
+                    [items]="dropdownData?.virtualization_type" formControlName="virtualization_type"
+                    placeholder="Select" [multiple]="false" [closeOnSelect]="true" [hideSelected]="false"
+                    [addTag]="addTag('virtualization_type')"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.virtualization_type">
+                    {{formErrors.virtualization_type}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="budget_period" class="col-4 col-form-label-sm text-right">Budget
+                Period</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.budget_period"
+                    [items]="dropdownData?.budget_period" formControlName="budget_period" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [clearable]="false"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.budget_period">
+                    {{formErrors.budget_period}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label class="col-4 col-form-label-sm text-right">Applications/Services
+                <em>*</em></label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.service"
+                    [items]="dropdownData?.service" formControlName="service" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [addTag]="addTag('service')"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.service">
+                    {{formErrors.service}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="allocation_type" class="col-4 col-form-label-sm text-right">Allocation
+                Type<em>*</em></label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">                
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.allocation_type"
+                    [items]="dropdownData?.allocation_type" formControlName="allocation_type" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [clearable]="false"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.allocation_type">
+                    {{formErrors.allocation_type}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="building_block_code" class="col-4 col-form-label-sm text-right">Building Block
+                Code<em>*</em></label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <input id="building_block_code" class="form-control form-control-sm" type="text"
+                    placeholder="Enter Building Block Code" formControlName="building_block_code"
+                    [class.is-invalid]="formErrors.building_block_code">
+                <div class="invalid-feedback" *ngIf="formErrors.building_block_code">
+                    {{formErrors.building_block_code}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="allocation_strategy" class="col-4 col-form-label-sm text-right">Allocation Strategy<em>*</em>
+            </label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <ng-select class="custom-ng-select" [class.is-invalid]="formErrors.allocation_strategy"
+                    [items]="dropdownData?.allocation_strategy" formControlName="allocation_strategy" placeholder="Select"
+                    [multiple]="false" [closeOnSelect]="true" [hideSelected]="false" [clearable]="false"></ng-select>
+                <div class="invalid-feedback" *ngIf="formErrors.allocation_strategy">
+                    {{formErrors.allocation_strategy}}</div>
+            </div>
+        </div>
+        <div class="col-6 form-group d-flex">
+            <label for="description" class="col-4 col-form-label-sm text-right">Description</label>
+            <div class="p-1">:</div>
+            <div class="col-6 pt-1">
+                <textarea class="form-control form-control-sm" id="description" name="description" rows="3"
+                    formControlName="description" [ngClass]="{'is-invalid' : formErrors.description}"
+                    placeholder="Enter Description"></textarea>
+                <div class="invalid-feedback" *ngIf="formErrors.description">
+                    {{formErrors.description}}</div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h3>{{ result.organization_name }}</h3>
+    <span>
+      <small ng-repeat="crumb in bread.crumbs">
+        <span ng-if="$index > 0">&lt;</span> <a href="{{ crumb.url }}">{{ crumb.name }}</a>
+      </small>
+    </span>
+  </div>
+</div>
+
+<alerts></alerts>
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <panelhalf heading="Customer Details"><detailtable cols="cols" result="result"></detailtable></panelhalf>
+  </div>
+  
+</div>
+
+

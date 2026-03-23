@@ -1,0 +1,172 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card text-center">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                <div class="d-flex justify-content-center align-items-center font-500">
+                    <span class="badge badge-secondary font-sm">{{count}}</span>
+                    <span class="ml-1 font-lg">Users</span>
+                    <span class="ml-1">
+                        <span class="font-lg">(</span>
+                        <span class="fa fa-check-circle fa-sm text-muted mx-1"></span>
+                        <span class="fas fa-long-arrow-alt-right fa-sm text-muted mx-1"></span>
+                        <span class="font-sm text-muted mx-1">Admin user</span>
+                        <span class="font-lg">)</span>
+                    </span>
+                </div>
+                <div class="d-flex justify-content-end align-items-center">
+                    <button class="btn btn-pill btn-sm btn-warning font-500 px-3" type="button"
+                        (click)="goToImportUsers()" [disabled]="isImportDisabled" accessControl moduleName="Public Cloud"
+                        accessType="View Public Cloud" elementType="btn">
+                        <span class="fas fa-user-plus"></span>
+                        <span class="mx-1">Import Users</span>
+                    </button>
+                    <button class="btn btn-pill btn-sm btn-warning font-500 ml-2 px-3" type="button"
+                        (click)="goToCreateUser()" accessControl moduleName="User Management" accessType="Create Users"
+                        elementType="btn">
+                        <span class="fas fa-plus"></span>
+                        <span class="mx-1">User</span>
+                    </button>
+                    <data-refresh-btn [page]="currentCriteria.pageNo"
+                        (refresh)="refreshData($event)"></data-refresh-btn>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <div class="row pb-2 d-flex justify-content-between">
+                    <div class="col-2">
+                        <search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></search-box>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    </div>
+                </div>
+                <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">
+                    <thead class="bg-light">
+                        <tr>
+                            <th sortable-column="email">Email</th>
+                            <th sortable-column="first_name">First Name</th>
+                            <th sortable-column="last_name">Last Name</th>
+                            <th>Created On</th>
+                            <th sortable-column="is_active">Is Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let user of viewData; let i = index;" truncateText>
+                            <td class="tdw-30">
+                                <div [tooltip]="user.email">
+                                    <span>{{user.email}}</span>
+                                    <span *ngIf="user.isCustomerAdmin" class="ml-2 fa fa-check-circle text-muted"></span>
+                                </div>
+                            </td>
+                            <td class="tdw-20">
+                                <div [tooltip]="user.firstName">{{user.firstName}}</div>
+                            </td>
+                            <td class="tdw-20">
+                                <div [tooltip]="user.lastName">{{user.lastName}}</div>
+                            </td>
+                            <td class="tdw-20">
+                                <div [tooltip]="user.createdOn">{{user.createdOn}}</div>
+                            </td>
+                            <td class="tdw-10">
+                                <i class="fa" [ngClass]="user.activeIcon"></i>
+                            </td>
+                            <td class="action-icons-column">
+                                <button class="action-icons mb-0 fa fa-pencil-alt font-sm ml-1"
+                                    [tooltip]="user.editTooltipMessage" [ngClass]="user.editButtonEnabled"
+                                    (click)="goToEditUser(i)" accessControl moduleName="User Management"
+                                    accessType="Manage Users" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fa font-sm ml-1" [tooltip]="user.activateStatusTooltip"
+                                    [ngClass]="[user.activateIcon, user.activateButtonEnabled]"
+                                    (click)="confirmToggle(i)" accessControl moduleName="User Management"
+                                    accessType="Manage Users" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-envelope font-sm ml-1"
+                                    [tooltip]="user.inviteUserTooltipMessage" [ngClass]="user.inviteUserButtonClass"
+                                    (click)="inviteUser(i)" accessControl moduleName="User Management"
+                                    accessType="Manage Users" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fa fa-undo font-sm ml-1"
+                                    [tooltip]="user.resetTooltipMessage" [ngClass]="user.resetButtonClass"
+                                    (click)="confirmPasswordToggle(i)" accessControl moduleName="User Management"
+                                    accessType="Manage Users" elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fa fa-trash-alt font-sm ml-1"
+                                    [tooltip]="user.deleteTooltipMessage" [ngClass]="user.deleteButtonEnabled"
+                                    (click)="confirmDeleteUser(i)" accessControl moduleName="User Management"
+                                    accessType="Manage Users" elementType="actionbtn"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                    [totalCount]="count">
+                </table-entries>
+                <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                    [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                    (pageChange)="pageChange($event)"></table-pager>
+                <div class="text-center text-muted py-4" *ngIf="!viewData.length">No users to display</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{confirmInput?.confirmTitle}}
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {{confirmInput?.confirmMessage}}
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="manageUser()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmModalRef.hide()" type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #password_reset>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{confirmInput?.confirmTitle}}
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmPasswordModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {{confirmInput?.confirmMessage}}
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="resetPassword()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmPasswordModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #delete_confirm>
+    <div class="card mb-0">
+        <div class="card-header">
+            {{confirmInput?.confirmTitle}}
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {{confirmInput?.confirmMessage}}
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="deleteUser()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmDeleteModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

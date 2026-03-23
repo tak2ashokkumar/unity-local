@@ -1,0 +1,2105 @@
+<div class="modal-body m-0 p-0" style="height: 550px;">
+  <!-- Round Close Button -->
+  <button type="button" class="btn-close-round mr-1" (click)="closeModal()">
+    <i class="fas fa-times"></i>
+  </button>
+
+  <button type="button" class="btn-tick-round" (click)="closeModal('save')">
+    <i class="fas fa-check"></i>
+  </button>
+
+  <div class="row m-0 p-0" style="max-height: 550px; min-height: 550px;">
+    <div class="col-3 m-0 p-0 left-sidebar">
+      <!-- Sidebar -->
+      <div class="sidebarParam p-3 rounded">
+        <!-- <h5 class="text-dark">INPUT</h5> -->
+        <h6 class="fw-bold mb-3">I N P U T</h6>
+
+        <div class="accordion text-muted" *ngIf="nodeData.node_type !== 'Manual Trigger' && 
+                              nodeData.node_type !== 'Schedule Trigger' &&
+                              nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger' &&
+                              nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger'">
+          <div class="accordion-headers" (click)="toggleContextVariables()">
+            <i class="text-muted mb-2 "
+              [ngClass]="contextVarHeader? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
+            <h6 class="ml-2">Context Variables</h6>
+          </div>
+          <div class="accordion-body" [ngClass]="{'active': contextVarHeader}">
+            <div *ngFor="let variable of contextVars"
+              class="draggable-item d-flex flex-row align-items-center ml-4 pl-1" draggable="true"
+              (dragstart)="onDragStart($event, 'context', variable)">
+
+              <!-- Key inside white pill -->
+              <div class="key-pill d-flex align-items-center me-2">
+                <span class="drag-handle mr-1">⋮⋮</span>
+                <span class="key-text"> {{ variable.key }}</span>
+              </div>
+
+              <!-- Value outside -->
+              <!-- <div class="value-text ml-2">
+                {{ variable.key }}
+              </div> -->
+            </div>
+          </div>
+
+        </div>
+
+        <ng-container
+          *ngIf="nodeData.node_type !== 'Manual Trigger' && 
+                              nodeData.node_type !== 'Schedule Trigger' &&
+                              nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'Webhook Trigger' 
+                              && nodeData.node_type !== 'ITSM Event Trigger' && nodeData.node_type !== 'AIML Event Trigger'">
+          <div class="accordion text-muted">
+            <div class="accordion-headers" (click)="toggleWorkflowVariables()">
+              <i class="text-muted mb-2 "
+                [ngClass]="workflowVarHeader? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
+              <h6 class="ml-2">Workflow Variables</h6>
+            </div>
+            <div class="accordion-body" [ngClass]="{'active': workflowVarHeader}">
+              <div class="pl-4">
+                <div *ngFor="let variable of workflowVarsData?.variables" class="draggable-item">
+                  <ng-container>
+                    <div class="draggable-item">
+                      <div class="key-pill align-items-center me-2" draggable="true"
+                        (dragstart)="onDragStart($event, 'workflow', variable)">
+                        <span class="drag-handle mr-1">⋮⋮</span>
+                        <span class="key-text">{{ variable.param_name }}</span>
+                      </div>
+                    </div>
+                    <ul class="list-unstyled mb-2"
+                      *ngIf="variable.param_type === 'Cloud Account' || variable.param_type === 'Credential'">
+                      <li *ngFor="let attr of getAttributesForInput(variable)" class="draggable-item pl-3">
+                        <div class="key-pill align-items-center me-2" draggable="true"
+                          (dragstart)="onDragStart($event, 'workflow', variable, attr)">
+                          <span class="drag-handle mr-1">⋮⋮</span>
+                          <span class="key-text">{{ attr }}</span>
+                        </div>
+                      </li>
+                    </ul>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="nodeData.node_type !== 'Manual Trigger' && 
+                              nodeData.node_type !== 'Schedule Trigger' &&
+                              nodeData.node_type !== 'Chat Trigger'&& nodeData.node_type !== 'ITSM Event Trigger' &&
+                              nodeData.node_type !== 'Webhook Trigger'">
+          <div class="accordion text-muted" *ngFor="let con of connectedNodes">
+            <div class="accordion-headers" *ngIf="nodeData.node_id !== con.node_id"
+              (click)="toggleAccordion(con.node_id)">
+              <i class="text-muted mb-2"
+                [ngClass]="isAccordionOpen(con.node_id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'">
+              </i>
+              <h6 class="ml-2 text-left">{{con.name}}</h6>
+            </div>
+
+            <div class="accordion-body" [ngClass]="{'active': isAccordionOpen(con.node_id)}">
+              <div *ngIf="con.node_type !== 'Manual Trigger' && 
+                              con.node_type !== 'Schedule Trigger' &&
+                              con.node_type !== 'Chat Trigger'" class="pl-4">
+                <div *ngFor="let variable of con.outputs" class="draggable-item">
+                  <div *ngIf="(variable.param_name === 'outputs' && variable?.children?.length) || 
+                    (variable.param_name === 'status' && con.node_type !== 'If Else' && 
+                    con.node_type !== 'Email' && con.node_type !== 'Chart' && con.node_type !== 'Switch Case') || 
+                    (variable.param_name === 'raw_output' && con.node_type !== 'If Else' && con.node_type !== 'Email' && 
+                    con.node_type !== 'Chart' && con.node_type !== 'Switch Case') ||
+                    (variable.param_name === 'payload' && variable?.children?.length) ||
+                    (variable.param_name === 'data' && variable?.children?.length) || (variable.param_name === 'event_type') ||
+                    (variable.param_name === 'outputs.0')" class="key-pill align-items-center me-2 p-2"
+                    draggable="true" (dragstart)="onDragStart($event, con, variable)">
+                    <span class="drag-handle mr-1">⋮⋮</span>
+                    <span class="key-text">{{ variable.param_name }}</span>
+                  </div>
+                  <div *ngFor="let c of variable?.children" class="draggable-item pl-3">
+                    <div class="key-pill align-items-center me-2 p-2" draggable="true"
+                      (dragstart)="onDragStart($event, con, variable, c)">
+                      <span class="drag-handle mr-1">⋮⋮</span>
+                      <span class="key-text" *ngIf="con.node_type !== 'Webhook Trigger' && 
+                      con.node_type === 'ITSM Event Trigger' || con.node_type === 'AIML Event Trigger'">
+                        {{ c.param_name }}
+                      </span>
+                      <span class="key-text" *ngIf="con.node_type === 'Webhook Trigger' || con.node_type === 'ITSM Event Trigger' ||
+                        con.node_type === 'AIML Event Trigger'">{{ c }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Cloud Attributes (derived directly from inputs) -->
+              <div *ngIf="con.node_type === 'Chat Trigger'" class="pl-4 draggable-item">
+                <div class="key-pill align-items-center me-2" draggable="true"
+                  (dragstart)="onDragStart($event, con, { param_name: '_query' })">
+                  <span class="drag-handle mr-1">⋮⋮</span>
+                  <span class="key-text">query</span>
+                </div>
+              </div>
+              <div
+                *ngIf="(con.node_type === 'Manual Trigger' || con.node_type === 'Schedule Trigger' || con.node_type === 'Chat Trigger')"
+                class="pl-4 mt-2">
+                <div *ngFor="let inp of con.inputs">
+                  <ng-container>
+                    <div class="draggable-item">
+                      <div class="key-pill align-items-center me-2" draggable="true"
+                        (dragstart)="onDragStart($event, con, inp)">
+                        <span class="drag-handle mr-1">⋮⋮</span>
+                        <span class="key-text">{{ inp.param_name }}</span>
+                      </div>
+                    </div>
+                    <ul class="list-unstyled mb-2"
+                      *ngIf="inp.param_type === 'Cloud Account' || inp.param_type === 'Credential'">
+                      <li *ngFor="let attr of getAttributesForInput(inp)" class="draggable-item pl-3">
+                        <div class="key-pill align-items-center me-2" draggable="true"
+                          (dragstart)="onDragStart($event, con, inp, attr)">
+                          <span class="drag-handle mr-1">⋮⋮</span>
+                          <span class="key-text">{{ attr }}</span>
+                        </div>
+                      </li>
+                    </ul>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
+                              nodeData.node_type === 'Schedule Trigger' ||
+                              nodeData.node_type === 'Chat Trigger' || nodeData.node_type === 'ITSM Event Trigger' ||
+                              nodeData.node_type === 'Webhook Trigger' || nodeData.node_type === 'AIML Event Trigger'">
+          Inputs are not applicable to Trigger nodes.
+        </div>
+      </div>
+    </div>
+
+    <div [ngClass]="isPromptExpanded ? 'col-9 m-0 p-0 form-section-shadow' : 'col-6 m-0 p-0 form-section-shadow'">
+      <!-- Middle Panel -->
+      <div class="form-section flex-fill pl-0">
+        <div class="d-flex bg-header justify-content-between align-items-center p-2">
+          <div class="d-flex align-items-center">
+            <img loading="eager" height="25" width="25" class="mx-2" [src]="middlePanelLogo" alt="Logo" />
+            <h5 class="text-dark mb-0">{{ nodeData.node_type }}</h5>
+          </div>
+
+          <div class="d-flex align-items-center">
+            <i [ngClass]="getStatusFaClass(realTimeData?.status) + ' pr-2'"></i>
+            <button class="btn btn-primary btn-sm" (click)="closeModal('test')"><i class="fas fa-play mr-1"></i>Run
+              Node</button>
+          </div>
+        </div>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs custom-tabs bg-header" role="tablist" *ngIf="!isPromptExpanded">
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="activeTab === 'properties'"
+              (click)="changeTab('properties')">Properties</a>
+          </li>
+          <li class="nav-item" *ngIf="nodeData.node_type === 'LLM Chain' || nodeData.node_type === 'AI Agent'">
+            <a class="nav-link" [class.active]="activeTab === 'model'" (click)="changeTab('model')">Model</a>
+          </li>
+          <li class="nav-item" *ngIf="nodeData.node_type === 'AI Agent'">
+            <a class="nav-link" [class.active]="activeTab === 'memory'" (click)="changeTab('memory')">Memory</a>
+          </li>
+          <li class="nav-item" *ngIf="nodeData.node_type === 'AI Agent'">
+            <a class="nav-link" [class.active]="activeTab === 'tools'" (click)="changeTab('tools')">Tools</a>
+          </li>
+          <li class="nav-item" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
+             && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
+             && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'
+             && nodeData.node_type !== 'AIML Event Trigger'">
+            <a class="nav-link" [class.active]="activeTab === 'output'" (click)="changeTab('output')">Output
+              Configuration</a>
+          </li>
+          <li class="nav-item" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
+             && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
+             && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger'">
+            <a class="nav-link" [class.active]="activeTab === 'settings'" (click)="changeTab('settings')">Settings</a>
+          </li>
+        </ul>
+        <div class="mt-3 px-3 properties">
+          <form [formGroup]="propertiesForm" *ngIf="propertiesForm">
+            <ng-container *ngIf="!isPromptExpanded">
+
+              <!-- Properties Tab -->
+              <div class="tab-pane fade show active" id="properties" *ngIf="activeTab === 'properties'"
+                class="properties pr-2">
+                <div class="mb-3" *ngIf="propertiesForm.get('name') || triggerFrom.get('name') || 
+                  scheduleTriggerForm.get('name') || onChatMessageForm.get('name')">
+                  <label class="form-label text-muted mb-1">Name<em>*</em></label>
+                  <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                    [adaptivePosition]="false" placement="top"></span>
+                  <ng-container
+                    *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('name')}"></ng-container>
+
+                </div>
+                <div class="mb-3" *ngIf="nodeData?.config?.target_type === 'Host' && propertiesForm.get('target')">
+                  <label class="form-label text-muted mb-1">Target<em>*</em></label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.target"></span>
+                  <ng-container
+                    *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('target'), key: 'target' , error: propertiesFormErrors.target }"></ng-container>
+                </div>
+                <div class="mb-3" *ngIf="nodeData?.config?.target_type === 'Host' && propertiesForm.get('credential')">
+                  <label class="form-label text-muted mb-1">Credential<em>*</em></label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.credential"></span>
+                  <ng-container
+                    *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('credential'),key: 'credential', error: propertiesFormErrors.credential }"></ng-container>
+                </div>
+                <ng-container *ngIf="nodeData.node_type === 'If Else'">
+                  <div class="mb-3" *ngIf="(nodeData.node_type === 'If Else') && propertiesForm.get('condition_key')">
+                    <label class="form-label text-muted mb-1">Key<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.key"></span>
+                    <ng-container
+                      *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('condition_key'),key: 'condition_key', error: propertiesFormErrors.condition_key}"></ng-container>
+                  </div>
+                  <div class="mb-3" *ngIf="(nodeData.node_type === 'If Else') && propertiesForm.get('operator')">
+                    <label class="form-label text-muted mb-1">Operator<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.operator"></span>
+                    <select id="operator" class="form-control text-dark" formControlName="operator"
+                      [class.is-invalid]="propertiesFormErrors.operator">
+                      <option value="" disabled> Select Operator </option>
+                      <option *ngFor="let c of conditionOperators" [value]="c.value">
+                        {{c.label}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors.operator">
+                      {{propertiesFormErrors.operator}}</div>
+                  </div>
+                  <div class="mb-3" *ngIf="(nodeData.node_type === 'If Else') && propertiesForm.get('condition_value')">
+                    <label class="form-label text-muted mb-1">Value<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.value"></span>
+                    <div class="pr-1 input-group">
+                      <input type="text" formControlName="condition_value" class="form-control text-dark"
+                        placeholder="Enter value" [class.is-invalid]="propertiesFormErrors.condition_value">
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.condition_value">
+                        {{propertiesFormErrors.condition_value}}</div>
+                    </div>
+                    <ng-container *ngIf="hasRealTimeData()">
+                      <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'condition_value')">
+                        <small>
+                          <strong>
+                            {{ getResolvedControlValue(propertiesForm, 'condition_value') }}
+                          </strong>
+                        </small>
+                      </div>
+                    </ng-container>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="nodeData.node_type === 'Switch Case'">
+                  <div formArrayName="switchConditions" class="p-0">
+                    <div *ngFor="let filterGroup of propertiesForm.get('switchConditions').controls; let i = index;"
+                      [formGroupName]="i" class="mb-4">
+                      <div class="mb-2"
+                        *ngIf="(nodeData.node_type === 'Switch Case') && filterGroup.get('condition_key')">
+                        <div class="d-flex justify-content-between mb-1">
+                          <label class="form-label text-muted align-self-end mb-0">Key<em>*</em></label>
+                          <span class="fas fa-info-circle text-primary pointer-link text-info align-self-end mb-1 pl-1"
+                            [tooltip]="tooltip.key"></span>
+                          <button type="button" class="action-icons fas fa-minus ml-auto  font-sm"
+                            (click)="removeSwitchForm(i)"></button>
+                        </div>
+                        <ng-container
+                          *ngTemplateOutlet="fxInput; context: { control: filterGroup.get('condition_key'), key: 'condition_key', index: i, error: propertiesFormErrors.switchConditions[i]?.condition_key }"></ng-container>
+                      </div>
+                      <div class="mb-2" *ngIf="(nodeData.node_type === 'Switch Case') && filterGroup.get('operator')">
+                        <label class="form-label text-muted mb-1">Operator<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                          [tooltip]="tooltip.operator"></span>
+                        <select id="operator" class="form-control text-dark" formControlName="operator"
+                          [class.is-invalid]="propertiesFormErrors.switchConditions[i]?.operator">
+                          <option value="" disabled> Select Operator </option>
+                          <option *ngFor="let c of conditionOperators" [value]="c.value">
+                            {{c.label}}
+                          </option>
+                        </select>
+                        <div class="invalid-feedback" *ngIf="propertiesFormErrors.switchConditions[i]?.operator">
+                          {{ propertiesFormErrors.switchConditions[i].operator }}
+                        </div>
+                      </div>
+                      <div class="mb-2"
+                        *ngIf="(nodeData.node_type === 'Switch Case') && filterGroup.get('condition_value')">
+                        <label class="form-label text-muted mb-1">Value<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                          [tooltip]="tooltip.value"></span>
+                        <div class="pr-1 input-group">
+                          <input type="text" formControlName="condition_value" class="form-control text-dark"
+                            placeholder="Enter value"
+                            [class.is-invalid]="propertiesFormErrors.switchConditions[i]?.condition_value">
+                        </div>
+                        <div class="invalid-feedback d-block"
+                          *ngIf="propertiesFormErrors.switchConditions[i]?.condition_value">
+                          {{ propertiesFormErrors.switchConditions[i].condition_value }}
+                        </div>
+                        <ng-container *ngIf="hasRealTimeData()">
+                          <div class="text-muted mt-1"
+                            *ngIf="getResolvedValue(propertiesForm, 'switchConditions', i, 'condition_value')">
+                            <small>
+                              <strong>
+                                {{ getResolvedValue(propertiesForm, 'switchConditions', i, 'condition_value') }}
+                              </strong>
+                            </small>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-end" *ngIf="nodeData.node_type === 'Switch Case'">
+                    <button type="button" class="btn text-primary border-primary w-20" (click)="addSwitchForm()">
+                      <i class="fas fa-plus mr-1"></i> Condition
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="nodeData.node_type === 'Wait'">
+                  <div class="mb-3" *ngIf="(nodeData.node_type === 'Wait') && propertiesForm.get('duration_value')">
+                    <label class="form-label text-muted mb-1">Duration<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
+                    <div class="pr-1 input-group">
+                      <input type="text" formControlName="duration_value" class="form-control text-dark"
+                        placeholder="Enter value" [class.is-invalid]="propertiesFormErrors.duration_value">
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.duration_value">
+                        {{propertiesFormErrors.duration_value}}</div>
+                    </div>
+                  </div>
+                  <div class="mb-3" *ngIf="(nodeData.node_type === 'Wait') && propertiesForm.get('duration_unit')">
+                    <label class="form-label text-muted mb-1">Unit<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
+                    <select id="duration_unit" class="form-control text-dark" formControlName="duration_unit"
+                      [class.is-invalid]="propertiesFormErrors.duration_unit">
+                      <option value="" disabled> Select Unit</option>
+                      <option value="seconds">Seconds</option>
+                      <option value="minutes">Minutes</option>
+                      <option value="hours">Hours</option>
+                      <option value="days">Days</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors.duration_unit">
+                      {{propertiesFormErrors.duration_unit}}</div>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="nodeData.node_type === 'Email'">
+                  <div class="mb-3" *ngIf="propertiesForm.get('to')">
+                    <label class="form-label text-muted mb-1">To<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.emailTo"></span>
+                    <ng-container
+                      *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('to'), key: 'to', error: propertiesFormErrors.to }"></ng-container>
+                    <ng-container *ngIf="hasRealTimeData()">
+                      <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'to')">
+                        <small>
+                          <strong>
+                            {{ getResolvedControlValue(propertiesForm, 'to') }}
+                          </strong>
+                        </small>
+                      </div>
+                    </ng-container>
+                  </div>
+                  <div class="mb-3" *ngIf="propertiesForm.get('subject')">
+                    <label class="form-label text-muted mb-1">Subject<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.subject"></span>
+                    <ng-container
+                      *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('subject'), key: 'subject', error: propertiesFormErrors.subject }"></ng-container>
+                    <ng-container *ngIf="hasRealTimeData()">
+                      <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'subject')">
+                        <small>
+                          <strong>
+                            {{ getResolvedControlValue(propertiesForm, 'subject') }}
+                          </strong>
+                        </small>
+                      </div>
+                    </ng-container>
+                  </div>
+                  <div class="mb-3" *ngIf="propertiesForm.get('body')">
+                    <label class="form-label text-muted mb-1">Body<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.body"></span>
+                    <div class="input-group">
+                      <textarea formControlName="body" class="form-control text-dark" placeholder="Enter value" rows="3"
+                        [class.is-invalid]="propertiesFormErrors.body"></textarea>
+                      <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" (click)="expandPrompt('body')">
+                          <i class="fas fa-expand"></i>
+                        </button>
+                      </div>
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.body">
+                        {{propertiesFormErrors.body}}</div>
+                      <ng-container *ngIf="hasRealTimeData()">
+                        <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'body')">
+                          <small>
+                            <strong>
+                              {{ getResolvedControlValue(propertiesForm, 'body') }}
+                            </strong>
+                          </small>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="nodeData.node_type === 'Chart'">
+                  <div class="mb-3" *ngIf="propertiesForm.get('chart_type')">
+                    <label class="form-label text-muted mb-1">Chart Type<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.chartType"></span>
+                    <select id="c" class="form-control text-dark" formControlName="chart_type"
+                      [class.is-invalid]="propertiesFormErrors.chart_type">
+                      <option value="Pie">Pie</option>
+                      <option value="Bar">Bar</option>
+                      <option value="Line">Line</option>
+                      <option value="Area">Area</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors.chart_type">
+                      {{propertiesFormErrors.chart_type}}</div>
+                  </div>
+                  <ng-container *ngIf="propertiesForm?.get('chart_type')?.value === 'Pie'">
+                    <div class="mb-3" *ngIf="propertiesForm.get('x_values')">
+                      <label class="form-label text-muted mb-1">Labels<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.chartLabels"></span>
+                      <ng-container
+                        *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('x_values'),key:'x_values', error: propertiesFormErrors.x_values }"></ng-container>
+                      <ng-container *ngIf="hasRealTimeData()">
+                        <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'x_values')">
+                          <small>
+                            <strong>
+                              {{ getResolvedControlValue(propertiesForm, 'x_values') }}
+                            </strong>
+                          </small>
+                        </div>
+                      </ng-container>
+                    </div>
+                    <div class="mb-3" *ngIf="propertiesForm.get('y_values')">
+                      <label class="form-label text-muted mb-1">Values<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.chartValue"></span>
+                      <div class="input-group">
+                        <ng-container
+                          *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('y_values'),key:'y_values', error: propertiesFormErrors.y_values }"></ng-container>
+                        <ng-container *ngIf="hasRealTimeData()">
+                          <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'y_values')">
+                            <small>
+                              <strong>
+                                {{ getResolvedControlValue(propertiesForm, 'y_values') }}
+                              </strong>
+                            </small>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="propertiesForm?.get('chart_type')?.value !== 'Pie'">
+                    <div class="mb-3" *ngIf="propertiesForm.get('x_label')">
+                      <label class="form-label text-muted mb-1">X-axis Label<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.chartXLabel"></span>
+                      <div class="input-group">
+                        <ng-container
+                          *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('x_label'),key:'x_values', error: propertiesFormErrors.x_values }"></ng-container>
+                        <ng-container *ngIf="hasRealTimeData()">
+                          <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'x_label')">
+                            <small>
+                              <strong>
+                                {{ getResolvedControlValue(propertiesForm, 'x_label') }}
+                              </strong>
+                            </small>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                    <div class="mb-3" *ngIf="propertiesForm.get('x_values')">
+                      <label class="form-label text-muted mb-1">X-axis Value<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.chartXValue"></span>
+                      <div class="input-group">
+                        <ng-container
+                          *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('x_values'),key:'x_values', error: propertiesFormErrors.x_values }"></ng-container>
+                        <ng-container *ngIf="hasRealTimeData()">
+                          <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'x_values')">
+                            <small>
+                              <strong>
+                                {{ getResolvedControlValue(propertiesForm, 'x_values') }}
+                              </strong>
+                            </small>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                    <div class="mb-3" *ngIf="propertiesForm.get('y_label')">
+                      <label class="form-label text-muted mb-1">Y-axis Label<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.chartYLabel"></span>
+                      <div class="input-group">
+                        <ng-container
+                          *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('y_label'),key:'y_values', error: propertiesFormErrors.y_values }"></ng-container>
+                        <ng-container *ngIf="hasRealTimeData()">
+                          <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'y_label')">
+                            <small>
+                              <strong>
+                                {{ getResolvedControlValue(propertiesForm, 'y_label') }}
+                              </strong>
+                            </small>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                    <div class="mb-3" *ngIf="propertiesForm.get('y_values')">
+                      <label class="form-label text-muted mb-1">Y-axis Value<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.chartYValue"></span>
+                      <div class="input-group">
+                        <ng-container
+                          *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('y_values'),key:'y_values', error: propertiesFormErrors.y_values }"></ng-container>
+                        <ng-container *ngIf="hasRealTimeData()">
+                          <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'y_values')">
+                            <small>
+                              <strong>
+                                {{ getResolvedControlValue(propertiesForm, 'y_values') }}
+                              </strong>
+                            </small>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="nodeData.node_type === 'LLM Chain'">
+                  <div class="mb-3" *ngIf="propertiesForm.get('prompt')">
+                    <label class="form-label text-muted mb-1">Prompt<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.prompt"></span>
+                    <div class="input-group">
+                      <textarea formControlName="prompt" class="form-control text-dark" placeholder="Enter value"
+                        rows="3" [class.is-invalid]="propertiesFormErrors.prompt"></textarea>
+                      <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" (click)="expandPrompt('prompt')">
+                          <i class="fas fa-expand"></i>
+                        </button>
+                      </div>
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.prompt">
+                        {{propertiesFormErrors.prompt}}</div>
+                      <ng-container *ngIf="hasRealTimeData()">
+                        <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'prompt')">
+                          <small>
+                            <strong>
+                              {{ getResolvedControlValue(propertiesForm, 'prompt') }}
+                            </strong>
+                          </small>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="nodeData.node_type === 'AI Agent' && !isPromptExpanded">
+                  <div class="mb-3" *ngIf="propertiesForm.get('user_prompt')">
+                    <label class="form-label text-muted mb-1">User Prompt<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.userPrompt"></span>
+                    <div class="input-group">
+                      <textarea formControlName="user_prompt" class="form-control text-dark" placeholder="Enter value"
+                        [class.is-invalid]="propertiesFormErrors.user_prompt" rows="3"></textarea>
+                      <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" (click)="expandPrompt('user_prompt')">
+                          <i class="fas fa-expand"></i>
+                        </button>
+                      </div>
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.user_prompt">
+                        {{propertiesFormErrors.user_prompt}}</div>
+                      <ng-container *ngIf="hasRealTimeData()">
+                        <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'user_prompt')">
+                          <small>
+                            <strong>
+                              {{ getResolvedControlValue(propertiesForm, 'user_prompt') }}
+                            </strong>
+                          </small>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                  <div class="mb-3" *ngIf="propertiesForm.get('system_prompt')">
+                    <label class="form-label text-muted mb-1">System Prompt</label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.systemPrompt"></span>
+                    <div class="input-group">
+                      <textarea formControlName="system_prompt" class="form-control text-dark" placeholder="Enter value"
+                        rows="3"></textarea>
+                      <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" (click)="expandPrompt('system_prompt')">
+                          <i class="fas fa-expand"></i>
+                        </button>
+                      </div>
+                      <ng-container *ngIf="hasRealTimeData()">
+                        <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'system_prompt')">
+                          <small>
+                            <strong>
+                              {{ getResolvedControlValue(propertiesForm, 'system_prompt') }}
+                            </strong>
+                          </small>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </ng-container>
+                <div class="mb-3"
+                  *ngIf="(isOrcPlayBook(nodeData.node_type) || nodeData.node_type === 'Source Task' || nodeData.node_type === 'Action Task') && propertiesForm.get('inputs').controls.length">
+                  <label class="form-label text-muted mb-1">Input Parameters</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.inputParameter"></span>
+                  <div formArrayName="inputs">
+                    <div *ngFor="let inputGroup of propertiesForm.get('inputs').controls; let i = index;"
+                      [formGroupName]="i" class="mb-2">
+                      <div class="align-items-center pr-1">
+                        <label class="mb-1" [title]="inputGroup.get('param_name')?.value">
+                          {{inputGroup.get('param_name')?.value }}<em>*</em>
+                        </label>
+                      </div>
+                      <div>
+                        <!-- <input type="text" formControlName="default_value" id="input-{{ i }}"
+                        class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                        <ng-container
+                          *ngTemplateOutlet="fxInput; context: { control: inputGroup.get('default_value'),key: 'default_value', index: i, error: propertiesFormErrors?.inputs?.[i]?.default_value  }"></ng-container>
+                        <ng-container *ngIf="hasRealTimeData()">
+                          <div class="text-muted mt-1"
+                            *ngIf="getResolvedValue(propertiesForm, 'inputs', i, 'default_value')">
+                            <small>
+                              <strong>
+                                {{ getResolvedValue(propertiesForm, 'inputs', i, 'default_value') }}
+                              </strong>
+                            </small>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- <button class="btn btn-md btn-success ml-2" type="button"
+                (click)="confirmPropertiesCreate()">Submit</button> -->
+              </div>
+
+
+              <!-- Settings Tab -->
+              <div class="tab-pane fade" [ngClass]="activeTab === 'settings' ? 'show active' : ''" id="settings"
+                *ngIf="activeTab === 'settings'">
+                <div class="p-0 mt-2 mb-2">
+                  <div class="mb-3">
+                    <label class="form-label text-muted mb-1">Timeouts</label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                    <div class="pr-1 input-group">
+                      <input type="number" formControlName="timeouts" class="form-control text-dark"
+                        placeholder="Enter value">
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-muted mb-0">Retries</label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.retries"></span>
+                    <div class="pr-1 mt-1 input-group">
+                      <input type="number" formControlName="retries" class="form-control text-dark"
+                        placeholder="Enter value">
+                    </div>
+                  </div>
+                  <div class="form-check ml-1 mb-3">
+                    <input class="form-check-input" type="checkbox" id="continue_on_failure"
+                      formControlName="continue_on_failure">
+                    <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Output Configuration Tab -->
+              <div class="tab-pane fade" [ngClass]="activeTab === 'output' ? 'show active' : ''" id="output"
+                *ngIf="activeTab === 'output'">
+                <!---------------------------------------------- OUTPUT START ------------------------------------------------->
+
+                <div class="col-12 m-0 p-0">
+                  <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
+                  <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
+                  <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
+                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
+                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                    <div *ngIf="!outputs.length" class="text-muted fst-italic mb-3">
+                      Outputs will appear here once you add.
+                    </div>
+                    <div *ngFor="let group of outputs.controls; let i = index" [formGroupName]="i" class="mb-4">
+                      <div class="d-flex justify-content-between mb-1">
+                        <div class="d-flex align-items-end">
+                          <label class="text-muted text-sm align-self-end mb-0">Param Name<em>*</em></label>
+                          <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
+                            [tooltip]="tooltip.paramName"></span>
+                        </div>
+                        <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
+                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                          type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
+                        </button>
+                      </div>
+                      <input type="text" class="form-control mb-2 text-dark" formControlName="param_name"
+                        placeholder="Output Name" [class.is-invalid]="propertiesFormErrors.outputs[i]?.param_name">
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.outputs[i]?.param_name">
+                        {{ propertiesFormErrors.outputs[i].param_name }}
+                      </div>
+
+                      <label class="text-muted text-sm mb-1">Expression Type<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.expressionType"></span>
+                      <select class="form-control mb-2 text-dark" formControlName="expression_type"
+                        [class.is-invalid]="propertiesFormErrors.outputs[i]?.expression_type">
+                        <option value="">Select Expression Type</option>
+                        <option value="jmespath">JMESPath</option>
+                        <option value="regex">RegEx</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.outputs[i]?.expression_type">
+                        {{ propertiesFormErrors.outputs[i].expression_type }}
+                      </div>
+
+                      <label class="text-muted text-sm mb-1">Expression<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.expression"></span>
+                      <input type="text" class="form-control text-dark mb-2" formControlName="expression"
+                        placeholder="Expression" [class.is-invalid]="propertiesFormErrors.outputs[i]?.expression">
+                      <div class="invalid-feedback" *ngIf="propertiesFormErrors.outputs[i]?.expression">
+                        {{ propertiesFormErrors.outputs[i].expression }}
+                      </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
+                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
+                                  && nodeData.node_type !== 'Get Ticket') &&
+                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
+                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
+                                  && nodeData.node_type !== 'Webhook Trigger')">
+                      <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
+                        <i class="fas fa-plus mr-1"></i> Output
+                      </button>
+                    </div>
+
+                  </div>
+                  <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
+                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
+                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
+                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                    Outputs are not applicable to this node.
+                  </div>
+                  <!-- </form> -->
+                </div>
+                <!---------------------------------------------- OUTPUT END ------------------------------------------------->
+              </div>
+
+              <!-- Model Tab -->
+              <div class="tab-pane fade" [ngClass]="activeTab === 'model' ? 'show active' : ''" id="model"
+                *ngIf="activeTab === 'model'">
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="model">Model<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pl-1" [tooltip]="tooltip.model"
+                      [adaptivePosition]="false" placement="top"></span>
+                  </div>
+                  <select class="form-control text-dark" id="model" formControlName="model"
+                    [class.is-invalid]="propertiesFormErrors.model">
+                    <option value="">Select Model</option>
+                    <option value="UnityOne AI">UnityOne AI</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="propertiesFormErrors.model">
+                    {{propertiesFormErrors.model}}</div>
+                </div>
+              </div>
+
+              <!-- Memory Tab -->
+              <div class="tab-pane fade" [ngClass]="activeTab === 'memory' ? 'show active' : ''" id="memory"
+                *ngIf="activeTab === 'memory'">
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-1" for="memory">Memory</label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pl-1" [tooltip]="tooltip.memory"
+                      [adaptivePosition]="false" placement="top"></span>
+                  </div>
+                  <select class="form-control text-dark" id="memory" formControlName="memory">
+                    <option value="">Select Memory</option>
+                    <option value="Buffer Memory">Buffer Memory</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Tools Tab -->
+
+              <div class="tab-pane fade" [ngClass]="activeTab === 'tools' ? 'show active' : ''" id="tools"
+                *ngIf="activeTab === 'tools'">
+                <div class="mb-3 d-flex flex-column">
+                  <div formArrayName="tools">
+                    <div *ngFor="let tool of tools?.controls; let i = index;" [formGroupName]="i" class="mb-3 p-0">
+                      <div>
+                        <!-- Replace input with search-dropdown -->
+                        <div class="mb-3">
+                          <label class="form-label text-muted mb-1">Tool<em>*</em></label>
+                          <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                            [tooltip]="tooltip.tool" [adaptivePosition]="false" placement="top"></span>
+                          <div class="d-flex mb-1">
+                            <search-dropdown [values]="toolsList" [defaultLabel]="'Tool'" [displayField]="'name'"
+                              [selectedValue]="tool.get('name').value" [editCaseValue]="tool.get('name').value"
+                              (selectedDropdownValue)="getToolsDropdown($event, i, 'click')" style="width: 93%;"
+                              [hasError]="propertiesFormErrors?.tools?.[i]?.name">
+                            </search-dropdown>
+                            <button type="button" class="action-icons fas fa-minus ml-auto"
+                              (click)="removeTool(i)"></button>
+                          </div>
+                          <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.tools?.[i]?.name">
+                            {{ propertiesFormErrors?.tools?.[i]?.name }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="mb-3" *ngIf="tool.get('target_type').value === 'Host'">
+                        <label class="form-label text-muted mb-1">Target<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                          [tooltip]="tooltip.target"></span>
+                        <ng-container
+                          *ngTemplateOutlet="fxInputIcon; context: { control: tool.get('target'), key: 'target',key: 'target', index: i, error: propertiesFormErrors?.tools?.[i]?.target }"></ng-container>
+                      </div>
+                      <div class="mb-3" *ngIf="tool.get('target_type').value === 'Host'">
+                        <label class="form-label text-muted mb-1">Credential<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                          [tooltip]="tooltip.credential"></span>
+                        <ng-container
+                          *ngTemplateOutlet="fxInputIcon; context: { control:tool.get('credential'),key: 'credential', index: i, error: propertiesFormErrors?.tools?.[i]?.credential}"></ng-container>
+                      </div>
+
+                      <div class="mb-3"
+                        *ngIf="nodeData?.config?.target_type === 'Host' && propertiesForm.get('target')">
+                        <label class="form-label text-muted mb-1">Target<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                          [tooltip]="tooltip.target"></span>
+                        <ng-container
+                          *ngTemplateOutlet="fxInputIcon; context: { control: propertiesForm.get('target'), key: 'target', index: i, error: propertiesFormErrors?.tools?.[i]?.target }"></ng-container>
+                      </div>
+                      <div class="mb-3"
+                        *ngIf="nodeData?.config?.target_type === 'Host' && propertiesForm.get('credential')">
+                        <label class="form-label text-muted mb-1">Credential<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                          [tooltip]="tooltip.credential"></span>
+                        <ng-container
+                          *ngTemplateOutlet="fxInputIcon; context: { control: propertiesForm.get('credential'),key: 'credential', index: i, error: propertiesFormErrors?.tools?.[i]?.credential }"></ng-container>
+                      </div>
+
+                      <div class="mb-3" *ngIf="tool.get('inputs').controls.length">
+                        <label class="form-label text-muted mb-1">Input Parameters</label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                          [tooltip]="tooltip.inputParameter"></span>
+                        <div formArrayName="inputs">
+                          <div *ngFor="let inputGroup of tool.get('inputs').controls; let j = index;"
+                            [formGroupName]="j" class="mb-2">
+                            <div class="align-items-center pr-1">
+                              {{inputGroup.get('param_name')?.value }}<em>*</em>
+                            </div>
+                            <div>
+                              <ng-container
+                                *ngTemplateOutlet="fxInputIcon; context: { control: inputGroup.get('default_value'), key: 'default_value', index: j, error: propertiesFormErrors?.tools?.[i]?.inputs?.[j]?.default_value }"></ng-container>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <ng-container *ngIf="!tools.length">
+                        <span class="text-muted fst-italic mb-3">Tools will appear here once you add.</span>
+                      </ng-container>
+                    </div>
+                    <div>
+                      <button type="button" class="btn text-primary border-primary" (click)="addTool()">
+                        <i class="fas fa-plus mr-1"></i> Tool
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </ng-container>
+
+            <!-- EXPANDED PROMPT VIEW (col-9) -->
+            <ng-container *ngIf="isPromptExpanded">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="form-label text-muted mb-1">{{expandedLabel}}</label>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="collapsePrompt()">
+                  <i class="fas fa-compress"></i>
+                </button>
+              </div>
+              <!-- same control, just bigger -->
+              <textarea class="form-control text-dark" rows="18" [formControl]="expandedPromptControl"></textarea>
+              <div class="invalid-feedback" *ngIf="expandedPromptKey && propertiesFormErrors[expandedPromptKey]">
+                {{propertiesFormErrors[expandedPromptKey]}}</div>
+            </ng-container>
+          </form>
+
+          <!-- </form> -->
+
+
+          <!----------------------------------------------- TRIGGER FORM START ------------------------------------------------------>
+
+          <form *ngIf="nodeData.node_type === 'Manual Trigger'" [formGroup]="triggerForm">
+            <div class="mb-4">
+              <label class="form-label text-muted mb-1">Name<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2" [tooltip]="tooltip.name"
+                [adaptivePosition]="false" placement="top"></span>
+              <ng-container *ngTemplateOutlet="fxInput; context: { control: triggerForm.get('name')}"></ng-container>
+            </div>
+            <ng-container formArrayName="inputs">
+              <div class="mb-4" *ngFor="let param of inputs.controls; let i = index" [formGroupName]="i">
+                <div class="d-flex justify-content-between mb-1">
+                  <div class="d-flex align-items-end">
+                    <label class="text-muted text-sm align-self-end mb-0">Param Name<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pl-1 mb-1"
+                      [tooltip]="tooltip.paramName"></span>
+                  </div>
+                  <button type="button" class="action-icons fas fa-minus btn-sm" (click)="removeParam(i)"></button>
+                </div>
+                <input type="text" class="text-dark form-control mb-2" formControlName="param_name"
+                  placeholder="Enter Param Name" [class.is-invalid]="triggerFormErrors?.inputs[i]?.param_name">
+                <div class="invalid-feedback" *ngIf="triggerFormErrors?.inputs[i]?.param_name">
+                  {{ triggerFormErrors?.inputs[i].param_name }}
+                </div>
+                <label class="text-muted text-sm mb-1">Param Type<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.paramType"></span>
+                <select class="form-control mb-2 text-dark" formControlName="param_type"
+                  [class.is-invalid]="triggerFormErrors?.inputs[i]?.param_type">
+                  <option value="">Select Param Type</option>
+                  <option value="Text">Text</option>
+                  <option value="Password">Password</option>
+                  <option value="Number">Number</option>
+                  <option value="Cloud Account">Cloud Account</option>
+                  <option value="Target">Target</option>
+                  <option value="Credential">Credential</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="triggerFormErrors?.inputs[i]?.param_type">
+                  {{ triggerFormErrors?.inputs[i].param_type }}
+                </div>
+                <label class="text-muted text-sm mb-1">Default Value</label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.defaultValue"></span>
+                <ng-container [ngSwitch]="param.get('param_type')?.value">
+                  <input *ngSwitchCase="'Text'" type="text" class="text-dark form-control mb-2"
+                    formControlName="default_value" placeholder="Enter Default Value">
+
+                  <custom-password-field *ngSwitchCase="'Password'" formControlName="default_value"
+                    [options]="{id:'default_value', errors:triggerFormErrors?.inputs[i]?.default_value, placeholder:'Enter Default Value'}"
+                    class="mb-3">
+                  </custom-password-field>
+
+                  <input *ngSwitchCase="'Number'" type="number" class="text-dark form-control mb-2"
+                    formControlName="default_value">
+
+                  <select *ngSwitchCase="'Cloud Account'" class="text-dark form-control mb-2"
+                    [compareWith]="compareAccounts" formControlName="default_value">
+                    <option value="">Select Cloud Account</option>
+                    <option *ngFor="let account of cloudAccount" [ngValue]="account">{{ account.account_name }}
+                    </option>
+                  </select>
+
+                  <select *ngSwitchCase="'Credential'" class="text-dark form-control mb-2"
+                    formControlName="default_value">
+                    <option value="">Select Credential</option>
+                    <option *ngFor="let account of credentials" [value]="account.uuid">{{ account.name }}</option>
+                  </select>
+
+                  <app-auto-complete-multi *ngSwitchCase="'Target'" formControlName="default_value"
+                    [apiFn]="searchTargets" placeholder="Search Targets" class="mb-2"></app-auto-complete-multi>
+
+                  <input *ngSwitchDefault type="text" class="text-dark form-control mb-2"
+                    formControlName="default_value" placeholder="Enter Default Value">
+                </ng-container>
+                <div class="invalid-feedback" *ngIf="triggerFormErrors?.inputs[i]?.default_value">
+                  {{ triggerFormErrors?.inputs[i].default_value }}
+                </div>
+
+              </div>
+            </ng-container>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <ng-container *ngIf="!inputs.length">
+                  <span class="text-muted fst-italic mb-3">Inputs will appear here once you add.</span>
+                </ng-container>
+              </div>
+              <div>
+                <button type="button" class="btn text-primary border-primary" (click)="addParam()">
+                  <i class="fas fa-plus mr-1"></i> Param
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!--------------------------------------------- TRIGGER FORM END ------------------------------------------------------>
+
+
+          <!-------------------------------------------- SCHEDULE TRIGGER FORM START --------------------------------------------->
+
+          <form *ngIf="nodeData.node_type === 'Schedule Trigger'" [formGroup]="scheduleTriggerForm">
+            <div class="mb-4">
+              <label class="form-label text-muted mb-1">Name<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2" [tooltip]="tooltip.name"
+                [adaptivePosition]="false" placement="top"></span>
+              <ng-container
+                *ngTemplateOutlet="fxInput; context: { control: scheduleTriggerForm.get('name')}"></ng-container>
+            </div>
+            <div formArrayName="inputs">
+              <div class="mb-4" *ngFor="let param of scheduleInputs.controls; let i = index" [formGroupName]="i">
+                <div class="d-flex justify-content-between mb-1">
+                  <div class="d-flex align-items-end">
+                    <label class="text-muted text-sm align-self-end mb-0">Param Name<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pl-1 mb-2"
+                      [tooltip]="tooltip.paramName"></span>
+                  </div>
+                  <button type="button" class="action-icons fas fa-minus" (click)="removeScheduleParam(i)"></button>
+                </div>
+                <input type="text" class="text-dark form-control mb-2" formControlName="param_name"
+                  placeholder="Enter Param Name" [class.is-invalid]="scheduleTriggerFormErrors.inputs[i]?.param_name">
+                <div class="invalid-feedback" *ngIf="scheduleTriggerFormErrors.inputs[i]?.param_name">
+                  {{ scheduleTriggerFormErrors.inputs[i].param_name }}
+                </div>
+                <label class="text-muted text-sm mb-1">Param Type<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.paramType"></span>
+                <select class="text-dark form-control mb-2" formControlName="param_type"
+                  [class.is-invalid]="scheduleTriggerFormErrors.inputs[i]?.param_type">
+                  <option value="">Select Param Type</option>
+                  <option value="Text">Text</option>
+                  <option value="Password">Password</option>
+                  <option value="Number">Number</option>
+                  <option value="Cloud Account">Cloud Account</option>
+                  <option value="Target">Target</option>
+                  <option value="Credential">Credential</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="scheduleTriggerFormErrors.inputs[i]?.param_type">
+                  {{ scheduleTriggerFormErrors.inputs[i].param_type }}
+                </div>
+                <label class="text-muted text-sm mb-1">Default Value<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.defaultValue"></span>
+                <ng-container [ngSwitch]="param.get('param_type')?.value">
+                  <input *ngSwitchCase="'Text'" type="text" class="text-dark form-control mb-2"
+                    formControlName="default_value" placeholder="Enter Default Value"
+                    [class.is-invalid]="scheduleTriggerFormErrors.inputs[i]?.default_value">
+
+                  <custom-password-field *ngSwitchCase="'Password'" formControlName="default_value"
+                    [options]="{id:'default_value', errors:scheduleTriggerFormErrors.inputs[i]?.default_value, placeholder:'Enter Default Value'}"
+                    class="mb-3">
+                  </custom-password-field>
+
+                  <input *ngSwitchCase="'Number'" type="number" class="text-dark form-control mb-2"
+                    formControlName="default_value"
+                    [class.is-invalid]="scheduleTriggerFormErrors.inputs[i]?.default_value">
+
+                  <select *ngSwitchCase="'Cloud Account'" class="text-dark form-control mb-2"
+                    formControlName="default_value" [compareWith]="compareAccounts"
+                    [class.is-invalid]="scheduleTriggerFormErrors.inputs[i]?.default_value">
+                    <option value="">Select Cloud Account</option>
+                    <option *ngFor="let account of cloudAccount" [ngValue]="account">{{ account.account_name }}
+                    </option>
+                  </select>
+
+                  <select *ngSwitchCase="'Credential'" class="text-dark form-control mb-2"
+                    formControlName="default_value"
+                    [class.is-invalid]="scheduleTriggerFormErrors.inputs[i]?.default_value">
+                    <option value="">Select Credential</option>
+                    <option *ngFor="let account of credentials" [value]="account.uuid">{{ account.name }}</option>
+                  </select>
+
+                  <app-auto-complete-multi *ngSwitchCase="'Target'" formControlName="default_value"
+                    [apiFn]="searchTargets" placeholder="Search Targets" class="mb-2"></app-auto-complete-multi>
+
+                  <input *ngSwitchDefault type="text" class="text-dark form-control mb-2"
+                    formControlName="default_value" placeholder="Enter Default Value"
+                    [class.is-invalid]="scheduleTriggerFormErrors.inputs[i]?.default_value">
+                </ng-container>
+                <div class="invalid-feedback" *ngIf="scheduleTriggerFormErrors.inputs[i]?.default_value">
+                  {{ scheduleTriggerFormErrors.inputs[i].default_value }}
+                </div>
+
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <ng-container *ngIf="!scheduleInputs.length">
+                  <span class="text-muted fst-italic mb-3">Inputs will appear here once you add.</span>
+                </ng-container>
+              </div>
+              <div>
+                <button type="button" class="btn text-primary border-primary" (click)="addScheduleParam()">
+                  <i class="fas fa-plus mr-1"></i> Param
+                </button>
+              </div>
+            </div>
+            <div class="mt-4">
+              <unity-schedule></unity-schedule>
+            </div>
+          </form>
+
+          <!-------------------------------------------- SCHEDULE TRIGGER FORM END--------------------------------------------->
+
+          <!-------------------------------------------- ON CHAT MESSAGE FORM START--------------------------------------------->
+
+          <form *ngIf="nodeData.node_type === 'Chat Trigger'" [formGroup]="onChatMessageForm">
+            <div class="mb-4">
+              <label class="form-label text-muted mb-1">Name<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2" [tooltip]="tooltip.name"
+                [adaptivePosition]="false" placement="top"></span>
+              <ng-container *ngTemplateOutlet="fxInput; context: { control: onChatMessageForm.get('name')}">
+              </ng-container>
+            </div>
+
+            <div class="row mb-4 pl-2">
+              <label for="welcome_message" class="form-label text-muted mb-1">Welcome Message<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                [tooltip]="tooltip.welcomeMessage"></span>
+              <textarea id="welcome_message" type="text" class="form-control text-dark"
+                formControlName="welcome_message"></textarea>
+            </div>
+
+            <ng-container formArrayName="inputs">
+              <label *ngIf="onChatInputs.length" class="form-label text-muted mb-1">Input Parameters</label>
+
+              <div class="mb-4" *ngFor="let param of onChatInputs.controls; let i = index" [formGroupName]="i">
+                <div class="d-flex justify-content-between mb-1">
+                  <div class="d-flex align-items-end">
+                    <label class="text-muted text-sm align-self-end mb-0">Param Name<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pl-1 mb-2"
+                      [tooltip]="tooltip.paramName"></span>
+                  </div>
+                  <button type="button" class="action-icons fas fa-minus btn-sm"
+                    (click)="removeOnChatParam(i)"></button>
+                </div>
+
+                <!-- Param Name -->
+                <input type="text" class="text-dark form-control mb-2" formControlName="param_name"
+                  placeholder="Enter Param Name" [class.is-invalid]="onChatMessageFormErrors.inputs?.[i]?.param_name">
+                <div class="invalid-feedback" *ngIf="onChatMessageFormErrors.inputs?.[i]?.param_name">
+                  {{ onChatMessageFormErrors.inputs[i].param_name }}
+                </div>
+
+                <!-- Param Type -->
+                <label class="text-muted text-sm mb-1">Param Type<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.paramType"></span>
+                <select class="form-control mb-2 text-dark" formControlName="param_type"
+                  [class.is-invalid]="onChatMessageFormErrors.inputs?.[i]?.param_type">
+                  <option value="">Select Param Type</option>
+                  <option value="Text">Text</option>
+                  <option value="Password">Password</option>
+                  <option value="Number">Number</option>
+                  <option value="Cloud Account">Cloud Account</option>
+                  <option value="Target">Target</option>
+                  <option value="Credential">Credential</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="onChatMessageFormErrors.inputs?.[i]?.param_type">
+                  {{ onChatMessageFormErrors.inputs[i].param_type }}
+                </div>
+
+                <!-- Default Value -->
+                <label class="text-muted text-sm mb-1">Default Value<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.defaultValue"></span>
+                <ng-container [ngSwitch]="param.get('param_type')?.value">
+
+                  <input *ngSwitchCase="'Text'" type="text" class="text-dark form-control mb-2"
+                    formControlName="default_value" placeholder="Enter Default Value"
+                    [class.is-invalid]="onChatMessageFormErrors.inputs?.[i]?.default_value">
+
+                  <custom-password-field *ngSwitchCase="'Password'" formControlName="default_value"
+                    [options]="{id:'default_value', errors:onChatMessageFormErrors.inputs?.[i]?.default_value, placeholder:'Enter Default Value'}"
+                    class="mb-2">
+                  </custom-password-field>
+
+                  <input *ngSwitchCase="'Number'" type="number" class="text-dark form-control mb-2"
+                    formControlName="default_value"
+                    [class.is-invalid]="onChatMessageFormErrors.inputs?.[i]?.default_value">
+
+                  <select *ngSwitchCase="'Cloud Account'" class="text-dark form-control mb-2"
+                    [compareWith]="compareAccounts" formControlName="default_value"
+                    [class.is-invalid]="onChatMessageFormErrors.inputs?.[i]?.default_value">
+                    <option value="">Select Cloud Account</option>
+                    <option *ngFor="let account of cloudAccount" [ngValue]="account">
+                      {{ account.account_name }}
+                    </option>
+                  </select>
+
+                  <select *ngSwitchCase="'Credential'" class="text-dark form-control mb-2"
+                    formControlName="default_value"
+                    [class.is-invalid]="onChatMessageFormErrors.inputs?.[i]?.default_value">
+                    <option value="">Select Credential</option>
+                    <option *ngFor="let account of credentials" [value]="account.uuid">
+                      {{ account.name }}
+                    </option>
+                  </select>
+
+                  <app-auto-complete-multi *ngSwitchCase="'Target'" formControlName="default_value"
+                    [apiFn]="searchTargets" placeholder="Search Targets" class="mb-2">
+                  </app-auto-complete-multi>
+
+                  <input *ngSwitchDefault type="text" class="text-dark form-control mb-2"
+                    formControlName="default_value" placeholder="Enter Default Value"
+                    [class.is-invalid]="onChatMessageFormErrors.inputs?.[i]?.default_value">
+                </ng-container>
+
+                <div class="invalid-feedback" *ngIf="onChatMessageFormErrors.inputs?.[i]?.default_value">
+                  {{ onChatMessageFormErrors.inputs[i].default_value }}
+                </div>
+              </div>
+            </ng-container>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <ng-container *ngIf="!onChatInputs.length">
+                  <span class="text-muted fst-italic mb-3">Inputs will appear here once you add.</span>
+                </ng-container>
+              </div>
+              <div>
+                <button type="button" class="btn text-primary border-primary" (click)="addOnChatParam()">
+                  <i class="fas fa-plus mr-1"></i> Param
+                </button>
+              </div>
+            </div>
+          </form>
+          <!-------------------------------------------- ON CHAT MESSAGE FORM END--------------------------------------------->
+
+
+          <form *ngIf="nodeData.node_type === 'ITSM Event Trigger'" [formGroup]="itsmForm">
+            <div class="mb-3">
+              <label class="form-label text-muted mb-1">Name<em>*</em></label>
+              <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                [adaptivePosition]="false" placement="top"></span>
+              <ng-container *ngTemplateOutlet="fxInput; context: { control: itsmForm.get('name')}"></ng-container>
+            </div>
+            <div class="mb-3" *ngIf="itsmForm.get('itsm_table')">
+              <label class="form-label text-muted mb-1">ITSM Table<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                [tooltip]="tooltip.tableOrModule"></span>
+              <select id="c" class="form-control text-dark" formControlName="itsm_table"
+                [class.is-invalid]="itsmFormErrors.itsm_table">
+                <option [value]="''" disabled>Select ITSM Table</option>
+                <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option>
+                <option *ngIf="!tableListOptions.length" disabled>No ITSM Table</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="itsmFormErrors.itsm_table">
+                {{itsmFormErrors.itsm_table}}</div>
+            </div>
+            <div class="mb-3" *ngIf="itsmForm.get('event_type')">
+              <label class="form-label text-muted mb-1">Event Type<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                [tooltip]="tooltip.eventType"></span>
+              <multiselect-dropdown [settings]="eventTypeSettings" [options]="eventTypes" class="form-control p-0"
+                style="height:auto;" formControlName="event_type"
+                [class.is-invalid]="itsmFormErrors.event_type"></multiselect-dropdown>
+              <div class="invalid-feedback" *ngIf="itsmFormErrors.event_type">
+                {{itsmFormErrors.event_type}}</div>
+            </div>
+            <div class="form-check ml-1 mb-3">
+              <input class="form-check-input" type="checkbox" id="skip_workflow_event"
+                formControlName="skip_workflow_event">
+              <label class="form-check-label" for="skip_workflow_event">Skip Workflow Event</label>
+            </div>
+          </form>
+
+
+          <form *ngIf="nodeData.node_type === 'Webhook Trigger'" [formGroup]="webhookForm">
+            <div class="mb-3">
+              <label class="form-label text-muted mb-1">Name<em>*</em></label>
+              <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                [adaptivePosition]="false" placement="top"></span>
+              <ng-container *ngTemplateOutlet="fxInput; context: { control: webhookForm.get('name')}"></ng-container>
+            </div>
+            <div class="mb-3" *ngIf="webhookForm.get('webhook_url')">
+              <label class="form-label text-muted mb-1">URL</label>
+              <input type="text" class="form-control text-dark" formControlName="webhook_url" />
+            </div>
+            <div class="mb-3" *ngIf="webhookForm.get('payload')">
+              <label class="form-label text-muted mb-1">Payload<em>*</em></label>
+              <textarea formControlName="payload" class="form-control text-dark" placeholder="Enter value" rows="3"
+                [class.is-invalid]="webhookFormErrors.payload"></textarea>
+              <div class="invalid-feedback" *ngIf="webhookFormErrors.payload">
+                {{webhookFormErrors.payload}}</div>
+            </div>
+          </form>
+
+          <form *ngIf="nodeData.node_type === 'AIML Event Trigger' && aimlForm" [formGroup]="aimlForm">
+            <div class="mb-3">
+              <label class="form-label text-muted mb-1">Name<em>*</em></label>
+              <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                [adaptivePosition]="false" placement="top"></span>
+              <ng-container *ngTemplateOutlet="fxInput; context: { control: aimlForm.get('name')}"></ng-container>
+            </div>
+            <div class="mb-3" *ngIf="aimlForm.get('aiml_type')">
+              <label class="form-label text-muted mb-1">Type<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                [tooltip]="tooltip.tableOrModule"></span>
+              <select id="c" class="form-control text-dark" formControlName="aiml_type"
+                [class.is-invalid]="aimlFormErrors.aiml_type">
+                <option [value]="''" disabled>Select Type</option>
+                <option *ngFor="let t of aimlTypes" [value]="t">{{t}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="aimlFormErrors.aiml_type">
+                {{aimlFormErrors.aiml_type}}</div>
+            </div>
+            <div class="mb-3" *ngIf="aimlForm.get('event_type')">
+              <label class="form-label text-muted mb-1">Event Type<em>*</em></label>
+              <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                [tooltip]="tooltip.eventType"></span>
+              <multiselect-dropdown [settings]="aimlEventTypeSettings" [options]="aimlEventTypes"
+                class="form-control p-0" style="height:auto;" formControlName="event_type"
+                [class.is-invalid]="aimlFormErrors.event_type"></multiselect-dropdown>
+              <div class="invalid-feedback" *ngIf="aimlFormErrors.event_type">
+                {{aimlFormErrors.event_type}}</div>
+            </div>
+            <div class="mb-3" *ngIf="aimlForm.get('filter')">
+              <label class="form-label text-muted mb-1">Filters</label>
+              <div class="col" *ngIf="queryBuilderConfig">
+                <query-builder #queryBuilder formControlName='filter' [classNames]='queryBuilderClassNames'
+                  [config]='queryBuilderConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
+                  [persistValueOnFieldChange]='persistValueOnFieldChange'>
+                  <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+                    <textarea class="text-input text-area" [(ngModel)]="rule.value"
+                      [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                      placeholder="Custom Textarea"></textarea>
+                  </ng-container>
+                  <ng-container *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
+                    <div class="col-auto">
+                      <tag-input [clearOnBlur]="true" [(ngModel)]="rule.value" [ngModelOptions]="{standalone: true}"
+                        [disabled]=getDisabledState() [modelAsStrings]="true" [secondaryPlaceholder]="'Enter tag'"
+                        (ngModelChange)="onTagInputChange()">
+                        <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200"
+                          (ngModelChange)="onTagInputChange()">
+                        </tag-input-dropdown>
+                      </tag-input>
+                    </div>
+                  </ng-container>
+                </query-builder>
+              </div>
+            </div>
+            <div class="mb-3" *ngIf="aimlForm.get('description')">
+              <div class="col">
+                <textarea class="form-control" id="description" name="description" formControlName="description"
+                  rows="4" readonly></textarea>
+              </div>
+            </div>
+          </form>
+
+
+          <form *ngIf="nodeData.node_type === 'Create Ticket'" [formGroup]="createTicketForm">
+            <ng-container *ngIf="activeTab === 'properties'">
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Name<em>*</em></label>
+                <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                  [adaptivePosition]="false" placement="top"></span>
+                <ng-container
+                  *ngTemplateOutlet="fxInput; context: { control: createTicketForm.get('name')}"></ng-container>
+              </div>
+              <div class="mb-3" *ngIf="createTicketForm.get('itsm_table')">
+                <label class="form-label text-muted mb-1">ITSM Table<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.tableOrModule"></span>
+                <select id="c" class="form-control text-dark" formControlName="itsm_table"
+                  [class.is-invalid]="createTicketFormErrors.itsm_table">
+                  <!-- <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option> -->
+                  <option [value]="''" disabled>Select ITSM Table</option>
+                  <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option>
+                  <option *ngIf="!tableListOptions.length" disabled>No ITSM Table</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="createTicketFormErrors.itsm_table">
+                  {{createTicketFormErrors.itsm_table}}</div>
+              </div>
+              <div class="mb-3" *ngIf="createTicketForm.get('inputs')?.value?.length > 0">
+                <label class="form-label text-muted mb-1">Fields</label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.inputParameter"></span>
+                <div formArrayName="inputs">
+                  <div *ngFor="let inputGroup of createTicketForm.get('inputs').controls; let i = index;"
+                    [formGroupName]="i" class="mb-2">
+                    <div class="align-items-center pr-1" *ngIf="inputGroup.get('param_name')?.value">
+                      <label class="mb-1" [title]="inputGroup.get('param_name')?.value">
+                        {{inputGroup.get('param_name')?.value }}
+                        <!-- <em *ngIf="inputGroup.get('is_required')?.value === 'true'">*</em> -->
+                        <em *ngIf="inputGroup.get('is_required')?.value">*</em>
+
+                      </label>
+                    </div>
+                    <div>
+                      <!-- <input type="text" formControlName="default_value" id="input-{{ i }}"
+                        class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
+                      <ng-container
+                        *ngTemplateOutlet="fxInput; context: { 
+                          control: inputGroup.get('default_value'),
+                          key: 'default_value', index: i, 
+                          error: inputGroup.get('is_required')?.value ? createTicketFormErrors?.inputs?.[i]?.default_value : '' }">
+                      </ng-container>
+                      <ng-container *ngIf="hasRealTimeData()">
+                        <div class="text-muted mt-1"
+                          *ngIf="getResolvedValue(createTicketForm, 'inputs', i, 'default_value')">
+                          <small>
+                            <strong>
+                              {{ getResolvedValue(createTicketForm, 'inputs', i, 'default_value') }}
+                            </strong>
+                          </small>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Output Configuration Tab -->
+            <div class="tab-pane fade" [ngClass]="activeTab === 'output' ? 'show active' : ''" id="output"
+              *ngIf="activeTab === 'output'">
+              <!---------------------------------------------- OUTPUT START ------------------------------------------------->
+
+              <div class="col-12 m-0 p-0">
+                <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
+                <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
+                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
+                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
+                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                  <div *ngIf="!createOutputs.length" class="text-muted fst-italic mb-3">
+                    Outputs will appear here once you add.
+                  </div>
+                  <div *ngFor="let group of createOutputs.controls; let i = index" [formGroupName]="i" class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                      <div class="d-flex align-items-end">
+                        <label class="text-muted text-sm align-self-end mb-0">Param Name<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
+                          [tooltip]="tooltip.paramName"></span>
+                      </div>
+                      <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
+                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                        type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
+                      </button>
+                    </div>
+                    <input type="text" class="form-control mb-2 text-dark" formControlName="param_name"
+                      placeholder="Output Name" [class.is-invalid]="createTicketFormErrors.outputs[i]?.param_name">
+                    <div class="invalid-feedback" *ngIf="createTicketFormErrors.outputs[i]?.param_name">
+                      {{ createTicketFormErrors.outputs[i].param_name }}
+                    </div>
+
+                    <label class="text-muted text-sm mb-1">Expression Type<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.expressionType"></span>
+                    <select class="form-control mb-2 text-dark" formControlName="expression_type"
+                      [class.is-invalid]="createTicketFormErrors.outputs[i]?.expression_type">
+                      <option value="">Select Expression Type</option>
+                      <option value="jmespath">JMESPath</option>
+                      <option value="regex">RegEx</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="createTicketFormErrors.outputs[i]?.expression_type">
+                      {{ createTicketFormErrors.outputs[i].expression_type }}
+                    </div>
+
+                    <label class="text-muted text-sm mb-1">Expression<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.expression"></span>
+                    <input type="text" class="form-control text-dark mb-2" formControlName="expression"
+                      placeholder="Expression" [class.is-invalid]="createTicketFormErrors.outputs[i]?.expression">
+                    <div class="invalid-feedback" *ngIf="createTicketFormErrors.outputs[i]?.expression">
+                      {{ createTicketFormErrors.outputs[i].expression }}
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
+                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
+                                  && nodeData.node_type !== 'Get Ticket') &&
+                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
+                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
+                                  && nodeData.node_type !== 'Webhook Trigger')">
+                    <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
+                      <i class="fas fa-plus mr-1"></i> Output
+                    </button>
+                  </div>
+
+                </div>
+                <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
+                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
+                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
+                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                  Outputs are not applicable to this node.
+                </div>
+                <!-- </form> -->
+              </div>
+              <!---------------------------------------------- OUTPUT END ------------------------------------------------->
+            </div>
+
+
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" [ngClass]="activeTab === 'settings' ? 'show active' : ''" id="settings"
+              *ngIf="activeTab === 'settings'">
+              <div class="p-0 mt-2 mb-2">
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeouts</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeouts" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-0">Retries</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.retries"></span>
+                  <div class="pr-1 mt-1 input-group">
+                    <input type="number" formControlName="retries" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="form-check ml-1 mb-3">
+                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
+                  <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <form *ngIf="nodeData.node_type === 'Update Ticket'" [formGroup]="updateTicketForm">
+            <ng-container *ngIf="activeTab === 'properties'">
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Name<em>*</em></label>
+                <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                  [adaptivePosition]="false" placement="top"></span>
+                <ng-container
+                  *ngTemplateOutlet="fxInput; context: { control: updateTicketForm.get('name')}"></ng-container>
+              </div>
+              <div class="mb-3" *ngIf="updateTicketForm.get('itsm_table')">
+                <label class="form-label text-muted mb-1">ITSM Table<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.tableOrModule"></span>
+                <select id="c" class="form-control text-dark" formControlName="itsm_table"
+                  [class.is-invalid]="updateTicketFormErrors.itsm_table">
+                  <!-- <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option> -->
+                  <option [value]="''" disabled>Select ITSM Table</option>
+                  <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option>
+                  <option *ngIf="!tableListOptions.length" disabled>No ITSM Table</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="updateTicketFormErrors.itsm_table">
+                  {{updateTicketFormErrors.itsm_table}}</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Ticket Uuid<em>*</em></label>
+                <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [adaptivePosition]="false"
+                  placement="top"></span>
+                <ng-container
+                  *ngTemplateOutlet="fxInput; context: { control: updateTicketForm.get('ticket_id'),error: updateTicketFormErrors.ticket_id }"></ng-container>
+              </div>
+              <div class="mb-3" *ngIf="updateTicketForm.get('inputs').controls.length">
+                <label class="form-label text-muted mb-1">Fields</label>
+                <div formArrayName="inputs" class="p-0">
+                  <div *ngFor="let filterGroup of updateTicketForm.get('inputs').controls; let i = index;"
+                    [formGroupName]="i" class="mb-4">
+                    <div class="mb-2">
+                      <div class="d-flex justify-content-between mb-1">
+                        <label class="form-label text-muted align-self-end mb-0">
+                          Field Name
+                          <em>*</em>
+                        </label>
+                        <button type="button" class="action-icons fas fa-minus ml-auto font-sm"
+                          (click)="removeUpdateTicketForm(i)"></button>
+                      </div>
+                      <select class="form-control text-dark" formControlName="param_name"
+                        [class.is-invalid]="updateTicketFormErrors?.inputs[i]?.param_name">
+                        <option *ngFor="let t of updateTicketList" [value]="t">{{t}}</option>
+                      </select>
+                      <div class="invalid-feedback" *ngIf="updateTicketFormErrors?.inputs[i]?.param_name">
+                        {{ updateTicketFormErrors?.inputs[i].param_name }}
+                      </div>
+                    </div>
+                    <div class="mb-2"
+                      *ngIf="(nodeData.node_type === 'Update Ticket') && filterGroup.get('default_value')">
+                      <label class="form-label text-muted mb-1">Value<em>*</em></label>
+                      <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                        [tooltip]="tooltip.value"></span>
+                      <div class="pr-1 input-group">
+                        <input type="text" formControlName="default_value" class="form-control text-dark"
+                          placeholder="Enter value"
+                          [class.is-invalid]="updateTicketFormErrors?.inputs[i]?.default_value">
+                        <div class="invalid-feedback" *ngIf="updateTicketFormErrors?.inputs[i]?.default_value">
+                          {{ updateTicketFormErrors?.inputs[i].default_value }}
+                        </div>
+                      </div>
+                      <ng-container *ngIf="hasRealTimeData()">
+                        <div class="text-muted mt-1"
+                          *ngIf="getResolvedValue(updateTicketForm, 'inputs', i, 'default_value')">
+                          <small>
+                            <strong>
+                              {{ getResolvedValue(updateTicketForm, 'inputs', i, 'default_value') }}
+                            </strong>
+                          </small>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end" *ngIf="nodeData.node_type === 'Update Ticket'">
+                <button type="button" class="btn text-primary border-primary w-20" (click)="addUpdateTicketForm()">
+                  <i class="fas fa-plus mr-1"></i> Field
+                </button>
+              </div>
+            </ng-container>
+
+            <!-- Output Configuration Tab -->
+            <div class="tab-pane fade" [ngClass]="activeTab === 'output' ? 'show active' : ''" id="output"
+              *ngIf="activeTab === 'output'">
+              <!---------------------------------------------- OUTPUT START ------------------------------------------------->
+
+              <div class="col-12 m-0 p-0">
+                <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
+                <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
+                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
+                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
+                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                  <div *ngIf="!updateOutputs.length" class="text-muted fst-italic mb-3">
+                    Outputs will appear here once you add.
+                  </div>
+                  <div *ngFor="let group of updateOutputs.controls; let i = index" [formGroupName]="i" class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                      <div class="d-flex align-items-end">
+                        <label class="text-muted text-sm align-self-end mb-0">Param Name<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
+                          [tooltip]="tooltip.paramName"></span>
+                      </div>
+                      <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
+                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                        type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
+                      </button>
+                    </div>
+                    <input type="text" class="form-control mb-2 text-dark" formControlName="param_name"
+                      placeholder="Output Name" [class.is-invalid]="updateTicketFormErrors.outputs[i]?.param_name">
+                    <div class="invalid-feedback" *ngIf="updateTicketFormErrors.outputs[i]?.param_name">
+                      {{ updateTicketFormErrors.outputs[i].param_name }}
+                    </div>
+
+                    <label class="text-muted text-sm mb-1">Expression Type<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.expressionType"></span>
+                    <select class="form-control mb-2 text-dark" formControlName="expression_type"
+                      [class.is-invalid]="updateTicketFormErrors.outputs[i]?.expression_type">
+                      <option value="">Select Expression Type</option>
+                      <option value="jmespath">JMESPath</option>
+                      <option value="regex">RegEx</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="updateTicketFormErrors.outputs[i]?.expression_type">
+                      {{ updateTicketFormErrors.outputs[i].expression_type }}
+                    </div>
+
+                    <label class="text-muted text-sm mb-1">Expression<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.expression"></span>
+                    <input type="text" class="form-control text-dark mb-2" formControlName="expression"
+                      placeholder="Expression" [class.is-invalid]="updateTicketFormErrors.outputs[i]?.expression">
+                    <div class="invalid-feedback" *ngIf="updateTicketFormErrors.outputs[i]?.expression">
+                      {{ updateTicketFormErrors.outputs[i].expression }}
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
+                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
+                                  && nodeData.node_type !== 'Get Ticket') &&
+                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
+                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
+                                  && nodeData.node_type !== 'Webhook Trigger')">
+                    <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
+                      <i class="fas fa-plus mr-1"></i> Output
+                    </button>
+                  </div>
+
+                </div>
+                <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
+                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
+                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
+                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                  Outputs are not applicable to this node.
+                </div>
+                <!-- </form> -->
+              </div>
+              <!---------------------------------------------- OUTPUT END ------------------------------------------------->
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" [ngClass]="activeTab === 'settings' ? 'show active' : ''" id="settings"
+              *ngIf="activeTab === 'settings'">
+              <div class="p-0 mt-2 mb-2">
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeouts</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeouts" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-0">Retries</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.retries"></span>
+                  <div class="pr-1 mt-1 input-group">
+                    <input type="number" formControlName="retries" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="form-check ml-1 mb-3">
+                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
+                  <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <form *ngIf="nodeData.node_type === 'Add Comment'" [formGroup]="commentInTicketForm">
+            <ng-container *ngIf="activeTab === 'properties'">
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Name<em>*</em></label>
+                <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                  [adaptivePosition]="false" placement="top"></span>
+                <ng-container
+                  *ngTemplateOutlet="fxInput; context: { control: commentInTicketForm.get('name')}"></ng-container>
+              </div>
+              <div class="mb-3" *ngIf="commentInTicketForm.get('itsm_table')">
+                <label class="form-label text-muted mb-1">ITSM Table<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.tableOrModule"></span>
+                <select id="c" class="form-control text-dark" formControlName="itsm_table"
+                  [class.is-invalid]="commentInTicketFormErrors.itsm_table">
+                  <!-- <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option> -->
+                  <option [value]="''" disabled>Select ITSM Table</option>
+                  <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option>
+                  <option *ngIf="!tableListOptions.length" disabled>No ITSM Table</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="commentInTicketFormErrors.itsm_table">
+                  {{commentInTicketFormErrors.itsm_table}}</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Ticket Uuid<em>*</em></label>
+                <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [adaptivePosition]="false"
+                  placement="top"></span>
+                <ng-container
+                  *ngTemplateOutlet="fxInput; context: { control: commentInTicketForm.get('ticket_id'),error: commentInTicketFormErrors.ticket_id }"></ng-container>
+              </div>
+              <div class="mb-3" *ngIf="commentFieldsList.length > 0">
+                <label class="form-label text-muted mb-1">Field</label>
+                <select class="form-control text-dark" formControlName="field_name"
+                  [class.is-invalid]="commentInTicketForm.itsm_table">
+                  <option *ngFor="let f of commentFieldsList" [value]="f">{{f}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="commentInTicketFormErrors.field_name">
+                  {{commentInTicketFormErrors.field_name}}</div>
+              </div>
+              <div class="mb-3" *ngIf="commentFieldsList.length > 0">
+                <label class="form-label text-muted mb-1">Add Comment<em>*</em></label>
+                <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [adaptivePosition]="false"
+                  placement="top"></span>
+                <textarea formControlName="comment" class="form-control text-dark" placeholder="Enter value" rows="3"
+                  [class.is-invalid]="commentInTicketForm.comment"></textarea>
+                <div class="invalid-feedback" *ngIf="commentInTicketFormErrors.comment">
+                  {{commentInTicketFormErrors.comment}}</div>
+              </div>
+              <div class="mb-3 text-muted"
+                *ngIf="commentInTicketForm.get('itsm_table').value && commentFieldsList.length === 0">
+                No comment fields found for this table.
+              </div>
+            </ng-container>
+
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" [ngClass]="activeTab === 'settings' ? 'show active' : ''" id="settings"
+              *ngIf="activeTab === 'settings'">
+              <div class="p-0 mt-2 mb-2">
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeouts</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeouts" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-0">Retries</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.retries"></span>
+                  <div class="pr-1 mt-1 input-group">
+                    <input type="number" formControlName="retries" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="form-check ml-1 mb-3">
+                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
+                  <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                </div>
+              </div>
+            </div>
+          </form>
+          <form *ngIf="nodeData.node_type === 'Get Ticket'" [formGroup]="getTicketForm">
+            <ng-container *ngIf="activeTab === 'properties'">
+              <div class="mb-3">
+                <label class="form-label text-muted mb-1">Name<em>*</em></label>
+                <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
+                  [adaptivePosition]="false" placement="top"></span>
+                <ng-container
+                  *ngTemplateOutlet="fxInput; context: { control: getTicketForm.get('name')}"></ng-container>
+              </div>
+              <div class="mb-3" *ngIf="getTicketForm.get('itsm_table')">
+                <label class="form-label text-muted mb-1">ITSM Table<em>*</em></label>
+                <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                  [tooltip]="tooltip.tableOrModule"></span>
+                <select id="c" class="form-control text-dark" formControlName="itsm_table"
+                  [class.is-invalid]="getTicketFormErrors.itsm_table">
+                  <!-- <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option> -->
+                  <option [value]="''" disabled>Select ITSM Table</option>
+                  <option *ngFor="let t of tableListOptions" [value]="t.uuid">{{t.name}}</option>
+                  <option *ngIf="!tableListOptions.length" disabled>No ITSM Table</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="getTicketFormErrors.itsm_table">
+                  {{getTicketFormErrors.itsm_table}}</div>
+              </div>
+              <label class="form-label text-muted align-self-end mb-0">Filters</label>
+              <div formArrayName="filters" class="p-0">
+                <div *ngFor="let filterGroup of getTicketForm.get('filters').controls; let i = index;"
+                  [formGroupName]="i" class="mb-4">
+                  <div class="mb-2" *ngIf="(nodeData.node_type === 'Get Ticket') && filterGroup.get('condition_key')">
+                    <div class="d-flex justify-content-between mb-1">
+                      <label class="form-label text-muted align-self-end mb-0">Key<em>*</em></label>
+                      <!-- <span class="fas fa-info-circle text-primary pointer-link text-info align-self-end mb-1 pl-1"
+                        [tooltip]="tooltip.key"></span> -->
+
+                      <button type="button" class="action-icons fas fa-minus ml-auto  font-sm"
+                        (click)="removeGetTicketForm(i)"></button>
+                    </div>
+                    <select class="form-control text-dark" formControlName="condition_key"
+                      [class.is-invalid]="getTicketFormErrors.filters[i]?.condition_key">
+                      <option value="" disabled> Select Key </option>
+                      <option *ngFor="let t of getTicketKeyList" [value]="t">{{t}}</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="getTicketFormErrors.filters[i]?.condition_key">
+                      {{ getTicketFormErrors.filters[i]?.condition_key }}
+                    </div>
+                  </div>
+                  <div class="mb-2" *ngIf="(nodeData.node_type === 'Get Ticket') && filterGroup.get('operator')">
+                    <label class="form-label text-muted mb-1">Operator<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.operator"></span>
+                    <select id="operator" class="form-control text-dark" formControlName="operator"
+                      [class.is-invalid]="getTicketFormErrors.filters[i]?.operator">
+                      <option value="" disabled> Select Operator </option>
+                      <option *ngFor="let c of conditionOperators" [value]="c.value">
+                        {{c.label}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="getTicketFormErrors.filters[i]?.operator">
+                      {{ getTicketFormErrors.filters[i]?.operator }}
+                    </div>
+                  </div>
+                  <div class="mb-2" *ngIf="(nodeData.node_type === 'Get Ticket') && filterGroup.get('condition_value')">
+                    <label class="form-label text-muted mb-1">Value<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.value"></span>
+                    <div class="pr-1 input-group">
+                      <input type="text" formControlName="condition_value" class="form-control text-dark"
+                        placeholder="Enter value" [class.is-invalid]="getTicketFormErrors.filters[i]?.condition_value">
+                      <div class="invalid-feedback" *ngIf="getTicketFormErrors.filters[i]?.condition_value">
+                        {{ getTicketFormErrors.filters[i]?.condition_value }}
+                      </div>
+                    </div>
+                    <ng-container *ngIf="hasRealTimeData()">
+                      <div class="text-muted mt-1"
+                        *ngIf="getResolvedValue(getTicketForm, 'filters', i, 'condition_value')">
+                        <small>
+                          <strong>
+                            {{ getResolvedValue(getTicketForm, 'filters', i, 'condition_value') }}
+                          </strong>
+                        </small>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end" *ngIf="nodeData.node_type === 'Get Ticket'">
+                <button type="button" class="btn text-primary border-primary w-20" (click)="addGetTicketForm()">
+                  <i class="fas fa-plus mr-1"></i> Field
+                </button>
+              </div>
+            </ng-container>
+
+            <!-- Output Configuration Tab -->
+            <div class="tab-pane fade" [ngClass]="activeTab === 'output' ? 'show active' : ''" id="output"
+              *ngIf="activeTab === 'output'">
+              <!---------------------------------------------- OUTPUT START ------------------------------------------------->
+
+              <div class="col-12 m-0 p-0">
+                <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
+                <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
+                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
+                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
+                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                  <div *ngIf="!getTicketOutputs.length" class="text-muted fst-italic mb-3">
+                    Outputs will appear here once you add.
+                  </div>
+                  <div *ngFor="let group of getTicketOutputs.controls; let i = index" [formGroupName]="i" class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                      <div class="d-flex align-items-end">
+                        <label class="text-muted text-sm align-self-end mb-0">Param Name<em>*</em></label>
+                        <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
+                          [tooltip]="tooltip.paramName"></span>
+                      </div>
+                      <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
+                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                        type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
+                      </button>
+                    </div>
+                    <input type="text" class="form-control mb-2 text-dark" formControlName="param_name"
+                      placeholder="Output Name" [class.is-invalid]="getTicketFormErrors.outputs[i]?.param_name">
+                    <div class="invalid-feedback" *ngIf="getTicketFormErrors.outputs[i]?.param_name">
+                      {{ getTicketFormErrors.outputs[i].param_name }}
+                    </div>
+
+                    <label class="text-muted text-sm mb-1">Expression Type<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.expressionType"></span>
+                    <select class="form-control mb-2 text-dark" formControlName="expression_type"
+                      [class.is-invalid]="getTicketFormErrors.outputs[i]?.expression_type">
+                      <option value="">Select Expression Type</option>
+                      <option value="jmespath">JMESPath</option>
+                      <option value="regex">RegEx</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="getTicketFormErrors.outputs[i]?.expression_type">
+                      {{ getTicketFormErrors.outputs[i].expression_type }}
+                    </div>
+
+                    <label class="text-muted text-sm mb-1">Expression<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.expression"></span>
+                    <input type="text" class="form-control text-dark mb-2" formControlName="expression"
+                      placeholder="Expression" [class.is-invalid]="getTicketFormErrors.outputs[i]?.expression">
+                    <div class="invalid-feedback" *ngIf="getTicketFormErrors.outputs[i]?.expression">
+                      {{ getTicketFormErrors.outputs[i].expression }}
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
+                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
+                                  && nodeData.node_type !== 'Get Ticket') &&
+                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
+                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
+                                  && nodeData.node_type !== 'Webhook Trigger')">
+                    <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
+                      <i class="fas fa-plus mr-1"></i> Output
+                    </button>
+                  </div>
+
+                </div>
+                <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
+                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
+                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
+                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                  Outputs are not applicable to this node.
+                </div>
+                <!-- </form> -->
+              </div>
+              <!---------------------------------------------- OUTPUT END ------------------------------------------------->
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-pane fade" [ngClass]="activeTab === 'settings' ? 'show active' : ''" id="settings"
+              *ngIf="activeTab === 'settings'">
+              <div class="p-0 mt-2 mb-2">
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeouts</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeouts" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-0">Retries</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.retries"></span>
+                  <div class="pr-1 mt-1 input-group">
+                    <input type="number" formControlName="retries" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+                <div class="form-check ml-1 mb-3">
+                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
+                  <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+      <ng-template #fxInput let-control="control" let-key="key" let-index="index" let-error="error">
+        <div class="input-group">
+          <input type="text" class="form-control text-dark" [formControl]="control" [class.is-invalid]="error"
+            (dragenter)="onDragEnter($event, key)" (dragover)="onDragOver($event,key)"
+            (dragleave)="onDragLeave($event,key)" (drop)="onDrop($event, control,key)" />
+          <!-- <div class="invalid-feedback" *ngIf="propertiesFormErrors[key]">
+            {{ propertiesFormErrors[key] }}</div> -->
+          <div class="invalid-feedback d-block" *ngIf="error">
+            {{ error }}
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #fxInputIcon let-control="control" let-key="key" let-index="index" let-error="error">
+        <div class="input-group">
+          <input type="text" class="form-control text-dark" [formControl]="control" (dragenter)="onDragEnter($event)"
+            (dragover)="onDragOver($event)" (dragleave)="onDragLeave($even)" (drop)="onDrop($event, control)"
+            [class.is-invalid]="error" />
+          <!-- <div class="invalid-feedback" *ngIf="propertiesFormErrors[key]">
+            {{ propertiesFormErrors[key] }}</div> -->
+          <!-- Icon on right -->
+          <div class="input-group-append">
+            <button type="button" class="btn border-secondary d-flex align-items-center"
+              style="height: 100%; border-radius: 0 .25rem .25rem 0;" (click)="onAIiconClick(control)"
+              title="AI will generate this input">
+              <img [src]="aiIcon" loading="eager" />
+            </button>
+          </div>
+        </div>
+        <div class="invalid-feedback d-block" *ngIf="error">
+          {{ error }}
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="col-3 pt-3 rightbarParam" *ngIf="!isPromptExpanded">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h6 class="fw-bold mb-3">O U T P U T</h6>
+        </div>
+        <div *ngIf=" realTimeData?.duration" style="float: right" class="mb-3">
+          <i class="fas fa-clock text-muted pr-1"></i>
+          <span>{{realTimeData?.duration}}</span>
+        </div>
+      </div>
+      <div
+        *ngIf="nodeData.node_type === 'Manual Trigger' || nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||  nodeData.node_type === 'AIML Event Trigger'"
+        class="text-dark">
+        Outputs are not applicable for Trigger Node.
+      </div>
+
+      <!-- Non-trigger + no output -->
+      <div
+        *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger' && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger' && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger' && !nodeOutput"
+        class="text-dark">
+        Outputs will appear after execution.
+      </div>
+      <pre
+        *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger' && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger' &&nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger' && nodeOutput">{{nodeOutput | json}}</pre>
+    </div>
+  </div>

@@ -1,0 +1,42 @@
+<form [formGroup]="form">
+    <div formArrayName="os">
+        <div *ngFor="let control of osArray.controls; let i = index;let first = first; let last = last;">
+            <div [formGroupName]="i">
+                <div class="bordered-container mb-3 mt-3">
+                    <div class="col border rounded position-relative mr-3 mb-4 p-4">
+                        <div class="pb-2 mb-3 bg-white position-absolute section-name-one">OS Config</div>
+                        <button class="action-icons fa fa-angle-down section-name-two"
+                            [tooltip]="sectionOpenStates[i] ? 'Expand' : 'Minimize'"
+                            [attr.aria-expanded]="!sectionOpenStates[i]" (click)="toggleComputeOpenOrClose(i)"></button>
+                        <i class="fas fa-plus action-icons section-name-three" (click)="addCompute(i)"
+                            [tooltip]="'Add Compute'"></i>
+                        <i class="far fa-trash-alt action-icons section-name-four" (click)="deleteCompute(i)"
+                            [tooltip]="'Delete Compute'" *ngIf="form.get('os').controls.length > 1"></i>
+                        <div [collapse]="sectionOpenStates[i]" [isAnimated]="true">
+                            <div class="row form-group">
+                                <div class="col-6">
+                                    <label for="device" class="form-col-label text-muted">Device<em>*</em></label>
+                                    <input type="text" class="form-control"
+                                        [class.is-invalid]="formErrors.os[i].device"
+                                        placeholder="Enter Device Name" formControlName="device">
+                                    <div class="invalid-feedback" *ngIf="formErrors.os[i].device">
+                                        {{formErrors.os[i].device}}
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="status" class="form-col-label text-muted">Status</label>
+                                    <input type="text" class="form-control"
+                                        [class.is-invalid]="formErrors.os[i].status" placeholder="Enter Status"
+                                        formControlName="status">
+                                    <div class="invalid-feedback" *ngIf="formErrors.os[i].status">
+                                        {{formErrors.os[i].status}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

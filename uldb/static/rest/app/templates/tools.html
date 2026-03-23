@@ -1,0 +1,53 @@
+<generic-panel heading="Celerybeat Tasks- Resfresh" panel-type="default">
+  	<panel-body>
+		<div class="row">
+			<div class="col-md-3">
+			  <button class="btn btn-danger" ng-click="refresh_nagios()">Refresh Nagios</button>
+			</div>
+
+			<div class="col-md-3">
+			  <button class="btn btn-danger" ng-click="refresh_observium_hosts()">Refresh Observium Hosts</button>
+			</div>
+
+			<div class="col-md-3">
+			  <button class="btn btn-info" ng-click="refresh_observium_interfaces()">Refresh Observium Interfaces</button>
+			</div>
+
+			<div class="col-md-3">
+			  <button class="btn btn-success" ng-click="refresh_observium_stats()">Refresh Observium Stats</button>
+			</div>
+		</div>
+		<br>
+		<pre>{{ result | json}}</pre>
+	</panel-body>
+  <panel-footer></panel-footer>
+</generic-panel>
+
+<generic-panel heading="Settings - Debug Mode" panel-type="default">
+  <panel-body>
+    <pre>{{ debug_mode | uppercase }}</pre>
+  </panel-body>
+  <panel-footer></panel-footer>
+</generic-panel>
+
+<generic-panel heading="Check + Update Proxy Configuration" panel-type="default">
+  <panel-body>
+    <div class="row">
+		<div class="col-md-3">
+		  <button class="btn btn-danger" ng-click="update_proxy_config()">Update Proxy Configuration</button>
+		</div>
+	</div>
+	<br>
+	<pre>{{ proxy_update_response }}</pre>
+  </panel-body>
+  <panel-footer></panel-footer>
+</generic-panel>
+
+<generic-panel heading="Tenable" panel-type="default">
+  <panel-body>
+    <pre>{{ security_center_integ | json }}</pre>
+  </panel-body>
+  <panel-footer></panel-footer>
+</generic-panel>
+
+

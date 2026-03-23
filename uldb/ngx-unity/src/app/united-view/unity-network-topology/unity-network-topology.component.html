@@ -1,0 +1,290 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card rounded-0 mb-2">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                        <span class="ml-1 font-lg">Service Topology</span>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <!-- <a class="btn btn-warning btn-sm" href="{{downloadUrl}}" accessControl
+                                moduleName="Activity Log" accessType="Download Activity Log" elementType="btn">
+                                <span class="fa fa-download"></span>
+                                <span class="ml-2">Download</span>
+                            </a> -->
+                            <data-refresh-btn (refresh)="refreshServiceTopology()"></data-refresh-btn>
+                        </div>
+                    </div>
+                    <div class="card-body chart-container">
+                        <ngx-graph [links]="links" [nodes]="nodes" [layout]="'dagre'" [view]="[1200, 600]"
+                            [showMiniMap]="true" [autoZoom]="true" [autoCenter]="true">
+                            <ng-template #defsTemplate>
+                                <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4"
+                                    markerHeight="4" orient="auto">
+                                    <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
+                                </svg:marker>
+                            </ng-template>
+                            <ng-template #nodeTemplate let-node>
+                                <svg:g class="node" (click)="onNodeClick(node)">
+                                    <svg:rect *ngIf="node.data.type === 'application' || node.data.type === 'group'"
+                                        [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
+                                        [attr.fill]="node.data.color" rx="5" ry="5" />
+                                    <svg:circle *ngIf="node.data.type === 'shared'" [attr.r]="node.dimension.width / 2"
+                                        [attr.fill]="node.data.color" />
+                                    <svg:text [attr.x]="node.dimension.width / 2" [attr.y]="node.dimension.height / 2"
+                                        text-anchor="middle" alignment-baseline="middle" fill="black">
+                                        {{ node.label }}
+                                    </svg:text>
+                                </svg:g>
+                            </ng-template>
+                        </ngx-graph>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-2">
+                <tabset ariaLabel="customTabs">
+                    <tab id="overview" heading="Overview" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngIf="view == 'overview'">
+                            <ng-container *ngTemplateOutlet="infraElementsRef"></ng-container>
+                        </ng-container>
+                    </tab>
+                    <tab id="alerts" heading="Alerts" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngIf="view == 'alerts'">
+                            <ng-container *ngTemplateOutlet="alertsRef"></ng-container>
+                        </ng-container>
+                    </tab>
+                    <tab id="cost" heading="Cost" class="p-0" (selectTab)="switchView($event)">
+                        <ng-container *ngIf="view == 'cost'">
+                            <ng-container *ngTemplateOutlet="costRef"></ng-container>
+                        </ng-container>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #infraElementsRef>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">36</span>
+                <span class="ml-1 font-lg">Infrastructure Elements</span>
+            </div>
+            <div>
+                <data-refresh-btn (refresh)="refreshInfraElements()"></data-refresh-btn>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                <div class="w-25">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'deviceBGPPeerList'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Device Name</th>
+                                <th>Management IP</th>
+                                <th>Device Type</th>
+                                <th>CPU Usage</th>
+                                <th>Memory Usage</th>
+                                <th>Disk Usage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let d of infraElements;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.identifier">{{d.identifier}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <shared-device-status [status]="d.state"></shared-device-status>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.local_addr">{{d.local_addr}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.remote_addr">{{d.remote_addr}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="d.local_port">{{d.local_port}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="d?.remote_port">{{d?.remote_port}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!infraElements.length">No associated
+                            Infrastructure Elements found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #alertsRef>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">10</span>
+                <span class="ml-1 font-lg">Alerts</span>
+            </div>
+            <div>
+                <data-refresh-btn (refresh)="refreshInfraElements()"></data-refresh-btn>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                <div class="w-25">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'deviceBGPPeerList'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Event ID</th>
+                                <th>Description</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                                <th>Event Time</th>
+                                <th>Source</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let d of alerts;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.identifier">{{d.identifier}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <shared-device-status [status]="d.state"></shared-device-status>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.local_addr">{{d.local_addr}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.remote_addr">{{d.remote_addr}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="d.local_port">{{d.local_port}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="d?.remote_port">{{d?.remote_port}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!alerts.length">No associated
+                            alerts found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #costRef>
+    <div class="card mb-0 border-0 mt-1 rounded-0">
+        <div class="card-header bg-transparent p-2 d-flex justify-content-between">
+            <div class="d-flex justify-content-center align-items-center font-500">
+                <span class="badge badge-secondary font-sm">36</span>
+                <span class="ml-1 font-lg">Cost Elements</span>
+            </div>
+            <div>
+                <data-refresh-btn (refresh)="refreshInfraElements()"></data-refresh-btn>
+            </div>
+        </div>
+        <div class="card-body py-2">
+            <div class="row mx-0 d-flex justify-content-between align-items-center pb-2">
+                <div class="w-25">
+                    <search-box [searchValue]="currentCriteria.searchValue"
+                        (searched)="onSearched($event)"></search-box>
+                </div>
+                <div>
+                    <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                </div>
+            </div>
+            <div class="card mb-0 border-0 rounded-0">
+                <app-spinner [name]="'deviceBGPPeerList'"></app-spinner>
+                <div class="card-body p-0 border-0">
+                    <table class="table table-sm text-left mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>name</th>
+                                <th>Status</th>
+                                <th>Local Address</th>
+                                <th>Remote Address</th>
+                                <th>Local Port</th>
+                                <th>Remote Port</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let d of costDetails;let i = index" truncateText>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.identifier">{{d.identifier}}</div>
+                                </td>
+                                <td class="tdw-10">
+                                    <shared-device-status [status]="d.state"></shared-device-status>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.local_addr">{{d.local_addr}}</div>
+                                </td>
+                                <td class="tdw-20">
+                                    <div [tooltip]="d.remote_addr">{{d.remote_addr}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="d.local_port">{{d.local_port}}</div>
+                                </td>
+                                <td class="tdw-15">
+                                    <div [tooltip]="d?.remote_port">{{d?.remote_port}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-12">
+                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count">
+                        </table-entries>
+                        <table-pager [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                            [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+                        <div class="text-center text-muted py-4" *ngIf="!costDetails.length">No associated
+                            Cost Elements found.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

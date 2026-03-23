@@ -1,0 +1,52 @@
+<table class="table table2 cabinet-table text-white mb-1 font-sm">
+  <tbody>
+    <tr>
+      <td>
+        <div class="row font-sm">
+          <div class="col-6 pr-0 pt-2 text-truncate"><i
+              class="fa fa-arrow-circle-up text-success"></i>&nbsp;{{cabinetData.up_count}}</div>
+          <div class="col-6 pl-0 pt-2 text-truncate"><i
+              class="fa fa-arrow-circle-down text-danger"></i>&nbsp;{{cabinetData.down_count}}</div>
+          <div class="col-12"><small>Devices</small></div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="border-top">
+        <div class="row font-sm">
+          <div class="col-6 pr-0 text-truncate" tooltip="{{cabinetData.alerts}} Alerts">
+            {{cabinetData.alerts}}<br /><small>Alerts</small></div>
+          <div class="col-6 pl-0 text-truncate" tooltip="{{cabinetData.occupied}} / {{cabinetData.capacity}} RU">
+            {{cabinetData.occupied}} / {{cabinetData.capacity}}<br /><small>RU</small>
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="border-top">
+        <div class="row font-sm">
+          <div class="col-6 pr-0 pt-2 text-truncate" tooltip="{{cabinetData.max_temperature}}&deg;C"><i
+              class="fa fa-thermometer-half text-warning"></i>&nbsp;{{cabinetData.max_temperature}}&deg;C</div>
+          <div class="col-6 pl-0 pt-2 text-truncate" tooltip="{{cabinetData.total_power}}kW"><i
+              class="fa fa-bolt text-success"></i>&nbsp;{{cabinetData.total_power}}kW</div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="border-top">
+        <div class="row font-sm">
+          <div class="col-6 pr-0 pt-2"><i class="fa cfa-socket fa-lg" [ngClass]="cabinetData.pdus[0].color"
+              [tooltip]="cabinetData.pdus[0].name"></i></div>
+          <div class="col-6 pl-0 pt-2"><i class="fa cfa-socket fa-lg" [ngClass]="cabinetData.pdus[1].color"
+              [tooltip]="cabinetData.pdus[1].name"></i></div>
+          <div class="col-6 pr-0 pt-2"><i class="fa cfa-socket fa-lg" [ngClass]="cabinetData.pdus[2].color"
+              [tooltip]="cabinetData.pdus[2].name"></i></div>
+          <div class="col-6 pl-0 pt-2"><i class="fa cfa-socket fa-lg" [ngClass]="cabinetData.pdus[3].color"
+              [tooltip]="cabinetData.pdus[3].name"></i></div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<small class="d-block text-muted font-weight-bold text-truncate pointer-link"
+  (click)="goTo(cabinetData.cabinet_url)">{{cabinetData.cabinet_name}}</small>

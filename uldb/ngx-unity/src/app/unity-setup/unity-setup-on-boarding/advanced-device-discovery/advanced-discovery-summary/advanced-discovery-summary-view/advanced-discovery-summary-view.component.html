@@ -1,0 +1,96 @@
+<div class="row mt-4" *ngIf="viewData">
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-pdu" [ngClass]="FaIconMapping.PDU"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.pdus}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">{{DeviceMapping.PDU}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-firewalls" [ngClass]="FaIconMapping.FIREWALL"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.firewalls}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">{{DeviceMapping.FIREWALL}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-switches" [ngClass]="FaIconMapping.SWITCH"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.switches}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">{{DeviceMapping.SWITCHES}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-lbs" [ngClass]="FaIconMapping.LOAD_BALANCER"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.lbs}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">{{DeviceMapping.LOAD_BALANCER}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-bms" [ngClass]="FaIconMapping.BARE_METAL_SERVER"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.servers}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">Servers</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-hypervisor" [ngClass]="FaIconMapping.HYPERVISOR"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.hypervisors}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">{{DeviceMapping.HYPERVISOR}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-mac" [ngClass]="FaIconMapping.MAC_MINI"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.mac}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">{{DeviceMapping.MAC_MINI}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <div class="card">
+            <div class="card-body p-0 d-flex align-items-center">
+                <i class="fa p-4 font-2xl mr-3 summary-icons-storage" [ngClass]="FaIconMapping.STORAGE_DEVICE"></i>
+                <div>
+                    <div class="text-value-sm text-primary">{{viewData.storage}}</div>
+                    <div class="text-muted text-uppercase font-weight-bold small">{{DeviceMapping.STORAGE_DEVICES}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

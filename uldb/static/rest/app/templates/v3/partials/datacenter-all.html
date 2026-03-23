@@ -1,0 +1,31 @@
+<div class="panel panel-primary">
+    <div class="panel-heading vcloud-head">
+        <div class="col-md-8 vcloudtitle"><i class="fa fa-cloud  fa-fw"></i> DATACENTER </div>
+        <div class="col-md-4 pinnewcus">
+            <input class="form-control custom_search_field" type="text" ng-model="searchKeyword"
+                   placeholder="Search by name.." ng-model-options="{debounce: {'default': 100, 'blur': 0 }}">
+        </div>
+    </div>
+
+    <div class="panel-body limt-scroll-cloud-widget" >
+        <span ng-if="!datacenternames">
+          <img src="/static/img/v3/loading_icon.gif" class="ajax-loader">
+        </span>
+        <div class="privateClouds-wrapper">
+            <div class="dataTable_wrapper auto-height">
+                <span ng-if="datacenternames.data.info.length != 0">
+                    <table class="table" id="dataTables-example" >
+                        <div ng-repeat="(index, dcenter) in datacenternames.data.info | filter: searchKeyword"
+                            class="cus-widget-item widget-item-wrapper col-lg-4 col-md-4 ">
+                            <datacenter-widget dcenter="dcenter"></datacenter-widget>
+                        </div>
+                    </table>
+                </span>
+                <span ng-if="datacenternames.data.info.length == 0">
+                    <h3 class="align-center">No records to display</h3>
+                </span>
+
+            </div>
+        </div>
+    </div>
+</div>

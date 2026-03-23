@@ -1,0 +1,58 @@
+.card-body-custom {
+  height: 100%;
+  overflow: hidden;
+  // gap: 0.5rem;
+  // background: linear-gradient(135deg, #FFFBFB 0%, #E4F5F7 55%, #FDEFE9 100%);
+  background-blend-mode: soft-light;
+  border-bottom-right-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+}
+
+.custom-gradient-bg {
+  background: linear-gradient(135deg, #FFFBFB 0%, #E4F5F7 55%, #FDEFE9 100%);
+  min-height: 0;
+}
+
+.tab-icon {
+  background-color: #e4e7ea;
+  color: #73818f;
+}
+
+.tab-icon.active {
+  background-color: #cef1e2;
+  color: #28a745;
+}
+
+.tab-icon:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.history:hover {
+  text-decoration: underline;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0.5rem;
+  overflow-x: hidden;
+  // margin-bottom: 120px;
+}
+
+.custom-gradient-bg ::-webkit-scrollbar {
+  display: none;
+}
+
+.angle-icon {
+  background-color: #cef1e2;
+  color: #28a745;
+  height: 1.5rem;
+  width: 1.5rem;
+  cursor: pointer;
+}
+
+.scroll-container ::-webkit-scrollbar {
+  display: none;
+}

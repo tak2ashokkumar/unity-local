@@ -1,0 +1,76 @@
+<style type="text/css">
+	.portGraphs {
+		display:block;
+	}
+</style>
+<div class="row page_wrapper margin_top20px">
+	<div class="col-xs-12 content-wrapper">
+		<h1>VM Ports</h1>
+	</div>
+</div>
+
+<div class="page_wrapper" style="float:left">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" ng-if="portDetails !== undefined">
+        <section id="no-more-tables" class="margintop20 middle-wrapper">
+            <table class="table table-condensed table-hover margin0">
+                <thead>
+                    <tr>
+                      <th>Port</th>
+                      <th></th>
+                      <th>Traffic</th>
+                      <th>Speed</th>
+                      <th>MAC Address</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="(portid,port) in portDetails.ports">
+                        <td>
+                        	<p>{{port.entity_name}}</p>
+                        	<p>{{port.entity_descr}}</p>
+                        	<p ng-repeat="address in port.addresses">
+                        		{{address.ipv4_network}}
+                        	</p>
+                        </td>
+                        <td ng-init="getPortGraphs(port)">
+                        	<p ng-if="port.graph.port_bits_graph">
+                        		<img class="portGraphs" 
+                        		ng-src="data:image/png;base64,{{ port.graph.port_bits_graph }}">
+                        	</p>
+                        	<p ng-if="port.graph.port_upkts_graph">
+                        		<img class="portGraphs" ng-if="port.graph.port_upkts_graph"
+                        		ng-src="data:image/png;base64,{{ port.graph.port_upkts_graph }}">
+                        	</p>
+                        	<p ng-if="port.graph.port_errors_graph">
+                        		<img class="portGraphs"  
+                        		ng-src="data:image/png;base64,{{ port.graph.port_errors_graph }}">
+                        	</p>
+                        </td>
+                    	<td>
+                    		<p ng-if="port.in_rate" style="{{port.bps_in_style}}">
+                    			<i class="fa fa-arrow-circle-down"></i> {{port.in_rate}}bps</p>
+                    		<p ng-if="port.out_rate" style="{{port.bps_out_style}}">
+                    			<i class="fa fa-arrow-circle-up"></i> {{port.out_rate}}bps</p>
+                    		<p ng-if="port.ifInUcastPkts_rate" style="{{port.pps_in_style}}">
+                    			<i class="fa fa-arrow-circle-down"></i> {{port.ifInUcastPkts_rate}}pps</p>
+                    		<p ng-if="port.ifOutUcastPkts_rate" style="{{port.pps_out_style}}">
+                    			<i class="fa fa-arrow-circle-up"></i> {{port.ifOutUcastPkts_rate}}pps</p>
+                    	</td>
+                    	<td>
+                    		<p>{{port.human_type}}</p>
+                    		<p>{{port.human_speed}}</p>
+                    		<p ng-if="port.ifMtu">MTU {{port.ifMtu}}</p>
+                    	</td>
+                    	<td>
+                    		<p>{{port.human_mac}}</p>
+                    		<p>{{port.ifLastChange}}</p>
+                    	</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div ng-if="!portDetails.ports && !loader" class="content-wrapper">
+                <no-records-found message="No Ports to display"></no-records-found>
+            </div>
+        </section>
+    </div>
+</div>

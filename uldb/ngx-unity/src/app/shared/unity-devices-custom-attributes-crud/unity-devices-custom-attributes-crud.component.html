@@ -1,0 +1,121 @@
+<ng-container *ngIf="isOutBound; else inBoundBlock">
+    <div class="card" *ngIf="attrsByDeviceType?.length">
+        <div class="card-header d-flex justify-content-between align-items-center font-weight-bold px-2 py-1">
+            <span>Custom Attributes</span>
+            <button class="action-icons fas fa-pencil-alt font-sm pull-right mb-0 ml-1" (click)="manageCAForm()"
+                [tooltip]="'Edit'" container="body" accessControl moduleName="Custom Attributes"
+                accessType="Manage Custom Attributes" elementType="actionbtn"></button>
+        </div>
+        <div class="card-body px-2">
+            <form *ngIf="caForm" [formGroup]="caForm" class="row mx-0">
+                <ng-container *ngFor="let attr of attrsByDeviceType; let i = index; let l=last;">
+                    <div class="col-6 text-right">
+                        <div class="form-group row">
+                            <label [for]="attr?.name" class="col-3 col-form-label">{{attr?.name}}</label>
+                            <div class="col-9">
+                                <ng-container [ngSwitch]="attr.value_type">
+                                    <ng-container *ngSwitchCase="'Choice'">
+                                        <select [id]="attr?.name" class="form-control" [formControlName]="attr?.name"
+                                            accessControl moduleName="Custom Attributes"
+                                            accessType="Manage Custom Attributes" elementType="formelem"
+                                            [class.is-invalid]="caFormErrors[attr?.name]">
+                                            <option [ngValue]="''">Select Value</option>
+                                            <option *ngFor="let choice of attr.choice_values" [value]="choice">
+                                                {{choice}}</option>
+                                        </select>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'Boolean'">
+                                        <select [id]="attr?.name" class="form-control" [formControlName]="attr?.name"
+                                            accessControl moduleName="Custom Attributes"
+                                            accessType="Manage Custom Attributes" elementType="formelem"
+                                            [class.is-invalid]="caFormErrors[attr?.name]">
+                                            <option [ngValue]="''">Select Value</option>
+                                            <option value="true">True</option>
+                                            <option value="false">False</option>
+                                        </select>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'Integer'">
+                                        <input [id]="attr?.name" class="form-control" type="text"
+                                            placeholder="Enter Value" [formControlName]="attr?.name" accessControl
+                                            moduleName="Custom Attributes" accessType="Manage Custom Attributes"
+                                            elementType="formelem" [class.is-invalid]="caFormErrors[attr?.name]">
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchDefault>
+                                        <input [id]="attr?.name" class="form-control" type="text"
+                                            placeholder="Enter Value" [formControlName]="attr?.name" accessControl
+                                            moduleName="Custom Attributes" accessType="Manage Custom Attributes"
+                                            elementType="formelem" [class.is-invalid]="caFormErrors[attr?.name]">
+                                    </ng-container>
+                                </ng-container>
+                                <div class="invalid-feedback" *ngIf="caFormErrors[attr?.name]">
+                                    {{caFormErrors[attr?.name]}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </form>
+            <div class="col-12 text-center" *ngIf="caForm.dirty">
+                <button type="button" class="btn btn-primary" (click)="submit()">Update</button>
+                <button type="button" class="btn btn-danger ml-2" (click)="buildForm()">Reset</button>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<ng-template #inBoundBlock>
+    <ng-conatiner *ngIf="showLoader && attrsByDeviceType.length == 0">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-center p-5">
+                    <span class="fas fa-spinner fa-spin fa-lg"></span>
+                    <span class="ml-2 ">Loading</span>
+                </div>
+            </div>
+        </div>
+    </ng-conatiner>
+    <form *ngIf="caForm" [formGroup]="caForm" class="row mx-0">
+        <ng-container *ngFor="let attr of attrsByDeviceType; let i = index; let l=last;">
+            <div class="form-group col-6">
+                <label [for]="attr?.name" class="form-col-form-label">{{attr?.name}}</label>
+                <ng-container [ngSwitch]="attr.value_type">
+                    <ng-container *ngSwitchCase="'Choice'">
+                        <select [id]="attr?.name" class="form-control" [formControlName]="attr?.name" accessControl
+                            moduleName="Custom Attributes" accessType="Manage Custom Attributes" elementType="formelem"
+                            [class.is-invalid]="caFormErrors[attr?.name]">
+                            <option [ngValue]="''">Select Value</option>
+                            <option *ngFor="let choice of attr.choice_values" [value]="choice">{{choice}}</option>
+                        </select>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'Boolean'">
+                        <select [id]="attr?.name" class="form-control" [formControlName]="attr?.name" accessControl
+                            moduleName="Custom Attributes" accessType="Manage Custom Attributes" elementType="formelem"
+                            [class.is-invalid]="caFormErrors[attr?.name]">
+                            <option [ngValue]="''">Select Value</option>
+                            <option value="true">True</option>
+                            <option value="false">False</option>
+                        </select>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'Integer'">
+                        <input [id]="attr?.name" class="form-control" type="text" placeholder="Enter Value"
+                            accessControl moduleName="Custom Attributes" accessType="Manage Custom Attributes"
+                            elementType="formelem" [formControlName]="attr?.name"
+                            [class.is-invalid]="caFormErrors[attr?.name]">
+                    </ng-container>
+
+                    <ng-container *ngSwitchDefault>
+                        <input [id]="attr?.name" class="form-control" type="text" placeholder="Enter Value"
+                            accessControl moduleName="Custom Attributes" accessType="Manage Custom Attributes"
+                            elementType="formelem" [formControlName]="attr?.name"
+                            [class.is-invalid]="caFormErrors[attr?.name]">
+                    </ng-container>
+                </ng-container>
+                <div class="invalid-feedback" *ngIf="caFormErrors[attr?.name]">{{caFormErrors[attr?.name]}}</div>
+            </div>
+        </ng-container>
+    </form>
+</ng-template>

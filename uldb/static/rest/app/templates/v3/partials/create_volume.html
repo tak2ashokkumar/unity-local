@@ -1,0 +1,80 @@
+<form class="form-horizontal ng-pristine ng-scope ng-invalid ng-invalid-required ng-valid-maxlength">
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">
+                Name*
+            </label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="text" maxlength="128" required="" value="" ng-model="obj.id_name">
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj.id_nameerr">{{ obj.id_nameMsg }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">
+                Description
+                <span ng-if="row.required">*</span>
+            </label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <textarea class="form-control ng-empty ng-valid-maxlength ng-touched" cols="40" maxlength="256" rows="4" value="" ng-model="obj.id_description" type="textarea"></textarea>
+        </div>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Volume Source</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <select class="form-control ng-empty" ng-model="obj.id_volume_source_type">
+                <option label="No source, empty volume" value="no_source_type" selected="selected">No source, empty volume</option>
+                <option label="Image" value="image_source">Image</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group ng-scope" ng-if="obj.id_volume_source_type == 'image_source'">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Use image as a source</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <select ng-options="row.name for row in rows8.images.data.data" class="form-control" ng-model="obj.id_image_source">
+                <option selected="selected" value="">Choose an image</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Type</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <select class="form-control ng-empty" ng-model="obj.id_type">
+                <option label="No volume type" value="" selected="selected">No volume type</option>
+                <option label="Testing_ABC" value="Testing_ABC">Testing_ABC</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Size (GB)*</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <input class="form-control ng-empty ng-invalid ng-invalid-required" type="number" id="number_vol_id" onkeydown="validate_number_field(this.id);" required="" min="1" max="1000" ng-model="obj.id_size" value="1" >
+            <div class="col-sm-9" style="float: right;">
+                <label class="errormsg" ng-if="obj.id_sizeerr">{{ obj.id_sizeMsg }}</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group ng-scope">
+        <span class="ng-scope">
+            <label class="col-sm-3 control-label ng-binding" for="blockName">Availability Zone</label>
+        </span>
+        <div class="col-sm-9 ng-scope">
+            <select ng-options="row.zone_name as row.zone_name for row in rows8.availability_zones.data.data" class="form-control" ng-model="obj.id_availability_zone">
+                <option selected="selected" value="">Choose an availability zone</option>
+            </select>
+        </div>
+    </div>
+</form>

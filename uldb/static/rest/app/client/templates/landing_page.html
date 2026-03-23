@@ -1,0 +1,365 @@
+<style type="text/css">
+	
+	.f1 {
+	    background: #fff;
+	    -moz-border-radius: 4px;
+	    -webkit-border-radius: 4px;
+	    border-radius: 4px;
+	}
+
+	p {
+	    margin: 0 0 10px;
+	}
+	
+	.f1-steps {
+	    overflow: hidden;
+	    position: relative;
+	    margin-top: 20px;
+	}
+
+	.f1-progress {
+	    position: absolute;
+	    top: 24px;
+	    left: 0;
+	    width: 100%;
+	    height: 1px;
+	    background: #ddd;
+	}
+	.f1-progress-line {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    height: 1px;
+	}
+
+	/* Normal Color : #646464*/
+
+	.f1-step {
+	    position: relative;
+	    float: left;
+	    width: 25%;
+	    padding: 0 5px;
+	}
+	.f1-step-icon {
+	    display: inline-block;
+	    width: 40px;
+	    height: 40px;
+	    margin-top: 4px;
+	    background: #ddd;
+	    font-size: 20px;
+	    color: #646464;
+	    line-height: 40px;
+	    -moz-border-radius: 50%;
+	    -webkit-border-radius: 50%;
+	    border-radius: 5px;
+	    padding: 0px;
+	    outline: none;
+	    border : 1px solid #646464;
+	}
+	
+	.f1-step p {
+	    color: #646464;
+	    margin-top: 2px;
+	}
+
+	.f1-step.disabled .f1-step-icon {
+	    width: 40px;
+	    height: 40px;
+	    margin-top: 0;
+	    background: #ddd;
+	    font-size: 16px;
+	    color: #fff;
+	    line-height: 40px;
+	    outline: none;
+	    border : 1px solid #ddd;
+	    pointer-events : none;
+	}
+
+	.f1-step.disabled p {
+	    color: #ccc;
+	    pointer-events : none;
+	}
+
+	.f1-step.inprogress .f1-step-icon {
+	    width: 48px;
+	    height: 48px;
+	    margin-top: 0;
+	    background: #ff8800 !important;
+	    font-size: 22px;
+	    line-height: 48px;
+	    color: #fff !important;
+	    border : none;
+	}
+
+	.f1-step.inprogress p {
+	    color: #ff8800 !important;
+	}
+
+	.f1-step.error .f1-step-icon {
+	    width: 48px;
+	    height: 48px;
+	    margin-top: 0;
+	    background: #e9533b !important;
+	    font-size: 22px;
+	    line-height: 48px;
+	    color: #fff !important;
+	    border : none;
+	}
+
+	.f1-step.error p {
+	    color: #e9533b !important;
+	}
+
+	.f1-step.complete .f1-step-icon {
+	    width: 48px;
+	    height: 48px;
+	    margin-top: 0;
+	    background: #40ac40 !important;
+	    font-size: 22px;
+	    line-height: 48px;
+	    color: #fff !important;
+	    border : none;
+	}
+
+	.f1-step.complete p {
+	    color: #40ac40 !important;
+	}
+
+	.f1-step.active .f1-step-icon {
+	    width: 56px;
+	    height: 56px;
+	    margin-top: 0;
+	    background: #646464;
+	    font-size: 28px;
+	    line-height: 56px;
+	    outline: none;
+	    color: #fff;
+	}
+
+	.f1-step.active p {
+	    color: #646464;
+	    margin-top: 10px;
+	}
+
+	.conn_req_modal {
+	    width: 85% !important;
+	    margin : 1% auto 0px auto !important;
+	}
+
+	.condense .form-group {
+	    margin-bottom: 0px;
+	}
+
+	.condense label {
+	    margin-top: 0px;
+	}
+
+	textarea {
+	    resize : none;
+	}
+
+	.success_badge {
+	    background-color: #40ac40;
+	    padding : 20px 20px;
+	    font-size: 70px;
+	    border-radius: 60px;
+	}
+
+	.warning_badge {
+	    background-color: #e48c11;
+	    padding : 20px 20px;
+	    font-size: 70px;
+	    border-radius: 60px;
+	}
+
+	.error_badge {
+	    background-color: #e9533b;
+	    padding : 18px 25px;
+	    font-size: 70px;
+	    border-radius: 60px;
+	}
+	#pdf {
+		width: 100%;
+		height: 2400px;
+		margin-bottom : 30px;
+	}
+	canvas {
+		display: block !important;
+	}
+
+</style>
+
+
+<page-title title="Welcome to Unity"></page-title>
+<div style="padding:20px">
+	<!-- <no-records-found message=" Coming Soon...."></no-records-found> -->
+	<div class="row content-wrapper bg-color">
+		<div class="col-md-4"></div>
+		<div class="col-md-4" style="margin-top: 60px;text-align: center">
+			<!-- <div class="logo wow fadeInDown"> <a href=""><img src="static/images/unity_logo.png" alt="logo"></a></div> -->
+                            <!-- /.main title -->
+                <article>
+	                <h1 style="font-size: 30px;color: #0bbb71">
+	                    Welcome to UNITY
+	                </h1>
+
+	                <!-- /.header paragraph -->
+	                <div style="font-size: 15px;margin-bottom: 30px;margin-top: 20px;">
+	                    <p>UNITY is a SaaS product from UnityOne. A Cloud Management,
+						Monitoring and Orchestration platform. With help of Unity you can increase the utilization efficiency of your Private Cloud and as well Public Cloud instances.
+						</p>
+	                </div>
+                </article>
+
+                <!-- /.header button -->
+                <div class="wow fadeInLeft" ng-class="{'head-btn' : !show_onboard_status}">
+                    <a href="#/unitydocs/releases/current" class="btn-default-release">Release Notes</a>
+                </div>
+
+                <!-- <div class="col-md-12" ng-if="show_onboard_status">
+                	<h1 style="font-size: 25px;color: #e48c11;">
+                	    Assets Onboard Status
+                	</h1>
+                	<div class="row" style="text-align: center;margin-top:20px;">
+                		<form role="form" action="" method="post" class="f1 text-center">
+                		    <div class="f1-steps">
+                		        <div class="f1-progress">
+                		            <div class="f1-progress-line" data-now-value="15.65" data-number-of-steps="4" style="width: 15.65%;"></div>
+                		        </div>
+                		        <div class="f1-step step-1" 
+                		        ng-class="{'inprogress' : (onboarding_details.onb_status.vpn_req && !onboarding_details.vpn_status), 'complete' : onboarding_details.vpn_status}">
+                		            <div class="f1-step-icon" ng-click="show_connection_page()">
+                		                <i class="fa fa-envelope-o"></i>
+                		            </div>
+                		            <p> Connect to Unity</p>
+                		        </div>
+                		        <div class="f1-step step-2" 
+                		        ng-class="{'error' : (onboarding_details.onb_status.excel_start && !onboarding_details.onb_status.excel_end), 'complete' : onboarding_details.onb_status.excel_end }">
+                		            <div class="f1-step-icon" ng-click="show_add_devices_page()">
+                		                <i class="fa fa-cloud-upload"></i>
+                		            </div>
+                		            <p>Onboard Assets</p>
+                		        </div>
+                		        <div class="f1-step step-3" 
+                		        ng-class="{'inprogress' : (onboarding_details.onb_status.monitoring_start && !onboarding_details.onb_status.monitoring_error && !onboarding_details.onb_status.monitoring_end), 'error' : (onboarding_details.onb_status.monitoring_error), 'complete' : onboarding_details.onb_status.monitoring_end, 'disabled' : (!onboarding_details.vpn_status) }">
+                		            <div class="f1-step-icon" ng-click="show_monitoring_configure_page()">
+                		                <i class="fa fa-line-chart"></i>
+                		            </div>
+                		            <p>Monitoring</p>
+                		        </div>
+                		        <div class="f1-step step-4" 
+                		        ng-class="{'error' : (onboarding_details.onb_status.manage_error), 'complete' : onboarding_details.onb_status.manage_end, 'disabled' : (!onboarding_details.vpn_status) }">
+                		            <div class="f1-step-icon" class="btn" ng-click="show_proxy_configure_page()">
+                		                <i class="fa fa-television"></i>
+                		            </div>
+                		            <p>Management</p>
+                		        </div>
+                		    </div>
+                		</form>
+                	</div>
+                </div> -->
+
+		</div>
+		<div class="col-md-12" ng-if="show_onboard_status">
+			<h1 style="font-size: 20px;color: #e48c11;">
+			    Devices On-boarding Status
+			</h1>
+			<div class="row" style="text-align: center;margin-top:10px;">
+				<form role="form" action="" method="post" class="f1 text-center">
+				    <div class="f1-steps">
+				        <div class="f1-progress">
+				            <div class="f1-progress-line" data-now-value="15.65" data-number-of-steps="4" style="width: 15.65%;"></div>
+				        </div>
+				        <div class="f1-step step-1" 
+				        ng-class="{'inprogress' : (onboarding_details.onb_status.vpn_req && !onboarding_details.vpn_status), 'complete' : onboarding_details.vpn_status}">
+				            <div class="f1-step-icon" ng-click="show_onboard_page()">
+				                <i class="fa fa-envelope-o"></i>
+				            </div>
+				            <p> Connect to Unity</p>
+				        </div>
+				        <div class="f1-step step-2" 
+				        ng-class="{'error' : (onboarding_details.onb_status.excel_start && !onboarding_details.onb_status.excel_end), 'complete' : onboarding_details.onb_status.excel_end }">
+				            <div class="f1-step-icon" ng-click="show_onboard_page()">
+				                <i class="fa fa-cloud-upload"></i>
+				            </div>
+				            <p>Onboard Devices</p>
+				        </div>
+				        <div class="f1-step step-3" 
+				        ng-class="{'inprogress' : (onboarding_details.onb_status.monitoring_start && !onboarding_details.onb_status.monitoring_error && !onboarding_details.onb_status.monitoring_end), 'error' : (onboarding_details.onb_status.monitoring_error), 'complete' : onboarding_details.onb_status.monitoring_end, 'disabled' : (!onboarding_details.vpn_status) }">
+				            <div class="f1-step-icon" ng-click="show_onboard_page()">
+				                <i class="fa fa-line-chart"></i>
+				            </div>
+				            <p>Monitoring</p>
+				        </div>
+				        <div class="f1-step step-4" 
+				        ng-class="{'error' : (onboarding_details.onb_status.manage_error), 'complete' : onboarding_details.onb_status.manage_end, 'disabled' : (!onboarding_details.vpn_status) }">
+				            <div class="f1-step-icon" class="btn" ng-click="show_onboard_page()">
+				                <i class="fa fa-television"></i>
+				            </div>
+				            <p>Management</p>
+				        </div>
+				    </div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style type="text/css">
+	.logo {
+		margin: 30px 0 20px 0;
+	}
+
+	.logo img {
+	    width: 150px;
+	    height: 37px;
+	}
+
+	img {
+    	vertical-align: middle;
+    	border: 0;
+	}
+
+
+	.landing h1 {
+	    font-size: 56px;
+	    font-weight: 300;
+	    color: #fff;
+	    margin: 30px 0 30px 0;
+	    text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+	    line-height: 1.2em;
+	}
+
+	.landing p, .landing h2 {
+		/*color: #fff;*/
+	}
+	.landing-text {
+		margin-bottom: 20px;
+	}
+	.landing-text p {
+		font-size: 17px !important; 
+	}
+	.head-btn {
+		margin-bottom: 150px;
+	}
+
+	.btn-default-release {
+		font-size: 17px;
+		margin: 30px 0 10px;
+		margin-right: 10px;
+		line-height: 20px;
+		padding: 6px 20px;
+		height: 50px;
+		border: 2px solid #3eb0f7 !important;
+		background: transparent !important;
+		transition: all 0.4s;
+		color: #3eb0f7 !important;
+		border-radius: 100px;
+	}
+	.btn-default-release:hover, .btn-default-release:focus, .btn-default-release:active, .btn-default-release.active, .open > .dropdown-toggle.btn-default-release {
+		border: 2px solid #3eb0f7;
+		background: #3eb0f7;
+		color: white;
+	}
+
+</style>

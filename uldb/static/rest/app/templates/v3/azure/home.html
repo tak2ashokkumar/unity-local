@@ -1,0 +1,23 @@
+<alerts></alerts>
+<div class="row dashboard-admin">
+    <div class="col-md-12">
+        <div class="col-md-12">
+            <azurecustomerlist
+                heading="Azure Accounts"
+                headers="azure_customer_headers"
+                tabledata="azure_content.data"
+                modeldata="azure_content_modeldata"
+                rows="azure_content_rows"
+                addclick="azure_account_add(data)"
+                resourcegroup = "list_resource_grps(data)"
+                editclick = "azure_edit(data)"
+                deleteclick = "azure_delete(data)"
+                deleteconfirm = "azure_delete_modal"
+                actions="azure_content.actions"
+                redirect ="redirect_resource_group()"
+            >
+            </azurecustomerlist>
+
+        </div>
+    </div>
+</div>

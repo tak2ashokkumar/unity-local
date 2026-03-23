@@ -1,0 +1,116 @@
+<div class="d-flex justify-content-end move-dropdowns-up-end-of-top-tabs">
+    <div class="w-16">
+        <multiselect-dropdown class="form-control px-0 py-1" [options]="vectorDbList" [settings]="vectorDbSettings"
+            [texts]="vectorDbTexts" (dropdownClosed)="onVectorDbFilterChange()"
+            [(ngModel)]="dropdownsViewData.selectedVectorDbValue"></multiselect-dropdown>
+    </div>
+    <div>
+        <custom-date-dropdown [options]="durationDropdownViewData.dropdownOptions" [enableCustomDateRange]="true"
+            [default]="durationDropdownViewData.defaultSelected" (onSubmit)="ondurationDropdownChanged($event)">
+        </custom-date-dropdown>
+    </div>
+    <div style="padding-top: 0.2rem;">
+        <data-refresh-btn (refresh)="refreshData($event)"></data-refresh-btn>
+    </div>
+</div>
+
+<div class="row section1">
+    <div class="col-3 d-flex flex-column align-items-stretch pr-2">
+        <div class="card round-edge flex-fill mb-2">
+            <app-spinner [name]="vectorDbSummaryWidgetData?.totalRequestLoader"></app-spinner>
+            <div class="card-body d-flex flex-column justify-content-around py-2">
+                <div class="font-lg-xl">Total Requests</div>
+                <div class="d-flex align-items-center">
+                    <div class="font-lg-xl text-primary">{{vectorDbSummaryWidgetData?.totalRequest?.total || 0}}</div>
+                    <div class="d-flex align-items-center ml-2"
+                        [ngClass]="vectorDbSummaryWidgetData?.totalRequest?.changePercentTextClass || 'text-success'">
+                        <i class="fas mt-1 font-sm"
+                            [ngClass]="vectorDbSummaryWidgetData?.totalRequest?.changePercentIconClass || 'fa-caret-up'"></i>
+                        <span class="ml-1 font-xs-sm">{{vectorDbSummaryWidgetData?.totalRequest?.changePercent ||
+                            0}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card round-edge flex-fill mb-0">
+            <app-spinner [name]="vectorDbSummaryWidgetData?.avgRequestDurationLoader"></app-spinner>
+            <div class="card-body d-flex flex-column justify-content-around py-2">
+                <div class="font-lg-xl">Avg Request Duration</div>
+                <div class="d-flex align-items-center">
+                    <div class="font-lg-xl text-primary">{{vectorDbSummaryWidgetData?.avgRequestDuration?.average || 0}}
+                    </div>
+                    <div class="d-flex align-items-center ml-2"
+                        [ngClass]="vectorDbSummaryWidgetData?.avgRequestDuration?.changePercentTextClass || 'text-success'">
+                        <i class="fas font-sm"
+                            [ngClass]="vectorDbSummaryWidgetData?.avgRequestDuration?.changePercentIconClass || 'fa-caret-up'"></i>
+                        <span class="ml-1 font-xs-sm">{{vectorDbSummaryWidgetData?.avgRequestDuration?.changePercent ||
+                            0}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-9 pl-0">
+        <div class="card round-edge equalize-card">
+            <app-spinner [name]="vectorDbGenerationByOperationWidgetData.loader"></app-spinner>
+            <div class="card-body pt-2 pb-0"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!vectorDbGenerationByOperationWidgetData?.chartData}">
+                <ng-container *ngIf="vectorDbGenerationByOperationWidgetData?.chartData">
+                    <div echarts [options]="vectorDbGenerationByOperationWidgetData?.chartData.options"
+                        [extentions]="vectorDbGenerationByOperationWidgetData?.chartData.extensions"
+                        [defaultHeight]="200">
+                    </div>
+                </ng-container>
+                <div *ngIf="!vectorDbGenerationByOperationWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row my-2 section2">
+    <div class="col-4 d-flex flex-column pr-2">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="vectorDbGenerationBySystemWidgetWidgetData.loader"></app-spinner>
+            <div class="card-body p-2"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!vectorDbGenerationBySystemWidgetWidgetData?.chartData}">
+                <ng-container *ngIf="vectorDbGenerationBySystemWidgetWidgetData?.chartData">
+                    <div echarts [options]="vectorDbGenerationBySystemWidgetWidgetData?.chartData.options"
+                        [extentions]="vectorDbGenerationBySystemWidgetWidgetData?.chartData.extensions"
+                        [defaultHeight]="280"></div>
+                </ng-container>
+                <div *ngIf="!vectorDbGenerationBySystemWidgetWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 d-flex flex-column pl-0 pr-2">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="VectorDbGenerationByApplicationWidgetData.loader"></app-spinner>
+            <div class="card-body p-2"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!VectorDbGenerationByApplicationWidgetData?.chartData}">
+                <ng-container *ngIf="VectorDbGenerationByApplicationWidgetData?.chartData">
+                    <div echarts [options]="VectorDbGenerationByApplicationWidgetData?.chartData.options"
+                        [extentions]="VectorDbGenerationByApplicationWidgetData?.chartData.extensions"
+                        [defaultHeight]="280">
+                    </div>
+                </ng-container>
+                <div *ngIf="!VectorDbGenerationByApplicationWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 d-flex flex-column pl-0">
+        <div class="card round-edge equalize-card flex-fill">
+            <app-spinner [name]="VectorDbGenerationByEnvironmentWidgetData.loader"></app-spinner>
+            <div class="card-body p-2"
+                [ngClass]="{'d-flex justify-content-center align-items-center':!VectorDbGenerationByEnvironmentWidgetData?.chartData}">
+                <ng-container *ngIf="VectorDbGenerationByEnvironmentWidgetData?.chartData">
+                    <div echarts [options]="VectorDbGenerationByEnvironmentWidgetData?.chartData.options"
+                        [extentions]="VectorDbGenerationByEnvironmentWidgetData?.chartData.extensions"
+                        [defaultHeight]="280">
+                    </div>
+                </ng-container>
+                <div *ngIf="!VectorDbGenerationByEnvironmentWidgetData?.chartData">No data available.</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+<div class="card mt-3" *ngIf="data">
+  <div class="card-header ">
+    <form class="form-inline" [formGroup]="dateForm" *ngIf="dateForm">
+      <div class="row">
+        <div class="col-5">
+          <div class="input-group">
+            <label for="from">From :&nbsp;</label>
+            <owl-date-time #from [hour12Timer]="true"></owl-date-time>
+            <input class="form-control rounded-left" formControlName="from" [owlDateTimeTrigger]="from" [owlDateTime]="from"
+              type="text" name="from" placeholder="from" [max]="now">
+            <div class="input-group-append " [owlDateTimeTrigger]="from">
+              <span class="input-group-text bg-white">
+                <i class="fas fa-calendar-alt"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-5">
+          <div class="input-group">
+            <label for="to">To :&nbsp;</label>
+            <owl-date-time #to [hour12Timer]="true"></owl-date-time>
+            <input class="form-control rounded-left" formControlName="to" [owlDateTimeTrigger]="to" [owlDateTime]="to"
+              type="text" name="to" placeholder="to" [max]="now">
+            <div class="input-group-append " [owlDateTimeTrigger]="to">
+              <span class="input-group-text bg-white">
+                <i class="fas fa-calendar-alt"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-2">
+          <button class="btn btn-warning btn-pill" [disabled]="dateForm.invalid || loading" (click)="onSubmit()">Update</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="card mb-0 border-0">
+    <app-spinner [name]="data.graphType"></app-spinner>
+    <div class="row align-items p-3">
+      <div class="col-12">
+        <h4 class="card-title font-lg">{{data?.label}}</h4>
+      </div>
+      <div class="col-12">
+        <img class="img-fluid" *ngIf="viewData" [src]="'data:image/png;base64,'+viewData?.graph">
+      </div>
+    </div>
+  </div>
+</div>

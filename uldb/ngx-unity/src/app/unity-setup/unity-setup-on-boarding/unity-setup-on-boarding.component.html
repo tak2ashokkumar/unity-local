@@ -1,0 +1,52 @@
+<div class="container-fluid" [class.py-4]="steps?.length <= 1">
+  <div class="animated fadeIn">
+    <div class="row py-4" *ngIf="steps?.length > 1">
+      <div class="col-12">
+        <div class="card rounded border border-secondary px-3 mb-0">
+          <div class="row justify-content-md-center">
+            <div class="col-8">
+              <div class="card-group bg-white">
+                <div class="card border-0" *ngFor="let step of steps">
+                  <div class="card-body px-0">
+                    <div class="row align-items-center justify-content-center">
+                      <div class="col-12">
+                        <div class="onb-wrap mb-2">
+                          <div class="onb-links">
+                            <button class="btn" [ngClass]="step.className" (click)="goTo(step)" type="button"><i
+                                [ngClass]="step.icon"></i></button>
+                          </div>
+                        </div>
+                        <small
+                          class="text-muted text-uppercase font-weight-bold d-flex justify-content-center">{{step.stepName}}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>
+<ng-template #confirmAdd>
+  <div class="card mb-0">
+    <div class="card-body mt-3">
+      <h5>To onboard devices using discovery method connectivity is mandatory</h5>
+    </div>
+    <div class="card-footer border-0 bg-white">
+      <div class="d-flex justify-content-center">
+        <button class="btn btn-sm btn-warning btn-pill" type="button" (click)="confirmAddCollector()" accessControl
+          moduleName="Onboarding" accessType="Manage Onboarding" elementType="btn">Add
+          Collector</button>
+        <button class="btn btn-sm btn-outline-warning ml-1 btn-pill" (click)="confirmAddModalRef.hide()"
+          type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<advanced-discovery-connectivity-crud></advanced-discovery-connectivity-crud>

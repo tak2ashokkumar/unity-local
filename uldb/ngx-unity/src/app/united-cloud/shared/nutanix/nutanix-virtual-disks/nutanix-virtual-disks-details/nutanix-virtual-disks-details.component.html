@@ -1,0 +1,167 @@
+<div class="row mt-2">
+    <div class="col-12">
+        <form *ngIf="detailForm" [formGroup]="detailForm">
+            <div class="card rounded-0">
+                <div class="card-header d-flex align-items-center font-weight-bold px-2 py-1">
+                    <div class="w-75 py-1">
+                        <span> Details</span>
+                    </div>
+                    <div class="w-25">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row text-right">
+                        <div class="col-6">
+                            <div class="form-group row">
+                                <label for="name" class="col-3 col-form-label">Name</label>
+                                <div class="col-9">
+                                    <input id="name" class="form-control" type="text" formControlName="name"
+                                        [class.is-invalid]="detailFormErrors.name">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.name">
+                                        {{detailFormErrors.name}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="flash_mode" class="col-3 col-form-label">Flash Mode</label>
+                                <div class="col-9">
+                                    <input id="flash_mode" class="form-control" type="text" formControlName="flash_mode"
+                                        [class.is-invalid]="detailFormErrors.flash_mode">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.flash_mode">
+                                        {{detailFormErrors.flash_mode}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="total_capacity" class="col-3 col-form-label">Total Capacity</label>
+                                <div class="col-9">
+                                    <input id="total_capacity" class="form-control" type="text" formControlName="total_capacity"
+                                        [class.is-invalid]="detailFormErrors.total_capacity">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.total_capacity">
+                                        {{detailFormErrors.total_capacity}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="read_iops" class="col-3 col-form-label">Read Iops</label>
+                                <div class="col-9">
+                                    <input id="read_iops" class="form-control" type="text" formControlName="read_iops"
+                                        [class.is-invalid]="detailFormErrors.read_iops">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.read_iops">
+                                        {{detailFormErrors.read_iops}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="read_latency" class="col-3 col-form-label">Read Latency</label>
+                                <div class="col-9">
+                                    <input id="read_latency" class="form-control" type="text" formControlName="read_latency"
+                                        [class.is-invalid]="detailFormErrors.read_latency">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.read_latency">
+                                        {{detailFormErrors.read_latency}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="write_iops" class="col-3 col-form-label">Write Iops</label>
+                                <div class="col-9">
+                                    <input id="write_iops" class="form-control" type="text" formControlName="write_iops"
+                                        [class.is-invalid]="detailFormErrors.write_iops">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.write_iops">
+                                        {{detailFormErrors.write_iops}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="write_latency" class="col-3 col-form-label">Write Latency</label>
+                                <div class="col-9">
+                                    <input id="write_latency" class="form-control" type="text" formControlName="write_latency"
+                                        [class.is-invalid]="detailFormErrors.write_latency">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.write_latency">
+                                        {{detailFormErrors.write_latency}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="write_bw" class="col-3 col-form-label">Write B/W</label>
+                                <div class="col-9">
+                                    <input id="write_bw" class="form-control" type="text" formControlName="write_bw"
+                                        [class.is-invalid]="detailFormErrors.write_bw">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.write_bw">
+                                        {{detailFormErrors.write_bw}}</div>
+                                </div>
+                            </div>                            
+                            <div class="form-group row">
+                                <label for="random_io" class="col-3 col-form-label">Random IO</label>
+                                <div class="col-9">
+                                    <input id="random_io" class="form-control" type="text" formControlName="random_io"
+                                        [class.is-invalid]="detailFormErrors.random_io">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.random_io">
+                                        {{detailFormErrors.random_io}}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">                            
+                            <div class="form-group row">
+                                <label for="read_source_ssd" class="col-3 col-form-label">Read Source SSD</label>
+                                <div class="col-9">
+                                    <input id="read_source_ssd" class="form-control" type="text" formControlName="read_source_ssd"
+                                        [class.is-invalid]="detailFormErrors.read_source_ssd">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.read_source_ssd">
+                                        {{detailFormErrors.read_source_ssd}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="total_iops" class="col-3 col-form-label">Total Iops</label>
+                                <div class="col-9">
+                                    <input id="total_iops" class="form-control" type="text" formControlName="total_iops"
+                                        [class.is-invalid]="detailFormErrors.total_iops">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.total_iops">
+                                        {{detailFormErrors.total_iops}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="read_source_cache" class="col-3 col-form-label">Read Source Cache</label>
+                                <div class="col-9">
+                                    <input id="read_source_cache" class="form-control" type="text" formControlName="read_source_cache"
+                                        [class.is-invalid]="detailFormErrors.read_source_cache">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.read_source_cache">
+                                        {{detailFormErrors.read_source_cache}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="read_source_hdd" class="col-3 col-form-label">Read Source Hdd</label>
+                                <div class="col-9">
+                                    <input id="read_source_hdd" class="form-control" type="text" formControlName="read_source_hdd"
+                                        [class.is-invalid]="detailFormErrors.read_source_hdd">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.read_source_hdd">
+                                        {{detailFormErrors.read_source_hdd}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="read_working_set_size" class="col-3 col-form-label">Read Working Set Size</label>
+                                <div class="col-9">
+                                    <input id="read_working_set_size" class="form-control" type="text" formControlName="read_working_set_size"
+                                        [class.is-invalid]="detailFormErrors.read_working_set_size">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.read_working_set_size">
+                                        {{detailFormErrors.read_working_set_size}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="write_working_set_size" class="col-3 col-form-label">Write Working Set Size</label>
+                                <div class="col-9">
+                                    <input id="write_working_set_size" class="form-control" type="text" formControlName="write_working_set_size"
+                                        [class.is-invalid]="detailFormErrors.write_working_set_size">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.write_working_set_size">
+                                        {{detailFormErrors.write_working_set_size}}</div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="union_working_set_size" class="col-3 col-form-label">Union Working Set Size</label>
+                                <div class="col-9">
+                                    <input id="union_working_set_size" class="form-control" type="text" formControlName="union_working_set_size"
+                                        [class.is-invalid]="detailFormErrors.union_working_set_size">
+                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.union_working_set_size">
+                                        {{detailFormErrors.union_working_set_size}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

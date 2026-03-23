@@ -1,0 +1,264 @@
+//**************** Form components border *******************/
+
+input.form-control,
+select.form-control,
+textarea.form-control,
+multiselect-dropdown.form-control {
+  border: 1px solid #c8ced3 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  // outline: -webkit-focus-ring-color auto 0px !important;
+}
+
+input.form-control.is-invalid,
+select.form-control.is-invalid,
+textarea.form-control.is-invalid,
+multiselect-dropdown.form-control.is-invalid {
+  border: 1px solid #cc0000 !important;
+}
+
+input.form-control.border-left-0,
+select.form-control.border-left-0,
+multiselect-dropdown.form-control.border-left-0 {
+  border-left: 0 !important;
+}
+
+input.form-control.border-right-0,
+select.form-control.border-right-0,
+multiselect-dropdown.form-control.border-right-0 {
+  border-right: 0 !important;
+}
+
+.input-group {
+  .input-group-prepend .input-group-text {
+    background-color: transparent !important;
+    border: 1px solid #c8ced3 !important;
+    border-right: 0 !important;
+  }
+
+  .input-group-prepend .input-group-text.is-invalid {
+    background-color: transparent !important;
+    border: 1px solid #cc0000 !important;
+    border-right: 0 !important;
+  }
+
+  .input-group-prepend + input.form-control {
+    border-left: 0 !important;
+  }
+
+  .input-group-append .input-group-text {
+    background-color: #ffffff !important;
+    border: 1px solid #c8ced3 !important;
+    border-left: 0 !important;
+  }
+
+  .input-group-append .input-group-text.is-invalid {
+    background-color: #ffffff !important;
+    border: 1px solid #cc0000 !important;
+    border-left: 0 !important;
+  }
+
+  input.form-control:has(+ .input-group-append) {
+    border-right: 0 !important;
+  }
+
+  .input.form-control.is-invalid + .input-group-append {
+    border: 0 !important;
+  }
+}
+
+//**************** Single Line Input box *******************/
+.line-input {
+  border: none !important;
+  border-bottom: 1px solid #1890ff !important;
+  padding: 5px 10px !important;
+  outline: none !important;
+  width: 100%;
+}
+
+//**************** Custom Unity Checkbox with Input formcontrol ***************************/
+.ut-checkbox {
+  position: absolute; // take it out of document flow
+  opacity: 0; // hide it
+
+  & + label {
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  // Box.
+  & + label:before {
+    content: "";
+    margin-right: 5px;
+    display: inline-block;
+    vertical-align: text-top;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 2px solid #c8ced3;
+    border-radius: 20%;
+  }
+
+  // Box checked
+  &:checked + label.primary:before {
+    background: #378ad8 !important;
+    border: 2px solid #378ad8 !important;
+  }
+
+  &:checked + label.warning:before {
+    background: #d97400 !important;
+    border: 2px solid #d97400 !important;
+  }
+
+  &:checked + label.success:before {
+    background: #0cbb70 !important;
+    border: 2px solid #0cbb70 !important;
+  }
+
+  &:checked + label.danger:before {
+    background: #c00 !important;
+    border: 2px solid #c00 !important;
+  }
+
+  // Disabled state label.
+  &:disabled + label {
+    color: #b8b8b8;
+    cursor: auto;
+  }
+
+  // Disabled box.
+  &:disabled + label:before {
+    box-shadow: none;
+    background: #ddd;
+  }
+
+  // Checkmark. Could be replaced with an image
+  &:checked + label:after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 9px;
+    background: white;
+    width: 2px;
+    height: 2px;
+    box-shadow:
+      2px 0 0 white,
+      4px 0 0 white,
+      4px -2px 0 white,
+      4px -4px 0 white,
+      4px -6px 0 white,
+      4px -8px 0 white;
+    transform: rotate(45deg);
+  }
+}
+
+//*********************** Custom Unity Checkbox with Input formcontrol *****************************/
+
+// .checkbox-lg.fa-square::before {
+//   font-size: initial !important;
+//   border: 2px solid #c8ced3 !important;
+//   border-radius: 25% !important;
+//   color: #ffffff !important;
+// }
+
+// .checkbox-lg.fa-check-square::before {
+//   font-size: initial !important;
+//   border: 2px solid #378ad8 !important;
+//   border-radius: 25% !important;
+//   color: #378ad8 !important;
+// }
+
+//*************** Radio Button FormControl as button group ************/
+
+.form-group > div.d-inline-block ul {
+  list-style: none;
+  li {
+    text-align: center;
+    background: #f0f3f5;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #c8ced3;
+
+    label {
+      border-radius: 25px;
+      width: 100%;
+      padding: 0.25rem 0.5rem;
+      display: inherit;
+      color: #73818f;
+      border-color: #73818f;
+      font-size: 0.765625rem;
+      line-height: 1.5;
+      margin-bottom: 0px !important;
+      input {
+        visibility: hidden;
+      }
+    }
+
+    label.active {
+      background-color: #378ad8 !important;
+      color: #ffffff !important;
+    }
+  }
+
+  li:first-child {
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
+    border-right: none !important;
+  }
+
+  li:last-child {
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    border-left: none !important;
+  }
+}
+
+// td .btn-group,
+td .btn-group-sm {
+  width: 7rem !important;
+}
+
+svg.leader-line {
+  pointer-events: all !important;
+  text {
+    display: none;
+    transform: translateY(3px);
+  }
+  text:has(textPath) {
+    display: unset !important;
+  }
+}
+
+svg.leader-line:hover {
+  text {
+    display: unset !important;
+  }
+}
+
+// for swith button in list pages [ enable/ disable btn]
+ul li label {
+  padding: 0.25rem 0.3rem 0rem 0.3rem !important;
+}
+
+ul li label.active {
+  padding: 0.25rem 0.7rem !important;
+}
+
+.component-list-accordian {
+  .card {
+    height: 100% !important;
+    margin-bottom: 0px !important;
+    border-radius: 0.25rem !important;
+    .card-header {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+    }
+  }
+}
+
+.CodeMirror {
+  height: calc(100vh - 180px);
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
