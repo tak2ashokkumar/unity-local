@@ -4,9 +4,9 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const app = express();
 
 /* ---------- TEST ROUTE for PROXY WORKING ---------- */
-app.get("/test", (req,res)=>{
-    console.log("Proxy server reached");
-    res.send("Proxy working");
+app.get("/test", (req, res) => {
+  console.log("Proxy server reached");
+  res.send("Proxy working");
 });
 
 /* MOCK API PROXY */
@@ -24,18 +24,12 @@ const unityProxy = createProxyMiddleware({
 
 /* ROUTER */
 app.use((req, res, next) => {
+  let isMockRequest = req.url.startsWith("/customer") ||
+    req.url.startsWith("/rest") ||
+    req.url.startsWith("/chatbot") ||
+    req.url.startsWith("/task")
 
-  if (req.url.startsWith("/customer")) {
-    console.log("→ MOCK:", req.url);
-    return mockProxy(req, res, next);
-  }
-
-  if (req.url.startsWith("/rest")) {
-    console.log("→ MOCK:", req.url);
-    return mockProxy(req, res, next);
-  }
-
-  if (req.url.startsWith("/chatbot")) {
+  if (isMockRequest) {
     console.log("→ MOCK:", req.url);
     return mockProxy(req, res, next);
   }
