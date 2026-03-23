@@ -1,0 +1,234 @@
+{
+    "storage_devices": [],
+    "load_balancers": [],
+    "capacity": 45,
+    "uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
+    "mac_devices": [],
+    "custom_devices": [
+        {
+            "status": null,
+            "name": "UnityDemo-Other-Device-sf10",
+            "uuid": "a9fb593c-4b98-42ad-8792-1080838efb70",
+            "management_ip": null,
+            "position": 0,
+            "id": 4375,
+            "size": 1
+        }
+    ],
+    "pdus": [
+        {
+            "status": null,
+            "pdu_type": "VERTICAL",
+            "name": "testpdu",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "uuid": "b58f5748-35ea-4673-a92f-f8cdb972c12a",
+            "sockets": 2,
+            "management_ip": null,
+            "position": "0",
+            "model": "AP7800",
+            "manufacturer": "APC",
+            "id": 5138,
+            "size": 1
+        },
+        {
+            "status": "0",
+            "pdu_type": "VERTICAL",
+            "name": "UnityDemo-pdub-1c02b3.sf9",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "uuid": "28319322-da20-4bac-a559-f99c3226f679",
+            "sockets": 21,
+            "management_ip": "209.237.225.144",
+            "position": "B",
+            "model": "AP7800",
+            "manufacturer": "APC",
+            "id": 4219,
+            "size": 1
+        },
+        {
+            "status": "0",
+            "pdu_type": "VERTICAL",
+            "name": "UnityDemo-pdua-110t.sf10.unitedlayer.com",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "uuid": "bf0efa8a-90a6-4ea1-8215-de2a9f53dcda",
+            "sockets": 18,
+            "management_ip": "209.237.225.33",
+            "position": "A",
+            "model": "AP7901",
+            "manufacturer": "APC",
+            "id": 3451,
+            "size": 1
+        }
+    ],
+    "firewalls": [],
+    "servers": [
+        {
+            "status": "0",
+            "username": "ADMIN",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "name": "UnityDemo1-BM-Lab Hypervisor-01",
+            "uuid": "394050ba-0b14-4d28-a14a-2f97a74c5357",
+            "management_ip": "10.128.7.37",
+            "bm_server": {
+                "os": {
+                    "name": "Ubuntu"
+                },
+                "uuid": "6c312882-4c13-4032-b88d-42b9937722e7"
+            },
+            "bm_enabled": true,
+            "position": 34,
+            "model": "E5-2620",
+            "manufacturer": "Supermicro",
+            "id": 1961,
+            "size": 2
+        },
+        {
+            "status": "0",
+            "username": "ADMIN",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "name": "UnityDemo-BM-Lab Hypervisor-10",
+            "uuid": "ae307b3f-0f1f-401d-9e67-15004b891d0b",
+            "management_ip": "10.128.7.14",
+            "bm_server": {
+                "os": {
+                    "name": "ESXi"
+                },
+                "uuid": "24b0646e-4390-4f3d-95e3-0d6a666ab351"
+            },
+            "bm_enabled": true,
+            "position": 20,
+            "model": "E5-2620",
+            "manufacturer": "Supermicro",
+            "id": 2648,
+            "size": 2
+        },
+        {
+            "status": "0",
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "name": "UnityDemo-G3-SF10-309-ESX-14",
+            "uuid": "79db3fe7-0423-4687-835e-583f8fccf730",
+            "instance": {
+                "os": {
+                    "name": "ESXi"
+                },
+                "virtualization_type": "ESXi",
+                "uuid": "7a2aa1d7-d89d-488d-95db-406278cf30d7"
+            },
+            "management_ip": "10.192.0.204",
+            "position": 44,
+            "model": "E5-2620",
+            "manufacturer": "Supermicro",
+            "id": 1958,
+            "size": 2
+        }
+    ],
+    "switches": [
+        {
+            "status": "0",
+            "is_shared": false,
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "name": "UnityDemo-sw1-505.sf10.unitedlayer.com",
+            "uuid": "0cecb309-bc56-46a1-b1bc-d620d5dd679a",
+            "management_ip": "10.1.0.22",
+            "position": 4,
+            "model": "WS-C3750G-48TS",
+            "manufacturer": "cisco",
+            "id": 3454,
+            "size": 2
+        },
+        {
+            "status": "0",
+            "is_shared": false,
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "name": "UnityDemo-Test-AR",
+            "uuid": "d60612bc-34e2-4a31-a838-105f275915c6",
+            "management_ip": "209.237.224.238",
+            "position": 40,
+            "model": "2911",
+            "manufacturer": "cisco",
+            "id": 3455,
+            "size": 2
+        },
+        {
+            "status": "0",
+            "is_shared": false,
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "name": "UnityDemo-sw1-503.sf10.unitedlayer.com",
+            "uuid": "39391a7f-1721-4c7e-b07b-fe7ff265c852",
+            "management_ip": "10.1.0.27",
+            "position": 6,
+            "model": "3750G-48-TS",
+            "manufacturer": "cisco",
+            "id": 3458,
+            "size": 2
+        },
+        {
+            "status": "0",
+            "is_shared": false,
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "name": "UnityDemo-Sw1",
+            "uuid": "c114ae07-2506-4d2d-8ae4-aa36889c1aee",
+            "management_ip": "10.128.7.11",
+            "position": 2,
+            "model": "C9200-48x",
+            "manufacturer": "cisco",
+            "id": 3572,
+            "size": 2
+        }
+    ],
+    "panel_devices": [],
+    "available_size": 31,
+    "model": "Standard",
+    "type": "COLO DEDICATED",
+    "id": 1273,
+    "name": "CB1-SF10"
+}

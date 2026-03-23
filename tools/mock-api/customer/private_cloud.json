@@ -1,0 +1,54 @@
+{
+    "url": "http://10.192.11.207:8000/customer/private_cloud_integrated/520ef675-cb6f-46dc-aaf7-34b7b818a887/",
+    "id": 1225,
+    "proxy": {
+        "proxy_fqdn": "https://g3cloud1.unitedlayer.com/tenant/demo6"
+    },
+    "name": "1.DemoVcloud",
+    "uuid": "520ef675-cb6f-46dc-aaf7-34b7b818a887",
+    "platform_type": "vCloud Director",
+    "customer": {
+        "url": "http://10.192.11.207:8000/rest/fast/org/365/",
+        "id": 365,
+        "name": "UnityDemo",
+        "storage": null,
+        "uuid": "ec92b121-b726-40bb-b90b-cddda5825f4a"
+    },
+    "colocation_cloud": {
+        "id": 301,
+        "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+        "name": "DataCenter1 - SF10"
+    },
+    "servers": [],
+    "vms": [],
+    "vms_count": 10,
+    "device_count": 0,
+    "switch": [],
+    "load_balancer": [],
+    "customdevice": [],
+    "firewall": [],
+    "storage_device": [],
+    "mac_device": [],
+    "upstream_providers": [],
+    "hypervisors": [],
+    "bm_server": [],
+    "display_platform": "VMware vCloud",
+    "server_list": [],
+    "collector": {
+        "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+        "name": "Prod Collector",
+        "id": 59
+    },
+    "nutanix": null,
+    "nutanix_details": null,
+    "monitoring": null,
+    "resources_list": [],
+    "discover_resources": false,
+    "discover_dependency": false,
+    "is_managed": false,
+    "ingest_event": false,
+    "total_resources": 10,
+    "clusters": [],
+    "datastores": [],
+    "networks": []
+}

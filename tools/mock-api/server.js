@@ -6,6 +6,15 @@ const app = express();
 const PORT = 3001;
 
 const baseDir = path.join(__dirname);
+const celeryDir = path.join(__dirname, "celery");
+
+if (fs.existsSync(celeryDir)) {
+  fs.readdirSync(celeryDir).forEach(file => {
+    if (file.endsWith(".js")) {
+      require(path.join(celeryDir, file))(app);
+    }
+  });
+}
 
 app.use((req, res) => {
 
@@ -27,18 +36,35 @@ app.use((req, res) => {
   const filePath = path.join(baseDir, urlPath + ".json");
 
   if (fs.existsSync(filePath)) {
-
     const data = fs.readFileSync(filePath);
     res.json(JSON.parse(data));
-
   } else {
-    res.status(404).json({
-      error: "Mock API not found",
-      request: req.path,
-      expectedFile: filePath
-    });
-  }
+    // res.status(404).json({
+    //   error: "Mock API not found",
+    //   request: req.path,
+    //   expectedFile: filePath
+    // });
+    const dir = path.dirname(filePath);
 
+    fs.mkdirSync(dir, { recursive: true });
+
+    const template = {
+        message: "Auto-generated mock file",
+        endpoint: req.path,
+        method: req.method,
+        query: req.query,
+        body: req.body || {},
+        data: []
+    };
+
+    fs.writeFileSync(filePath, JSON.stringify(template, null, 2));
+
+    console.log("\n⚠ Mock file created:");
+    console.log(filePath);
+    console.log("Edit this file to add mock data.\n");
+
+    return res.json(template);
+  }
 });
 
 app.listen(PORT, () => {

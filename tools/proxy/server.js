@@ -30,6 +30,11 @@ app.use((req, res, next) => {
     return mockProxy(req, res, next);
   }
 
+  if (req.url.startsWith("/rest")) {
+    console.log("→ MOCK:", req.url);
+    return mockProxy(req, res, next);
+  }
+
   if (req.url.startsWith("/chatbot")) {
     console.log("→ MOCK:", req.url);
     return mockProxy(req, res, next);

@@ -1,0 +1,37 @@
+[
+    {
+        "id": 59,
+        "name": "Prod Collector",
+        "ip_address": "10.192.4.150",
+        "poller_id": null,
+        "status": "Completed",
+        "test_result": {
+            "date": "2025-06-16T13:35:38.558510-07:00",
+            "ping": {
+                "msg": null,
+                "result": true
+            },
+            "ssh": {
+                "msg": null,
+                "result": true
+            },
+            "host_name": ""
+        },
+        "snmp_community": null,
+        "pkey": null,
+        "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+        "poller_name": "UnityDemo-1",
+        "ssh_username": "uladmin",
+        "ssh_port": 22,
+        "web_username": null,
+        "web_password": null,
+        "deployment_status": 1,
+        "pyro_port": 9090,
+        "rdp_access_name": "https://rdp-ca296e51-f0331a2581df.uproxy.unitedlayer.com",
+        "created_at": "2023-01-09T22:09:34.795989-08:00",
+        "updated_at": "2025-06-16T13:35:41.599774-07:00",
+        "enable_vcenter": true,
+        "is_docker": false,
+        "customer": 365
+    }
+]

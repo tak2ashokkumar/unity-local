@@ -19,9 +19,10 @@ export class AppDefaultDashboardsService {
   }
 
   convertToViewData(data: DefaultType[]) {
+    if(!data || !data.length) return [];
     let viewData: DefaultViewData[] = [];
     const defaultDashboard = ['Infrastructure Overview', 'Network Overview', 'Cloud Cost Overview', 'Task and Workflow Overview', 'IoT Device Overview', 'Application Dashboard']
-    const filterdData = data.filter(d => defaultDashboard.includes(d.name));
+    const filterdData = data?.filter(d => defaultDashboard.includes(d.name));
     filterdData.forEach(d => {
       let view: DefaultViewData = new DefaultViewData();
       view.defaultId = d.uuid;
