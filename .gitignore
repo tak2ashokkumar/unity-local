@@ -1,6 +1,3 @@
-tools/node/
-node_modules/
-
 # Logs
 *.log
 
@@ -12,9 +9,18 @@ Thumbs.db
 .vscode/
 .idea/
 
+# node libraries & installs
+tools/node/
+node_modules/
+
 # Build output
 dist/
+webpack-stats.json
+webpack-stats-mtp.json
 build/
+
+#code coverages
+coverage/
 
 # Environment
 .env
