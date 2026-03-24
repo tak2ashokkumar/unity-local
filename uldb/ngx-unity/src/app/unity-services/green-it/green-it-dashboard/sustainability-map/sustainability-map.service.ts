@@ -197,7 +197,7 @@ export function createCO2Overlay(bound: google.maps.LatLng, percent: number): Un
 
       const panes = this.getPanes()!;
       panes.overlayMouseTarget.appendChild(this.div);
-      google.maps.event.addDomListener(this.div, 'click', () => {
+      this.div.addEventListener('click', () => {
         google.maps.event.trigger(this, 'click');
       });
     }

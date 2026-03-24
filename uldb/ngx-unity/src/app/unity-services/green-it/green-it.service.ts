@@ -217,7 +217,7 @@ export class GreenITService {
             xaxisScale = chartInstance.scales['x-axis-0'];
 
           ctx.textBaseline = 'bottom';
-          ctx.textAlign = 'bottom';
+          ctx.textAlign = 'center';
           if (xaxisScale && xaxisScale._labelItems && xaxisScale._labelItems.length) {
             ctx.font = `bold ${xaxisScale._labelItems[0].font.string}`;
           }

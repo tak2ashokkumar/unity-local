@@ -605,6 +605,8 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   onNewChat() {
+    this.isTyping = false;
+    this.cleanup();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.conversationId = null;

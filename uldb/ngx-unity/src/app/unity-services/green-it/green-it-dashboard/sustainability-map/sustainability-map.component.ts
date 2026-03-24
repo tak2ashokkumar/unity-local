@@ -2,11 +2,11 @@ import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { MapService } from 'src/app/map.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { environment } from 'src/environments/environment';
 import { createCO2Overlay, DatacenterInRegion, SustainabilityMapDatacenterCluster, SustainabilityMapService, SustainabilityMapViewdata, UnitySustainabilityCO2Overlay } from './sustainability-map.service';
+import { MapService } from 'src/app/map.service';
 
 @Component({
   selector: 'sustainability-map',
@@ -24,6 +24,7 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
 
   cluster: any;
   private clusterListeners: google.maps.MapsEventListener[] = [];
+  // clusterInfoWindow = new google.maps.InfoWindow();
   clusterInfoWindow: google.maps.InfoWindow;
   private tilesLoaded: google.maps.MapsEventListener;
 
@@ -32,6 +33,7 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
   oldZIndex: number = null;
   initialZoom: number;
   INIT_ZOOM: number = 1.0;
+  // INIT_CENTER: google.maps.LatLng = new google.maps.LatLng(25.738611, 0);
   INIT_CENTER = { lat: 25.738611, lng: 0 };
 
   overlays: UnitySustainabilityCO2Overlay[] = []
