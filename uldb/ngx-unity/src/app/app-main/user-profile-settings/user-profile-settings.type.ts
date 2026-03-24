@@ -32,3 +32,17 @@ export interface UnityOrganizationSettingsTicketInstance {
     name: string;
     uuid: string;
 }
+
+export interface SupportedLLMResponse {
+  supported_llms: LLMConfig[];
+}
+
+export interface LLMConfig {
+  id: number;
+  provider: string;
+  model_name: string;
+  description: string;
+  endpoint_url: string;
+  is_user_owned: boolean;
+  is_active_for_session: boolean;
+}

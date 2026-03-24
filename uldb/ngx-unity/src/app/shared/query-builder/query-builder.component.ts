@@ -117,6 +117,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
   @Input() parentChangeCallback: () => void;
   @Input() parentTouchedCallback: () => void;
   @Input() persistValueOnFieldChange: boolean = false;
+  @Input() moduleName: string;
 
   @ViewChild('treeContainer', { static: true }) treeContainer: ElementRef;
 
@@ -172,6 +173,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
       } else {
         this.entities = null;
       }
+
       this.operatorsCache = {};
     } else {
       throw new Error(`Expected 'config' must be a valid object, got ${type} instead.`);
@@ -206,11 +208,23 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
     return this.data;
   }
   set value(value: RuleSet) {
-    // When component is initialized without a formControl, null is passed to value
     this.data = value || { condition: 'and', rules: [] };
-    if(!this.data.rules.length){
+
+    // REMOVE invalid fields like device_name
+    this.data.rules = this.data.rules.filter((rule): rule is Rule | RuleSet => {
+      if ('rules' in rule) return true; // RuleSet
+
+      return !!this.config?.fields?.[rule.field]; // Rule
+    });
+
+    //Add default rule only if none left
+    if (!this.data.rules.length) {
+      if (this.moduleName === 'workflow') {
+        return;
+      }
       this.addRule(this.data);
     }
+
     this.handleDataChange();
   }
 
@@ -259,13 +273,13 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
       return this.operatorsCache[field];
     }
     let operators = this.defaultEmptyList;
-    const fieldObject = this.config.fields[field];
+    const fieldObject = this.config?.fields[field];
 
     if (this.config.getOperators) {
       return this.config.getOperators(field, fieldObject);
     }
 
-    const type = fieldObject.type;
+    const type = fieldObject?.type;
 
     if (fieldObject && fieldObject.operators) {
       operators = fieldObject.operators;
@@ -303,11 +317,11 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
       return this.config.getInputType(field, operator);
     }
 
-    if (!this.config.fields[field]) {
+    if (!this.config?.fields?.[field]) {
       throw new Error(`No configuration for field '${field}' could be found! Please add it to config.fields.`);
     }
 
-    const type = this.config.fields[field].type;
+    const type = this.config?.fields[field]?.type;
     switch (operator) {
       case 'is null':
       case 'is not null':
@@ -324,7 +338,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
     if (this.config.getOptions) {
       return this.config.getOptions(field);
     }
-    return this.config.fields[field].options || this.defaultEmptyList;
+    return this.config?.fields[field].options || this.defaultEmptyList;
   }
 
   getClassNames(...args): string {
@@ -376,7 +390,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
     if (this.config.addRule) {
       this.config.addRule(parent);
     } else {
-      const field = this.fields[0];
+      const field = this.fields.find(f => this.config?.fields?.[f.value]);
       parent.rules = parent.rules.concat([{
         field: field.value,
         operator: this.getDefaultOperator(field),
@@ -511,7 +525,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
     const inputContext = this.inputContextCache.get(rule);
     const currentField = inputContext && inputContext.field;
 
-    const nextField: Field = this.config.fields[fieldValue];
+    const nextField: Field = this.config?.fields[fieldValue];
 
     const nextValue = this.calculateFieldChangeValue(
       currentField, nextField, rule.value);
@@ -610,7 +624,6 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
   }
 
   getRuleSetConnector() {
-    // console.log(this.parentValue, this.value)
     if (this.parentValue) {
       let a = this.parentValue.rules[this.parentValue.rules.length - 1];
       return a == this.data ? 'end-rs-connector' : 'mid-rs-connector';
@@ -733,7 +746,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
         onChange: this.changeInput.bind(this),
         getDisabledState: this.getDisabledState,
         options: this.getOptions(rule.field),
-        field: this.config.fields[rule.field],
+        field: this.config?.fields[rule.field],
         $implicit: rule
       });
     }
@@ -790,7 +803,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
         if ((item as RuleSet).rules) {
           return this.validateRulesInRuleset(item as RuleSet, errorStore);
         } else if ((item as Rule).field) {
-          const field = this.config.fields[(item as Rule).field];
+          const field = this.config?.fields[(item as Rule).field];
           if (field && field.validator && field.validator.apply) {
             const error = field.validator(item as Rule, ruleset);
             if (error != null) {

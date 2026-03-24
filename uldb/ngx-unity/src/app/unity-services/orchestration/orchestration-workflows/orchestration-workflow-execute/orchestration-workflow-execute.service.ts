@@ -54,8 +54,13 @@ export class OrchestrationWorkflowExecuteService {
     );
   }
 
-  getAIMLData(obj: any): Observable<any> {
-    return this.http.post<any>(`/rest/orchestration/aiml/search/`, obj);
+  getAIMLData(page: number, pageSize: number, obj: any): Observable<any> {
+    const params = {
+      page: page,
+      page_size: pageSize
+    };
+
+    return this.http.post<any>(`/rest/orchestration/aiml/search/`, obj, { params });
   }
 
   buildManualTriggerForm(param: any): FormGroup {

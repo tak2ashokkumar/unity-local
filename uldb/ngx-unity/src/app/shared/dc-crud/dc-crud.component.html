@@ -35,15 +35,24 @@
         </div>
         <div class="form-group">
           <label for="name">Name<em>*</em></label>
-          <input class="form-control" id="name" formControlName="name" type="text" placeholder="name" [ngClass]="{'is-invalid' : formErrors.name}">
+          <input class="form-control" id="name" formControlName="name" type="text" placeholder="name"
+            [ngClass]="{'is-invalid' : formErrors.name}">
           <div class="invalid-feedback" *ngIf="formErrors.name">{{formErrors.name}}</div>
         </div>
-        <div class="form-group">
+        <div class="form-group location-field">
           <label for="location">Location<em>*</em></label>
-          <input class="form-control" id="location" type="text" placeholder="location" [ngClass]="{'is-invalid' : formErrors.searchlocation || formErrors.location || formErrors.lat }"
-            formControlName="searchlocation">
+          <input class="form-control" id="location" type="text" placeholder="location"
+            [ngClass]="{'is-invalid' : formErrors.searchlocation || formErrors.location || formErrors.lat }"
+            formControlName="searchlocation" (input)="!isOnline && onLocationInput($any($event).target.value)"
+            (blur)="!isOnline && onLocationBlur()">
+          <div class="city-suggestions" *ngIf="!isOnline && showSuggestions">
+            <div class="city-suggestion-item" *ngFor="let loc of locationSuggestions" (mousedown)="selectLocation(loc)">
+              {{loc.name}}, {{loc.state}}, {{loc.country}}
+            </div>
+          </div>
           <div class="invalid-feedback" *ngIf="formErrors.searchlocation">{{formErrors.searchlocation}}</div>
-          <div class="invalid-feedback" *ngIf="!formErrors.searchlocation && formErrors.location">{{formErrors.location}}</div>
+          <div class="invalid-feedback" *ngIf="!formErrors.searchlocation && formErrors.location">
+            {{formErrors.location}}</div>
           <div class="invalid-feedback" *ngIf="formErrors.lat">{{formErrors.lat}}</div>
         </div>
       </form>

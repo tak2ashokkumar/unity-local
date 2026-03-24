@@ -17,8 +17,17 @@ export class OrchestrationAgenticWorkflowAimlTriggerService {
     return this.http.post<any>(`rest/orchestration/agentic_workflow/${workflowUuid}/aiml/`, data)
   }
 
-  getAIMLData(obj: any): Observable<any> {
-    return this.http.post<any>(`/rest/orchestration/aiml/search/`, obj);
+  // getAIMLData(obj: any): Observable<any> {
+  //   return this.http.post<any>(`/rest/orchestration/aiml/search/`, obj);
+  // }
+
+  getAIMLData(page: number, pageSize: number, obj: any): Observable<any> {
+    const params = {
+      page: page,
+      page_size: pageSize
+    };
+
+    return this.http.post<any>(`/rest/orchestration/aiml/search/`, obj, { params });
   }
 
   buildAIMLTriggerForm(param: any): FormGroup {

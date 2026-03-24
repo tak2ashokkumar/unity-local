@@ -15,8 +15,9 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { TabData } from 'src/app/shared/tabdata';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
+import { LlmConfigViewData, providerImages, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
 import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 
 @Component({
   selector: 'user-profile-settings',
@@ -57,6 +58,14 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
   selectedDashboard: AppDashboardListType;
   @ViewChild('confirmDefaultDashboardRef') confirmDefaultDashboardRef: ElementRef;
   defaultDashboardModalRef: BsModalRef;
+
+  supportedLlmsViewData: LlmConfigViewData[] = []
+  userOwnedLlms: LlmConfigViewData[] = [];
+
+  delId: string = '';
+  @ViewChild('confirmdelete') confirmdelete: ElementRef;
+  modelDeleteModalRef: BsModalRef;
+  providerImages = providerImages;
 
   severityTypeSettings: IMultiSelectSettings = {
     isSimpleArray: false,
@@ -105,7 +114,9 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     private appService: AppLevelService,
     public userInfo: UserInfoService,
     private notification: AppNotificationService,
-    private spinner: AppSpinnerService) {
+    private spinner: AppSpinnerService,
+    private router: Router,
+    private route: ActivatedRoute) {
     this.aimlPermissionSet = new UnityPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
     this.monitoringPermissionSet = new UnityPermissionSet(UnityModules.MONITORING);
   }
@@ -117,6 +128,7 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     this.getOrganizationSettings();
     this.getItsmList();
     this.getDashboardList();
+    this.getLLMList();
   }
 
   ngOnDestroy() {
@@ -352,6 +364,53 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
       this.notification.error(new Notification('Failed to set default dashboard.'));
       this.spinner.stop('main');
     });
+  }
+
+  getLLMList() {
+    this.profileSvc.getLLMList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.userOwnedLlms = this.profileSvc.convertToLLMListViewData(res.results);
+      this.spinner.stop('main');
+    }, (err: HttpErrorResponse) => {
+      this.notification.error(new Notification('Failed to get Supported Llms'));
+      this.spinner.stop('main');
+    });
+  }
+
+  enableModel(model: any) {
+    this.profileSvc.enableModel(model.id).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.getLLMList();
+      this.spinner.stop('main');
+      this.notification.success(new Notification('Model Enabled successfully.'));
+    }, err => {
+      this.spinner.stop('main');
+      this.notification.error(new Notification('Something wrong happened!! Please try again.'));
+    });
+  }
+
+  editModel(model: any) {
+    this.router.navigate(['edit-model', model.id], { relativeTo: this.route });
+  }
+
+  deleteModel(model: any) {
+    this.delId = model.id;
+    this.modelDeleteModalRef = this.modalService.show(this.confirmdelete, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  confirmModelDelete() {
+    this.modelDeleteModalRef.hide();
+    this.spinner.start('main');
+    this.profileSvc.deleteModel(this.delId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.spinner.stop('main');
+      this.getLLMList();
+      this.notification.success(new Notification('Model deleted successfully.'));
+    }, err => {
+      this.spinner.stop('main');
+      this.notification.error(new Notification('Something wrong happened!! Please try again.'));
+    });
+  }
+
+  goToAddModel() {
+    this.router.navigate(['add-model'], { relativeTo: this.route })
   }
 }
 

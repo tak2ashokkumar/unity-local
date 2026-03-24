@@ -1038,6 +1038,9 @@ export class OrchestrationAgenticWorkflowParamsService {
         value: field.name
       }
     });
+    // if (aimlType === 'Condition') {
+    //   fieldMeta.fields['device_name'] = { name: '', type: '' }
+    // }
     return fieldMeta;
   }
 

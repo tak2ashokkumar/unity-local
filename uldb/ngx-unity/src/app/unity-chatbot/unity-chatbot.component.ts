@@ -2,19 +2,18 @@ import { HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { AfterViewChecked, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
+import moment from 'moment';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { from, Subject, Subscription, timer } from 'rxjs';
 import { filter, mergeMap, skip, takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { UnityChartDetails } from '../shared/unity-chart-config.service';
+import { DateRange } from '../shared/app-utility/app-utility.service';
+import { SupportedLLMConfigData } from '../shared/SharedEntityTypes/ai-chatbot/llm-model.type';
 import { UserInfoService } from '../shared/user-info.service';
 import { UcChartsService } from './uc-charts/uc-charts.service';
-import { ChatbotTableViewData, UcTableService } from './uc-table/uc-table.service';
+import { UcTableService } from './uc-table/uc-table.service';
 import { DashboardApiMapping, InsightsMapping, ModuleIcons, moduleMapping, TabNames, UnityChatbotService } from './unity-chatbot.service';
-import { ChatHistoryData, Insight, UnityChatBot, UnityChatBotResponseChartData, UnityChatBotResponseTableData, UntiyChatBotExploreMenu } from './unity-chatbot.type';
-import { DateRange } from '../shared/app-utility/app-utility.service';
-import moment from 'moment';
-import { query } from '@angular/animations';
+import { ChatHistoryData, Insight, UnityChatBot, UntiyChatBotExploreMenu } from './unity-chatbot.type';
 
 @Component({
   selector: 'unity-chatbot',
@@ -30,7 +29,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   imageURL: string = `${environment.assetsUrl}external-brand/logos/Chatbot_Logo.svg`
-  form: FormGroup;
+  form: FormGroup; botResponseId
   resetThread: boolean = false;
   chatHistoryData: Array<ChatHistoryData> = [];
   previousResponse: UnityChatBot;
@@ -64,6 +63,9 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
 
   onHistory: boolean = false;
 
+  showModelDropdown = false;
+  llmModels: SupportedLLMConfigData[] = [];
+  activeModel: SupportedLLMConfigData;
   constructor(private service: UnityChatbotService,
     private router: Router,
     private modalService: BsModalService,
@@ -108,6 +110,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
       this.isDashboard();
     }
     if (this.userInfoService.isChatbotEnabled) {
+      this.getAIModels();
       this.buildForm();
       this.getModuleNames();
       this.modalService.onShown.subscribe(() => {
@@ -242,9 +245,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   manageResponse(res: UnityChatBot) {
     if (res.response) {
       this.chatHistoryData.push({ user: 'bot', message: (res.response.answer as string), type: 'text' });
-      if (res.response.suggested_questions?.length) {
-        this.chatHistoryData.getLast()['suggestedPrompt'] = res.response.suggested_questions[0];
-      }
+      this.chatHistoryData.getLast()['suggestedPrompt'] = res.response?.suggested_questions?.length ? res.response?.suggested_questions[0] : '';
     } else {
       this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
     }
@@ -289,12 +290,12 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     // } else {
     //   this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
     // }
-    // this.chatHistoryData.getLast()['liked'] = false;
-    // this.chatHistoryData.getLast()['disliked'] = false;
-    // this.chatHistoryData.getLast()['comment'] = false;
-    // this.chatHistoryData.getLast()['feedbackSubmitted'] = false;
-    // this.chatHistoryData.getLast()['botResponseId'] = res.query_id;
-    // this.chatHistoryData.getLast()['feedbackIconTooltip'] = 'Feedback';
+    this.chatHistoryData.getLast()['liked'] = false;
+    this.chatHistoryData.getLast()['disliked'] = false;
+    this.chatHistoryData.getLast()['comment'] = false;
+    this.chatHistoryData.getLast()['feedbackSubmitted'] = false;
+    this.chatHistoryData.getLast()['botResponseId'] = res.response.chat_message_id ? res.response.chat_message_id : '';
+    this.chatHistoryData.getLast()['feedbackIconTooltip'] = 'Feedback';
   }
 
   scrollToBottom(): void {
@@ -310,6 +311,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     const buttonElement = document.getElementById('chatbotButton');
     const insightsbuttonElement = document.getElementById('insightsButton');
     if (this.isOpen) {
+      this.getAIModels();
       if (this.selectedTab === 'Assistant' && this.modules.length) {
         this.findCurrentModule();
       }
@@ -459,15 +461,17 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   onLike(index: number) {
     this.chatHistoryData[index].liked = !this.chatHistoryData[index].liked
     this.chatHistoryData[index].liked && (this.chatHistoryData[index].disliked = false);
-    this.chatHistoryData[index].liked && this.submitReaction({ reaction: 'like' }, this.chatHistoryData[index].botResponseId);
-    this.chatHistoryData[index].liked || this.submitReaction({ reaction: 'none' }, this.chatHistoryData[index].botResponseId);
+    this.submitReaction({ action: 'like' }, this.chatHistoryData[index].botResponseId);
+    // this.chatHistoryData[index].liked && this.submitReaction({ reaction: 'like' }, this.chatHistoryData[index].botResponseId);
+    // this.chatHistoryData[index].liked || this.submitReaction({ reaction: 'none' }, this.chatHistoryData[index].botResponseId);
   }
 
   onDislike(index: number) {
     this.chatHistoryData[index].disliked = !this.chatHistoryData[index].disliked
     this.chatHistoryData[index].disliked && (this.chatHistoryData[index].liked = false);
-    this.chatHistoryData[index].disliked && this.submitReaction({ reaction: 'dislike' }, this.chatHistoryData[index].botResponseId);
-    this.chatHistoryData[index].disliked || this.submitReaction({ reaction: 'none' }, this.chatHistoryData[index].botResponseId);
+    this.submitReaction({ action: 'dislike' }, this.chatHistoryData[index].botResponseId);
+    // this.chatHistoryData[index].disliked && this.submitReaction({ reaction: 'dislike' }, this.chatHistoryData[index].botResponseId);
+    // this.chatHistoryData[index].disliked || this.submitReaction({ reaction: 'none' }, this.chatHistoryData[index].botResponseId);
   }
 
   onComment(index: number) {
@@ -485,13 +489,16 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
 
   buildFeedbackForm() {
     this.feedbackForm = this.service.buildFeedbackForm();
+    setTimeout(() => {
+      this.scrollToBottom();
+    });
   }
 
-  submitReaction(data: any, queryId: number) {
+  submitReaction(data: any, queryId: string) {
     this.service.submitReaction(data, queryId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => { })
   }
 
-  submitFeedBackForm(queryId: number, index: number) {
+  submitFeedBackForm(queryId: string, index: number) {
     this.service.submitFeedback(this.feedbackForm.getRawValue(), queryId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.chatHistoryData[index].comment = false;
       this.chatHistoryData[index].feedbackSubmitted = true;
@@ -586,6 +593,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     });
   }
 
+
   cleanup() {
     this.timerSub?.unsubscribe();
     this.waitMessage = '';
@@ -602,5 +610,60 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.conversationId = null;
     this.chatHistoryData = [];
     this.expandDefaultQueries();
+  }
+
+  getAIModels() {
+    this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.llmModels = res;
+      this.llmModels.forEach(m => {
+        if (m.active_for_applications?.includes('assistant')) {
+          this.activeModel = m;
+        }
+      })
+    }, err => {
+      this.llmModels = [];
+      this.activeModel = null;
+    })
+  }
+
+  toggleDropdown() {
+    this.showModelDropdown = !this.showModelDropdown;
+  }
+
+  changeActiveModel(model: SupportedLLMConfigData) {
+    if (this.activeModel?.id === model.id) {
+      this.showModelDropdown = false;
+      return;
+    }
+
+    if (model.is_user_owned) {
+      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+      model.active_for_applications.push('assistant');
+      this.changeActiveModelToSelected(model);
+    } else {
+      // this.goToConfig(model);
+    }
+
+  }
+
+  changeActiveModelToSelected(model: SupportedLLMConfigData) {
+    this.showModelDropdown = false;
+    this.service.changeActiveModel(this.selectedTab, model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.activeModel = model;
+    }, err => {
+
+    })
+  }
+
+  goToConfig(model: SupportedLLMConfigData) {
+    this.togglePopUp();
+    this.router.navigate(['/settings/profile/add-model']);
+  }
+
+  getModelItemClass(model: SupportedLLMConfigData) {
+    return {
+      'active-model-item': model.active_for_applications?.includes('assistant'),
+      'bg-light text-muted': !model.is_user_owned
+    }
   }
 }

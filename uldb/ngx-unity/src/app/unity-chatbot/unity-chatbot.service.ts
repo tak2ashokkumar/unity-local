@@ -1,7 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { SupportedLLMConfig, SupportedLLMConfigData } from '../shared/SharedEntityTypes/ai-chatbot/llm-model.type';
 import { AssistedInsights, UntiyChatBotExploreMenu, UrlData } from './unity-chatbot.type';
 
 @Injectable({
@@ -15,6 +18,40 @@ export class UnityChatbotService {
 
   constructor(private builder: FormBuilder,
     private http: HttpClient) { }
+
+  // get enhanced llm object
+  getSupportedLLMModelList(): Observable<SupportedLLMConfigData[]> {
+    return this.http.get<SupportedLLMConfig>(`/mcp/get-supported-llm-configs/`).pipe(
+      map((res: SupportedLLMConfig) => {
+        res.supported_llms.forEach(llm => {
+          llm.text = `${llm.model_name.toUpperCase()}`;
+          llm.type = `${llm.provider.toUpperCase()} ${llm.model_name}`;
+          switch (llm.provider) {
+            case 'openai': llm.image = `${environment.assetsUrl}external-brand/ai-models/openai.svg`; break;
+            case 'google': llm.image = `${environment.assetsUrl}external-brand/ai-models/gemini.svg`; break;
+            case 'anthropic': llm.image = `${environment.assetsUrl}external-brand/ai-models/claude-color.svg`; break;
+            case 'groq': llm.image = `${environment.assetsUrl}external-brand/ai-models/grok.svg`; break;
+            default: llm.image = `${environment.assetsUrl}external-brand/ai-models/openai.svg`; break;
+          }
+        })
+        return res && res.supported_llms ? res.supported_llms : [];
+      })
+    )
+  }
+
+  changeActiveModel(selectedApplication: string, model: SupportedLLMConfigData) {
+    let app: string;
+    switch (selectedApplication) {
+      case 'Assistant': app = 'assistant'; break;
+      case 'Network Agent': app = 'network_agent'; break;
+      case 'Workflow Agent': app = 'workflow_agent'; break;
+      default: app = 'assistant';
+    }
+    let data = { 'active_model': model.id, 'application': app };
+    return this.http.post(`mcp/user-session-config/`, data);
+
+    // return of(null);
+  }
 
   getResponse(data: any) {
     return this.http.post(`mcp/query/`, data);
@@ -44,12 +81,12 @@ export class UnityChatbotService {
     });
   }
 
-  submitReaction(data: any, queryId: number) {
-    return this.http.post(`chatbot/reaction/${queryId}/`, data);
+  submitReaction(data: any, queryId: string) {
+    return this.http.patch(`customer/network_agent/chat-messages/${queryId}/reaction/`, data);
   }
 
-  submitFeedback(data: any, queryId: number) {
-    return this.http.post(`chatbot/feedback/${queryId}/`, data);
+  submitFeedback(data: any, queryId: string) {
+    return this.http.patch(`customer/network_agent/chat-messages/${queryId}/feedback/`, data);
   }
 }
 
@@ -120,7 +157,7 @@ export const InsightsMapping: { [key: string]: UrlData } = {
 };
 
 export const TabNames = [
-  {name:'Assistant', isSelected: true},
-  {name:'Agentic Workflows', isSelected: false},
-  {name:'AI Agents', isSelected: false},
+  { name: 'Assistant', isSelected: true },
+  { name: 'Agentic Workflows', isSelected: false },
+  { name: 'AI Agents', isSelected: false },
 ]

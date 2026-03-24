@@ -1,0 +1,373 @@
+    /*
+     * Base structure
+     */
+
+    /* Move down content because we have a fixed navbar that is 50px tall */
+    body {
+      padding-top: 50px;
+      /*overflow: hidden;*/
+    }
+
+    /*
+     * Global add-ons
+     */
+
+    .sub-header {
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    /*
+     * Top navigation
+     * Hide default border to remove 1px line.
+     */
+    .navbar-fixed-top {
+      border: 0;
+    }
+
+    /*
+     * Sidebar
+     */
+
+    /* Hide for mobile, show later */
+    .sidebar {
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 51px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        /*padding: 20px;*/
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        /*background-color: #f5f5f5;*/
+        border-right: 1px solid #eee;
+      }
+    }
+
+    /* Sidebar navigation */
+    .nav-sidebar {
+      margin-right: -21px; /* 20px padding + 1px border */
+      margin-bottom: 20px;
+      margin-left: -20px;
+    }
+
+    .nav-sidebar > li > a {
+      padding-right: 20px;
+      padding-left: 20px;
+    }
+
+    .nav-sidebar > .active > a,
+    .nav-sidebar > .active > a:hover,
+    .nav-sidebar > .active > a:focus {
+      color: #fff;
+      background-color: #428bca;
+    }
+
+    /*
+     * Main content
+     */
+
+    .main {
+      padding: 0px;
+    }
+
+    @media (min-width: 768px) {
+      .main {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+    }
+
+    .main .page-header {
+      margin-top: 0;
+    }
+
+    /*
+     * Placeholder dashboard ideas
+     */
+
+    .placeholders {
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .placeholders h4 {
+      margin-bottom: 0;
+    }
+
+    .placeholder {
+      margin-bottom: 20px;
+    }
+
+    .placeholder img {
+      display: inline-block;
+      border-radius: 50%;
+    }
+
+    #logo {
+      height: 50px;
+    }
+
+/*** custom changes **/
+
+.container-background, .sidebar-background
+{
+	background: #eee;
+	
+}
+
+.table
+{
+	margin-bottom: 0px; !important;
+}
+
+.tableheader
+{
+    background-color: #18BC9C;
+    color: #fff;
+}
+
+.tabborder
+{
+	border: solid 1px #eee;
+}
+
+.leftpan
+{
+	width:50% !important;
+}
+.rightpan
+{
+	width:50%;
+	float:right;
+}
+
+#pageview
+{
+	margin-top:2%;
+}
+
+.leftpans
+{
+	width:50% !important;
+	float:left;
+}
+
+.serversysname
+{
+	text-decoration: none !important;
+}
+
+.btn-success:hover, .btn-success:focus, .btn-success.focus, .btn-success:active, .btn-success.active, .open>.dropdown-toggle.btn-success {
+    color: #ffffff;
+    background-color: #128f76 !important;
+    border-color: #11866f !important;
+}
+
+pagination
+{
+	z-index: 0 !important;
+}
+
+.details_shrink {
+    display: none;
+    position: fixed;
+    top: 53% !important;
+    left: 17%;
+    width: 83%;
+    height: 83%;
+    border-top: 1px solid darkgrey;
+    border-left: 1px solid darkgrey;
+    background: #FFFFFF !important;
+    z-index:10;
+}
+
+
+
+.nav-tabs 
+{
+	border-bottom: 1px solid #5A5858;
+}
+
+
+.nav-tabs>li>a 
+{
+	margin-right: 2px;
+	line-height: 0.428571;
+	border: 1px solid transparent;
+	border-bottom: 5px solid #18BC9C;
+	border-radius: 10px 10px 0 0;
+	background-color: #18BC9C !important;
+	color: #FFF !important;
+	text-decoration: none;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus
+{
+	color: #5A5858 !important;
+	background-color: transparent !important;
+	border: 1px solid #5A5858;
+	border-top-color:#18BC9C !important;
+	border-bottom-color: transparent !important;
+	border-top-width: 5px;
+	cursor: default;
+}
+
+
+.nav-tabs>li 
+{
+	float: left;
+	margin-bottom: 0px;
+}
+
+.headcolor
+{
+	color: #18bc9c !important;
+	font-weight: bold;
+}
+	
+.ins_state_running {
+    height: 15px;
+    width: 15px;
+    position: relative;
+    background-image: url('/static/img/circle_green.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-top: 0px;
+    margin-left: -2px;
+}
+
+.showvmdetails, .showcabdetails, .showswitchcustdet, .showinterfacedetails, .showvdcdetails {
+    height: 13px;
+    width: 13px;
+    position: relative;
+    top: 0%;
+    background-image: url('/static/img/exp_black.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    margin-top: 2px;
+    margin-left: -3px;
+}
+
+.showvmdetails_col, .showcabdetails_col, .showswitchcustdet_col, .showinterfacedetails_col, .showvdcdetails_col
+{
+	display:none;	
+	height: 13px;
+	width: 13px;
+	position: relative;
+	top: 0%;
+	background-image: url('/static/img/col_black.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	
+}
+
+.main, .scrollsize
+{
+	overflow:auto !important;
+}
+
+#resulttable
+{
+	display:block;	
+	height:350px;
+	overflow: auto;
+}
+
+.server_customer:hover, .cabinet_customer:hover
+{
+	cursor:pointer;
+}
+
+
+
+.add-item, .add-item:hover {
+  font: bold 11px Arial;
+  text-decoration: none !important;
+  color: #ffffff;
+  background-color: #18bc9c;
+  border-color: #18bc9c;
+  padding: 2px 6px 2px 6px;
+  border-top: 1px solid #18bc9c;
+  border-right: 1px solid #18bc9c;
+  border-bottom: 1px solid #18bc9c;
+  border-left: 1px solid #18bc9c;
+font-size: 15px;
+line-height: 3;
+padding: 10px;
+}
+
+.cabedit:hover  .edit_cabinet
+{
+	display: inline-block;
+}
+
+.edit_cabinet
+{
+	height: 13px;
+	width: 15px;
+	position: relative;
+	/*top: 0%;*/
+	background-image: url('/static/img/edit32.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	/*margin-left: 5px;*/
+	display: none;	
+}
+
+.errormsg
+{
+	display: inline !important;
+	color: red;
+}
+
+.dropdown-menu>.active>a, .dropdown-menu>.active>a:hover, .dropdown-menu>.active>a:focus {
+    background-color: #18bc9c!important;
+    background-image: -webkit-linear-gradient(top,#18bc9c,#18bc9c 100%) !important;
+    background-image: -o-linear-gradient(top,#18bc9c,#18bc9c 100%) !important;
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#18bc9c),to(#18bc9c)) !important;
+    background-image: linear-gradient(to bottom,#18bc9c,#18bc9c 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff337ab7', endColorstr='#ff2e6da4', GradientType=0) !important;
+    background-repeat: repeat-x !important;
+}
+.dropdown-menu>li>a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #18bc9c;
+    white-space: nowrap;
+}
+
+.dropdown-menu {
+    max-height: 260px;
+    overflow: auto;
+}
+
+#orgName
+{
+	width:100%;
+}
+
+.bs-component .modal {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    bottom: auto;
+    z-index: 1;
+    display: block;
+}
+
+.bs-component .modal-dialog{width:90%}
+/*.modal-header {*/
+    /*background-color: #18bc9c !important;*/
+    /*color: #fff !important;*/
+/*}*/

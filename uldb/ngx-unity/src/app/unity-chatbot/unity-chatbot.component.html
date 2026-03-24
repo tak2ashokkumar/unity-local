@@ -62,9 +62,15 @@
                                         (mouseenter)="onIconHover(module)">
                                         <i [ngClass]="module.icon + ' fa-lg'"></i>
                                     </div>
-                                    <div *ngIf="queries.length"
-                                        class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
-                                        [ngClass]="{'font-500': module.isActive}">{{ module.module_name }}</div>
+                                    <ng-container *ngIf="userInfoService.selfBrandedOrgName">
+                                        <div class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
+                                            [ngClass]="{'font-500': module.isActive}">{{ module.module_display_name }}
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="!userInfoService.selfBrandedOrgName">
+                                        <div class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
+                                            [ngClass]="{'font-500': module.isActive}">{{ module.module_name }}</div>
+                                    </ng-container>
                                 </div>
                             </div>
                             <div *ngIf="isHovered" id="queries" class="queries-container"
@@ -100,9 +106,16 @@
                                                     (click)="manageActiveModule(module)">
                                                     <i [ngClass]="module.icon + ' fa-lg'"></i>
                                                 </div>
-                                                <div class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
-                                                    [ngClass]="{'font-500': module.isActive}">{{ module.module_name }}
-                                                </div>
+                                                <ng-container *ngIf="userInfoService.selfBrandedOrgName">
+                                                    <div class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
+                                                        [ngClass]="{'font-500': module.isActive}">{{
+                                                        module.module_display_name }}</div>
+                                                </ng-container>
+                                                <ng-container *ngIf="!userInfoService.selfBrandedOrgName">
+                                                    <div class="text-muted text-center font-sm-xs mt-1 d-flex align-items-center justify-content-center flex-grow-1"
+                                                        [ngClass]="{'font-500': module.isActive}">{{ module.module_name
+                                                        }}</div>
+                                                </ng-container>
                                             </div>
                                         </div>
                                     </div>
@@ -219,7 +232,63 @@
                             </div>
                         </div>
                         <form *ngIf="form" [formGroup]="form" class="w-100 mt-auto p-2">
-                            <div class="row">
+                            <div class="round-edge bg-white w-100 form-wrapper">
+                                <div class="row">
+                                    <div class="col">
+                                        <input class="form-control round-edge" type="text" formControlName="chat"
+                                            placeholder="Ask me anything..." (keyup.enter)="onSubmit()"
+                                            style="height:2.7rem; border: 0 !important;">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end mb-2 pt-1">
+                                    <div class="active-ai-modal-model-selector">
+                                        <button type="button"
+                                            class="btn btn-pill active-ai-modal-model-btn d-flex align-items-center"
+                                            (click)="toggleDropdown()">
+                                            <img [src]="activeModel?.image" class="active-ai-modal-model-icon mr-1">
+                                            {{activeModel?.text}}
+                                            <i class="fas fa-chevron-down ml-1"></i>
+                                        </button>
+                                        <div *ngIf="showModelDropdown" class="active-ai-modal-model-dropdown">
+                                            <div *ngFor="let model of llmModels" class="active-ai-modal-model-option"
+                                                (click)="changeActiveModel(model)" [ngClass]="getModelItemClass(model)">
+                                                <img [src]="model?.image" class="active-ai-modal-model-icon mr-2">
+                                                <div style="min-width: 0; flex: 1;">
+                                                    <div
+                                                        class="d-flex align-items-center justify-content-between font-sm">
+                                                        <div class="font-500 text-truncate"
+                                                            style="min-width: 0; flex: 1;">
+                                                            {{model?.text}}
+                                                        </div>
+                                                        <div *ngIf="!model.is_user_owned"
+                                                            class="ml-1 flex-shrink-0 text-primary font-sm-xs"
+                                                            style="cursor: pointer; text-decoration: underline;"
+                                                            (click)="goToConfig(model); $event.stopPropagation()">
+                                                            Configure
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="text-muted font-sm-xs">
+                                                        {{model?.description}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ng-container *ngIf="chatHistoryData.length > 1">
+                                        <button type="button" class="btn btn-sm ml-2 new-chat-button no-hover query-button"
+                                            (click)="onNewChat()">
+                                            <i class="fas fa-comment-medical font-md text-muted"></i>
+                                        </button>
+                                    </ng-container>
+                                    <button type="button" class="btn btn-sm mx-2 query-button"
+                                        [ngClass]="isTyping ? 'btn-secondary' : 'btn-success query-button-success'"
+                                        (click)="onSubmit()">
+                                        <i class="fas fa-arrow-up font-md text-white"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- <div class="row">
                                 <div class="col d-flex align-items-center">
                                     <div class="input-group">
                                         <input class="form-control border-left-radius" type="text"
@@ -234,10 +303,11 @@
                                         </div>
                                     </div>
                                     <ng-container *ngIf="chatHistoryData.length > 1">
-                                        <button type="button" class="action-icons action-icons-big fa fa-plus ml-2" (click)="onNewChat()"></button>
+                                        <button type="button" class="action-icons action-icons-big fa fa-plus ml-2"
+                                            (click)="onNewChat()"></button>
                                     </ng-container>
                                 </div>
-                            </div>
+                            </div> -->
                         </form>
                     </div>
                 </ng-container>

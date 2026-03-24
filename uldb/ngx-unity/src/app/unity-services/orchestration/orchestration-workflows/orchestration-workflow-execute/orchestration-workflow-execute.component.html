@@ -284,15 +284,31 @@
 
         <form *ngIf="aimlTriggerForm" [formGroup]="aimlTriggerForm">
             <div class="form-group mb-1">
-                <label for="record_uuid" class="col-form-label">Select Event<em>*</em> :</label>
-                <div class="col p-0">
-                    <select class="text-dark form-control mb-2" formControlName="id"
+                <label class="col-form-label">Select Event<em>*</em> :</label>
+                <div class="col p-0 position-relative">
+                    <div class="form-control mb-1 dropdown-toggle-custom d-flex align-items-center justify-content-between"
+                        (click)="toggleDropdown(); $event.stopPropagation()"
                         [class.is-invalid]="aimlTriggerFormErrors.id">
-                        <option value="" disabled>Select Event</option>
-                        <option *ngFor="let i of aimlData" [ngValue]="i.id">{{i.id}} - {{ i.status}} - {{ i.description
-                            }}
-                        </option>
-                    </select>
+                        <span class="text-truncate">
+                            <ng-container *ngIf="!selectedItem">Select Event</ng-container>
+                            <ng-container *ngIf="selectedItem">
+                                {{selectedItem.id}} - {{ selectedItem.status }} - {{ selectedItem.description }}
+                            </ng-container>
+                        </span>
+                        <i class="fa" [ngClass]="isDropdownOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </div>
+                    <div class="dropdown-list" *ngIf="isDropdownOpen" (scroll)="onScroll($event)"
+                        (click)="$event.stopPropagation()">
+                        <div *ngFor="let i of aimlData" class="dropdown-item" (click)="selectItem(i)">
+                            {{i.id}} - {{ i.status }} - {{ i.description }}
+                        </div>
+                        <div *ngIf="isLoading" class="dropdown-loading">
+                            Loading...
+                        </div>
+                        <div *ngIf="!hasNextPage && !isLoading" class="dropdown-end">
+                            No more results
+                        </div>
+                    </div>
                     <div class="invalid-feedback d-block" *ngIf="aimlTriggerFormErrors.id">
                         {{ aimlTriggerFormErrors.id }}
                     </div>

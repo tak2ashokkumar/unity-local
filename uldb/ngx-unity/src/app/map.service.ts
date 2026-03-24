@@ -1,7 +1,5 @@
 import { Injectable, NgZone } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { take, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +11,8 @@ export class MapService {
   private disabled = false;
 
   mapHidden = false;
-  private available = false;
 
-  constructor(private zone: NgZone) {
-    this.listenToNetwork();
-  }
+  constructor(private zone: NgZone) { }
 
   get iconBase(): string {
     return `https://maps.google.com/mapfiles/ms/icons/`;
@@ -47,16 +42,6 @@ export class MapService {
     return this.loaded && !this.disabled;
   }
 
-  private listenToNetwork() {
-    window.addEventListener('online', () => {
-      if (!this.loaded && !this.disabled) {
-        console.info('[MapService] Back online – retrying map load');
-        this.loadPromise = undefined;
-        this.loadMap();
-      }
-    });
-  }
-
   private disable() {
     this.disabled = true;
     this.mapHidden = true;
@@ -71,7 +56,6 @@ export class MapService {
   }
 
   loadMap(): Promise<void> {
-    console.log('in load map');
     if (this.loadPromise) return this.loadPromise;
     if (this.disabled) return Promise.resolve();
     if ((window as any).google?.maps?.importLibrary) {
@@ -80,39 +64,43 @@ export class MapService {
     }
 
     if (!navigator.onLine) {
-      console.warn('[MapService] Offline – map deferred');
       this.disable();
       return Promise.resolve();
     }
 
-    this.loadPromise = new Promise((resolve) => {
-      const script = document.createElement('script');
+    this.loadPromise = new Promise<void>((resolve) => {
+      // Google Maps official bootstrap loader pattern:
+      // Pre-set importLibrary as a stub so the SDK detects it and skips
+      // the "loaded directly without loading=async" warning.
+      // Uses callback=google.maps.__ib__ — the SDK replaces the stub with
+      // the real importLibrary when it calls __ib__ after initialization.
+      const win = window as any;
+      win.google = win.google || {};
+      const d = (win.google.maps = win.google.maps || {});
+      const r = new Set<string>(['marker', 'places']);
 
-      script.src =
-        `https://maps.googleapis.com/maps/api/js` +
-        `?key=${environment.gmk}` +
-        `&v=weekly` +
-        `&loading=async` +
-        `&libraries=marker,places` +
-        `&map_ids=${environment.gmId}`;
-
-      script.async = true;
-      script.defer = true;
-
-      script.onload = () => {
-        this.zone.run(() => {
-          this.loaded = true;
-          resolve();
+      let h: Promise<void>;
+      const u = (): Promise<void> => h || (h = new Promise<void>((f, n) => {
+        const params = new URLSearchParams({
+          key: environment.gmk,
+          v: 'weekly',
+          libraries: [...r].join(','),
+          map_ids: environment.gmId,
+          callback: 'google.maps.__ib__',
         });
-      };
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?${params}`;
+        d.__ib__ = f;
+        script.onerror = () => { h = undefined; n(new Error('Maps load failed')); };
+        document.head.appendChild(script);
+      }));
 
-      script.onerror = () => {
-        // console.error('[MapService] Google Maps load failed');
-        this.disable();
-        resolve(); // never reject
-      };
+      d.importLibrary = (lib: string, ...args: any[]) =>
+        r.add(lib) && u().then(() => (d.importLibrary as Function)(lib, ...args));
 
-      document.head.appendChild(script);
+      u()
+        .then(() => this.zone.run(() => { this.loaded = true; resolve(); }))
+        .catch(() => { this.disable(); resolve(); });
     });
 
     return this.loadPromise;

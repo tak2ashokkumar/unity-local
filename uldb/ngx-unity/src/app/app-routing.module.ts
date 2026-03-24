@@ -9,6 +9,7 @@ import { AppWelcomePageComponent } from './app-welcome-page/app-welcome-page.com
 import { DefaultComponent } from './default/default.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
 import { WelcomePageGuardService } from './welcome-page-guard.service';
+import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
 
 export const routes: Routes = [
   {
@@ -136,6 +137,24 @@ export const routes: Routes = [
             data: {
               breadcrumb: {
                 title: 'Profile Settings'
+              }
+            }
+          },
+          {
+            path: 'profile/add-model',
+            component: UserProfileAddModelComponent,
+            data: {
+              breadcrumb: {
+                title: 'Add Model'
+              }
+            }
+          },
+          {
+            path: 'profile/edit-model/:modelId',
+            component: UserProfileAddModelComponent,
+            data: {
+              breadcrumb: {
+                title: 'Edit Model'
               }
             }
           },

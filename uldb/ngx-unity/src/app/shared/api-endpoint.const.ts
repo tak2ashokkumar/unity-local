@@ -605,6 +605,7 @@ export const ADD_DATA_CENTERS = () => DATA_CENTERS();
 
 export const EDIT_DATA_CENTERS = (dcId: string) => `customer/colo_cloud/${dcId}/`;
 
+export const GET_OFFLINE_LOCATION_DATA = () => `${environment.staticData}locations/offline-locations.json`;
 
 export const PRIVATE_CLOUDS_BY_DATACENTER_ID = (dcId: string) => `customer/colo_cloud/${dcId}/private_clouds`;
 

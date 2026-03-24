@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { OrchestrationAgenticWorkflowAimlTriggerService } from './orchestration-agentic-workflow-aiml-trigger.service';
@@ -24,14 +24,21 @@ export class OrchestrationAgenticWorkflowAimlTriggerComponent implements OnInit 
   aimlTriggerFormValidationMessage: any;
   workflowId: string;
   workflowName: string;
-  aimlData: any;
+  aimlData: any[] = [];
+  isDropdownOpen = false;
+  isLoading = false;
+  hasNextPage = true;
+  page = 1;
+  pageSize = 10;
+  selectedItem: any;
+  aimlParams: any;
 
   constructor(private svc: OrchestrationAgenticWorkflowAimlTriggerService,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
     private route: ActivatedRoute,
     private utilService: AppUtilityService,
-    private router: Router) {
+    private router: Router, private eRef: ElementRef) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.workflowId = params.get('id');
     });
@@ -47,16 +54,86 @@ export class OrchestrationAgenticWorkflowAimlTriggerComponent implements OnInit 
     this.ngUnsubscribe.complete();
   }
 
-  getAIMLData(param: any) {
-    const obj = { aiml_type: param.config.aiml_type, event_type: param.config.event_type, filter: param.config.filter }
-    this.svc.getAIMLData(obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.aimlData = res.results.map(item => ({
+  // getAIMLData(param: any) {
+  //   const obj = { aiml_type: param.config.aiml_type, event_type: param.config.event_type, filter: param.config.filter }
+  //   this.svc.getAIMLData(obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+  //     this.aimlData = res.results.map(item => ({
+  //       ...item,
+  //       status: item.status === 0 ? "Open" : item.status === 1 ? "Resolved" : item.status
+  //     }));
+  //   }, () => {
+  //     this.notification.error(new Notification('Failed to load AIML Data'));
+  //   });
+  // }
+
+  getAIMLData() {
+    if (this.isLoading || !this.hasNextPage) return;
+
+    this.isLoading = true;
+
+    const obj = {
+      aiml_type: this.aimlParams.config.aiml_type,
+      event_type: this.aimlParams.config.event_type,
+      filter: this.aimlParams.config.filter
+    };
+
+    this.svc.getAIMLData(this.page, this.pageSize, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+
+      const newData = res.results.map(item => ({
         ...item,
         status: item.status === 0 ? "Open" : item.status === 1 ? "Resolved" : item.status
       }));
+
+      this.aimlData = [...(this.aimlData || []), ...newData];
+      this.hasNextPage = !!res.next;
+      this.page++;
+      this.isLoading = false;
+      this.spinner.stop('main');
+
     }, () => {
+      this.isLoading = false;
+      this.spinner.stop('main');
       this.notification.error(new Notification('Failed to load AIML Data'));
     });
+  }
+
+  onScroll(event: any) {
+    const element = event.target;
+
+    const atBottom =
+      element.scrollHeight - element.scrollTop <= element.clientHeight + 10;
+
+    if (atBottom) {
+      this.getAIMLData();
+    }
+  }
+
+  openDropdown() {
+    this.page = 1;
+    this.hasNextPage = true;
+    this.aimlData = [];
+
+    this.getAIMLData();
+  }
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+    if (this.isDropdownOpen && this.aimlData.length === 0) {
+      this.openDropdown();
+    }
+  }
+
+  selectItem(item: any) {
+    this.selectedItem = item;
+    this.aimlTriggerForm.patchValue({ id: item.id });
+    this.isDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: MouseEvent) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.isDropdownOpen = false;
+    }
   }
 
   getWebhookDetails() {
@@ -64,7 +141,8 @@ export class OrchestrationAgenticWorkflowAimlTriggerComponent implements OnInit 
     this.svc.getAIMLTriggerDetails(this.workflowId).pipe(takeUntil(this.ngUnsubscribe)).subscribe((param) => {
       this.workflowName = param.name;
       this.buildWebhookForm(param);
-      this.getAIMLData(param);
+      this.aimlParams = param;
+      this.getAIMLData();
     }, err => {
       this.notification.error(new Notification('Error while fetching AIML Trigger Inputs. Please try again!!'));
     });

@@ -5,13 +5,14 @@ import { NoWhitespaceValidator } from '../app-utility/app-utility.service';
 import { RxwebValidators } from '@rxweb/reactive-form-validators';
 import { DataCenter } from 'src/app/united-cloud/datacenter/tabs';
 import { Observable, Subject, of } from 'rxjs';
-import { EDIT_DATA_CENTERS, ADD_DATA_CENTERS } from '../api-endpoint.const';
+import { EDIT_DATA_CENTERS, ADD_DATA_CENTERS, GET_OFFLINE_LOCATION_DATA } from '../api-endpoint.const';
 import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DcCrudService {
+  private locationCache: OfflineLocationDetails[] | null = null;
   private addOrEditAnnouncedSource = new Subject<string>();
   addOrEditAnnounced$ = this.addOrEditAnnouncedSource.asObservable();
 
@@ -87,6 +88,13 @@ export class DcCrudService {
     }
   }
 
+   getOfflineLocations(): Observable<OfflineLocationDetails[]> {
+    if (this.locationCache) return of(this.locationCache);
+    return this.http.get<OfflineLocationDetails[]>(GET_OFFLINE_LOCATION_DATA()).pipe(
+      map(cities => { this.locationCache = cities; return cities; })
+    );
+  }
+
   saveDatacenter(dcId: string, dc: DataCenter): Observable<DataCenter> {
     if (dcId) {
       return this.http.put<DataCenter>(EDIT_DATA_CENTERS(dcId), dc);
@@ -98,4 +106,12 @@ export class DcCrudService {
   delete(dcId: string) {
     return this.http.delete(EDIT_DATA_CENTERS(dcId));
   }
+}
+
+export interface OfflineLocationDetails {
+  name: string;
+  state: string;
+  country: string;
+  lat: number;
+  lng: number;
 }

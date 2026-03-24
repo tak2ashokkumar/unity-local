@@ -38,11 +38,11 @@ export class UcAgentsService {
     });
   }
 
-  submitReaction(data: any, queryId: number) {
+  submitReaction(data: any, queryId: string) {
     return this.http.post(`chatbot/reaction/${queryId}/`, data);
   }
 
-  submitFeedback(data: any, queryId: number) {
+  submitFeedback(data: any, queryId: string) {
     return this.http.post(`chatbot/feedback/${queryId}/`, data);
   }
 }

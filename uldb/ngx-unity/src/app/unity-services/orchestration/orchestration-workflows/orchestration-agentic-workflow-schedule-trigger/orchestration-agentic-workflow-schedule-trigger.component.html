@@ -57,9 +57,9 @@
                                         <div class="col-4"
                                             *ngIf="inputControl.get('param_type')?.value === 'Cloud Account'">
                                             <select class="text-dark form-control" formControlName="default_value"
-                                                [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }">
+                                                [ngClass]="{ 'is-invalid': scheduleFormErrors.inputs[i]?.default_value }"  [compareWith]="compareAccounts">
                                                 <option value="">Select Cloud Account</option>
-                                                <option *ngFor="let account of cloudAccount" [value]="account.uuid">{{
+                                                <option *ngFor="let account of cloudAccount" [value]="account">{{
                                                     account.account_name }}
                                                 </option>
                                             </select>

@@ -240,6 +240,75 @@
                         </div>
                     </div>
                 </div>
+                <div class="card mb-2">
+                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                        <span class="fw-semibold">LLM Model Configuration</span>
+                        <button class="btn btn-warning btn-sm btn-pill" (click)="goToAddModel()">
+                            Add Model
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive" *ngIf="userOwnedLlms?.length">
+                            <table class="table mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Provider</th>
+                                        <th>Model Name</th>
+                                        <th>Description</th>
+                                        <th>Active for</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let model of userOwnedLlms">
+                                        <td class="float-left">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <img *ngIf="providerImages[model.provider]"
+                                                    [src]="providerImages[model.provider]" width="20" height="20"
+                                                    class="mx-2" />
+                                                <div class="text-capitalize">{{ model.provider }}</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{ model.modelName }}
+                                        </td>
+                                        <td>
+                                            {{ model.description }}
+                                        </td>
+                                        <td class="w-30">
+                                            {{ model.activeFor.join(', ') }}
+                                        </td>
+                                        <td class="text-center w-17">
+                                            <!-- <button class="action-icons mb-0 fas fa-toggle-on font-sm mt-1 mb-1"
+                                                [tooltip]="view.triggerDisableBtnTooltipMsg" container="body"
+                                                [ngClass]="{'action-icons-disabled':view.isStatusResolved || !view.isSourceUnity}"
+                                                (click)="disable(view)"></button> -->
+                                            <!-- <button class="action-icons fas mb-0 font-sm mr-2" container="body"
+                                                [ngClass]="{
+'fa-toggle-on': model.isActiveForSession,'fa-toggle-off': !model.isActiveForSession,'action-icons-disabled': model.isActiveForSession}"
+                                                [disabled]="model.isActiveForSession"
+                                                (click)="!model.isActiveForSession && enableModel(model)">
+                                            </button> -->
+                                            <button class="action-icons btn btn-sm fas fa-pen mr-2"
+                                                [ngClass]="{'action-icons-disabled': model.isActiveForSession}"
+                                                [disabled]="model.isActiveForSession" tooltip="Edit"
+                                                (click)="!model.isActiveForSession && editModel(model)">
+                                            </button>
+                                            <button class="action-icons btn btn-sm fas fa-trash" tooltip="Delete"
+                                                [ngClass]="{'action-icons-disabled': model.isActiveForSession}"
+                                                [disabled]="model.isActiveForSession"
+                                                (click)="!model.isActiveForSession && deleteModel(model)">
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center py-3 text-muted" *ngIf="!userOwnedLlms?.length">
+                            No User-Owned Models Found
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-6 pr-0">
                 <div class="card mb-2">
@@ -360,6 +429,28 @@
                 (click)="defaultDashboardModalRef.hide()">Cancel</button>
             <button class="btn btn-sm btn-pill btn-warning ml-2 px-4 font-500" type="button"
                 (click)="confirmSetDefaultDashboard()">Yes</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #confirmdelete>
+    <div class="card mb-0">
+        <div class="card-header">
+            Confirm Delete
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="modelDeleteModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            This Model will be deleted. Are you sure you want to delete?
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmModelDelete()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="modelDeleteModalRef.hide()"
+                type="button">No</button>
         </div>
     </div>
 </ng-template>

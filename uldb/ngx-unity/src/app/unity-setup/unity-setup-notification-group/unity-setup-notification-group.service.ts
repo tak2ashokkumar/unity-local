@@ -52,7 +52,7 @@ export class UnitySetupNotificationGroupService {
       view.statusIcon = group.is_enabled ? 'fa-toggle-on' : 'fa-toggle-off';
       view.statusTooltip = group.is_enabled ? 'Disable' : 'Enable';
       enabledCount = group.is_enabled ? enabledCount + 1 : enabledCount;
-      view.module = group.module == 'aiml' ? 'AIML' : group.module == 'devops_automation' ? 'Devops Automation' : 'N/A';
+      view.module = group.module == 'aiml' ? 'AIML' : group.module == 'devops_automation' ? 'Devops Automation' : group.module == 'deprecation' ? 'Deprecation' : 'N/A';
       viewData.push(view);
     });
     return { viewData: viewData, enabledCount: enabledCount };

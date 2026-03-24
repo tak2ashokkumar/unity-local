@@ -1,0 +1,199 @@
+.systemedit:hover  .edit_system,.serveredit:hover  .edit_server, .connectedit:hover  .edit_connect, .serveredit:hover .delete_server, .connectedit:hover .delete_connect, .cabedit:hover .edit_cabinet,.compedit:hover  .edit_comp,.compedit:hover  .delete_comp
+{
+	display: inline-block;
+}
+
+.edit_system, .edit_server, .edit_connect, .edit_cabinet, .edit_comp
+{
+	height: 13px;
+	width: 15px;
+	position: relative;
+	background-image: url('/static/img/edit32.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: none;	
+}
+
+.delete_connect, .delete_server, .delete_comp
+{
+	height: 13px;
+	width: 15px;
+	position: relative;
+	/*top: 0%;*/
+	background-image: url('/static/img/del32.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	/*margin-left: 10px;*/
+	display: none;	
+}
+
+.server_connect_edit
+{
+	height: 20px;
+	width: 20px;
+	position: relative;
+	top: 0%;
+	background-image: url('/static/img/server_connection.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: inline-block;	
+}
+
+.errormsg
+{
+	display: inline !important;
+	color: red;
+}
+
+.remove_system_item
+{
+	height: 15px;
+	width: 15px;
+	position: relative;
+	/*top: 0%;*/
+	background-image: url('/static/img/remove.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	/*margin-left: 30px;*/
+	display: inline-block;	
+	opacity: 0.5;
+}
+
+.remove_system_item:hover, .showvmdetails:hover
+{
+	opacity: 1;
+	cursor: pointer;
+}
+
+.edit_item
+{
+	height: 16px;
+	width: 16px;
+	position: relative;
+	background-image: url('/static/img/edit32.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: inline-block;	
+	opacity: 0.5;
+}
+
+.edit_item:hover, .dropdown-toggle:hover, .changepwd:hover
+{
+	opacity: 1;
+	cursor: pointer;
+}
+
+.remove_item, .remove_item_edit
+{
+	height: 15px;
+	width: 15px;
+	position: relative;
+	top: 0%;
+	background-image: url('/static/img/remove.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	margin-left: 5px;
+	display: block;	
+	opacity: 0.5;
+}
+
+.remove_item:hover, .remove_item_edit:hover, .server_customer:hover
+{
+	opacity: 1;
+	cursor: pointer;
+}
+
+.highlight 
+{
+	border: 1px solid #44adc6;
+	background-color: #6bbed2;
+	background-image: -webkit-gradient(linear,left top,left bottom,from(#dadada),to(#dadada));
+	background-image: -webkit-linear-gradient(top,#dadada,#dadada);
+	background-image: -moz-linear-gradient(top,#dadada,#dadada);
+	background-image: -ms-linear-gradient(top,#dadada,#dadada);
+	background-image: -o-linear-gradient(top,#dadada,#dadada);
+	background-image: linear-gradient(to bottom,#dadada,#dadada);
+}
+
+.highlight td, .highlight th
+{
+	border-bottom:1px solid lightgrey !important;
+}
+
+.highlight th a
+{
+	color:black;
+	font-weight: bold;
+}
+
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    background-color: #f5f5f5;
+}
+
+.panelheight
+{
+	    min-height: 50px;
+	    max-height: 400px;
+	    overflow: auto;
+}
+
+.panelbodyborder
+{
+	border: 1px solid transparent;
+	border-color: #269b6b;
+}
+
+.panelheadinline
+{
+	display: inline-block;
+}
+
+.panelheaderblockborder
+{
+	border:none;
+	border-radius: 0; 
+        -webkit-box-shadow: none;
+         box-shadow: none;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+    color: #fff;
+    cursor: default;
+    background-color: #269b6b;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+}
+
+.addmb
+{
+	margin-left:5px;
+	color: #269b6b;
+}
+
+.addmb:hover
+{
+	cursor: pointer;
+}
+
+.ins_state_running
+{
+	height: 15px;
+	width: 15px;
+	position: relative;
+	background-image: url('/static/img/circle_green.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+	
+.ins_state_stopped
+{
+	height: 15px;
+	width: 15px;
+	position: relative;
+	background-image: url('/static/img/stopped.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+}

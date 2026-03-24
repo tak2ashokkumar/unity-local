@@ -36,6 +36,7 @@ import { SharedModule } from './shared/shared.module';
 import { UserInfoService } from './shared/user-info.service';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { UnityChatbotModule } from './unity-chatbot/unity-chatbot.module';
+import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
 
 export let AppInjector: Injector;
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -57,6 +58,7 @@ export function useFactory(service: UserInfoService) { return () => service.load
     TwoFactorAuthComponent,
     AppWelcomePageComponent,
     GlobalSearchComponent,
+    UserProfileAddModelComponent,
   ],
   imports: [
     BrowserModule,

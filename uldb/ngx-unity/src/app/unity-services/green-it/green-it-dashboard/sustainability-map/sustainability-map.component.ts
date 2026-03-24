@@ -2,10 +2,11 @@ import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MapService } from 'src/app/map.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { environment } from 'src/environments/environment';
-import { DatacenterInRegion, SustainabilityMapDatacenterCluster, SustainabilityMapService, SustainabilityMapViewdata, UnitySustainabilityCO2Overlay } from './sustainability-map.service';
+import { createCO2Overlay, DatacenterInRegion, SustainabilityMapDatacenterCluster, SustainabilityMapService, SustainabilityMapViewdata, UnitySustainabilityCO2Overlay } from './sustainability-map.service';
 
 @Component({
   selector: 'sustainability-map',
@@ -23,7 +24,7 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
 
   cluster: any;
   private clusterListeners: google.maps.MapsEventListener[] = [];
-  clusterInfoWindow = new google.maps.InfoWindow();
+  clusterInfoWindow: google.maps.InfoWindow;
   private tilesLoaded: google.maps.MapsEventListener;
 
   markers: google.maps.marker.AdvancedMarkerElement[] = [];
@@ -31,17 +32,26 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
   oldZIndex: number = null;
   initialZoom: number;
   INIT_ZOOM: number = 1.0;
-  INIT_CENTER: google.maps.LatLng = new google.maps.LatLng(25.738611, 0);
+  INIT_CENTER = { lat: 25.738611, lng: 0 };
 
   overlays: UnitySustainabilityCO2Overlay[] = []
+  isMapAvailable = false;
+  mapCheckComplete = false;
 
   constructor(private notification: AppNotificationService,
     private ngZone: NgZone,
     private spinner: AppSpinnerService,
-    private smSvc: SustainabilityMapService) { }
+    private smSvc: SustainabilityMapService,
+    private mapSvc: MapService) { }
 
   ngOnInit(): void {
-    this.getCarbonEmmissionByRegion();
+    this.mapSvc.loadMap().then(() => {
+      this.mapCheckComplete = true;
+      if (!this.mapSvc.isAvailable()) return;
+      this.isMapAvailable = true;
+      this.clusterInfoWindow = new google.maps.InfoWindow();
+      this.getCarbonEmmissionByRegion();
+    });
     // this.getDCStatus();
   }
 
@@ -91,7 +101,7 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
         this.dcMap[dc.location] = dc.centers.map(dc => dc.name);
       });
       // Create overlay for each regions
-      const overlay: UnitySustainabilityCO2Overlay = new UnitySustainabilityCO2Overlay(view.location, view.percent);
+      const overlay: UnitySustainabilityCO2Overlay = createCO2Overlay(view.location, view.percent);
       overlay.setMap(this.map);
       this.overlays.push(overlay);
       google.maps.event.addListener(overlay, 'click', (event) => {

@@ -1023,7 +1023,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
         return {
           aiml_type: formDatas?.aimlForm?.aiml_type,
           event_type: formDatas?.aimlForm?.event_type,
-          filter: formDatas?.aimlForm?.filter,
+          filter: _clone(formDatas?.aimlForm?.filter),
           description: formDatas?.aimlForm?.description,
         }
 
@@ -2170,6 +2170,9 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
         this.workflowStatus = data?.status;
         if (data?.status === 'Failed') {
           this.resumeBtn = true;
+        }
+        if (data?.status === 'Success') {
+          this.resumeBtn = false;
         }
         if (data?.status === 'Success' || data?.status === 'Failed') {
           this.isWorkflowExecuting = false

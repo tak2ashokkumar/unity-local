@@ -27,6 +27,7 @@ app.use((req, res, next) => {
   let isMockRequest = req.url.startsWith("/customer") ||
     req.url.startsWith("/rest") ||
     req.url.startsWith("/chatbot") ||
+    req.url.startsWith("/mcp") ||
     req.url.startsWith("/task")
 
   if (isMockRequest) {

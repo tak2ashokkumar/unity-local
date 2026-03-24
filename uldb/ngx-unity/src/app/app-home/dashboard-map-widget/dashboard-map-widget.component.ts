@@ -47,7 +47,6 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
     await this.mapSvc.loadMap();
 
     this.isMapAvailable = this.mapSvc.isAvailable();
-    console.log('this.isMapAvailable : ', this.isMapAvailable)
     if (!this.isMapAvailable) return;
 
     this.getDCStatus();
@@ -70,7 +69,6 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
   }
 
   getDCStatus() {
-    console.log('in getDCStatus')
     this.spinner.start('dashboard_map_widget');
     this.mapWidgetSerice.getDatacenterSatus().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       if (res) {
@@ -170,7 +168,7 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
     const { AdvancedMarkerElement } = await this.mapSvc.importMarkerLibrary();
     this.viewdata.map((loc, i) => {
       // const ll = new google.maps.LatLng(loc.lat, loc.long);
-      const ll = { lat: loc.lat, lng: loc.long };
+      const ll = { lat: Number(loc.lat), lng: Number(loc.long) };
       const marker = new AdvancedMarkerElement({
         position: ll,
         map: this.map,

@@ -119,6 +119,10 @@ export class OrchestrationAgenticWorkflowScheduleTriggerComponent implements OnI
     return name.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
   }
 
+  compareAccounts(a: any, b: any): boolean {
+    return a && b ? a.uuid === b.uuid : a === b;
+  }
+
   goBack() {
     this.router.navigate(['../../'], { relativeTo: this.route });
   }

@@ -18,6 +18,7 @@ export interface UnityChatBotResponse {
     // data: string | UnityChatBotResponseTableData | UnityChatBotResponseChartData;
     answer: string;
     suggested_questions: string[];
+    chat_message_id: string;
 }
 
 export interface UnityChatBotResponseTableData {
@@ -49,7 +50,7 @@ export interface ChatHistoryData {
     user: 'user' | 'bot';
     message: string | ChatbotTableViewData | UnityChartDetails;
     type: string;
-    botResponseId?: number;
+    botResponseId?: string;
     liked?: boolean;
     disliked?: boolean;
     comment?: boolean;

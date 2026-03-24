@@ -1,0 +1,147 @@
+{
+  "supported_llms": [
+    {
+      "active_for_applications": [],
+      "description": "OpenAI's reliable model",
+      "provider": "openai",
+      "is_user_owned": true,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": 4,
+      "model_name": "gpt-4o"
+    },
+    {
+      "active_for_applications": [],
+      "description": "OpenAI's advanced model",
+      "provider": "openai",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "gpt-4.1"
+    },
+    {
+      "active_for_applications": [],
+      "description": "OpenAI's best model",
+      "provider": "openai",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "gpt-5.1"
+    },
+    {
+      "active_for_applications": [
+        "network_agent",
+        "assistant"
+      ],
+      "description": "OpenAI's recent model",
+      "provider": "openai",
+      "is_user_owned": true,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": 2,
+      "model_name": "gpt-5.2"
+    },
+    {
+      "active_for_applications": [],
+      "description": "Claude's recent model",
+      "provider": "anthropic",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "claude-opus-4-6"
+    },
+    {
+      "active_for_applications": [],
+      "description": "Claude's reliable model",
+      "provider": "anthropic",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "claude-sonnet-4-6"
+    },
+    {
+      "active_for_applications": [],
+      "description": "Google's recent model",
+      "provider": "google",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "gemini-3-flash"
+    },
+    {
+      "active_for_applications": [],
+      "description": "Google's reliable model",
+      "provider": "google",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "gemini-2.5-flash"
+    },
+    {
+      "active_for_applications": [],
+      "description": "groq's llama model",
+      "provider": "groq",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "llama-3.3-70b-versatile"
+    },
+    {
+      "active_for_applications": [],
+      "description": "groq's gpt open source model",
+      "provider": "groq",
+      "is_user_owned": false,
+      "endpoint_url": "",
+      "compatible_applications": {
+        "assistant": "Assistant",
+        "network_agent": "Network Agent",
+        "workflow_agent": "Workflow Agent"
+      },
+      "id": null,
+      "model_name": "openai/gpt-oss-120b"
+    }
+  ]
+}

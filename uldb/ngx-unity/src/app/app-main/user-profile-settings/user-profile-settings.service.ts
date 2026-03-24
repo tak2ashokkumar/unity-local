@@ -8,8 +8,9 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { TicketMgmtList } from 'src/app/shared/SharedEntityTypes/ticket-mgmt-list.type';
 import { GET_TICKET_MGMT_LIST, GET_USER_PROFILE, GET_ZENDESK_STATUS, LIST_USER, UNITY_ORG_SETTINGS, UNITY_ORG_SETTINGS_DETAILS, UPDATE_PASSWORD, UPDATE_TIMEZONE } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
-import { UnityOrganizationSettings } from './user-profile-settings.type';
+import { LLMConfig, UnityOrganizationSettings } from './user-profile-settings.type';
 import { AppDashboardListType } from 'src/app/app-dashboard/app-dashboard.type';
+import { AILLMModel } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.type';
 
 @Injectable()
 export class UserProfileSettingsService {
@@ -156,6 +157,36 @@ export class UserProfileSettingsService {
     return this.http.put(`customer/uldbusers/set_default_dashboard/`, dashboard);
   }
 
+  getLLMList(): Observable<PaginatedResult<AILLMModel>> {
+    return this.http.get<PaginatedResult<AILLMModel>>(`/mcp/user-llm-config/`);
+  }
+
+  enableModel(modelId: string): Observable<any> {
+    let obj = { active_model: modelId }
+    return this.http.post(`mcp/user-session-config/`, obj);
+  }
+
+  deleteModel(modelId: string): Observable<any> {
+    return this.http.delete(`mcp/user-llm-config/${modelId}`)
+  }
+
+  convertToLLMListViewData(data: AILLMModel[]) {
+    let viewData: LlmConfigViewData[] = [];
+    data.forEach(a => {
+      let td: LlmConfigViewData = new LlmConfigViewData();
+      td.id = a.id;
+      td.provider = a.provider;
+      td.modelName = a.model_name;
+      td.activeFor = a.active_for_applications?.length ? a.active_for_applications.map(app =>
+        app.replace(/_/g, ' ').replace(/\b./g, m => m.toUpperCase())
+      ): [];
+      td.description = a.description;
+      td.endpointUrl = a.endpoint_url ? a.endpoint_url : 'NA';
+      viewData.push(td);
+    });
+    return viewData;
+  }
+
 }
 
 export class UserProfileViewData {
@@ -186,3 +217,20 @@ interface UpdateTimeZoneType {
   uuid: string;
   timezone: string;
 }
+
+export class LlmConfigViewData {
+  constructor() { };
+  id: number;
+  provider: string;
+  modelName: string;
+  description: string;
+  endpointUrl: string;
+  activeFor: string[];
+}
+
+export const providerImages = {
+  openai: 'static/assets/images/external-brand/ai-models/openai.svg',
+  anthropic: 'static/assets/images/external-brand/ai-models/claude-color.svg',
+  google: 'static/assets/images/external-brand/ai-models/gemini.svg',
+  groq: 'static/assets/images/external-brand/ai-models/grok.svg'
+};

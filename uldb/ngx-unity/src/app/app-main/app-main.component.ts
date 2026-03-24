@@ -41,9 +41,9 @@ export class AppMainComponent implements OnDestroy, OnInit {
     private mainService: AppMainService,
     @Inject(DOCUMENT) _document?: any) {
     this.changes = new MutationObserver((mutations) => {
-      this.sidebarMinimized = _document.body.classList.contains('sidebar-minimized');
+      this.sidebarMinimized = _document.body?.classList?.contains('sidebar-minimized');
       this.mainWidth = this.sidebarMinimized ? 50 : 225;
-      this.sidebarHidden = !_document.body.classList.contains('sidebar-lg-show');
+      this.sidebarHidden = !_document.body?.classList?.contains('sidebar-lg-show');
       this.mainWidth = this.sidebarHidden ? 0 : this.sidebarMinimized ? 50 : 225;
     });
     this.element = _document.body;

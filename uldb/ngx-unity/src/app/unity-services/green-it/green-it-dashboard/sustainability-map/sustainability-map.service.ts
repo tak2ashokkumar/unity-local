@@ -157,107 +157,99 @@ export class SustainabilityMapDatacenterCluster {
   [key: string]: string[];
 }
 
-export class UnitySustainabilityCO2Overlay extends google.maps.OverlayView {
+export interface UnitySustainabilityCO2Overlay extends google.maps.OverlayView {
   bound: google.maps.LatLng;
-  private percent: number;
-  private div?: HTMLElement;
-  private circleSize = 50;
+  hide(): void;
+  show(): void;
+  toggle(): void;
+  toggleDOM(map: google.maps.Map): void;
+}
 
-  constructor(bound: google.maps.LatLng, percent: number) {
-    super();
-    this.bound = bound;
-    this.percent = percent;
-  }
+/**
+ * Factory function to create CO2 overlay instances lazily.
+ * The class definition is inside this function to avoid evaluating
+ * `google.maps.OverlayView` at module load time (before Maps API loads).
+ */
+export function createCO2Overlay(bound: google.maps.LatLng, percent: number): UnitySustainabilityCO2Overlay {
+  const Overlay = class extends google.maps.OverlayView {
+    bound: google.maps.LatLng;
+    private percent: number;
+    private div?: HTMLElement;
+    private circleSize = 50;
 
-  /**
-   * onAdd is called when the map's panes are ready and the overlay has been
-   * added to the map.
-   */
-  onAdd() {
-    this.div = document.createElement('div');
-    this.div.style.borderStyle = 'none';
-    this.div.style.borderWidth = '0px';
-    this.div.style.position = 'absolute';
-
-    // Create the img element and attach it to the div.
-
-    this.div.style.width = '1px';
-    this.div.style.height = '1px';
-    this.div.style.position = 'absolute';
-    this.div.style['border-radius'] = '50%';
-    this.div.style['background-color'] = getComputedStyle(document.documentElement).getPropertyValue(`--primary-400`);
-
-    // Add the element to the "overlayLayer" pane.
-    const panes = this.getPanes()!;
-
-    panes.overlayMouseTarget.appendChild(this.div);
-    google.maps.event.addDomListener(this.div, 'click', () => {
-      google.maps.event.trigger(this, 'click');
-    });
-  }
-
-  draw() {
-    // We use the south-west and north-east
-    // coordinates of the overlay to peg it to the correct position and size.
-    // To do this, we need to retrieve the projection from the overlay.
-    const overlayProjection = this.getProjection();
-
-    // Retrieve the south-west and north-east coordinates of this overlay
-    // in LatLngs and convert them to pixel coordinates.
-    // We'll use these coordinates to resize the div.
-    const sw = overlayProjection.fromLatLngToDivPixel(this.bound)!;
-
-    // Resize the image's div to fit the indicated dimensions.
-    if (this.div) {
-      let size = this.circleSize * (this.percent / 100);
-      this.div.style.width = `${size}px`;
-      this.div.style.height = `${size}px`;
-      this.div.style.left = `${sw.x - (size / 2)}px`;
-      this.div.style.top = `${sw.y - (size / 2)}px`;
+    constructor() {
+      super();
+      this.bound = bound;
+      this.percent = percent;
     }
-  }
 
-  /**
-   * The onRemove() method will be called automatically from the API if
-   * we ever set the overlay's map property to 'null'.
-   */
-  onRemove() {
-    if (this.div) {
-      (this.div.parentNode as HTMLElement).removeChild(this.div);
-      delete this.div;
+    onAdd() {
+      this.div = document.createElement('div');
+      this.div.style.borderStyle = 'none';
+      this.div.style.borderWidth = '0px';
+      this.div.style.position = 'absolute';
+
+      this.div.style.width = '1px';
+      this.div.style.height = '1px';
+      this.div.style.position = 'absolute';
+      this.div.style['border-radius'] = '50%';
+      this.div.style['background-color'] = getComputedStyle(document.documentElement).getPropertyValue(`--primary-400`);
+
+      const panes = this.getPanes()!;
+      panes.overlayMouseTarget.appendChild(this.div);
+      google.maps.event.addDomListener(this.div, 'click', () => {
+        google.maps.event.trigger(this, 'click');
+      });
     }
-  }
 
-  /**
-     *  Set the visibility to 'hidden' or 'visible'.
-     */
-  hide() {
-    if (this.div) {
-      this.div.style.visibility = 'hidden';
-    }
-  }
-
-  show() {
-    if (this.div) {
-      this.div.style.visibility = 'visible';
-    }
-  }
-
-  toggle() {
-    if (this.div) {
-      if (this.div.style.visibility === 'hidden') {
-        this.show();
-      } else {
-        this.hide();
+    draw() {
+      const overlayProjection = this.getProjection();
+      const sw = overlayProjection.fromLatLngToDivPixel(this.bound)!;
+      if (this.div) {
+        let size = this.circleSize * (this.percent / 100);
+        this.div.style.width = `${size}px`;
+        this.div.style.height = `${size}px`;
+        this.div.style.left = `${sw.x - (size / 2)}px`;
+        this.div.style.top = `${sw.y - (size / 2)}px`;
       }
     }
-  }
 
-  toggleDOM(map: google.maps.Map) {
-    if (this.getMap()) {
-      this.setMap(null);
-    } else {
-      this.setMap(map);
+    onRemove() {
+      if (this.div) {
+        (this.div.parentNode as HTMLElement).removeChild(this.div);
+        delete this.div;
+      }
     }
-  }
+
+    hide() {
+      if (this.div) {
+        this.div.style.visibility = 'hidden';
+      }
+    }
+
+    show() {
+      if (this.div) {
+        this.div.style.visibility = 'visible';
+      }
+    }
+
+    toggle() {
+      if (this.div) {
+        if (this.div.style.visibility === 'hidden') {
+          this.show();
+        } else {
+          this.hide();
+        }
+      }
+    }
+
+    toggleDOM(map: google.maps.Map) {
+      if (this.getMap()) {
+        this.setMap(null);
+      } else {
+        this.setMap(map);
+      }
+    }
+  };
+  return new Overlay();
 }

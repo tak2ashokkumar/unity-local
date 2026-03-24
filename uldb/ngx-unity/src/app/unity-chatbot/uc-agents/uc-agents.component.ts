@@ -316,11 +316,11 @@ export class UcAgentsComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.feedbackForm = this.service.buildFeedbackForm();
   }
 
-  submitReaction(data: any, queryId: number) {
+  submitReaction(data: any, queryId: string) {
     this.service.submitReaction(data, queryId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => { })
   }
 
-  submitFeedBackForm(queryId: number, index: number) {
+  submitFeedBackForm(queryId: string, index: number) {
     this.service.submitFeedback(this.feedbackForm.getRawValue(), queryId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.chatHistoryData[index].comment = false;
       this.chatHistoryData[index].feedbackSubmitted = true;

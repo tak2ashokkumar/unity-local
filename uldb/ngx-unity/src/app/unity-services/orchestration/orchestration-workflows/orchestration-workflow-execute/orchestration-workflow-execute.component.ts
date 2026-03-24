@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Inject, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, HostListener, Inject, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
@@ -66,7 +66,13 @@ export class OrchestrationWorkflowExecuteComponent implements OnInit {
   aimlTriggerForm: FormGroup;
   aimlTriggerFormErrors: any;
   aimlTriggerFormValidationMessage: any;
-  aimlData: any;
+  aimlData: any[] = [];
+  isDropdownOpen = false;
+  isLoading = false;
+  hasNextPage = true;
+  page = 1;
+  pageSize = 10;
+  selectedItem: any;
 
   //Resizing
   @HostBinding('style.width.px')
@@ -98,7 +104,9 @@ export class OrchestrationWorkflowExecuteComponent implements OnInit {
     private utilService: AppUtilityService,
     private router: Router,
     @Inject(DOCUMENT) private document: Document,
-    private renderer: Renderer2) { }
+    private renderer: Renderer2,
+    private eRef: ElementRef
+  ) { }
 
   ngOnInit(): void {
     console.log(this.selectedNode, "selectedNode");
@@ -318,21 +326,93 @@ export class OrchestrationWorkflowExecuteComponent implements OnInit {
     });
   }
 
+  // getAIMLData() {
+  //   if (this.selectedNode?.node_type === 'AIML Event Trigger') {
+  //     const obj = { aiml_type: this.selectedNode.config.aiml_type, event_type: this.selectedNode.config.event_type, filter: this.selectedNode.config.filter }
+  //     this.svc.getAIMLData(obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+  //       this.aimlData = res.results.map(item => ({
+  //         ...item,
+  //         status: item.status === 0 ? "Open" : item.status === 1 ? "Resolved" : item.status
+  //       }));
+  //       this.spinner.stop('main');
+  //     }, () => {
+  //       this.spinner.stop('main');
+  //       this.notification.error(new Notification('Failed to load AIML Data'));
+  //     });
+  //   }
+  // }
+
   getAIMLData() {
-    if (this.selectedNode?.node_type === 'AIML Event Trigger') {
-      const obj = { aiml_type: this.selectedNode.config.aiml_type, event_type: this.selectedNode.config.event_type, filter: this.selectedNode.config.filter }
-      this.svc.getAIMLData(obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-        this.aimlData = res.results.map(item => ({
-          ...item,
-          status: item.status === 0 ? "Open" : item.status === 1 ? "Resolved" : item.status
-        }));
-        this.spinner.stop('main');
-      }, () => {
-        this.spinner.stop('main');
-        this.notification.error(new Notification('Failed to load AIML Data'));
-      });
+    if (this.isLoading || !this.hasNextPage) return;
+
+    this.isLoading = true;
+
+    const obj = {
+      aiml_type: this.selectedNode.config.aiml_type,
+      event_type: this.selectedNode.config.event_type,
+      filter: this.selectedNode.config.filter
+    };
+
+    this.svc.getAIMLData(this.page, this.pageSize, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+
+      const newData = res.results.map(item => ({
+        ...item,
+        status: item.status === 0 ? "Open" : item.status === 1 ? "Resolved" : item.status
+      }));
+
+      this.aimlData = [...(this.aimlData || []), ...newData];
+      this.hasNextPage = !!res.next;
+      this.page++;
+      this.isLoading = false;
+      this.spinner.stop('main');
+    }, () => {
+      this.isLoading = false;
+      this.spinner.stop('main');
+      this.notification.error(new Notification('Failed to load AIML Data'));
+    });
+  }
+
+  onScroll(event: any) {
+    const element = event.target;
+
+    const atBottom =
+      element.scrollHeight - element.scrollTop <= element.clientHeight + 10;
+
+    if (atBottom) {
+      this.getAIMLData();
     }
   }
+
+  openDropdown() {
+    this.page = 1;
+    this.hasNextPage = true;
+    this.aimlData = [];
+
+    this.getAIMLData();
+  }
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+
+    // load data when opening first time
+    if (this.isDropdownOpen && this.aimlData.length === 0) {
+      this.openDropdown();
+    }
+  }
+
+  selectItem(item: any) {
+    this.selectedItem = item;
+    this.aimlTriggerForm.patchValue({ id: item.id });
+    this.isDropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: MouseEvent) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.isDropdownOpen = false;
+    }
+  }
+
 
   updateManualFormErrors() {
     this.manualFormErrors.inputs = {};
