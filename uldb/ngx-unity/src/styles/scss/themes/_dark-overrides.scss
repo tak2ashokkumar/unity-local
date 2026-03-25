@@ -1,0 +1,710 @@
+// ============================================================
+//  UNITY — DARK THEME COMPONENT OVERRIDES
+//  All rules are scoped under  body.theme-dark
+//  Tokens come from  _theme.dark.scss  via CSS custom props.
+// ============================================================
+
+body.theme-dark {
+
+  // ── 1. Base page ──────────────────────────────────────────
+  background-color: var(--unity-bg-body);
+  color: var(--unity-text-primary);
+
+  a:not(.btn) {
+    color: var(--unity-text-link);
+    &:hover { color: var(--unity-text-link-hover); }
+  }
+
+  // Muted text helpers
+  .text-muted,
+  .text-secondary { color: var(--unity-text-secondary) !important; }
+  .text-dark       { color: var(--unity-text-primary)  !important; }
+  .text-black      { color: var(--unity-text-primary)  !important; }
+  .text-body       { color: var(--unity-text-primary)  !important; }
+
+  // Bootstrap bg-white / bg-light overrides (these are baked as hardcoded colours)
+  .bg-white         { background-color: var(--unity-bg-surface)        !important; }
+  .bg-light         { background-color: var(--unity-bg-surface-raised)  !important; }
+  .bg-secondary     { background-color: var(--unity-bg-surface-raised)  !important; }
+  .bg-transparent   { background-color: transparent                     !important; }
+
+  // Bootstrap text utilities — remap semantic colours for dark-mode contrast
+  .text-success { color: var(--unity-color-success) !important; }
+  .text-danger  { color: var(--unity-color-danger)  !important; }
+  .text-warning { color: var(--unity-color-warning) !important; }
+  .text-info    { color: var(--unity-color-info)    !important; }
+
+  hr { border-color: var(--unity-border-color); }
+
+  // ── 2. CoreUI App shell ───────────────────────────────────
+
+  // Top header bar
+  .app-header,
+  .navbar.app-header {
+    background-color: var(--unity-bg-header);
+    border-bottom-color: var(--unity-border-color);
+    color: var(--unity-text-primary);
+
+    .navbar-brand     { filter: brightness(1.3); }
+    .nav-link         { color: var(--unity-text-primary); }
+    .nav-link:hover   { color: var(--unity-color-primary); }
+  }
+
+  // Left sidebar
+  .sidebar {
+    background-color: var(--unity-bg-sidebar);
+    color: var(--unity-nav-link-hover-color);
+
+    .sidebar-header {
+      background-color: var(--unity-bg-sidebar);
+      border-bottom-color: rgba(255,255,255,0.08);
+    }
+
+    .nav-link {
+      color: var(--unity-nav-link-color);
+      &:hover,
+      &:focus       { color: var(--unity-nav-link-hover-color); background-color: var(--unity-nav-link-active-bg); }
+    }
+
+    .nav-link.active,
+    .nav-item.open > .nav-link {
+      color: var(--unity-nav-link-hover-color);
+      background-color: var(--unity-nav-link-active-bg);
+    }
+
+    .nav-dropdown.open { background-color: rgba(0,0,0,0.15); }
+
+    .sidebar-minimizer { background-color: rgba(0,0,0,0.2); }
+    .sidebar-minimizer:hover { background-color: rgba(0,0,0,0.35); }
+  }
+
+  // Main content area
+  .app-body,
+  .main           { background-color: var(--unity-bg-body); }
+
+  // App breadcrumb
+  .breadcrumb {
+    background-color: var(--unity-bg-surface);
+    border-bottom-color: var(--unity-border-color);
+
+    .breadcrumb-item         { color: var(--unity-text-secondary); }
+    .breadcrumb-item.active  { color: var(--unity-text-primary); }
+    .breadcrumb-item + .breadcrumb-item::before { color: var(--unity-text-secondary); }
+  }
+
+  // ── 3. Cards ─────────────────────────────────────────────
+
+  .card {
+    background-color: var(--unity-card-bg);
+    border-color: var(--unity-card-border);
+    color: var(--unity-text-primary);
+    box-shadow: var(--unity-card-shadow);
+  }
+
+  .card-header {
+    background-color: var(--unity-card-header-bg);
+    border-bottom-color: var(--unity-border-color);
+    color: var(--unity-text-primary);
+
+    &.bg-transparent { background-color: transparent !important; }
+  }
+
+  .card-footer {
+    background-color: var(--unity-bg-surface);
+    border-top-color: var(--unity-border-color);
+    color: var(--unity-text-primary);
+  }
+
+  .card-header-actions .card-header-action { color: var(--unity-text-secondary); }
+
+  // ── 4. Tables ────────────────────────────────────────────
+
+  .table {
+    color: var(--unity-text-primary);
+    border-color: var(--unity-table-border);
+
+    th, td    { border-color: var(--unity-table-border); color: var(--unity-text-primary); }
+    thead th  { background-color: var(--unity-table-header-bg); color: var(--unity-table-header-text); border-color: var(--unity-table-border); }
+    tbody tr  { background-color: var(--unity-table-row-bg); }
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) { background-color: var(--unity-table-row-alt-bg); }
+  .table-hover  tbody tr:hover             { background-color: var(--unity-table-row-hover-bg); color: var(--unity-text-primary); }
+
+  .table-light,
+  .table-light > th,
+  .table-light > td           { background-color: var(--unity-table-header-bg); color: var(--unity-table-header-text); }
+
+  .table-responsive           { border-color: var(--unity-table-border); }
+
+  // ── 5. Forms ─────────────────────────────────────────────
+
+  .form-control,
+  .custom-select {
+    background-color: var(--unity-input-bg);
+    border-color: var(--unity-input-border);
+    color: var(--unity-input-text);
+
+    &:focus {
+      background-color: var(--unity-input-bg);
+      border-color: var(--unity-input-border-focus);
+      color: var(--unity-input-text);
+      box-shadow: 0 0 0 0.2rem var(--unity-focus-ring);
+    }
+
+    &::placeholder             { color: var(--unity-input-placeholder); }
+    &:disabled, &[readonly]    { background-color: var(--unity-input-disabled-bg); color: var(--unity-input-disabled-text); }
+    &.is-invalid               { border-color: var(--unity-input-border-invalid); }
+  }
+
+  .input-group-text {
+    background-color: var(--unity-bg-surface-raised);
+    border-color: var(--unity-input-border);
+    color: var(--unity-text-primary);
+  }
+
+  .form-control option      { background-color: var(--unity-bg-surface); color: var(--unity-text-primary); }
+
+  select.form-control       { background-color: var(--unity-input-bg); color: var(--unity-input-text); }
+
+  label                     { color: var(--unity-text-primary); }
+
+  // Checkboxes & radios — show native outline when bg is dark
+  .custom-control-label::before { background-color: var(--unity-input-bg); border-color: var(--unity-input-border); }
+
+  // ── 6. Modals ────────────────────────────────────────────
+
+  .modal-content {
+    background-color: var(--unity-modal-bg);
+    color: var(--unity-text-primary);
+    border: none;
+    box-shadow: var(--unity-modal-shadow);
+  }
+
+  .modal-header {
+    border-bottom-color: var(--unity-modal-header-border);
+    color: var(--unity-text-primary);
+
+    .close, .btn-close {
+      color: var(--unity-text-secondary);
+      &:hover { color: var(--unity-text-primary); }
+    }
+  }
+
+  .modal-body  { background-color: var(--unity-modal-bg); color: var(--unity-text-primary); }
+  .modal-footer {
+    border-top-color: var(--unity-modal-footer-border);
+    background-color: var(--unity-modal-bg);
+    &.bg-white { background-color: var(--unity-modal-bg) !important; }
+  }
+
+  .modal-backdrop { background-color: #000; }
+
+  // ── 7. Dropdowns ─────────────────────────────────────────
+
+  .dropdown-menu {
+    background-color: var(--unity-dropdown-bg);
+    border-color: var(--unity-dropdown-border);
+    color: var(--unity-dropdown-text);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  .dropdown-item {
+    color: var(--unity-dropdown-text);
+
+    &:hover, &:focus  { background-color: var(--unity-dropdown-item-hover); color: var(--unity-text-primary); }
+    &.active          { background-color: var(--unity-dropdown-item-active); color: var(--unity-text-primary); }
+    &.disabled        { color: var(--unity-text-disabled); }
+  }
+
+  .dropdown-divider { border-color: var(--unity-border-color); }
+  .dropdown-header  { color: var(--unity-text-secondary); }
+
+  // ── 8. Navigation Tabs ────────────────────────────────────
+
+  .nav-tabs {
+    border-bottom-color: var(--unity-border-color);
+
+    .nav-link {
+      color: var(--unity-text-secondary);
+      background-color: transparent;
+      border-color: transparent;
+
+      &:hover {
+        color: var(--unity-text-primary);
+        background-color: var(--unity-hover-bg);
+        border-color: var(--unity-border-color) var(--unity-border-color) transparent;
+      }
+    }
+
+    .nav-link.active,
+    .nav-item.show .nav-link {
+      color: var(--unity-color-success);
+      background-color: var(--unity-bg-surface);
+      border-color: var(--unity-border-color) var(--unity-border-color) var(--unity-bg-surface);
+    }
+  }
+
+  .tab-content    { background-color: var(--unity-bg-surface); border-color: var(--unity-border-color); }
+  .tab-pane       { background-color: var(--unity-bg-surface); }
+
+  // Plain .nav tabs (custom-nav-container, no .nav-tabs class — e.g. private-cloud row tabs)
+  .custom-nav-container .nav-link {
+    color: var(--unity-text-secondary);
+    &:hover { color: var(--unity-text-primary); }
+  }
+
+  // Scroll-arrow buttons used inside scrollable-tab (bg-secondary on <a>)
+  .nav-item > .nav-link.bg-secondary {
+    color: var(--unity-text-secondary);
+  }
+
+  // Bootstrap border-light inside nav strips
+  .nav-item.border-right.border-light,
+  .nav-item.border-left.border-light {
+    border-color: var(--unity-border-color) !important;
+  }
+
+  // tab-container custom tabs
+  .tab-container[arialabel="customTabs"] {
+    .nav-tabs .nav-link {
+      background: var(--unity-bg-surface) !important;
+      border-color: var(--unity-border-color) !important;
+    }
+    .nav-tabs .nav-link.active { color: var(--unity-color-success) !important; }
+  }
+
+  // ── 9. Alerts ────────────────────────────────────────────
+
+  .alert {
+    border-color: var(--unity-border-color);
+    color: var(--unity-text-primary);
+
+    &.alert-info    { background-color: rgba(133,213,239,0.15); border-color: rgba(133,213,239,0.4); }
+    &.alert-success { background-color: rgba(61,214,140,0.15);  border-color: rgba(61,214,140,0.4); }
+    &.alert-warning { background-color: rgba(255,173,51,0.15);  border-color: rgba(255,173,51,0.4); }
+    &.alert-danger  { background-color: rgba(255,107,107,0.15); border-color: rgba(255,107,107,0.4); }
+  }
+
+  // ── 10. Badges ───────────────────────────────────────────
+
+  .badge-light,
+  .badge-secondary { background-color: var(--unity-badge-bg); color: var(--unity-badge-text); }
+
+  // ── 11. List groups ──────────────────────────────────────
+
+  .list-group-item {
+    background-color: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+    color: var(--unity-text-primary);
+
+    &:hover, &:focus   { background-color: var(--unity-hover-bg); }
+    &.active           { background-color: var(--unity-active-bg); border-color: var(--unity-border-focus); color: var(--unity-text-primary); }
+    &.disabled         { background-color: var(--unity-disabled-bg); color: var(--unity-text-disabled); }
+  }
+
+  // ── 12. Pagination ───────────────────────────────────────
+
+  .page-link {
+    background-color: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+    color: var(--unity-text-link);
+
+    &:hover  { background-color: var(--unity-hover-bg); color: var(--unity-text-primary); }
+  }
+
+  .page-item.active .page-link {
+    background-color: var(--unity-color-primary);
+    border-color: var(--unity-color-primary);
+    color: #fff;
+  }
+
+  .page-item.disabled .page-link { background-color: var(--unity-disabled-bg); color: var(--unity-text-disabled); border-color: var(--unity-border-color); }
+
+  // ── 13. Popovers ─────────────────────────────────────────
+
+  .popover {
+    background-color: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+
+    .popover-header {
+      background-color: var(--unity-bg-surface-raised);
+      border-bottom-color: var(--unity-border-color);
+      color: var(--unity-text-primary);
+    }
+
+    .popover-body { color: var(--unity-text-primary); }
+
+    .arrow::after,
+    .popover-arrow::after { border-right-color: var(--unity-bg-surface); border-left-color: var(--unity-bg-surface); border-top-color: var(--unity-bg-surface); border-bottom-color: var(--unity-bg-surface); }
+  }
+
+  // ── 14. Tooltips ─────────────────────────────────────────
+
+  .tooltip .tooltip-inner {
+    background-color: var(--unity-tooltip-bg);
+    color: var(--unity-tooltip-text);
+    border: 1px solid var(--unity-border-color);
+  }
+
+  // ── 15. Progress bars ────────────────────────────────────
+
+  .progress {
+    background-color: var(--unity-border-color);
+  }
+
+  // ── 16. Buttons ──────────────────────────────────────────
+
+  // Secondary / outline variants need adjustment on dark bg
+  .btn-secondary    { background-color: #3a3f55; border-color: var(--unity-border-color); color: var(--unity-text-primary); }
+  .btn-light        { background-color: var(--unity-bg-surface-raised); border-color: var(--unity-border-color); color: var(--unity-text-primary); }
+  .btn-outline-secondary { border-color: var(--unity-border-color); color: var(--unity-text-secondary); }
+  .btn-outline-light     { border-color: var(--unity-border-color); color: var(--unity-text-primary); }
+
+  .action-icons {
+    background: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+    color: var(--unity-color-primary);
+
+    &:hover, &:focus {
+      background: var(--unity-color-primary);
+      color: #fff;
+    }
+  }
+
+  .action-icons-disabled {
+    &:hover, &:focus {
+      background: var(--unity-bg-surface) !important;
+      color: var(--unity-text-disabled) !important;
+    }
+  }
+
+  .action-icons-on {
+    background: var(--unity-color-primary);
+    border-color: var(--unity-border-color);
+    color: #fff;
+
+    &:hover, &:focus {
+      background: var(--unity-bg-surface);
+      color: var(--unity-color-primary);
+    }
+  }
+
+  .action-icons-off {
+    background: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+    color: var(--unity-color-primary);
+
+    &:hover, &:focus {
+      background: var(--unity-color-primary);
+      color: #fff;
+    }
+  }
+
+  // ── 17. ng-select ────────────────────────────────────────
+
+  .ng-select {
+    .ng-select-container {
+      background-color: var(--unity-input-bg);
+      border-color: var(--unity-input-border);
+      color: var(--unity-input-text);
+    }
+
+    &.ng-select-focused > .ng-select-container {
+      border-color: var(--unity-input-border-focus);
+      box-shadow: 0 0 0 0.2rem var(--unity-focus-ring);
+    }
+
+    .ng-value-label         { color: var(--unity-input-text); }
+    .ng-placeholder         { color: var(--unity-input-placeholder); }
+    .ng-arrow-wrapper .ng-arrow { border-color: var(--unity-text-secondary) transparent transparent; }
+
+    .ng-clear-wrapper       { color: var(--unity-text-secondary); }
+  }
+
+  .ng-dropdown-panel {
+    background-color: var(--unity-dropdown-bg);
+    border-color: var(--unity-border-color);
+    color: var(--unity-dropdown-text);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+
+    .ng-option {
+      background-color: var(--unity-dropdown-bg);
+      color: var(--unity-dropdown-text);
+
+      &.ng-option-selected      { background-color: var(--unity-active-bg); }
+      &.ng-option-marked        { background-color: var(--unity-hover-bg); }
+      &.ng-option-disabled      { color: var(--unity-text-disabled); }
+    }
+
+    .ng-optgroup { color: var(--unity-text-secondary); background-color: var(--unity-bg-surface-raised); }
+    .ng-option-child { padding-left: 22px; }
+  }
+
+  // ── 18. ngx-bootstrap datepicker ─────────────────────────
+
+  .bs-datepicker-container {
+    background-color: var(--unity-bg-surface);
+  }
+
+  .bs-datepicker-head {
+    background-color: var(--unity-color-primary);
+  }
+
+  .bs-datepicker-body {
+    background-color: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+
+    table td, table th     { color: var(--unity-text-primary); }
+    table td span          { color: var(--unity-text-primary); }
+    table td span.selected,
+    table td.selected span { background-color: var(--unity-color-primary) !important; color: #fff !important; }
+    table td.week span     { color: var(--unity-color-primary); }
+    table td span:hover,
+    table td:hover span    { background-color: var(--unity-hover-bg); }
+    table td.disabled span,
+    table td span.disabled { color: var(--unity-text-disabled); }
+  }
+
+  .bs-datepicker-predefined-btns button { background-color: var(--unity-bg-surface-raised); color: var(--unity-text-primary); }
+  .bs-datepicker-predefined-btns button:hover { background-color: var(--unity-hover-bg); }
+  .bs-datepicker-buttons .btn-success { background-color: var(--unity-color-success); }
+  .bs-datepicker-buttons .btn-default { background-color: var(--unity-bg-surface-raised); color: var(--unity-text-primary); }
+
+  // ── 19. Owl DateTime picker ───────────────────────────────
+
+  .owl-dt-container {
+    background: var(--unity-bg-surface);
+    color: var(--unity-text-primary);
+  }
+
+  .owl-dt-calendar-main,
+  .owl-dt-timer      { color: var(--unity-text-primary); background: var(--unity-bg-surface); }
+
+  .owl-dt-calendar-table .owl-dt-calendar-header th { color: var(--unity-text-secondary); }
+  .owl-dt-calendar-table .owl-dt-calendar-cell-content { color: var(--unity-text-primary); }
+  .owl-dt-calendar-table .owl-dt-calendar-cell-content:hover { background-color: var(--unity-hover-bg); }
+  .owl-dt-calendar-table .owl-dt-calendar-cell-selected .owl-dt-calendar-cell-content { background-color: var(--unity-color-primary); }
+  .owl-dt-calendar-table .owl-dt-calendar-cell-today .owl-dt-calendar-cell-content { border-color: var(--unity-color-primary); }
+
+  .owl-dt-container-info      { background: var(--unity-bg-surface-raised); color: var(--unity-text-primary); }
+  .owl-dt-container-buttons   { background: var(--unity-bg-surface); }
+  .owl-dt-control-button-content { color: var(--unity-color-primary); }
+
+  .owl-dt-timer-divider::before,
+  .owl-dt-timer-divider::after { background-color: var(--unity-text-secondary); }
+
+  // ── 20. Multiselect dropdown ─────────────────────────────
+
+  .dropdown-toggle.btn-default {
+    background-color: var(--unity-input-bg);
+    border-color: var(--unity-input-border);
+    color: var(--unity-input-text);
+  }
+
+  .form-control button.truncate { color: var(--unity-text-secondary) !important; }
+
+  // ── 21. Scrollbar ────────────────────────────────────────
+
+  * {
+    scrollbar-color: var(--unity-scrollbar-thumb) var(--unity-scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar       { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-track { background: var(--unity-scrollbar-track); }
+  *::-webkit-scrollbar-thumb { background: var(--unity-scrollbar-thumb); border-radius: 3px; }
+  *::-webkit-scrollbar-thumb:hover { background: var(--unity-border-color-strong); }
+
+  // ── 22. App spinner ──────────────────────────────────────
+
+  app-spinner .spinner-border { color: var(--unity-spinner-color); }
+
+  // ── 23. CodeMirror ───────────────────────────────────────
+
+  .CodeMirror {
+    background: var(--unity-bg-surface);
+    color: var(--unity-text-primary);
+    border-color: var(--unity-border-color);
+  }
+
+  .CodeMirror-cursor          { border-left-color: var(--unity-text-primary); }
+  .CodeMirror-gutters         { background: var(--unity-bg-surface-raised); border-right-color: var(--unity-border-color); }
+  .CodeMirror-linenumber      { color: var(--unity-text-secondary); }
+
+  // ── 24. vis-timeline (hardcoded overrides) ────────────────
+
+  .vis-item {
+    background-color: var(--unity-color-primary) !important;
+    border-color: var(--unity-color-primary) !important;
+    color: #fff !important;
+  }
+
+  .vis-item.vis-selected {
+    background-color: var(--unity-color-primary-hover) !important;
+  }
+
+  .vis-time-axis .vis-text { color: var(--unity-text-secondary); }
+  .vis-panel { background-color: var(--unity-bg-surface); border-color: var(--unity-border-color); }
+
+  // ── 25. custom panel accordion ────────────────────────────
+
+  .panel-group .panel .panel .panel-heading.card-header.panel-enabled {
+    background-color: var(--unity-bg-surface) !important;
+  }
+
+  // ── 26. Custom tab-container ──────────────────────────────
+
+  .tab-container[arialabel="customTabs"] .nav-tabs .nav-link {
+    background: var(--unity-bg-surface) !important;
+    border-top-color:  var(--unity-border-color) !important;
+    border-left-color: var(--unity-border-color) !important;
+  }
+
+  // ── 27. app-main-tab (Unity custom first-level tab bar) ──
+
+  // Strip container
+  app-main-tab .tabs-level1 {
+    background-color: var(--unity-bg-surface);
+    border-bottom-color: var(--unity-border-color);
+  }
+
+  // Inactive tab items and scroll arrow buttons
+  app-main-tab .tabs-level1-item,
+  app-main-tab .tabs-level1-item-scroll {
+    background-color: var(--unity-bg-surface-raised);
+    border-color: var(--unity-border-color);
+    color: var(--unity-text-secondary);
+  }
+
+  // Inactive tab link text
+  app-main-tab .tabs-level1-item .nav-link,
+  app-main-tab .tabs-level1-item .tabs-level1-link {
+    color: var(--unity-text-secondary);
+  }
+
+  // Inactive hover
+  app-main-tab .tabs-level1-item:not(.active):hover {
+    background-color: var(--unity-hover-bg);
+    color: var(--unity-text-primary);
+  }
+  app-main-tab .tabs-level1-item:not(.active):hover .nav-link,
+  app-main-tab .tabs-level1-item:not(.active):hover .tabs-level1-link {
+    color: var(--unity-text-primary);
+  }
+
+  // Active tab item
+  app-main-tab .tabs-level1-item.active {
+    background-color: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+    color: var(--unity-color-success);
+  }
+  app-main-tab .tabs-level1-item.active:hover,
+  app-main-tab .tabs-level1-item.active:focus {
+    background-color: var(--unity-bg-surface);
+    color: var(--unity-color-success);
+  }
+
+  // Active tab link text
+  app-main-tab .tabs-level1-item.active .nav-link,
+  app-main-tab .tabs-level1-item.active .tabs-level1-link {
+    color: var(--unity-color-success);
+  }
+
+  // nav-tabs border on the wrapper ul
+  app-main-tab .nav-tabs {
+    border-bottom-color: var(--unity-border-color);
+  }
+
+  // ── 28. read-only overlay ─────────────────────────────────
+
+  &.read-only {
+    button.action-icons-disabled { color: var(--unity-text-disabled) !important; }
+    td multiselect-dropdown       { color: var(--unity-text-disabled) !important; }
+  }
+
+  // ── 29. topology / vis-network popover ────────────────────
+
+  .topology-card {
+    .popover           { border-color: var(--unity-color-primary); }
+    .bs-popover-top > .arrow::after { border-top-color: var(--unity-bg-surface); }
+  }
+
+  // ── 30. topology modal nav tabs ──────────────────────────
+
+  .topology-modal {
+    .nav-tabs .nav-link         { color: var(--unity-text-secondary); }
+    .nav-tabs .nav-link.active  { color: var(--unity-color-success); }
+  }
+
+  // ── 31. angular-calendar ─────────────────────────────────
+
+  .cal-month-view,
+  .cal-week-view,
+  .cal-day-view {
+    background-color: var(--unity-bg-surface);
+
+    .cal-header,
+    .cal-header .cal-cell { color: var(--unity-text-primary); }
+
+    .cal-day-headers span { color: var(--unity-text-secondary); }
+
+    .cal-cell-row:hover,
+    .cal-cell:hover { background-color: var(--unity-hover-bg) !important; }
+
+    .cal-day-cell { border-color: var(--unity-border-color); }
+    .cal-day-cell.cal-today { background-color: var(--unity-active-bg) !important; }
+    .cal-day-cell.cal-today .cal-day-number { color: var(--unity-color-primary); }
+    .cal-day-cell.cal-weekend .cal-day-number { color: var(--unity-color-danger); }
+
+    .cal-day-number { color: var(--unity-text-secondary); }
+
+    .cal-open-day-events { background-color: var(--unity-bg-surface-raised); box-shadow: none; }
+  }
+
+  // ── 32. Sequential workflow designer ─────────────────────
+
+  .sqd-designer-angular,
+  .sqd-designer { background-color: var(--unity-bg-surface); color: var(--unity-text-primary); }
+
+  // ── 33. ngx-chips (tag-input) ─────────────────────────────
+
+  tag-input .ng2-tag-input {
+    border-bottom-color: var(--unity-input-border) !important;
+
+    tag { background-color: var(--unity-active-bg) !important; color: var(--unity-text-primary) !important; }
+    input.ng2-tag-input__text-input { color: var(--unity-input-text) !important; background-color: transparent !important; }
+  }
+
+  // ── 34. perfect-scrollbar ─────────────────────────────────
+
+  .ps__thumb-y,
+  .ps__thumb-x { background-color: var(--unity-scrollbar-thumb) !important; }
+
+  // ── 35. app notification (toast) ─────────────────────────
+
+  .notification .alert {
+    background-color: var(--unity-bg-surface);
+    border-color: var(--unity-border-color);
+    color: var(--unity-text-primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  // ── 36. ng-select default theme overrides ─────────────────
+  // (the default.theme.css from @ng-select is loaded globally)
+
+  .ng-select.ng-select-single .ng-select-container,
+  .ng-select.ng-select-multiple .ng-select-container {
+    background-color: var(--unity-input-bg);
+    border-color: var(--unity-input-border);
+    color: var(--unity-input-text);
+  }
+
+  // ── 37. Global search modal ───────────────────────────────
+
+  .modal-dialog.global-search-modal .modal-content {
+    background-color: var(--unity-modal-bg);
+    color: var(--unity-text-primary);
+    border: none;
+  }
+}

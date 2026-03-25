@@ -3,6 +3,11 @@
 // If you want to override variables do it here
 @import "variables";
 
+// ── Theme tokens (CSS custom properties) ──────────────────────────────────
+// Must be imported BEFORE framework styles so tokens are defined globally.
+@import "themes/theme.light";
+@import "themes/theme.dark";
+
 // Import styles
 @import "~@coreui/coreui/scss/coreui";
 @import "~@fortawesome/fontawesome-free/scss/fontawesome";
@@ -17,6 +22,7 @@
 @import "custom";
 @import "custom-vis-network";
 @import "custom-components";
+
 @import "~@busacca/ng-pick-datetime/assets/style/picker.min.css";
 @import "~angular-calendar/css/angular-calendar.css";
 @import "~sequential-workflow-designer/css/designer.css";
@@ -25,6 +31,9 @@
 
 // @import url(https://unpkg.com/ngx-bootstrap/datepicker/bs-datepicker.css);
 @import "~ngx-bootstrap/datepicker/bs-datepicker.css";
+
+// ── Dark theme component overrides — LAST so it wins over all library CSS ─
+@import "themes/dark-overrides";
 
 @for $i from 0 through 100 {
   .w-#{$i} {

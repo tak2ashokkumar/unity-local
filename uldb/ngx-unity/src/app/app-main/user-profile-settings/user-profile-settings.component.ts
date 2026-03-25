@@ -16,6 +16,7 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { TabData } from 'src/app/shared/tabdata';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { LlmConfigViewData, providerImages, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
+import { ThemeService } from 'src/app/shared/theme/theme.service';
 import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
 import { ActivatedRoute, Route, Router } from '@angular/router';
 
@@ -116,7 +117,8 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     private notification: AppNotificationService,
     private spinner: AppSpinnerService,
     private router: Router,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    public themeSvc: ThemeService) {
     this.aimlPermissionSet = new UnityPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
     this.monitoringPermissionSet = new UnityPermissionSet(UnityModules.MONITORING);
   }

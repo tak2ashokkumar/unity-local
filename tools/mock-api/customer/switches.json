@@ -1,0 +1,5121 @@
+{
+    "count": 13,
+    "next": "http://10.192.11.207:8000/customer/switches/?page=2&page_size=10",
+    "previous": null,
+    "results": [
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/55ef02ba-564c-48e1-a600-47b7a54a9501/",
+            "id": 5460,
+            "proxy": {},
+            "ip_address": "10.192.10.1",
+            "snmp_community": null,
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "55ef02ba-564c-48e1-a600-47b7a54a9501",
+            "name": "fw1a-313.sf10",
+            "model": "CATALYST 45XX VSS",
+            "model_id": 1356,
+            "manufacturer": "CISCO",
+            "manufacturer_id": 68,
+            "cabinet": null,
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.192.10.1",
+            "asset_tag": "test asset, test 2",
+            "position": 0,
+            "failed_alerts_count": null,
+            "size": 1,
+            "tags": [
+                "test asset1"
+            ],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/467/",
+                "id": 467,
+                "uuid": "abd483ee-5644-41c0-8838-ffcd5baa1641",
+                "name": "DC5-Demo"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": "junos os",
+            "os_name": null,
+            "version_number": "15.1x49-d160.2",
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": "ssh,snmp",
+            "first_discovered": "2023-08-25T06:19:02.199464-07:00",
+            "environment": null,
+            "last_discovered": "2024-01-29T11:13:19.845435-08:00",
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "1",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.192.10.1",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": "dsvc xsax",
+            "interfaces": [
+                {
+                    "status": "down",
+                    "name": "fxp0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-50-56-A3-1B-4C",
+                    "type": "ethernetCsmacd",
+                    "description": "fxp0"
+                },
+                {
+                    "status": "up",
+                    "name": "lsi",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "mplsTunnel",
+                    "description": "lsi"
+                },
+                {
+                    "status": "up",
+                    "name": "dsc",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "other",
+                    "description": "dsc"
+                },
+                {
+                    "status": "up",
+                    "name": "lo0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "softwareLoopback",
+                    "description": "lo0"
+                },
+                {
+                    "status": "up",
+                    "name": "tap",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "other",
+                    "description": "tap"
+                },
+                {
+                    "status": "up",
+                    "name": "gre",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "gre"
+                },
+                {
+                    "status": "up",
+                    "name": "ipip",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "ipip"
+                },
+                {
+                    "status": "up",
+                    "name": "pime",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "pime"
+                },
+                {
+                    "status": "up",
+                    "name": "pimd",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "pimd"
+                },
+                {
+                    "status": "up",
+                    "name": "mtun",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "mtun"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "name": "fxp0.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-50-56-A3-1B-4C",
+                    "type": "propVirtual",
+                    "description": "fxp0.0"
+                },
+                {
+                    "status": "up",
+                    "name": "lo0.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "softwareLoopback",
+                    "description": "lo0.0"
+                },
+                {
+                    "status": "up",
+                    "name": "em0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-50-56-A3-C3-9D",
+                    "type": "ethernetCsmacd",
+                    "description": "em0"
+                },
+                {
+                    "status": "up",
+                    "name": "em0.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-50-56-A3-C3-9D",
+                    "type": "propVirtual",
+                    "description": "em0.0"
+                },
+                {
+                    "status": "up",
+                    "name": "lo0.16384",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "softwareLoopback",
+                    "description": "lo0.16384"
+                },
+                {
+                    "status": "up",
+                    "name": "lo0.16385",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "softwareLoopback",
+                    "description": "lo0.16385"
+                },
+                {
+                    "status": "up",
+                    "name": "lo0.32768",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "softwareLoopback",
+                    "description": "lo0.32768"
+                },
+                {
+                    "status": "up",
+                    "name": "pp0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "other",
+                    "description": "pp0"
+                },
+                {
+                    "status": "up",
+                    "name": "irb",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-AD",
+                    "type": "other",
+                    "description": "irb"
+                },
+                {
+                    "status": "up",
+                    "name": "st0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "other",
+                    "description": "st0"
+                },
+                {
+                    "status": "up",
+                    "name": "ppd0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "ppd0"
+                },
+                {
+                    "status": "up",
+                    "name": "ppe0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "ppe0"
+                },
+                {
+                    "status": "up",
+                    "name": "fti0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "other",
+                    "description": "fti0"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-AE",
+                    "type": "ethernetCsmacd",
+                    "description": "ge-0/0/0"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ethernetCsmacd",
+                    "description": "ge-0/0/1"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/2",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-01",
+                    "type": "ethernetCsmacd",
+                    "description": "ge-0/0/2"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/3",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-03",
+                    "type": "ethernetCsmacd",
+                    "description": "ge-0/0/3"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/4",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-04",
+                    "type": "ethernetCsmacd",
+                    "description": "ge-0/0/4"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/5",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-05",
+                    "type": "ethernetCsmacd",
+                    "description": "ge-0/0/5"
+                },
+                {
+                    "status": "up",
+                    "name": "gr-0/0/0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "gr-0/0/0"
+                },
+                {
+                    "status": "up",
+                    "name": "ip-0/0/0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "ip-0/0/0"
+                },
+                {
+                    "status": "up",
+                    "name": "lt-0/0/0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "02-00-00-00-00-33",
+                    "type": "tunnel",
+                    "description": "lt-0/0/0"
+                },
+                {
+                    "status": "up",
+                    "name": "fab0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-AE",
+                    "type": "ieee8023adLag",
+                    "description": "fab0"
+                },
+                {
+                    "status": "up",
+                    "name": "fab0.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-AE",
+                    "type": "ieee8023adLag",
+                    "description": "fab0.0"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.16000",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.16000"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/0.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "4C-96-14-1B-4C-AE",
+                    "type": "propVirtual",
+                    "description": "ge-0/0/0.0"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.32767",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.32767"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0"
+                },
+                {
+                    "status": "up",
+                    "name": "reth1",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-01",
+                    "type": "ieee8023adLag",
+                    "description": "reth1"
+                },
+                {
+                    "status": "up",
+                    "name": "reth1.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-01",
+                    "type": "ieee8023adLag",
+                    "description": "reth1.0"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/2.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-01",
+                    "type": "propVirtual",
+                    "description": "ge-0/0/2.0"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.32767",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.32767"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.0",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.0"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.2",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.2"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.4",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.4"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.6",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.6"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.7",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.7"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.8",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.8"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.9",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.9"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.10",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.10"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.11",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.11"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.12",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.12"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.14",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.14"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.15",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.15"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.16",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.16"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.17",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.17"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.18",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.18"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.19",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.19"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.20",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.20"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.21",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.21"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.22",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.22"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.23",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.23"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.25",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.25"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.26",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.26"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.27",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.27"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.28",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.28"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.29",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.29"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.30",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.30"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.31",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.31"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.32",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.32"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.33",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.33"
+                },
+                {
+                    "status": "down",
+                    "name": "st0.34",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.34"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.35",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.35"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.36",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.36"
+                },
+                {
+                    "status": "down",
+                    "name": "st0.37",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.37"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.38",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.38"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.40",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.40"
+                },
+                {
+                    "status": "up",
+                    "name": "gr-0/0/0.2",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "description": "gr-0/0/0.2"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.114",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.114"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.115",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.115"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.121",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.121"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.123",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.123"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.124",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.124"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.130",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.130"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.131",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.131"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.170",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.170"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.175",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.175"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.187",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.187"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.188",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.188"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.190",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.190"
+                },
+                {
+                    "status": "down",
+                    "name": "ge-0/0/1.199",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.199"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.214",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.214"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.227",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.227"
+                },
+                {
+                    "status": "up",
+                    "name": "ge-0/0/1.299",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "l2vlan",
+                    "description": "ge-0/0/1.299"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.114",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.114"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.115",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.115"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.121",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.121"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.123",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.123"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.124",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.124"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.130",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.130"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.131",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.131"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.170",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.170"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.175",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.175"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.187",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.187"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.188",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.188"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.190",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.190"
+                },
+                {
+                    "status": "down",
+                    "name": "reth0.199",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.199"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.214",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.214"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.227",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.227"
+                },
+                {
+                    "status": "up",
+                    "name": "reth0.299",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": "00-10-DB-FF-87-00",
+                    "type": "ieee8023adLag",
+                    "description": "reth0.299"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.39",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.39"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.41",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.41"
+                },
+                {
+                    "status": "up",
+                    "name": "st0.42",
+                    "remote_devices": null,
+                    "interface_id": null,
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "description": "st0.42"
+                }
+            ],
+            "uptime": "34 days, 22:07:16.43",
+            "domain": "fw1a-313.sf10",
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/0493eda4-b7f1-48c8-883e-377dd311017d/",
+            "id": 5397,
+            "proxy": {},
+            "ip_address": "10.192.10.18",
+            "snmp_community": "ul4ever",
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "0493eda4-b7f1-48c8-883e-377dd311017d",
+            "name": "sw1-unitydemo",
+            "model": "WS-C2950T-24",
+            "model_id": 1361,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": null,
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.192.10.18",
+            "asset_tag": null,
+            "position": 0,
+            "failed_alerts_count": null,
+            "size": 1,
+            "tags": [],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/464/",
+                "id": 464,
+                "uuid": "a6d76e20-175d-4b34-9189-fbcb0972f684",
+                "name": "DC4-Test"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": "linux",
+            "os_name": null,
+            "version_number": "release software (fc1)..copyright (c) 1986-2002 by cisco systems",
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": "ssh,snmp",
+            "first_discovered": "2024-01-31T12:34:45.126876-08:00",
+            "environment": null,
+            "last_discovered": "2024-01-31T12:32:07.829230-08:00",
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "1",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.192.10.18",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": "FHK0613W1UB1117171",
+            "interfaces": [
+                {
+                    "status": "up",
+                    "name": "Fa0/1",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-01-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/1"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/2",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-02-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/2"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/3",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-03-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/3"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/4",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-04-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/4"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/5",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-05-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/5"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/6",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-06-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/6"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/7",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-07-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/7"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/8",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-08-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/8"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/9",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-09-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/9"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/10",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-0A-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/10"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/11",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-0B-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/11"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/12",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-0C-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/12"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/13",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-0D-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/13"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/14",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-0E-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/14"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/15",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-0F-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/15"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/16",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-10-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/16"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/17",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-11-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/17"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/18",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-12-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/18"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/19",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-13-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/19"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/20",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-14-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/20"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/21",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-15-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/21"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/22",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-16-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/22"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/23",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-17-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/23"
+                },
+                {
+                    "status": "up",
+                    "name": "Fa0/24",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-18-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "FastEthernet0/24"
+                },
+                {
+                    "status": "up",
+                    "name": "Gi0/1",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-19-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "GigabitEthernet0/1"
+                },
+                {
+                    "status": "up",
+                    "name": "Gi0/2",
+                    "remote_devices": null,
+                    "mac_address": "00-08-E3-1A-00-03",
+                    "type": "ethernetCsmacd",
+                    "description": "GigabitEthernet0/2"
+                },
+                {
+                    "status": "up",
+                    "name": "Nu0",
+                    "remote_devices": null,
+                    "mac_address": null,
+                    "type": "other",
+                    "description": "Null0"
+                }
+            ],
+            "uptime": "",
+            "domain": null,
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/8b04e7a3-d7d3-4a94-8d1b-b63be60d3996/",
+            "id": 5398,
+            "proxy": {},
+            "ip_address": "10.192.10.21",
+            "snmp_community": "ul4ever",
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "8b04e7a3-d7d3-4a94-8d1b-b63be60d3996",
+            "name": "sw2-unitydemo",
+            "model": "WS-C2950T-24",
+            "model_id": 1361,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": null,
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.192.10.21",
+            "asset_tag": null,
+            "position": 0,
+            "failed_alerts_count": null,
+            "size": 1,
+            "tags": [],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/464/",
+                "id": 464,
+                "uuid": "a6d76e20-175d-4b34-9189-fbcb0972f684",
+                "name": "DC4-Test"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": "linux",
+            "os_name": null,
+            "version_number": "release software (fc1)..copyright (c) 1986-2002 by cisco systems",
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": "ssh,snmp",
+            "first_discovered": "2024-01-31T12:34:45.126876-08:00",
+            "environment": null,
+            "last_discovered": "2024-01-31T12:32:07.829230-08:00",
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "1",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.192.10.21",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": "FHK0613W1UB11171",
+            "interfaces": [],
+            "uptime": "",
+            "domain": null,
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/38fa10ae-24e8-4894-a550-03f45d31cf33/",
+            "id": 5399,
+            "proxy": {},
+            "ip_address": "10.192.10.23",
+            "snmp_community": null,
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "38fa10ae-24e8-4894-a550-03f45d31cf33",
+            "name": "sw3-unitydemo",
+            "model": "WS-C2950T-24",
+            "model_id": 1361,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": null,
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.192.10.23",
+            "asset_tag": null,
+            "position": 0,
+            "failed_alerts_count": null,
+            "size": 1,
+            "tags": [],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/464/",
+                "id": 464,
+                "uuid": "a6d76e20-175d-4b34-9189-fbcb0972f684",
+                "name": "DC4-Test"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": "linux",
+            "os_name": null,
+            "version_number": "release software (fc1)..copyright (c) 1986-2002 by cisco systems",
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": "ssh,snmp",
+            "first_discovered": "2024-01-31T12:34:45.126876-08:00",
+            "environment": null,
+            "last_discovered": "2024-01-31T12:32:07.829230-08:00",
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "1",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.192.10.23",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": "FHK0613W1UB11171717173",
+            "interfaces": [],
+            "uptime": "",
+            "domain": null,
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/ce77fe2d-0817-4d3e-b659-75c6a9eb6b0d/",
+            "id": 5456,
+            "proxy": {},
+            "ip_address": "10.128.7.142",
+            "snmp_community": null,
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "ce77fe2d-0817-4d3e-b659-75c6a9eb6b0d",
+            "name": "ul-ansible-c1",
+            "model": "191910",
+            "model_id": 62,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": null,
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.128.7.142",
+            "asset_tag": null,
+            "position": 0,
+            "failed_alerts_count": null,
+            "size": 1,
+            "tags": [],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/464/",
+                "id": 464,
+                "uuid": "a6d76e20-175d-4b34-9189-fbcb0972f684",
+                "name": "DC4-Test"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": "",
+            "os_name": null,
+            "version_number": "",
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": "ssh,",
+            "first_discovered": "2023-05-26T08:01:44.982960-07:00",
+            "environment": null,
+            "last_discovered": "2024-01-30T08:05:25.264902-08:00",
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "0",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.128.7.142",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": "test",
+            "interfaces": [],
+            "uptime": "",
+            "domain": null,
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/86e70919-9221-4b01-a9e1-2181da3a27e2/",
+            "id": 3456,
+            "proxy": {},
+            "ip_address": "10.192.129.9",
+            "snmp_community": "ul4ever",
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "86e70919-9221-4b01-a9e1-2181da3a27e2",
+            "name": "UnityDemo-oobsw1-301.sf10",
+            "model": "C9200-48T",
+            "model_id": 295,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": null,
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.192.129.9",
+            "asset_tag": null,
+            "position": 0,
+            "failed_alerts_count": null,
+            "size": 2,
+            "tags": [
+                "UnitedLayer"
+            ],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/301/",
+                "id": 301,
+                "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+                "name": "DataCenter1 - SF10"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": null,
+            "os_name": null,
+            "version_number": null,
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": null,
+            "first_discovered": null,
+            "environment": null,
+            "last_discovered": null,
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "0",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.192.129.9",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": null,
+            "interfaces": [
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "mplsTunnel",
+                    "name": "lsi",
+                    "description": "lsi"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "other",
+                    "name": "dsc",
+                    "description": "dsc"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "softwareLoopback",
+                    "name": "lo0",
+                    "description": "lo0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "other",
+                    "name": "tap",
+                    "description": "tap"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "name": "gre",
+                    "description": "gre"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "name": "ipip",
+                    "description": "ipip"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "name": "pime",
+                    "description": "pime"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "name": "pimd",
+                    "description": "pimd"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "tunnel",
+                    "name": "mtun",
+                    "description": "mtun"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "softwareLoopback",
+                    "name": "lo0.16385",
+                    "description": "lo0.16385"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-45-F7",
+                    "type": "ethernetCsmacd",
+                    "name": "me0",
+                    "description": "me0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-45-F7",
+                    "type": "propVirtual",
+                    "name": "me0.0",
+                    "description": "me0.0"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-45-F7",
+                    "type": "other",
+                    "name": "vme",
+                    "description": "vme"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "02-00-00-00-00-0A",
+                    "type": "ethernetCsmacd",
+                    "name": "bme0",
+                    "description": "bme0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "02-00-00-00-00-0A",
+                    "type": "propVirtual",
+                    "name": "bme0.0",
+                    "description": "bme0.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "00-00-00-00-00-14",
+                    "type": "other",
+                    "name": "cbp0",
+                    "description": "cbp0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "other",
+                    "name": "esi",
+                    "description": "esi"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-F6",
+                    "type": "other",
+                    "name": "irb",
+                    "description": "irb"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-F6",
+                    "type": "other",
+                    "name": "jsrv",
+                    "description": "jsrv"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-F6",
+                    "type": "propVirtual",
+                    "name": "jsrv.1",
+                    "description": "jsrv.1"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-F7",
+                    "type": "other",
+                    "name": "pip0",
+                    "description": "pip0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "other",
+                    "name": "vtep",
+                    "description": "vtep"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "other",
+                    "name": "pfh-0/0/0",
+                    "description": "pfh-0/0/0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "other",
+                    "name": "pfe-0/0/0",
+                    "description": "pfe-0/0/0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "name": "pfe-0/0/0.16383",
+                    "description": "pfe-0/0/0.16383"
+                },
+                {
+                    "status": "up",
+                    "mac_address": null,
+                    "type": "propVirtual",
+                    "name": "pfh-0/0/0.16383",
+                    "description": "pfh-0/0/0.16383"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-F9",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/0",
+                    "description": "ge-0/0/0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FA",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/1",
+                    "description": "ge-0/0/1"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FB",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/2",
+                    "description": "ge-0/0/2"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FC",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/3",
+                    "description": "ge-0/0/3"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-45-FD",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/4",
+                    "description": "ge-0/0/4"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-45-FE",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/5",
+                    "description": "ge-0/0/5"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FF",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/6",
+                    "description": "ge-0/0/6"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-00",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/7",
+                    "description": "ge-0/0/7"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-01",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/8",
+                    "description": "ge-0/0/8"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-02",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/9",
+                    "description": "ge-0/0/9"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-03",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/10",
+                    "description": "ge-0/0/10"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-04",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/11",
+                    "description": "ge-0/0/11"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-05",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/12",
+                    "description": "ge-0/0/12"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-06",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/13",
+                    "description": "ge-0/0/13"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/14",
+                    "description": "ge-0/0/14"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-08",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/15",
+                    "description": "ge-0/0/15"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-09",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/16",
+                    "description": "ge-0/0/16"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-0A",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/17",
+                    "description": "ge-0/0/17"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-0B",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/18",
+                    "description": "ge-0/0/18"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-0C",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/19",
+                    "description": "ge-0/0/19"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-0D",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/20",
+                    "description": "ge-0/0/20"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-0E",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/21",
+                    "description": "ge-0/0/21"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-0F",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/22",
+                    "description": "ge-0/0/22"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-10",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/23",
+                    "description": "ge-0/0/23"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-11",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/24",
+                    "description": "ge-0/0/24"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-12",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/25",
+                    "description": "ge-0/0/25"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-13",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/26",
+                    "description": "ge-0/0/26"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-14",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/27",
+                    "description": "ge-0/0/27"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-15",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/28",
+                    "description": "ge-0/0/28"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-16",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/29",
+                    "description": "ge-0/0/29"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-17",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/30",
+                    "description": "ge-0/0/30"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-18",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/31",
+                    "description": "ge-0/0/31"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-19",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/32",
+                    "description": "ge-0/0/32"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-1A",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/33",
+                    "description": "ge-0/0/33"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-1B",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/34",
+                    "description": "ge-0/0/34"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-1C",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/35",
+                    "description": "ge-0/0/35"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-1D",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/36",
+                    "description": "ge-0/0/36"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-1E",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/37",
+                    "description": "ge-0/0/37"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-1F",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/38",
+                    "description": "ge-0/0/38"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-20",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/39",
+                    "description": "ge-0/0/39"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-21",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/40",
+                    "description": "ge-0/0/40"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-22",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/41",
+                    "description": "ge-0/0/41"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-23",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/42",
+                    "description": "ge-0/0/42"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-24",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/43",
+                    "description": "ge-0/0/43"
+                },
+                {
+                    "status": "down",
+                    "mac_address": "44-AA-50-20-46-25",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/44",
+                    "description": "ge-0/0/44"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-26",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/45",
+                    "description": "ge-0/0/45"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/46",
+                    "description": "ge-0/0/46"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "ethernetCsmacd",
+                    "name": "ge-0/0/47",
+                    "description": "ge-0/0/47"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-F9",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/0.0",
+                    "description": "ge-0/0/0.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FA",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/1.0",
+                    "description": "ge-0/0/1.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FB",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/2.0",
+                    "description": "ge-0/0/2.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FC",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/3.0",
+                    "description": "ge-0/0/3.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-45-FD",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/4.0",
+                    "description": "ge-0/0/4.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-45-FE",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/5.0",
+                    "description": "ge-0/0/5.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-FF",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/6.0",
+                    "description": "ge-0/0/6.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-00",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/7.0",
+                    "description": "ge-0/0/7.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-01",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/8.0",
+                    "description": "ge-0/0/8.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-02",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/9.0",
+                    "description": "ge-0/0/9.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-03",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/10.0",
+                    "description": "ge-0/0/10.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-04",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/11.0",
+                    "description": "ge-0/0/11.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-05",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/12.0",
+                    "description": "ge-0/0/12.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-06",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/13.0",
+                    "description": "ge-0/0/13.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/14.0",
+                    "description": "ge-0/0/14.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-08",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/15.0",
+                    "description": "ge-0/0/15.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-09",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/16.0",
+                    "description": "ge-0/0/16.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-0A",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/17.0",
+                    "description": "ge-0/0/17.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-0B",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/18.0",
+                    "description": "ge-0/0/18.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-0C",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/19.0",
+                    "description": "ge-0/0/19.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-0D",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/20.0",
+                    "description": "ge-0/0/20.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-0E",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/21.0",
+                    "description": "ge-0/0/21.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-0F",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/22.0",
+                    "description": "ge-0/0/22.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-10",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/23.0",
+                    "description": "ge-0/0/23.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-11",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/24.0",
+                    "description": "ge-0/0/24.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-12",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/25.0",
+                    "description": "ge-0/0/25.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-13",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/26.0",
+                    "description": "ge-0/0/26.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-14",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/27.0",
+                    "description": "ge-0/0/27.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-15",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/28.0",
+                    "description": "ge-0/0/28.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-16",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/29.0",
+                    "description": "ge-0/0/29.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-17",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/30.0",
+                    "description": "ge-0/0/30.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-18",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/31.0",
+                    "description": "ge-0/0/31.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-19",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/32.0",
+                    "description": "ge-0/0/32.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-1A",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/33.0",
+                    "description": "ge-0/0/33.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-1B",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/34.0",
+                    "description": "ge-0/0/34.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-1C",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/35.0",
+                    "description": "ge-0/0/35.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-1D",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/36.0",
+                    "description": "ge-0/0/36.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-1E",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/37.0",
+                    "description": "ge-0/0/37.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-1F",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/38.0",
+                    "description": "ge-0/0/38.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-20",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/39.0",
+                    "description": "ge-0/0/39.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-21",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/40.0",
+                    "description": "ge-0/0/40.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-22",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/41.0",
+                    "description": "ge-0/0/41.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-23",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/42.0",
+                    "description": "ge-0/0/42.0"
+                },
+                {
+                    "status": "lowerLayerDown",
+                    "mac_address": "44-AA-50-20-46-25",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/44.0",
+                    "description": "ge-0/0/44.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-26",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/45.0",
+                    "description": "ge-0/0/45.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/46.0",
+                    "description": "ge-0/0/46.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "propVirtual",
+                    "name": "ge-0/0/47.0",
+                    "description": "ge-0/0/47.0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "ieee8023adLag",
+                    "name": "ae0",
+                    "description": "ae0"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-45-F6",
+                    "type": "propVirtual",
+                    "name": "irb.129",
+                    "description": "irb.129"
+                },
+                {
+                    "status": "up",
+                    "mac_address": "44-AA-50-20-46-07",
+                    "type": "propVirtual",
+                    "name": "ae0.0",
+                    "description": "ae0.0"
+                }
+            ],
+            "uptime": null,
+            "domain": "UnityDemo-oobsw1-301.sf10",
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/c114ae07-2506-4d2d-8ae4-aa36889c1aee/",
+            "id": 3572,
+            "proxy": {},
+            "ip_address": "209.237.224.238",
+            "snmp_community": "ul4ever",
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "c114ae07-2506-4d2d-8ae4-aa36889c1aee",
+            "name": "UnityDemo-Sw1",
+            "model": "C9200-48x",
+            "model_id": 294,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": {
+                "url": "http://10.192.11.207:8000/rest/fast/cabinet/1273/",
+                "id": 1273,
+                "uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
+                "name": "CB1-SF10"
+            },
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.128.7.11",
+            "asset_tag": "UnityTest",
+            "position": 2,
+            "failed_alerts_count": null,
+            "size": 2,
+            "tags": [
+                "Custom"
+            ],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/301/",
+                "id": 301,
+                "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+                "name": "DataCenter1 - SF10"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": "Cisco",
+            "os_name": "Cisco IOS 15.2(4)E8 (ENTSERVICESK9)",
+            "version_number": "15.2",
+            "system_object_oid": null,
+            "dns_name": "UnityDemo-Sw1.unitedlayer.com",
+            "discovery_method": null,
+            "first_discovered": null,
+            "environment": "Production",
+            "last_discovered": null,
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "0",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": "RELEASE SOFTWARE (fc3)",
+            "last_updated": null,
+            "address": "209.237.224.238",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": "CAT1805S412",
+            "interfaces": null,
+            "uptime": null,
+            "domain": "unitedlayer.com",
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/39391a7f-1721-4c7e-b07b-fe7ff265c852/",
+            "id": 3458,
+            "proxy": {},
+            "ip_address": "10.1.0.27",
+            "snmp_community": "ul4ever",
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "39391a7f-1721-4c7e-b07b-fe7ff265c852",
+            "name": "UnityDemo-sw1-503.sf10.unitedlayer.com",
+            "model": "3750G-48-TS",
+            "model_id": 53,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": {
+                "url": "http://10.192.11.207:8000/rest/fast/cabinet/1273/",
+                "id": 1273,
+                "uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
+                "name": "CB1-SF10"
+            },
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.1.0.27",
+            "asset_tag": null,
+            "position": 6,
+            "failed_alerts_count": null,
+            "size": 2,
+            "tags": [
+                "Custom"
+            ],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/301/",
+                "id": 301,
+                "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+                "name": "DataCenter1 - SF10"
+            },
+            "end_of_life": "2018-01-30T18:30:00Z",
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": null,
+            "os_name": null,
+            "version_number": null,
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": null,
+            "first_discovered": null,
+            "environment": "Production",
+            "last_discovered": null,
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "0",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.1.0.27",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": null,
+            "interfaces": [
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:c0",
+                    "type": 53,
+                    "name": "Vl1",
+                    "description": "Vlan1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c1",
+                    "type": 53,
+                    "name": "Vl76",
+                    "description": "Vlan76"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c3",
+                    "type": 53,
+                    "name": "Vl2008",
+                    "description": "Vlan2008"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c2",
+                    "type": 53,
+                    "name": "Vl2009",
+                    "description": "Vlan2009"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c5",
+                    "type": 53,
+                    "name": "Vl2015",
+                    "description": "Vlan2015"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c4",
+                    "type": 53,
+                    "name": "Vl2016",
+                    "description": "Vlan2016"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c6",
+                    "type": 53,
+                    "name": "Vl2018",
+                    "description": "Vlan2018"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c7",
+                    "type": 53,
+                    "name": "Vl2019",
+                    "description": "Vlan2019"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c8",
+                    "type": 53,
+                    "name": "Vl2020",
+                    "description": "Vlan2020"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:c9",
+                    "type": 53,
+                    "name": "Vl2021",
+                    "description": "Vlan2021"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:ad",
+                    "type": 53,
+                    "name": "Po1",
+                    "description": "Port-channel1"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:ae",
+                    "type": 53,
+                    "name": "Po2",
+                    "description": "Port-channel2"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:8c",
+                    "type": 53,
+                    "name": "Po15",
+                    "description": "Port-channel15"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:83",
+                    "type": 53,
+                    "name": "Po16",
+                    "description": "Port-channel16"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackPort1",
+                    "description": "StackPort1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St1-1",
+                    "description": "StackSub-St1-1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St1-2",
+                    "description": "StackSub-St1-2"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackPort2",
+                    "description": "StackPort2"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St2-1",
+                    "description": "StackSub-St2-1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St2-2",
+                    "description": "StackSub-St2-2"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:81",
+                    "type": 6,
+                    "name": "Gi1/0/1",
+                    "description": "GigabitEthernet1/0/1"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:82",
+                    "type": 6,
+                    "name": "Gi1/0/2",
+                    "description": "GigabitEthernet1/0/2"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:83",
+                    "type": 6,
+                    "name": "Gi1/0/3",
+                    "description": "GigabitEthernet1/0/3"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:84",
+                    "type": 6,
+                    "name": "Gi1/0/4",
+                    "description": "GigabitEthernet1/0/4"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:85",
+                    "type": 6,
+                    "name": "Gi1/0/5",
+                    "description": "GigabitEthernet1/0/5"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:86",
+                    "type": 6,
+                    "name": "Gi1/0/6",
+                    "description": "GigabitEthernet1/0/6"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:87",
+                    "type": 6,
+                    "name": "Gi1/0/7",
+                    "description": "GigabitEthernet1/0/7"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:88",
+                    "type": 6,
+                    "name": "Gi1/0/8",
+                    "description": "GigabitEthernet1/0/8"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:89",
+                    "type": 6,
+                    "name": "Gi1/0/9",
+                    "description": "GigabitEthernet1/0/9"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:8a",
+                    "type": 6,
+                    "name": "Gi1/0/10",
+                    "description": "GigabitEthernet1/0/10"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:8b",
+                    "type": 6,
+                    "name": "Gi1/0/11",
+                    "description": "GigabitEthernet1/0/11"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:8c",
+                    "type": 6,
+                    "name": "Gi1/0/12",
+                    "description": "GigabitEthernet1/0/12"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:8d",
+                    "type": 6,
+                    "name": "Gi1/0/13",
+                    "description": "GigabitEthernet1/0/13"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:8e",
+                    "type": 6,
+                    "name": "Gi1/0/14",
+                    "description": "GigabitEthernet1/0/14"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:8f",
+                    "type": 6,
+                    "name": "Gi1/0/15",
+                    "description": "GigabitEthernet1/0/15"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:90",
+                    "type": 6,
+                    "name": "Gi1/0/16",
+                    "description": "GigabitEthernet1/0/16"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:91",
+                    "type": 6,
+                    "name": "Gi1/0/17",
+                    "description": "GigabitEthernet1/0/17"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:92",
+                    "type": 6,
+                    "name": "Gi1/0/18",
+                    "description": "GigabitEthernet1/0/18"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:93",
+                    "type": 6,
+                    "name": "Gi1/0/19",
+                    "description": "GigabitEthernet1/0/19"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:94",
+                    "type": 6,
+                    "name": "Gi1/0/20",
+                    "description": "GigabitEthernet1/0/20"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:95",
+                    "type": 6,
+                    "name": "Gi1/0/21",
+                    "description": "GigabitEthernet1/0/21"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:96",
+                    "type": 6,
+                    "name": "Gi1/0/22",
+                    "description": "GigabitEthernet1/0/22"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:97",
+                    "type": 6,
+                    "name": "Gi1/0/23",
+                    "description": "GigabitEthernet1/0/23"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:98",
+                    "type": 6,
+                    "name": "Gi1/0/24",
+                    "description": "GigabitEthernet1/0/24"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:99",
+                    "type": 6,
+                    "name": "Gi1/0/25",
+                    "description": "GigabitEthernet1/0/25"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:9a",
+                    "type": 6,
+                    "name": "Gi1/0/26",
+                    "description": "GigabitEthernet1/0/26"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:9b",
+                    "type": 6,
+                    "name": "Gi1/0/27",
+                    "description": "GigabitEthernet1/0/27"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:9c",
+                    "type": 6,
+                    "name": "Gi1/0/28",
+                    "description": "GigabitEthernet1/0/28"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:9d",
+                    "type": 6,
+                    "name": "Gi1/0/29",
+                    "description": "GigabitEthernet1/0/29"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:9e",
+                    "type": 6,
+                    "name": "Gi1/0/30",
+                    "description": "GigabitEthernet1/0/30"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:9f",
+                    "type": 6,
+                    "name": "Gi1/0/31",
+                    "description": "GigabitEthernet1/0/31"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:a0",
+                    "type": 6,
+                    "name": "Gi1/0/32",
+                    "description": "GigabitEthernet1/0/32"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:a1",
+                    "type": 6,
+                    "name": "Gi1/0/33",
+                    "description": "GigabitEthernet1/0/33"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:a2",
+                    "type": 6,
+                    "name": "Gi1/0/34",
+                    "description": "GigabitEthernet1/0/34"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:a3",
+                    "type": 6,
+                    "name": "Gi1/0/35",
+                    "description": "GigabitEthernet1/0/35"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:a4",
+                    "type": 6,
+                    "name": "Gi1/0/36",
+                    "description": "GigabitEthernet1/0/36"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:a5",
+                    "type": 6,
+                    "name": "Gi1/0/37",
+                    "description": "GigabitEthernet1/0/37"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:a6",
+                    "type": 6,
+                    "name": "Gi1/0/38",
+                    "description": "GigabitEthernet1/0/38"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:a7",
+                    "type": 6,
+                    "name": "Gi1/0/39",
+                    "description": "GigabitEthernet1/0/39"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:a8",
+                    "type": 6,
+                    "name": "Gi1/0/40",
+                    "description": "GigabitEthernet1/0/40"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:a9",
+                    "type": 6,
+                    "name": "Gi1/0/41",
+                    "description": "GigabitEthernet1/0/41"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:aa",
+                    "type": 6,
+                    "name": "Gi1/0/42",
+                    "description": "GigabitEthernet1/0/42"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:ab",
+                    "type": 6,
+                    "name": "Gi1/0/43",
+                    "description": "GigabitEthernet1/0/43"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:ac",
+                    "type": 6,
+                    "name": "Gi1/0/44",
+                    "description": "GigabitEthernet1/0/44"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:ad",
+                    "type": 6,
+                    "name": "Gi1/0/45",
+                    "description": "GigabitEthernet1/0/45"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:ae",
+                    "type": 6,
+                    "name": "Gi1/0/46",
+                    "description": "GigabitEthernet1/0/46"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:a:57:d9:af",
+                    "type": 6,
+                    "name": "Gi1/0/47",
+                    "description": "GigabitEthernet1/0/47"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:b0",
+                    "type": 6,
+                    "name": "Gi1/0/48",
+                    "description": "GigabitEthernet1/0/48"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:b1",
+                    "type": 6,
+                    "name": "Gi1/0/49",
+                    "description": "GigabitEthernet1/0/49"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:b2",
+                    "type": 6,
+                    "name": "Gi1/0/50",
+                    "description": "GigabitEthernet1/0/50"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:b3",
+                    "type": 6,
+                    "name": "Gi1/0/51",
+                    "description": "GigabitEthernet1/0/51"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:a:57:d9:b4",
+                    "type": 6,
+                    "name": "Gi1/0/52",
+                    "description": "GigabitEthernet1/0/52"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:81",
+                    "type": 6,
+                    "name": "Gi2/0/1",
+                    "description": "GigabitEthernet2/0/1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:82",
+                    "type": 6,
+                    "name": "Gi2/0/2",
+                    "description": "GigabitEthernet2/0/2"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:83",
+                    "type": 6,
+                    "name": "Gi2/0/3",
+                    "description": "GigabitEthernet2/0/3"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:84",
+                    "type": 6,
+                    "name": "Gi2/0/4",
+                    "description": "GigabitEthernet2/0/4"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:85",
+                    "type": 6,
+                    "name": "Gi2/0/5",
+                    "description": "GigabitEthernet2/0/5"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:86",
+                    "type": 6,
+                    "name": "Gi2/0/6",
+                    "description": "GigabitEthernet2/0/6"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:87",
+                    "type": 6,
+                    "name": "Gi2/0/7",
+                    "description": "GigabitEthernet2/0/7"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:88",
+                    "type": 6,
+                    "name": "Gi2/0/8",
+                    "description": "GigabitEthernet2/0/8"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:89",
+                    "type": 6,
+                    "name": "Gi2/0/9",
+                    "description": "GigabitEthernet2/0/9"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:8a",
+                    "type": 6,
+                    "name": "Gi2/0/10",
+                    "description": "GigabitEthernet2/0/10"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:8b",
+                    "type": 6,
+                    "name": "Gi2/0/11",
+                    "description": "GigabitEthernet2/0/11"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:8c",
+                    "type": 6,
+                    "name": "Gi2/0/12",
+                    "description": "GigabitEthernet2/0/12"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:8d",
+                    "type": 6,
+                    "name": "Gi2/0/13",
+                    "description": "GigabitEthernet2/0/13"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:8e",
+                    "type": 6,
+                    "name": "Gi2/0/14",
+                    "description": "GigabitEthernet2/0/14"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:8f",
+                    "type": 6,
+                    "name": "Gi2/0/15",
+                    "description": "GigabitEthernet2/0/15"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:90",
+                    "type": 6,
+                    "name": "Gi2/0/16",
+                    "description": "GigabitEthernet2/0/16"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:91",
+                    "type": 6,
+                    "name": "Gi2/0/17",
+                    "description": "GigabitEthernet2/0/17"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:92",
+                    "type": 6,
+                    "name": "Gi2/0/18",
+                    "description": "GigabitEthernet2/0/18"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:93",
+                    "type": 6,
+                    "name": "Gi2/0/19",
+                    "description": "GigabitEthernet2/0/19"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:94",
+                    "type": 6,
+                    "name": "Gi2/0/20",
+                    "description": "GigabitEthernet2/0/20"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:95",
+                    "type": 6,
+                    "name": "Gi2/0/21",
+                    "description": "GigabitEthernet2/0/21"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:96",
+                    "type": 6,
+                    "name": "Gi2/0/22",
+                    "description": "GigabitEthernet2/0/22"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:97",
+                    "type": 6,
+                    "name": "Gi2/0/23",
+                    "description": "GigabitEthernet2/0/23"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:98",
+                    "type": 6,
+                    "name": "Gi2/0/24",
+                    "description": "GigabitEthernet2/0/24"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:99",
+                    "type": 6,
+                    "name": "Gi2/0/25",
+                    "description": "GigabitEthernet2/0/25"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:9a",
+                    "type": 6,
+                    "name": "Gi2/0/26",
+                    "description": "GigabitEthernet2/0/26"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:9b",
+                    "type": 6,
+                    "name": "Gi2/0/27",
+                    "description": "GigabitEthernet2/0/27"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:9c",
+                    "type": 6,
+                    "name": "Gi2/0/28",
+                    "description": "GigabitEthernet2/0/28"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:9d",
+                    "type": 6,
+                    "name": "Gi2/0/29",
+                    "description": "GigabitEthernet2/0/29"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:9e",
+                    "type": 6,
+                    "name": "Gi2/0/30",
+                    "description": "GigabitEthernet2/0/30"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:9f",
+                    "type": 6,
+                    "name": "Gi2/0/31",
+                    "description": "GigabitEthernet2/0/31"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:a0",
+                    "type": 6,
+                    "name": "Gi2/0/32",
+                    "description": "GigabitEthernet2/0/32"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:a1",
+                    "type": 6,
+                    "name": "Gi2/0/33",
+                    "description": "GigabitEthernet2/0/33"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:a2",
+                    "type": 6,
+                    "name": "Gi2/0/34",
+                    "description": "GigabitEthernet2/0/34"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:a3",
+                    "type": 6,
+                    "name": "Gi2/0/35",
+                    "description": "GigabitEthernet2/0/35"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:a4",
+                    "type": 6,
+                    "name": "Gi2/0/36",
+                    "description": "GigabitEthernet2/0/36"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:a5",
+                    "type": 6,
+                    "name": "Gi2/0/37",
+                    "description": "GigabitEthernet2/0/37"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:a6",
+                    "type": 6,
+                    "name": "Gi2/0/38",
+                    "description": "GigabitEthernet2/0/38"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:a7",
+                    "type": 6,
+                    "name": "Gi2/0/39",
+                    "description": "GigabitEthernet2/0/39"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:a8",
+                    "type": 6,
+                    "name": "Gi2/0/40",
+                    "description": "GigabitEthernet2/0/40"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:a9",
+                    "type": 6,
+                    "name": "Gi2/0/41",
+                    "description": "GigabitEthernet2/0/41"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:26:ca:fb:f1:aa",
+                    "type": 6,
+                    "name": "Gi2/0/42",
+                    "description": "GigabitEthernet2/0/42"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:ab",
+                    "type": 6,
+                    "name": "Gi2/0/43",
+                    "description": "GigabitEthernet2/0/43"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:ac",
+                    "type": 6,
+                    "name": "Gi2/0/44",
+                    "description": "GigabitEthernet2/0/44"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:ad",
+                    "type": 6,
+                    "name": "Gi2/0/45",
+                    "description": "GigabitEthernet2/0/45"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:ae",
+                    "type": 6,
+                    "name": "Gi2/0/46",
+                    "description": "GigabitEthernet2/0/46"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:af",
+                    "type": 6,
+                    "name": "Gi2/0/47",
+                    "description": "GigabitEthernet2/0/47"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:b0",
+                    "type": 6,
+                    "name": "Gi2/0/48",
+                    "description": "GigabitEthernet2/0/48"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:b1",
+                    "type": 6,
+                    "name": "Gi2/0/49",
+                    "description": "GigabitEthernet2/0/49"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:b2",
+                    "type": 6,
+                    "name": "Gi2/0/50",
+                    "description": "GigabitEthernet2/0/50"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:b3",
+                    "type": 6,
+                    "name": "Gi2/0/51",
+                    "description": "GigabitEthernet2/0/51"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:26:ca:fb:f1:b4",
+                    "type": 6,
+                    "name": "Gi2/0/52",
+                    "description": "GigabitEthernet2/0/52"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 1,
+                    "name": "Nu0",
+                    "description": "Null0"
+                }
+            ],
+            "uptime": null,
+            "domain": "unitedlayer.com",
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/0cecb309-bc56-46a1-b1bc-d620d5dd679a/",
+            "id": 3454,
+            "proxy": {},
+            "ip_address": "10.1.0.22",
+            "snmp_community": "ul4ever",
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "0cecb309-bc56-46a1-b1bc-d620d5dd679a",
+            "name": "UnityDemo-sw1-505.sf10.unitedlayer.com",
+            "model": "WS-C3750G-48TS",
+            "model_id": 39,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": {
+                "url": "http://10.192.11.207:8000/rest/fast/cabinet/1273/",
+                "id": 1273,
+                "uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
+                "name": "CB1-SF10"
+            },
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.1.0.22",
+            "asset_tag": null,
+            "position": 4,
+            "failed_alerts_count": null,
+            "size": 2,
+            "tags": [
+                "UnitedLayer"
+            ],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/301/",
+                "id": 301,
+                "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+                "name": "DataCenter1 - SF10"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": null,
+            "os_name": null,
+            "version_number": null,
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": null,
+            "first_discovered": null,
+            "environment": null,
+            "last_discovered": null,
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "0",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.1.0.22",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": null,
+            "interfaces": null,
+            "uptime": null,
+            "domain": "unitedlayer.com",
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        },
+        {
+            "url": "http://10.192.11.207:8000/customer/switches/d3017b3c-0abb-49d8-b20d-516f2657e020/",
+            "id": 3544,
+            "proxy": {},
+            "ip_address": "10.128.7.1",
+            "snmp_community": "ul4ever",
+            "snmp_version": "v2c",
+            "snmp_authlevel": null,
+            "snmp_authname": null,
+            "snmp_authpass": null,
+            "snmp_authalgo": null,
+            "snmp_cryptopass": null,
+            "snmp_cryptoalgo": null,
+            "uuid": "d3017b3c-0abb-49d8-b20d-516f2657e020",
+            "name": "UnityDemo-sw2-mgmt.sf10.unitedlayer.com",
+            "model": "WS-C3750G-48TS",
+            "model_id": 39,
+            "manufacturer": "cisco",
+            "manufacturer_id": 13,
+            "cabinet": null,
+            "cloud": [],
+            "is_shared": false,
+            "observium_status": null,
+            "management_ip": "10.128.7.1",
+            "asset_tag": null,
+            "position": 0,
+            "failed_alerts_count": null,
+            "size": 1,
+            "tags": [
+                "Custom"
+            ],
+            "monitoring": {
+                "configured": false,
+                "observium": false,
+                "enabled": false,
+                "zabbix": true
+            },
+            "datacenter": {
+                "url": "http://10.192.11.207:8000/rest/colo_cloud/301/",
+                "id": 301,
+                "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+                "name": "DataCenter1 - SF10"
+            },
+            "end_of_life": null,
+            "end_of_service": null,
+            "collector": {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector",
+                "id": 59
+            },
+            "custom_attribute_data": null,
+            "credentials_m2m": [],
+            "credentials_type": null,
+            "redfish": false,
+            "applicable_module_permissions": [],
+            "alias_name": null,
+            "os_type": null,
+            "os_name": null,
+            "version_number": null,
+            "system_object_oid": null,
+            "dns_name": null,
+            "discovery_method": null,
+            "first_discovered": null,
+            "environment": null,
+            "last_discovered": null,
+            "number_of_ports": null,
+            "description": null,
+            "last_rebooted": null,
+            "cpu": null,
+            "status": "1",
+            "memory": null,
+            "fan": null,
+            "power_supply1": null,
+            "power_supply2": null,
+            "firmware_version": null,
+            "last_updated": null,
+            "address": "10.128.7.1",
+            "power_socket1": null,
+            "power_socket2": null,
+            "note": null,
+            "serial_number": null,
+            "interfaces": [
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:c0",
+                    "type": 53,
+                    "name": "Vl1",
+                    "description": "Vlan1"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:c1",
+                    "type": 53,
+                    "name": "Vl20",
+                    "description": "Vlan20"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:c8",
+                    "type": 53,
+                    "name": "Vl75",
+                    "description": "Vlan75"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:c9",
+                    "type": 53,
+                    "name": "Vl76",
+                    "description": "Vlan76"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:df",
+                    "type": 53,
+                    "name": "Vl109",
+                    "description": "Vlan109"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d9",
+                    "type": 53,
+                    "name": "Vl121",
+                    "description": "Vlan121"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:e2",
+                    "type": 53,
+                    "name": "Vl129",
+                    "description": "Vlan129"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d6",
+                    "type": 53,
+                    "name": "Vl2014",
+                    "description": "Vlan2014"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:dc",
+                    "type": 53,
+                    "name": "Vl2068",
+                    "description": "Vlan2068"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:c2",
+                    "type": 53,
+                    "name": "Vl2069",
+                    "description": "Vlan2069"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:c3",
+                    "type": 53,
+                    "name": "Vl2070",
+                    "description": "Vlan2070"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:c6",
+                    "type": 53,
+                    "name": "Vl2071",
+                    "description": "Vlan2071"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:cb",
+                    "type": 53,
+                    "name": "Vl2102",
+                    "description": "Vlan2102"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:ce",
+                    "type": 53,
+                    "name": "Vl2105",
+                    "description": "Vlan2105"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:cf",
+                    "type": 53,
+                    "name": "Vl2106",
+                    "description": "Vlan2106"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d0",
+                    "type": 53,
+                    "name": "Vl2107",
+                    "description": "Vlan2107"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:db",
+                    "type": 53,
+                    "name": "Vl2109",
+                    "description": "Vlan2109"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d2",
+                    "type": 53,
+                    "name": "Vl2110",
+                    "description": "Vlan2110"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d4",
+                    "type": 53,
+                    "name": "Vl2112",
+                    "description": "Vlan2112"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d5",
+                    "type": 53,
+                    "name": "Vl2113",
+                    "description": "Vlan2113"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d8",
+                    "type": 53,
+                    "name": "Vl2114",
+                    "description": "Vlan2114"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:e1",
+                    "type": 53,
+                    "name": "Vl2118",
+                    "description": "Vlan2118"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:cd",
+                    "type": 53,
+                    "name": "Vl2119",
+                    "description": "Vlan2119"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:e4",
+                    "type": 53,
+                    "name": "Vl2120",
+                    "description": "Vlan2120"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:cc",
+                    "type": 53,
+                    "name": "Vl2180",
+                    "description": "Vlan2180"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:c4",
+                    "type": 53,
+                    "name": "Vl3000",
+                    "description": "Vlan3000"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:c5",
+                    "type": 53,
+                    "name": "Vl3001",
+                    "description": "Vlan3001"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:c7",
+                    "type": 53,
+                    "name": "Vl3002",
+                    "description": "Vlan3002"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d7",
+                    "type": 53,
+                    "name": "Vl3003",
+                    "description": "Vlan3003"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:da",
+                    "type": 53,
+                    "name": "Vl3005",
+                    "description": "Vlan3005"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:dd",
+                    "type": 53,
+                    "name": "Vl3006",
+                    "description": "Vlan3006"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:ca",
+                    "type": 53,
+                    "name": "Vl3009",
+                    "description": "Vlan3009"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:de",
+                    "type": 53,
+                    "name": "Vl3010",
+                    "description": "Vlan3010"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:e0",
+                    "type": 53,
+                    "name": "Vl3011",
+                    "description": "Vlan3011"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d3",
+                    "type": 53,
+                    "name": "Vl3016",
+                    "description": "Vlan3016"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:e5",
+                    "type": 53,
+                    "name": "Po3",
+                    "description": "Port-channel3"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:53:f2:91:8e",
+                    "type": 53,
+                    "name": "Po5",
+                    "description": "Port-channel5"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackPort1",
+                    "description": "StackPort1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St1-1",
+                    "description": "StackSub-St1-1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St1-2",
+                    "description": "StackSub-St1-2"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackPort2",
+                    "description": "StackPort2"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St2-1",
+                    "description": "StackSub-St2-1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 53,
+                    "name": "StackSub-St2-2",
+                    "description": "StackSub-St2-2"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:81",
+                    "type": 6,
+                    "name": "Gi1/0/1",
+                    "description": "GigabitEthernet1/0/1"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:82",
+                    "type": 6,
+                    "name": "Gi1/0/2",
+                    "description": "GigabitEthernet1/0/2"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:83",
+                    "type": 6,
+                    "name": "Gi1/0/3",
+                    "description": "GigabitEthernet1/0/3"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:84",
+                    "type": 6,
+                    "name": "Gi1/0/4",
+                    "description": "GigabitEthernet1/0/4"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:85",
+                    "type": 6,
+                    "name": "Gi1/0/5",
+                    "description": "GigabitEthernet1/0/5"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:86",
+                    "type": 6,
+                    "name": "Gi1/0/6",
+                    "description": "GigabitEthernet1/0/6"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:87",
+                    "type": 6,
+                    "name": "Gi1/0/7",
+                    "description": "GigabitEthernet1/0/7"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:88",
+                    "type": 6,
+                    "name": "Gi1/0/8",
+                    "description": "GigabitEthernet1/0/8"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:89",
+                    "type": 6,
+                    "name": "Gi1/0/9",
+                    "description": "GigabitEthernet1/0/9"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:8a",
+                    "type": 6,
+                    "name": "Gi1/0/10",
+                    "description": "GigabitEthernet1/0/10"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:8b",
+                    "type": 6,
+                    "name": "Gi1/0/11",
+                    "description": "GigabitEthernet1/0/11"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:8c",
+                    "type": 6,
+                    "name": "Gi1/0/12",
+                    "description": "GigabitEthernet1/0/12"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:8d",
+                    "type": 6,
+                    "name": "Gi1/0/13",
+                    "description": "GigabitEthernet1/0/13"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:8e",
+                    "type": 6,
+                    "name": "Gi1/0/14",
+                    "description": "GigabitEthernet1/0/14"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:8f",
+                    "type": 6,
+                    "name": "Gi1/0/15",
+                    "description": "GigabitEthernet1/0/15"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:90",
+                    "type": 6,
+                    "name": "Gi1/0/16",
+                    "description": "GigabitEthernet1/0/16"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:91",
+                    "type": 6,
+                    "name": "Gi1/0/17",
+                    "description": "GigabitEthernet1/0/17"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:92",
+                    "type": 6,
+                    "name": "Gi1/0/18",
+                    "description": "GigabitEthernet1/0/18"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:93",
+                    "type": 6,
+                    "name": "Gi1/0/19",
+                    "description": "GigabitEthernet1/0/19"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:d1",
+                    "type": 6,
+                    "name": "Gi1/0/20",
+                    "description": "GigabitEthernet1/0/20"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:95",
+                    "type": 6,
+                    "name": "Gi1/0/21",
+                    "description": "GigabitEthernet1/0/21"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:96",
+                    "type": 6,
+                    "name": "Gi1/0/22",
+                    "description": "GigabitEthernet1/0/22"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:97",
+                    "type": 6,
+                    "name": "Gi1/0/23",
+                    "description": "GigabitEthernet1/0/23"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:98",
+                    "type": 6,
+                    "name": "Gi1/0/24",
+                    "description": "GigabitEthernet1/0/24"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:99",
+                    "type": 6,
+                    "name": "Gi1/0/25",
+                    "description": "GigabitEthernet1/0/25"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:9a",
+                    "type": 6,
+                    "name": "Gi1/0/26",
+                    "description": "GigabitEthernet1/0/26"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:9b",
+                    "type": 6,
+                    "name": "Gi1/0/27",
+                    "description": "GigabitEthernet1/0/27"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:9c",
+                    "type": 6,
+                    "name": "Gi1/0/28",
+                    "description": "GigabitEthernet1/0/28"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:9d",
+                    "type": 6,
+                    "name": "Gi1/0/29",
+                    "description": "GigabitEthernet1/0/29"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:9e",
+                    "type": 6,
+                    "name": "Gi1/0/30",
+                    "description": "GigabitEthernet1/0/30"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:9f",
+                    "type": 6,
+                    "name": "Gi1/0/31",
+                    "description": "GigabitEthernet1/0/31"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a0",
+                    "type": 6,
+                    "name": "Gi1/0/32",
+                    "description": "GigabitEthernet1/0/32"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a1",
+                    "type": 6,
+                    "name": "Gi1/0/33",
+                    "description": "GigabitEthernet1/0/33"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a2",
+                    "type": 6,
+                    "name": "Gi1/0/34",
+                    "description": "GigabitEthernet1/0/34"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a3",
+                    "type": 6,
+                    "name": "Gi1/0/35",
+                    "description": "GigabitEthernet1/0/35"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a4",
+                    "type": 6,
+                    "name": "Gi1/0/36",
+                    "description": "GigabitEthernet1/0/36"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a5",
+                    "type": 6,
+                    "name": "Gi1/0/37",
+                    "description": "GigabitEthernet1/0/37"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a6",
+                    "type": 6,
+                    "name": "Gi1/0/38",
+                    "description": "GigabitEthernet1/0/38"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a7",
+                    "type": 6,
+                    "name": "Gi1/0/39",
+                    "description": "GigabitEthernet1/0/39"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a8",
+                    "type": 6,
+                    "name": "Gi1/0/40",
+                    "description": "GigabitEthernet1/0/40"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:a9",
+                    "type": 6,
+                    "name": "Gi1/0/41",
+                    "description": "GigabitEthernet1/0/41"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:aa",
+                    "type": 6,
+                    "name": "Gi1/0/42",
+                    "description": "GigabitEthernet1/0/42"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:ab",
+                    "type": 6,
+                    "name": "Gi1/0/43",
+                    "description": "GigabitEthernet1/0/43"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:ac",
+                    "type": 6,
+                    "name": "Gi1/0/44",
+                    "description": "GigabitEthernet1/0/44"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:ad",
+                    "type": 6,
+                    "name": "Gi1/0/45",
+                    "description": "GigabitEthernet1/0/45"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:ae",
+                    "type": 6,
+                    "name": "Gi1/0/46",
+                    "description": "GigabitEthernet1/0/46"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:af",
+                    "type": 6,
+                    "name": "Gi1/0/47",
+                    "description": "GigabitEthernet1/0/47"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:b0",
+                    "type": 6,
+                    "name": "Gi1/0/48",
+                    "description": "GigabitEthernet1/0/48"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:b1",
+                    "type": 6,
+                    "name": "Gi1/0/49",
+                    "description": "GigabitEthernet1/0/49"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:b2",
+                    "type": 6,
+                    "name": "Gi1/0/50",
+                    "description": "GigabitEthernet1/0/50"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:b3",
+                    "type": 6,
+                    "name": "Gi1/0/51",
+                    "description": "GigabitEthernet1/0/51"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:54:3f:d8:b4",
+                    "type": 6,
+                    "name": "Gi1/0/52",
+                    "description": "GigabitEthernet1/0/52"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:81",
+                    "type": 6,
+                    "name": "Gi2/0/1",
+                    "description": "GigabitEthernet2/0/1"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:82",
+                    "type": 6,
+                    "name": "Gi2/0/2",
+                    "description": "GigabitEthernet2/0/2"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:83",
+                    "type": 6,
+                    "name": "Gi2/0/3",
+                    "description": "GigabitEthernet2/0/3"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:84",
+                    "type": 6,
+                    "name": "Gi2/0/4",
+                    "description": "GigabitEthernet2/0/4"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:85",
+                    "type": 6,
+                    "name": "Gi2/0/5",
+                    "description": "GigabitEthernet2/0/5"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:86",
+                    "type": 6,
+                    "name": "Gi2/0/6",
+                    "description": "GigabitEthernet2/0/6"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:53:f2:91:87",
+                    "type": 6,
+                    "name": "Gi2/0/7",
+                    "description": "GigabitEthernet2/0/7"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:53:f2:91:88",
+                    "type": 6,
+                    "name": "Gi2/0/8",
+                    "description": "GigabitEthernet2/0/8"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:89",
+                    "type": 6,
+                    "name": "Gi2/0/9",
+                    "description": "GigabitEthernet2/0/9"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:e3",
+                    "type": 6,
+                    "name": "Gi2/0/10",
+                    "description": "GigabitEthernet2/0/10"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:53:f2:91:8b",
+                    "type": 6,
+                    "name": "Gi2/0/11",
+                    "description": "GigabitEthernet2/0/11"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:53:f2:91:8c",
+                    "type": 6,
+                    "name": "Gi2/0/12",
+                    "description": "GigabitEthernet2/0/12"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:8d",
+                    "type": 6,
+                    "name": "Gi2/0/13",
+                    "description": "GigabitEthernet2/0/13"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:53:f2:91:8e",
+                    "type": 6,
+                    "name": "Gi2/0/14",
+                    "description": "GigabitEthernet2/0/14"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:8f",
+                    "type": 6,
+                    "name": "Gi2/0/15",
+                    "description": "GigabitEthernet2/0/15"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:90",
+                    "type": 6,
+                    "name": "Gi2/0/16",
+                    "description": "GigabitEthernet2/0/16"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:91",
+                    "type": 6,
+                    "name": "Gi2/0/17",
+                    "description": "GigabitEthernet2/0/17"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:92",
+                    "type": 6,
+                    "name": "Gi2/0/18",
+                    "description": "GigabitEthernet2/0/18"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:93",
+                    "type": 6,
+                    "name": "Gi2/0/19",
+                    "description": "GigabitEthernet2/0/19"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:54:3f:d8:e6",
+                    "type": 6,
+                    "name": "Gi2/0/20",
+                    "description": "GigabitEthernet2/0/20"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:95",
+                    "type": 6,
+                    "name": "Gi2/0/21",
+                    "description": "GigabitEthernet2/0/21"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:96",
+                    "type": 6,
+                    "name": "Gi2/0/22",
+                    "description": "GigabitEthernet2/0/22"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:97",
+                    "type": 6,
+                    "name": "Gi2/0/23",
+                    "description": "GigabitEthernet2/0/23"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:98",
+                    "type": 6,
+                    "name": "Gi2/0/24",
+                    "description": "GigabitEthernet2/0/24"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:99",
+                    "type": 6,
+                    "name": "Gi2/0/25",
+                    "description": "GigabitEthernet2/0/25"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:9a",
+                    "type": 6,
+                    "name": "Gi2/0/26",
+                    "description": "GigabitEthernet2/0/26"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:9b",
+                    "type": 6,
+                    "name": "Gi2/0/27",
+                    "description": "GigabitEthernet2/0/27"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:9c",
+                    "type": 6,
+                    "name": "Gi2/0/28",
+                    "description": "GigabitEthernet2/0/28"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:9d",
+                    "type": 6,
+                    "name": "Gi2/0/29",
+                    "description": "GigabitEthernet2/0/29"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:9e",
+                    "type": 6,
+                    "name": "Gi2/0/30",
+                    "description": "GigabitEthernet2/0/30"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:9f",
+                    "type": 6,
+                    "name": "Gi2/0/31",
+                    "description": "GigabitEthernet2/0/31"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a0",
+                    "type": 6,
+                    "name": "Gi2/0/32",
+                    "description": "GigabitEthernet2/0/32"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a1",
+                    "type": 6,
+                    "name": "Gi2/0/33",
+                    "description": "GigabitEthernet2/0/33"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a2",
+                    "type": 6,
+                    "name": "Gi2/0/34",
+                    "description": "GigabitEthernet2/0/34"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a3",
+                    "type": 6,
+                    "name": "Gi2/0/35",
+                    "description": "GigabitEthernet2/0/35"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a4",
+                    "type": 6,
+                    "name": "Gi2/0/36",
+                    "description": "GigabitEthernet2/0/36"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a5",
+                    "type": 6,
+                    "name": "Gi2/0/37",
+                    "description": "GigabitEthernet2/0/37"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a6",
+                    "type": 6,
+                    "name": "Gi2/0/38",
+                    "description": "GigabitEthernet2/0/38"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a7",
+                    "type": 6,
+                    "name": "Gi2/0/39",
+                    "description": "GigabitEthernet2/0/39"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a8",
+                    "type": 6,
+                    "name": "Gi2/0/40",
+                    "description": "GigabitEthernet2/0/40"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:a9",
+                    "type": 6,
+                    "name": "Gi2/0/41",
+                    "description": "GigabitEthernet2/0/41"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:aa",
+                    "type": 6,
+                    "name": "Gi2/0/42",
+                    "description": "GigabitEthernet2/0/42"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:ab",
+                    "type": 6,
+                    "name": "Gi2/0/43",
+                    "description": "GigabitEthernet2/0/43"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:ac",
+                    "type": 6,
+                    "name": "Gi2/0/44",
+                    "description": "GigabitEthernet2/0/44"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:ad",
+                    "type": 6,
+                    "name": "Gi2/0/45",
+                    "description": "GigabitEthernet2/0/45"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:ae",
+                    "type": 6,
+                    "name": "Gi2/0/46",
+                    "description": "GigabitEthernet2/0/46"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:af",
+                    "type": 6,
+                    "name": "Gi2/0/47",
+                    "description": "GigabitEthernet2/0/47"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "0:1b:53:f2:91:b0",
+                    "type": 6,
+                    "name": "Gi2/0/48",
+                    "description": "GigabitEthernet2/0/48"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:b1",
+                    "type": 6,
+                    "name": "Gi2/0/49",
+                    "description": "GigabitEthernet2/0/49"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:b2",
+                    "type": 6,
+                    "name": "Gi2/0/50",
+                    "description": "GigabitEthernet2/0/50"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:b3",
+                    "type": 6,
+                    "name": "Gi2/0/51",
+                    "description": "GigabitEthernet2/0/51"
+                },
+                {
+                    "status": 2,
+                    "mac_address": "0:1b:53:f2:91:b4",
+                    "type": 6,
+                    "name": "Gi2/0/52",
+                    "description": "GigabitEthernet2/0/52"
+                },
+                {
+                    "status": 1,
+                    "mac_address": "",
+                    "type": 1,
+                    "name": "Nu0",
+                    "description": "Null0"
+                }
+            ],
+            "uptime": null,
+            "domain": "unitedlayer.com",
+            "short_description": null,
+            "host_name": null,
+            "primary_capability": null,
+            "capability_list": null,
+            "flash_memory": null,
+            "supported": true,
+            "physical_memory": null,
+            "boot_rom_supported": true,
+            "dhcp_use": true,
+            "system_type": null,
+            "integrity": true,
+            "expansion": null,
+            "frequency": null,
+            "input_current": null,
+            "input_voltage": null,
+            "reset_limit": null,
+            "ports_per_slot": null,
+            "max_consumption": null,
+            "number_of_slots": null,
+            "configuration_options": null,
+            "reset_count": null,
+            "data_rate": null,
+            "chassis_bootup_state": null,
+            "thermal_state": null
+        }
+    ]
+}

@@ -1,0 +1,516 @@
+[
+    {
+        "field_name": "dns_name",
+        "display_name": "DNS Name",
+        "field_type": "text"
+    },
+    {
+        "field_name": "collector",
+        "display_name": "Collector",
+        "field_options": [
+            {
+                "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
+                "name": "Prod Collector"
+            }
+        ],
+        "field_type": "dropdown"
+    },
+    {
+        "field_name": "datacenter",
+        "display_name": "Datacenter",
+        "field_options": [
+            {
+                "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+                "name": "DataCenter1 - SF10"
+            },
+            {
+                "uuid": "9cbde93f-26e9-4185-ae8e-83e016caa808",
+                "name": "DataCenter2 - Aus"
+            },
+            {
+                "uuid": "6340900a-d401-4895-a8d2-993ac60f953e",
+                "name": "DC3-Fin"
+            },
+            {
+                "uuid": "a6d76e20-175d-4b34-9189-fbcb0972f684",
+                "name": "DC4-Test"
+            },
+            {
+                "uuid": "abd483ee-5644-41c0-8838-ffcd5baa1641",
+                "name": "DC5-Demo"
+            },
+            {
+                "uuid": "f1574ebd-52a6-46e5-b2d4-a4e71c23b8f2",
+                "name": "nellore hub"
+            }
+        ],
+        "field_type": "dropdown"
+    },
+    {
+        "field_name": "tags",
+        "display_name": "Tag",
+        "field_options": [
+            {
+                "name": "tag"
+            },
+            {
+                "name": "Demo"
+            },
+            {
+                "name": "custom"
+            },
+            {
+                "name": "LinuxSNMP"
+            },
+            {
+                "name": "WindowsSNMP"
+            },
+            {
+                "name": "WindowsAgent-AD"
+            },
+            {
+                "name": "infraApp Monitoring"
+            },
+            {
+                "name": "test asset1"
+            },
+            {
+                "name": "WindowsAgent"
+            },
+            {
+                "name": "Good"
+            },
+            {
+                "name": "better"
+            },
+            {
+                "name": "best"
+            },
+            {
+                "name": "Lab"
+            },
+            {
+                "name": "UnitedLayer"
+            },
+            {
+                "name": "LinuxAgent"
+            },
+            {
+                "name": "Custom"
+            },
+            {
+                "name": "Mobile"
+            }
+        ],
+        "field_type": "multi_select_dropdown"
+    },
+    {
+        "field_name": "environment",
+        "display_name": "Environment",
+        "field_options": [
+            {
+                "name": "Production"
+            },
+            {
+                "name": "dev"
+            },
+            {
+                "name": "Test"
+            }
+        ],
+        "field_type": "dropdown"
+    },
+    {
+        "field_name": "cabinet",
+        "field_type": "dependent_dropdown",
+        "display_name": "Cabinet",
+        "dependent_field": "Datacenter"
+    },
+    {
+        "field_name": "model",
+        "field_type": "dependent_dropdown",
+        "display_name": "Model",
+        "dependent_field": "Manufacturer"
+    },
+    {
+        "field_name": "cloud",
+        "field_type": "dependent_dropdown",
+        "display_name": "Private Cloud",
+        "dependent_field": "Datacenter"
+    },
+    {
+        "field_name": "description",
+        "display_name": "Description",
+        "field_type": "text"
+    },
+    {
+        "field_name": "note",
+        "display_name": "Notes",
+        "field_type": "text"
+    },
+    {
+        "display_name": "Serial Number",
+        "field_name": "serial_number",
+        "field_type": "text"
+    },
+    {
+        "display_name": "Manufacturer",
+        "field_name": "manufacturer",
+        "field_options": [
+            {
+                "id": 65,
+                "name": ""
+            },
+            {
+                "id": 6,
+                "name": "Adaptec"
+            },
+            {
+                "id": 1304,
+                "name": "AKCP"
+            },
+            {
+                "id": 57,
+                "name": "Alteon"
+            },
+            {
+                "id": 18,
+                "name": "APC"
+            },
+            {
+                "id": 16,
+                "name": "Apple"
+            },
+            {
+                "id": 58,
+                "name": "Arista"
+            },
+            {
+                "id": 1299,
+                "name": "Arista Networks"
+            },
+            {
+                "id": 59,
+                "name": "Avocent"
+            },
+            {
+                "id": 42,
+                "name": "Barracuda"
+            },
+            {
+                "id": 31,
+                "name": "BIG-IP"
+            },
+            {
+                "id": 34,
+                "name": "Bigleaf"
+            },
+            {
+                "id": 19,
+                "name": "Broadcom"
+            },
+            {
+                "id": 24,
+                "name": "Brocade"
+            },
+            {
+                "id": 27,
+                "name": "Brocade Serverlron ADX 1000"
+            },
+            {
+                "id": 64,
+                "name": "Cambium Networks"
+            },
+            {
+                "id": 38,
+                "name": "Checkpoint"
+            },
+            {
+                "id": 13,
+                "name": "cisco"
+            },
+            {
+                "id": 68,
+                "name": "CISCO"
+            },
+            {
+                "id": 67,
+                "name": "cisco Systems Inc."
+            },
+            {
+                "id": 66,
+                "name": "Cisco Systems Inc"
+            },
+            {
+                "id": 25,
+                "name": "Citrix"
+            },
+            {
+                "id": 20,
+                "name": "ComputerLink"
+            },
+            {
+                "id": 1305,
+                "name": "CyberPower"
+            },
+            {
+                "id": 7,
+                "name": "Dell"
+            },
+            {
+                "id": 49,
+                "name": "dell1"
+            },
+            {
+                "id": 29,
+                "name": "Dell Computer"
+            },
+            {
+                "id": 36,
+                "name": "Extreme Networks"
+            },
+            {
+                "id": 1226,
+                "name": "F5 LABS, INC."
+            },
+            {
+                "id": 22,
+                "name": "F5 Networks"
+            },
+            {
+                "id": 39,
+                "name": "Forcepoint"
+            },
+            {
+                "id": 32,
+                "name": "FortiGate"
+            },
+            {
+                "id": 45,
+                "name": "Fortinet"
+            },
+            {
+                "id": 14,
+                "name": "Foundry"
+            },
+            {
+                "id": 12,
+                "name": "Fujitsu"
+            },
+            {
+                "id": 3,
+                "name": "Generic"
+            },
+            {
+                "id": 10,
+                "name": "Hitachi"
+            },
+            {
+                "id": 8,
+                "name": "HP"
+            },
+            {
+                "id": 21,
+                "name": "Hynix"
+            },
+            {
+                "id": 47,
+                "name": "IBM"
+            },
+            {
+                "id": 1307,
+                "name": "Impinj"
+            },
+            {
+                "id": 2,
+                "name": "Intel"
+            },
+            {
+                "id": 15,
+                "name": "Juniper"
+            },
+            {
+                "id": 69,
+                "name": "JUNIPER"
+            },
+            {
+                "id": 60,
+                "name": "Junper"
+            },
+            {
+                "id": 43,
+                "name": "Kemp"
+            },
+            {
+                "id": 28,
+                "name": "KEMP"
+            },
+            {
+                "id": 52,
+                "name": "KVM"
+            },
+            {
+                "id": 63,
+                "name": "Lantronix"
+            },
+            {
+                "id": 5,
+                "name": "LSI"
+            },
+            {
+                "id": 17,
+                "name": "Microsoft"
+            },
+            {
+                "id": 54,
+                "name": "NETAPP"
+            },
+            {
+                "id": 55,
+                "name": "Netgear"
+            },
+            {
+                "id": 35,
+                "name": "Netscout"
+            },
+            {
+                "id": 1300,
+                "name": "NETWORK APPLIANCE CORPORATION"
+            },
+            {
+                "id": 61,
+                "name": "Nexsan"
+            },
+            {
+                "id": 46,
+                "name": "NUTANIX"
+            },
+            {
+                "id": 70,
+                "name": "NVIDIA"
+            },
+            {
+                "id": 50,
+                "name": "Opengear"
+            },
+            {
+                "id": 33,
+                "name": "Paloalto"
+            },
+            {
+                "id": 37,
+                "name": "Palo Alto"
+            },
+            {
+                "id": 72,
+                "name": "Palo Alto Networks"
+            },
+            {
+                "id": 44,
+                "name": "Radware"
+            },
+            {
+                "id": 1303,
+                "name": "RARITAN COMPUTER, INC."
+            },
+            {
+                "id": 4,
+                "name": "Samsung"
+            },
+            {
+                "id": 11,
+                "name": "Seagate"
+            },
+            {
+                "id": 40,
+                "name": "Sonicwall"
+            },
+            {
+                "id": 41,
+                "name": "Sophos"
+            },
+            {
+                "id": 56,
+                "name": "Sunfire"
+            },
+            {
+                "id": 1,
+                "name": "Supermicro"
+            },
+            {
+                "id": 30,
+                "name": "Super Micro"
+            },
+            {
+                "id": 51,
+                "name": "Telco Systems"
+            },
+            {
+                "id": 53,
+                "name": "TrueNAS System software"
+            },
+            {
+                "id": 48,
+                "name": "Ubiquiti"
+            },
+            {
+                "id": 62,
+                "name": "VMware"
+            },
+            {
+                "id": 9,
+                "name": "Western Digital"
+            },
+            {
+                "id": 1306,
+                "name": "Zebra Technologies"
+            }
+        ],
+        "field_type": "dropdown"
+    },
+    {
+        "field_name": "fan",
+        "display_name": "Fan",
+        "field_type": "Integer"
+    },
+    {
+        "field_name": "size",
+        "display_name": "Size",
+        "field_type": "Integer"
+    },
+    {
+        "field_name": "asset_tag",
+        "display_name": "Asset Tag",
+        "field_type": "text"
+    },
+    {
+        "field_name": "os_type",
+        "display_name": "OS Type/Group",
+        "field_type": "text"
+    },
+    {
+        "field_name": "os_name",
+        "display_name": "OS Name",
+        "field_type": "text"
+    },
+    {
+        "field_name": "version_number",
+        "display_name": "Version Number",
+        "field_type": "text"
+    },
+    {
+        "field_name": "cpu",
+        "display_name": "CPU Cores",
+        "field_type": "Integer"
+    },
+    {
+        "field_name": "memory",
+        "display_name": "Memory(MB)",
+        "field_type": "Integer"
+    },
+    {
+        "field_name": "firmware_version",
+        "display_name": "Firmware Version",
+        "field_type": "text"
+    }
+]

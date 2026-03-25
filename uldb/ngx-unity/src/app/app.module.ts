@@ -32,6 +32,7 @@ import { DefaultComponent } from './default/default.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
 import { MapService } from './map.service';
 import { StorageService, StorageType } from './shared/app-storage/storage.service';
+import { ThemeService } from './shared/theme/theme.service';
 import { SharedModule } from './shared/shared.module';
 import { UserInfoService } from './shared/user-info.service';
 import { SidebarModule } from './sidebar/sidebar.module';
@@ -45,6 +46,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
 export function useStorageFactory(service: StorageService) { return () => service.put('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone, StorageType.COOKIESTORAGE); }
 export function useFactory(service: UserInfoService) { return () => service.loadUserData(); }
+export function useThemeFactory(service: ThemeService) { return () => service.init(); }
 // export function useMapFactory(service: MapService) { return () => service.loadMap(); }
 
 @NgModule({
@@ -107,7 +109,13 @@ export function useFactory(service: UserInfoService) { return () => service.load
     provide: APP_INITIALIZER,
     useFactory: useFactory,
     deps: [UserInfoService],
-    multi: true 
+    multi: true
+  },
+  {
+    provide: APP_INITIALIZER,
+    useFactory: useThemeFactory,
+    deps: [ThemeService],
+    multi: true
   }],
   bootstrap: [AppComponent]
 })

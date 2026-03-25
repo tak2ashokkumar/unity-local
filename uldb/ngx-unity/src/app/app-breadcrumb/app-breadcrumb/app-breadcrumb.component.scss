@@ -1,67 +1,111 @@
 @import "variables";
 
 .custom-breadcrumb {
-    margin-left: 20px;
-    a {
-      text-decoration: none;
-      outline: none;
-      display: block;
-      float: left;
-      font-size: 12px;
-      line-height: 30px;
-      color: $black;
-      padding: 0 0px 0 40px;
+  margin-left: 20px;
+
+  a {
+    text-decoration: none;
+    outline: none;
+    display: block;
+    float: left;
+    font-size: 12px;
+    line-height: 30px;
+    color: $black;
+    padding: 0 0px 0 40px;
+    background: $gray-200;
+    position: relative;
+    cursor: pointer !important;
+
+    &:hover {
+      color: $primary;
+    }
+
+    &:first-child {
+      padding-left: 10px;
+    }
+
+    &:last-child {
+      color: $success;
+      padding-right: 15px;
+      cursor: default !important;
+    }
+
+    &:last-child:hover {
+      color: $success;
+    }
+
+    &.active,
+    &:hover {
+      cursor: default;
+    }
+
+    &.active:after,
+    &:hover:after {
       background: $gray-200;
-      position: relative;
-      cursor: pointer !important;
-      &:hover {
-        color: $primary;
-      }
-      &:first-child {
-        padding-left: 10px;
-      }
-      &:last-child {
-        color: $success;
-        padding-right: 15px;
-        cursor: default !important;
-      }
-      &:last-child:hover {
-        color: $success;
-      }
-      &.active,
-      &:hover {
-        cursor: default;
-      }
-      &.active:after,
-      &:hover:after {
-        background: $gray-200;
-      }
-      &:after {
-        content: "";
-        position: absolute;
-        top: 0;
-        cursor: pointer;
-        width: 30px;
-        height: 30px;
-        /*as you see the rotated square takes a larger height. which makes it tough to position it properly. So we are going to scale it down so that the diagonals become equal to the line-height of the link. We scale it to 70.7% because if square's: 
+    }
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      /*as you see the rotated square takes a larger height. which makes it tough to position it properly. So we are going to scale it down so that the diagonals become equal to the line-height of the link. We scale it to 70.7% because if square's: 
         length = 1; diagonal = (1^2 + 1^2)^0.5 = 1.414 (pythagoras theorem)
         if diagonal required = 1; length = 1/1.414 = 0.707*/
-        transform: scale(0.707) rotate(45deg);
-        /*we need to prevent the arrows from getting buried under the next link*/
-        z-index: 1;
-        background: $gray-200;
-        /*stylish arrow design using box shadow*/
-        box-shadow: 2px -2px 0 2px #fff, 3px -3px 0 2px #fff;
-        /*
+      transform: scale(0.707) rotate(45deg);
+      /*we need to prevent the arrows from getting buried under the next link*/
+      z-index: 1;
+      background: $gray-200;
+      /*stylish arrow design using box shadow*/
+      box-shadow: 2px -2px 0 2px #fff, 3px -3px 0 2px #fff;
+      /*
             5px - for rounded arrows and 
             50px - to prevent hover glitches on the border created using shadows*/
-        border-radius: 0 5px 0 50px;
+      border-radius: 0 5px 0 50px;
+    }
+
+    &:last-child:after {
+      //   content: none;
+      box-shadow: none;
+      cursor: default !important;
+    }
+  }
+}
+
+// ── Dark theme overrides ──────────────────────────────────────────────────────
+:host-context(body.theme-dark) {
+  .custom-breadcrumb {
+    a {
+      color: var(--unity-text-secondary);
+      background: #2e3347;
+
+      &:hover {
+        color: var(--unity-color-primary);
       }
+
+      &:last-child {
+        color: var(--unity-color-success);
+      }
+
+      &:last-child:hover {
+        color: var(--unity-color-success);
+      }
+
+      &.active:after,
+      &:hover:after {
+        background: #2e3347;
+      }
+
+      &:after {
+        background: #2e3347;
+        box-shadow: 2px -2px 0 2px #1a1d2e, 3px -3px 0 2px #1a1d2e;
+      }
+
       &:last-child:after {
-        //   content: none;
         box-shadow: none;
-        cursor: default !important;
       }
     }
   }
-  
+}

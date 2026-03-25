@@ -338,6 +338,48 @@
                 </div>
             </div>
         </div>
+
+        <!-- ── Appearance ─────────────────────────────────────────── -->
+        <div class="row" *ngIf="themeSvc.allowSwitch">
+            <div class="col px-0">
+                <div class="card mb-2">
+                    <div class="card-header bg-transparent py-2">
+                        <h4 class="card-title font-lg mb-0">Appearance</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted font-sm mb-3">Choose how Unity looks to you. Theme preference is saved locally in your browser.</p>
+                        <div class="unity-theme-options">
+                            <button
+                                *ngFor="let t of themeSvc.availableThemes"
+                                type="button"
+                                class="unity-theme-btn"
+                                [class.unity-theme-btn--active]="themeSvc.currentTheme === t"
+                                (click)="themeSvc.setTheme(t)">
+                                <span class="unity-theme-btn__preview unity-theme-btn__preview--{{t}}">
+                                    <span class="unity-theme-btn__preview-sidebar"></span>
+                                    <span class="unity-theme-btn__preview-body">
+                                        <span class="unity-theme-btn__preview-bar"></span>
+                                        <span class="unity-theme-btn__preview-card"></span>
+                                    </span>
+                                </span>
+                                <span class="unity-theme-btn__label">
+                                    <i class="fas"
+                                       [class.fa-sun]="t === 'light'"
+                                       [class.fa-moon]="t === 'dark'">
+                                    </i>
+                                    {{ t | titlecase }}
+                                </span>
+                                <i *ngIf="themeSvc.currentTheme === t"
+                                   class="fas fa-check-circle unity-theme-btn__check text-success">
+                                </i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ── /Appearance ────────────────────────────────────────── -->
+
     </div>
 </div>
 
