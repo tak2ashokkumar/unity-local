@@ -1,11 +1,9 @@
-<!-- <ol class="breadcrumb">
-  <li class="breadcrumb-item" [ngClass]="{active: last}" *ngFor="let breadcrumb of breadcrumbs; let last = last">
-    <a *ngIf="!last" [routerLink]="breadcrumb.url">{{breadcrumb.label}}</a>
-    <span *ngIf="last" [routerLink]="breadcrumb.url">{{breadcrumb.label}}</span>
-  </li>
-</ol> -->
-<!-- a simple div with some links -->
-<div class="custom-breadcrumb">
-  <a *ngFor="let breadcrumb of breadcrumbs; let last = last;let first = first" [ngClass]="{active: last,nopointerevents:first}"
-    [routerLink]="breadcrumb.url">{{breadcrumb.label}}</a>
-</div>
+<nav aria-label="Breadcrumb">
+  <div class="custom-breadcrumb">
+    <a *ngFor="let breadcrumb of breadcrumbs; let last = last; let first = first; trackBy: trackByUrl"
+       [ngClass]="{ active: last, nopointerevents: first }"
+       [routerLink]="breadcrumb.url"
+       [title]="breadcrumb.label"
+       [attr.aria-current]="last ? 'page' : null">{{breadcrumb.label}}</a>
+  </div>
+</nav>

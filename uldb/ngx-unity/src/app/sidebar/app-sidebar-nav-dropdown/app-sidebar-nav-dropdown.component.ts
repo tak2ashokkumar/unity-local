@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
+import { UnityNavData } from 'src/app/app-main/unity-nav';
 
 import { Replace } from 'src/app/shared/replace';
 
@@ -10,24 +10,19 @@ import { Replace } from 'src/app/shared/replace';
 })
 export class AppSidebarNavDropdownComponent implements OnInit {
 
-  @Input() link: any;
+  @Input() link: UnityNavData;
 
-  public isBadge() {
-    return this.link.badge ? true : false;
+  isBadge(): boolean   { return !!this.link.badge; }
+  isIcon(): boolean    { return !!this.link.icon; }
+  isBranched(): boolean { return this.link.variant === 'branched'; }
+
+  trackByUrl(_index: number, item: UnityNavData): string {
+    return item.url ?? item.name;
   }
 
-  public isIcon() {
-    return this.link.icon ? true : false;
-  }
+  constructor(private el: ElementRef) { }
 
-  isBranched(){
-    return this.link.variant == 'branched' ? true : false;
-  }
-
-  constructor(private router: Router, private el: ElementRef) { }
-
-  ngOnInit() {
+  ngOnInit(): void {
     Replace(this.el);
   }
-
 }

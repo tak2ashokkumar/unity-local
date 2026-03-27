@@ -1,10 +1,11 @@
-<li *ngIf="!isDropdown(); else dropdown" [ngClass]="hasClass() ? 'nav-item ' + item.class : 'nav-item'"
+<li *ngIf="!isDropdown(); else dropdown"
+  [ngClass]="item.class ? ['nav-item', item.class] : ['nav-item']"
   [hideMenuForNonAdmin]="item.attributes">
   <app-sidebar-nav-link [link]='item'></app-sidebar-nav-link>
 </li>
 <ng-template #dropdown>
-  <li [ngClass]="hasClass() ? 'nav-item nav-dropdown ' + item.class : 'nav-item nav-dropdown'" [class.open]="isActive()"
-    routerLinkActive="open" appNavDropdown>
+  <li [ngClass]="item.class ? ['nav-item', 'nav-dropdown', item.class] : ['nav-item', 'nav-dropdown']"
+    [class.open]="isActive()" routerLinkActive="open" appNavDropdown>
     <app-sidebar-nav-dropdown [link]='item'></app-sidebar-nav-dropdown>
   </li>
 </ng-template>

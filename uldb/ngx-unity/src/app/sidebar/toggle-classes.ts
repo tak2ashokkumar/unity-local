@@ -1,43 +1,27 @@
 import { Inject, Injectable, Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
-const RemoveClasses = (NewClassNames) => {
-    const MatchClasses = NewClassNames.map((Class) => document.body.classList.contains(Class));
-    return MatchClasses.indexOf(true) !== -1;
-};
-
-export const ToggleClasses = (Toggle, ClassNames) => {
-    const Level = ClassNames.indexOf(Toggle);
-    const NewClassNames = ClassNames.slice(0, Level + 1);
-
-    if (RemoveClasses(NewClassNames)) {
-        NewClassNames.map((Class) => document.body.classList.remove(Class));
-    } else {
-        document.body.classList.add(Toggle);
-    }
-};
-
 @Injectable({ providedIn: 'root' })
 export class ClassToggler {
 
     constructor(
-        @Inject(DOCUMENT) private document: any,
+        @Inject(DOCUMENT) private readonly document: Document,
         private renderer: Renderer2,
     ) { }
 
-    removeClasses(NewClassNames) {
-        const MatchClasses = NewClassNames.map((Class) => this.document.body.classList.contains(Class));
-        return MatchClasses.indexOf(true) !== -1;
+    removeClasses(newClassNames: string[]): boolean {
+        const matchClasses = newClassNames.map(c => this.document.body.classList.contains(c));
+        return matchClasses.indexOf(true) !== -1;
     }
 
-    toggleClasses(Toggle, ClassNames) {
-        const Level = ClassNames.indexOf(Toggle);
-        const NewClassNames = ClassNames.slice(0, Level + 1);
+    toggleClasses(toggle: string, classNames: string[]): void {
+        const level = classNames.indexOf(toggle);
+        const newClassNames = classNames.slice(0, level + 1);
 
-        if (this.removeClasses(NewClassNames)) {
-            NewClassNames.map((Class) => this.renderer.removeClass(this.document.body, Class));
+        if (this.removeClasses(newClassNames)) {
+            newClassNames.forEach(c => this.renderer.removeClass(this.document.body, c));
         } else {
-            this.renderer.addClass(this.document.body, Toggle);
+            this.renderer.addClass(this.document.body, toggle);
         }
     }
 }

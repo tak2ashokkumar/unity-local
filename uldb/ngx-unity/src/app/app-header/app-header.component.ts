@@ -4,6 +4,12 @@ import { DOCUMENT } from '@angular/common';
 import { Replace } from 'src/app/shared/replace';
 import { Router } from '@angular/router';
 
+export interface NavbarBrandConfig {
+  src?: string;
+  alt?: string;
+  [attr: string]: any;
+}
+
 @Component({
   selector: 'app-header',
   templateUrl: './app-header.component.html',
@@ -11,13 +17,13 @@ import { Router } from '@angular/router';
 })
 export class AppHeaderComponent implements OnInit, OnDestroy {
 
-  @Input() fixed: boolean;
+  @Input() fixed = false;
 
-  @Input() navbarBrand: any;
-  @Input() navbarBrandFull: any;
-  @Input() navbarBrandMinimized: any;
-  @Input() navbarBrandText: any = { icon: 'UL', text: 'UNITY' };
-  @Input() navbarBrandHref: any = 'app-dashboard';
+  @Input() navbarBrand: NavbarBrandConfig;
+  @Input() navbarBrandFull: NavbarBrandConfig;
+  @Input() navbarBrandMinimized: NavbarBrandConfig;
+  @Input() navbarBrandText: { icon: string; text: string } = { icon: 'UL', text: 'UNITY' };
+  @Input() navbarBrandHref = 'app-dashboard';
 
   @Input() sidebarToggler: any;
   @Input() mobileSidebarToggler: any;
@@ -29,11 +35,11 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   navbarBrandImg: boolean;
 
   constructor(
-    @Inject(DOCUMENT) private document: any,
+    @Inject(DOCUMENT) private readonly document: Document,
     private renderer: Renderer2,
     private router: Router,
     private el: ElementRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     Replace(this.el);
@@ -45,7 +51,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     this.renderer.removeClass(this.document.body, this.fixedClass);
   }
 
-  goTo() {
+  goTo(): void {
     this.router.navigate([this.navbarBrandHref]);
   }
 
@@ -54,5 +60,4 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
       this.renderer.addClass(this.document.body, this.fixedClass);
     }
   }
-
 }

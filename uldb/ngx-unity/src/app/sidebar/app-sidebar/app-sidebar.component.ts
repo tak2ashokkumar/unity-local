@@ -24,7 +24,7 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   @HostBinding('class.sidebar')sidebarClass = true;
 
   constructor(
-    @Inject(DOCUMENT) private document: any,
+    @Inject(DOCUMENT) private readonly document: Document,
     private renderer: Renderer2
   ) { }
 
@@ -64,12 +64,6 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  fixedPosition(fixed: boolean = this.fixed): void {
-    console.warn('deprecated fixedPosition(), use isFixed() instead');
-    if (fixed) {
-      this.renderer.addClass(this.document.body, 'sidebar-fixed');
-    }
-  }
 
   displayBreakpoint(display: any = this.display): void {
     if (display !== false) {

@@ -1,18 +1,22 @@
 <ng-container [ngSwitch]="getLinkType()">
-  <a *ngSwitchCase="'disabled'" [attr.disabled]="true" [appHtmlAttr]="link.attributes" href="" [ngClass]="getClasses()">
-    <i *ngIf="isIcon()" class="nav-icon {{ link.icon }}"></i>
+  <a *ngSwitchCase="'disabled'" [attr.disabled]="true" tabindex="-1" aria-disabled="true"
+     [appHtmlAttr]="link.attributes" href="javascript:void(0);" [ngClass]="getClasses()">
+    <i *ngIf="isIcon()" [ngClass]="['nav-icon', link.icon]" aria-hidden="true"></i>
     <span>{{ link.name }}</span>
     <span *ngIf="isBadge()" [ngClass]="'badge badge-' + link.badge.variant">{{ link.badge.text }}</span>
   </a>
-  <a *ngSwitchCase="'external'" [ngClass]="getClasses()" href="{{link.url}}" [appHtmlAttr]="link.attributes">
-    <i *ngIf="isIcon()" class="nav-icon {{ link.icon }}"></i>
+  <a *ngSwitchCase="'external'" [ngClass]="getClasses()" href="{{link.url}}"
+     [appHtmlAttr]="link.attributes" target="_blank" rel="noopener noreferrer">
+    <i *ngIf="isIcon()" [ngClass]="['nav-icon', link.icon]" aria-hidden="true"></i>
     <span>{{ link.name }}</span>
     <span *ngIf="isBadge()" [ngClass]="'badge badge-' + link.badge.variant">{{ link.badge.text }}</span>
     <span *ngIf="isBetaItem()" class="font-lg">(beta)</span>
   </a>
-  <a *ngSwitchDefault [ngClass]="getClasses()" [appHtmlAttr]="link.attributes" routerLinkActive=""
-    [routerLink]="[link.url]" (click)="hideMobile()">
-    <i *ngIf="isIcon()" class="nav-icon {{ link.icon }}"></i>
+  <a *ngSwitchDefault [ngClass]="getClasses()" [appHtmlAttr]="link.attributes"
+     routerLinkActive #rla="routerLinkActive"
+     [attr.aria-current]="rla.isActive ? 'page' : null"
+     [routerLink]="[link.url]" (click)="hideMobile()">
+    <i *ngIf="isIcon()" [ngClass]="['nav-icon', link.icon]" aria-hidden="true"></i>
     <span>{{ link.name }}</span>
     <span *ngIf="isBadge()" [ngClass]="'badge badge-' + link.badge.variant">{{ link.badge.text }}</span>
     <span *ngIf="isBetaItem()" class="font-lg">(beta)</span>

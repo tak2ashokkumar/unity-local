@@ -1,5 +1,42 @@
 @import "variables";
 
+// ── Main content column ───────────────────────────────────
+// CoreUI's .main is flex:1 inside .app-body (a flex-row container), so it already
+// fills the full viewport height.  Turning it into a flex column lets margin-top:auto
+// on the footer push it to the very bottom of the available space.
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+// ── App footer ────────────────────────────────────────────
+.unity-app-footer {
+  margin-top: auto;   // pushed to bottom of the flex column above
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.78rem;
+  color: var(--unity-text-secondary);
+  border-top: 1px solid var(--unity-border-color);
+  background-color: var(--unity-bg-surface);
+
+  &__link {
+    color: var(--unity-color-primary);
+    font-weight: 500;
+    text-decoration: none;
+    &:hover {
+      color: var(--unity-color-primary-hover);
+      text-decoration: underline;
+    }
+  }
+}
+
+// Spacing between avatar image and username text
+.header-username {
+  padding-left: 0.4rem;
+}
+
 .reset-action-icon {
   color: $gray-600;
   &:hover,
@@ -9,6 +46,13 @@
     outline: none;
   }
 }
+// ── Dark theme overrides ──────────────────────────────────
+:host-context(body.theme-dark) {
+  .reset-action-icon {
+    color: var(--unity-text-secondary);
+  }
+}
+
 .impersonated-icon {
   display: inline-block;
   padding: 0.1rem 0.5em;

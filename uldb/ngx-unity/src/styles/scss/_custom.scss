@@ -4,6 +4,28 @@
   padding: 0 20px;
 }
 
+// ── Main column: stretch to full viewport height ────────────────────────────
+// CoreUI's flex height chain (app-root → .app-body → .main) is broken when
+// the Angular router inserts <app-main> between app-root and .app-body.
+// Without a definite height, margin-top:auto on the footer has zero free
+// space and the footer floats immediately after content.
+// min-height fixes this: .main is always at least (viewport - header) tall,
+// so the footer is always pinned to the bottom on short-content pages.
+.app-body > .main {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: calc(100vh - #{$navbar-height});
+}
+
+.app-body > .main > .unity-app-footer {
+  margin-top: auto;
+}
+
+// Ensure content never touches the footer — consistent bottom breathing room
+.app-body > .main > div {
+  padding-bottom: 1.5rem;
+}
+
 .equalize-card {
   height: 100%;
   margin-bottom: 0;
@@ -79,6 +101,85 @@
 
   .nav-dropdown>.nav-dropdown-items>.nav-item>.nav-link {
     padding-left: 1.5rem;
+  }
+}
+
+// ── Minimized sidebar: hover popout improvements ──────────────────────────
+.sidebar-minimized .sidebar {
+
+  // Hover popout panel: fixed width, capped height, vertical scroll only.
+  //
+  // min-width: $sidebar-width (225px) aligns the popout's right edge with the header row.
+  //   Header row = $sidebar-width + $sidebar-minimized-width = 275px total.
+  //   Popout starts at left: $sidebar-minimized-width (50px) → right edge = 50+225 = 275px. ✓
+  //
+  // max-height: 200px — ensures overflow-y:auto fires for menus with 5+ items.
+  //   A large calc(100vh) value would exceed any menu's content height, so no scrollbar
+  //   would ever appear and items near the bottom of the viewport would simply be cut.
+  //
+  // scrollbar-gutter: stable — always reserves the 6px gutter inside the 225px width,
+  //   whether the scrollbar is showing or not.  This keeps the panel's outer boundary
+  //   constant (no 6px jump) and keeps the right edge flush with the header row.
+  //
+  // overflow-y: auto — vertical scroll when content > 200px.
+  //   By CSS spec, overflow-y:auto also turns overflow-x from 'visible' to 'auto'.
+  //   We prevent any horizontal scrollbar via text-overflow:ellipsis on nav-links
+  //   (see below), so overflow-x:auto never has anything to scroll.
+  .nav > .nav-dropdown:hover > .nav-dropdown-items {
+    min-width: $sidebar-width;
+    max-height: 185px;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    // Thin scrollbar — Firefox
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+    // Thin scrollbar — WebKit
+    &::-webkit-scrollbar        { width: 6px; }
+    &::-webkit-scrollbar-track  { background: transparent; }
+    &::-webkit-scrollbar-thumb  { background: rgba(255, 255, 255, 0.35); border-radius: 3px; }
+    &::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.55); }
+  }
+
+  // Prevent horizontal overflow on nav-links inside the popout.
+  // white-space:nowrap keeps each item on one line; overflow:hidden + text-overflow:ellipsis
+  // truncates any name that exceeds the available content width (225px - 6px gutter = 219px)
+  // with a trailing "…" instead of causing a horizontal scrollbar.
+  .nav > .nav-dropdown:hover > .nav-dropdown-items .nav-link {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Sub-submenu: collapsed by default, toggled open/closed on click — same as maximised sidebar.
+  // We gate on .open (added/removed by AppNavDropdownToggleDirective click handler) rather
+  // than forcing all sub-dropdowns open unconditionally.
+  .nav > .nav-dropdown:hover .nav-dropdown-items {
+
+    // Show sub-dropdown only when .open class is present
+    .nav-dropdown.open > .nav-dropdown-items {
+      display: block !important;
+      max-height: none !important;
+      visibility: visible !important;
+      overflow: hidden;
+      background: darken($sidebar-bg, 5%);
+    }
+
+    // tree-variant (variant:"branched") children — visible only when parent has .open
+    li.open > ul.tree {
+      visibility: visible !important;
+      margin-top: 0;
+    }
+
+    // Rotate chevron only when the sub-dropdown is open
+    .nav-dropdown.open > .nav-link.nav-dropdown-toggle::before {
+      display: inline-block !important;
+      transform: rotate(-90deg);
+    }
+
+    // Indent 3rd-level links to maintain visual hierarchy
+    .nav-dropdown > .nav-dropdown-items > .nav-item > .nav-link {
+      padding-left: 2.5rem;
+    }
   }
 }
 

@@ -1,36 +1,32 @@
 <app-header [fixed]="true" [navbarBrandFull]="{src: unityLogo, alt: 'UL Logo'}" [navbarBrandMinimized]="{src: unityLogo, alt: 'UL Logo'}"
     [sidebarToggler]="'lg'" [asideMenuToggler]="'lg'">
-    <!-- <ul class="nav navbar-nav d-md-down-none">
-    <li class="nav-item px-3">
-      <a class="nav-link" href="#">Dashboard</a>
-    </li>
-    <li class="nav-item px-3">
-      <a class="nav-link" href="#">Users</a>
-    </li>
-    <li class="nav-item px-3">
-      <a class="nav-link" href="#">Settings</a>
-    </li>
-  </ul> -->
     <app-breadcrumb></app-breadcrumb>
     <ul class="nav navbar-nav ml-auto">
-        <li class="nav-item dropdown">
+        <li class="nav-item">
             <a class="nav-link reset-cursor">
                 <span class="text-primary">{{user.userOrg}}</span>
             </a>
         </li>
         <li class="nav-item d-md-down-none">
-            <button class="action-icons reset-action-icon mb-0 fa fa-envelope font-sm ml-1" (click)="reportAnIssue()"
+            <button type="button" class="action-icons reset-action-icon mb-0 fa fa-envelope font-sm ml-1"
+                (click)="reportAnIssue()"
+                aria-label="Report an Issue"
                 tooltip="Report an Issue" placement="left" container="body"></button>
         </li>
         <li class="nav-item d-md-down-none" *ngIf="user.inventoryViewEnabled">
-            <button class="action-icons reset-action-icon mb-0 fas fa-search font-sm ml-1" (click)="search()" tooltip="Search"
-                placement="left" container="body"></button>
+            <button type="button" class="action-icons reset-action-icon mb-0 fas fa-search font-sm ml-1"
+                (click)="search()"
+                aria-label="Search"
+                tooltip="Search" placement="left" container="body"></button>
         </li>
-        <li class="nav-item dropdown" dropdown placement="bottom right">
-            <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"
-                (click)="false">
-                <!-- <i class="icon-bell"></i> -->
-                <i class="far fa-bell"></i>
+        <li class="nav-item" dropdown placement="bottom right" #bellDd="bs-dropdown">
+            <a class="nav-link" href="#" role="button"
+               aria-haspopup="true"
+               [attr.aria-expanded]="bellDd.isOpen"
+               dropdownToggle
+               aria-label="Notifications"
+               (click)="$event.preventDefault()">
+                <i class="far fa-bell" aria-hidden="true"></i>
             </a>
             <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg" *dropdownMenu aria-labelledby="simple-dropdown">
                 <div class="dropdown-header text-center">
@@ -60,29 +56,33 @@
                 </a>
             </div>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item">
             <a class="nav-link reset-cursor">
                 <span class="text-muted">GMT{{user.userTimeZone}}</span>
             </a>
         </li>
-        <li class="nav-item dropdown" dropdown placement="bottom right">
-            <a class="nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
-                dropdownToggle (click)="false">
-                <span>&nbsp;&nbsp;{{user.userName}}</span>
-                <img src="{{assetsUrl}}avatars/default_user.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" />
-                <span class="badge-pill badge-danger impersonated-icon" *ngIf="user.isImpersonated"><i class="fa fa-info"></i></span>
-                <span class="fa fa-angle-down">&nbsp;</span>
+        <li class="nav-item" dropdown placement="bottom right" #userDd="bs-dropdown">
+            <a class="nav-link" href="#" role="button"
+               aria-haspopup="true"
+               [attr.aria-expanded]="userDd.isOpen"
+               dropdownToggle
+               (click)="$event.preventDefault()">
+                <span class="header-username">{{user.userName}}</span>
+                <img src="{{assetsUrl}}avatars/default_user.jpg" class="img-avatar" [attr.alt]="user.userName + ' profile picture'" />
+                <span class="badge-pill badge-danger impersonated-icon" *ngIf="user.isImpersonated" title="Impersonated account">
+                    <i class="fa fa-info" aria-hidden="true"></i>
+                    <span class="sr-only">Impersonated account</span>
+                </span>
+                <span class="fa fa-angle-down" aria-hidden="true"></span>
             </a>
             <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
                 <div class="dropdown-header text-center"><strong>Account</strong></div>
-                <a class="dropdown-item" routerLink="/welcomepage"><i class="far fa-newspaper"></i> Welcome Page</a>
-                <a class="dropdown-item" routerLink="/settings/profile"><i class="fa fa-user"></i>Profile Settings</a>
-                <a class="dropdown-item" (click)="logout()" *ngIf="!user.isImpersonated"><i class="fa fa-lock"></i>
-                    Logout</a>
-                <a class="dropdown-item text-danger" (click)="stopImpersonating()" *ngIf="user.isImpersonated"><i class="fa fa-lock"></i>
-                    Stop Impersonating</a>
+                <a class="dropdown-item" routerLink="/welcomepage"><i class="far fa-newspaper" aria-hidden="true"></i> Welcome Page</a>
+                <a class="dropdown-item" routerLink="/settings/profile"><i class="fa fa-user" aria-hidden="true"></i> Profile Settings</a>
+                <a class="dropdown-item" (click)="logout()" *ngIf="!user.isImpersonated"><i class="fa fa-lock" aria-hidden="true"></i> Logout</a>
+                <a class="dropdown-item text-danger" (click)="stopImpersonating()" *ngIf="user.isImpersonated"><i class="fa fa-lock" aria-hidden="true"></i> Stop Impersonating</a>
                 <a class="dropdown-item text-danger" (click)="mapService.toggleWorldMap()" *ngIf="user.isUserAdmin && mapService.showToggle()">
-                    <i class="fas fa-map-marked-alt"></i>{{mapService.action}}</a>
+                    <i class="fas fa-map-marked-alt" aria-hidden="true"></i> {{mapService.action}}</a>
             </div>
         </li>
     </ul>
@@ -110,6 +110,9 @@
         <div [style.margin-bottom]="contentHeight">
             <router-outlet></router-outlet>
         </div>
+        <footer class="unity-app-footer">
+            <span>Powered by <a class="unity-app-footer__link" href="javascript:void(0);">UnityOne.</a></span>
+        </footer>
         <check-auth></check-auth>
         <floating-terminal></floating-terminal>
     </main>

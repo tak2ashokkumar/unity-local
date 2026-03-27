@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { UnityNavData } from 'src/app/app-main/unity-nav';
 
 import { Replace } from 'src/app/shared/replace';
 
@@ -10,27 +11,15 @@ import { Replace } from 'src/app/shared/replace';
 })
 export class AppSidebarNavItemComponent implements OnInit {
 
-  @Input() item: any;
+  @Input() item: UnityNavData;
 
   constructor(private router: Router, private el: ElementRef) { }
 
-  public hasClass() {
-    return this.item.class ? true : false;
-  }
+  hasClass(): boolean    { return !!this.item.class; }
+  isDropdown(): boolean  { return !!this.item.children?.length; }
+  isActive(): boolean    { return this.router.isActive(this.item.url, false); }
 
-  public isDropdown() {
-    return this.item.children ? true : false;
-  }
-
-  public thisUrl() {
-    return this.item.url;
-  }
-
-  public isActive() {
-    return this.router.isActive(this.thisUrl(), false);
-  }
-
-  ngOnInit() {
+  ngOnInit(): void {
     Replace(this.el);
   }
 }

@@ -707,4 +707,15 @@ body.theme-dark {
     color: var(--unity-text-primary);
     border: none;
   }
+
+  // ── 38. Minimized sidebar — nested dropdown bg ────────────
+  // darken($sidebar-bg, 5%) in _custom.scss uses the light-theme hardcoded value.
+  // Override here so the nested items use the dark sidebar token instead.
+
+  &.sidebar-minimized .sidebar .nav > .nav-dropdown:hover .nav-dropdown-items {
+    .nav-dropdown > .nav-dropdown-items {
+      background: var(--unity-bg-sidebar-active);
+    }
+  }
+
 }

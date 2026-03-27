@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Inject, OnInit, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnDestroy, Inject, OnInit } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { ReportAnIssueService } from '../app-breadcrumb/report-an-issue/report-an-issue.service';
@@ -17,8 +17,9 @@ import { GET_UNITY_NAV_DATA, UnityNavData } from './unity-nav';
   templateUrl: './app-main.component.html',
   styleUrls: ['./app-main.component.scss']
 })
-export class AppMainComponent implements OnDestroy, OnInit {
-  private ngUnsubscribe = new Subject();
+export class AppMainComponent implements OnInit, OnDestroy {
+  private readonly ngUnsubscribe = new Subject<void>();
+
   assetsUrl: string = environment.assetsUrl;
   unityLogo: string = this.assetsUrl + 'brand/Unityone-AI.png';
   public navItems: UnityNavData[] = [];
@@ -26,46 +27,51 @@ export class AppMainComponent implements OnDestroy, OnInit {
   public sidebarHidden = false;
   private changes: MutationObserver;
   public element: HTMLElement;
-  mainWidth: number = 0;
-  contentHeight: string = '0px';
+  mainWidth = 0;
+  contentHeight = '0px';
   chatbotData: ChatbotDataType;
 
-  constructor(private reportService: ReportAnIssueService,
+  constructor(
+    private reportService: ReportAnIssueService,
     private searchService: AppSearchService,
     public user: UserInfoService,
     public appService: AppLevelService,
     public mapService: MapService,
     private terminalService: FloatingTerminalService,
-    private elRef: ElementRef,
-    private renderer: Renderer2,
     private mainService: AppMainService,
-    @Inject(DOCUMENT) _document?: any) {
-    this.changes = new MutationObserver((mutations) => {
-      this.sidebarMinimized = _document.body?.classList?.contains('sidebar-minimized');
-      this.mainWidth = this.sidebarMinimized ? 50 : 225;
-      this.sidebarHidden = !_document.body?.classList?.contains('sidebar-lg-show');
+    @Inject(DOCUMENT) private readonly document: Document
+  ) {}
+
+  ngOnInit(): void {
+    // Nav items and custom tenant logo
+    this.navItems = GET_UNITY_NAV_DATA(this.appService, this.user);
+    if (this.user.logo) {
+      this.unityLogo = this.user.logo.includes('data:image')
+        ? this.user.logo
+        : 'data:image/png;base64,' + this.user.logo;
+    }
+
+    // Watch sidebar class changes to compute spinner/content offset
+    this.element = this.document.body;
+    this.changes = new MutationObserver(() => {
+      const body = this.document.body;
+      this.sidebarMinimized = body.classList.contains('sidebar-minimized');
+      this.sidebarHidden = !body.classList.contains('sidebar-lg-show');
       this.mainWidth = this.sidebarHidden ? 0 : this.sidebarMinimized ? 50 : 225;
     });
-    this.element = _document.body;
-    this.changes.observe(<Element>this.element, {
+    this.changes.observe(this.element, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ['class'],
     });
-    this.terminalService.resizeAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.contentHeight = res;
-    });
-    _document.querySelector('.app-footer')?.classList?.remove('d-none');
-  }
 
-  ngOnInit() {
-    this.navItems = GET_UNITY_NAV_DATA(this.appService, this.user);
-    // console.log('org name : ', this.user.userOrg)
-    if (this.user.logo) {
-      this.unityLogo = this.user.logo.includes('data:image') ? this.user.logo : 'data:image/png;base64,' + this.user.logo;
-    }
-    this.mainService.$assistantData.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      this.chatbotData = val;
-    });
+    // Subscriptions
+    this.terminalService.resizeAnnounced$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => { this.contentHeight = res; });
+
+    this.mainService.$assistantData
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(val => { this.chatbotData = val; });
   }
 
   ngOnDestroy(): void {
@@ -74,19 +80,19 @@ export class AppMainComponent implements OnDestroy, OnInit {
     this.changes.disconnect();
   }
 
-  reportAnIssue() {
+  reportAnIssue(): void {
     this.reportService.reportIssue();
   }
 
-  search() {
+  search(): void {
     this.searchService.searchByKeyword();
   }
 
-  logout() {
+  logout(): void {
     this.appService.logout();
   }
 
-  stopImpersonating() {
+  stopImpersonating(): void {
     this.appService.stopImpersonating();
   }
 }

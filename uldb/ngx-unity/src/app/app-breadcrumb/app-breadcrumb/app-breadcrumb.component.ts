@@ -1,7 +1,13 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AppBreadcrumbService } from '../app-breadcrumb.service';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { UserInfoService } from 'src/app/shared/user-info.service';
+
+interface BreadcrumbItem {
+  label: string;
+  url: string;
+}
 
 @Component({
   selector: 'app-breadcrumb',
@@ -9,87 +15,100 @@ import { UserInfoService } from 'src/app/shared/user-info.service';
   styleUrls: ['./app-breadcrumb.component.scss']
 })
 export class AppBreadcrumbComponent implements OnInit, OnDestroy {
+  private readonly ngUnsubscribe = new Subject<void>();
 
-  @Input() fixed: boolean;
-  private subscr: Subscription;
+  public breadcrumbs: BreadcrumbItem[] = [];
 
-  public breadcrumbs = [];
-
-  constructor(public service: AppBreadcrumbService,
-    public user: UserInfoService,) { }
+  constructor(
+    public service: AppBreadcrumbService,
+    public user: UserInfoService
+  ) {}
 
   public ngOnInit(): void {
-    this.subscr = this.service.breadcrumbs.subscribe((params) => {
-      if (params.length && params[0]) {
-        for (let i = 0; i < params.length; i++) {
-          let p = <{ label: string, url: string }>params[i];
-          if (p.label) {
-            if (this.user.selfBrandedOrgName) {
-              p.label = this.getModuleNameByOrgName(p.label, this.user.selfBrandedOrgName);
-            }
-          }
-        }
-        let servicesIndexForAI = params.findIndex((p: { label: string, url: string }) => p.label == 'UPC for AI' || p.label == 'AI Agents');
-        if (servicesIndexForAI > -1) {
-          params.splice(servicesIndexForAI - 1, 1);
-        }
-      }
-      this.breadcrumbs = params;
-    });
+    this.service.breadcrumbs
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(params => this.processBreadcrumbs(params as BreadcrumbItem[]));
   }
 
-  getModuleNameByOrgName(moduleName: string, orgName?: string) {
+  private processBreadcrumbs(params: BreadcrumbItem[]): void {
+    if (!params.length || !params[0]) {
+      this.breadcrumbs = [];
+      return;
+    }
+
+    // Work on a copy — never mutate the upstream observable emission
+    let crumbs: BreadcrumbItem[] = params.map(p => ({
+      ...p,
+      label: this.user.selfBrandedOrgName
+        ? this.getModuleNameByOrgName(p.label, this.user.selfBrandedOrgName)
+        : p.label,
+    }));
+
+    // Remove the parent breadcrumb entry that precedes 'UPC for AI' / 'AI Agents'
+    const aiIndex = crumbs.findIndex(p => p.label === 'UPC for AI' || p.label === 'AI Agents');
+    if (aiIndex > 0) {
+      crumbs = crumbs.filter((_, i) => i !== aiIndex - 1);
+    }
+
+    this.breadcrumbs = crumbs;
+  }
+
+  trackByUrl(_index: number, crumb: BreadcrumbItem): string {
+    return crumb.url;
+  }
+
+  getModuleNameByOrgName(moduleName: string, orgName?: string): string {
     switch (moduleName) {
       case 'Unity View':
-        return orgName ? `Observability` : 'Unity View';
+        return orgName ? 'Observability' : 'Unity View';
 
-      //Unity Cloud Related
+      // Unity Cloud
       case 'Unity Cloud':
-        return orgName ? `Cloud Management` : 'Unity Cloud';
+        return orgName ? 'Cloud Management' : 'Unity Cloud';
       case 'Datacenter':
-        return orgName ? `DCIM` : 'Datacenter';
+        return orgName ? 'DCIM' : 'Datacenter';
       case 'Unity Connect':
-        return orgName ? `UnitedConnect®` : 'Unity Connect';
+        return orgName ? 'UnitedConnect®' : 'Unity Connect';
 
-      //Unity Services Related
+      // Unity Services
       case 'Unity Services':
-        return orgName ? `Cloud Intelligence` : 'Unity Services';
+        return orgName ? 'Cloud Intelligence' : 'Unity Services';
       case 'Devops Automation':
-        return orgName ? `Agentic Orchestration` : 'Devops Automation';
+        return orgName ? 'Agentic Orchestration' : 'Devops Automation';
       case 'AI Observability':
-        return orgName ? `AI Performance` : 'AI Observability';
+        return orgName ? 'AI Performance' : 'AI Observability';
       case 'LLM':
-        return orgName ? `LLM Performance` : 'LLM';
+        return orgName ? 'LLM Performance' : 'LLM';
       case 'Vector DB':
-        return orgName ? `Vector DB Performance` : 'Vector DB';
+        return orgName ? 'Vector DB Performance' : 'Vector DB';
       case 'GPU':
-        return orgName ? `GPU Performance` : 'GPU';
+        return orgName ? 'GPU Performance' : 'GPU';
 
-      //Cost Analysis Related
+      // Cost Analysis
       case 'Cost Analysis':
-        return orgName ? `FINOPS` : 'Cost Analysis';
+        return orgName ? 'FINOPS' : 'Cost Analysis';
 
-      //Unity Reports Related
+      // Unity Reports
       case 'Unity Reports':
-        return orgName ? `Reports` : 'Unity Reports';
+        return orgName ? 'Reports' : 'Unity Reports';
 
-      //Support Related
+      // Support
       case 'Support':
-        return orgName ? `ITSM` : 'Support';
+        return orgName ? 'ITSM' : 'Support';
 
-      //Unity Setup Related
+      // Unity Setup
       case 'Unity Setup':
         return orgName ? `${orgName} Administration` : 'Unity Setup';
       case 'Credentials':
-        return orgName ? `Secrets Management` : 'Credentials';
+        return orgName ? 'Secrets Management' : 'Credentials';
+
       default:
         return moduleName;
     }
   }
 
-  ngOnDestroy() {
-    if (this.subscr && !this.subscr.closed) {
-      this.subscr.unsubscribe();
-    }
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 }
