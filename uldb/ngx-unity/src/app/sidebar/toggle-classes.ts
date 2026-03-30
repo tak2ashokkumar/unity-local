@@ -6,8 +6,7 @@ export class ClassToggler {
 
     constructor(
         @Inject(DOCUMENT) private readonly document: Document,
-        private renderer: Renderer2,
-    ) { }
+        private renderer: Renderer2) { }
 
     removeClasses(newClassNames: string[]): boolean {
         const matchClasses = newClassNames.map(c => this.document.body.classList.contains(c));

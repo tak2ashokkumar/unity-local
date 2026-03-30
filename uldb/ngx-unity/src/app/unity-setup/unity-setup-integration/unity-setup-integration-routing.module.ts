@@ -670,7 +670,7 @@ const routes: Routes = [
         component: UsisPureCrudComponent,
         data: {
           breadcrumb: {
-            title: 'OnTap Storage'
+            title: 'Pure Storage'
           }
         }
       },
@@ -679,7 +679,7 @@ const routes: Routes = [
         component: UsisPureCrudComponent,
         data: {
           breadcrumb: {
-            title: 'OnTap Storage'
+            title: 'Pure Storage'
           }
         }
       },

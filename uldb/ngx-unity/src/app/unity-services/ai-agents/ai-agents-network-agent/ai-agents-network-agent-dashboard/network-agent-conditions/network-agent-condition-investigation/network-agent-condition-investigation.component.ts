@@ -13,6 +13,7 @@ import { FormGroup } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DOCUMENT } from '@angular/common';
+import { NetworkAgentsChatResponseType } from './naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'network-agent-condition-investigation',
@@ -245,14 +246,14 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
     }
   }
 
-  handleChatResponse(res: any) {
+  handleChatResponse(res: NetworkAgentsChatResponseType | null) {
     if (this.initialChatResponseData?.length == 0) {
       this.initialChatResponseData.push(res);
       this.spinner.stop('conditionSummarySpinner');
     }
-    if (res?.answer?.phase == 'General' || res == null) { return; }
+    if (res == null || res?.answer?.phase == 'General') { return; }
     this.isAnyStepDataPresent = res?.answer?.stage ? true : this.isAnyStepDataPresent;
-    const stageTitle = ["Basic CLI Check", "Monitoring", "Resource Utilization", "Check Device Health", "Centralized Logs"];
+    const stageTitle = ["Basic CLI Check", "Monitoring", "Resource Utilization", "Check Device Health", "Centralized Logs", "Network Topology"];
     if (stageTitle.includes(res?.answer?.stage_title)) {
       this.currentStageTitle = res.answer.stage_title;
     } else {

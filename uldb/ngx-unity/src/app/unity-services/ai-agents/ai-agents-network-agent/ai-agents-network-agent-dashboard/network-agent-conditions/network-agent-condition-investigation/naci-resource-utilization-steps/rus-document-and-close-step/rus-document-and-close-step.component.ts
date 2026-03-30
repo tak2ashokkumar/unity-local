@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { NaciResourceUtilizationStepsService } from '../naci-resource-utilization-steps.service';
 import { takeUntil } from 'rxjs/operators';
+import { DocumentAndCloseDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'rus-document-and-close-step',
@@ -11,10 +12,10 @@ import { takeUntil } from 'rxjs/operators';
 export class RusDocumentAndCloseStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input('chatResponse') chatResponse: any;
+  @Input('chatResponse') chatResponse: NetworkAgentsChatResponseType;
 
   documentAndCloseOpen: boolean = false;
-  documentAndCloseViewData: any;
+  documentAndCloseViewData: DocumentAndCloseDataType;
 
   constructor(private cliSvc: NaciResourceUtilizationStepsService) {
     this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
@@ -32,7 +33,7 @@ export class RusDocumentAndCloseStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleDocumentAndClose();
-    this.documentAndCloseViewData = this.chatResponse?.answer?.data;
+    this.documentAndCloseViewData = this.chatResponse?.answer?.data as DocumentAndCloseDataType;
   }
 
   toggleDocumentAndClose() {

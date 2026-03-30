@@ -1,15 +1,14 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { NaciMonitoringService } from './naci-monitoring.service';
+import { NetworkAgentsChatResponseType } from '../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'naci-monitoring',
   templateUrl: './naci-monitoring.component.html',
   styleUrls: ['./naci-monitoring.component.scss'],
-  providers: [NaciMonitoringService]
 })
 export class NaciMonitoringComponent implements OnInit, OnChanges {
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
   currentStep = 1;
   constructor() { }
 

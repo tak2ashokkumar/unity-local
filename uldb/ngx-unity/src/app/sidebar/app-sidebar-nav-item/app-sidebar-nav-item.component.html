@@ -1,5 +1,4 @@
-<li *ngIf="!isDropdown(); else dropdown"
-  [ngClass]="item.class ? ['nav-item', item.class] : ['nav-item']"
+<li *ngIf="!isDropdown(); else dropdown" [ngClass]="item.class ? ['nav-item', item.class] : ['nav-item']"
   [hideMenuForNonAdmin]="item.attributes">
   <app-sidebar-nav-link [link]='item'></app-sidebar-nav-link>
 </li>

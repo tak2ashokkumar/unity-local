@@ -7,10 +7,8 @@ export class AppHtmlAttrDirective implements OnInit {
 
   @Input() appHtmlAttr: { [key: string]: any };
 
-  constructor(
-    private renderer: Renderer2,
-    private el: ElementRef
-  ) { }
+  constructor(private renderer: Renderer2,
+    private el: ElementRef) { }
 
   ngOnInit(): void {
     const attribs = this.appHtmlAttr;
@@ -42,4 +40,5 @@ export class AppHtmlAttrDirective implements OnInit {
   private setAttrib(key: string, value: string): void {
     this.renderer.setAttribute(this.el.nativeElement, key, value);
   }
+
 }

@@ -3,6 +3,8 @@ import { MonitoringMetricWidgetViewData, MonitoringVerifyAndAuditStepService } f
 import { NaciMonitoringService } from '../naci-monitoring.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { MonitoringDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
+import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
 
 @Component({
   selector: 'monitoring-verify-and-audit-step',
@@ -13,11 +15,12 @@ import { Subject } from 'rxjs';
 export class MonitoringVerifyAndAuditStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
   isVerifyAndAuditOpen: boolean = false;
   verifyAuditViewData: MonitoringMetricWidgetViewData;
 
   constructor(private svc: MonitoringVerifyAndAuditStepService,
+    private cliSvc: NaciCliCheckStepsService,
     private monitoringSvc: NaciMonitoringService) {
     this.monitoringSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
       setTimeout(() => {
@@ -38,11 +41,13 @@ export class MonitoringVerifyAndAuditStepComponent implements OnInit, OnChanges 
   }
 
   verifyAudit() {
-    this.verifyAuditViewData = this.chatResponse.answer;
-    this.verifyAuditViewData = this.svc.convertToVerifyAndAuditViewData(this.chatResponse?.answer);
+    this.verifyAuditViewData = this.svc.convertToVerifyAndAuditViewData(this.chatResponse?.answer?.data as MonitoringDataType);
   }
 
   toggleVerifyAndAuditAccordion() {
+    if (!this.isVerifyAndAuditOpen) {
+      this.cliSvc.toggle('');
+    }
     this.monitoringSvc.toggle('verfiyAndAudit');
   }
 

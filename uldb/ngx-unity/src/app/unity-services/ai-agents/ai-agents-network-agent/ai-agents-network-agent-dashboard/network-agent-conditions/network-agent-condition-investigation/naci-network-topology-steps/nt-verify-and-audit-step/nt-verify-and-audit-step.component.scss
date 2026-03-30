@@ -4,16 +4,28 @@
     background-color: #cfe2ff;
 }
 
-.card-body{
-    // background-color: black;
-    // color: white;
-    min-height: 300px;
-}
+// .card-body{
+//     // background-color: black;
+//     // color: white;
+//     min-height: 300px;
+// }
 
-.topology-card{
+.topology-card {
   min-height: calc(100vh - 150px);
 }
 
+.popover {
+  max-width: 250px;
+}
+
+.popover .card-body {
+  min-height: unset !important;
+  padding: 6px 10px !important;
+}
+
+.popover p {
+  margin-bottom: 4px;
+}
 #dc-node-details-wrapper{
   position: absolute !important;
 }

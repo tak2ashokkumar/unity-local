@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -14,11 +15,10 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { TabData } from 'src/app/shared/tabdata';
+import { UnityThemeService } from 'src/app/shared/unity-theme.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { LlmConfigViewData, providerImages, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
-import { ThemeService } from 'src/app/shared/theme/theme.service';
 import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
-import { ActivatedRoute, Route, Router } from '@angular/router';
 
 @Component({
   selector: 'user-profile-settings',
@@ -118,7 +118,7 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     private spinner: AppSpinnerService,
     private router: Router,
     private route: ActivatedRoute,
-    public themeSvc: ThemeService) {
+    public themeSvc: UnityThemeService) {
     this.aimlPermissionSet = new UnityPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
     this.monitoringPermissionSet = new UnityPermissionSet(UnityModules.MONITORING);
   }

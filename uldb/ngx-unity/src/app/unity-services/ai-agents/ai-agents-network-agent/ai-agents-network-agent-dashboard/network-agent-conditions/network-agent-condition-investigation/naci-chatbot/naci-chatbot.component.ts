@@ -7,7 +7,7 @@ import { NaciChatbotService } from './naci-chatbot.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { takeUntil } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
-import { NetworkAgentsChatResponse } from './naci-chatbot.type';
+import { NetworkAgentsChatResponseType } from './naci-chatbot.type';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -23,7 +23,7 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
 
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
   @Input() conditionId: string;
-  @Output() chatResponse = new EventEmitter<NetworkAgentsChatResponse>();
+  @Output() chatResponse = new EventEmitter<NetworkAgentsChatResponseType>();
 
   chatHistoryData: Array<ChatHistoryData> = [];
   form: FormGroup;

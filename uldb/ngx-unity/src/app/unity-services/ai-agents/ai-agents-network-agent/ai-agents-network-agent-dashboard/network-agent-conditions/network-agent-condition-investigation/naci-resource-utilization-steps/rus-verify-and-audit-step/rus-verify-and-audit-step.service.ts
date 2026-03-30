@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { UNITY_FONT_FAMILY, UNITY_TEXT_DEFAULT_COLOR } from 'src/app/app-constants';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import * as echarts from 'echarts';
+import { MetricsType, ResourceSummaryType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Injectable()
 export class RusVerifyAndAuditStepService {
 
   constructor(private chartConfigSvc: UnityChartConfigService) { }
 
-  convertToResourceUtilizationChartData(graphData: { [key: string]: string }) {
+  convertToResourceUtilizationChartData(graphData: ResourceSummaryType): ResourceUtilizationWidgetViewData {
     if (Object.keys(graphData).length == 0) {
       return;
     }
@@ -133,7 +134,7 @@ export class RusVerifyAndAuditStepService {
     return view;
   }
 
-  convertToInterfaceChartData(data: any): UnityChartDetails[] {
+  convertToInterfaceChartData(data: MetricsType[]): UnityChartDetails[] {
     let viewData: UnityChartDetails[] = []
     const interfaceData = data?.find(d => d.metric_type == 'interface_data');
     interfaceData?.metrics_data?.forEach(md => {

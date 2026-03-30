@@ -1,19 +1,19 @@
-import { Directive, HostListener, Inject, Input, OnInit, Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { Directive, HostListener, Inject, Input, OnInit, Renderer2 } from '@angular/core';
+
 
 import { ClassToggler } from 'src/app/sidebar/toggle-classes';
 
-export const sidebarCssClasses: string[] = [
+export const sidebarCssClasses: Array<string> = [
   'sidebar-show',
   'sidebar-sm-show',
   'sidebar-md-show',
   'sidebar-lg-show',
   'sidebar-xl-show'
 ];
-
 /**
- * Allows the sidebar to be toggled via click.
- */
+* Allows the sidebar to be toggled via click.
+*/
 @Directive({
   selector: '[appSidebarToggler]',
   providers: [ClassToggler]
@@ -21,7 +21,6 @@ export const sidebarCssClasses: string[] = [
 export class SidebarToggleDirective implements OnInit {
   @Input('appSidebarToggler') breakpoint: string;
   private bp: string;
-
   constructor(private classToggler: ClassToggler) { }
 
   ngOnInit(): void {
@@ -63,6 +62,11 @@ export class MobileSidebarToggleDirective {
     @Inject(DOCUMENT) private readonly document: Document,
     private renderer: Renderer2,
   ) { }
+
+  // Check if element has class
+  private hasClass(target: any, elementClassName: string) {
+    return new RegExp('(\\s|^)' + elementClassName + '(\\s|$)').test(target.className);
+  }
 
   @HostListener('click', ['$event'])
   toggleOpen($event: Event): void {

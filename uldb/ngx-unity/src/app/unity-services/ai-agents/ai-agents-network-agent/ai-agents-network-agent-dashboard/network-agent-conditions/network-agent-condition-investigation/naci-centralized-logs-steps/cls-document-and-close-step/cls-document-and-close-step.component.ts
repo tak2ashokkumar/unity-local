@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NaciCentralizedLogsStepsService } from '../naci-centralized-logs-steps.service';
 import { ClsDocumentAndCloseStepService } from './cls-document-and-close-step.service';
+import { DocumentAndCloseDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'cls-document-and-close-step',
@@ -13,10 +14,10 @@ import { ClsDocumentAndCloseStepService } from './cls-document-and-close-step.se
 export class ClsDocumentAndCloseStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input('chatResponse') chatResponse: any;
+  @Input('chatResponse') chatResponse: NetworkAgentsChatResponseType;
 
   documentAndCloseOpen: boolean = false;
-  documentAndCloseViewData: any;
+  documentAndCloseViewData: DocumentAndCloseDataType;
 
   constructor(private clSvc: NaciCentralizedLogsStepsService) {
     this.clSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
@@ -34,7 +35,7 @@ export class ClsDocumentAndCloseStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleDocumentAndClose();
-    this.documentAndCloseViewData = this.chatResponse?.answer?.data;
+    this.documentAndCloseViewData = this.chatResponse?.answer?.data as DocumentAndCloseDataType;
   }
 
   toggleDocumentAndClose() {

@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NaciMonitoringService } from '../naci-monitoring.service';
+import { DocumentAndCloseDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'monitoring-document-and-close-step',
@@ -11,9 +12,9 @@ import { NaciMonitoringService } from '../naci-monitoring.service';
 export class MonitoringDocumentAndCloseStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input('chatResponse') chatResponse: any;
+  @Input('chatResponse') chatResponse: NetworkAgentsChatResponseType;
   documentAndCloseOpen: boolean = false;
-  documentAndCloseViewData: any;
+  documentAndCloseViewData: DocumentAndCloseDataType;
 
   constructor(private monitoringSvc: NaciMonitoringService) {
     this.monitoringSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
@@ -31,7 +32,7 @@ export class MonitoringDocumentAndCloseStepComponent implements OnInit, OnChange
       return;
     }
     this.toggleDocumentAndClose();
-    this.documentAndCloseViewData = this.chatResponse?.answer?.data;
+    this.documentAndCloseViewData = this.chatResponse?.answer?.data as DocumentAndCloseDataType;
   }
 
   toggleDocumentAndClose() {

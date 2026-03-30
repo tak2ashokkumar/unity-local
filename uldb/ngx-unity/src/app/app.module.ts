@@ -23,6 +23,7 @@ import { AppCoreModule } from './app-core/app-core.module';
 import { AppHeaderComponent } from './app-header/app-header.component';
 import { AppMainComponent } from './app-main/app-main.component';
 import { TwoFactorAuthComponent } from './app-main/two-factor-auth/two-factor-auth.component';
+import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
 import { UserProfileSettingsComponent } from './app-main/user-profile-settings/user-profile-settings.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AppTermialViewComponent } from './app-termial-view/app-termial-view.component';
@@ -30,14 +31,12 @@ import { AppWelcomePageComponent } from './app-welcome-page/app-welcome-page.com
 import { AppComponent } from './app.component';
 import { DefaultComponent } from './default/default.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
-import { MapService } from './map.service';
 import { StorageService, StorageType } from './shared/app-storage/storage.service';
-import { ThemeService } from './shared/theme/theme.service';
 import { SharedModule } from './shared/shared.module';
+import { UnityThemeService } from './shared/unity-theme.service';
 import { UserInfoService } from './shared/user-info.service';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { UnityChatbotModule } from './unity-chatbot/unity-chatbot.module';
-import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
 
 export let AppInjector: Injector;
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
@@ -46,8 +45,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 
 export function useStorageFactory(service: StorageService) { return () => service.put('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone, StorageType.COOKIESTORAGE); }
 export function useFactory(service: UserInfoService) { return () => service.loadUserData(); }
-export function useThemeFactory(service: ThemeService) { return () => service.init(); }
-// export function useMapFactory(service: MapService) { return () => service.loadMap(); }
+export function useThemeFactory(service: UnityThemeService) { return () => service.init(); }
 
 @NgModule({
   declarations: [
@@ -114,12 +112,12 @@ export function useThemeFactory(service: ThemeService) { return () => service.in
   {
     provide: APP_INITIALIZER,
     useFactory: useThemeFactory,
-    deps: [ThemeService],
+    deps: [UnityThemeService],
     multi: true
   }],
   bootstrap: [AppComponent]
 })
-export class AppModule { 
+export class AppModule {
   constructor(private injector: Injector) {
     AppInjector = this.injector;
   }

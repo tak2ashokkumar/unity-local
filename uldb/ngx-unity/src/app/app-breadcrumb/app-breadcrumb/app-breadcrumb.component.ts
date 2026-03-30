@@ -1,13 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { AppBreadcrumbService } from '../app-breadcrumb.service';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-
-interface BreadcrumbItem {
-  label: string;
-  url: string;
-}
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-breadcrumb',
@@ -15,19 +10,23 @@ interface BreadcrumbItem {
   styleUrls: ['./app-breadcrumb.component.scss']
 })
 export class AppBreadcrumbComponent implements OnInit, OnDestroy {
+  @Input() fixed: boolean;
   private readonly ngUnsubscribe = new Subject<void>();
 
   public breadcrumbs: BreadcrumbItem[] = [];
 
-  constructor(
-    public service: AppBreadcrumbService,
-    public user: UserInfoService
-  ) {}
+  constructor(public service: AppBreadcrumbService,
+    public user: UserInfoService,) { }
 
   public ngOnInit(): void {
     this.service.breadcrumbs
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(params => this.processBreadcrumbs(params as BreadcrumbItem[]));
+  }
+
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   private processBreadcrumbs(params: BreadcrumbItem[]): void {
@@ -106,9 +105,9 @@ export class AppBreadcrumbComponent implements OnInit, OnDestroy {
         return moduleName;
     }
   }
+}
 
-  ngOnDestroy(): void {
-    this.ngUnsubscribe.next();
-    this.ngUnsubscribe.complete();
-  }
+export interface BreadcrumbItem {
+  label: string;
+  url: string;
 }

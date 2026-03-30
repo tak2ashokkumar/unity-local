@@ -118,12 +118,11 @@
                     <div class="key-pill align-items-center me-2 p-2" draggable="true"
                       (dragstart)="onDragStart($event, con, variable, c)">
                       <span class="drag-handle mr-1">⋮⋮</span>
-                      <span class="key-text" *ngIf="con.node_type !== 'Webhook Trigger' && 
-                      con.node_type === 'ITSM Event Trigger' || con.node_type === 'AIML Event Trigger'">
+                      <span class="key-text" *ngIf="con.node_type !== 'Webhook Trigger'">
                         {{ c.param_name }}
                       </span>
-                      <span class="key-text" *ngIf="con.node_type === 'Webhook Trigger' || con.node_type === 'ITSM Event Trigger' ||
-                        con.node_type === 'AIML Event Trigger'">{{ c }}</span>
+                      <span class="key-text" *ngIf="con.node_type === 'Webhook Trigger' || 
+                      con.node_type === 'ITSM Event Trigger' || con.node_type === 'AIML Event Trigger'">{{ c }}</span>
                     </div>
                   </div>
                 </div>

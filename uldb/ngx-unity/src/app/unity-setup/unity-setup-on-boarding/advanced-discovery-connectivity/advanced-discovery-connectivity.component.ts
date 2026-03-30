@@ -1,8 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 import { DOWNLOAD_COLLECTOR } from 'src/app/shared/api-endpoint.const';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -13,7 +13,11 @@ import { COLLECTOR_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { AdvancedDiscoveryConnectivityCrudService } from './advanced-discovery-connectivity-crud/advanced-discovery-connectivity-crud.service';
-import { AdvancedDiscoveryConnectivityService, AgentConfigurationViewData } from './advanced-discovery-connectivity.service';
+import { AdvancedDiscoveryConnectivityService, AgentConfigurationViewData, NetworkConnectionTypeOption } from './advanced-discovery-connectivity.service';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { FormGroup } from '@angular/forms';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { Result } from 'src/app/shared/SharedEntityTypes/task-status.type';
 
 @Component({
   selector: 'advanced-discovery-connectivity',
@@ -26,6 +30,16 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
 
   vmWareCollectorUrl = DOWNLOAD_COLLECTOR('vmware');
   hyperVCollectorUrl = DOWNLOAD_COLLECTOR('hyper-v');
+
+  networkAction: string; // Allowed values - 'ping' | 'telnet'| 'traceroute';
+  @ViewChild('testNWConnectionRef') testNWConnectionRef: ElementRef;
+  testNetworkFormModalRef: BsModalRef;
+  testNetworkFormErrors: any;
+  testNetworkFormValidationMessages: any;
+  testNetworkForm: FormGroup;
+  collectorUuid: string;
+  consoleResult: Result;
+
   constructor(private agentService: AdvancedDiscoveryConnectivityService,
     private crudSvc: AdvancedDiscoveryConnectivityCrudService,
     private notificationService: AppNotificationService,
@@ -34,6 +48,8 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
+    private modalService: BsModalService,
+    private utilService: AppUtilityService,
     public userInfo: UserInfoService) {
     this.crudSvc.crudAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
       this.getConfigurations();
@@ -114,6 +130,66 @@ export class AdvancedDiscoveryConnectivityComponent implements OnInit {
     obj.newTab = true;
     this.storageService.put('console', obj, StorageType.LOCALSTORAGE);
     window.open(view.newTabConsoleAccessUrl);
+  }
+
+  openNWConnectionPopup(view: AgentConfigurationViewData, method: string){
+    if(!view || !method){
+      return;
+    }
+    this.consoleResult = null;
+    this.collectorUuid = view.uuid;
+    this.networkAction = method;
+    this.testNetworkFormErrors = this.agentService.resetTestNetworkFormErrors();
+    this.testNetworkFormValidationMessages = this.agentService.testNetworkFormValidationMessages;
+    this.testNetworkForm = this.agentService.buildPingOrTracerouteForm();
+    if(method == 'telnet'){
+      this.testNetworkForm = this.agentService.buildTelnetForm();
+    }
+    this.testNetworkFormModalRef = this.modalService.show(this.testNWConnectionRef, Object.assign({}, { class: 'modal-lg', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  onSubmit()  {
+    if (this.testNetworkForm.invalid) {
+      this.testNetworkFormErrors = this.utilService.validateForm(this.testNetworkForm, this.testNetworkFormValidationMessages, this.testNetworkFormErrors);
+      this.testNetworkForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((data: any) => { this.testNetworkFormErrors = this.utilService.validateForm(this.testNetworkForm, this.testNetworkFormValidationMessages, this.testNetworkFormErrors); });
+      return;
+    } else {      
+      this.spinner.start('main');
+      this.testNetworkFormErrors = this.agentService.resetTestNetworkFormErrors();
+      this.testNetworkFormValidationMessages = this.agentService.testNetworkFormValidationMessages;
+      let formObj = this.testNetworkForm.getRawValue();
+      if(this.networkAction == 'ping'){
+        this.agentService.testPing(formObj, this.collectorUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+          this.consoleResult = res?.result;
+          this.spinner.stop('main');
+        }, err => {
+          this.testNetworkFormModalRef.hide();
+          this.spinner.stop('main');
+          this.notificationService.error(new Notification('Error while initiating the ping.'));
+        });
+      }
+      else if(this.networkAction == 'telnet'){
+        this.agentService.testTelnet(formObj, this.collectorUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+          this.consoleResult = res?.result;
+          this.spinner.stop('main');
+        }, err => {
+          this.testNetworkFormModalRef.hide();
+          this.spinner.stop('main');
+          this.notificationService.error(new Notification('Error while initiating telnet connection.'));
+        });
+      }
+      else{
+        this.agentService.testTraceRoute(formObj, this.collectorUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+          this.consoleResult = res?.result;
+          this.spinner.stop('main');
+        }, err => {
+          this.testNetworkFormModalRef.hide();
+          this.spinner.stop('main');
+          this.notificationService.error(new Notification('Error while initiating trace-route.'));
+        });
+      }
+    }
   }
 
   goTo(url: string) {

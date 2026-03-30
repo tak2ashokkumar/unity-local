@@ -13,6 +13,7 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { NetworkAgentConditionActivityDetail } from '../network-agent-conditions.type';
 import { NetworkAgentConditionActivityDetailViewData } from '../network-agent-conditions.service';
 import { ConditionResponse } from './network-agent-condition-investigation.type';
+import { AnswerType, ConditionData } from './naci-chatbot/naci-chatbot.type';
 
 @Injectable()
 export class NetworkAgentConditionInvestigationService {
@@ -71,7 +72,7 @@ export class NetworkAgentConditionInvestigationService {
     return viewdata;
   }
 
-  convertToConditionOverviewData(data: ConditionResponse): ConditionResponseViewData {
+  convertToConditionOverviewData(data: AnswerType): ConditionResponseViewData {
 
     const viewdata = new ConditionResponseViewData();
 
@@ -82,7 +83,8 @@ export class NetworkAgentConditionInvestigationService {
     viewdata.recommendedActions = data.recommended_actions || [];
 
     const overview = new ConditionOverviewData();
-    const summary = data.data.condition_summary;
+    const conditionData = data.data as ConditionData;
+    const summary = conditionData.condition_summary;
 
     const summaryView = new ConditionSummary();
 
@@ -105,7 +107,7 @@ export class NetworkAgentConditionInvestigationService {
     overview.conditionSummary = summaryView;
 
 
-    overview.eventsTimeline = (data.data.events_timeline || []).map(event => {
+    overview.eventsTimeline = (conditionData.events_timeline || []).map(event => {
       const eventView = new EventTimelineItem();
       eventView.timestamp = event.timestamp;
       eventView.type = event.type;
@@ -114,7 +116,7 @@ export class NetworkAgentConditionInvestigationService {
       return eventView;
     });
 
-    overview.alertsTimeline = (data.data.alerts_timeline || []).map(alert => {
+    overview.alertsTimeline = (conditionData.alerts_timeline || []).map(alert => {
       const alertView = new AlertTimelineItem();
       alertView.timestamp = alert.timestamp;
       alertView.type = alert.type;
@@ -123,7 +125,7 @@ export class NetworkAgentConditionInvestigationService {
       return alertView;
     });
 
-    overview.preliminaryRca = (data.data.preliminary_rca || []).map(rca => {
+    overview.preliminaryRca = (conditionData.preliminary_rca || []).map(rca => {
       const rcaView = new PreliminaryRca();
       rcaView.possibleCause = rca.possible_cause;
       rcaView.confidence = rca.confidence;
@@ -131,9 +133,9 @@ export class NetworkAgentConditionInvestigationService {
       return rcaView;
     });
 
-    overview.planOfAction = data.data.plan_of_action || [];
+    overview.planOfAction = conditionData.plan_of_action || [];
 
-    overview.suggestedCommands = (data.data.suggested_commands || []).map(cmd => {
+    overview.suggestedCommands = (conditionData.suggested_commands || []).map(cmd => {
       const cmdView = new SuggestedCommand();
       cmdView.command = cmd.command;
       cmdView.useCase = cmd.use_case;

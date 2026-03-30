@@ -1,14 +1,13 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { NaciResourceUtilizationStepsService } from './naci-resource-utilization-steps.service';
+import { NetworkAgentsChatResponseType } from '../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'naci-resource-utilization-steps',
   templateUrl: './naci-resource-utilization-steps.component.html',
   styleUrls: ['./naci-resource-utilization-steps.component.scss'],
-  providers: [NaciResourceUtilizationStepsService]
 })
 export class NaciResourceUtilizationStepsComponent implements OnInit, OnChanges {
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
   currentStep: number;
 
   constructor() { }

@@ -21,12 +21,11 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
   @Input() minimized: boolean;
   @Input() offCanvas: boolean;
 
-  @HostBinding('class.sidebar')sidebarClass = true;
+  @HostBinding('class.sidebar') sidebarClass = true;
 
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
-    private renderer: Renderer2
-  ) { }
+    private renderer: Renderer2) { }
 
   ngOnInit(): void {
     this.displayBreakpoint(this.display);
@@ -63,7 +62,6 @@ export class AppSidebarComponent implements OnInit, OnDestroy {
       this.renderer.addClass(this.document.body, 'sidebar-off-canvas');
     }
   }
-
 
   displayBreakpoint(display: any = this.display): void {
     if (display !== false) {

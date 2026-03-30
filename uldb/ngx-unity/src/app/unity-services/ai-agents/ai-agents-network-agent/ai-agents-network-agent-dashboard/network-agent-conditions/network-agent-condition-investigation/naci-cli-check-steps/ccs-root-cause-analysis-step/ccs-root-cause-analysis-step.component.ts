@@ -3,6 +3,7 @@ import { AnalysisLogos, CcsRootCauseAnalysisStepService } from './ccs-root-cause
 import { NaciCliCheckStepsService } from '../naci-cli-check-steps.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { NetworkAgentsChatResponseType, RcaDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'ccs-root-cause-analysis-step',
@@ -13,7 +14,8 @@ import { Subject } from 'rxjs';
 export class CcsRootCauseAnalysisStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input('chatResponse') chatResponse: any;
+  @Input('chatResponse') chatResponse: NetworkAgentsChatResponseType;
+  @Input('verifyAndAuditRelatedStageTitle') verifyAndAuditRelatedStageTitle: string;
 
   isRCAOpen: boolean = false;
   rcaViewData: any;
@@ -21,9 +23,9 @@ export class CcsRootCauseAnalysisStepComponent implements OnInit, OnChanges {
 
   constructor(private svc: CcsRootCauseAnalysisStepService,
     private cliSvc: NaciCliCheckStepsService) {
-    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((stepName) => {
       setTimeout(() => {
-        this.isRCAOpen = StepName == 'rca' ? !this.isRCAOpen : false;
+        this.isRCAOpen = stepName == 'rca' ? !this.isRCAOpen : false;
       }, 0);
     })
   }
@@ -36,10 +38,11 @@ export class CcsRootCauseAnalysisStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleRCAAccordion();
-    this.rcaViewData = this.svc.convertToRCAViewData(this.chatResponse?.answer);
+    this.rcaViewData = this.svc.convertToRCAViewData(this.chatResponse?.answer?.data as RcaDataType);
   }
 
   toggleRCAAccordion() {
+    this.cliSvc.closeVerifyAndAuditStep(this.verifyAndAuditRelatedStageTitle);
     this.cliSvc.toggle('rca');
   }
 

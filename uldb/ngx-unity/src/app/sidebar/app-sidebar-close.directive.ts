@@ -1,17 +1,17 @@
-import { Directive, HostListener, Inject, Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { Directive, HostListener, Inject, Renderer2 } from '@angular/core';
+
 
 /**
- * Allows the off-canvas sidebar to be closed via click.
- */
+* Allows the off-canvas sidebar to be closed via click.
+*/
 @Directive({
   selector: '[appSidebarClose]'
 })
 export class SidebarOffCanvasCloseDirective {
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
-    private renderer: Renderer2,
-  ) { }
+    private renderer: Renderer2) { }
 
   @HostListener('click', ['$event'])
   toggleOpen($event: Event): void {
@@ -30,16 +30,17 @@ export class SidebarOffCanvasCloseDirective {
 })
 export class BrandMinimizeDirective {
   constructor(
-    @Inject(DOCUMENT) private readonly document: Document,
+    @Inject(DOCUMENT) private document: any,
     private renderer: Renderer2,
   ) { }
 
   @HostListener('click', ['$event'])
-  toggleOpen($event: Event): void {
+  toggleOpen($event: any) {
     $event.preventDefault();
     const body = this.document.body;
-    body.classList.contains('brand-minimized')
-      ? this.renderer.removeClass(body, 'brand-minimized')
-      : this.renderer.addClass(body, 'brand-minimized');
+    body.classList.contains('brand-minimized') ?
+      this.renderer.removeClass(body, 'brand-minimized') :
+      this.renderer.addClass(body, 'brand-minimized');
+    // document.body.classList.toggle('brand-minimized');
   }
 }

@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
+import { ValidateFixDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Injectable()
 export class RusValidateFixStepService {
 
   constructor() { }
 
-  convertToValidateFixViewData(validateFixData: any): ValidateFixViewData {
+  convertToValidateFixViewData(validateFixData: ValidateFixDataType): ValidateFixViewData {
     let viewData: ValidateFixViewData = new ValidateFixViewData();
-    viewData.targetDevice = validateFixData?.data?.execution?.target_device;
-    viewData.executionStatus = validateFixData?.data?.execution?.execution_status;
-    viewData.logs = validateFixData?.data?.execution?.logs;
+    viewData.targetDevice = validateFixData?.execution?.target_device;
+    viewData.executionStatus = validateFixData?.execution?.execution_status;
+    viewData.logs = validateFixData?.execution?.logs;
     return viewData;
   }
 }

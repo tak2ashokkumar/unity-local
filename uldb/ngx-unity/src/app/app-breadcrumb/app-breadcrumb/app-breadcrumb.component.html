@@ -1,9 +1,7 @@
 <nav aria-label="Breadcrumb">
   <div class="custom-breadcrumb">
     <a *ngFor="let breadcrumb of breadcrumbs; let last = last; let first = first; trackBy: trackByUrl"
-       [ngClass]="{ active: last, nopointerevents: first }"
-       [routerLink]="breadcrumb.url"
-       [title]="breadcrumb.label"
-       [attr.aria-current]="last ? 'page' : null">{{breadcrumb.label}}</a>
+      [ngClass]="{ active: last, nopointerevents: first }" [routerLink]="breadcrumb.url" [title]="breadcrumb.label"
+      [attr.aria-current]="last ? 'page' : null">{{breadcrumb.label}}</a>
   </div>
 </nav>

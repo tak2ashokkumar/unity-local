@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { AnalysisLogos, CdhRrotCauseAnalysisStepService } from './cdh-rrot-cause-analysis-step.service';
+import { AnalysisLogos, CdhRrotCauseAnalysisStepService, NetworkAgentRCAViewData } from './cdh-rrot-cause-analysis-step.service';
 import { Subject } from 'rxjs';
 import { NaciCheckDeviceHealthStepsService } from '../naci-check-device-health-steps.service';
 import { takeUntil } from 'rxjs/operators';
+import { NetworkAgentsChatResponseType, RcaDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'cdh-root-cause-analysis-step',
@@ -14,10 +15,10 @@ export class CdhRootCauseAnalysisStepComponent implements OnInit, OnChanges {
 
   private ngUnsubscribe = new Subject();
 
-  @Input('chatResponse') chatResponse: any;
+  @Input('chatResponse') chatResponse: NetworkAgentsChatResponseType;
 
   isRCAOpen: boolean = false;
-  rcaViewData: any;
+  rcaViewData: NetworkAgentRCAViewData;
   analysisLogos = AnalysisLogos;
 
   constructor(private svc: CdhRrotCauseAnalysisStepService,
@@ -37,7 +38,7 @@ export class CdhRootCauseAnalysisStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleRCAAccordion();
-    this.rcaViewData = this.svc.convertToRCAViewData(this.chatResponse?.answer);
+    this.rcaViewData = this.svc.convertToRCAViewData(this.chatResponse?.answer?.data as RcaDataType);
   }
 
   toggleRCAAccordion() {

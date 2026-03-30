@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core';
+import { RemediationScriptDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Injectable()
 export class CdhRemediationScriptStepService {
   constructor() { }
 
-  convertToRemediationScriptViewData(remediationData: any): RemediationScriptViewData {
+  convertToRemediationScriptViewData(remediationData: RemediationScriptDataType): RemediationScriptViewData {
     let viewData: RemediationScriptViewData = new RemediationScriptViewData();
-    viewData.remediationScript = remediationData?.data?.script_name;
-    viewData.targetDevice = remediationData?.data?.target_device;
-    viewData.actions = remediationData?.data?.actions;
-    viewData.risks = remediationData?.data?.risks;
-    viewData.preConditions = remediationData?.data?.pre_conditions;
-    viewData.postConditions = remediationData?.data?.post_conditions;
+    viewData.remediationScript = remediationData?.script_name;
+    viewData.targetDevice = remediationData?.target_device;
+    viewData.actions = remediationData?.actions;
+    viewData.risks = remediationData?.risks;
+    viewData.preConditions = remediationData?.pre_conditions;
+    viewData.postConditions = remediationData?.post_conditions;
 
-    viewData.isrecommendedActionsKeyPresent = remediationData?.data?.hasOwnProperty('recommended_actions');
-    viewData.recommendedActions = remediationData?.data?.recommended_actions;
+    viewData.isrecommendedActionsKeyPresent = remediationData?.hasOwnProperty('recommended_actions');
+    viewData.recommendedActions = remediationData?.recommended_actions;
     return viewData;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, ContentChild, HostBinding, Input, SimpleChanges, TemplateRef } from '@angular/core';
 import { UnityNavData } from 'src/app/app-main/unity-nav';
 
 @Component({
@@ -11,6 +11,8 @@ export class AppSidebarNavComponent {
 
   @HostBinding('class.sidebar-nav') sidebarNavClass = true;
   @HostBinding('attr.role') role = 'navigation';
+
+  public navItemsArray: Array<any>;
 
   isDivider(item: UnityNavData): boolean { return !!item.divider; }
   isTitle(item: UnityNavData): boolean   { return !!item.title; }

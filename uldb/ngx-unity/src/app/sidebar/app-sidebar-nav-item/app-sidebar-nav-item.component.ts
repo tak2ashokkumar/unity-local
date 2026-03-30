@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UnityNavData } from 'src/app/app-main/unity-nav';
 
@@ -15,9 +15,9 @@ export class AppSidebarNavItemComponent implements OnInit {
 
   constructor(private router: Router, private el: ElementRef) { }
 
-  hasClass(): boolean    { return !!this.item.class; }
-  isDropdown(): boolean  { return !!this.item.children?.length; }
-  isActive(): boolean    { return this.router.isActive(this.item.url, false); }
+  hasClass(): boolean { return !!this.item.class; }
+  isDropdown(): boolean { return !!this.item.children?.length; }
+  isActive(): boolean { return this.router.isActive(this.item.url, false); }
 
   ngOnInit(): void {
     Replace(this.el);

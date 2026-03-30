@@ -169,6 +169,12 @@ import { NtDocumentAndCloseStepComponent } from './ai-agents/ai-agents-network-a
 import { NtRemediationScriptStepComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-network-topology-steps/nt-remediation-script-step/nt-remediation-script-step.component';
 import { NtRootCauseAnalysisStepComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-network-topology-steps/nt-root-cause-analysis-step/nt-root-cause-analysis-step.component';
 import { NtValidateFixStepComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-network-topology-steps/nt-validate-fix-step/nt-validate-fix-step.component';
+import { NaciCentralizedLogsStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-centralized-logs-steps/naci-centralized-logs-steps.service';
+import { NaciResourceUtilizationStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-resource-utilization-steps/naci-resource-utilization-steps.service';
+import { NaciMonitoringService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-monitoring/naci-monitoring.service';
+import { NaciNetworkTopologyStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-network-topology-steps/naci-network-topology-steps.service';
+import { NaciCheckDeviceHealthStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-check-device-health-steps/naci-check-device-health-steps.service';
+import { NaciCliCheckStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-cli-check-steps/naci-cli-check-steps.service';
 /**
  * Change format according to need
  */
@@ -363,7 +369,13 @@ export const MY_NATIVE_FORMATS = {
     { provide: DateTimeAdapter, useClass: MomentDateTimeAdapter, deps: [OWL_DATE_TIME_LOCALE] },
     { provide: OWL_DATE_TIME_FORMATS, useValue: MY_NATIVE_FORMATS },
     AimlConditionDetailsService,
-    TitleCasePipe
+    TitleCasePipe,
+    NaciCliCheckStepsService,
+    NaciCheckDeviceHealthStepsService,
+    NaciNetworkTopologyStepsService,
+    NaciMonitoringService,
+    NaciCentralizedLogsStepsService,
+    NaciResourceUtilizationStepsService
   ]
 })
 export class UnityServicesModule { }

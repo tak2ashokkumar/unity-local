@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { CdhValidateFixStepService } from './cdh-validate-fix-step.service';
+import { CdhValidateFixStepService, ValidateFixViewData } from './cdh-validate-fix-step.service';
 import { NaciCheckDeviceHealthStepsService } from '../naci-check-device-health-steps.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { NetworkAgentsChatResponseType, ValidateFixDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'cdh-validate-fix-step',
@@ -15,8 +16,8 @@ export class CdhValidateFixStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
   isValidateFixOpen: boolean = false;
-  @Input() chatResponse: any;
-  validateFixViewData: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
+  validateFixViewData: ValidateFixViewData;
 
   constructor(private svc: CdhValidateFixStepService,
     private cdhSvc: NaciCheckDeviceHealthStepsService) {
@@ -35,7 +36,7 @@ export class CdhValidateFixStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleValidateFix();
-    this.validateFixViewData = this.svc.convertToValidateFixViewData(this.chatResponse?.answer);
+    this.validateFixViewData = this.svc.convertToValidateFixViewData(this.chatResponse?.answer?.data as ValidateFixDataType);
   }
 
   toggleValidateFix() {

@@ -64,7 +64,7 @@
                         {{formErrors.access_type}}
                       </div>
                     </div>
-                    <div class="form-group col-6">
+                    <!-- <div class="form-group col-6">
                       <label for="username">Username<em>*</em></label>
                       <input class="form-control" id="username" formControlName="username" type="text"
                         placeholder="Username" [ngClass]="{'is-invalid' : formErrors.username}">
@@ -78,6 +78,14 @@
                         placeholder="Password" [ngClass]="{'is-invalid' : formErrors.password}">
                       <div class="invalid-feedback" *ngIf="formErrors.password">
                         {{formErrors.password}}
+                      </div>
+                    </div> -->                    
+                    <div class="form-group col-6">
+                      <label for="client_secret" class="form-col-form-label">Client Secret<em>*</em></label>
+                      <custom-password-field formControlName="client_secret"
+                        [options]="{id:'client_secret', errors:formErrors.client_secret, placeholder:'Enter Client Secret'}"></custom-password-field>                      
+                      <div class="invalid-feedback" *ngIf="formErrors.client_secret">
+                        {{formErrors.client_secret}}
                       </div>
                     </div>
                     <div class="form-group col-6">

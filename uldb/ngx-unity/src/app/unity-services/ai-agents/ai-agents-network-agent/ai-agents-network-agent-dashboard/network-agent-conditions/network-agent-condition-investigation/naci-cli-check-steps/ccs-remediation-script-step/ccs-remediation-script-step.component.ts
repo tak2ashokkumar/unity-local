@@ -3,6 +3,7 @@ import { CcsRemediationScriptStepService, RemediationScriptViewData } from './cc
 import { NaciCliCheckStepsService } from '../naci-cli-check-steps.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { NetworkAgentsChatResponseType, RemediationScriptDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'ccs-remediation-script-step',
@@ -13,16 +14,17 @@ import { Subject } from 'rxjs';
 export class CcsRemediationScriptStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
+  @Input() verifyAndAuditRelatedStageTitle: string;
 
   isRemediationFixOpen: boolean = false;
   remediationScriptViewData: RemediationScriptViewData;
 
   constructor(private svc: CcsRemediationScriptStepService,
     private cliSvc: NaciCliCheckStepsService) {
-    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((stepName) => {
       setTimeout(() => {
-        this.isRemediationFixOpen = StepName == 'remediationScript' ? !this.isRemediationFixOpen : false;
+        this.isRemediationFixOpen = stepName == 'remediationScript' ? !this.isRemediationFixOpen : false;
       }, 0);
     })
   }
@@ -35,10 +37,11 @@ export class CcsRemediationScriptStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleRemediationFix();
-    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer);
+    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer?.data as RemediationScriptDataType);
   }
 
   toggleRemediationFix() {
+    this.cliSvc.closeVerifyAndAuditStep(this.verifyAndAuditRelatedStageTitle);
     this.cliSvc.toggle('remediationScript');
   }
 

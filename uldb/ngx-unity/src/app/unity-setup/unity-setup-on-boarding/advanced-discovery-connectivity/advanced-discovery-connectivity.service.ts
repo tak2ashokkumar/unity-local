@@ -1,19 +1,27 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 import { MANAGEMENT_NOT_ENABLED_MESSAGE, VM_CONSOLE_CLIENT } from 'src/app/app-constants';
 import { GET_AGENT_CONFIGURATIONS, TEST_AGENT_CONNECTION } from 'src/app/shared/api-endpoint.const';
-import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { ConnectionTestResult, DeviceDiscoveryAgentConfigurationType } from './agent-config.type';
+import { FormBuilder, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
+import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
+import { AppLevelService } from 'src/app/app-level.service';
+import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
 
 @Injectable()
 export class AdvancedDiscoveryConnectivityService {
 
   constructor(private http: HttpClient,
     private userInfo: UserInfoService,
-    private utilSvc: AppUtilityService) { }
+    private utilSvc: AppUtilityService,
+    private builder: FormBuilder,
+    private appService: AppLevelService) { }
 
   getConfigurations() {
     const params = new HttpParams().set('page_size', '0');
@@ -65,6 +73,55 @@ export class AdvancedDiscoveryConnectivityService {
       })
     );
   }
+
+  buildPingOrTracerouteForm() {
+    return this.builder.group({
+      'ip': ['', [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]]
+    });
+  }
+
+  buildTelnetForm() {
+    return this.builder.group({
+      'host': ['', [Validators.required, NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
+      'port': ['', [Validators.required, NoWhitespaceValidator]]
+    });
+  }
+
+  testNetworkFormValidationMessages = {
+    'ip': {
+      'required': 'Ip Address is required'
+    },
+    'host': {
+      'required': 'Ip Address / Host is required'
+    },
+    'port': {
+      'required': 'Port number is required'
+    }
+  }
+
+  resetTestNetworkFormErrors() {
+    return {
+      'ip': '',
+      'host': '',
+      'port': ''
+    };
+  }
+
+  testPing(data: any , uuid: string): Observable<TaskStatus> {
+    return this.http.post<CeleryTask>(`/customer/agent/config/${uuid}/network_ping/`, data)
+      .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 3, 100).pipe(take(1))), take(1));
+  }
+
+  testTelnet(data: any , uuid: string): Observable<TaskStatus> {
+    return this.http.post<CeleryTask>(`/customer/agent/config/${uuid}/network_telnet/`, data)
+      .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 3, 100).pipe(take(1))), take(1));
+  }
+
+  testTraceRoute(data: any , uuid: string): Observable<TaskStatus> {
+    return this.http.post<CeleryTask>(`/customer/agent/config/${uuid}/network_traceroute/`, data)
+      .pipe(switchMap(res => this.appService.pollForTask(res.task_id, 3, 100).pipe(take(1))), take(1));
+  }
+
 }
 
 export class AgentConfigurationViewData {
@@ -105,4 +162,10 @@ export class AgentConfigurationViewData {
       return 'Test Connection';
     }
   }
+}
+
+export enum NetworkConnectionTypeOption {
+  PING = 'ping',
+  TELNET = 'telnet',
+  TRACEROUTE = 'traceroute'
 }

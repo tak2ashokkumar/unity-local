@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { StorageService, StorageType } from '../app-storage/storage.service';
+import { StorageService, StorageType } from './app-storage/storage.service';
+
 
 export type UnityTheme = string;
-
 const STORAGE_KEY = 'theme';
 
-@Injectable({ providedIn: 'root' })
-export class ThemeService {
-
+@Injectable({
+  providedIn: 'root'
+})
+export class UnityThemeService {
   private _current$ = new BehaviorSubject<UnityTheme>(environment.theme.defaultTheme);
 
   /** Observable of the currently active theme name ('light' | 'dark' | …) */
   readonly currentTheme$ = this._current$.asObservable();
-
-  constructor(private storage: StorageService) {}
+  constructor(private storage: StorageService) { }
 
   // ─── Getters used by template / profile page ──────────────────────────────
 
@@ -35,8 +35,8 @@ export class ThemeService {
 
   init(): void {
     const persisted = this.storage.getByKey(STORAGE_KEY, StorageType.LOCALSTORAGE) as string | null;
-    const valid     = environment.theme.availableThemes;
-    const resolved  = persisted && valid.includes(persisted) ? persisted : environment.theme.defaultTheme;
+    const valid = environment.theme.availableThemes;
+    const resolved = persisted && valid.includes(persisted) ? persisted : environment.theme.defaultTheme;
     this._applyToDOM(resolved);
     this._current$.next(resolved);
   }
@@ -57,8 +57,8 @@ export class ThemeService {
   // ─── Private ──────────────────────────────────────────────────────────────
 
   private _applyToDOM(theme: UnityTheme): void {
-    const body    = document.body;
-    const prefix  = 'theme-';
+    const body = document.body;
+    const prefix = 'theme-';
     // Remove any existing theme-* class
     const existing = Array.from(body.classList).filter(c => c.startsWith(prefix));
     existing.forEach(c => body.classList.remove(c));

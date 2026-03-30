@@ -9,10 +9,10 @@ export const environment = {
   gmk: 'AIzaSyAtO2aDDnFIBISFiPOi2-ucP_pB16cJKTU',
   gmId: 'da696c0425f1f845',
   DISABLE_WORLD_MAP: process.env.DISABLE_WORLD_MAP === 'true' ? true : false,
-  networkAgentHostUrl: 'https://unity.unitedlayer.com/networkai/',
   theme: {
-    allowSwitch: true,
+    allowSwitch: false,
     defaultTheme: 'light',
     availableThemes: ['light', 'dark'] as string[],
-  }
+  },
+  networkAgentHostUrl: 'https://unity.unitedlayer.com/networkai/'
 };

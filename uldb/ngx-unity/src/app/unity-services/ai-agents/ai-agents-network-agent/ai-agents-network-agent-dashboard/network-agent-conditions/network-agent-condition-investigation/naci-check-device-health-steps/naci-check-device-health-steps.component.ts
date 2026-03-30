@@ -1,15 +1,14 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { NaciCheckDeviceHealthStepsService } from './naci-check-device-health-steps.service';
+import { NetworkAgentsChatResponseType } from '../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'naci-check-device-health-steps',
   templateUrl: './naci-check-device-health-steps.component.html',
   styleUrls: ['./naci-check-device-health-steps.component.scss'],
-  providers: [NaciCheckDeviceHealthStepsService]
 })
 export class NaciCheckDeviceHealthStepsComponent implements OnInit, OnChanges {
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
   currentStep = 1;
   constructor() { }
 

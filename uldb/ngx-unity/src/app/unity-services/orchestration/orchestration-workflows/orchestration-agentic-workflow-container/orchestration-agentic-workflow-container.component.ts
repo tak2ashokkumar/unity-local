@@ -1063,7 +1063,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
       case nodeTypes.GetITSMTicket:
         return {
           itsm_table: formDatas?.getTicketForm?.itsm_table,
-          filter: [...formDatas?.getTicketForm?.filter],
+          filter: [...formDatas?.getTicketForm?.filters],
           settings: {
             retries: formDatas?.getTicketForm?.retries ?? node.config?.settings?.retries ?? 0,
             timeout: formDatas?.getTicketForm?.timeouts ?? node.config?.settings?.timeout ?? 3600,
@@ -2009,7 +2009,6 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   }
 
   openWorkflowVarModal() {
-    console.log('In container>>>>>>>>>>>>>', this.workflowVarsData)
     this.modalRef = this.modalService.show(OrchestrationAgenticWorkflowVariablesComponent, {
       class: 'custom-agentic-workflow-modal-md',
       backdrop: true,                 // show dimmed backdrop

@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { MapService } from 'src/app/map.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -44,14 +44,15 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
   ngOnInit() { }
 
   async ngAfterViewInit() {
+    this.spinner.start('dashboard_map_widget');
     await this.mapSvc.loadMap();
 
     this.isMapAvailable = this.mapSvc.isAvailable();
-    if (!this.isMapAvailable) return;
-
-    this.getDCStatus();
-    // this.syncDCStatus();
-    // await this.drawMap();
+    if (!this.isMapAvailable) {
+      this.spinner.stop('dashboard_map_widget');
+      return;
+    }
+    this.loadAndSyncDCStatus();
   }
 
   ngOnDestroy() {
@@ -60,37 +61,44 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
     this.ngUnsubscribe.complete();
   }
 
-  syncDCStatus() {
-    this.mapWidgetSerice.syncDatacenterSatus().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.getDCStatus();
-    }, err => {
-      this.notification.error(new Notification('Problem occurred while updating datacenter status. Please try again.'));
-    });
+  loadAndSyncDCStatus() {
+    this.mapWidgetSerice.getDatacenterSatus().pipe(
+      takeUntil(this.ngUnsubscribe),
+      tap(res => {
+        this.processDCData(res);
+      }),
+      switchMap(() => this.mapWidgetSerice.syncDatacenterSatus()),
+      switchMap(() => this.mapWidgetSerice.getDatacenterSatus())
+    ).subscribe(
+      res => {
+        this.processDCData(res);
+        this.spinner.stop('dashboard_map_widget');
+      },
+      err => {
+        this.spinner.stop('dashboard_map_widget');
+        this.notification.error(
+          new Notification(
+            'Problem occurred while updating datacenter status. Please try again.'
+          )
+        );
+
+      }
+    );
   }
 
-  getDCStatus() {
-    this.spinner.start('dashboard_map_widget');
-    this.mapWidgetSerice.getDatacenterSatus().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      if (res) {
-        this.viewdata = this.mapWidgetSerice.convertToViewdata(res);
-        let dcm: WorldMapWidgetDCMap = {};
-        this.viewdata.forEach(view => {
-          dcm[view.location] = view.datacenters.map(dc => dc.name);
-        });
-        this.dcMap = dcm;
-        if (this.map) {
-          this.addMarkers();
-        } else {
-          this.drawMap();
-        }
-      }
-      this.syncDCStatus();
-      this.spinner.stop('dashboard_map_widget');
-    }, err => {
-      this.syncDCStatus();
-      this.spinner.stop('dashboard_map_widget');
-      this.notification.error(new Notification('Problem occurred while fetching datacenter status. Please try again.'));
+  private processDCData(res: any) {
+    if (!res) return;
+    this.viewdata = this.mapWidgetSerice.convertToViewdata(res);
+    const dcm: WorldMapWidgetDCMap = {};
+    this.viewdata.forEach(view => {
+      dcm[view.location] = view.datacenters.map(dc => dc.name);
     });
+    this.dcMap = dcm;
+    if (this.map) {
+      this.addMarkers();
+    } else {
+      this.drawMap();
+    }
   }
 
   async drawMap() {

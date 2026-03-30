@@ -5,13 +5,13 @@ import { NaciNetworkTopologyStepsService } from '../naci-network-topology-steps.
 import { takeUntil } from 'rxjs/operators';
 import { UnityViewNetworkTopologyNode } from 'src/app/shared/SharedEntityTypes/network-topology.type';
 import { Data, Network, Options } from 'vis-network';
-import { UnityTopologyoptionsService } from 'src/app/united-view/unity-topology/unity-topologyoptions.service';
 import { Router } from '@angular/router';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { clone as _clone } from 'lodash-es';
+import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
 
 @Component({
   selector: 'nt-verify-and-audit-step',
@@ -44,21 +44,21 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   options: Options;
   private remInPx: number;
   constructor(private svc: NtVerifyAndAuditStepService,
-    private cliSvc: NaciNetworkTopologyStepsService,
+    private ntSvc: NaciNetworkTopologyStepsService,
     // private optionService: UnityTopologyoptionsService,
+    private cliSvc: NaciCliCheckStepsService,
     private router: Router,
     private renderer: Renderer2,
     private notification: AppNotificationService,
     private spinner: AppSpinnerService,
     private storageService: StorageService,) {
-    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+    this.ntSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
       this.isVerifyAndAuditOpen = StepName == 'verfiyAndAudit' ? !this.isVerifyAndAuditOpen : false;
     })
   }
 
   ngOnInit(): void {
     this.options = this.getInitialOptions();
-    console.log(this.options, 'opitions 1');
     setTimeout(() => {
       this.spinner.start('unity-topology');
       this.nodeDetailsRef = document.getElementById('dc-node-details-wrapper');
@@ -138,7 +138,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
 
   verifyAudit() {
     this.verifyAuditViewData = this.chatResponse.answer;
-    this.verifyAuditViewData = jsonOutput;
+    // this.verifyAuditViewData = jsonOutput;
     // this.verifyAuditViewData = this.svc.convertToVerifyAndAuditViewData(this.chatResponse?.answer);
     // console.log(this.verifyAuditViewData, 'vf & avd')
     this.getDeviceNetwork();
@@ -152,8 +152,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
 
   getDeviceNetwork() {
     this.destroyNetwork();
-    console.log(this.verifyAuditViewData, 'vf & ad')
-    let networkData: UnityNetworkTopologyViewData = this.svc.convertToViewData(this.verifyAuditViewData.answer.data);
+    let networkData: UnityNetworkTopologyViewData = this.svc.convertToViewData(this.verifyAuditViewData.data);
     if (networkData.nodes && networkData.nodes.length) {
       this.spinner.stop('unity-topology');
       this.networkViewData = networkData;
@@ -316,7 +315,10 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
 
 
   toggleVerifyAndAuditAccordion() {
-    this.cliSvc.toggle('verfiyAndAudit');
+    if (!this.isVerifyAndAuditOpen) {
+      this.cliSvc.toggle('');
+    }
+    this.ntSvc.toggle('verfiyAndAudit');
   }
 
 }

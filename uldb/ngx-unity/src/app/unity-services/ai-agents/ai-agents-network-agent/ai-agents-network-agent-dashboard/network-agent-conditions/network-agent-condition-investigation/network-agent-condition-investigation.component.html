@@ -257,28 +257,27 @@
                         </div>
                     </div>
                 </div>
+                <h5 class="mt-3"
+                    *ngIf="chatResponse?.answer?.stage?.startsWith('Stage ') && chatResponse?.answer?.stage != 'Stage 0'">
+                    Workspace</h5>
 
-                <ng-container *ngIf="chatResponse?.answer?.stage?.startsWith('Stage ') && currentStageTitle">
-                    <naci-cli-check-steps *ngIf="currentStageTitle=='Basic CLI Check'"
-                        [chatResponse]="chatResponse"></naci-cli-check-steps>
+                <naci-resource-utilization-steps *ngIf="currentStageTitle=='Resource Utilization'"
+                    [chatResponse]="chatResponse"></naci-resource-utilization-steps>
 
-                    <naci-resource-utilization-steps *ngIf="currentStageTitle=='Resource Utilization'"
-                        [chatResponse]="chatResponse"></naci-resource-utilization-steps>
+                <naci-monitoring *ngIf="currentStageTitle=='Monitoring'"
+                    [chatResponse]="chatResponse"></naci-monitoring>
 
-                    <naci-monitoring *ngIf="currentStageTitle=='Monitoring'"
-                        [chatResponse]="chatResponse"></naci-monitoring>
+                <naci-check-device-health-steps *ngIf="currentStageTitle=='Check Device Health'"
+                    [chatResponse]="chatResponse"></naci-check-device-health-steps>
 
-                    <naci-check-device-health-steps *ngIf="currentStageTitle=='Check Device Health'"
-                        [chatResponse]="chatResponse"></naci-check-device-health-steps>
+                <naci-centralized-logs-steps *ngIf="currentStageTitle=='Centralized Logs'"
+                    [chatResponse]="chatResponse"></naci-centralized-logs-steps>
 
-                    <naci-centralized-logs-steps *ngIf="currentStageTitle=='Centralized Logs'"
-                        [chatResponse]="chatResponse"></naci-centralized-logs-steps>
-                </ng-container>
+                <naci-network-topology-steps *ngIf="currentStageTitle=='Network Topology'"
+                    [chatResponse]="chatResponse"></naci-network-topology-steps>
 
-                <ng-container *ngIf="!currentStageTitle">
-                    <naci-cli-check-steps *ngIf="chatResponse?.answer?.stage?.startsWith('Stage ')"
-                        [chatResponse]="chatResponse"></naci-cli-check-steps>
-                </ng-container>
+                <naci-cli-check-steps *ngIf="chatResponse?.answer?.stage?.startsWith('Stage ') "
+                    [chatResponse]="chatResponse"></naci-cli-check-steps>
 
             </div>
 

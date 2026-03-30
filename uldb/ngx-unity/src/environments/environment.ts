@@ -14,12 +14,12 @@ export const environment = {
   gmk: 'AIzaSyBqymWM02elVMqsILC51xw1dzIci6fLMhU',
   gmId: 'da696c0425f1f845',
   DISABLE_WORLD_MAP: process.env.DISABLE_WORLD_MAP === 'false' ? false : true,
-  networkAgentHostUrl: 'http://10.192.11.72:8003/',
   theme: {
-    allowSwitch: true,
+    allowSwitch: false,
     defaultTheme: 'light',
     availableThemes: ['light', 'dark'] as string[],
-  }
+  },
+  networkAgentHostUrl: 'http://10.192.11.72:8003/'
 };
 
 /*

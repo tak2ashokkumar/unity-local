@@ -1,4 +1,4 @@
-<div class="card mb-2">
+<div class="card mb-0">
 
     <!-- Card Header -->
     <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1 px-2">
@@ -17,19 +17,22 @@
 
     <!-- Collapsible Body -->
     <div [collapse]="!isVerifyAndAuditOpen">
-        <div class="card-body topology-card">
-            <app-spinner [name]="'unity-topology'"></app-spinner>
-            <div class="card-body py-0">
-                <div class="text-center text-muted m-5 p-5 font-lg"
-                    *ngIf="!networkViewData || !networkViewData.nodes.length">No
-                    devices discovered.</div>
-                <ng-container>
-                    <div id="dc-node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo"></div>
-                </ng-container>
+        <div class="card-body">
+            <div class="topology-card">
+                <app-spinner [name]="'unity-topology'"></app-spinner>
+                <div class="py-0">
+                    <div class="text-center text-muted m-5 p-5 font-lg"
+                        *ngIf="!networkViewData || !networkViewData.nodes.length">No
+                        devices discovered.</div>
+                    <ng-container>
+                        <div id="dc-node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo">
+                        </div>
+                    </ng-container>
 
-                <div class="row">
-                    <div class="pr-0" [ngClass]="selectedNodes.length ? 'col-11': 'col-12'">
-                        <div class="discovery-network-container" id="discovery-network-container" #visGraph>
+                    <div class="row">
+                        <div class="pr-0" [ngClass]="selectedNodes.length ? 'col-11': 'col-12'">
+                            <div class="discovery-network-container" id="discovery-network-container" #visGraph>
+                            </div>
                         </div>
                     </div>
                 </div>

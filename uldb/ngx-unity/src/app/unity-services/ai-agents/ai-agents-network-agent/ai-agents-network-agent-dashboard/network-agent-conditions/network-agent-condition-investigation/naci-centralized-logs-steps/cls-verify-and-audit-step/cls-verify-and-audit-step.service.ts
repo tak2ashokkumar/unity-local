@@ -1,19 +1,20 @@
 import { Injectable } from '@angular/core';
 import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { AlertsType, CentralizedLogsDataType, EventsType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Injectable()
 export class ClsVerifyAndAuditStepService {
 
   constructor(private utilSvc: AppUtilityService) { }
 
-  convertToCentralizedLogsViewData(data: any): CentralizedLogsViewData {
+  convertToCentralizedLogsViewData(data: CentralizedLogsDataType): CentralizedLogsViewData {
     let viewData: CentralizedLogsViewData = new CentralizedLogsViewData();
     viewData.alerts = this.convertToAlertsViewData(data.alerts);
     viewData.events = this.convertToEventsViewData(data.events);
     return viewData;
   }
 
-  convertToAlertsViewData(alerts: any[]): AlertsViewData[] {
+  convertToAlertsViewData(alerts: AlertsType[]): AlertsViewData[] {
     let viewData: AlertsViewData[] = [];
 
     alerts.forEach(alert => {
@@ -45,7 +46,7 @@ export class ClsVerifyAndAuditStepService {
     return viewData;
   }
 
-  convertToEventsViewData(events: any[]): EVentsViewData[] {
+  convertToEventsViewData(events: EventsType[]): EVentsViewData[] {
     let viewData: EVentsViewData[] = [];
     events.forEach(event => {
       let view: EVentsViewData = new EVentsViewData();

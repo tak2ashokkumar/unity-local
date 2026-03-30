@@ -25,8 +25,9 @@ export class UsiMsDynamicsCrmCrudService {
       'crm_url': '',
       'client_id': '',
       'tenant_id': '',
-      'username': '',
-      'password': '',
+      // 'username': '',
+      // 'password': '',
+      'client_secret': '',
       'access_type': '',
       'crm_account_uuid': ''
     };
@@ -46,11 +47,14 @@ export class UsiMsDynamicsCrmCrudService {
     'tenant_id': {
       'required': 'Instance URL is required'
     },
-    'username': {
-      'required': 'Username is required',
-    },
-    'password': {
-      'required': 'Password is required'
+    // 'username': {
+    //   'required': 'Username is required',
+    // },
+    // 'password': {
+    //   'required': 'Password is required'
+    // },
+    'client_secret': {
+      'required': 'Client Secret is required'
     },
     'access_type': {
       'required': 'Access type is required'
@@ -70,8 +74,9 @@ export class UsiMsDynamicsCrmCrudService {
             'crm_url': [instance ? instance.crm_url : '', [Validators.required, NoWhitespaceValidator]],
             'client_id': [instance ? instance.client_id : '', [Validators.required, NoWhitespaceValidator]],
             'tenant_id': [instance ? instance.tenant_id : '', [Validators.required, NoWhitespaceValidator]],
-            'username': [instance ? instance.username : '', [Validators.required, NoWhitespaceValidator]],
-            'password': ['', [Validators.required, NoWhitespaceValidator]],
+            // 'username': [instance ? instance.username : '', [Validators.required, NoWhitespaceValidator]],
+            // 'password': ['', [Validators.required, NoWhitespaceValidator]],
+            'client_secret': [instance ? instance.client_secret : '',[Validators.required, NoWhitespaceValidator]],
             'is_default': [instance ? instance.is_default : false],
             'access_type': [instance ? instance.access_type : '']
           });
@@ -82,8 +87,9 @@ export class UsiMsDynamicsCrmCrudService {
         'crm_url': ['', [Validators.required, NoWhitespaceValidator]],
         'client_id': ['', [Validators.required, NoWhitespaceValidator]],
         'tenant_id': ['', [Validators.required, NoWhitespaceValidator]],
-        'username': ['', [Validators.required, NoWhitespaceValidator]],
-        'password': ['', [Validators.required, NoWhitespaceValidator]],
+        // 'username': ['', [Validators.required, NoWhitespaceValidator]],
+        // 'password': ['', [Validators.required, NoWhitespaceValidator]],
+        'client_secret': ['', [Validators.required, NoWhitespaceValidator]],
         'is_default': [false],
         'crm_account_uuid': ['', [Validators.required, NoWhitespaceValidator]],
         'access_type': ['', [Validators.required]]

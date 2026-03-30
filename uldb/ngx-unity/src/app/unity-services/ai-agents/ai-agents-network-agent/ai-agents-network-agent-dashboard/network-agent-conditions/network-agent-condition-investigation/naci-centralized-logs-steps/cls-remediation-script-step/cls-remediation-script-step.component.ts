@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { ClsRemediationScriptStepService, RemediationScriptViewData } from './cls-remediation-script-step.service';
 import { NaciCentralizedLogsStepsService } from '../naci-centralized-logs-steps.service';
 import { takeUntil } from 'rxjs/operators';
+import { NetworkAgentsChatResponseType, RemediationScriptDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'cls-remediation-script-step',
@@ -13,7 +14,7 @@ import { takeUntil } from 'rxjs/operators';
 export class ClsRemediationScriptStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
 
   isRemediationFixOpen: boolean = false;
   remediationScriptViewData: RemediationScriptViewData;
@@ -35,7 +36,7 @@ export class ClsRemediationScriptStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleRemediationFix();
-    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer);
+    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer?.data as RemediationScriptDataType);
   }
 
   toggleRemediationFix() {

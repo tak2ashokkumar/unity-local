@@ -23,7 +23,8 @@ export interface MSDynamicsCRMType {
   crm_url: string;
   client_id: string;
   tenant_id: string;
-  username: string;
+  // username: string;
+  client_secret: string;
   is_default: boolean;
   user: number;
   access_type: string;

@@ -2,15 +2,16 @@ import { Injectable } from '@angular/core';
 import { UNITY_FONT_FAMILY, UNITY_TEXT_DEFAULT_COLOR } from 'src/app/app-constants';
 import * as echarts from 'echarts';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
+import { MetricsDataType, MetricsType, MonitoringDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Injectable()
 export class MonitoringVerifyAndAuditStepService {
 
   constructor(private chartConfigSvc: UnityChartConfigService) { }
 
-  convertToVerifyAndAuditViewData(data: any) {
+  convertToVerifyAndAuditViewData(data: MonitoringDataType): MonitoringMetricWidgetViewData {
     let viewData: MonitoringMetricWidgetViewData = new MonitoringMetricWidgetViewData();
-    const metrics = data?.data?.metrics || [];
+    const metrics: MetricsType[] = data?.metrics || [];
     metrics.forEach(metric => {
       metric.metrics_data.forEach(item => {
         const chart = this.convertHistoryToChart(item);
@@ -20,7 +21,7 @@ export class MonitoringVerifyAndAuditStepService {
     return viewData;
   }
 
-  convertHistoryToChart(metricItem: any): UnityChartDetails {
+  convertHistoryToChart(metricItem: MetricsDataType): UnityChartDetails {
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.LINE;
     view.options = this.chartConfigSvc.getDefaultLineChartOptions();

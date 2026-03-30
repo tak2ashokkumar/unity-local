@@ -1,14 +1,13 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { NaciCentralizedLogsStepsService } from './naci-centralized-logs-steps.service';
+import { NetworkAgentsChatResponseType } from '../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'naci-centralized-logs-steps',
   templateUrl: './naci-centralized-logs-steps.component.html',
   styleUrls: ['./naci-centralized-logs-steps.component.scss'],
-  providers: [NaciCentralizedLogsStepsService]
 })
 export class NaciCentralizedLogsStepsComponent implements OnInit, OnChanges {
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
   currentStep: number;
 
   constructor() { }

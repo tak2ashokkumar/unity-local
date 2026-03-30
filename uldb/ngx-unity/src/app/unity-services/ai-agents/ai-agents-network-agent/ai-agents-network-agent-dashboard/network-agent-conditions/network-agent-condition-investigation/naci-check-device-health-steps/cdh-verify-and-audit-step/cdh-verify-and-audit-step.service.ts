@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { UNITY_FONT_FAMILY, UNITY_TEXT_DEFAULT_COLOR } from 'src/app/app-constants';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import * as echarts from 'echarts';
+import { MetricsDataType, MetricsType, ResourceUtilizationSummaryType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Injectable()
 export class CdhVerifyAndAuditStepService {
 
   constructor(private chartConfigSvc: UnityChartConfigService) { }
 
-  convertToDeviceHealthSummaryViewData(data): DeviceHealthSummaryViewData {
+  convertToDeviceHealthSummaryViewData(data: ResourceUtilizationSummaryType): DeviceHealthSummaryViewData {
     let viewData: DeviceHealthSummaryViewData = new DeviceHealthSummaryViewData();
     viewData.cpu = data?.cpu;
     viewData.memory = data?.memory;
@@ -19,7 +20,7 @@ export class CdhVerifyAndAuditStepService {
     return viewData;
   }
 
-  convertToDeviceHealthMetricWidgetViewData(data: any): DeviceHealthMetricWidgetViewData {
+  convertToDeviceHealthMetricWidgetViewData(data: MetricsType[]): DeviceHealthMetricWidgetViewData {
     let viewData: DeviceHealthMetricWidgetViewData = new DeviceHealthMetricWidgetViewData();
     data.forEach(d => {
       d.metrics_data.forEach(md => {
@@ -29,7 +30,7 @@ export class CdhVerifyAndAuditStepService {
     return viewData;
   }
 
-  convertToMetricChartData(data: any, metricType: string): UnityChartDetails {
+  convertToMetricChartData(data: MetricsDataType, metricType: string): UnityChartDetails {
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.LINE;
     view.options = this.chartConfigSvc.getDefaultLineChartOptions();

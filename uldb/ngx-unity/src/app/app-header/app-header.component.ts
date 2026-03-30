@@ -1,14 +1,8 @@
-import { Component, ElementRef, Input, OnInit, OnDestroy, Inject, Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { Component, ElementRef, Inject, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
-import { Replace } from 'src/app/shared/replace';
 import { Router } from '@angular/router';
-
-export interface NavbarBrandConfig {
-  src?: string;
-  alt?: string;
-  [attr: string]: any;
-}
+import { Replace } from 'src/app/shared/replace';
 
 @Component({
   selector: 'app-header',
@@ -16,8 +10,7 @@ export interface NavbarBrandConfig {
   styleUrls: ['./app-header.component.scss']
 })
 export class AppHeaderComponent implements OnInit, OnDestroy {
-
-  @Input() fixed = false;
+  @Input() fixed = false;;
 
   @Input() navbarBrand: NavbarBrandConfig;
   @Input() navbarBrandFull: NavbarBrandConfig;
@@ -39,7 +32,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private router: Router,
     private el: ElementRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     Replace(this.el);
@@ -60,4 +53,10 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
       this.renderer.addClass(this.document.body, this.fixedClass);
     }
   }
+}
+
+export interface NavbarBrandConfig {
+  src?: string;
+  alt?: string;
+  [attr: string]: any;
 }

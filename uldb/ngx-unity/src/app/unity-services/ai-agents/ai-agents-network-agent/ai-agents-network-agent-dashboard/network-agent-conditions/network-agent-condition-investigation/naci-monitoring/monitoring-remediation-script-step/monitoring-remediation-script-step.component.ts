@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { MonitoringRemediationScriptStepService, RemediationScriptViewData } from './monitoring-remediation-script-step.service';
 import { NaciMonitoringService } from '../naci-monitoring.service';
 import { takeUntil } from 'rxjs/operators';
+import { NetworkAgentsChatResponseType, RemediationScriptDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'monitoring-remediation-script-step',
@@ -14,7 +15,7 @@ export class MonitoringRemediationScriptStepComponent implements OnInit, OnChang
 
   private ngUnsubscribe = new Subject();
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
 
   isRemediationFixOpen: boolean = false;
   remediationScriptViewData: RemediationScriptViewData;
@@ -36,7 +37,7 @@ export class MonitoringRemediationScriptStepComponent implements OnInit, OnChang
       return;
     }
     this.toggleRemediationFix();
-    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer);
+    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer?.data as RemediationScriptDataType);
   }
 
   toggleRemediationFix() {

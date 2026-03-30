@@ -3,6 +3,8 @@ import { CentralizedLogsViewData, ClsVerifyAndAuditStepService } from './cls-ver
 import { NaciCentralizedLogsStepsService } from '../naci-centralized-logs-steps.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { CentralizedLogsDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
+import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
 
 @Component({
   selector: 'cls-verify-and-audit-step',
@@ -13,11 +15,12 @@ import { takeUntil } from 'rxjs/operators';
 export class ClsVerifyAndAuditStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
   isVerifyAndAuditOpen: boolean = false;
   centralizedLogsViewData: CentralizedLogsViewData;
 
   constructor(private svc: ClsVerifyAndAuditStepService,
+    private cliSvc: NaciCliCheckStepsService,
     private clSvc: NaciCentralizedLogsStepsService) {
     this.clSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
       setTimeout(() => {
@@ -38,10 +41,13 @@ export class ClsVerifyAndAuditStepComponent implements OnInit, OnChanges {
   }
 
   verifyAudit() {
-    this.centralizedLogsViewData = this.svc.convertToCentralizedLogsViewData(this.chatResponse?.answer?.data);
+    this.centralizedLogsViewData = this.svc.convertToCentralizedLogsViewData(this.chatResponse?.answer?.data as CentralizedLogsDataType);
   }
 
   toggleVerifyAndAuditAccordion() {
+    if (!this.isVerifyAndAuditOpen) {
+      this.cliSvc.toggle('');
+    }
     this.clSvc.toggle('verfiyAndAudit');
   }
 

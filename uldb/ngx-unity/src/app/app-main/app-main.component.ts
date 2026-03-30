@@ -1,15 +1,15 @@
-import { Component, OnDestroy, Inject, OnInit } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { environment } from 'src/environments/environment';
-import { ReportAnIssueService } from '../app-breadcrumb/report-an-issue/report-an-issue.service';
-import { UserInfoService } from '../shared/user-info.service';
-import { AppLevelService } from '../app-level.service';
-import { FloatingTerminalService } from '../shared/floating-terminal/floating-terminal.service';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { ReportAnIssueService } from '../app-breadcrumb/report-an-issue/report-an-issue.service';
+import { AppLevelService } from '../app-level.service';
 import { MapService } from '../map.service';
-import { AppMainService, ChatbotDataType } from './app-main.service';
 import { AppSearchService } from '../shared/app-search/app-search.service';
+import { FloatingTerminalService } from '../shared/floating-terminal/floating-terminal.service';
+import { UserInfoService } from '../shared/user-info.service';
+import { AppMainService, ChatbotDataType } from './app-main.service';
 import { GET_UNITY_NAV_DATA, UnityNavData } from './unity-nav';
 
 @Component({
@@ -19,7 +19,6 @@ import { GET_UNITY_NAV_DATA, UnityNavData } from './unity-nav';
 })
 export class AppMainComponent implements OnInit, OnDestroy {
   private readonly ngUnsubscribe = new Subject<void>();
-
   assetsUrl: string = environment.assetsUrl;
   unityLogo: string = this.assetsUrl + 'brand/Unityone-AI.png';
   public navItems: UnityNavData[] = [];
@@ -31,18 +30,16 @@ export class AppMainComponent implements OnInit, OnDestroy {
   contentHeight = '0px';
   chatbotData: ChatbotDataType;
 
-  constructor(
-    private reportService: ReportAnIssueService,
+  constructor(private reportService: ReportAnIssueService,
     private searchService: AppSearchService,
     public user: UserInfoService,
     public appService: AppLevelService,
     public mapService: MapService,
     private terminalService: FloatingTerminalService,
     private mainService: AppMainService,
-    @Inject(DOCUMENT) private readonly document: Document
-  ) {}
+    @Inject(DOCUMENT) private readonly document: Document) { }
 
-  ngOnInit(): void {
+  ngOnInit() {
     // Nav items and custom tenant logo
     this.navItems = GET_UNITY_NAV_DATA(this.appService, this.user);
     if (this.user.logo) {

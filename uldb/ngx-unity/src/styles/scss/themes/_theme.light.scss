@@ -7,113 +7,113 @@
 :root,
 body.theme-light {
 
-  // ── Page & Layout backgrounds ───────────────────────────
-  --unity-bg-body:           #f4f3ef;
-  --unity-bg-surface:        #ffffff;
-  --unity-bg-surface-raised: #f8f9fa;
-  --unity-bg-sidebar:        #576071;
-  --unity-bg-sidebar-active: #4a5260;
-  --unity-bg-header:         #ffffff;
-  --unity-bg-overlay:        rgba(0, 0, 0, 0.5);
+    // ── Page & Layout backgrounds ───────────────────────────
+    --unity-bg-body: #f4f3ef;
+    --unity-bg-surface: #ffffff;
+    --unity-bg-surface-raised: #f8f9fa;
+    --unity-bg-sidebar: #576071;
+    --unity-bg-sidebar-active: #4a5260;
+    --unity-bg-header: #ffffff;
+    --unity-bg-overlay: rgba(0, 0, 0, 0.5);
 
-  // ── Text ────────────────────────────────────────────────
-  --unity-text-primary:      #23282c;
-  --unity-text-secondary:    #73818f;
-  --unity-text-disabled:     #b8b8b8;
-  --unity-text-inverse:      #ffffff;
-  --unity-text-link:         #378ad8;
-  --unity-text-link-hover:   #0b69c2;
-  --unity-text-on-primary:   #ffffff;
+    // ── Text ────────────────────────────────────────────────
+    --unity-text-primary: #23282c;
+    --unity-text-secondary: #73818f;
+    --unity-text-disabled: #b8b8b8;
+    --unity-text-inverse: #ffffff;
+    --unity-text-link: #378ad8;
+    --unity-text-link-hover: #0b69c2;
+    --unity-text-on-primary: #ffffff;
 
-  // ── Brand / semantic ────────────────────────────────────
-  --unity-color-primary:       #378ad8;
-  --unity-color-primary-hover: #0b69c2;
-  --unity-color-primary-light: #d8ecff;
-  --unity-color-success:       #0cbb70;
-  --unity-color-success-light: #cef1e2;
-  --unity-color-warning:       #ff8800;
-  --unity-color-warning-light: #fff4de;
-  --unity-color-danger:        #cc0000;
-  --unity-color-danger-light:  #ffe9e9;
-  --unity-color-info:          #63c2de;
+    // ── Brand / semantic ────────────────────────────────────
+    --unity-color-primary: #378ad8;
+    --unity-color-primary-hover: #0b69c2;
+    --unity-color-primary-light: #d8ecff;
+    --unity-color-success: #0cbb70;
+    --unity-color-success-light: #cef1e2;
+    --unity-color-warning: #ff8800;
+    --unity-color-warning-light: #fff4de;
+    --unity-color-danger: #cc0000;
+    --unity-color-danger-light: #ffe9e9;
+    --unity-color-info: #63c2de;
 
-  // ── Borders & Dividers ───────────────────────────────────
-  --unity-border-color:        #c8ced3;
-  --unity-border-color-strong: #73818f;
-  --unity-border-focus:        #378ad8;
-  --unity-border-disabled:     #ddd;
-  --unity-divider-color:       #e0e0e0;
+    // ── Borders & Dividers ───────────────────────────────────
+    --unity-border-color: #c8ced3;
+    --unity-border-color-strong: #73818f;
+    --unity-border-focus: #378ad8;
+    --unity-border-disabled: #ddd;
+    --unity-divider-color: #e0e0e0;
 
-  // ── Interactive states ───────────────────────────────────
-  --unity-hover-bg:      #f0f3f5;
-  --unity-active-bg:     #d8ecff;
-  --unity-disabled-bg:   #f5f5f5;
-  --unity-focus-ring:    rgba(55, 138, 216, 0.25);
+    // ── Interactive states ───────────────────────────────────
+    --unity-hover-bg: #f0f3f5;
+    --unity-active-bg: #d8ecff;
+    --unity-disabled-bg: #f5f5f5;
+    --unity-focus-ring: rgba(55, 138, 216, 0.25);
 
-  // ── Form elements ────────────────────────────────────────
-  --unity-input-bg:               #ffffff;
-  --unity-input-border:           #c8ced3;
-  --unity-input-border-focus:     #378ad8;
-  --unity-input-border-invalid:   #cc0000;
-  --unity-input-text:             #23282c;
-  --unity-input-placeholder:      #73818f;
-  --unity-input-disabled-bg:      #f5f5f5;
-  --unity-input-disabled-text:    #b8b8b8;
+    // ── Form elements ────────────────────────────────────────
+    --unity-input-bg: #ffffff;
+    --unity-input-border: #c8ced3;
+    --unity-input-border-focus: #378ad8;
+    --unity-input-border-invalid: #cc0000;
+    --unity-input-text: #23282c;
+    --unity-input-placeholder: #73818f;
+    --unity-input-disabled-bg: #f5f5f5;
+    --unity-input-disabled-text: #b8b8b8;
 
-  // ── Cards ────────────────────────────────────────────────
-  --unity-card-bg:             #ffffff;
-  --unity-card-border:         rgba(0, 0, 0, 0.125);
-  --unity-card-header-bg:      transparent;
-  --unity-card-shadow:         0 1px 3px rgba(0, 0, 0, 0.08);
+    // ── Cards ────────────────────────────────────────────────
+    --unity-card-bg: #ffffff;
+    --unity-card-border: rgba(0, 0, 0, 0.125);
+    --unity-card-header-bg: transparent;
+    --unity-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
-  // ── Tables ───────────────────────────────────────────────
-  --unity-table-header-bg:     #f0f3f5;
-  --unity-table-header-text:   #23282c;
-  --unity-table-row-bg:        #ffffff;
-  --unity-table-row-alt-bg:    #f8f9fa;
-  --unity-table-row-hover-bg:  #e8f4ff;
-  --unity-table-border:        #dee2e6;
+    // ── Tables ───────────────────────────────────────────────
+    --unity-table-header-bg: #f0f3f5;
+    --unity-table-header-text: #23282c;
+    --unity-table-row-bg: #ffffff;
+    --unity-table-row-alt-bg: #f8f9fa;
+    --unity-table-row-hover-bg: #e8f4ff;
+    --unity-table-border: #dee2e6;
 
-  // ── Navigation / Sidebar ─────────────────────────────────
-  --unity-nav-link-color:       rgba(255, 255, 255, 0.7);
-  --unity-nav-link-hover-color: #ffffff;
-  --unity-nav-link-active-bg:   rgba(255, 255, 255, 0.1);
+    // ── Navigation / Sidebar ─────────────────────────────────
+    --unity-nav-link-color: rgba(255, 255, 255, 0.7);
+    --unity-nav-link-hover-color: #ffffff;
+    --unity-nav-link-active-bg: rgba(255, 255, 255, 0.1);
 
-  // ── Modals ───────────────────────────────────────────────
-  --unity-modal-bg:             #ffffff;
-  --unity-modal-header-border:  #dee2e6;
-  --unity-modal-footer-border:  #dee2e6;
-  --unity-modal-shadow:         0 4px 24px rgba(0, 0, 0, 0.18);
+    // ── Modals ───────────────────────────────────────────────
+    --unity-modal-bg: #ffffff;
+    --unity-modal-header-border: #dee2e6;
+    --unity-modal-footer-border: #dee2e6;
+    --unity-modal-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
 
-  // ── Dropdowns ────────────────────────────────────────────
-  --unity-dropdown-bg:          #ffffff;
-  --unity-dropdown-border:      rgba(0, 0, 0, 0.15);
-  --unity-dropdown-item-hover:  #f0f3f5;
-  --unity-dropdown-item-active: #d8ecff;
-  --unity-dropdown-text:        #23282c;
+    // ── Dropdowns ────────────────────────────────────────────
+    --unity-dropdown-bg: #ffffff;
+    --unity-dropdown-border: rgba(0, 0, 0, 0.15);
+    --unity-dropdown-item-hover: #f0f3f5;
+    --unity-dropdown-item-active: #d8ecff;
+    --unity-dropdown-text: #23282c;
 
-  // ── Badges & Tags ────────────────────────────────────────
-  --unity-badge-bg:             #e0e0e0;
-  --unity-badge-text:           #23282c;
+    // ── Badges & Tags ────────────────────────────────────────
+    --unity-badge-bg: #e0e0e0;
+    --unity-badge-text: #23282c;
 
-  // ── Tooltips ─────────────────────────────────────────────
-  --unity-tooltip-bg:           #23282c;
-  --unity-tooltip-text:         #ffffff;
+    // ── Tooltips ─────────────────────────────────────────────
+    --unity-tooltip-bg: #23282c;
+    --unity-tooltip-text: #ffffff;
 
-  // ── Charts ───────────────────────────────────────────────
-  --unity-chart-grid-color:     rgba(0, 0, 0, 0.08);
-  --unity-chart-axis-text:      #73818f;
-  --unity-chart-tooltip-bg:     #ffffff;
-  --unity-chart-tooltip-text:   #23282c;
-  --unity-chart-tooltip-border: #c8ced3;
+    // ── Charts ───────────────────────────────────────────────
+    --unity-chart-grid-color: rgba(0, 0, 0, 0.08);
+    --unity-chart-axis-text: #73818f;
+    --unity-chart-tooltip-bg: #ffffff;
+    --unity-chart-tooltip-text: #23282c;
+    --unity-chart-tooltip-border: #c8ced3;
 
-  // ── Scrollbar ────────────────────────────────────────────
-  --unity-scrollbar-thumb:      #c8ced3;
-  --unity-scrollbar-track:      #f4f3ef;
+    // ── Scrollbar ────────────────────────────────────────────
+    --unity-scrollbar-thumb: #c8ced3;
+    --unity-scrollbar-track: #f4f3ef;
 
-  // ── Misc ─────────────────────────────────────────────────
-  --unity-code-bg:              #f4f3ef;
-  --unity-code-text:            #cc0000;
-  --unity-skeleton-bg:          #e0e0e0;
-  --unity-spinner-color:        #378ad8;
+    // ── Misc ─────────────────────────────────────────────────
+    --unity-code-bg: #f4f3ef;
+    --unity-code-text: #cc0000;
+    --unity-skeleton-bg: #e0e0e0;
+    --unity-spinner-color: #378ad8;
 }

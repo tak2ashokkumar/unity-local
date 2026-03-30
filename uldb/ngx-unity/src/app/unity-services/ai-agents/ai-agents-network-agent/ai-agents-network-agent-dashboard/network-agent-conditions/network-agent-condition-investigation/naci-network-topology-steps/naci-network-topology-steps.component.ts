@@ -1,11 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NaciNetworkTopologyStepsService } from './naci-network-topology-steps.service';
 
 @Component({
   selector: 'naci-network-topology-steps',
   templateUrl: './naci-network-topology-steps.component.html',
   styleUrls: ['./naci-network-topology-steps.component.scss'],
-  providers: [NaciNetworkTopologyStepsService]
 })
 export class NaciNetworkTopologyStepsComponent implements OnInit {
   @Input() chatResponse: any;

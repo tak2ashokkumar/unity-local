@@ -3,6 +3,7 @@ import { CcsVerifyAndAuditStepService } from './ccs-verify-and-audit-step.servic
 import { NaciCliCheckStepsService } from '../naci-cli-check-steps.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'ccs-verify-and-audit-step',
@@ -13,15 +14,15 @@ import { Subject } from 'rxjs';
 export class CcsVerifyAndAuditStepComponent implements OnInit, OnChanges {
 
   private ngUnsubscribe = new Subject();
-  @Input() chatResponse!: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
   isVerifyAndAuditOpen: boolean = false;
   verifyAuditViewData: any;
 
   constructor(private svc: CcsVerifyAndAuditStepService,
     private cliSvc: NaciCliCheckStepsService) {
-    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((stepName) => {
       setTimeout(() => {
-        this.isVerifyAndAuditOpen = StepName == 'verfiyAndAudit' ? !this.isVerifyAndAuditOpen : false;
+        this.isVerifyAndAuditOpen = stepName == 'verfiyAndAudit' ? !this.isVerifyAndAuditOpen : false;
       }, 0);
     })
   }

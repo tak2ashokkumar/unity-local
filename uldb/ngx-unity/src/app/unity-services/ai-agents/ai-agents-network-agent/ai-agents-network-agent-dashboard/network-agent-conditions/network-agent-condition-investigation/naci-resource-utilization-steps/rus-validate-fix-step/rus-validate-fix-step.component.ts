@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RusValidateFixStepService } from './rus-validate-fix-step.service';
+import { RusValidateFixStepService, ValidateFixViewData } from './rus-validate-fix-step.service';
 import { NaciResourceUtilizationStepsService } from '../naci-resource-utilization-steps.service';
+import { NetworkAgentsChatResponseType, ValidateFixDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'rus-validate-fix-step',
@@ -14,8 +15,8 @@ export class RusValidateFixStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
   isValidateFixOpen: boolean = false;
-  @Input() chatResponse: any;
-  validateFixViewData: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
+  validateFixViewData: ValidateFixViewData;
 
   constructor(private svc: RusValidateFixStepService,
     private ruSvc: NaciResourceUtilizationStepsService) {
@@ -34,7 +35,7 @@ export class RusValidateFixStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleValidateFix();
-    this.validateFixViewData = this.svc.convertToValidateFixViewData(this.chatResponse?.answer);
+    this.validateFixViewData = this.svc.convertToValidateFixViewData(this.chatResponse?.answer?.data as ValidateFixDataType);
   }
 
   toggleValidateFix() {

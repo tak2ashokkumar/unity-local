@@ -4,7 +4,7 @@ import { AlertCriticalColors, AlertInfoColors, AlertWarningColors, DeviceIconSer
 import { UnityViewNetworkTopology, UnityViewNetworkTopologyLink, UnityViewNetworkTopologyNode, UnityViewNetworkTopologyNodeAlertTypes } from 'src/app/shared/SharedEntityTypes/network-topology.type';
 import { UnityTopologydataService } from 'src/app/united-view/unity-topology/unity-topologydata.service';
 import { DataSet } from 'vis-data';
-import { Data, Edge, Node } from 'vis-network';
+import { Data, Edge, network, Node } from 'vis-network';
 import { clone as _clone } from 'lodash-es';
 
 @Injectable()
@@ -102,6 +102,7 @@ export class NtVerifyAndAuditStepService {
       edge.smooth = { enabled: true, type: 'cubicBezier', forceDirection: true, roundness: 0.5 };
       edge.font = { size: 12 };
       edge.color = { inherit: 'to', opacity: 0.6 };
+      edge.arrows = 'to';
       return edge;
     }
   

@@ -3,6 +3,7 @@ import { Subject } from 'rxjs';
 import { NaciCheckDeviceHealthStepsService } from '../naci-check-device-health-steps.service';
 import { CdhRemediationScriptStepService, RemediationScriptViewData } from './cdh-remediation-script-step.service';
 import { takeUntil } from 'rxjs/operators';
+import { NetworkAgentsChatResponseType, RemediationScriptDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'cdh-remediation-script-step',
@@ -13,7 +14,7 @@ import { takeUntil } from 'rxjs/operators';
 export class CdhRemediationScriptStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input() chatResponse: any;
+  @Input() chatResponse: NetworkAgentsChatResponseType;
 
   isRemediationFixOpen: boolean = false;
   remediationScriptViewData: RemediationScriptViewData;
@@ -35,7 +36,7 @@ export class CdhRemediationScriptStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleRemediationFix();
-    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer);
+    this.remediationScriptViewData = this.svc.convertToRemediationScriptViewData(this.chatResponse?.answer?.data as RemediationScriptDataType);
   }
 
   toggleRemediationFix() {

@@ -1,8 +1,9 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Subject } from 'rxjs';
-import { AnalysisLogos, RusRootCauseAnalysisStepService } from './rus-root-cause-analysis-step.service';
+import { AnalysisLogos, NetworkAgentRCAViewData, RusRootCauseAnalysisStepService } from './rus-root-cause-analysis-step.service';
 import { NaciResourceUtilizationStepsService } from '../naci-resource-utilization-steps.service';
 import { takeUntil } from 'rxjs/operators';
+import { NetworkAgentsChatResponseType, RcaDataType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'rus-root-cause-analysis-step',
@@ -13,10 +14,9 @@ import { takeUntil } from 'rxjs/operators';
 export class RusRootCauseAnalysisStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
-  @Input('chatResponse') chatResponse: any;
-
+  @Input('chatResponse') chatResponse: NetworkAgentsChatResponseType;
   isRCAOpen: boolean = false;
-  rcaViewData: any;
+  rcaViewData: NetworkAgentRCAViewData;
   analysisLogos = AnalysisLogos;
 
   constructor(private svc: RusRootCauseAnalysisStepService,
@@ -36,7 +36,7 @@ export class RusRootCauseAnalysisStepComponent implements OnInit, OnChanges {
       return;
     }
     this.toggleRCAAccordion();
-    this.rcaViewData = this.svc.convertToRCAViewData(this.chatResponse?.answer);
+    this.rcaViewData = this.svc.convertToRCAViewData(this.chatResponse?.answer?.data as RcaDataType);
   }
 
   toggleRCAAccordion() {
