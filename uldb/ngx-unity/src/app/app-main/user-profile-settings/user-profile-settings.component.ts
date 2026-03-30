@@ -15,7 +15,6 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { TabData } from 'src/app/shared/tabdata';
-import { UnityThemeService } from 'src/app/shared/unity-theme.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { LlmConfigViewData, providerImages, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
 import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
@@ -117,8 +116,7 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     private notification: AppNotificationService,
     private spinner: AppSpinnerService,
     private router: Router,
-    private route: ActivatedRoute,
-    public themeSvc: UnityThemeService) {
+    private route: ActivatedRoute) {
     this.aimlPermissionSet = new UnityPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
     this.monitoringPermissionSet = new UnityPermissionSet(UnityModules.MONITORING);
   }

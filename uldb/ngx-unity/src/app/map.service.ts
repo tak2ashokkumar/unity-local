@@ -111,7 +111,8 @@ export class MapService {
     img.src = this.icons[loc.locationStatus];
     img.style.width = '32px';
     img.style.height = '32px';
-    img.style.transform = 'translate(-50%, -50%)';
+    // No transform needed — AdvancedMarkerElement anchors at bottom-center
+    // of the element, which is exactly where the pin tip should be.
     return img;
   }
 }

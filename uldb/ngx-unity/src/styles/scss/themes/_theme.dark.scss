@@ -1,118 +1,134 @@
 // ============================================================
-//  UNITY — DARK THEME TOKENS
-//  Overrides applied when body carries class  .theme-dark
-//  Only tokens that differ from the light theme are listed.
+//  UNITY — DARK THEME TOKENS  (Google Stitch palette)
+//  Source palette: stitch.withgoogle.com  ".editor_dark"
+//
+//  Stitch dark-mode background scale:
+//    Top-layer / deepest  →  #151315  (colors-primary-900)
+//    Page body            →  #191a1f  (colors-primary-850)
+//    Cards / panels       →  #23272f  (colors-primary-700)
+//    Wash / hover strip   →  #373840  (colors-primary-600)
+//    Inputs / inset       →  #2a2a2a  (colors-neutral-775)
+//    Pressed / active     →  #404040  (colors-neutral-600)
+//
+//  Accent palette pulled from Stitch:
+//    Blue-500  #5e9bff   Blue-300  #bdd6ff
+//    Emerald   #0bd972   Red       #f84563
+//    Orange    #ff8e59   Violet    #9c75ff
 // ============================================================
 
 body.theme-dark {
 
     // ── Page & Layout backgrounds ───────────────────────────
-    --unity-bg-body: #13151a;
-    --unity-bg-surface: #1e2030;
-    --unity-bg-surface-raised: #252840;
-    --unity-bg-sidebar: #0f1117;
-    --unity-bg-sidebar-active: #1a1d2e;
-    --unity-bg-header: #1a1d2e;
-    --unity-bg-overlay: rgba(0, 0, 0, 0.7);
+    --unity-bg-body:            #191a1f;   // colors-primary-850
+    --unity-bg-surface:         #23272f;   // colors-primary-700  — cards, panels
+    --unity-bg-surface-raised:  #373840;   // colors-primary-600  — raised elements, table headers
+    --unity-bg-sidebar:         #151315;   // colors-primary-900  — deepest level
+    --unity-bg-sidebar-active:  #23272f;   // colors-primary-700
+    --unity-bg-header:          #23272f;   // colors-primary-700  — header bar
+    --unity-bg-overlay:         rgba(0, 0, 0, 0.72);
 
     // ── Text ────────────────────────────────────────────────
-    --unity-text-primary: #e8eaf0;
-    --unity-text-secondary: #9aa0b0;
-    --unity-text-disabled: #4a5060;
-    --unity-text-inverse: #13151a;
-    --unity-text-link: #62a7e9;
-    --unity-text-link-hover: #86c3fc;
-    --unity-text-on-primary: #ffffff;
+    --unity-text-primary:       #fafafa;   // colors-neutral-50   — near-white, high contrast
+    --unity-text-secondary:     #cfcfcf;   // colors-neutral-150  — secondary labels
+    --unity-text-disabled:      #6f6f6f;   // colors-neutral-500
+    --unity-text-inverse:       #191919;   // colors-neutral-900
+    --unity-text-link:          #5e9bff;   // colors-blue-500
+    --unity-text-link-hover:    #bdd6ff;   // colors-blue-300
+    --unity-text-on-primary:    #ffffff;
 
     // ── Brand / semantic ────────────────────────────────────
-    --unity-color-primary: #62a7e9;
-    --unity-color-primary-hover: #86c3fc;
-    --unity-color-primary-light: #1a3a5c;
-    --unity-color-success: #3dd68c;
-    --unity-color-success-light: #0a3322;
-    --unity-color-warning: #ffad33;
-    --unity-color-warning-light: #3d2800;
-    --unity-color-danger: #ff6b6b;
-    --unity-color-danger-light: #3d0000;
-    --unity-color-info: #85d5ef;
+    --unity-color-primary:       #5e9bff;  // colors-blue-500
+    --unity-color-primary-hover: #bdd6ff;  // colors-blue-300
+    --unity-color-primary-light: #1c2236;  // muted blue tint for bg use
+    --unity-color-success:       #0bd972;  // colors-emerald-300  — vivid green
+    --unity-color-success-light: #1c221f;  // colors-emerald-950
+    --unity-color-warning:       #ff8e59;  // colors-orange-500
+    --unity-color-warning-light: #2a1a10;  // dark orange tint
+    --unity-color-danger:        #f84563;  // colors-red-400
+    --unity-color-danger-light:  #25101a;  // dark red tint
+    --unity-color-info:          #9c75ff;  // colors-violet-400
 
     // ── Borders & Dividers ───────────────────────────────────
-    --unity-border-color: #2e3347;
-    --unity-border-color-strong: #4a5270;
-    --unity-border-focus: #62a7e9;
-    --unity-border-disabled: #2a2e3d;
-    --unity-divider-color: #252840;
+    --unity-border-color:        #373840;  // colors-primary-600  — default separator
+    --unity-border-color-strong: #6f6f6f;  // colors-neutral-500  — emphatic border
+    --unity-border-focus:        #5e9bff;  // colors-blue-500
+    --unity-border-disabled:     #2a2a2a;  // colors-neutral-775
+    --unity-divider-color:       #2a2a2a;  // colors-neutral-775
 
     // ── Interactive states ───────────────────────────────────
-    --unity-hover-bg: #252840;
-    --unity-active-bg: #1a3a5c;
-    --unity-disabled-bg: #1e2030;
-    --unity-focus-ring: rgba(98, 167, 233, 0.3);
+    --unity-hover-bg:   #373840;           // colors-primary-600  — state-hover
+    --unity-active-bg:  #2a2730;           // colors-violet-900   — subtle violet tint on active
+    --unity-disabled-bg:#23272f;           // colors-primary-700
+    --unity-focus-ring: rgba(94, 155, 255, 0.25);  // blue-500 @ 25%
 
     // ── Form elements ────────────────────────────────────────
-    --unity-input-bg: #252840;
-    --unity-input-border: #2e3347;
-    --unity-input-border-focus: #62a7e9;
-    --unity-input-border-invalid: #ff6b6b;
-    --unity-input-text: #e8eaf0;
-    --unity-input-placeholder: #6b7280;
-    --unity-input-disabled-bg: #1e2030;
-    --unity-input-disabled-text: #4a5060;
+    --unity-input-bg:            #2a2a2a;  // colors-neutral-775  — inset surface
+    --unity-input-border:        #373840;  // colors-primary-600
+    --unity-input-border-focus:  #5e9bff;  // colors-blue-500
+    --unity-input-border-invalid:#f84563;  // colors-red-400
+    --unity-input-text:          #fafafa;  // colors-neutral-50
+    --unity-input-placeholder:   #6f6f6f;  // colors-neutral-500
+    --unity-input-disabled-bg:   #23272f;  // colors-primary-700
+    --unity-input-disabled-text: #6f6f6f;  // colors-neutral-500
 
     // ── Cards ────────────────────────────────────────────────
-    --unity-card-bg: #1e2030;
-    --unity-card-border: #2e3347;
-    --unity-card-header-bg: transparent;
-    --unity-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+    //  Stitch cards sit on body (#191a1f), surface is #23272f.
+    //  A hairline inner highlight + deep shadow gives depth.
+    --unity-card-bg:         #23272f;
+    --unity-card-border:     #373840;
+    --unity-card-header-bg:  transparent;
+    --unity-card-shadow:     0 1px 3px rgba(0,0,0,0.45),
+                             0 4px 16px rgba(0,0,0,0.28);
 
     // ── Tables ───────────────────────────────────────────────
-    --unity-table-header-bg: #1a1d2e;
-    --unity-table-header-text: #e8eaf0;
-    --unity-table-row-bg: #1e2030;
-    --unity-table-row-alt-bg: #22263a;
-    --unity-table-row-hover-bg: #1a3a5c;
-    --unity-table-border: #2e3347;
+    --unity-table-header-bg:    #151315;   // deepest — creates contrast with rows
+    --unity-table-header-text:  #fafafa;
+    --unity-table-row-bg:       #23272f;
+    --unity-table-row-alt-bg:   #2a2a2a;  // slight zebra stripe
+    --unity-table-row-hover-bg: #373840;  // wash hover
+    --unity-table-border:       #373840;
 
     // ── Navigation / Sidebar ─────────────────────────────────
-    --unity-nav-link-color: rgba(232, 234, 240, 0.65);
-    --unity-nav-link-hover-color: #e8eaf0;
-    --unity-nav-link-active-bg: rgba(98, 167, 233, 0.15);
+    --unity-nav-link-color:       rgba(207, 207, 207, 0.65);  // neutral-150 @ 65%
+    --unity-nav-link-hover-color: #fafafa;
+    --unity-nav-link-active-bg:   rgba(94, 155, 255, 0.12);   // blue tint
 
     // ── Modals ───────────────────────────────────────────────
-    --unity-modal-bg: #1e2030;
-    --unity-modal-header-border: #2e3347;
-    --unity-modal-footer-border: #2e3347;
-    --unity-modal-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+    --unity-modal-bg:            #23272f;
+    --unity-modal-header-border: #373840;
+    --unity-modal-footer-border: #373840;
+    --unity-modal-shadow:        0 4px 24px rgba(0,0,0,0.60),
+                                 0 0 0 1px rgba(255,255,255,0.05);
 
     // ── Dropdowns ────────────────────────────────────────────
-    --unity-dropdown-bg: #1e2030;
-    --unity-dropdown-border: #2e3347;
-    --unity-dropdown-item-hover: #252840;
-    --unity-dropdown-item-active: #1a3a5c;
-    --unity-dropdown-text: #e8eaf0;
+    --unity-dropdown-bg:          #23272f;
+    --unity-dropdown-border:      #373840;
+    --unity-dropdown-item-hover:  #373840;
+    --unity-dropdown-item-active: #2a2730;
+    --unity-dropdown-text:        #fafafa;
 
     // ── Badges & Tags ────────────────────────────────────────
-    --unity-badge-bg: #252840;
-    --unity-badge-text: #e8eaf0;
+    --unity-badge-bg:    #373840;
+    --unity-badge-text:  #fafafa;
 
     // ── Tooltips ─────────────────────────────────────────────
-    --unity-tooltip-bg: #252840;
-    --unity-tooltip-text: #e8eaf0;
+    --unity-tooltip-bg:   #373840;
+    --unity-tooltip-text: #fafafa;
 
     // ── Charts ───────────────────────────────────────────────
-    --unity-chart-grid-color: rgba(255, 255, 255, 0.08);
-    --unity-chart-axis-text: #9aa0b0;
-    --unity-chart-tooltip-bg: #252840;
-    --unity-chart-tooltip-text: #e8eaf0;
-    --unity-chart-tooltip-border: #2e3347;
+    --unity-chart-grid-color:    rgba(255, 255, 255, 0.07);
+    --unity-chart-axis-text:     #cfcfcf;  // neutral-150
+    --unity-chart-tooltip-bg:    #373840;
+    --unity-chart-tooltip-text:  #fafafa;
+    --unity-chart-tooltip-border:#6f6f6f;
 
     // ── Scrollbar ────────────────────────────────────────────
-    --unity-scrollbar-thumb: #2e3347;
-    --unity-scrollbar-track: #13151a;
+    --unity-scrollbar-thumb: #373840;  // wash — visible but subtle
+    --unity-scrollbar-track: #191a1f;  // body
 
     // ── Misc ─────────────────────────────────────────────────
-    --unity-code-bg: #252840;
-    --unity-code-text: #ff6b6b;
-    --unity-skeleton-bg: #252840;
-    --unity-spinner-color: #62a7e9;
+    --unity-code-bg:       #2a2a2a;   // input surface
+    --unity-code-text:     #f84563;   // red accent
+    --unity-skeleton-bg:   #373840;   // wash
+    --unity-spinner-color: #5e9bff;   // blue-500
 }

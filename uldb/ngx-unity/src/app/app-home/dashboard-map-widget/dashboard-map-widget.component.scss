@@ -1,6 +1,45 @@
 .map-container {
   height: 500px;
 }
-:host::ng-deep .gm-ui-hover-effect {
-  display: none !important;
+
+:host::ng-deep {
+  // Hide Google's close button AND the chrome row that wraps it
+  .gm-ui-hover-effect,
+  .gm-style-iw-chr {
+    display: none !important;
+  }
+
+  // ── Info window frame — reset dark-theme bleed ───────────────────────────
+  // Only override the frame shell colours; the actual content is self-styled
+  // inline in createInfoWindowContent() so no colour rules needed there.
+
+  .gm-style .gm-style-iw-c {
+    background-color: #ffffff !important;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18) !important;
+    border-radius: 8px !important;
+    padding: 0 !important;       // content carries its own padding
+    max-height: none !important; // let content dictate height
+  }
+
+  // Scrollable inner wrapper — collapse Google's min-height so no extra space
+  .gm-style .gm-style-iw-d {
+    background-color: transparent !important;
+    overflow: hidden !important; // no scroll needed; prevents extra scroll space
+    max-height: none !important;
+  }
+
+  // Tail arrow
+  .gm-style .gm-style-iw-tc::after {
+    background: #ffffff !important;
+  }
+
+  // ── Undo dark-theme global scrollbar override inside the map ─────────────
+  .gm-style * {
+    scrollbar-color: auto !important;
+    scrollbar-width: auto !important;
+  }
+
+  .gm-style *::-webkit-scrollbar       { width: 4px !important; height: 4px !important; }
+  .gm-style *::-webkit-scrollbar-track { background: transparent !important; }
+  .gm-style *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18) !important; border-radius: 2px !important; }
 }

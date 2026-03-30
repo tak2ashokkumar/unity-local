@@ -15,7 +15,7 @@ export const environment = {
   gmId: 'da696c0425f1f845',
   DISABLE_WORLD_MAP: process.env.DISABLE_WORLD_MAP === 'false' ? false : true,
   theme: {
-    allowSwitch: false,
+    allowSwitch: true,
     defaultTheme: 'light',
     availableThemes: ['light', 'dark'] as string[],
   },
