@@ -3,7 +3,7 @@ import { Component, ElementRef, Inject, Input, OnDestroy, OnInit, Renderer2 } fr
 
 import { Router } from '@angular/router';
 import { Replace } from 'src/app/shared/replace';
-import { UnityThemeService } from 'src/app/shared/unity-theme.service';
+import { UnityThemeService } from '../shared/unity-theme.service';
 
 @Component({
   selector: 'app-header',
@@ -33,8 +33,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private router: Router,
     private el: ElementRef,
-    public themeSvc: UnityThemeService
-  ) { }
+    public themeSvc: UnityThemeService) { }
 
   ngOnInit(): void {
     Replace(this.el);

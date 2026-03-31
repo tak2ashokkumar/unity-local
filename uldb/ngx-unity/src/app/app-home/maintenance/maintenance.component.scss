@@ -3,6 +3,12 @@
 .maintenance-widget .month-row {
   font-size: 13px;
   background-color: $gray-100;
+  color: $gray-800;
+  border-radius: 4px;
+
+  a {
+    color: $gray-700;
+  }
 }
 
 .maintenance-widget .month-name {

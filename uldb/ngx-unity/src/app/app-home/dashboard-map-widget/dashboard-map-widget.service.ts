@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { switchMap, take } from 'rxjs/operators';
@@ -40,10 +40,10 @@ export class DashboardMapWidgetService {
 
   private getStatusDot = (status: MapWidgetStatus): string => {
     const bg: Record<MapWidgetStatus, string> = {
-      [MapWidgetStatus.UP]:           '#1aad52',
+      [MapWidgetStatus.UP]: '#1aad52',
       [MapWidgetStatus.PARTIALLY_UP]: '#f59e0b',
-      [MapWidgetStatus.DOWN]:         '#ef4444',
-      [MapWidgetStatus.NA]:           '#9ca3af',
+      [MapWidgetStatus.DOWN]: '#ef4444',
+      [MapWidgetStatus.NA]: '#9ca3af',
     };
     const color = bg[status] ?? bg[MapWidgetStatus.NA];
     return `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;background:${color};"></span>`;
@@ -79,6 +79,6 @@ export class WorldMapWidgetViewdata {
   locationStatus: string;
 }
 
-export class WorldMapWidgetDCMap{
+export class WorldMapWidgetDCMap {
   [key: string]: string[];
 }
