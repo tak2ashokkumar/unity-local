@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -29,7 +29,9 @@ export class AppMainComponent implements OnInit, OnDestroy {
   mainWidth = 0;
   contentHeight = '0px';
   chatbotData: ChatbotDataType;
+  isPlayground: boolean;
 
+  public trialPopupOpen = false;
   constructor(private reportService: ReportAnIssueService,
     private searchService: AppSearchService,
     public user: UserInfoService,
@@ -69,6 +71,8 @@ export class AppMainComponent implements OnInit, OnDestroy {
     this.mainService.$assistantData
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(val => { this.chatbotData = val; });
+
+    this.isPlayground = this.isOrgPlayground();
   }
 
   ngOnDestroy(): void {
@@ -91,5 +95,18 @@ export class AppMainComponent implements OnInit, OnDestroy {
 
   stopImpersonating(): void {
     this.appService.stopImpersonating();
+  }
+
+  @HostListener('document:click')
+  closeTrialPopup(): void {
+    this.trialPopupOpen = false;
+  }
+
+  isOrgPlayground(): boolean {
+    return this.user.userDetails.org.name == 'Playground'
+  }
+
+  openFreeTrial() {
+    window.open('https://unityone.ai/free-trial/', '_blank');
   }
 }

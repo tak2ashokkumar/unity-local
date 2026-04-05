@@ -83,7 +83,7 @@ export class UnitySupportTicketMgmtComponent implements OnInit, OnDestroy {
   }
 
   getITSMTabsAndNavigate(baseUrl?: string) {
-    this.http.get<any>('/rest/unity_itsm/tables/').pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.http.get<any>('/rest/unity_itsm/tables/?is_enabled=true').pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       if (res?.results?.length) {
         this.tabData = res.results.map(r => ({
           name: r.name,

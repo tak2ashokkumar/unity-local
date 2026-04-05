@@ -104,6 +104,38 @@
   }
 }
 
+// ── Sidebar bottom bar: trial button (left) + minimiser chevron (right) ────
+// The wrapper is a flex-row placed at the bottom of the sidebar flex-column.
+// Replace() moves <button.sidebar-minimizer> into this wrapper, making the
+// two buttons natural siblings in a row.
+//
+// CoreUI sets .sidebar-minimizer { flex: 0 0 50px } for the column context.
+// In a row context that same flex-basis becomes the button's WIDTH — still 50px,
+// which equals $sidebar-minimized-width. ✓
+//
+// Minimised state: CoreUI makes .sidebar-minimizer position:fixed, so it leaves
+// the bar's flow entirely. We collapse the now-empty bar to zero height so it
+// doesn't create a blank gap below the nav items.
+.sidebar .sidebar-bottom-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex: 0 0 $sidebar-minimizer-height; // 50px height in sidebar column context
+}
+
+// Keep minimizer square (50px × 50px) in the row context
+.sidebar .sidebar-bottom-bar .sidebar-minimizer {
+  flex: 0 0 $sidebar-minimizer-height;
+  min-width: $sidebar-minimizer-height;
+  margin-left: auto; //pushes minimizer btn to the right end when org isnt playground
+}
+
+// Collapse bar when minimised — minimizer is already position:fixed at this point
+.sidebar-minimized .sidebar .sidebar-bottom-bar {
+  flex: 0 0 0;
+  overflow: hidden;
+}
+
 // ── Minimized sidebar: hover popout improvements ──────────────────────────
 .sidebar-minimized .sidebar {
 

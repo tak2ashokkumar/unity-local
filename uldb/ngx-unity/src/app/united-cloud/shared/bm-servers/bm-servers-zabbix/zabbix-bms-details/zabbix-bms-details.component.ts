@@ -114,7 +114,7 @@ export class ZabbixBmsDetailsComponent implements OnInit, OnDestroy {
 
   lifeCycleStageOptions: string[] = LifeCycleStageOptions;
   lifeCycleStageStatusOptions: string[] = LifeCycleStageStatusOptions;
-  
+
   constructor(private detailService: ZabbixBmsDetailsService,
     private route: ActivatedRoute,
     private router: Router,

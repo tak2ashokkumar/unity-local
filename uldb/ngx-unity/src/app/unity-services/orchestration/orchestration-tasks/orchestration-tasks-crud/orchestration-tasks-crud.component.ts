@@ -1077,18 +1077,20 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.form.get('script').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value: string) => {
-      console.log(value, "value")
-      // if (this.form.contains('inputs')) {
-      //   this.form.removeControl('inputs');
-      // }
-      this.formErrors['inputs'] = []; // keep clean always
+    setTimeout(() => {
+      this.form?.get('script')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value: string) => {
+        console.log(value, "value")
+        // if (this.form.contains('inputs')) {
+        //   this.form.removeControl('inputs');
+        // }
+        this.formErrors['inputs'] = []; // keep clean always
 
-      // if API says don’t show parameters → nothing should be pushed
-      if (this.showRestApiInputParameters === false) {
-        return;
-      }
-    })
+        // if API says don’t show parameters → nothing should be pushed
+        if (this.showRestApiInputParameters === false) {
+          return;
+        }
+      })
+    }, 0);
   }
 
   getConnections() {

@@ -1,0 +1,178 @@
+<!-- ── Page Title ─────────────────────────── -->
+<div class="card-header bg-white border-bottom-0 py-2">
+    <span class="font-lg font-500 text-success">AI Storage Solutions</span>
+</div>
+
+<!-- ── Summary KPIs ──────────────────────── -->
+<div class="row mx-0 mt-2">
+    <ng-container *ngTemplateOutlet="summaryKpisRef"></ng-container>
+</div>
+
+<!-- ── Storage Pool Cards ────────────────── -->
+<div class="row mx-0 mt-2">
+    <ng-container *ngTemplateOutlet="storagePoolCardsRef"></ng-container>
+</div>
+
+<!-- ── I/O Operation + Storage by Tenant ── -->
+<div class="row mx-0 mt-2">
+    <div class="col-6 pl-2 pr-0">
+        <ng-container *ngTemplateOutlet="ioOperationRef"></ng-container>
+    </div>
+    <div class="col-6 px-2">
+        <ng-container *ngTemplateOutlet="storageByTenantRef"></ng-container>
+    </div>
+</div>
+
+<!-- ── Data Growth Trend ─────────────────── -->
+<div class="row mx-0 mt-2">
+    <div class="col-12 px-2">
+        <ng-container *ngTemplateOutlet="dataGrowthTrendRef"></ng-container>
+    </div>
+</div>
+
+<!-- ── Storage Pool Inventory ────────────── -->
+<div class="row mx-0 mt-2 mb-2">
+    <div class="col-12 px-2">
+        <ng-container *ngTemplateOutlet="storagePoolInventoryRef"></ng-container>
+    </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!--           TEMPLATE DEFINITIONS              -->
+<!-- ═══════════════════════════════════════════ -->
+
+<!-- ── Summary KPIs Template ─────────────── -->
+<ng-template #summaryKpisRef>
+    <div class="col pr-0 pl-2" *ngFor="let kpi of summaryKpis; let last = last" [ngClass]="{'pr-2': last}">
+        <div class="card rounded equalize-card mb-0 shadow-none border">
+            <div class="card-body d-flex flex-column px-2 py-2">
+                <span class="font-xs text-muted font-500">{{kpi.label}}</span>
+                <span class="font-xl font-500 text-dark">{{kpi.value}}<span
+                        class="font-sm text-muted ml-1">{{kpi.unit}}</span></span>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- ── Storage Pool Cards Template ────────── -->
+<ng-template #storagePoolCardsRef>
+    <div class="col-2 px-1 mb-2" *ngFor="let pool of storagePoolCards">
+        <div class="card rounded mb-0 h-100 shadow-none border">
+            <div class="card-body p-2 d-flex flex-column">
+                <span class="font-xs text-muted font-500">{{pool.poolId}}</span>
+                <span class="font-md font-500 text-primary mt-1">{{pool.name}}</span>
+                <span class="font-xs text-muted mt-1" style="min-height: 48px;">{{pool.description}}</span>
+
+                <!-- Vertical Pill Progress Bar -->
+                <div class="mt-2 mb-2 w-100"
+                    style="height: 60px; background-color: #d8d8d8; border-radius: 4px; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;">
+                    <div class="d-flex justify-content-center align-items-center text-white"
+                        [style.height.%]="pool.utilizationPercent" [style.background]="pool.barColor">
+                        <span class="font-xs font-500">{{pool.utilizationPercent}}%</span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-auto">
+                    <span class="font-xs text-muted">{{pool.usedTB}}</span>
+                    <span class="font-xs text-muted">{{pool.totalTB}}</span>
+                </div>
+                <span class="font-xs text-muted mt-2">{{pool.iops}} • {{pool.throughput}}</span>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<!-- ── I/O Operation Chart Template ──────── -->
+<ng-template #ioOperationRef>
+    <div class="card round-edge equalize-card">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+            <span class="font-lg font-500">I/O Operation</span>
+        </div>
+        <div class="card-body p-0" style="min-height:280px;">
+            <ng-container *ngIf="ioOperationChart">
+                <div echarts [options]="ioOperationChart.options" [extentions]="ioOperationChart.extensions"
+                    [defaultHeight]="280">
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<!-- ── Storage by Tenant Bar Chart Template ─ -->
+<ng-template #storageByTenantRef>
+    <div class="card round-edge equalize-card">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+            <span class="font-lg font-500">Storage by Tenant</span>
+        </div>
+        <div class="card-body p-0" style="min-height:280px;">
+            <ng-container *ngIf="storageByTenantChart">
+                <div echarts [options]="storageByTenantChart.options" [extentions]="storageByTenantChart.extensions"
+                    [defaultHeight]="280">
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<!-- ── Data Growth Trend Chart Template ───── -->
+<ng-template #dataGrowthTrendRef>
+    <div class="card round-edge equalize-card">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+            <span class="font-lg font-500">Data Growth Trend — PB</span>
+        </div>
+        <div class="card-body p-0" style="min-height:280px;">
+            <ng-container *ngIf="dataGrowthTrendChart">
+                <div echarts [options]="dataGrowthTrendChart.options" [extentions]="dataGrowthTrendChart.extensions"
+                    [defaultHeight]="280">
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>
+
+<!-- ── Storage Pool Inventory Table ──────── -->
+<ng-template #storagePoolInventoryRef>
+    <div class="card round-edge equalize-card">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+            <span class="font-lg font-500">
+                <span class="badge badge-light border mr-1">{{storagePoolInventory.length}}</span>
+                Storage Pool Inventory
+            </span>
+        </div>
+        <div class="card-body p-0" style="max-height:500px;overflow-y: auto;overflow-x: hidden;">
+            <table class="table table-sm font-sm text-left mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>POOL</th>
+                        <th>NAME</th>
+                        <th>Type</th>
+                        <th>TIER</th>
+                        <th>CAPACITY</th>
+                        <th>USED</th>
+                        <th>UTIL %</th>
+                        <th>IOPS</th>
+                        <th>THROUGHPUT</th>
+                        <th>REGION</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of storagePoolInventory">
+                        <td class="text-primary">{{item.pool}}</td>
+                        <td>{{item.name}}</td>
+                        <td>{{item.type}}</td>
+                        <td>{{item.tier}}</td>
+                        <td>{{item.capacity}}</td>
+                        <td>{{item.used}}</td>
+                        <td>{{item.utilPercent}}</td>
+                        <td>{{item.iops}}</td>
+                        <td>{{item.throughput}}</td>
+                        <td>{{item.region}}</td>
+                        <td><span class="text-success font-500">{{item.status}}</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</ng-template>

@@ -38,6 +38,8 @@ export interface BMServer {
     // bm_enabled: false;
     monitoring: DeviceMonitoringType;
     // datacenter: DatacenterInDevice;
+    used_storage: string;
+    available_storage: string;
     custom_attribute_data?: { [key: string]: any };
     life_cycle_stage: string;
     life_cycle_stage_status: string

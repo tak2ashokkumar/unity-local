@@ -136,6 +136,9 @@ export class OrchestrationTasksScheduleService {
           });
           (form.get('inputs') as FormArray).push(inputGroup);
         } else {
+          if (p.param_type === 'Dictionary' || p.param_type === 'List') {
+            p.default_value = JSON.stringify(p.default_value);
+          }
           const defaultValueGroup = this.builder.group({
             default_value: new FormControl(p.default_value, [Validators.required]),
             param_name: new FormControl(p.param_name),

@@ -105,7 +105,7 @@ export class ZabbixBmsDetailsService {
       'uptime': [{ value: d.server.uptime, disabled: true }, [NoWhitespaceValidator]],
       'last_rebooted': [d.server.last_rebooted, [NoWhitespaceValidator]],
       'description': [d.server.description, [NoWhitespaceValidator]],
-      'note': [d.server.note, [NoWhitespaceValidator]],      
+      'note': [d.server.note, [NoWhitespaceValidator]],
       'life_cycle_stage': [d.life_cycle_stage ? d.life_cycle_stage : 'Operational', [NoWhitespaceValidator]],
       'life_cycle_stage_status': [d.life_cycle_stage_status ? d.life_cycle_stage_status : 'In Use', [NoWhitespaceValidator]]
     })
@@ -194,6 +194,9 @@ export class ZabbixBmsDetailsService {
       'capacity_gb': [d.server.capacity_gb, [Validators.required, Validators.pattern("^[0-9]*$"), Validators.min(0), NoWhitespaceValidator]],
       'fan': [d.server.fan, [Validators.pattern("^[0-9]*$"), Validators.min(0), NoWhitespaceValidator]],
       'firmware_version': [d.server.firmware_version, [NoWhitespaceValidator]],
+      'used_storage': [d.used_storage, [Validators.required, Validators.pattern("^[0-9]*\\.?[0-9]+$"), Validators.min(0), NoWhitespaceValidator]],
+      'available_storage': [d.available_storage, [Validators.required, Validators.pattern("^[0-9]*\\.?[0-9]+$"), Validators.min(0), NoWhitespaceValidator]],
+
       // 'power_supply1': this.builder.group({
       //   'id': [device.power_supply1 ? device.power_supply1.uuid, [Validators.required, NoWhitespaceValidator]]
       // }),
@@ -211,6 +214,8 @@ export class ZabbixBmsDetailsService {
       'logical_cpu': '',
       'memory_mb': '',
       'capacity_gb': '',
+      'used_storage': '',
+      'available_storage': '',
       'fan': '',
     }
   }
@@ -236,6 +241,16 @@ export class ZabbixBmsDetailsService {
       'min': 'Minimum value should be is greater than or equal to 0'
     },
     'capacity_gb': {
+      'required': "Storage is required",
+      'pattern': 'Enter a numeric value',
+      'min': 'Minimum value should be is greater than or equal to 0'
+    },
+    'used_storage': {
+      'required': "Storage is required",
+      'pattern': 'Enter a numeric value',
+      'min': 'Minimum value should be is greater than or equal to 0'
+    },
+    'available_storage': {
       'required': "Storage is required",
       'pattern': 'Enter a numeric value',
       'min': 'Minimum value should be is greater than or equal to 0'

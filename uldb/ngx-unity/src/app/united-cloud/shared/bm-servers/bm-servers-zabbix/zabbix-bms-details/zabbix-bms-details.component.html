@@ -162,11 +162,12 @@
                                         {{detailFormErrors.description}}</div>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group row">
                                 <label for="life_cycle_stage" class="col-3 col-form-label">Life Cycle Stage</label>
                                 <div class="col-9">
-                                    <select id="life_cycle_stage" class="form-control" formControlName="life_cycle_stage"
+                                    <select id="life_cycle_stage" class="form-control"
+                                        formControlName="life_cycle_stage"
                                         [class.is-invalid]="detailFormErrors.life_cycle_stage">
                                         <option value="''" disabled>Select Life Cycle Stage</option>
                                         <option *ngFor="let opt of lifeCycleStageOptions" [value]="opt">
@@ -178,15 +179,18 @@
                             </div>
 
                             <div class="form-group row">
-                                <label for="life_cycle_stage_status" class="col-3 mt--1 mb-0">Life Cycle Stage Status</label>
+                                <label for="life_cycle_stage_status" class="col-3 mt--1 mb-0">Life Cycle Stage
+                                    Status</label>
                                 <div class="col-9">
-                                    <select id="life_cycle_stage_status" class="form-control" formControlName="life_cycle_stage_status"
+                                    <select id="life_cycle_stage_status" class="form-control"
+                                        formControlName="life_cycle_stage_status"
                                         [class.is-invalid]="detailFormErrors.life_cycle_stage_status">
                                         <option value="''" disabled>Select Life Cycle Stage</option>
                                         <option *ngFor="let opt of lifeCycleStageStatusOptions" [value]="opt">
                                             {{opt}}</option>
                                     </select>
-                                    <div class="invalid-feedback text-left" *ngIf="detailFormErrors.life_cycle_stage_status">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="detailFormErrors.life_cycle_stage_status">
                                         {{detailFormErrors.life_cycle_stage_status}}</div>
                                 </div>
                             </div>
@@ -395,6 +399,18 @@
                                         {{metaDataFormErrors.capacity_gb}}</div>
                                 </div>
                             </div>
+
+                            <div class="form-group row">
+                                <label for="used_storage" class="col-3 col-form-label">Used
+                                    Storage(GB)<em>*</em></label>
+                                <div class="col-9">
+                                    <input id="fan" class="form-control" type="number" formControlName="used_storage"
+                                        [class.is-invalid]="metaDataFormErrors.used_storage">
+                                    <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.used_storage">
+                                        {{metaDataFormErrors.used_storage}}</div>
+                                </div>
+                            </div>
+
                             <div class="form-group row">
                                 <label for="firmware_version" class="col-3 col-form-label">Firmware Version</label>
                                 <div class="col-9">
@@ -441,6 +457,21 @@
                                         [class.is-invalid]="metaDataFormErrors.fan">
                                     <div class="invalid-feedback text-left" *ngIf="metaDataFormErrors.fan">
                                         {{metaDataFormErrors.fan}}</div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group row">
+                                <label for="available_storage" class="col-3 col-form-label">Available
+                                    Storage(GB)<em>*</em></label>
+                                <div class="col-9">
+                                    <input id="available_storage" class="form-control" type="number"
+                                        formControlName="available_storage"
+                                        [class.is-invalid]="metaDataFormErrors.available_storage">
+                                    <div class="invalid-feedback text-left"
+                                        *ngIf="metaDataFormErrors.available_storage">
+                                        {{metaDataFormErrors.available_storage}}</div>
                                 </div>
                             </div>
 

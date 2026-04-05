@@ -34,7 +34,7 @@ export class OrchestrationAgenticWorkflowParamsService {
 
 
   getTableList(): Observable<any> {
-    return this.http.get<any>(`rest/unity_itsm/tables/`);
+    return this.http.get<any>(`rest/unity_itsm/tables/?is_enabled=true`);
   }
 
   getTableDetails(uuid: string): Observable<any> {
@@ -104,11 +104,15 @@ export class OrchestrationAgenticWorkflowParamsService {
   }
 
   createInputParamGroup(input: InputParamsType) {
+    const isComplexType = input.param_type === 'List' || input.param_type === 'Dictionary';
+
+    const defaultValue = isComplexType ? JSON.stringify(input.default_value) : (input.default_value || '');
+
     return this.fb.group({
       param_name: [input.param_name || ''],
-      // param_type: [input.param_type || ''],
-      default_value: [input.default_value || '', [Validators.required, NoWhitespaceValidator]],
-    })
+      param_type: [input.param_type || ''],
+      default_value: [defaultValue, [Validators.required, NoWhitespaceValidator]],
+    });
   }
 
   createOutputParamGroup(input: OutputParamsType) {

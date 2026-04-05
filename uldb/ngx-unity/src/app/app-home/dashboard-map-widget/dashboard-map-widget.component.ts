@@ -47,6 +47,8 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
     this.spinner.start('dashboard_map_widget');
     await this.mapSvc.loadMap();
 
+    this.mapSvc.toggleWorldMap(); // for manualy disabling the map.
+
     this.isMapAvailable = this.mapSvc.isAvailable();
     if (!this.isMapAvailable) {
       this.spinner.stop('dashboard_map_widget');

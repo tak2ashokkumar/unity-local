@@ -80,9 +80,9 @@
                         aria-hidden="true"></i> Logout</a>
                 <a class="dropdown-item text-danger" (click)="stopImpersonating()" *ngIf="user.isImpersonated"><i
                         class="fa fa-lock" aria-hidden="true"></i> Stop Impersonating</a>
-                <a class="dropdown-item text-danger" (click)="mapService.toggleWorldMap()"
+                <!-- <a class="dropdown-item text-danger" (click)="mapService.toggleWorldMap()"
                     *ngIf="user.isUserAdmin && mapService.showToggle()">
-                    <i class="fas fa-map-marked-alt" aria-hidden="true"></i> {{mapService.action}}</a>
+                    <i class="fas fa-map-marked-alt" aria-hidden="true"></i> {{mapService.action}}</a> -->
             </div>
         </li>
     </ul>
@@ -96,7 +96,18 @@
                     Report an Issue</a>
             </li>
         </app-sidebar-nav>
-        <app-sidebar-minimizer></app-sidebar-minimizer>
+        <!-- Bottom bar: trial button (left) + minimizer chevron (right) in one row -->
+        <div class="sidebar-bottom-bar">
+            <div class="sidebar-trial-wrapper" *ngIf="!sidebarMinimized && isPlayground">
+
+                <button type="button" class="sidebar-trial-btn" (click)="openFreeTrial()"
+                    aria-label="Upgrade to free trial">
+                    <i class="fas fa-bullhorn" aria-hidden="true"></i>
+                    <span>Upgrade to free trial</span>
+                </button>
+            </div>
+            <app-sidebar-minimizer></app-sidebar-minimizer>
+        </div>
     </app-sidebar>
     <app-notification></app-notification>
     <create-ticket></create-ticket>
