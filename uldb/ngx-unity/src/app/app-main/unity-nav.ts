@@ -139,37 +139,42 @@ const filterRequiredUnitySetupNavItems = (navItem: UnityNavData, svc: AppLevelSe
 }
 
 
-const UNITY_AI_LIFECYCLE_NAV_ITEMS = () => {
+const UNITY_AI_INFRA_MGMT_NAV_ITEMS = () => {
     const navItems: UnityNavData[] = [
         {
+            name: 'Lifecycle Management',
+            url: '/unity-ai-infra-mgmt/lifecycle-management',
+            variant: 'branched',
+        },
+        {
             name: 'GPU Orchestration',
-            url: '/unity-ai-lifecycle/gpu-orchestration',
+            url: '/unity-ai-infra-mgmt/gpu-orchestration',
             variant: 'branched',
         },
         {
             name: 'Workload Management',
-            url: '/unity-ai-lifecycle/workload-management',
+            url: '/unity-ai-infra-mgmt/workload-management',
             variant: 'branched',
         },
         {
             name: 'Storage',
-            url: '/unity-ai-lifecycle/storage',
+            url: '/unity-ai-infra-mgmt/storage',
             variant: 'branched',
         },
-        // {
-        //     name: 'Preconfigured AI Stack',
-        //     url: '/unity-ai-lifecycle/preconfigured-ai-stack',
-        //     variant: 'branched',
-        // },
+        {
+            name: 'Preconfigured AI Stack',
+            url: '/unity-ai-infra-mgmt/preconfigured-ai-stack',
+            variant: 'branched',
+        },
     ]
     return navItems;
 }
-const UNITY_AI_LIFECYCLE_NAV_DATA = () => {
+const UNITY_AI_INFRA_MGMT_NAV_DATA = () => {
     const navItems: UnityNavData = {
-        name: 'AI Lifecycle Management',
-        url: '/unity-ai-lifecycle',
+        name: 'AI Infra Management',
+        url: '/unity-ai-infra-mgmt',
         icon: 'fas fa-microchip',
-        children: UNITY_AI_LIFECYCLE_NAV_ITEMS(),
+        children: UNITY_AI_INFRA_MGMT_NAV_ITEMS(),
     }
     return navItems.children && navItems.children.length ? navItems : null;
 }
@@ -888,7 +893,7 @@ export const GET_UNITY_NAV_DATA = (svc: AppLevelService, userSvc: UserInfoServic
         UNITY_SETUP_NAV_DATA(svc, selfBrandedOrgName),
     ];
     if (selfBrandedOrgName) {
-        nav.splice(5, 0, UNITY_AI_LIFECYCLE_NAV_DATA());
+        nav.splice(5, 0, UNITY_AI_INFRA_MGMT_NAV_DATA());
     }
     if (isTenantOrg) {
         nav.splice(selfBrandedOrgName ? 6 : 5, 0, UNITY_AI_AGENTS_NAV_DATA(svc, selfBrandedOrgName));

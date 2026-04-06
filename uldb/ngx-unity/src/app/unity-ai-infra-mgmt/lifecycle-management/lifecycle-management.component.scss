@@ -1,0 +1,91 @@
+// ── Shared Card Base ─────────────────────
+.lc-chart-card,
+.lc-kpi-card,
+.lc-table-card {
+    border: 1px solid #e8eaed;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0;
+}
+
+// ── Card Header ───────────────────────────
+.lc-card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e8eaed;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+// ── KPI Card ─────────────────────────────
+.lc-kpi-card {
+    .card-body {
+        padding: 0.6rem 0.75rem;
+    }
+
+    .font-xl {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+}
+
+// ── Table Card ────────────────────────────
+.lc-thead {
+    th {
+        background-color: #f5f6f8;
+        border-top: none;
+        border-bottom: 1px solid #e0e0e0;
+        color: #4f5d73;
+        font-weight: 600;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        padding: 0.55rem 0.75rem;
+    }
+}
+
+.table tbody td {
+    border-top: 1px solid #f0f0f0;
+    vertical-align: middle;
+    padding: 0.55rem 0.75rem;
+}
+
+.table tbody tr:hover {
+    background-color: #fafbfc;
+}
+
+// ── Specs & Load Cell ─────────────────────
+.specs-cell {
+    min-width: 180px;
+}
+
+.lc-progress {
+    height: 5px;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+
+    .progress-bar {
+        transition: width 0.4s ease;
+        border-radius: 3px;
+    }
+}
+
+
+// ── Status Colors ─────────────────────────
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-primary {
+    color: #20a8d8 !important;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

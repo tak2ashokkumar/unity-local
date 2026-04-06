@@ -1,0 +1,149 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+                        <div class="d-flex justify-content-center align-items-center font-500">
+                            <span class="badge badge-secondary font-sm">{{count}}</span>
+                            <span class="ml-1 font-lg">GPU Containers</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-warning btn-pill text-white px-3 mr-2" type="button"
+                                [routerLink]="['create']">
+                                <i class="fa fa-plus mr-1"></i> GPU Container
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body py-2">
+                        <div class="row pb-3 d-flex justify-content-between align-items-center">
+                            <div class="col-3">
+                                <search-box [searchValue]="currentCriteria.searchValue"
+                                    (searched)="onSearched($event)"></search-box>
+                            </div>
+                            <div class="col-3 d-flex justify-content-end">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover text-left mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="font-600">Container ID</th>
+                                        <th class="font-600 text-center">Status</th>
+                                        <th class="font-600">Cluster Name</th>
+                                        <th class="font-600">GPU Model</th>
+                                        <th class="font-600 text-center">Node Count</th>
+                                        <th class="font-600">Utilization</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of viewData">
+                                        <td class="align-middle">
+                                            <a href="javascript:void(0)" class="text-primary"
+                                                (click)="openDetail(item)">{{item.name}}</a>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <span [ngClass]="getStatusClass(item.status)">
+                                                <i [ngClass]="getStatusIcon(item.status)" class="mr-1"></i>
+                                                {{item.status}}
+                                            </span>
+                                        </td>
+                                        <td class="align-middle">{{item.clusterName}}</td>
+                                        <td class="align-middle">{{item.cpuModel}}</td>
+                                        <td class="align-middle text-center">{{item.nodeCount}} Node{{item.nodeCount > 1
+                                            ? 's' : ''}}</td>
+                                        <td class="align-middle" style="width: 200px;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 mr-2" style="height: 6px;">
+                                                    <div class="progress-bar" role="progressbar"
+                                                        [style.width.%]="item.utilization"
+                                                        [style.background-color]="getUtilizationColor(item.utilization)">
+                                                    </div>
+                                                </div>
+                                                <span class="text-muted font-sm"
+                                                    style="width: 30px;">{{item.utilization}}%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                [totalCount]="count"></table-entries>
+                            <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                                [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                (pageChange)="pageChange($event)"></table-pager>
+                        </div>
+
+                        <div class="text-center text-muted py-4" *ngIf="!viewData.length">
+                            No GPU containers to display
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── GPU Container Detail Popup ─────────────────── -->
+<div class="gpu-detail-overlay" *ngIf="selectedItem" (click)="closeDetail()">
+    <div class="gpu-detail-panel animated fadeIn" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="gpu-detail-header">
+            <div class="d-flex align-items-center">
+                <span class="gpu-detail-title">{{selectedItem.name}}</span>
+                <span class="gpu-detail-status-badge ml-2" [ngClass]="getStatusBadgeClass(selectedItem.status)">
+                    ● {{selectedItem.status}}
+                </span>
+            </div>
+            <button class="gpu-detail-close" (click)="closeDetail()">✕</button>
+        </div>
+
+        <!-- Body -->
+        <div class="gpu-detail-body">
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">Instance ID</span>
+                <span class="gpu-detail-value">{{selectedItem.instanceId}}</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">GPU</span>
+                <span class="gpu-detail-value">{{selectedItem.gpuCount}}x {{selectedItem.cpuModel}}</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">vCPUs</span>
+                <span class="gpu-detail-value">{{selectedItem.vcpus}}</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">RAM</span>
+                <span class="gpu-detail-value">{{selectedItem.ram}}</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">OS Image</span>
+                <span class="gpu-detail-value">{{selectedItem.osImage}}</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">IP Address</span>
+                <span class="gpu-detail-value">{{selectedItem.ipAddress}}</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">Uptime</span>
+                <span class="gpu-detail-value">{{selectedItem.uptime}}</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">GPU Utilization</span>
+                <span class="gpu-detail-value">{{selectedItem.gpuUtilization}}%</span>
+            </div>
+            <div class="gpu-detail-row">
+                <span class="gpu-detail-label">VRAM Used</span>
+                <span class="gpu-detail-value">{{selectedItem.vramUsed}}</span>
+            </div>
+        </div>
+
+    </div>
+</div>

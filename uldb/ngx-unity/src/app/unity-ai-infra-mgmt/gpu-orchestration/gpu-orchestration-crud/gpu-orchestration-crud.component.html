@@ -1,0 +1,196 @@
+<div class="container-fluid mt-2 px-2">
+    <div class="animated fadeIn">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-0">
+                    <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-2">
+                        <span class="ml-2 font-weight-bold font-lg">{{ action }} GPU VM</span>
+                        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" (click)="goBack()">
+                            <i class="fa fa-arrow-left text-white"></i>
+                        </button>
+                    </div>
+                    <div class="card-body py-4">
+                        <form *ngIf="form" [formGroup]="form" class="form-horizontal">
+
+                            <!-- Non Field Error -->
+                            <div class="row mb-3" *ngIf="nonFieldErr">
+                                <div class="col-md-12 text-center text-danger small">
+                                    {{ nonFieldErr }}
+                                </div>
+                            </div>
+
+                            <!-- Instance Name -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2" for="vm_name">
+                                    Instance Name<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" id="vm_name" formControlName="vm_name"
+                                        placeholder="e.g. gpu-vm-001" [ngClass]="{'is-invalid': formErrors.vm_name}">
+                                    <div class="invalid-feedback" *ngIf="formErrors.vm_name">{{ formErrors.vm_name }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Environment -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2" for="environment">
+                                    Environment<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <select class="form-control" id="environment" formControlName="environment"
+                                        [ngClass]="{'is-invalid': formErrors.environment}">
+                                        <option value="" disabled selected>Select Environment</option>
+                                        <option *ngFor="let item of dropdownData.environments" [value]="item">{{ item }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.environment">{{
+                                        formErrors.environment }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Select Account -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2" for="account">
+                                    Select Account<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <select class="form-control" id="account" formControlName="account"
+                                        [ngClass]="{'is-invalid': formErrors.account}">
+                                        <option value="" disabled selected>Select Account</option>
+                                        <option *ngFor="let item of dropdownData.accounts" [value]="item">{{ item }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.account">{{ formErrors.account }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Select Region -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2" for="account_region">
+                                    Select Region<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <select class="form-control" id="account_region" formControlName="account_region"
+                                        [ngClass]="{'is-invalid': formErrors.account_region}">
+                                        <option value="" disabled selected>Select Region</option>
+                                        <option *ngFor="let item of dropdownData.regions" [value]="item">{{ item }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.account_region">{{
+                                        formErrors.account_region }}</div>
+                                </div>
+                            </div>
+
+                            <!-- GPU Type -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2" for="gpu_type">
+                                    Select GPU Type<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <select class="form-control" id="gpu_type" formControlName="gpu_type"
+                                        [ngClass]="{'is-invalid': formErrors.gpu_type}">
+                                        <option value="" disabled selected>Select GPU Type</option>
+                                        <option *ngFor="let item of dropdownData.gpuTypes" [value]="item">{{ item }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.gpu_type">{{ formErrors.gpu_type }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GPUs / vCPUs / vRAM — inline row -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2">
+                                    GPU / vCPUs / vRAM<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <div class="row">
+                                        <div class="col-4 pr-1">
+                                            <select class="form-control" id="gpu_count" formControlName="gpu_count"
+                                                [ngClass]="{'is-invalid': formErrors.gpu_count}">
+                                                <option value="" disabled selected>GPUs</option>
+                                                <option *ngFor="let n of dropdownData.gpuCounts" [value]="n">{{ n }}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="formErrors.gpu_count">{{
+                                                formErrors.gpu_count }}</div>
+                                        </div>
+                                        <div class="col-4 px-1">
+                                            <select class="form-control" id="vcpus" formControlName="vcpus"
+                                                [ngClass]="{'is-invalid': formErrors.vcpus}">
+                                                <option value="" disabled selected>vCPUs</option>
+                                                <option *ngFor="let n of dropdownData.vcpus" [value]="n">{{ n }}
+                                                </option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="formErrors.vcpus">{{ formErrors.vcpus
+                                                }}</div>
+                                        </div>
+                                        <div class="col-4 pl-1">
+                                            <select class="form-control" id="vram" formControlName="vram"
+                                                [ngClass]="{'is-invalid': formErrors.vram}">
+                                                <option value="" disabled selected>vRAM</option>
+                                                <option *ngFor="let item of dropdownData.vramOptions" [value]="item">{{
+                                                    item }}</option>
+                                            </select>
+                                            <div class="invalid-feedback" *ngIf="formErrors.vram">{{ formErrors.vram }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- OS Image -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2" for="os_image">
+                                    OS Image<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <select class="form-control" id="os_image" formControlName="os_image"
+                                        [ngClass]="{'is-invalid': formErrors.os_image}">
+                                        <option value="" disabled selected>Select OS Image</option>
+                                        <option *ngFor="let item of dropdownData.osImages" [value]="item">{{ item }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.os_image">{{ formErrors.os_image }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Storage Size -->
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label text-md-right p-0 pt-2" for="storage_size">
+                                    Storage Size<span class="text-danger">*</span> :
+                                </label>
+                                <div class="col-md-5">
+                                    <select class="form-control" id="storage_size" formControlName="storage_size"
+                                        [ngClass]="{'is-invalid': formErrors.storage_size}">
+                                        <option value="" disabled selected>Select Storage Size</option>
+                                        <option *ngFor="let item of dropdownData.storageSizes" [value]="item">{{ item }}
+                                        </option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="formErrors.storage_size">{{
+                                        formErrors.storage_size }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Form Buttons -->
+                            <div class="row pt-3">
+                                <div class="col-12 text-center">
+                                    <button type="button" class="btn btn-outline-danger px-4 font-weight-bold"
+                                        (click)="goBack()">Cancel</button>
+                                    <button type="button" class="btn btn-success px-4 font-weight-bold ml-2"
+                                        (click)="onSubmit()">
+                                        {{ action }}
+                                    </button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

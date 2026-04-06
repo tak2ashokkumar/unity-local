@@ -1,0 +1,169 @@
+// ============================================================
+//  Preconfigured AI Stack — Component Styles
+//  Uses var(--unity-*) tokens exclusively so that both
+//  body.theme-light and body.theme-dark are covered
+//  with zero manual dark-mode overrides.
+// ============================================================
+
+:host {
+  display: block;
+}
+
+.ai-stack-catalog {
+
+  // ── Header ────────────────────────────────────────────────
+  .catalog-title {
+    color: var(--unity-text-primary);
+    font-size: 1.25rem;
+  }
+
+  .catalog-subtitle {
+    color: var(--unity-text-secondary);
+    font-size: 0.82rem;
+  }
+
+  // ── Search Bar ────────────────────────────────────────────
+  // Single wrapper — one background, one border, one radius.
+  // Icon and input live inside; no Bootstrap input-group involved.
+  .search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    height: 38px;
+    background-color: var(--unity-input-bg);
+    border: 1px solid var(--unity-input-border);
+    border-radius: 8px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+    &:focus-within {
+      border-color: var(--unity-input-border-focus);
+      box-shadow: 0 0 0 3px var(--unity-focus-ring);
+    }
+
+    .search-icon {
+      color: var(--unity-text-secondary);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--unity-input-text);
+      font-size: 0.875rem;
+      padding: 0;
+      box-shadow: none;
+
+      &::placeholder {
+        color: var(--unity-input-placeholder);
+      }
+    }
+  }
+
+  // ── Category Filter Pills ─────────────────────────────────
+  .filter-pill {
+    background-color: var(--unity-bg-surface-raised);
+    color: var(--unity-text-secondary);
+    border: 1px solid var(--unity-border-color);
+    border-radius: 20px;
+    padding: 4px 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.5;
+    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+
+    &.active {
+      background-color: var(--unity-color-success);
+      border-color: var(--unity-color-success);
+      color: #fff;
+    }
+
+    &:hover:not(.active) {
+      background-color: var(--unity-hover-bg);
+      color: var(--unity-text-primary);
+      border-color: var(--unity-border-color-strong);
+    }
+
+    &:focus {
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  // ── Stack Cards ───────────────────────────────────────────
+  .stack-card {
+    border-radius: 14px;
+    border: 1px solid var(--unity-card-border);
+    box-shadow: var(--unity-card-shadow);
+    background-color: var(--unity-card-bg);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+      border-color: var(--unity-border-color-strong);
+    }
+
+    // Icon — no container background (floats on card like the design)
+    .icon-wrap {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .stack-icon {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    .stack-title {
+      color: var(--unity-text-primary);
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+
+    .stack-desc {
+      color: var(--unity-text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-size: 0.72rem;
+      line-height: 1.45;
+    }
+
+    .stack-version {
+      color: var(--unity-text-disabled);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-deploy {
+      border-radius: 8px;
+      background-color: var(--unity-color-success);
+      border-color: var(--unity-color-success);
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 0.4rem;
+      transition: filter 0.18s ease;
+
+      &:hover {
+        filter: brightness(0.88);
+        border-color: transparent;
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 3px var(--unity-focus-ring);
+        outline: none;
+      }
+    }
+  }
+}

@@ -5,6 +5,8 @@
 set -e
 
 PROJECT_ROOT="$(pwd)"
+UNITY_WEBPACK_DEV="$PROJECT_ROOT/uldb/ngx-unity/extra-webpack-dev.config.js"
+MTP_WEBPACK_DEV="$PROJECT_ROOT/uldb/ngx-mtp/extra-webpack-dev.config.js"
 
 echo "Preparing Unity local workspace..."
 
@@ -45,6 +47,22 @@ fi
 if [ ! -d "$PROJECT_ROOT/uldb/ngx-mtp/node_modules" ]; then
 	cd "$PROJECT_ROOT/uldb/ngx-mtp"
    	npm install
+fi
+
+echo "Patching UNITY webpack publicPath..."
+if [ -f "$UNITY_WEBPACK_DEV" ]; then
+  # Replace publicPath → local proxy
+  sed -i 's|publicPath.*|publicPath: "/",|g' "$UNITY_WEBPACK_DEV"
+else
+  echo "❌ webpack config not found"
+fi
+
+echo "Patching MTP webpack publicPath..."
+if [ -f "$MTP_WEBPACK_DEV" ]; then
+  # Replace publicPath → local proxy
+  sed -i 's|publicPath.*|publicPath: "/",|g' "$MTP_WEBPACK_DEV"
+else
+  echo "❌ webpack config not found"
 fi
 
 echo "Workspace prepared successfully."

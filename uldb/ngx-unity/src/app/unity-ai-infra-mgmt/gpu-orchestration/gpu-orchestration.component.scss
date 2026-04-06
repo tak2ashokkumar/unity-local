@@ -1,0 +1,196 @@
+.card {
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.card-header {
+    border-bottom: 1px solid #ebedef;
+    background-color: transparent !important;
+}
+
+.badge-dark {
+    background-color: #000;
+}
+
+.btn-warning {
+    background-color: #f7941d;
+    border-color: #f7941d;
+
+    &:hover {
+        background-color: darken(#f7941d, 10%);
+        border-color: darken(#f7941d, 10%);
+    }
+}
+
+.btn-pill {
+    border-radius: 50rem;
+}
+
+.table {
+    thead th {
+        border-top: none;
+        border-bottom: 1px solid #ebedef;
+        background-color: #f8f9fa;
+        color: #4f5d73;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+
+    tbody td {
+        border-top: 1px solid #ebedef;
+        vertical-align: middle;
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+.text-success {
+    color: #2eb85c !important;
+}
+
+.text-warning {
+    color: #f9b115 !important;
+}
+
+.text-danger {
+    color: #e55353 !important;
+}
+
+.font-600 {
+    font-weight: 600;
+}
+
+.font-500 {
+    font-weight: 500;
+}
+
+.font-lg {
+    font-size: 1.125rem;
+}
+
+.font-sm {
+    font-size: 0.8125rem;
+}
+
+// Alignment for specific columns
+.text-primary {
+    color: #20a8d8 !important;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+// ── GPU Detail Popup ──────────────────────────
+// All colors use CSS custom properties so the popup
+// automatically adapts to light / dark theme.
+
+.gpu-detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--unity-bg-overlay);
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gpu-detail-panel {
+    background: var(--unity-modal-bg);
+    border: 1px solid var(--unity-border-color);
+    border-radius: 10px;
+    width: 480px;
+    max-width: 95vw;
+    color: var(--unity-text-primary);
+    box-shadow: var(--unity-modal-shadow);
+    overflow: hidden;
+}
+
+.gpu-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--unity-modal-header-border);
+}
+
+.gpu-detail-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--unity-text-primary);
+}
+
+.gpu-detail-status-badge {
+    font-size: 0.78rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+
+    &.detail-badge-running {
+        background: var(--unity-color-success-light);
+        color: var(--unity-color-success);
+    }
+
+    &.detail-badge-scaling {
+        background: var(--unity-color-warning-light);
+        color: var(--unity-color-warning);
+    }
+
+    &.detail-badge-down {
+        background: var(--unity-color-danger-light);
+        color: var(--unity-color-danger);
+    }
+}
+
+.gpu-detail-close {
+    background: none;
+    border: none;
+    color: var(--unity-text-secondary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+
+    &:hover {
+        color: var(--unity-text-primary);
+    }
+}
+
+.gpu-detail-body {
+    padding: 0.25rem 0;
+}
+
+.gpu-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    border-bottom: 1px solid var(--unity-divider-color);
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.gpu-detail-label {
+    color: var(--unity-text-secondary);
+    font-size: 0.85rem;
+}
+
+.gpu-detail-value {
+    color: var(--unity-text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: right;
+}

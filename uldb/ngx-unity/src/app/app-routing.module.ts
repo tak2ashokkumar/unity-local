@@ -73,13 +73,13 @@ export const routes: Routes = [
         loadChildren: () => import('src/app/unity-cost-analysis/unity-cost-analysis.module').then(m => m.UnityCostAnalysisModule)
       },
       {
-        path: 'unity-ai-lifecycle',
+        path: 'unity-ai-infra-mgmt',
         data: {
           breadcrumb: {
-            title: 'AI Lifecycle Management'
+            title: 'AI Infra Management'
           }
         },
-        loadChildren: () => import('src/app/unity-ai-lifecycle/unity-ai-lifecycle.module').then(m => m.UnityAiLifecycleModule)
+        loadChildren: () => import('src/app/unity-ai-infra-mgmt/unity-ai-infra-mgmt.module').then(m => m.UnityAiInfraMgmtModule)
       },
       {
         path: 'reports',
