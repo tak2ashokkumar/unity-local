@@ -7,13 +7,14 @@
 export interface WorkloadSummaryKpi {
     label: string;
     value: string | number;
+    unit?: string;
 }
 
 export const WORKLOAD_SUMMARY_KPIS: WorkloadSummaryKpi[] = [
     { label: 'ACTIVE GPUs', value: 27 },
     { label: 'RUNNING JOBS', value: 17 },
     { label: 'QUEUED', value: 4 },
-    { label: 'AVG WAIT TIME', value: 6 },
+    { label: 'AVG WAIT TIME', value: 6, unit: 'Seconds' },
     { label: 'THROUGHPUT', value: '83.1%' },
     { label: 'SLA ACHIEVED', value: '91.4%' },
 ];
