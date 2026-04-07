@@ -1,9 +1,9 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { CcsRemediationScriptStepService, RemediationScriptViewData } from './ccs-remediation-script-step.service';
-import { NaciCliCheckStepsService } from '../naci-cli-check-steps.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { NetworkAgentsChatResponseType, RemediationScriptDataType } from '../../naci-chatbot/naci-chatbot.type';
+import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
 
 @Component({
   selector: 'ccs-remediation-script-step',
@@ -15,14 +15,13 @@ export class CcsRemediationScriptStepComponent implements OnInit, OnChanges {
   private ngUnsubscribe = new Subject();
 
   @Input() chatResponse: NetworkAgentsChatResponseType;
-  @Input() verifyAndAuditRelatedStageTitle: string;
 
   isRemediationFixOpen: boolean = false;
   remediationScriptViewData: RemediationScriptViewData;
 
   constructor(private svc: CcsRemediationScriptStepService,
-    private cliSvc: NaciCliCheckStepsService) {
-    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((stepName) => {
+    private investigationSvc: NetworkAgentConditionInvestigationService) {
+    this.investigationSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((stepName) => {
       setTimeout(() => {
         this.isRemediationFixOpen = stepName == 'remediationScript' ? !this.isRemediationFixOpen : false;
       }, 0);
@@ -33,7 +32,7 @@ export class CcsRemediationScriptStepComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.chatResponse?.answer?.stage != 'Stage 3') {
+    if (this.chatResponse?.answer?.stage_title != StageTitleMapping.REMEDIATION_SCRIPT) {
       return;
     }
     this.toggleRemediationFix();
@@ -41,8 +40,7 @@ export class CcsRemediationScriptStepComponent implements OnInit, OnChanges {
   }
 
   toggleRemediationFix() {
-    this.cliSvc.closeVerifyAndAuditStep(this.verifyAndAuditRelatedStageTitle);
-    this.cliSvc.toggle('remediationScript');
+    this.investigationSvc.toggle('remediationScript');
   }
 
 }

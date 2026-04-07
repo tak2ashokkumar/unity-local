@@ -14,9 +14,9 @@ export class NaciResourceUtilizationStepsComponent implements OnInit, OnChanges 
 
   ngOnInit(): void {
   }
-
+ 
   ngOnChanges(): void {
-    this.updateStep();
+    // this.updateStep();
   }
 
   private updateStep(): void {

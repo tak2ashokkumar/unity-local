@@ -1,10 +1,9 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { MonitoringMetricWidgetViewData, MonitoringVerifyAndAuditStepService } from './monitoring-verify-and-audit-step.service';
-import { NaciMonitoringService } from '../naci-monitoring.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { MonitoringDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
-import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
+import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
 
 @Component({
   selector: 'monitoring-verify-and-audit-step',
@@ -20,11 +19,10 @@ export class MonitoringVerifyAndAuditStepComponent implements OnInit, OnChanges 
   verifyAuditViewData: MonitoringMetricWidgetViewData;
 
   constructor(private svc: MonitoringVerifyAndAuditStepService,
-    private cliSvc: NaciCliCheckStepsService,
-    private monitoringSvc: NaciMonitoringService) {
-    this.monitoringSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+    private investigationSvc: NetworkAgentConditionInvestigationService) {
+    this.investigationSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
       setTimeout(() => {
-        this.isVerifyAndAuditOpen = StepName == 'verfiyAndAudit' ? !this.isVerifyAndAuditOpen : false;
+        this.isVerifyAndAuditOpen = StepName == 'monitoring' ? !this.isVerifyAndAuditOpen : false;
       }, 0);
     })
   }
@@ -33,7 +31,7 @@ export class MonitoringVerifyAndAuditStepComponent implements OnInit, OnChanges 
   }
 
   ngOnChanges(): void {
-    if (this.chatResponse?.answer?.stage != 'Stage 1') {
+    if (this.chatResponse?.answer?.stage_title != StageTitleMapping.MONITORING) {
       return;
     }
     this.toggleVerifyAndAuditAccordion();
@@ -45,10 +43,7 @@ export class MonitoringVerifyAndAuditStepComponent implements OnInit, OnChanges 
   }
 
   toggleVerifyAndAuditAccordion() {
-    if (!this.isVerifyAndAuditOpen) {
-      this.cliSvc.toggle('');
-    }
-    this.monitoringSvc.toggle('verfiyAndAudit');
+    this.investigationSvc.toggle('monitoring');
   }
 
 }

@@ -5,6 +5,7 @@ import { NaciResourceUtilizationStepsService } from '../naci-resource-utilizatio
 import { takeUntil } from 'rxjs/operators';
 import { NetworkAgentsChatResponseType, ResourceUtilizationDataType } from '../../naci-chatbot/naci-chatbot.type';
 import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
+import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
 
 @Component({
   selector: 'rus-verify-and-audit-step',
@@ -22,11 +23,11 @@ export class RusVerifyAndAuditStepComponent implements OnInit, OnChanges {
   interfaceWidgetViewData: InterfaceWidgetViewData;
 
   constructor(private svc: RusVerifyAndAuditStepService,
-    private cliSvc: NaciCliCheckStepsService,
+    private investigationSvc: NetworkAgentConditionInvestigationService,
     private ruSvc: NaciResourceUtilizationStepsService) {
-    this.ruSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+    this.investigationSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
       setTimeout(() => {
-        this.isVerifyAndAuditOpen = StepName == 'verfiyAndAudit' ? !this.isVerifyAndAuditOpen : false;
+        this.isVerifyAndAuditOpen = StepName == 'resourceUtilization' ? !this.isVerifyAndAuditOpen : false;
       }, 0);
     })
   }
@@ -35,7 +36,7 @@ export class RusVerifyAndAuditStepComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    if (this.chatResponse?.answer?.stage != 'Stage 1') {
+    if (this.chatResponse?.answer?.stage_title != StageTitleMapping.RESOURCE_UTILIZATION) {
       return;
     }
     this.toggleVerifyAndAuditAccordion();
@@ -51,9 +52,9 @@ export class RusVerifyAndAuditStepComponent implements OnInit, OnChanges {
   }
 
   toggleVerifyAndAuditAccordion() {
-    if (!this.isVerifyAndAuditOpen) {
-      this.cliSvc.toggle('');
-    }
-    this.ruSvc.toggle('verfiyAndAudit');
+    // if (!this.isVerifyAndAuditOpen) {
+    //   this.cliSvc.toggle('');
+    // }
+    this.investigationSvc.toggle('resourceUtilization');
   }
 }

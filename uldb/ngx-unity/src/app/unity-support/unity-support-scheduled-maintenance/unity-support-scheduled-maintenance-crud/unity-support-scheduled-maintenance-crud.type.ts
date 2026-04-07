@@ -10,8 +10,8 @@ export interface MaintenanceType {
     has_auto_ticketing: boolean;
     correlate_all_alerts: boolean;
     send_notification: boolean;
-    send_before_window: boolean;
-    send_after_window: boolean;
+    notify_before_window: boolean;
+    notify_after_window: boolean;
     start_date: string;
     end_date: string;
     timezone: string;
@@ -22,16 +22,19 @@ export interface MaintenanceType {
     recurrence_end_time_min: number;
     recurrence_pattern: string;
     weekday: string[];
-    additional_email: string[];
+    additional_emails: string[];
     ends_never: boolean;
-    user_and_user_group: string[];
+    users_and_user_groups: string[];
     daily_type: string;
+    end_next: string;
     every_day_count: string;
+    schedule_meta: Schedule_meta;
     every_hr_count: string;
     monthly_type: string;
     custom_month_day: string;
     every_month_count: string;
     every_custom_month_day: string;
+    end_date_status: string,
     every_custom_month_weekday: string;
     schedule_start_time_hr: number;
     schedule_start_time_min: number;
@@ -39,6 +42,16 @@ export interface MaintenanceType {
     schedule_end_time_min: number;
     infrastructure: MaintenanceInfrastructureType[];
     filter_rule_meta: RuleSet;
+}
+
+export interface Schedule_meta {
+    window_type: string;
+    end_date: string;
+    end_next: number;
+    run_now: boolean;
+    schedule_type: string;
+    end_date_status: string;
+    start_date: string;
 }
 
 export interface MaintenanceInfrastructureType {

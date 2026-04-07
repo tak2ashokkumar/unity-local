@@ -1,19 +1,19 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
-import { Subject } from 'rxjs';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
-import { AiStack, PreconfiguredAiStackService } from './preconfigured-ai-stack.service';
+import { AiStack } from './preconfigured-ai-stack.constants';
+import { PreconfiguredAiStackService } from './preconfigured-ai-stack.service';
 
 @Component({
-  selector: 'app-preconfigured-ai-stack',
+  selector: 'preconfigured-ai-stack',
   templateUrl: './preconfigured-ai-stack.component.html',
   styleUrls: ['./preconfigured-ai-stack.component.scss'],
   providers: [PreconfiguredAiStackService]
 })
 export class PreconfiguredAiStackComponent implements OnInit, OnDestroy {
+  private ngUnsubscribe = new Subject<void>();
 
   filteredStacks: AiStack[] = [];
   categories: string[] = [];
@@ -22,31 +22,27 @@ export class PreconfiguredAiStackComponent implements OnInit, OnDestroy {
   loading = true;
 
   private stacks: AiStack[] = [];
-  private destroy$ = new Subject<void>();
 
-  constructor(
-    private location: Location,
-    private service: PreconfiguredAiStackService,
-    private notification: AppNotificationService
-  ) { }
+  constructor(private service: PreconfiguredAiStackService,
+    private notification: AppNotificationService) { }
 
   ngOnInit(): void {
     forkJoin({
       categories: this.service.getFilterCategories(),
       stacks: this.service.getAiStacks()
     })
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(({ categories, stacks }) => {
-      this.categories = categories;
-      this.stacks = stacks;
-      this.filteredStacks = stacks;
-      this.loading = false;
-    });
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(({ categories, stacks }) => {
+        this.categories = categories;
+        this.stacks = stacks;
+        this.filteredStacks = stacks;
+        this.loading = false;
+      });
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 
   onSearchInput(event: Event): void {
@@ -61,7 +57,7 @@ export class PreconfiguredAiStackComponent implements OnInit, OnDestroy {
 
   deploy(stack: AiStack): void {
     this.service.deployStack(stack.id)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe({
         next: (success) => {
           if (success) {
@@ -76,10 +72,6 @@ export class PreconfiguredAiStackComponent implements OnInit, OnDestroy {
       });
   }
 
-  goBack(): void {
-    this.location.back();
-  }
-
   private applyFilters(): void {
     const query = this.searchQuery.toLowerCase();
     this.filteredStacks = this.stacks.filter(stack => {
@@ -90,4 +82,5 @@ export class PreconfiguredAiStackComponent implements OnInit, OnDestroy {
       return matchCategory && matchSearch;
     });
   }
+
 }

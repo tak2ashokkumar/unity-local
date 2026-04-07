@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { AI_STACKS, AiStack, FILTER_CATEGORIES } from './preconfigured-ai-stack.constants';
 
-export { AiStack };  // re-export so existing imports from this path still work
+export { AI_STACKS };  // re-export so existing imports from this path still work
 
 @Injectable()
 export class PreconfiguredAiStackService {

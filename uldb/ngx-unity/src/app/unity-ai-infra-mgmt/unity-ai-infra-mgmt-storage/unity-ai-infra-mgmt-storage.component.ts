@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { UnityAiInfraMgmtStorageService } from './unity-ai-infra-mgmt-storage.service';
-import { StoragePoolCard, StoragePoolInventoryItem, StorageSummaryKpi } from './unity-ai-infra-mgmt-storage.constants';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
+import { StoragePoolCard, StoragePoolInventoryItem, StorageSummaryKpi } from './unity-ai-infra-mgmt-storage.constants';
+import { UnityAiInfraMgmtStorageService } from './unity-ai-infra-mgmt-storage.service';
 
 @Component({
   selector: 'unity-ai-infra-mgmt-storage',

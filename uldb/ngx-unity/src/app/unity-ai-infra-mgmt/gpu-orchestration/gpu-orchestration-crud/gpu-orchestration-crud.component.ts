@@ -70,7 +70,7 @@ export class GpuOrchestrationCrudComponent implements OnInit, OnDestroy {
       this.dropdownData.vramOptions = res.vramOptions || [];
       this.dropdownData.osImages = res.osImages || [];
       this.dropdownData.storageSizes = res.storageSizes || [];
-      
+
       if (this.containerId) {
         this.getGpuContainerDetails();
       } else {
@@ -90,7 +90,7 @@ export class GpuOrchestrationCrudComponent implements OnInit, OnDestroy {
 
   buildForm(data: any) {
     this.form = this.crudSvc.buildForm(data);
-    
+
     // Subscribe to environment changes to update dependent dropdowns
     this.form.get('environment').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(env => {
       if (env) {
@@ -102,24 +102,24 @@ export class GpuOrchestrationCrudComponent implements OnInit, OnDestroy {
         this.dropdownData.regions = [];
         this.dropdownData.gpuTypes = [];
       }
-      
+
       // Reset dependent fields if not loading initial data
       if (!this.containerId || this.form.get('environment').dirty) {
         this.form.patchValue({
-           account: '',
-           account_region: '',
-           gpu_type: ''
+          account: '',
+          account_region: '',
+          gpu_type: ''
         });
       }
     });
 
     if (data && data.environment) {
-        this.form.get('environment').setValue(data.environment, { emitEvent: true });
-        this.form.patchValue({
-           account: data.account,
-           account_region: data.account_region,
-           gpu_type: data.gpu_type
-        });
+      this.form.get('environment').setValue(data.environment, { emitEvent: true });
+      this.form.patchValue({
+        account: data.account,
+        account_region: data.account_region,
+        gpu_type: data.gpu_type
+      });
     }
 
     this.formErrors = this.crudSvc.resetFormErrors();

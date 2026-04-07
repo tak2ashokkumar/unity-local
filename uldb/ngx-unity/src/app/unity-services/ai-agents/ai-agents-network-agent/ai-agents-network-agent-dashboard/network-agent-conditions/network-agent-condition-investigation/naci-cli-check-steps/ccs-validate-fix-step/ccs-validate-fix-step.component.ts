@@ -1,9 +1,9 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { CcsValidateFixStepService } from './ccs-validate-fix-step.service';
-import { NaciCliCheckStepsService } from '../naci-cli-check-steps.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { NetworkAgentsChatResponseType, ValidateFixDataType } from '../../naci-chatbot/naci-chatbot.type';
+import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
 
 @Component({
   selector: 'ccs-validate-fix-step',
@@ -16,12 +16,11 @@ export class CcsValidateFixStepComponent implements OnInit, OnChanges {
 
   isValidateFixOpen: boolean = false;
   @Input() chatResponse: NetworkAgentsChatResponseType;
-  @Input() verifyAndAuditRelatedStageTitle: string;
   validateFixViewData: any;
 
   constructor(private svc: CcsValidateFixStepService,
-    private cliSvc: NaciCliCheckStepsService) {
-    this.cliSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((stepName) => {
+    private investigationSvc: NetworkAgentConditionInvestigationService) {
+    this.investigationSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((stepName) => {
       setTimeout(() => {
         this.isValidateFixOpen = stepName == 'validateFix' ? !this.isValidateFixOpen : false;
       }, 0);
@@ -32,7 +31,7 @@ export class CcsValidateFixStepComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    if (this.chatResponse?.answer?.stage != 'Stage 4') {
+    if (this.chatResponse?.answer?.stage_title != StageTitleMapping.VALIDATE_FIX) {
       return;
     }
     this.toggleValidateFix();
@@ -40,8 +39,7 @@ export class CcsValidateFixStepComponent implements OnInit, OnChanges {
   }
 
   toggleValidateFix() {
-    this.cliSvc.closeVerifyAndAuditStep(this.verifyAndAuditRelatedStageTitle);
-    this.cliSvc.toggle('validateFix');
+    this.investigationSvc.toggle('validateFix');
   }
 
 }

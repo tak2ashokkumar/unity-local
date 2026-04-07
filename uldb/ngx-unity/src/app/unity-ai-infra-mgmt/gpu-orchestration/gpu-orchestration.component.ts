@@ -83,8 +83,8 @@ export class GpuOrchestrationComponent implements OnInit, OnDestroy {
     switch (status) {
       case 'Running': return 'text-success';
       case 'Scaling': return 'text-warning';
-      case 'Down':    return 'text-danger';
-      default:        return '';
+      case 'Down': return 'text-danger';
+      default: return '';
     }
   }
 
@@ -92,8 +92,8 @@ export class GpuOrchestrationComponent implements OnInit, OnDestroy {
     switch (status) {
       case 'Running': return 'fas fa-check-circle';
       case 'Scaling': return 'fas fa-circle-notch fa-spin';
-      case 'Down':    return 'fas fa-exclamation-triangle';
-      default:        return '';
+      case 'Down': return 'fas fa-exclamation-triangle';
+      default: return '';
     }
   }
 
@@ -101,8 +101,8 @@ export class GpuOrchestrationComponent implements OnInit, OnDestroy {
     switch (status) {
       case 'Running': return 'detail-badge-running';
       case 'Scaling': return 'detail-badge-scaling';
-      case 'Down':    return 'detail-badge-down';
-      default:        return '';
+      case 'Down': return 'detail-badge-down';
+      default: return '';
     }
   }
 

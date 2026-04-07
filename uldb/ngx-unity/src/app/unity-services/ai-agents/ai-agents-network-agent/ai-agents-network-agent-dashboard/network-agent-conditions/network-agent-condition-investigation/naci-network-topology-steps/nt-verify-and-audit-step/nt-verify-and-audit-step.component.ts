@@ -12,6 +12,7 @@ import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { clone as _clone } from 'lodash-es';
 import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
+import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
 
 @Component({
   selector: 'nt-verify-and-audit-step',
@@ -47,13 +48,14 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
     private ntSvc: NaciNetworkTopologyStepsService,
     // private optionService: UnityTopologyoptionsService,
     private cliSvc: NaciCliCheckStepsService,
+    private investigationSvc: NetworkAgentConditionInvestigationService,
     private router: Router,
     private renderer: Renderer2,
     private notification: AppNotificationService,
     private spinner: AppSpinnerService,
     private storageService: StorageService,) {
-    this.ntSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
-      this.isVerifyAndAuditOpen = StepName == 'verfiyAndAudit' ? !this.isVerifyAndAuditOpen : false;
+    this.investigationSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+      this.isVerifyAndAuditOpen = StepName == 'networkTopology' ? !this.isVerifyAndAuditOpen : false;
     })
   }
 
@@ -121,7 +123,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   }
 
   ngOnChanges(): void {
-    if (this.chatResponse?.answer?.stage != 'Stage 1') {
+    if (this.chatResponse?.answer?.stage_title != StageTitleMapping.NETWORK_TOPOLOGY) {
       return;
     }
     this.toggleVerifyAndAuditAccordion();
@@ -315,10 +317,10 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
 
 
   toggleVerifyAndAuditAccordion() {
-    if (!this.isVerifyAndAuditOpen) {
-      this.cliSvc.toggle('');
-    }
-    this.ntSvc.toggle('verfiyAndAudit');
+    // if (!this.isVerifyAndAuditOpen) {
+    //   this.cliSvc.toggle('');
+    // }
+    this.investigationSvc.toggle('networkTopology');
   }
 
 }

@@ -162,8 +162,8 @@ const UNITY_AI_INFRA_MGMT_NAV_ITEMS = () => {
             variant: 'branched',
         },
         {
-            name: 'Preconfigured AI Stack',
-            url: '/unity-ai-infra-mgmt/preconfigured-ai-stack',
+            name: 'AI Stack',
+            url: '/unity-ai-infra-mgmt/ai-stack',
             variant: 'branched',
         },
     ]

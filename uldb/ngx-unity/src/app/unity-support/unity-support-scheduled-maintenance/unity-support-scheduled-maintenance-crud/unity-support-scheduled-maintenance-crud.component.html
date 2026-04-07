@@ -52,9 +52,9 @@
                             </div>
 
                             <div class="row border rounded p-4 position-relative mt-4 mx-0">
-                                <div class="pb-2 mb-3 bg-white position-absolute section-name">Infrastructure</div>
+                                <div class="pb-2 mb-3 bg-white position-absolute section-name">Filter</div>
                                 <div class="col">
-                                    <div class="form-group row">
+                                    <!-- <div class="form-group row">
                                         <div class="col-2 text-right  align-self-center">Infrastructure Type<em>*</em> :
                                         </div>
                                         <div class="col-3">
@@ -70,8 +70,8 @@
                                                 *ngIf="formErrors.infrastructure_type">{{formErrors.infrastructure_type}}
                                             </small>
                                         </div>
-                                    </div>
-                                    <ng-container *ngIf="form.get('infrastructure')">
+                                    </div> -->
+                                    <!-- <ng-container *ngIf="form.get('infrastructure')">
                                         <div class="form-group row">
                                             <div class="col form-array-margin" formArrayName="infrastructure">
                                                 <ng-container
@@ -141,7 +141,8 @@
                                                                             *ngIf="form.controls.infrastructure.controls[i].get('infrastructure_level').value == 'devices'">
                                                                             <div class="col-2 form-group">
                                                                                 <label
-                                                                                    class="form-col-form-label">Device Type<em>*</em></label>
+                                                                                    class="form-col-form-label">Device
+                                                                                    Type<em>*</em></label>
                                                                                 <multiselect-dropdown
                                                                                     [options]="infraList[i]"
                                                                                     [settings]="infraListSettings"
@@ -154,20 +155,32 @@
                                                                                     *ngIf="formErrors.infrastructure[i].infra_level_types">
                                                                                     {{formErrors.infrastructure[i].infra_level_types}}</small>
                                                                             </div>
-                                                                            <div class="col-2 form-group" *ngIf="form.controls.infrastructure.controls[i].get('device_list')">
-                                                                                <label class="form-col-form-label">Devices</label>
-                                                                                <multiselect-dropdown [options]="devicesList[i]" [settings]="devicesListSettings" class="form-control p-0"
-                                                                                    style="height:auto;" formControlName="device_list" 
+                                                                            <div class="col-2 form-group"
+                                                                                *ngIf="form.controls.infrastructure.controls[i].get('device_list')">
+                                                                                <label
+                                                                                    class="form-col-form-label">Devices</label>
+                                                                                <multiselect-dropdown
+                                                                                    [options]="devicesList[i]"
+                                                                                    [settings]="devicesListSettings"
+                                                                                    class="form-control p-0"
+                                                                                    style="height:auto;"
+                                                                                    formControlName="device_list"
                                                                                     (dropdownClosed)="onDevicesSelectionClose(i)"></multiselect-dropdown>
                                                                             </div>
-                                                                            <div class="col-2 form-group" *ngIf="form.controls.infrastructure.controls[i].get('triggers')">
-                                                                                <label class="form-col-form-label">Trigger</label>
-                                                                                <multiselect-dropdown [options]="triggerList[i]" [settings]="devicesListSettings" class="form-control p-0"
-                                                                                    style="height:auto;" formControlName="triggers"></multiselect-dropdown>
+                                                                            <div class="col-2 form-group"
+                                                                                *ngIf="form.controls.infrastructure.controls[i].get('triggers')">
+                                                                                <label
+                                                                                    class="form-col-form-label">Trigger</label>
+                                                                                <multiselect-dropdown
+                                                                                    [options]="triggerList[i]"
+                                                                                    [settings]="devicesListSettings"
+                                                                                    class="form-control p-0"
+                                                                                    style="height:auto;"
+                                                                                    formControlName="triggers"></multiselect-dropdown>
                                                                             </div>
                                                                         </ng-container>
                                                                     </ng-container>
-                                                                    
+
                                                                     <ng-container
                                                                         *ngIf="form.controls.infrastructure.controls[i].get('exclude')">
                                                                         <div class="col-2 form-group">
@@ -199,27 +212,46 @@
                                                 </ng-container>
                                             </div>
                                         </div>
-                                    </ng-container>
+                                    </ng-container> -->
+
+                                    <div class="col-10 d-inline-block mb-3">
+                                        <div class="btn-group rounded-pill border" style="border-radius: 50px;">
+                                            <button
+                                                class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                                type="button" (click)="enableFilter()"
+                                                [class.active]="form.controls.filter_enabled.value">Enable</button>
+                                            <button
+                                                class="btn btn-pill btn-sm btn-outline-primary rounded-pill border-0"
+                                                type="button" (click)="disableFilter()"
+                                                [class.active]="!form.controls.filter_enabled.value">Disable</button>
+                                        </div>
+                                    </div>
 
                                     <!-- place for filters -->
                                     <ng-container *ngIf="form.get('filter_rule_meta')">
-                                        <div class="col" *ngIf="form.controls.infrastructure_type.value == 'Filter' && queryBuilderConfig">
+                                        <div class="col" *ngIf="form.get('filter_enabled').value && queryBuilderConfig">
                                             <query-builder #queryBuilder formControlName='filter_rule_meta'
                                                 [classNames]='queryBuilderClassNames' [config]='queryBuilderConfig'
                                                 [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
                                                 [persistValueOnFieldChange]='persistValueOnFieldChange'>
-                                                <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+                                                <ng-container
+                                                    *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
                                                     <textarea class="text-input text-area" [(ngModel)]="rule.value"
-                                                        [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        [disabled]=getDisabledState()
                                                         placeholder="Custom Textarea"></textarea>
                                                 </ng-container>
-                                                <ng-container *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
+                                                <ng-container
+                                                    *queryInput="let rule; type: 'tag'; let getDisabledState=getDisabledState">
                                                     <div class="col-auto">
                                                         <tag-input [clearOnBlur]="true" [(ngModel)]="rule.value"
-                                                            [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()
-                                                            [modelAsStrings]="true" [secondaryPlaceholder]="'Enter tag'"
+                                                            [ngModelOptions]="{standalone: true}"
+                                                            [disabled]=getDisabledState() [modelAsStrings]="true"
+                                                            [secondaryPlaceholder]="'Enter tag'"
                                                             (ngModelChange)="onTagInputChange($event)">
-                                                            <tag-input-dropdown [autocompleteItems]="tagsAutocompleteItems" [zIndex]="2200"
+                                                            <tag-input-dropdown
+                                                                [autocompleteItems]="tagsAutocompleteItems"
+                                                                [zIndex]="2200"
                                                                 (ngModelChange)="onTagInputChange($event)">
                                                             </tag-input-dropdown>
                                                         </tag-input>
@@ -234,25 +266,25 @@
                             <div class="row border rounded p-4 position-relative mt-4 mx-0">
                                 <div class="pb-2 mb-3 bg-white position-absolute section-name">Actions</div>
                                 <div class="col">
-                                    <div class="form-group row">
+                                    <div class="form-group row ml-5 pl-3">
                                         <div class="col-4 align-items-center row px-0">
-                                            <div class="col-3 pr-0">Alerts :</div>
-                                            <div class="col-9 pl-0">
+                                            <div class="col-5 pr-0">Event Email Notification :</div>
+                                            <div class="col-7 pl-0">
                                                 <div class="d-inline-block">
                                                     <ul class="d-flex px-0 mb-0">
                                                         <li>
                                                             <label class="pointer-link"
-                                                                [class.active]="form.get('has_alerts').value">
+                                                                [class.active]="form.get('disable_event_notification').value">
                                                                 <input type="radio" [value]="true"
-                                                                    formControlName="has_alerts">
+                                                                    formControlName="disable_event_notification">
                                                                 <span class="font-sm">Enable</span>
                                                             </label>
                                                         </li>
                                                         <li>
                                                             <label class="pointer-link"
-                                                                [class.active]="!form.get('has_alerts').value">
+                                                                [class.active]="!form.get('disable_event_notification').value">
                                                                 <input type="radio" [value]="false"
-                                                                    formControlName="has_alerts">
+                                                                    formControlName="disable_event_notification">
                                                                 <span class="font-sm">Disable</span>
                                                             </label>
                                                         </li>
@@ -261,73 +293,61 @@
                                             </div>
                                         </div>
 
-                                        <ng-container
-                                            *ngIf="form.get('has_notification') && form.get('has_auto_ticketing')">
-                                            <div class="col-4 align-items-center row px-0">
-                                                <div class="col-4 pr-0">Notification :</div>
-                                                <div class="col-8 pl-0">
-                                                    <div class="d-inline-block">
-                                                        <ul class="d-flex px-0 mb-0">
-                                                            <li>
-                                                                <label class="pointer-link"
-                                                                    [class.active]="form.get('has_notification').value">
-                                                                    <input type="radio" [value]="true"
-                                                                        formControlName="has_notification">
-                                                                    <span class="font-sm">Enable</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label class="pointer-link"
-                                                                    [class.active]="!form.get('has_notification').value">
-                                                                    <input type="radio" [value]="false"
-                                                                        formControlName="has_notification">
-                                                                    <span class="font-sm">Disable</span>
-                                                                </label>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-4 align-items-center row px-0">
-                                                <div class="col-5 pr-0">Autoticketing :</div>
-                                                <div class="col-7 pl-0">
-                                                    <div class="d-inline-block">
-                                                        <ul class="d-flex px-0 mb-0">
-                                                            <li>
-                                                                <label class="pointer-link"
-                                                                    [class.active]="form.get('has_auto_ticketing').value">
-                                                                    <input type="radio" [value]="true"
-                                                                        formControlName="has_auto_ticketing">
-                                                                    <span class="font-sm">Enable</span>
-                                                                </label>
-                                                            </li>
-                                                            <li>
-                                                                <label class="pointer-link"
-                                                                    [class.active]="!form.get('has_auto_ticketing').value">
-                                                                    <input type="radio" [value]="false"
-                                                                        formControlName="has_auto_ticketing">
-                                                                    <span class="font-sm">Disable</span>
-                                                                </label>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </ng-container>
-                                    </div>
-                                    <ng-container *ngIf="form.get('correlate_all_alerts')">
-                                        <div class="form-group row">
-                                            <div class="col px-0">
-                                                <div class="form-check">
-                                                    <input class="form-check-input form-check-xl" type="checkbox"
-                                                        formControlName="correlate_all_alerts">
-                                                    <label class="form-check-label">
-                                                        Correlate all alerts once the maintenance window ends
-                                                    </label>
+                                        <div class="col-4 align-items-center row px-0">
+                                            <div class="col-4 pr-0">Event Suppresion :</div>
+                                            <div class="col-8 pl-0">
+                                                <div class="d-inline-block">
+                                                    <ul class="d-flex px-0 mb-0">
+                                                        <li>
+                                                            <label class="pointer-link"
+                                                                [class.active]="form.get('suppress_event').value">
+                                                                <input type="radio" [value]="true"
+                                                                    formControlName="suppress_event">
+                                                                <span class="font-sm">Enable</span>
+                                                            </label>
+                                                        </li>
+                                                        <li>
+                                                            <label class="pointer-link"
+                                                                [class.active]="!form.get('suppress_event').value">
+                                                                <input type="radio" [value]="false"
+                                                                    formControlName="suppress_event">
+                                                                <span class="font-sm">Disable</span>
+                                                            </label>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                    </ng-container>
+
+                                        <div class="col-4 align-items-center row px-0"
+                                            *ngIf="!form.get('suppress_event').value">
+                                            <div class="col-4 pr-0">Correlate :</div>
+                                            <div class="col-8 pl-0">
+                                                <div class="d-inline-block">
+                                                    <ul class="d-flex px-0 mb-0">
+                                                        <li>
+                                                            <label class="pointer-link"
+                                                                [class.active]="form.get('single_correlation').value">
+                                                                <input type="radio" [value]="true"
+                                                                    formControlName="single_correlation">
+                                                                <span class="font-sm">Enable</span>
+                                                            </label>
+                                                        </li>
+                                                        <li>
+                                                            <label class="pointer-link"
+                                                                [class.active]="!form.get('single_correlation').value">
+                                                                <input type="radio" [value]="false"
+                                                                    formControlName="single_correlation">
+                                                                <span class="font-sm">Disable</span>
+                                                            </label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -362,7 +382,7 @@
                                             <div class="col-2 mt-1">
                                                 <div class="form-check">
                                                     <input class="form-check-input form-check-xl" type="checkbox"
-                                                        formControlName="send_before_window">
+                                                        formControlName="notify_before_window">
                                                     <label class="form-check-label">
                                                         Before And
                                                     </label>
@@ -371,7 +391,7 @@
                                             <div class="col-3 mt-1">
                                                 <div class="form-check">
                                                     <input class="form-check-input form-check-xl" type="checkbox"
-                                                        formControlName="send_after_window">
+                                                        formControlName="notify_after_window">
                                                     <label class="form-check-label">
                                                         After Maintenance Window
                                                     </label>
@@ -379,12 +399,12 @@
                                             </div>
                                         </ng-container>
                                     </div>
-                                    <ng-container *ngIf="form.get('user_and_user_group')">
+                                    <ng-container *ngIf="form.get('users_and_user_groups')">
                                         <div class="form-group row">
                                             <div class=" col-2 text-right mt-1">User or User Group<em>*</em> :</div>
                                             <div class="col">
                                                 <div class="card mb-1"
-                                                    [ngClass]="{'border-danger': formErrors.user_and_user_group}">
+                                                    [ngClass]="{'border-danger': formErrors.users_and_user_groups}">
                                                     <div class="card-body p-2">
                                                         <span *ngIf="selectedUserAndGroups.length">
                                                             <span
@@ -402,21 +422,21 @@
                                                     </div>
                                                 </div>
                                                 <small class="text-danger"
-                                                    *ngIf="formErrors.user_and_user_group">{{formErrors.user_and_user_group}}
+                                                    *ngIf="formErrors.users_and_user_groups">{{formErrors.users_and_user_groups}}
                                                 </small>
                                             </div>
                                         </div>
                                     </ng-container>
-                                    <ng-container *ngIf="form.get('additional_email')">
+                                    <ng-container *ngIf="form.get('additional_emails')">
                                         <div class="form-group row">
                                             <div class="col-2 text-right align-self-center">Custom MailID :</div>
                                             <div class="col-6">
                                                 <input class="form-control" type="text"
                                                     placeholder="Comma Seperated Emails"
-                                                    [class.is-invalid]="formErrors.additional_email"
-                                                    formControlName="additional_email">
+                                                    [class.is-invalid]="formErrors.additional_emails"
+                                                    formControlName="additional_emails">
                                                 <small class="invalid-feedback"
-                                                    *ngIf="formErrors.additional_email">{{formErrors.additional_email}}
+                                                    *ngIf="formErrors.additional_emails">{{formErrors.additional_emails}}
                                                 </small>
                                             </div>
                                         </div>
@@ -424,647 +444,378 @@
                                 </div>
                             </div>
 
-                            <div class="row border rounded p-4 position-relative mt-4 mx-0">
+                            <div class="row border flex-column rounded p-4 position-relative mt-4 mx-0">
                                 <div class="pb-2 mb-3 bg-white position-absolute section-name">Schedule</div>
-                                <div class="col">
-                                    <div class="form-group row">
-                                        <div class="col-2 text-right align-self-center">Time Zone<em>* </em> :</div>
-                                        <div class="col-3">
-                                            <select class="form-control" type="text" formControlName="timezone"
-                                                [class.is-invalid]="formErrors.timezone">
-                                                <option [value]="''" disabled>Select</option>
-                                                <option *ngFor="let timezone of timeZoneList" [value]="timezone">
-                                                    {{timezone}}</option>
-                                            </select>
-                                            <small class="invalid-feedback"
-                                                *ngIf="formErrors.timezone">{{formErrors.timezone}}
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col-2 text-right align-self-center">Schedule :</div>
-                                        <div class="col">
+
+                                <div formGroupName="schedule_meta">
+
+                                    <div class="row mx-0 d-flex align-items-center">
+                                        <div class="col-2-w text-right pr-0">Schedule <em>*</em> : </div>
+                                        <div class="col-8-w px-2">
                                             <div class="d-inline-block">
                                                 <ul class="d-flex px-0 mb-0">
                                                     <li>
-                                                        <label class="pointer-link"
-                                                            [class.active]="form.get('schedule_type').value == 'One-time'">
-                                                            <input type="radio" [value]="'One-time'"
-                                                                formControlName="schedule_type">
-                                                            <span class="font-sm">One-time</span>
+                                                        <label class="pointer-link px-4"
+                                                            [class.active]="form.get('schedule_meta')?.get('schedule_type')?.value === 'onetime'">
+                                                            <input type="radio" formControlName="schedule_type"
+                                                                [value]="'onetime'">
+                                                            <span class="font-sm mr-2">One-time</span>
+                                                        </label>
+                                                    </li>
+                                                    <!-- <li>
+                                                    <label class="pointer-link px-4"
+                                                        [class.active]="form.get('schedule_type').value=='hourly'">
+                                                        <input type="radio" formControlName="schedule_type"
+                                                            [value]="'hourly'">
+                                                        <span class="font-sm mr-2">Hourly</span>
+                                                    </label>
+                                                </li> -->
+                                                    <li>
+                                                        <label class="pointer-link px-4"
+                                                            [class.active]="form.get('schedule_meta')?.get('schedule_type')?.value =='daily'">
+                                                            <input type="radio" formControlName="schedule_type"
+                                                                [value]="'daily'">
+                                                            <span class="font-sm mr-2">Daily</span>
                                                         </label>
                                                     </li>
                                                     <li>
-                                                        <label class="pointer-link"
-                                                            [class.active]="form.get('schedule_type').value == 'Recurring'">
-                                                            <input type="radio" [value]="'Recurring'"
-                                                                formControlName="schedule_type">
-                                                            <span class="font-sm">Recurring</span>
+                                                        <label class="pointer-link px-4"
+                                                            [class.active]="form.get('schedule_meta')?.get('schedule_type')?.value =='weekly'">
+                                                            <input type="radio" formControlName="schedule_type"
+                                                                [value]="'weekly'">
+                                                            <span class="font-sm mr-2">Weekly</span>
+                                                        </label>
+                                                    </li>
+                                                    <li>
+                                                        <label class="pointer-link px-4"
+                                                            [class.active]="form.get('schedule_meta')?.get('schedule_type')?.value =='monthly'">
+                                                            <input type="radio" formControlName="schedule_type"
+                                                                [value]="'monthly'">
+                                                            <span class="font-sm mr-2">Monthly</span>
                                                         </label>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
                                     </div>
-                                    <ng-container *ngIf="form.get('schedule_type').value == 'One-time'">
-                                        <div class="form-group row">
-                                            <div class="col-2 text-right align-self-center">Start Time<em>* </em> :
-                                            </div>
-                                            <div class="col-2">
+
+
+                                    <div class="row mx-0 d-flex align-items-center justify-content-center mt-4"
+                                        *ngIf="form.get('schedule_meta')?.get('schedule_type')?.value === 'onetime'">
+                                        <div class="col-2-w text-right pr-0">Range of Recurrence <em>*</em> : </div>
+                                        <div class="col-10-w d-flex align-items-center justify-content-between px-2">
+                                            <div class="form-group col-5-w pr-3">
+                                                <label for="start_date" class="mb-0 font-sm">Start Date
+                                                    <em>*</em></label>
                                                 <div class="input-group">
-                                                    <owl-date-time #contractStartDate [pickerType]="'calendar'"
+                                                    <owl-date-time #startDate
                                                         [scrollStrategy]="scrollStrategy"></owl-date-time>
                                                     <input class="form-control rounded-left"
-                                                        formControlName="start_date"
-                                                        [owlDateTimeTrigger]="contractStartDate"
-                                                        [owlDateTime]="contractStartDate"
-                                                        [ngClass]="{'is-invalid' : formErrors.start_date}"
-                                                        [max]="form.controls.end_date.value" type="text"
-                                                        name="start_date">
-                                                    <div class="input-group-append"
-                                                        [owlDateTimeTrigger]="contractStartDate">
-                                                        <span class="input-group-text bg-white rounded-right">
+                                                        formControlName="start_date" [owlDateTime]="startDate"
+                                                        [owlDateTimeTrigger]="startDate"
+                                                        [class.is-invalid]="formErrors.schedule_meta?.start_date">
+                                                    <div class="input-group-append" [owlDateTimeTrigger]="startDate">
+                                                        <span class="input-group-text bg-white">
                                                             <i class="fas fa-calendar-alt"></i>
                                                         </span>
                                                     </div>
-                                                    <div class="invalid-feedback" *ngIf="formErrors.start_date">
-                                                        {{formErrors.start_date}}</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-1">
-                                                <input class="form-control" type="number" placeholder="Hour(s)"
-                                                    formControlName="schedule_start_time_hr"
-                                                    [class.is-invalid]="formErrors.schedule_start_time_hr" [max]="23"
-                                                    [min]="0">
-                                                <small class="invalid-feedback"
-                                                    *ngIf="formErrors.schedule_start_time_hr">{{formErrors.schedule_start_time_hr}}
-                                                </small>
-                                            </div>
-                                            <div class="col-1">
-                                                <input class="form-control" type="number" placeholder="Minute(s)"
-                                                    formControlName="schedule_start_time_min"
-                                                    [class.is-invalid]="formErrors.schedule_start_time_min" [max]="59"
-                                                    [min]="0">
-                                                <small class="invalid-feedback"
-                                                    *ngIf="formErrors.schedule_start_time_min">{{formErrors.schedule_start_time_min}}
-                                                </small>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <div class="col-2 text-right align-self-center">End Time<em>* </em> :</div>
-                                            <div class="col-2">
-                                                <div class="input-group">
-                                                    <owl-date-time #contractEndDate [pickerType]="'calendar'"
-                                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
-                                                    <input class="form-control rounded-left" formControlName="end_date"
-                                                        [owlDateTimeTrigger]="contractEndDate"
-                                                        [owlDateTime]="contractEndDate"
-                                                        [ngClass]="{'is-invalid' : formErrors.end_date}"
-                                                        [min]="form.controls.start_date.value" type="text"
-                                                        name="end_date">
-                                                    <div class="input-group-append "
-                                                        [owlDateTimeTrigger]="contractEndDate">
-                                                        <span class="input-group-text bg-white rounded-right">
-                                                            <i class="fas fa-calendar-alt"></i>
-                                                        </span>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.schedule_meta?.start_date">
+                                                        {{ formErrors.schedule_meta.start_date }}
                                                     </div>
-                                                    <div class="invalid-feedback" *ngIf="formErrors.end_date">
-                                                        {{formErrors.end_date}}</div>
                                                 </div>
                                             </div>
-                                            <div class="col-1">
-                                                <input class="form-control" type="number" placeholder="Hour(s)"
-                                                    formControlName="schedule_end_time_hr"
-                                                    [class.is-invalid]="formErrors.schedule_end_time_hr" [max]="23"
-                                                    [min]="0">
-                                                <small class="invalid-feedback"
-                                                    *ngIf="formErrors.schedule_end_time_hr">{{formErrors.schedule_end_time_hr}}
-                                                </small>
-                                            </div>
-                                            <div class="col-1">
-                                                <input class="form-control" type="number" placeholder="Minute(s)"
-                                                    formControlName="schedule_end_time_min"
-                                                    [class.is-invalid]="formErrors.schedule_end_time_min" [max]="59"
-                                                    [min]="0">
-                                                <small class="invalid-feedback"
-                                                    *ngIf="formErrors.schedule_end_time_min">{{formErrors.schedule_end_time_min}}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </ng-container>
-                                    <ng-container *ngIf="form.get('schedule_type').value == 'Recurring'">
-                                        <div class="form-group row">
-                                            <div class="col-2 text-right align-self-center mt-4">Range of
-                                                Recurrence<em>* </em> :</div>
-                                            <div class="col-2">
-                                                <label class="form-col-form-label" for="start_date">Start
-                                                    Date<em>*</em></label>
-                                                <div class="input-group">
-                                                    <owl-date-time #contractStartDate [pickerType]="'calendar'"
-                                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
-                                                    <input class="form-control rounded-left"
-                                                        formControlName="start_date"
-                                                        [owlDateTimeTrigger]="contractStartDate"
-                                                        [owlDateTime]="contractStartDate"
-                                                        [ngClass]="{'is-invalid' : formErrors.start_date}"
-                                                        [max]="form.controls.end_date.value" type="text"
-                                                        name="start_date">
-                                                    <div class="input-group-append"
-                                                        [owlDateTimeTrigger]="contractStartDate">
-                                                        <span class="input-group-text bg-white rounded-right">
-                                                            <i class="fas fa-calendar-alt"></i>
-                                                        </span>
-                                                    </div>
-                                                    <div class="invalid-feedback" *ngIf="formErrors.start_date">
-                                                        {{formErrors.start_date}}</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-1 mt-4">
-                                                <input class="form-control mt-1" type="number" placeholder="Hours"
-                                                    formControlName="recurrence_start_time_hr"
-                                                    [class.is-invalid]="formErrors.recurrence_start_time_hr" [max]="23"
-                                                    [min]="0">
-                                                <small class="invalid-feedback"
-                                                    *ngIf="formErrors.recurrence_start_time_hr">{{formErrors.recurrence_start_time_hr}}
-                                                </small>
-                                            </div>
-                                            <div class="col-1 mt-4">
-                                                <input class="form-control mt-1" type="number" placeholder="Minutes"
-                                                    formControlName="recurrence_start_time_min"
-                                                    [class.is-invalid]="formErrors.recurrence_start_time_min" [max]="59"
-                                                    [min]="0">
-                                                <small class="invalid-feedback"
-                                                    *ngIf="formErrors.recurrence_start_time_min">{{formErrors.recurrence_start_time_min}}
-                                                </small>
-                                            </div>
-                                            <div class="mx-1">
-                                                <div>End Date<em>*</em></div>
-                                                <div class="form-check form-check-inline mt-2">
-                                                    <input class="form-check-input mt-1" type="radio" name="ends_never"
-                                                        [value]="true" formControlName="ends_never">
-                                                    <label class="form-check-label mt-1" for="true">Never</label>
-                                                </div>
-                                                <div class="form-check form-check-inline mt-2">
-                                                    <input class="form-check-input mt-1" type="radio" name="ends_never"
-                                                        [value]="false" formControlName="ends_never">
-                                                    <label class="form-check-label mt-1" for="false">On</label>
-                                                </div>
-                                                <div class="mt-2">
-                                                    <small class="text-danger"
-                                                        *ngIf="formErrors.ends_never">{{formErrors.ends_never}}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <ng-container *ngIf="form.get('ends_never').value == false">
-                                                <div class="col-2 mt-4">
-                                                    <div class="input-group mt-1">
-                                                        <owl-date-time #contractEndDate [pickerType]="'calendar'"
+                                            <div class="form-group col-7-w pl-3">
+                                                <label for="end_date_status" class="mb-0 font-sm ml-2">End Date
+                                                    <em>*</em></label>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="col-8-w input-group pl-2">
+                                                        <owl-date-time #endDate
                                                             [scrollStrategy]="scrollStrategy"></owl-date-time>
-                                                        <input class="form-control rounded-left"
-                                                            formControlName="end_date"
-                                                            [owlDateTimeTrigger]="contractEndDate"
-                                                            [owlDateTime]="contractEndDate"
-                                                            [ngClass]="{'is-invalid' : formErrors.end_date}"
-                                                            [min]="form.controls.start_date.value" type="text"
-                                                            name="end_date">
-                                                        <div class="input-group-append "
-                                                            [owlDateTimeTrigger]="contractEndDate">
-                                                            <span class="input-group-text bg-white rounded-right">
+                                                        <input class="form-control rounded-left pr-0"
+                                                            formControlName="end_date" [owlDateTime]="endDate"
+                                                            [owlDateTimeTrigger]="endDate"
+                                                            [class.is-invalid]="formErrors.schedule_meta?.end_date">
+                                                        <div class="input-group-append" [owlDateTimeTrigger]="endDate">
+                                                            <span class="input-group-text bg-white">
                                                                 <i class="fas fa-calendar-alt"></i>
                                                             </span>
                                                         </div>
-                                                        <div class="invalid-feedback" *ngIf="formErrors.end_date">
-                                                            {{formErrors.end_date}}</div>
+                                                        <div class="invalid-feedback"
+                                                            *ngIf="formErrors.schedule_meta?.end_date">
+                                                            {{ formErrors.schedule_meta.end_date }}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-1 mt-4">
-                                                    <input class="form-control mt-1" type="number" placeholder="Hours"
-                                                        formControlName="recurrence_end_time_hr"
-                                                        [class.is-invalid]="formErrors.recurrence_end_time_hr"
-                                                        [max]="23" [min]="0">
-                                                    <small class="invalid-feedback"
-                                                        *ngIf="formErrors.recurrence_end_time_hr">{{formErrors.recurrence_end_time_hr}}
-                                                    </small>
-                                                </div>
-                                                <div class="col-1 mt-4">
-                                                    <input class="form-control mt-1" type="number" placeholder="Minutes"
-                                                        formControlName="recurrence_end_time_min"
-                                                        [class.is-invalid]="formErrors.recurrence_end_time_min"
-                                                        [max]="59" [min]="0">
-                                                    <small class="invalid-feedback"
-                                                        *ngIf="formErrors.recurrence_end_time_min">{{formErrors.recurrence_end_time_min}}
-                                                    </small>
-                                                </div>
-                                            </ng-container>
-                                        </div>
-                                        <div class="form-group row">
-                                            <div class="col-2 text-right align-self-center">Recurrence pattern<em>*</em>
-                                                :</div>
-                                            <div class="col">
-                                                <div class="d-inline-block">
-                                                    <ul class="d-flex px-0 mb-0">
-                                                        <li>
-                                                            <label class="pointer-link"
-                                                                [class.active]="form.get('recurrence_pattern').value == 'Daily'">
-                                                                <input type="radio" [value]="'Daily'"
-                                                                    formControlName="recurrence_pattern">
-                                                                <span class="font-sm">Daily</span>
-                                                            </label>
-                                                        </li>
-                                                        <li>
-                                                            <label class="pointer-link"
-                                                                [class.active]="form.get('recurrence_pattern').value == 'Weekly'">
-                                                                <input type="radio" [value]="'Weekly'"
-                                                                    formControlName="recurrence_pattern">
-                                                                <span class="font-sm">Weekly</span>
-                                                            </label>
-                                                        </li>
-                                                        <li>
-                                                            <label class="pointer-link"
-                                                                [class.active]="form.get('recurrence_pattern').value == 'Monthly'">
-                                                                <input type="radio" [value]="'Monthly'"
-                                                                    formControlName="recurrence_pattern">
-                                                                <span class="font-sm">Monthly</span>
-                                                            </label>
-                                                        </li>
-                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <ng-container
-                                            *ngIf="form.get('recurrence_pattern').value == 'Daily' && form.get('schedule_type').value == 'Recurring'">
-                                            <div class="form-group row">
-                                                <div class="col-2 text-right  align-self-center"
-                                                    [ngClass]="{'mt-4': form.get('daily_type').value == 'Every Weekday'}">
-                                                    Select
-                                                    Schedule :</div>
-                                                <div class="col ml-4">
-                                                    <div class="d-flex align-items-center">
-                                                        <label class="form-check-label"
-                                                            [ngClass]="{'mt-4': form.get('daily_type').value == 'Every Weekday'}">
-                                                            <input type="radio" name="daily_type"
-                                                                [value]="'Every Weekday'" class="form-check-input"
-                                                                formControlName="daily_type">
-                                                            Every Weekday (Mon-Fri)
-                                                        </label>
-                                                        <ng-container
-                                                            *ngIf="form.get('daily_type').value == 'Every Weekday'">
-                                                            <label class="form-check-label mx-2 mt-4">at</label>
-                                                            <div class="w-8 mr-2">
-                                                                <label class="form-col-form-label mb-0"
-                                                                    for="schedule_start_time_hr">Start
-                                                                    Time<em>*</em></label> <input
-                                                                    class="form-control mt-1" type="number"
-                                                                    placeholder="Hours"
-                                                                    formControlName="schedule_start_time_hr"
-                                                                    [class.is-invalid]="formErrors.schedule_start_time_hr"
-                                                                    [max]="23" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_start_time_hr">{{formErrors.schedule_start_time_hr}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-9 mt-4">
-                                                                <input class="form-control mt-1" type="number"
-                                                                    placeholder="Minutes"
-                                                                    formControlName="schedule_start_time_min"
-                                                                    [class.is-invalid]="formErrors.schedule_start_time_min"
-                                                                    [max]="59" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_start_time_min">{{formErrors.schedule_start_time_min}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-8 mx-2">
-                                                                <label class="form-col-form-label mb-0"
-                                                                    for="schedule_end_time_hr">End
-                                                                    Time<em>*</em></label> <input
-                                                                    class="form-control mt-1" type="number"
-                                                                    placeholder="Hours"
-                                                                    formControlName="schedule_end_time_hr"
-                                                                    [class.is-invalid]="formErrors.schedule_end_time_hr"
-                                                                    [max]="23" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_end_time_hr">{{formErrors.schedule_end_time_hr}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-9 mt-4">
-                                                                <input class="form-control mt-1" type="number"
-                                                                    placeholder="Minutes"
-                                                                    formControlName="schedule_end_time_min"
-                                                                    [class.is-invalid]="formErrors.schedule_end_time_min"
-                                                                    [max]="59" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_end_time_min">{{formErrors.schedule_end_time_min}}
-                                                                </small>
-                                                            </div>
-                                                        </ng-container>
+                                    </div>
+
+
+                                    <div class="row mx-0 d-flex align-items-center mt-4"
+                                        *ngIf="form.get('schedule_meta')?.get('schedule_type')?.value !='onetime'">
+                                        <div class="col-2-w text-right pr-0">Range of Recurrence <em>*</em> : </div>
+                                        <div class="col-10-w d-flex align-items-center px-2">
+                                            <div class="form-group col-5-w pr-3">
+                                                <label for="start_date" class="mb-0 font-sm">Start Date
+                                                    <em>*</em></label>
+                                                <div class="input-group">
+                                                    <owl-date-time #startDate [pickerType]="'calendar'"
+                                                        [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                                    <input class="form-control rounded-left" name="start_date"
+                                                        formControlName="start_date" [owlDateTimeTrigger]="startDate"
+                                                        [owlDateTime]="startDate"
+                                                        [max]="form.get('schedule_meta')?.get('end_date').value"
+                                                        type="text" placeholder="Date"
+                                                        [class.is-invalid]="formErrors.schedule_meta?.start_date">
+                                                    <div class="input-group-append" [owlDateTimeTrigger]="startDate">
+                                                        <span class="input-group-text bg-white">
+                                                            <i class="fas fa-calendar-alt"></i>
+                                                        </span>
                                                     </div>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.schedule_meta?.start_date">
+                                                        {{formErrors.schedule_meta?.start_date}}</div>
                                                 </div>
                                             </div>
-                                            <div class="form-group custom-margin">
+                                            <div class="form-group col-7-w pl-3">
+                                                <label for="end_date_status" class="mb-0 font-sm">End Date
+                                                    <em>*</em></label>
                                                 <div class="d-flex align-items-center">
-                                                    <label class="form-check-label mr-2"
-                                                        [ngClass]="{'mt-4': form.get('daily_type').value == 'Every Custom Day'}">
-                                                        <input type="radio" name="daily_type"
-                                                            [value]="'Every Custom Day'" class="form-check-input"
-                                                            formControlName="daily_type">
-                                                        Every
-                                                    </label>
-                                                    <input class="form-control w-5 mr-2" type="number"
-                                                        [ngClass]="{'mt-4': form.get('daily_type').value == 'Every Custom Day'}"
-                                                        formControlName="every_day_count"
-                                                        [class.is-invalid]="formErrors.every_day_count" [min]="0">
-                                                    <label class="form-check-label"
-                                                        [ngClass]="{'mt-4': form.get('daily_type').value == 'Every Custom Day'}">Day(s)</label>
-                                                    <ng-container
-                                                        *ngIf="form.get('daily_type').value == 'Every Custom Day'">
-                                                        <label class="form-check-label mx-2 mt-4">at</label>
-                                                        <div class="w-8 mr-2">
-                                                            <label class="form-col-form-label mb-0"
-                                                                for="schedule_start_time_hr">Start
-                                                                Time<em>*</em></label> <input class="form-control mt-1"
-                                                                type="number" placeholder="Hours"
-                                                                formControlName="schedule_start_time_hr"
-                                                                [class.is-invalid]="formErrors.schedule_start_time_hr"
-                                                                [max]="23" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_start_time_hr">{{formErrors.schedule_start_time_hr}}
-                                                            </small>
+                                                    <div class="justify-content-between">
+                                                        <div class="form-check d-inline pr-2">
+                                                            <input class="form-check-input form-check-inline pr-0"
+                                                                type="radio" id="never" name="end_date_status"
+                                                                formControlName="end_date_status" value="never">
+                                                            <label class="form-check-label" for="never">Never</label>
                                                         </div>
-                                                        <div class="w-10 mt-4">
-                                                            <input class="form-control mt-1" type="number"
-                                                                placeholder="Minutes"
-                                                                formControlName="schedule_start_time_min"
-                                                                [class.is-invalid]="formErrors.schedule_start_time_min"
-                                                                [max]="59" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_start_time_min">{{formErrors.schedule_start_time_min}}
-                                                            </small>
+                                                        <div class="form-check d-inline">
+                                                            <input class="form-check-input form-check-inline"
+                                                                type="radio" id="on" name="end_date_status"
+                                                                formControlName="end_date_status" value="on">
+                                                            <label class="form-check-label" for="on">On</label>
                                                         </div>
-                                                        <div class="w-8 mx-2">
-                                                            <label class="form-col-form-label mb-0"
-                                                                for="schedule_end_time_hr">End
-                                                                Time<em>*</em></label> <input class="form-control mt-1"
-                                                                type="number" placeholder="Hours"
-                                                                formControlName="schedule_end_time_hr"
-                                                                [class.is-invalid]="formErrors.schedule_end_time_hr"
-                                                                [max]="23" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_end_time_hr">{{formErrors.schedule_end_time_hr}}
-                                                            </small>
-                                                        </div>
-                                                        <div class="w-10 mt-4">
-                                                            <input class="form-control mt-1" type="number"
-                                                                placeholder="Minutes"
-                                                                formControlName="schedule_end_time_min"
-                                                                [class.is-invalid]="formErrors.schedule_end_time_min"
-                                                                [max]="59" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_end_time_min">{{formErrors.schedule_end_time_min}}
-                                                            </small>
-                                                        </div>
-                                                    </ng-container>
-                                                </div>
-                                            </div>
-                                            <small class="text-danger custom-margin" *ngIf="formErrors.daily_type">
-                                                {{formErrors.daily_type}}</small>
-                                        </ng-container>
-                                        <ng-container
-                                            *ngIf="form.get('recurrence_pattern').value == 'Weekly' && form.get('schedule_type').value == 'Recurring'">
-                                            <div class="form-group row">
-                                                <div class="col-2 text-right align-self-center"
-                                                    [ngClass]="{'mt-3': form.get('weekday').value.length}">Select
-                                                    Weekday(s) :</div>
-                                                <div class="col mt-2">
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <div class="form-check mr-3" *ngFor="let day of days"
-                                                            [ngClass]="{'mt-4': form.get('weekday').value.length}">
-                                                            <input class="form-check-input form-check-xl"
-                                                                type="checkbox"
-                                                                [checked]="form.get('weekday').value.includes(day)"
-                                                                (change)="onCheckboxChange(day)" />
-                                                            <label class="form-check-label">{{day}}</label>
-                                                        </div>
-                                                        <ng-container *ngIf="form.get('weekday').value.length">
-                                                            <label class="form-check-label mr-3 mt-4">at</label>
-                                                            <div class="w-8 mr-2">
-                                                                <label class="form-col-form-label mb-0"
-                                                                    for="schedule_start_time_hr">Start
-                                                                    Time<em>*</em></label> <input
-                                                                    class="form-control mt-1" type="number"
-                                                                    placeholder="Hours"
-                                                                    formControlName="schedule_start_time_hr"
-                                                                    [class.is-invalid]="formErrors.schedule_start_time_hr"
-                                                                    [max]="23" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_start_time_hr">{{formErrors.schedule_start_time_hr}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-10 mt-4">
-                                                                <input class="form-control mt-1" type="number"
-                                                                    placeholder="Minutes"
-                                                                    formControlName="schedule_start_time_min"
-                                                                    [class.is-invalid]="formErrors.schedule_start_time_min"
-                                                                    [max]="59" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_start_time_min">{{formErrors.schedule_start_time_min}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-8 mx-2">
-                                                                <label class="form-col-form-label mb-0"
-                                                                    for="schedule_end_time_hr">End
-                                                                    Time<em>*</em></label> <input
-                                                                    class="form-control mt-1" type="number"
-                                                                    placeholder="Hours"
-                                                                    formControlName="schedule_end_time_hr"
-                                                                    [class.is-invalid]="formErrors.schedule_end_time_hr"
-                                                                    [max]="23" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_end_time_hr">{{formErrors.schedule_end_time_hr}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-10 mt-4">
-                                                                <input class="form-control mt-1" type="number"
-                                                                    placeholder="Minutes"
-                                                                    formControlName="schedule_end_time_min"
-                                                                    [class.is-invalid]="formErrors.schedule_end_time_min"
-                                                                    [max]="59" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_end_time_min">{{formErrors.schedule_end_time_min}}
-                                                                </small>
-                                                            </div>
-                                                        </ng-container>
                                                     </div>
-                                                    <small class="text-danger" *ngIf="formErrors.weekday">
-                                                        {{formErrors.weekday}}</small>
-                                                </div>
-                                            </div>
-                                        </ng-container>
-                                        <ng-cointianer
-                                            *ngIf="form.get('recurrence_pattern').value == 'Monthly' && form.get('schedule_type').value == 'Recurring'">
-                                            <div class="form-group row">
-                                                <div class="col-2 text-right align-self-center"
-                                                    [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Month'}">
-                                                    Select
-                                                    Schedule :</div>
-                                                <div class="col ml-4">
-                                                    <div class="d-flex align-items-center">
-                                                        <input type="radio" name="monthly_type" [value]="'Every Month'"
-                                                            class="form-check-input"
-                                                            [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Month'}"
-                                                            formControlName="monthly_type">
-                                                        <label class="form-check-label"
-                                                            [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Month'}">Every</label>
-                                                        <input class="form-control w-5 mx-2" type="number"
-                                                            formControlName="every_month_count"
-                                                            [class.is-invalid]="formErrors.every_month_count"
-                                                            [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Month'}"
-                                                            [min]="0">
-                                                        <label class="form-check-label"
-                                                            [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Month'}">Day(s)
-                                                            of
-                                                            month</label>
-                                                        <ng-container
-                                                            *ngIf="form.get('monthly_type').value == 'Every Month'">
-                                                            <label class="form-check-label mx-2 mt-4">at</label>
-                                                            <div class="w-8 mr-2">
-                                                                <label class="form-col-form-label mb-0"
-                                                                    for="schedule_start_time_hr">Start
-                                                                    Time<em>*</em></label> <input
-                                                                    class="form-control mt-1" type="number"
-                                                                    placeholder="Hours"
-                                                                    formControlName="schedule_start_time_hr"
-                                                                    [class.is-invalid]="formErrors.schedule_start_time_hr"
-                                                                    [max]="23" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_start_time_hr">{{formErrors.schedule_start_time_hr}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-10 mt-4">
-                                                                <input class="form-control mt-1" type="number"
-                                                                    placeholder="Minutes"
-                                                                    formControlName="schedule_start_time_min"
-                                                                    [class.is-invalid]="formErrors.schedule_start_time_min"
-                                                                    [max]="59" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_start_time_min">{{formErrors.schedule_start_time_min}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-8 mx-2">
-                                                                <label class="form-col-form-label mb-0"
-                                                                    for="schedule_end_time_hr">End
-                                                                    Time<em>*</em></label> <input
-                                                                    class="form-control mt-1" type="number"
-                                                                    placeholder="Hours"
-                                                                    formControlName="schedule_end_time_hr"
-                                                                    [class.is-invalid]="formErrors.schedule_end_time_hr"
-                                                                    [max]="23" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_end_time_hr">{{formErrors.schedule_end_time_hr}}
-                                                                </small>
-                                                            </div>
-                                                            <div class="w-10 mt-4">
-                                                                <input class="form-control mt-1" type="number"
-                                                                    placeholder="Minutes"
-                                                                    formControlName="schedule_end_time_min"
-                                                                    [class.is-invalid]="formErrors.schedule_end_time_min"
-                                                                    [max]="59" [min]="0">
-                                                                <small class="invalid-feedback"
-                                                                    *ngIf="formErrors.schedule_end_time_min">{{formErrors.schedule_end_time_min}}
-                                                                </small>
-                                                            </div>
-                                                        </ng-container>
+                                                    <div class="col-8-w input-group pl-2">
+                                                        <owl-date-time #endDate [pickerType]="'calendar'"
+                                                            [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                                        <input class="form-control rounded-left pr-0" name="end_date"
+                                                            formControlName="end_date" [owlDateTimeTrigger]="endDate"
+                                                            [owlDateTime]="endDate"
+                                                            [min]="form.get('schedule_meta')?.get('start_date').value"
+                                                            type="text" placeholder="Date"
+                                                            [class.is-invalid]="formErrors.schedule_meta?.end_date">
+                                                        <div class="input-group-append" [owlDateTimeTrigger]="endDate">
+                                                            <span class="input-group-text bg-white">
+                                                                <i class="fas fa-calendar-alt"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="invalid-feedback"
+                                                            *ngIf="formErrors.schedule_meta?.end_date">
+                                                            {{formErrors.schedule_meta?.end_date}}</div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group custom-margin">
+                                        </div>
+                                    </div>
+                                    <div class="row mx-0 d-flex align-items-center mt-2" formGroupName="daily"
+                                        *ngIf="form.get('schedule_meta').get('daily')">
+                                        <div class="col-10 offset-2">
+                                            <div class="d-flex align-items-center">
+                                                <div>Every</div>
+                                                <div class="d-flex align-items-center px-2 w-20">
+                                                    <div class="form-group w-70 mb-0">
+                                                        <input class="form-control" type="number" min="1"
+                                                            placeholder="Day(s)" formControlName="days_interval"
+                                                            [class.is-invalid]="formErrors.schedule_meta.daily.days_interval">
+                                                        <div class="invalid-feedback d-block"
+                                                            *ngIf="formErrors.schedule_meta.daily.days_interval">
+                                                            {{formErrors.daily.schedule_meta.days_interval}}</div>
+                                                    </div>
+                                                    <div class="ml-2">Day(s)<em>*</em></div>
+                                                </div>
+                                                <div class="col-3-w d-flex align-items-center px-2">
+                                                    <div class="mr-3">at<em>*</em></div>
+                                                    <div class="input-group">
+                                                        <owl-date-time #at [pickerType]="'timer'"
+                                                            [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                                        <input class="form-control rounded-left" name="at"
+                                                            formControlName="at" [owlDateTimeTrigger]="at"
+                                                            [owlDateTime]="at" type="text"
+                                                            [class.is-invalid]="formErrors.schedule_meta.daily.at">
+                                                        <div class="input-group-append " [owlDateTimeTrigger]="at">
+                                                            <span class="input-group-text bg-white">
+                                                                <i class="fas fa-clock"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="invalid-feedback"
+                                                            *ngIf="formErrors.schedule_meta.daily.at">
+                                                            {{formErrors.schedule_meta.daily.at}}</div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mx-0 d-flex align-items-center mt-2" formGroupName="weekly"
+                                        *ngIf="form.get('schedule_meta').get('weekly')">
+                                        <div class="col-10 offset-2">
+                                            <div class="d-flex align-items-center">
+                                                <div>Every</div>
+                                                <div class="col-4-w px-2">
+                                                    <multiselect-dropdown class="form-control p-0" style="height:auto;"
+                                                        [settings]="weekdaySettings" [texts]="weekdayTexts"
+                                                        [options]="weekdayOptions" formControlName="week_days"
+                                                        [class.is-invalid]="formErrors.schedule_meta.weekly.week_days"></multiselect-dropdown>
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors.schedule_meta.weekly.week_days">
+                                                        {{formErrors.schedule_meta.weekly.week_days}}</div>
+                                                </div>
+                                                <div class="col-3-w d-flex align-items-center px-2">
+                                                    <div class="mr-3">at<em>*</em></div>
+                                                    <div class="input-group">
+                                                        <owl-date-time #at [pickerType]="'timer'"
+                                                            [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                                        <input class="form-control rounded-left" name="at"
+                                                            formControlName="at" [owlDateTimeTrigger]="at"
+                                                            [owlDateTime]="at" type="text"
+                                                            [class.is-invalid]="formErrors.schedule_meta.weekly.at">
+                                                        <div class="input-group-append " [owlDateTimeTrigger]="at">
+                                                            <span class="input-group-text bg-white">
+                                                                <i class="fas fa-clock"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="invalid-feedback"
+                                                            *ngIf="formErrors.schedule_meta.weekly.at">
+                                                            {{formErrors.schedule_meta.weekly.at}}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mx-0 d-flex align-items-center mt-2" formGroupName="monthly"
+                                        *ngIf="form.get('schedule_meta').get('monthly')">
+                                        <div class="col-10 offset-2">
+                                            <div class="d-flex flex-column">
                                                 <div class="d-flex align-items-center">
-                                                    <input type="radio" name="monthly_type"
-                                                        [value]="'Every Custom Month Day'" class="form-check-input"
-                                                        [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Custom Month Day'}"
-                                                        formControlName="monthly_type">
-                                                    <label class="form-check-label"
-                                                        [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Custom Month Day'}">Every</label>
-                                                    <select class="form-control w-7 mx-2"
-                                                        [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Custom Month Day'}"
-                                                        type="text" formControlName="every_custom_month_day"
-                                                        [class.is-invalid]="formErrors.every_custom_month_day">
-                                                        <option [value]="" disabled>Select</option>
-                                                        <option [value]="'First'">First</option>
-                                                        <option [value]="'Second'">Second</option>
-                                                        <option [value]="'Third'">Third</option>
-                                                        <option [value]="'Fourth'">Fourth</option>
-                                                    </select>
-                                                    <select class="form-control w-9 mr-2"
-                                                        [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Custom Month Day'}"
-                                                        type="text" formControlName="every_custom_month_weekday"
-                                                        [class.is-invalid]="formErrors.every_custom_month_weekday">
-                                                        <option [value]="" disabled>Select</option>
-                                                        <option [value]="'Sunday'">Sunday</option>
-                                                        <option [value]="'Monday'">Monday</option>
-                                                        <option [value]="'Tuesday'">Tuesday</option>
-                                                        <option [value]="'Wednesday'">Wednesday</option>
-                                                        <option [value]="'Thursday'">Thursday</option>
-                                                        <option [value]="'Friday'">Friday</option>
-                                                        <option [value]="'Saturday'">Saturday</option>
-                                                    </select>
-                                                    <label class="form-check-label"
-                                                        [ngClass]="{'mt-4': form.get('monthly_type').value == 'Every Custom Month Day'}">Every
-                                                        month</label>
-                                                    <ng-container
-                                                        *ngIf="form.get('monthly_type').value == 'Every Custom Month Day'">
-                                                        <label class="form-check-label mx-2 mt-4">at</label>
-                                                        <div class="w-8 mr-2">
-                                                            <label class="form-col-form-label mb-0"
-                                                                for="schedule_start_time_hr">Start
-                                                                Time<em>*</em></label> <input class="form-control mt-1"
-                                                                type="number" placeholder="Hours"
-                                                                formControlName="schedule_start_time_hr"
-                                                                [class.is-invalid]="formErrors.schedule_start_time_hr"
-                                                                [max]="23" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_start_time_hr">{{formErrors.schedule_start_time_hr}}
-                                                            </small>
+                                                    <div class="d-flex align-items-center pr-2">
+                                                        <input type="radio" name="monthly_type"
+                                                            formControlName="monthly_type" value="by_days">
+                                                    </div>
+                                                    <div class="d-flex col-3-w align-items-center">
+                                                        <div class="mr-3">Day<em>*</em></div>
+                                                        <div class="col-10-w px-2">
+                                                            <multiselect-dropdown class="form-control p-0"
+                                                                style="height:auto;" [settings]="daySettings"
+                                                                [texts]="dayTexts" [options]="dayOptions"
+                                                                formControlName="days"
+                                                                class.is-invalid]="formErrors.schedule_meta.monthly.days"></multiselect-dropdown>
+                                                            <div class="invalid-feedback"
+                                                                *ngIf="formErrors.schedule_meta.monthly.days">
+                                                                {{formErrors.schedule_meta.monthly.days}}</div>
                                                         </div>
-                                                        <div class="w-10 mt-4">
-                                                            <input class="form-control mt-1" type="number"
-                                                                placeholder="Minutes"
-                                                                formControlName="schedule_start_time_min"
-                                                                [class.is-invalid]="formErrors.schedule_start_time_min"
-                                                                [max]="59" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_start_time_min">{{formErrors.schedule_start_time_min}}
-                                                            </small>
+                                                    </div>
+                                                    <div class="d-flex col-4-w align-items-center">
+                                                        <div class="mr-3">of<em>*</em></div>
+                                                        <div class="col-10-w px-2">
+                                                            <multiselect-dropdown class="form-control p-0"
+                                                                style="height:auto;" [settings]="monthSettings"
+                                                                [texts]="monthTexts" [options]="monthOptions"
+                                                                formControlName="months"
+                                                                [class.is-invalid]="formErrors.schedule_meta.monthly.months"></multiselect-dropdown>
+                                                            <div class="invalid-feedback"
+                                                                *ngIf="formErrors.schedule_meta.monthly.months">
+                                                                {{formErrors.schedule_meta.monthly.months}}</div>
                                                         </div>
-                                                        <div class="w-8 mx-2">
-                                                            <label class="form-col-form-label mb-0"
-                                                                for="schedule_end_time_hr">End
-                                                                Time<em>*</em></label> <input class="form-control mt-1"
-                                                                type="number" placeholder="Hours"
-                                                                formControlName="schedule_end_time_hr"
-                                                                [class.is-invalid]="formErrors.schedule_end_time_hr"
-                                                                [max]="23" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_end_time_hr">{{formErrors.schedule_end_time_hr}}
-                                                            </small>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center mt-3">
+                                                    <div class="d-flex align-items-center pr-2">
+                                                        <input type="radio" name="monthly_type"
+                                                            formControlName="monthly_type" value="by_week_days">
+                                                    </div>
+                                                    <div
+                                                        class="d-flex col-6-w justify-content-between align-items-center">
+                                                        <div class="mr-2">Every</div>
+                                                        <div class="col-5-w">
+                                                            <multiselect-dropdown class="form-control p-0"
+                                                                style="height:auto;" [settings]="weekSettings"
+                                                                [texts]="weekTexts" [options]="weekOptions"
+                                                                formControlName="weeks"
+                                                                [class.is-invalid]="formErrors.schedule_meta.monthly.weeks"></multiselect-dropdown>
+                                                            <div class="invalid-feedback"
+                                                                *ngIf="formErrors.schedule_meta.monthly.weeks">
+                                                                {{formErrors.schedule_meta.monthly.weeks}}</div>
                                                         </div>
-                                                        <div class="w-10 mt-4">
-                                                            <input class="form-control mt-1" type="number"
-                                                                placeholder="Minutes"
-                                                                formControlName="schedule_end_time_min"
-                                                                [class.is-invalid]="formErrors.schedule_end_time_min"
-                                                                [max]="59" [min]="0">
-                                                            <small class="invalid-feedback"
-                                                                *ngIf="formErrors.schedule_end_time_min">{{formErrors.schedule_end_time_min}}
-                                                            </small>
+                                                        <div class="col-5-w">
+                                                            <multiselect-dropdown class="form-control p-0"
+                                                                style="height:auto;" [settings]="weekdaySettings"
+                                                                [texts]="weekdayTexts" [options]="weekdayOptions"
+                                                                formControlName="week_days"
+                                                                [class.is-invalid]="formErrors.schedule_meta.monthly.week_days"></multiselect-dropdown>
+                                                            <div class="invalid-feedback"
+                                                                *ngIf="formErrors.schedule_meta.monthly.week_days">
+                                                                {{formErrors.schedule_meta.monthly.week_days}}</div>
                                                         </div>
-                                                    </ng-container>
+                                                    </div>
+                                                    <div
+                                                        class="d-flex col-3-w justify-content-between align-items-center pl-2">
+                                                        <div class="mr-2">of<em>*</em></div>
+                                                        <div class="col-10-w">
+                                                            <multiselect-dropdown class="form-control p-0"
+                                                                style="height:auto;" [settings]="monthSettings"
+                                                                [texts]="monthTexts" [options]="monthOptions"
+                                                                formControlName="every_months"
+                                                                [class.is-invalid]="formErrors.schedule_meta.monthly.every_months"></multiselect-dropdown>
+                                                            <div class="invalid-feedback"
+                                                                *ngIf="formErrors.schedule_meta.monthly.every_months">
+                                                                {{formErrors.schedule_meta.monthly.every_months}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="d-flex col-3-w justify-content-between align-items-center pl-2">
+                                                        <div class="mr-2">at<em>*</em></div>
+                                                        <div class="col-10-w">
+                                                            <div class="input-group">
+                                                                <owl-date-time #at [pickerType]="'timer'"
+                                                                    [scrollStrategy]="scrollStrategy"></owl-date-time>
+                                                                <input class="form-control rounded-left" name="at"
+                                                                    formControlName="at" [owlDateTimeTrigger]="at"
+                                                                    [owlDateTime]="at" type="text"
+                                                                    [class.is-invalid]="formErrors.schedule_meta.monthly.at">
+                                                                <div class="input-group-append "
+                                                                    [owlDateTimeTrigger]="at">
+                                                                    <span class="input-group-text bg-white">
+                                                                        <i class="fas fa-clock"></i>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="invalid-feedback"
+                                                                    *ngIf="formErrors.schedule_meta.monthly.at">
+                                                                    {{formErrors.schedule_meta.monthly.at}}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <small class="text-danger custom-margin" *ngIf="formErrors.monthly_type">
-                                                {{formErrors.monthly_type}}</small>
-                                        </ng-cointianer>
-                                    </ng-container>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row align-items-center"
+                                        *ngIf="form.get('schedule_meta')?.get('schedule_type')?.value != 'onetime'">
+                                        <div class="col-2 text-right align-self-center mt-3">
+                                            End Next<em>*</em> :
+                                        </div>
+                                        <div class="col-1 mt-3">
+                                            <input class="form-control" type="number" formControlName="end_next"
+                                                [class.is-invalid]="formErrors.end_next">
+
+                                            <small class="invalid-feedback" *ngIf="formErrors.schedule_meta.end_next">
+                                                {{ formErrors.schedule_meta.end_next }}
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
+
+
                             </div>
                         </form>
                         <!-- <shared-schedule-form></shared-schedule-form> -->

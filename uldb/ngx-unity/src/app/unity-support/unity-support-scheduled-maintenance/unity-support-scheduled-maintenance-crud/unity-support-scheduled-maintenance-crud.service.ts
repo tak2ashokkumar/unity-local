@@ -9,6 +9,8 @@ import { CREATE_SCHEDULE, EDIT_SCHEDULE, GET_DATACENTER_FAST, GET_PRIVATE_CLOUD_
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { DatacenterFast, MaintenanceInfrastructureType, MaintenanceType, PrivateCloudFast, TenantType, TenantUserGroupType } from './unity-support-scheduled-maintenance-crud.type';
 import { QueryBuilderClassNames, QueryBuilderConfig, Rule, RuleSet } from 'src/app/shared/query-builder/query-builder.interfaces';
+import { UnityScheduleDataType, unityScheduleDayOptions, unityScheduleMonthOptions, unityScheduleWeekdayOptions, unityScheduleWeekOptions } from 'src/app/shared/unity-schedule/unity-schedule.servicedata';
+import { CorrelationRuleFields } from 'src/app/unity-services/aiml-event-mgmt/aiml-rules/aiml-rules.type';
 
 @Injectable()
 export class UnitySupportScheduledMaintenanceCrudService {
@@ -108,52 +110,43 @@ export class UnitySupportScheduledMaintenanceCrudService {
     return this.http.get<TiggerDataType[]>('/customer/mtp/triggers_list/', { params: params })
   }
 
-  buildForm(data: MaintenanceType): FormGroup {
+  buildForm(data: any): FormGroup {
     const moment = require('moment-timezone');
     if (data) {
       let ae = '';
-      if (data.additional_email.length) {
-        data.additional_email.forEach((em, index) => {
-          ae = index == data.additional_email.length - 1 ? ae.concat(`${em}`) : ae.concat(`${em},`);
+      if (data.additional_emails.length) {
+        data.additional_emails.forEach((em, index) => {
+          ae = index == data.additional_emails.length - 1 ? ae.concat(`${em}`) : ae.concat(`${em},`);
         });
       }
       let form = this.builder.group({
         // 'tenant': [data.tenant, [Validators.required]],
         'name': [data.name, [Validators.required, NoWhitespaceValidator]],
         'description': [data.description, [Validators.required, NoWhitespaceValidator]],
-        'infrastructure_type': [data.infrastructure_type, [Validators.required]],
-        'has_alerts': [data.has_alerts],
+        // 'infrastructure_type': [data.infrastructure_type, [Validators.required]],
+        'disable_event_notification': [data.disable_event_notification],
         'has_notification': [data.has_notification],
-        'has_auto_ticketing': [data.has_auto_ticketing],
+        'single_correlation': [data.single_correlation],
+        'suppress_event': [data.suppress_event],
+        'filter_enabled': [data.filter_enabled],
+        'filter_rule_meta': [data.filter_rule_meta],
         'correlate_all_alerts': [data.correlate_all_alerts],
         'send_notification': [data.send_notification],
-        'send_before_window': [data.send_before_window],
-        'send_after_window': [data.send_after_window],
-        'start_date': [moment(data.start_date).format('YYYY-MM-DDTHH:mm:ss'), [Validators.required, NoWhitespaceValidator]],
-        'end_date': [moment(data.end_date).format('YYYY-MM-DDTHH:mm:ss'), [Validators.required, NoWhitespaceValidator]],
-        'timezone': [data.timezone, [Validators.required]],
-        'schedule_type': [data.schedule_type],
-        'recurrence_start_time_hr': [data.recurrence_start_time_hr],
-        'recurrence_start_time_min': [data.recurrence_start_time_min],
-        'recurrence_end_time_hr': [data.recurrence_end_time_hr],
-        'recurrence_end_time_min': [data.recurrence_end_time_min],
-        'recurrence_pattern': [data.recurrence_pattern],
-        'weekday': [data.weekday],
-        'daily_type': [data.daily_type],
-        'every_day_count': [data.every_day_count],
-        'monthly_type': [data.monthly_type],
-        'every_month_count': [data.every_month_count],
-        'every_custom_month_day': [data.every_custom_month_day],
-        'every_custom_month_weekday': [data.every_custom_month_weekday],
-        'additional_email': [ae],
-        'ends_never': [data.ends_never],
-        'schedule_start_time_hr': [data.schedule_start_time_hr, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]],
-        'schedule_start_time_min': [data.schedule_start_time_min, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]],
-        'schedule_end_time_hr': [data.schedule_end_time_hr, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]],
-        'schedule_end_time_min': [data.schedule_end_time_min, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]],
-        'user_and_user_group': [data.user_and_user_group, [Validators.required]],
-        'infrastructure': this.buildFormArray(data.infrastructure),
-        'filter_rule_meta': data.filter_rule_meta
+        'notify_before_window': [data.notify_before_window],
+        'notify_after_window': [data.notify_after_window],
+        'additional_emails': [ae],
+        'schedule_meta': this.builder.group({
+          'window_type': ['maintenance'],
+          'run_now': [false],
+          'start_date': [data.schedule_meta.start_date || '', [Validators.required]],
+          'end_date': [data.schedule_meta.end_date || ''],
+          'end_next': [data.schedule_meta.end_next],
+          'schedule_type': [data.schedule_meta.schedule_type || 'onetime'],
+          'end_date_status': [data.schedule_meta.end_date_status || 'never']
+        }),
+        'users_and_user_groups': [data.users_and_user_groups, [Validators.required]],
+        // 'infrastructure': this.buildFormArray(data.infrastructure),
+        // 'filter_rule_meta': data.filter_rule_meta
       });
       return form
     } else {
@@ -161,53 +154,65 @@ export class UnitySupportScheduledMaintenanceCrudService {
         // 'tenant': ['', [Validators.required]],
         'name': ['', [Validators.required, NoWhitespaceValidator]],
         'description': ['', [Validators.required, NoWhitespaceValidator]],
-        'infrastructure_type': ['', [Validators.required]],
-        'has_alerts': [true],
+        // 'infrastructure_type': ['', [Validators.required]],
+        'disable_event_notification': [true],
+        'single_correlation': [false],
+        'suppress_event': [false],
+        'filter_rule_meta': [null],
+        'filter_enabled': [true],
         'has_notification': [false],
         'has_auto_ticketing': [false],
         'correlate_all_alerts': [false],
         'send_notification': [true],
-        'send_before_window': [false],
-        'send_after_window': [false],
-        'start_date': ['', [Validators.required, NoWhitespaceValidator]],
-        'end_date': ['', [Validators.required, NoWhitespaceValidator]],
-        'timezone': ['', [Validators.required]],
-        'schedule_type': ['One-time'],
-        'recurrence_start_time_hr': [null],
-        'recurrence_start_time_min': [null],
-        'recurrence_end_time_hr': [null],
-        'recurrence_end_time_min': [null],
-        'recurrence_pattern': ['Daily'],
-        'weekday': [[]],
-        'daily_type': [''],
-        'every_day_count': [null],
-        'monthly_type': [''],
-        'every_month_count': [null],
-        'every_custom_month_day': [''],
-        'every_custom_month_weekday': [''],
-        'additional_email': [''],
-        'ends_never': [null],
-        'schedule_start_time_hr': [null, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]],
-        'schedule_start_time_min': [null, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]],
-        'schedule_end_time_hr': [null, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]],
-        'schedule_end_time_min': [null, [Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]],
+        'notify_before_window': [false],
+        'notify_after_window': [false],
+        'schedule_meta': this.builder.group({
+          'window_type': ['maintenance'],
+          'run_now': [false],
+          'start_date': ['', [Validators.required]],
+          'end_date': ['', [Validators.required]],
+          'end_next': [''],
+          'schedule_type': ['onetime'],
+          'end_date_status': ['']
+        }),
+        'additional_emails': [''],
         'maintenance_status': [true], //has to be sent as true for create
-        'user_and_user_group': ['', [Validators.required]],
+        'users_and_user_groups': ['', [Validators.required]],
       });
     }
   }
 
-  private buildFormArray(data: MaintenanceInfrastructureType[]): FormArray {
-    return this.builder.array(
-      data.map(infrastructure => this.builder.group({
-        infra_level_types: [infrastructure.infra_level_types, [Validators.required]],
-        infrastructure_level: [infrastructure.infrastructure_level, [Validators.required]],        
-        device_list: [infrastructure.device_list],
-        triggers: [infrastructure.triggers],
-        exclude: [infrastructure.exclude]
-      }))
-    );
+  // private buildFormArray(data: MaintenanceInfrastructureType[]): FormArray {
+  //   return this.builder.array(
+  //     data.map(infrastructure => this.builder.group({
+  //       infra_level_types: [infrastructure.infra_level_types, [Validators.required]],
+  //       infrastructure_level: [infrastructure.infrastructure_level, [Validators.required]],
+  //       device_list: [infrastructure.device_list],
+  //       triggers: [infrastructure.triggers],
+  //       exclude: [infrastructure.exclude]
+  //     }))
+  //   );
+  // }
+
+
+  convert(data: CorrelationRuleFields[]): QueryBuilderConfig {
+    let fieldMeta: QueryBuilderConfig = { fields: {} }
+    data.forEach(field => {
+      fieldMeta.fields[field.name] = {
+        name: field.display_name,
+        type: field.choices.length ? 'category' : 'string',
+        operators: field.choices.length ? ['is', 'in'] : ['is', 'contains'],
+        defaultOperator: 'is',
+        options: field.choices.length ? field.choices.map(choice => {
+          return { name: choice[1], value: choice[0] }
+        }) : [],
+        defaultValue: field.choices.length ? field.choices[0][0] : '',
+        value: field.name
+      }
+    });
+    return fieldMeta;
   }
+
 
   resetFormErrors() {
     return {
@@ -220,33 +225,44 @@ export class UnitySupportScheduledMaintenanceCrudService {
       'has_auto_ticketing': '',
       'correlate_all_alerts': '',
       'send_notification': '',
-      'send_before_window': '',
-      'send_after_window': '',
+      'notify_before_window': '',
+      'notify_after_window': '',
+      'additional_emails': '',
+      'users_and_user_groups': '',
+      'infrastructure': [],
+      'schedule_meta': this.scheduleResetFormErrors()
+    }
+  }
+
+
+  scheduleResetFormErrors() {
+    return {
+      'schedule_type': '',
       'start_date': '',
       'end_date': '',
-      'timezone': '',
-      'schedule_type': '',
-      'recurrence_start_time_hr': '',
-      'recurrence_start_time_min': '',
-      'recurrence_end_time_hr': '',
-      'recurrence_end_time_min': '',
-      'recurrence_pattern': '',
-      'weekday': '',
-      'additional_email': '',
-      'daily_type': '',
-      'every_day_count': '',
-      'monthly_type': '',
-      'custom_month_day': '',
-      'every_month_count': '',
-      'every_custom_month_day': '',
-      'every_custom_month_weekday': '',
-      'ends_never': '',
-      'schedule_start_time_hr': '',
-      'schedule_start_time_min': '',
-      'schedule_end_time_hr': '',
-      'schedule_end_time_min': '',
-      'user_and_user_group': '',
-      'infrastructure': []
+      'one_time': {
+        'execute_now': ''
+      },
+      'hourly': {
+        'hours_interval': '',
+        'minutes_interval': ''
+      },
+      'daily': {
+        'days_interval': '',
+        'at': ''
+      },
+      'weekly': {
+        'week_days': '',
+        'at': ''
+      },
+      'monthly': {
+        'days': '',
+        'months': '',
+        'weeks': '',
+        'week_days': '',
+        'every_months': '',
+        'at': '',
+      }
     }
   }
 
@@ -258,135 +274,139 @@ export class UnitySupportScheduledMaintenanceCrudService {
   }
 
   validationMessages = {
-    // 'tenant': {
-    //   'required': 'Tenant is required'
-    // },
-    'name': {
-      'required': 'Name is required'
+
+    name: {
+      required: 'Name is required'
     },
-    'description': {
-      'required': 'Description is required'
+
+    description: {
+      required: 'Description is required'
     },
-    'infrastructure_type': {
-      'required': 'Infrastructure type is required'
+
+    infrastructure_type: {
+      required: 'Infrastructure type is required'
     },
-    // 'has_alerts': {
-    //   'required': ' is required'
-    // },
-    // 'has_notification': {
-    //   'required': ' is required'
-    // },
-    // 'has_auto_ticketing': {
-    //   'required': ' is required'
-    // },
-    // 'send_notification': {
-    //   'required': ' is required'
-    // },
-    // 'send_before_window': {
-    //   'required': ' is required'
-    // },
-    // 'send_after_window': {
-    //   'required': ' is required'
-    // },
-    'start_date': {
-      'required': 'Start date is required',
-      'owlDateTimeMax': 'Start date cannot be after end date'
-    },
-    'end_date': {
-      'required': 'End date is required',
-      'owlDateTimeMin': 'End date cannot be before start date'
-    },
-    'timezone': {
-      'required': 'Timezone is required'
-    },
-    // 'schedule_type': {
-    //   'required': ' is required'
-    // },
-    'recurrence_start_time_hr': {
-      'required': 'Hr(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    'recurrence_start_time_min': {
-      'required': 'Min(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    'recurrence_end_time_hr': {
-      'required': 'Hr(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    'recurrence_end_time_min': {
-      'required': 'Min(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    // 'recurrence_pattern': {
-    //   'required': ' is required'
-    // },
-    'additional_email': {
-      'required': 'Custom mailID is required'
-    },
-    'daily_type': {
-      'required': 'Recurrence pattern is required'
-    },
-    'every_day_count': {
-      'required': 'Required'
-    },
-    'weekday': {
-      'required': 'Weekday is required'
-    },
-    'custom_month_day': {
-      'required': 'Required'
-    },
-    'every_month_count': {
-      'required': 'Required'
-    },
-    'every_custom_month_day': {
-      'required': 'Required'
-    },
-    'every_custom_month_weekday': {
-      'required': 'Required'
-    },
-    'monthly_type': {
-      'required': 'Recurrence pattern is required'
-    },
-    'ends_never': {
-      'required': 'End date preference is required'
-    },
-    'schedule_start_time_hr': {
-      'required': 'Hr(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    'schedule_start_time_min': {
-      'required': 'Min(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    'schedule_end_time_hr': {
-      'required': 'Hr(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    'schedule_end_time_min': {
-      'required': 'Min(s) is required',
-      'min': 'Enter a valid time',
-      'max': 'Enter a valid time'
-    },
-    'user_and_user_group': {
-      'required': 'User or user group is required'
-    },
-    'infrastructure': {
-      'infrastructure_level': {
-        'required': 'Infra type is required'
+
+    schedule_meta: {
+
+      schedule_type: {
+        required: 'Schedule type is required'
       },
-      'infra_level_types': {
-        'required': 'Selection is mandatory'
+
+      start_date: {
+        required: 'Start date is required',
+        owlDateTimeMax: 'Start date cannot be after end date'
       },
+
+      end_date: {
+        required: 'End date is required',
+        owlDateTimeMin: 'End date cannot be before start date'
+      },
+
+      one_time: {
+        execute_now: {
+          required: 'Execute Now is required'
+        }
+      },
+
+      hourly: {
+        hours_interval: {
+          required: 'Hr(s) is required',
+          min: 'Enter valid time',
+          max: 'Enter valid time'
+        },
+        minutes_interval: {
+          required: 'Min(s) is required',
+          min: 'Enter valid time',
+          max: 'Enter valid time'
+        }
+      },
+
+      daily: {
+        days_interval: {
+          required: 'Day is required'
+        },
+        at: {
+          required: 'Time is required'
+        }
+      },
+
+      weekly: {
+        week_days: {
+          required: 'Week Day(s) is required'
+        },
+        at: {
+          required: 'Time is required'
+        }
+      },
+
+      monthly: {
+        days: {
+          required: 'Day(s) is required'
+        },
+        months: {
+          required: 'Month(s) is required'
+        },
+        weeks: {
+          required: 'Week(s) is required'
+        },
+        week_days: {
+          required: 'Week Day(s) is required'
+        },
+        every_months: {
+          required: 'Month(s) is required'
+        },
+        at: {
+          required: 'Time is required'
+        }
+      }
+    },
+
+    users_and_user_groups: {
+      required: 'User or user group is required'
+    },
+
+    infrastructure: {
+      infrastructure_level: {
+        required: 'Infra type is required'
+      },
+      infra_level_types: {
+        required: 'Selection is mandatory'
+      }
     }
+  };
+
+
+  getEveryMonthValues() {
+    let options = <UnityScheduleDataType[]>[].concat(unityScheduleMonthOptions);
+    return options.map(m => m.value);
   }
+
+  getMonthOptions() {
+    let options = [].concat(unityScheduleMonthOptions);
+    return options;
+  }
+
+  getWeekOptions() {
+    let options = [].concat(unityScheduleWeekOptions);
+    return options;
+  }
+
+  getWeekdayOptions() {
+    let options = [].concat(unityScheduleWeekdayOptions);
+    return options;
+  }
+
+  getDayOptions() {
+    let options = [].concat(unityScheduleDayOptions);
+    return options;
+  }
+
+
+
+
+
+
 
   manageFormData(data: any) {
     let obj = Object.assign({}, data);
@@ -394,8 +414,8 @@ export class UnitySupportScheduledMaintenanceCrudService {
     if (!obj.ends_never) {
       obj.end_date = this.utilService.getUTCDateInUserSetTimeZone(moment(obj.end_date)).format('YYYY-MM-DD');
     }
-    if (obj.additional_email) {
-      obj.additional_email = obj.additional_email.length ? (<string>obj.additional_email).split(',') : [];
+    if (obj.additional_emails) {
+      obj.additional_emails = obj.additional_emails.length ? (<string>obj.additional_emails).split(',') : [];
     }
     if (obj.schedule_type == 'One-time') {
       delete obj.recurrence_pattern;
@@ -478,6 +498,7 @@ export const deviceTypes = [
   { 'name': 'Openstack' },
   { 'name': 'Custom VM' }
 ];
+
 
 export const queryBuilderConfig: QueryBuilderConfig = {
   fields: {
@@ -599,6 +620,24 @@ export const queryBuilderConfig: QueryBuilderConfig = {
     }
   }
 }
+
+const filterWeights = {
+  'Event Source': 20,
+  'Event Type': 30,
+  'Event Severity': 15,
+  'Event Category': 25,
+  'Event Description': 50,
+  'Device Type': 60,
+  'Device Name': 80,
+  'Device Tag': 40,
+};
+
+export const correlatorWeights = {
+  'topology': 0.90,
+  'same-host': 0.30,
+  'same-dc': 0.50,
+  'textual-similarity': 0.10
+};
 
 export const queryBuilderClassNames: QueryBuilderClassNames = {
   removeIcon: 'fa fa-minus',

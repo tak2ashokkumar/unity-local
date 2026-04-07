@@ -3343,15 +3343,15 @@ export const ADD_SERVICE_NOW_ACCOUNT = () => `customer/service_now/`;
 
 export const MANAGE_SERVICE_NOW = (uuid: string) => `customer/service_now/${uuid}/`;
 
-export const CREATE_SCHEDULE = () => `customer/mtp/mschedules/`;
+export const CREATE_SCHEDULE = () => `customer/ms/schedules/`;
 
-export const GET_SCHEDULE = (uuid: string) => `customer/mtp/mschedules/${uuid}/`;
+export const GET_SCHEDULE = (uuid: string) => `/customer/ms/schedules/${uuid}/`;
 
-export const EDIT_SCHEDULE = (uuid: string) => `customer/mtp/mschedules/${uuid}/`;
+export const EDIT_SCHEDULE = (uuid: string) => `/customer/ms/schedules/${uuid}/`;
 
-export const GET_MAINTENANCE_INSTANCE = () => `/customer/mtp/mschedules/`;
+export const GET_MAINTENANCE_INSTANCE = () => `/customer/ms/schedules/`;
 
-export const DELETE_MAINTENANCE_INSTANCE = (uuid: string) => `/customer/mtp/mschedules/${uuid}`;
+export const DELETE_MAINTENANCE_INSTANCE = (uuid: string) => `/customer/ms/schedules/${uuid}`;
 
 export const GET_DATACENTER_FAST = () => `customer/colo_cloud_fast/`;
 

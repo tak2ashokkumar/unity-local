@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UNITY_FONT_FAMILY } from 'src/app/app-constants';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
-import {
-  CPU_LOAD_DATA, GPU_THERMAL_DATA, LIFECYCLE_INSTANCES, LIFECYCLE_SUMMARY_KPIS,
-  LifecycleInstance, LifecycleSummaryKpi, MEMORY_USAGE_DATA
-} from './lifecycle-management.constants';
+import { CPU_LOAD_DATA, GPU_THERMAL_DATA, LIFECYCLE_INSTANCES, LIFECYCLE_SUMMARY_KPIS, LifecycleInstance, LifecycleSummaryKpi, MEMORY_USAGE_DATA } from './lifecycle-management.constants';
 
 @Injectable()
 export class LifecycleManagementService {

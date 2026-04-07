@@ -16,7 +16,7 @@ export class NaciMonitoringComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    this.updateStep();
+    // this.updateStep();
   }
 
   private updateStep(): void {

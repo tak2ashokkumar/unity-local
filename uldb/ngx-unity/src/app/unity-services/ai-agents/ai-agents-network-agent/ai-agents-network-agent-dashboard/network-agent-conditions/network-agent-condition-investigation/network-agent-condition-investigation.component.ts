@@ -43,7 +43,12 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
 
   initialChatResponseData: any[] = [];
   isAnyStepDataPresent: boolean = false;
-  currentStageTitle: string = '';
+
+  dynamicSteps: {
+    stageKey: string;
+    componentType: string;
+    chatResponse: NetworkAgentsChatResponseType;
+  }[] = [];
 
   constructor(private svc: NetworkAgentConditionInvestigationService,
     @Inject(DOCUMENT) private document,
@@ -246,6 +251,23 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
     }
   }
 
+  private resolveStep(res: NetworkAgentsChatResponseType) {
+    const phase = res?.answer?.phase;
+    const stageTitle = res?.answer?.stage_title;
+
+    if (phase !== 'Verify and Audit') {
+      return {
+        stageKey: phase,
+        componentType: 'Basic CLI Check'
+      }
+    }
+
+    return {
+      stageKey: stageTitle,
+      componentType: stageTitle
+    }
+  }
+
   handleChatResponse(res: NetworkAgentsChatResponseType | null) {
     if (this.initialChatResponseData?.length == 0) {
       this.initialChatResponseData.push(res);
@@ -253,12 +275,20 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
     }
     if (res == null || res?.answer?.phase == 'General') { return; }
     this.isAnyStepDataPresent = res?.answer?.stage ? true : this.isAnyStepDataPresent;
-    const stageTitle = ["Basic CLI Check", "Monitoring", "Resource Utilization", "Check Device Health", "Centralized Logs", "Network Topology"];
-    if (stageTitle.includes(res?.answer?.stage_title)) {
-      this.currentStageTitle = res.answer.stage_title;
+    const { stageKey, componentType } = this.resolveStep(res);
+    const existingStep = this.dynamicSteps.find(
+      step => step.stageKey === stageKey
+    );
+    if (existingStep) {
+      existingStep.chatResponse = res;
     } else {
-      this.currentStageTitle = this.currentStageTitle ? this.currentStageTitle : '';
+      this.dynamicSteps.push({
+        stageKey,
+        componentType,
+        chatResponse: res
+      });
     }
+    this.dynamicSteps = [...this.dynamicSteps];
     this.chatResponse = res;
     if (res?.answer?.stage == "Stage 0") {
       this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);

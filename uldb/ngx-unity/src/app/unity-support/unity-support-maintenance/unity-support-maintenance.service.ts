@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { DELETE_MAINTENANCE_INSTANCE, GET_MAINTENANCE_INSTANCE } from 'src/app/shared/api-endpoint.const';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 
@@ -10,7 +11,7 @@ import { TableApiServiceService } from 'src/app/shared/table-functionality/table
 export class UnitySupportMaintenanceService {
 
   constructor(private tableService: TableApiServiceService,
-    private http: HttpClient) { }
+    private http: HttpClient, private utilSvc: AppUtilityService) { }
 
   getInstances(criteria: SearchCriteria): Observable<PaginatedResult<MaintenanceInstance>> {
     return this.tableService.getData<PaginatedResult<MaintenanceInstance>>(GET_MAINTENANCE_INSTANCE(), criteria);
@@ -21,7 +22,7 @@ export class UnitySupportMaintenanceService {
   }
 
   saveSettings(uuid: string, status: string) {
-    return this.http.put(`/customer/mtp/mschedules/update_status/?maintenance=${uuid}`, { status: status });
+    return this.http.post(`/customer/ms/schedules/${uuid}/${status}/`, { status: status });
   }
 
   convertToViewData(data: MaintenanceInstance[]): MaintenanceInstanceViewData[] {
@@ -31,11 +32,11 @@ export class UnitySupportMaintenanceService {
       ud.uuid = a.uuid;
       ud.name = a.name;
       ud.tenantName = a.tenant_name;
-      ud.scheduleStart = a.schedule_start;
-      ud.scheduleEnd = a.schedule_end;
+      ud.scheduleStart = a.schedule_meta?.start_date ? this.utilSvc.toUnityOneDateFormat(a.schedule_meta.start_date, 'DD MMM YYYY') : 'N/A';
+      ud.scheduleEnd = a.schedule_meta?.end_date ? this.utilSvc.toUnityOneDateFormat(a.schedule_meta.end_date, 'DD MMM YYYY') : 'N/A';
       ud.description = a.description;
       ud.createdByName = a.created_by_name;
-      ud.maintenanceStatus = a.maintenance_status;
+      ud.maintenanceStatus = a.status;
       viewData.push(ud);
     });
     return viewData;
@@ -74,6 +75,7 @@ export interface MaintenanceInstance {
   schedule_end_time_min: number;
   ends_never: boolean;
   recurrence_pattern: null;
+  schedule_meta: Schedule_meta;
   daily_type: null;
   every_day_count: number;
   every_hr_count: number;
@@ -90,6 +92,15 @@ export interface MaintenanceInstance {
   created_by_name: string;
   schedule_start: string;
   schedule_end: string;
+}
+export interface Schedule_meta {
+  window_type: string;
+  end_date: string;
+  end_next: number;
+  run_now: boolean;
+  schedule_type: string;
+  end_date_status: string;
+  start_date: string;
 }
 
 export class MaintenanceInstanceViewData {

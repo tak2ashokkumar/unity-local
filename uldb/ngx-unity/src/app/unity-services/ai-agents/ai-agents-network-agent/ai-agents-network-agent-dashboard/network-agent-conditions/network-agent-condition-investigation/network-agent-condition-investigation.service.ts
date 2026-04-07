@@ -8,7 +8,7 @@ import { TableApiServiceService } from 'src/app/shared/table-functionality/table
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { map, switchMap, take } from 'rxjs/operators';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { NetworkAgentConditionActivityDetail } from '../network-agent-conditions.type';
 import { NetworkAgentConditionActivityDetailViewData } from '../network-agent-conditions.service';
@@ -18,11 +18,18 @@ import { AnswerType, ConditionData } from './naci-chatbot/naci-chatbot.type';
 @Injectable()
 export class NetworkAgentConditionInvestigationService {
 
+  private toggleAnnouncedSource = new Subject<string>();
+  toggleAnnouncedSourceAnnounced$ = this.toggleAnnouncedSource.asObservable();
+
   constructor(private http: HttpClient,
     private builder: FormBuilder,
     private utilSvc: AppUtilityService,
     private appService: AppLevelService,
     private tableService: TableApiServiceService) { }
+
+  toggle(StepName: string) {
+    this.toggleAnnouncedSource.next(StepName);
+  }
 
   getConditionDetails(conditionUuid: string) {
     return this.http.get<NetworkAgentConditionDetails>(GET_AIOPS_CONDITION_BY_ID(conditionUuid));
@@ -372,4 +379,17 @@ export function insertLineBreaks(text: string, wordLimit: number, maxWordLength:
   } else {
     return null;
   }
+}
+
+export enum StageTitleMapping {
+  BASIC_CLI_CHECK = 'Basic CLI Check',
+  MONITORING = 'Monitoring',
+  RESOURCE_UTILIZATION = 'Resource Utilization',
+  CHECK_DEVICE_HEALTH = 'Check Device Health',
+  CENTRALIZED_LOGS = 'Centralized Logs',
+  NETWORK_TOPOLOGY = 'Network Topology',
+  RCA = 'Root Cause Analysis',
+  REMEDIATION_SCRIPT = 'Remediation',
+  VALIDATE_FIX = 'Run Remediation Script and Validate',
+  DOCUMENT_AND_CLOSE = 'Document and Close'
 }

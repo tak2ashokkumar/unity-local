@@ -1,10 +1,9 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { CentralizedLogsViewData, ClsVerifyAndAuditStepService } from './cls-verify-and-audit-step.service';
-import { NaciCentralizedLogsStepsService } from '../naci-centralized-logs-steps.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CentralizedLogsDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
-import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
+import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
 
 @Component({
   selector: 'cls-verify-and-audit-step',
@@ -20,11 +19,10 @@ export class ClsVerifyAndAuditStepComponent implements OnInit, OnChanges {
   centralizedLogsViewData: CentralizedLogsViewData;
 
   constructor(private svc: ClsVerifyAndAuditStepService,
-    private cliSvc: NaciCliCheckStepsService,
-    private clSvc: NaciCentralizedLogsStepsService) {
-    this.clSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
+    private investigationSvc: NetworkAgentConditionInvestigationService) {
+    this.investigationSvc.toggleAnnouncedSourceAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((StepName) => {
       setTimeout(() => {
-        this.isVerifyAndAuditOpen = StepName == 'verfiyAndAudit' ? !this.isVerifyAndAuditOpen : false;
+        this.isVerifyAndAuditOpen = StepName == 'centralizedLogs' ? !this.isVerifyAndAuditOpen : false;
       }, 0);
     })
   }
@@ -33,7 +31,7 @@ export class ClsVerifyAndAuditStepComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    if (this.chatResponse?.answer?.stage != 'Stage 1') {
+    if (this.chatResponse?.answer?.stage_title != StageTitleMapping.CENTRALIZED_LOGS) {
       return;
     }
     this.toggleVerifyAndAuditAccordion();
@@ -45,10 +43,7 @@ export class ClsVerifyAndAuditStepComponent implements OnInit, OnChanges {
   }
 
   toggleVerifyAndAuditAccordion() {
-    if (!this.isVerifyAndAuditOpen) {
-      this.cliSvc.toggle('');
-    }
-    this.clSvc.toggle('verfiyAndAudit');
+    this.investigationSvc.toggle('centralizedLogs');
   }
 
 }

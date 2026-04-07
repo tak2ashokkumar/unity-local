@@ -1,4 +1,4 @@
-<div class="container-fluid px-0" *ngIf="currentStep>0">
+<div class="container-fluid px-0">
   <!-- <div class="d-flex justify-content-between align-items-center">
 
     <h5 class="mb-0">Workspace</h5>
@@ -26,25 +26,21 @@
     </div>
   </div> -->
   <div class="row">
-    <div class="col-12 mt-2">
-      <ccs-verify-and-audit-step *ngIf="isStepExecuted(1)" [chatResponse]="chatResponse">
+    <div class="col-12 mt-2" *ngIf="stageTitle==stageTitleMapping.BASIC_CLI_CHECK">
+      <ccs-verify-and-audit-step [chatResponse]="chatResponse">
       </ccs-verify-and-audit-step>
     </div>
-    <div class="col-12">
-      <ccs-root-cause-analysis-step *ngIf="isStepExecuted(2)" [chatResponse]="chatResponse"
-        [verifyAndAuditRelatedStageTitle]="verifyAndAuditRelatedStageTitle"></ccs-root-cause-analysis-step>
+    <div class="col-12 mt-2" *ngIf="stageTitle==stageTitleMapping.RCA">
+      <ccs-root-cause-analysis-step [chatResponse]="chatResponse"></ccs-root-cause-analysis-step>
     </div>
-    <div class="col-12 mt-2">
-      <ccs-remediation-script-step *ngIf="isStepExecuted(3)" [chatResponse]="chatResponse"
-        [verifyAndAuditRelatedStageTitle]="verifyAndAuditRelatedStageTitle"></ccs-remediation-script-step>
+    <div class="col-12 mt-2" *ngIf="stageTitle==stageTitleMapping.REMEDIATION_SCRIPT">
+      <ccs-remediation-script-step [chatResponse]="chatResponse"></ccs-remediation-script-step>
     </div>
-    <div class="col-12">
-      <ccs-validate-fix-step *ngIf="isStepExecuted(4)" [chatResponse]="chatResponse"
-        [verifyAndAuditRelatedStageTitle]="verifyAndAuditRelatedStageTitle"></ccs-validate-fix-step>
+    <div class="col-12 mt-2" *ngIf="stageTitle==stageTitleMapping.VALIDATE_FIX">
+      <ccs-validate-fix-step [chatResponse]="chatResponse"></ccs-validate-fix-step>
     </div>
-    <div class="col-12">
-      <ccs-document-and-close-step *ngIf="isStepExecuted(5)" [chatResponse]="chatResponse"
-        [verifyAndAuditRelatedStageTitle]="verifyAndAuditRelatedStageTitle"></ccs-document-and-close-step>
+    <div class="col-12 mt-2" *ngIf="stageTitle==stageTitleMapping.DOCUMENT_AND_CLOSE">
+      <ccs-document-and-close-step [chatResponse]="chatResponse"></ccs-document-and-close-step>
     </div>
   </div>
 </div>

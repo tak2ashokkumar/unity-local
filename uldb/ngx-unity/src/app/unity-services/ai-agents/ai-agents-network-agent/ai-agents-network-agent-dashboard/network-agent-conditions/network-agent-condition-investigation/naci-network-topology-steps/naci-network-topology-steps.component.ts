@@ -15,7 +15,7 @@ export class NaciNetworkTopologyStepsComponent implements OnInit {
   }
 
   ngOnChanges(): void {
-    this.updateStep();
+    // this.updateStep();
   }
 
   private updateStep(): void {

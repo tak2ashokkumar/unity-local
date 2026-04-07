@@ -110,7 +110,7 @@ export class OrchestrationAgenticWorkflowParamsService {
 
     return this.fb.group({
       param_name: [input.param_name || ''],
-      param_type: [input.param_type || ''],
+      // param_type: [input.param_type || ''],
       default_value: [defaultValue, [Validators.required, NoWhitespaceValidator]],
     });
   }

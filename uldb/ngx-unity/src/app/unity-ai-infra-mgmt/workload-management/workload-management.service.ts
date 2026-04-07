@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
 import { UNITY_FONT_FAMILY, UNITY_TEXT_DEFAULT_COLOR } from 'src/app/app-constants';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
-import { UnityThemeService } from 'src/app/shared/unity-theme.service';
 import { ACTIVE_JOBS_DATA, ActiveJob, GPU_ALLOCATION_DATA, GPU_ALLOCATION_TOTAL, GPU_CLUSTER_LEGEND, GPU_CLUSTER_MAP_DATA, GpuClusterCell, RESOURCE_UTILIZATION_DATA, SCHEDULING_THROUGHPUT_DATA, WORKLOAD_SUMMARY_KPIS, WorkloadSummaryKpi } from './workload-management.constants';
+import { UnityThemeService } from 'src/app/shared/unity-theme.service';
 
 @Injectable()
 export class WorkloadManagementService {
 
-  constructor(
-    private chartConfigSvc: UnityChartConfigService,
-    private themeSvc: UnityThemeService
-  ) { }
+  constructor(private chartConfigSvc: UnityChartConfigService,
+    private themeSvc: UnityThemeService) { }
 
   // ── Summary KPIs ─────────────────────────
   getSummaryKpis(): WorkloadSummaryKpi[] {
@@ -23,12 +21,12 @@ export class WorkloadManagementService {
     const isDark = this.themeSvc.isDark();
 
     // Theme-adaptive colors
-    const axisColor     = isDark ? '#8a8ea0' : '#888888';
-    const gridColor     = isDark ? '#2e3145' : '#e5e5e5';
+    const axisColor = isDark ? '#8a8ea0' : '#888888';
+    const gridColor = isDark ? '#2e3145' : '#e5e5e5';
     const markLineColor = isDark ? '#4a4f62' : '#c8ced3';
-    const bgColor       = isDark ? 'rgba(35,39,47,0.85)' : 'rgba(255,255,255,0.9)';
-    const tooltipTxt    = isDark ? '#ebedef' : '#23282c';
-    const font          = UNITY_FONT_FAMILY();
+    const bgColor = isDark ? 'rgba(35,39,47,0.85)' : 'rgba(255,255,255,0.9)';
+    const tooltipTxt = isDark ? '#ebedef' : '#23282c';
+    const font = UNITY_FONT_FAMILY();
 
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.LINE;

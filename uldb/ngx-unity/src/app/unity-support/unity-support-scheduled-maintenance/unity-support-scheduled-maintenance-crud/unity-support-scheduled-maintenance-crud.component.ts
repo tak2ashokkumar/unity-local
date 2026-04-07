@@ -2,13 +2,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
-import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
+import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
 import { UnitySupportScheduledMaintenanceCrudService, UserAndGroupViewData, deviceTypes, queryBuilderClassNames, queryBuilderConfig } from './unity-support-scheduled-maintenance-crud.service';
 import { DatacenterFast, DeviceDataType, MaintenanceType, PrivateCloudFast, TenantUserGroupType, TiggerDataType, UserType } from './unity-support-scheduled-maintenance-crud.type';
@@ -19,6 +19,9 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { AIMLSourceData } from 'src/app/shared/SharedEntityTypes/aiml.type';
 import { cloneDeep as _clone } from 'lodash-es';
 import { AimlRulesService } from 'src/app/unity-services/aiml-event-mgmt/aiml-rules/aiml-rules.service';
+import { UnityScheduleDailyType, UnityScheduleMonthlyType, UnityScheduleType, UnityScheduleWeeklyType } from 'src/app/shared/SharedEntityTypes/schedule.type';
+import moment from 'moment';
+import { UnityScheduleDataType } from 'src/app/shared/unity-schedule/unity-schedule.servicedata';
 
 
 @Component({
@@ -72,6 +75,102 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
     showUncheckAll: true
   };
 
+
+  daySettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: "label",
+    keyToSelect: "value",
+    enableSearch: false,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: false,
+    showUncheckAll: false,
+    appendToBody: true,
+  };
+
+  dayTexts: IMultiSelectTexts = {
+    checkAll: 'Every Day',
+    uncheckAll: 'Uncheck all',
+    checked: 'day',
+    checkedPlural: 'days',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select',
+    allSelected: 'Every Day',
+  };
+
+  weekSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: "label",
+    keyToSelect: "value",
+    enableSearch: false,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: false,
+    showCheckAll: false,
+    showUncheckAll: false,
+    appendToBody: true,
+  };
+
+  weekTexts: IMultiSelectTexts = {
+    checkAll: 'Every Week',
+    uncheckAll: 'Uncheck all',
+    checked: 'week',
+    checkedPlural: 'weeks',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select',
+    allSelected: 'Every Week',
+  };
+
+  weekdaySettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: "label",
+    keyToSelect: "value",
+    enableSearch: false,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: false,
+    showUncheckAll: false,
+    appendToBody: true,
+  };
+
+  weekdayTexts: IMultiSelectTexts = {
+    checkAll: 'Every Day',
+    uncheckAll: 'Uncheck all',
+    checked: 'day',
+    checkedPlural: 'days',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select',
+    allSelected: 'Every Day',
+  };
+
+  monthSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: "label",
+    keyToSelect: "value",
+    enableSearch: false,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: false,
+    appendToBody: true,
+  };
+
+  monthTexts: IMultiSelectTexts = {
+    checkAll: 'Every Month',
+    uncheckAll: 'Uncheck all',
+    checked: 'month',
+    checkedPlural: 'months',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select',
+    allSelected: 'Every Month',
+  };
   datacenterList: Array<DatacenterFast> = [];
   privateCLoudList: Array<PrivateCloudFast> = [];
   userList: Array<UserType> = [];
@@ -96,6 +195,11 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
   formErrors: any;
   validationMessages: any;
 
+  weekdayOptions: UnityScheduleDataType[] = [];
+  monthOptions: UnityScheduleDataType[] = [];
+  dayOptions: UnityScheduleDataType[] = [];
+  weekOptions: UnityScheduleDataType[] = [];
+
   devicesList: DeviceDataType[][] = [];
   triggerList: TiggerDataType[][] = [];
 
@@ -108,7 +212,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
   queryBuilderConfig: QueryBuilderConfig;
   queryBuilderClassNames: QueryBuilderClassNames = queryBuilderClassNames;
   @ViewChild('queryBuilder') queryBuilder: QueryBuilderComponent;
-  
+
   public allowRuleset: boolean = true;
   public allowCollapse: boolean = false;
   public persistValueOnFieldChange: boolean = false;
@@ -125,6 +229,12 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
     private ruleSvc: AimlRulesService,
     private readonly sso: ScrollStrategyOptions) {
     this.route.paramMap.subscribe(params => this.smId = params.get('smId'));
+    this.weekdayOptions = this.crudService.getWeekdayOptions();
+    this.monthOptions = this.crudService.getMonthOptions();
+    this.dayOptions = this.crudService.getDayOptions();
+    this.weekOptions = this.crudService.getWeekOptions();
+
+
     this.scrollStrategy = this.sso.noop();
   }
 
@@ -132,7 +242,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
     this.spinner.start('main');
     this.timeZoneList = this.utilService.getTimezones();
 
-    this.getDropdownData();
+    this.getDropdownFields();
     this.getTags();
 
     if (this.smId) {
@@ -145,6 +255,9 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
       this.spinner.stop('main');
     }
   }
+
+
+
 
   ngOnDestroy(): void {
     this.spinner.stop('main');
@@ -206,8 +319,8 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
         this.userAndGroupList = this.userList.map(user => ({ name: user.email, isSelected: false }));
         this.filteredUserAndGroupList = this.userList.map(user => ({ name: user.email, isSelected: false }));
         if (this.smId) {
-          if (this.maintenance.user_and_user_group) {
-            let userAndUserGroups = this.maintenance.user_and_user_group;
+          if (this.maintenance.users_and_user_groups) {
+            let userAndUserGroups = this.maintenance.users_and_user_groups;
             if (userAndUserGroups.length) {
               userAndUserGroups.forEach(user => {
                 let obj = this.filteredUserAndGroupList.find(a => a.name == user);
@@ -226,7 +339,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
     });
   }
 
-  getDevicesList(formGroup: FormGroup, deviceTypes: string[], index:number) {
+  getDevicesList(formGroup: FormGroup, deviceTypes: string[], index: number) {
     this.crudService.getDevicesList(deviceTypes).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: DeviceDataType[]) => {
       if (this.infrastructures) {
         this.devicesList[index] = res;
@@ -241,7 +354,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
     });
   }
 
-  getTriggersList(formGroup: FormGroup, devices: DeviceDataType[], index:number) {
+  getTriggersList(formGroup: FormGroup, devices: DeviceDataType[], index: number) {
     this.crudService.getTriggersList(devices).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: TiggerDataType[]) => {
       if (this.infrastructures) {
         this.triggerList[index] = res;
@@ -281,474 +394,16 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
     }
   }
 
-  buildForm(data: MaintenanceType) {
-    this.form = this.crudService.buildForm(data);
-    this.formErrors = this.crudService.resetFormErrors();
-    if (this.infrastructures) {
-      for (let index = 0; index < this.infrastructures.length; index++) {
-        this.formErrors.infrastructure.push(this.crudService.resetInfrastructureErrors());
-        const fg = this.infrastructures.at(index) as FormGroup;
-        this.manageInfrastructure(fg);
-        this.infraList.push([]);
-        this.excludeList.push([]);
-        this.devicesList.push([]);
-        this.triggerList.push([]);
-        if (this.maintenance.infrastructure[index]?.infrastructure_level == 'devices') {
-          this.infraList[index] = this.deviceTypes;
-          // this.excludeList[index] = this.deviceTypes;
-          //For setting device lists for selected devices          
-          const infraType = this.infrastructures.at(index).get('infra_level_types').value;
-          const selectedDevices = this.infrastructures.at(index).get('device_list').value;
-          fg.removeControl('exclude');
-          this.getDevicesList(fg, infraType, index);
-          this.getTriggersList(fg, selectedDevices, index);
-        }
-      }
-    }
-    this.validationMessages = this.crudService.validationMessages;
-    if (data) {
-      if (!data.send_notification) {
-        this.form.removeControl('user_and_user_group');
-        this.form.removeControl('additional_email');
-      }
-      if (data.infrastructure_type == 'All') {
-        this.form.removeControl('infrastructure');
-        this.form.removeControl('filter_rule_meta');
-      }
-      if (data.infrastructure_type == 'Custom') {
-        this.form.removeControl('filter_rule_meta');
-      }
-      if (data.infrastructure_type == 'Filter') {
-        this.form.removeControl('infrastructure');
-      }
-    }
-    this.manageForm();
-  }
 
-  manageForm() {
-    const mg = this.builder.group({
-      'infrastructure_level': ['', [Validators.required]],
-    });
-    this.manageBasics();
-    this.manageInfrastructure(mg);
-    this.manageActions();
-    this.manageNotification();
-    this.manageSchedule();
-  }
-
-  manageBasics() {
-    if (this.smId == '') {
-      this.form.get('infrastructure_type').setValue('');
-      this.form.get('user_and_user_group').setValue('');
-      this.selectedUserAndGroups = [];
-      this.formErrors.infrastructure = [];
-      this.form.removeControl('infrastructure');
-      this.form.removeControl('filter_rule_meta');      
-      this.infraList = [];
-      this.excludeList = [];
-      this.devicesList = [];
-      this.triggerList = [];
-      this.getDropdownData();
-      this.getDatacenters();
-      this.getPrivateClouds();
-    }
-  }
-
-  manageInfrastructure(formGroup: FormGroup) {
-    this.form.get('infrastructure_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {  
-      this.infraList = [];
-      this.excludeList = [];
-      this.devicesList = [];
-      this.triggerList = [];
-      this.formErrors.infrastructure = [];
-      if (val == 'All') {
-        this.form.removeControl('infrastructure');
-        this.form.removeControl('filter_rule_meta');        
-      } else if(val == 'Custom'){
-        this.form.removeControl('filter_rule_meta');
-        this.formErrors.infrastructure.push(this.crudService.resetInfrastructureErrors());
-        this.form.addControl('infrastructure', this.builder.array([formGroup]));
-        this.infrastructures?.at(0).get('infrastructure_level').setValue('');
-      } else if(val == 'Filter'){
-        this.form.removeControl('infrastructure');
-        this.form.addControl('filter_rule_meta', new FormControl(null));
-        this.manageFilterSubscription();   
+  getDropdownFields() {
+    this.ruleSvc.getDropdownFields().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (res.length) {
+        console.log(res, 'res')
+        this.queryBuilderConfig = this.crudService.convert(res);
+        console.log(this.queryBuilderConfig, 'qbc')
       }
-    });
-    this.manageInfrastructureFormArray(formGroup);
-  }
-  
-  manageFilterSubscription(){
-    this.currentRuleSetValue = this.form.get('filter_rule_meta').value;
-    this.form.get('filter_rule_meta')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: RuleSet) => {
-      this.currentRuleSetValue = val;
-      this.form.get('description').setValue(this.crudService.basicRulesetToSQL(val));
-    });
-  }
-
-  addControls(formGroup: FormGroup, controlName: string, value: any = []) {
-    const control = formGroup.get(controlName);
-    if (!control) {
-      formGroup.addControl(controlName, new FormControl(value));
-    } else {
-      control.setValue(value);
-    }
-  };
-
-  manageInfrastructureFormArray(formGroup: FormGroup) {
-    formGroup.get('infrastructure_level').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
-      const index = this.infrastructures.controls.findIndex(fg => fg === formGroup);
-      this.addControls(formGroup,'infra_level_types');
-      if (val === 'datacenter' || val === 'private cloud') {
-        this.addControls(formGroup, 'exclude');
-        this.infraList[index] = val === 'datacenter' ? this.datacenterList : this.privateCLoudList;
-        this.excludeList[index] = val === 'datacenter' ? this.datacenterList : this.privateCLoudList;
-        return;
-      }
-      formGroup.removeControl('exclude');
-      this.infraList[index] = this.deviceTypes;
-    });
-  }
-
-  onDeviceTypeClose(index: number){
-    const type = this.infrastructures.at(index).get('infrastructure_level').value;
-    const devices = this.infrastructures.at(index).get('infra_level_types').value;
-    const fg = this.infrastructures.at(index) as FormGroup;
-    if(type == 'devices'){
-      this.getDevicesList(fg, devices, index);
-      this.addControls(fg, 'device_list');
-      this.addControls(fg, 'triggers');
-    }
-    else{
-      fg.removeControl('device_list');
-      fg.removeControl('triggers');
-    }
-  }
-
-  onDevicesSelectionClose(index: number){
-    const devices = this.infrastructures.at(index).get('device_list').value;
-    const fg = this.infrastructures.at(index) as FormGroup;
-    this.getTriggersList(fg, devices, index);
-  }
-
-  manageActions() {
-    this.form.get('has_alerts').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      if (!val) {
-        this.form.removeControl('has_notification');
-        this.form.removeControl('has_auto_ticketing');
-        this.form.removeControl('correlate_all_alerts');
-      } else {
-        this.form.addControl('has_notification', new FormControl(false));
-        this.form.addControl('has_auto_ticketing', new FormControl(false));
-        this.form.addControl('correlate_all_alerts', new FormControl(false));
-      }
-    });
-  }
-
-  manageNotification() {
-    this.form.get('send_notification').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      if (!val) {
-        this.form.get('send_after_window').setValue(false);
-        this.form.get('send_before_window').setValue(false);
-        this.form.removeControl('user_and_user_group');
-        this.form.removeControl('additional_email');
-      } else {
-        this.form.addControl('user_and_user_group', new FormControl('', [Validators.required]));
-        this.form.addControl('additional_email', new FormControl(''));
-      }
-    });
-  }
-
-  manageSchedule() {
-    if (this.smId) {
-      if (this.form.get('schedule_type').value == 'Recurring') {
-        this.form.get('recurrence_start_time_hr').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]);
-        this.form.get('recurrence_start_time_min').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]);
-        this.form.get('recurrence_start_time_hr').updateValueAndValidity();
-        this.form.get('recurrence_start_time_min').updateValueAndValidity();
-        if (this.form.get('daily_type').value == 'Every Custom Day') {
-          this.form.get('every_day_count').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-          this.form.get('every_day_count').updateValueAndValidity();
-        } else if (this.form.get('daily_type').value == 'Every Weekday') {
-          this.form.get('every_day_count').setValue(null);
-          this.form.get('every_day_count').disable()
-        }
-        if (this.form.get('monthly_type').value == 'Every Month') {
-          this.form.get('every_month_count').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-          this.form.get('every_month_count').updateValueAndValidity();
-          this.form.get('every_custom_month_day').setValue('');
-          this.form.get('every_custom_month_day').disable();
-          this.form.get('every_custom_month_weekday').setValue('');
-          this.form.get('every_custom_month_weekday').disable();
-        } else if (this.form.get('monthly_type').value == 'Every Custom Month Day') {
-          this.form.get('every_custom_month_day').setValidators([Validators.required]);
-          this.form.get('every_custom_month_weekday').setValidators([Validators.required]);
-          this.form.get('every_custom_month_day').updateValueAndValidity();
-          this.form.get('every_custom_month_weekday').updateValueAndValidity();
-          this.form.get('every_month_count').setValue(null);
-          this.form.get('every_month_count').disable();
-        }
-        if (this.form.get('ends_never').value) {
-          this.form.get('end_date').removeValidators([Validators.required, NoWhitespaceValidator]);
-          this.form.get('recurrence_end_time_hr').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]);
-          this.form.get('recurrence_end_time_min').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]);
-          this.form.get('end_date').updateValueAndValidity();
-          this.form.get('recurrence_end_time_hr').updateValueAndValidity();
-          this.form.get('recurrence_end_time_min').updateValueAndValidity();
-        } else {
-          this.form.get('recurrence_end_time_hr').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]);
-          this.form.get('recurrence_end_time_min').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]);
-          this.form.get('recurrence_end_time_hr').updateValueAndValidity();
-          this.form.get('recurrence_end_time_min').updateValueAndValidity();
-        }
-      }
-    }
-    this.form.get('schedule_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      if (val == 'Recurring') {
-        this.form.get('recurrence_pattern').setValue('Daily');
-        this.form.get('ends_never').setValidators([Validators.required]);
-        this.form.get('ends_never').setValue(null);
-        this.form.get('daily_type').setValidators([Validators.required]);
-        this.form.get('recurrence_start_time_hr').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]);
-        this.form.get('recurrence_start_time_min').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]);
-        this.form.get('ends_never').updateValueAndValidity();
-        this.form.get('end_date').updateValueAndValidity();
-        this.form.get('daily_type').updateValueAndValidity();
-        this.form.get('recurrence_start_time_hr').updateValueAndValidity();
-        this.form.get('recurrence_start_time_min').updateValueAndValidity();
-      } else if (val == 'One-time') {
-        this.form.get('ends_never').removeValidators([Validators.required]);
-        this.form.get('end_date').setValidators([Validators.required]);
-        this.form.get('recurrence_start_time_hr').removeValidators([Validators.required, NoWhitespaceValidator]);
-        this.form.get('recurrence_start_time_min').removeValidators([Validators.required, NoWhitespaceValidator]);
-        this.form.get('recurrence_end_time_hr').removeValidators([Validators.required, NoWhitespaceValidator]);
-        this.form.get('recurrence_end_time_min').removeValidators([Validators.required, NoWhitespaceValidator]);
-        this.form.get('daily_type').removeValidators([Validators.required]);
-        this.form.get('monthly_type').removeValidators([Validators.required]);
-        this.form.get('weekday').removeValidators([Validators.required]);
-        this.form.get('every_day_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_month_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_custom_month_day').removeValidators([Validators.required]);
-        this.form.get('every_custom_month_weekday').removeValidators([Validators.required]);
-        this.form.get('every_day_count').updateValueAndValidity();
-        this.form.get('every_month_count').updateValueAndValidity();
-        this.form.get('every_custom_month_day').updateValueAndValidity();
-        this.form.get('every_custom_month_weekday').updateValueAndValidity();
-        this.form.get('ends_never').updateValueAndValidity({ emitEvent: false });
-        this.form.get('end_date').updateValueAndValidity();
-        this.form.get('recurrence_start_time_hr').updateValueAndValidity();
-        this.form.get('recurrence_start_time_min').updateValueAndValidity();
-        this.form.get('recurrence_end_time_hr').updateValueAndValidity();
-        this.form.get('recurrence_end_time_min').updateValueAndValidity();
-        this.form.get('daily_type').updateValueAndValidity({ emitEvent: false });
-        this.form.get('monthly_type').updateValueAndValidity({ emitEvent: false });
-        this.form.get('weekday').updateValueAndValidity({ emitEvent: false });
-      }
-    });
-    this.form.get('recurrence_pattern').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      if (val == 'Daily') {
-        this.form.get('daily_type').setValidators([Validators.required]);
-        this.form.get('monthly_type').setValue(null);
-        this.form.get('weekday').removeValidators([Validators.required]);
-        this.form.get('monthly_type').removeValidators([Validators.required]);
-        this.form.get('every_month_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_custom_month_day').removeValidators([Validators.required]);
-        this.form.get('every_custom_month_weekday').removeValidators([Validators.required]);
-        this.form.get('every_month_count').updateValueAndValidity();
-        this.form.get('every_custom_month_day').updateValueAndValidity();
-        this.form.get('every_custom_month_weekday').updateValueAndValidity();
-        this.form.get('daily_type').updateValueAndValidity();
-        this.form.get('weekday').updateValueAndValidity();
-        this.form.get('monthly_type').updateValueAndValidity();
-      } else if (val == 'Weekly') {
-        this.form.get('weekday').setValue([]);
-        this.form.get('monthly_type').setValue(null);
-        this.form.get('daily_type').setValue(null);
-        this.form.get('weekday').setValidators([Validators.required]);
-        this.form.get('daily_type').removeValidators([Validators.required]);
-        this.form.get('monthly_type').removeValidators([Validators.required]);
-        this.form.get('every_day_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_month_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_custom_month_day').removeValidators([Validators.required]);
-        this.form.get('every_custom_month_weekday').removeValidators([Validators.required]);
-        this.form.get('every_day_count').updateValueAndValidity();
-        this.form.get('every_month_count').updateValueAndValidity();
-        this.form.get('every_custom_month_day').updateValueAndValidity();
-        this.form.get('every_custom_month_weekday').updateValueAndValidity();
-        this.form.get('weekday').updateValueAndValidity();
-        this.form.get('daily_type').updateValueAndValidity();
-        this.form.get('monthly_type').updateValueAndValidity();
-      } else if (val == 'Monthly') {
-        this.form.get('monthly_type').setValidators([Validators.required]);
-        this.form.get('daily_type').setValue(null);
-        this.form.get('daily_type').removeValidators([Validators.required]);
-        this.form.get('weekday').removeValidators([Validators.required]);
-        this.form.get('every_day_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_day_count').updateValueAndValidity();
-        this.form.get('monthly_type').updateValueAndValidity();
-        this.form.get('weekday').updateValueAndValidity();
-        this.form.get('daily_type').updateValueAndValidity();
-      }
-    });
-    this.form.get('ends_never').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      if (!val) {
-        this.form.get('end_date').setValidators([Validators.required, NoWhitespaceValidator]);
-        this.form.get('recurrence_end_time_hr').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]);
-        this.form.get('recurrence_end_time_min').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]);
-        this.form.get('end_date').updateValueAndValidity();
-        this.form.get('recurrence_end_time_hr').updateValueAndValidity();
-        this.form.get('recurrence_end_time_min').updateValueAndValidity();
-      } else if (val) {
-        this.form.get('end_date').removeValidators([Validators.required, NoWhitespaceValidator]);
-        this.form.get('recurrence_end_time_hr').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(23)]);
-        this.form.get('recurrence_end_time_min').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0), Validators.max(59)]);
-        this.form.get('end_date').setValue('');
-        this.form.get('recurrence_end_time_hr').setValue(null);
-        this.form.get('recurrence_end_time_min').setValue(null);
-        this.form.get('end_date').updateValueAndValidity();
-        this.form.get('recurrence_end_time_hr').updateValueAndValidity();
-        this.form.get('recurrence_end_time_min').updateValueAndValidity();
-      }
-    });
-    this.form.get('daily_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      if (val == 'Every Weekday') {
-        this.form.get('every_day_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_day_count').updateValueAndValidity();
-        this.form.get('every_day_count').setValue(null);
-        this.form.get('every_day_count').disable()
-      } else if (val == 'Every Custom Day') {
-        this.form.get('every_day_count').enable()
-        this.form.get('every_day_count').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_day_count').updateValueAndValidity();
-      }
-    });
-    this.form.get('monthly_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
-      if (val == 'Every Month') {
-        this.form.get('every_month_count').setValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_custom_month_day').removeValidators([Validators.required]);
-        this.form.get('every_custom_month_weekday').removeValidators([Validators.required]);
-        this.form.get('every_month_count').updateValueAndValidity();
-        this.form.get('every_custom_month_day').updateValueAndValidity();
-        this.form.get('every_custom_month_weekday').updateValueAndValidity();
-        this.form.get('every_month_count').enable();
-        this.form.get('every_custom_month_day').setValue('');
-        this.form.get('every_custom_month_day').disable();
-        this.form.get('every_custom_month_weekday').setValue('');
-        this.form.get('every_custom_month_weekday').disable();
-      } else if (val == 'Every Custom Month Day') {
-        this.form.get('every_custom_month_day').setValidators([Validators.required]);
-        this.form.get('every_custom_month_weekday').setValidators([Validators.required]);
-        this.form.get('every_month_count').removeValidators([Validators.required, NoWhitespaceValidator, Validators.min(0)]);
-        this.form.get('every_custom_month_day').updateValueAndValidity();
-        this.form.get('every_custom_month_weekday').updateValueAndValidity();
-        this.form.get('every_month_count').updateValueAndValidity()
-        this.form.get('every_custom_month_day').enable();
-        this.form.get('every_custom_month_weekday').enable();
-        this.form.get('every_month_count').setValue(null);
-        this.form.get('every_month_count').disable();
-      }
+      this.spinner.stop('main');
     })
-  }
-
-  selectUserAndUserGroup(i: number) {
-    if (this.filteredUserAndGroupList[i].isSelected) {
-      this.filteredUserAndGroupList[i].isSelected = false;
-    } else {
-      this.filteredUserAndGroupList[i].isSelected = true;
-    }
-  }
-
-  updateSelectedUserAndUserGroups() {
-    this.searchValue = '';
-    this.onSearched('');
-    this.selectedUserAndGroups = this.filteredUserAndGroupList.filter(user => user.isSelected);
-    this.form.get('user_and_user_group').setValue(this.selectedUserAndGroups.map(t => t.name));
-  }
-
-  unSelectUserAndUserGroup(i: number) {
-    let userIndex = this.filteredUserAndGroupList.findIndex(user => user.name == this.selectedUserAndGroups[i].name);
-    if (userIndex != -1) {
-      this.filteredUserAndGroupList[userIndex].isSelected = false;
-    }
-    this.selectedUserAndGroups.splice(i, 1);
-    this.form.get('user_and_user_group').setValue(this.selectedUserAndGroups.map(a => a.name));
-  }
-
-  onCheckboxChange(weekday: string) {
-    const weekdaysArray = this.form.get('weekday').value as string[];
-    if (weekdaysArray.includes(weekday)) {
-      weekdaysArray.splice(weekdaysArray.indexOf(weekday), 1);
-    } else {
-      weekdaysArray.push(weekday);
-    }
-    this.form.get('weekday').setValue(weekdaysArray);
-  }
-
-  addInfrastructure(index: number) {
-    let formGroup = <FormGroup>this.infrastructures.at(index);
-    if (formGroup.invalid) {
-      this.formErrors.infrastructure[index] = this.utilService.validateForm(formGroup, this.validationMessages.infrastructure, this.formErrors.infrastructure[index]);
-      formGroup.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((data: any) => {
-          this.formErrors.infrastructure[index] = this.utilService.validateForm(formGroup, this.validationMessages.infrastructure, this.formErrors.infrastructure[index]);
-        });
-    }
-    else {
-      const mg = this.builder.group({
-        'infrastructure_level': ['', [Validators.required]],
-      });
-      this.manageInfrastructureFormArray(mg);
-      this.formErrors.infrastructure.push(this.crudService.resetInfrastructureErrors());
-      this.infrastructures.push(mg);
-      this.infraList.push([]);
-      this.excludeList.push([]);
-    }
-  }
-
-  removeInfrastructure(index: number) {
-    this.infrastructures.removeAt(index);
-    this.formErrors.infrastructure.splice(index, 1);
-    this.infraList.splice(index, 1);
-    this.excludeList.splice(index, 1);
-  }  
-
-  //For filters
-  getDropdownData() {
-    this.sources = [];
-    this.eventTypes = [];
-    this.eventCategories = [];
-    let config = queryBuilderConfig;
-    this.ruleSvc.getDropdownData().pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(({ sources, eventTypes, eventCategories }) => {
-        if (sources) {
-          this.sources = _clone(sources);
-        } else {
-          this.sources = [];
-          this.notification.error(new Notification("Error while fetching event sources"));
-        }
-        this.setEventSources(config);
-
-        if (eventTypes) {
-          this.eventTypes = _clone(eventTypes);
-        } else {
-          this.eventTypes = [];
-          this.notification.error(new Notification("Error while fetching event types"));
-        }
-        this.setEventTypes(config);
-
-        if (eventCategories) {
-          this.eventCategories = _clone(eventCategories);
-        } else {
-          this.eventCategories = [];
-          this.notification.error(new Notification("Error while fetching event categories"));
-        }
-        this.setEventCategories(config);
-        this.queryBuilderConfig = config;
-        // setTimeout(() => {
-        //   this.buildForm(this.maintenance);
-        //   this.spinner.stop('main');
-        // }, 100);
-      });
   }
 
   setEventSources(config: any) {
@@ -767,6 +422,484 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
     }
   }
 
+
+  buildForm(data: MaintenanceType) {
+    this.form = this.crudService.buildForm(data);
+    this.formErrors = this.crudService.resetFormErrors();
+
+    this.validationMessages = this.crudService.validationMessages;
+    console.log(this.validationMessages);
+    if (data) {
+      if (!data.users_and_user_groups) {
+        this.form.removeControl('users_and_user_groups');
+        this.form.removeControl('additional_emails');
+      }
+    }
+    this.manageForm();
+  }
+
+  manageForm() {
+
+    this.manageBasics();
+    this.manageFilterSubscription();
+    this.manageNotification();
+    this.manageSchedule();
+  }
+
+  manageBasics() {
+    if (this.smId == '') {
+      this.form.get('users_and_user_groups').setValue('');
+      this.selectedUserAndGroups = [];
+
+      this.getDropdownFields();
+      this.getDatacenters();
+      this.getPrivateClouds();
+    }
+  }
+
+
+  manageFilterSubscription() {
+    const ctrl = this.form.get('filter_rule_meta');
+    if (!ctrl) return;
+
+    // seed once
+    const val = ctrl.value;
+    if (val) {
+      this.form.get('description')
+        .setValue(this.crudService.basicRulesetToSQL(val));
+    }
+
+    ctrl.valueChanges
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(val => {
+        this.form.get('description')
+          .setValue(this.crudService.basicRulesetToSQL(val));
+      });
+  }
+
+  addControls(formGroup: FormGroup, controlName: string, value: any = []) {
+    const control = formGroup.get(controlName);
+    if (!control) {
+      formGroup.addControl(controlName, new FormControl(value));
+    } else {
+      control.setValue(value);
+    }
+  };
+
+
+
+  enableFilter() {
+    this.form.get('filter_enabled').setValue(true);
+  }
+
+  disableFilter() {
+    this.form.get('filter_enabled').setValue(false);
+  }
+
+
+  onDeviceTypeClose(index: number) {
+    const type = this.infrastructures.at(index).get('infrastructure_level').value;
+    const devices = this.infrastructures.at(index).get('infra_level_types').value;
+    const fg = this.infrastructures.at(index) as FormGroup;
+    if (type == 'devices') {
+      this.getDevicesList(fg, devices, index);
+      this.addControls(fg, 'device_list');
+      this.addControls(fg, 'triggers');
+    }
+    else {
+      fg.removeControl('device_list');
+      fg.removeControl('triggers');
+    }
+  }
+
+  onDevicesSelectionClose(index: number) {
+    const devices = this.infrastructures.at(index).get('device_list').value;
+    const fg = this.infrastructures.at(index) as FormGroup;
+    this.getTriggersList(fg, devices, index);
+  }
+
+
+  manageNotification() {
+    this.form.get('send_notification').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
+      if (!val) {
+        this.form.get('notify_after_window').setValue(false);
+        this.form.get('notify_before_window').setValue(false);
+        this.form.removeControl('users_and_user_groups');
+        this.form.removeControl('additional_emails');
+      } else {
+        this.form.addControl('users_and_user_groups', new FormControl('', [Validators.required]));
+        this.form.addControl('additional_emails', new FormControl(''));
+      }
+    });
+  }
+
+  manageSchedule() {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (!meta) return;
+    if (this.smId) {
+      this.handleFormFieldsByScheduleType(this.maintenance.schedule_meta);
+      this.subscribeToStartDateEndDatepart()
+      this.subscribeToMonthlyPart()
+    }
+    meta.get('schedule_type').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
+      console.log('manageSchedule')
+      this.handleFormFieldsByScheduleType(meta.getRawValue())
+      this.subscribeToStartDateEndDatepart()
+      this.subscribeToMonthlyPart()
+    });
+  }
+  private endDateSubscr: Subscription;
+
+  subscribeToStartDateEndDatepart() {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (!meta) return;
+
+    if (meta.controls.end_date_status) {
+      this.endDateSubscr = meta.get('end_date_status').valueChanges.subscribe(val => {
+        if (val == 'never') {
+          meta.get('end_date').patchValue('');
+          meta.get('end_date').clearValidators();
+          meta.get('end_date').disable();
+        } else {
+          console.log('subscribeToStartDateEndDatepart else')
+          meta.get('end_date').enable();
+          meta.get('end_date').setValidators([Validators.required, NoWhitespaceValidator]);
+        }
+        meta.get('end_date').updateValueAndValidity();
+      });
+    } else {
+      if (this.endDateSubscr && !this.endDateSubscr.closed) {
+        this.endDateSubscr.unsubscribe();
+      }
+    }
+  }
+
+
+  handleFormFieldsByScheduleType(obj: any): void {
+
+    console.log(obj)
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (!meta) return;
+    const scheduleType = meta.get('schedule_type')?.value;
+
+    const endDateStatusCtrl = meta.get('end_date_status');
+    const endDateCtrl = meta.get('end_date');
+
+    /* ---------------- ONETIME ---------------- */
+    if (scheduleType === 'onetime') {
+
+      // Control exists but hidden in UI
+      endDateStatusCtrl?.setValue('on', { emitEvent: false });
+      endDateStatusCtrl?.disable({ emitEvent: false });
+
+      endDateCtrl?.enable({ emitEvent: false });
+
+      this.removeDailyFileds();
+      this.removeWeeklyFileds();
+      this.removeMonthlyFileds();
+
+    } else {
+
+      /* -------------- NON-ONETIME -------------- */
+      endDateStatusCtrl?.enable({ emitEvent: false });
+
+      const status = obj.end_date_status ?? 'never';
+      endDateStatusCtrl?.setValue(status, { emitEvent: false });
+
+      if (status === 'on') {
+        endDateCtrl?.enable({ emitEvent: false });
+        endDateCtrl?.setValue(obj.end_date ?? '', { emitEvent: false });
+      } else {
+        endDateCtrl?.reset('', { emitEvent: false });
+        endDateCtrl?.disable({ emitEvent: false });
+      }
+    }
+
+    this.handleDailyFields(obj);
+    this.handleWeeklyFields(obj);
+    this.handleMonthlyFields(obj);
+  }
+
+
+
+  /*
+  * Handle Daily fields of the Schedule
+  * Adding and deleting of daily fields
+  */
+  handleDailyFields(obj: any) {
+    const scheduleType = obj?.schedule_type;
+    if (scheduleType == 'daily') {
+      console.log(obj.daily, 'obj.dailty')
+      this.addDailyFields(obj.daily);
+    } else {
+      this.removeDailyFileds();
+    }
+  }
+
+  addDailyFields(data: any) {
+    console.log(data)
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (!meta) return;
+    meta.addControl('daily', this.builder.group({}));
+    let group = <FormGroup>this.form.get('schedule_meta.daily');
+    group.addControl('days_interval', new FormControl(data ? data.days_interval : '1', [Validators.required, NoWhitespaceValidator]));
+    group.addControl('at', new FormControl(data ? data.at : '', [Validators.required, NoWhitespaceValidator]));
+  }
+
+  removeDailyFileds() {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (meta?.contains('daily')) {
+      meta.removeControl('daily');
+    }
+  }
+
+  /*
+  * Handle Weekly fields of the Schedule
+  * Adding and deleting of weekly fields
+  */
+  handleWeeklyFields(obj: any) {
+    const scheduleType = obj?.schedule_type;
+    if (scheduleType == 'weekly') {
+      this.addWeeklyFields(obj.weekly);
+      console.log('addeeklyFields')
+
+    } else {
+      this.removeWeeklyFileds();
+    }
+  }
+
+  addWeeklyFields(data: any) {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (!meta) return;
+    meta.addControl('weekly', this.builder.group({}));
+    let group = <FormGroup>this.form.get('schedule_meta.weekly');
+    group.addControl('week_days', new FormControl(data ? data.week_days : [], [Validators.required]));
+    group.addControl('at', new FormControl(data?.at ? data.at : '', [Validators.required, NoWhitespaceValidator]));
+  }
+
+
+  removeWeeklyFileds() {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (meta?.contains('weekly')) {
+      meta.removeControl('weekly');
+    }
+    // this.form.get('schedule_meta.weekly') ? this.form.removeControl('schedule_meta.weekly') : null;
+  }
+
+  /*
+  * Handle Monthly fields of the Schedule
+  * Adding and deleting of monthly fields
+  */
+  handleMonthlyFields(obj: any) {
+    const scheduleType = obj?.schedule_type;
+    if (scheduleType == 'monthly') {
+      this.addMonthlyFields(obj.monthly);
+      console.log('addMonthlyFields')
+    } else {
+      this.removeMonthlyFileds();
+    }
+  }
+
+  addMonthlyFields(data: any) {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (!meta) return;
+    meta.addControl('monthly', this.builder.group({}));
+    let group = <FormGroup>this.form.get('schedule_meta.monthly');
+    group.addControl('monthly_type', new FormControl(data ? data.monthly_type : 'by_week_days', [Validators.required]));
+    if (data && data.monthly_type == 'by_days') {
+      group.addControl('days', new FormControl(data ? data.days : ['1'], [Validators.required]));
+      group.addControl('months', new FormControl(data ? data.months : this.crudService.getEveryMonthValues(), [Validators.required]));
+      group.addControl('weeks', new FormControl({ value: [], disabled: true }));
+      group.addControl('week_days', new FormControl({ value: [], disabled: true }));
+      group.addControl('every_months', new FormControl({ value: [], disabled: true }));
+      group.addControl('at', new FormControl({ value: '', disabled: true }));
+    } else {
+      group.addControl('weeks', new FormControl(data ? data.weeks : ['first'], [Validators.required]));
+      group.addControl('week_days', new FormControl(data ? data.week_days : ['sun'], [Validators.required]));
+      group.addControl('every_months', new FormControl(data ? data.every_months : this.crudService.getEveryMonthValues(), [Validators.required]));
+      group.addControl('at', new FormControl(data ? data.at : '', [Validators.required, NoWhitespaceValidator]));
+      group.addControl('days', new FormControl({ value: [], disabled: true }));
+      group.addControl('months', new FormControl({ value: [], disabled: true }));
+    }
+  }
+
+  removeMonthlyFileds() {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    if (meta?.contains('monthly')) {
+      meta.removeControl('monthly');
+    }
+  }
+
+  private monthlyTypeSubscr: Subscription;
+
+
+  subscribeToMonthlyPart() {
+    const meta = this.form.get('schedule_meta') as FormGroup;
+    let group = <FormGroup>meta.get('monthly');
+    if (group && group.get('monthly_type')) {
+      this.monthlyTypeSubscr = group.get('monthly_type').valueChanges.subscribe(val => {
+        if (val == 'by_week_days') {
+          this.switchMonthlySchduleByWeekdays(group);
+        } else {
+          this.switchMonthlySchduleByDays(group);
+        }
+      });
+    } else {
+      if (this.monthlyTypeSubscr && !this.monthlyTypeSubscr.closed) {
+        this.monthlyTypeSubscr.unsubscribe();
+      }
+    }
+  }
+
+  switchMonthlySchduleByWeekdays(group: FormGroup) {
+    group.get('weeks').setValue(['first']);
+    group.get('week_days').setValue(['sun']);
+    group.get('every_months').setValue(this.crudService.getEveryMonthValues());
+
+    group.get('days').setValue([]);
+    group.get('months').setValue([]);
+
+    group.get('weeks').enable();
+    group.get('week_days').enable();
+    group.get('every_months').enable();
+    group.get('at').enable();
+    group.get('days').disable();
+    group.get('months').disable();
+
+    group.get('weeks').setValidators([Validators.required]);
+    group.get('week_days').setValidators([Validators.required]);;
+    group.get('every_months').setValidators([Validators.required]);;
+    group.get('at').setValidators([Validators.required, NoWhitespaceValidator]);
+    group.get('days').clearValidators();
+    group.get('months').clearValidators();
+  }
+
+  switchMonthlySchduleByDays(group: FormGroup) {
+    group.get('days').setValue(['1']);
+    group.get('months').setValue(this.crudService.getEveryMonthValues());
+
+    group.get('weeks').setValue([]);
+    group.get('week_days').setValue([]);
+    group.get('every_months').setValue([]);
+    group.get('at').setValue('');
+
+    group.get('days').enable();
+    group.get('months').enable();
+    group.get('weeks').disable();
+    group.get('week_days').disable();
+    group.get('every_months').disable();
+    group.get('at').disable();
+
+    group.get('days').setValidators([Validators.required]);
+    group.get('months').setValidators([Validators.required]);;
+    group.get('weeks').clearValidators();
+    group.get('week_days').clearValidators();
+    group.get('every_months').clearValidators();
+    group.get('at').clearValidators();
+  }
+
+  selectUserAndUserGroup(i: number) {
+    if (this.filteredUserAndGroupList[i].isSelected) {
+      this.filteredUserAndGroupList[i].isSelected = false;
+    } else {
+      this.filteredUserAndGroupList[i].isSelected = true;
+    }
+  }
+
+  updateSelectedUserAndUserGroups() {
+    this.searchValue = '';
+    this.onSearched('');
+    this.selectedUserAndGroups = this.filteredUserAndGroupList.filter(user => user.isSelected);
+    this.form.get('users_and_user_groups').setValue(this.selectedUserAndGroups.map(t => t.name));
+  }
+
+  unSelectUserAndUserGroup(i: number) {
+    let userIndex = this.filteredUserAndGroupList.findIndex(user => user.name == this.selectedUserAndGroups[i].name);
+    if (userIndex != -1) {
+      this.filteredUserAndGroupList[userIndex].isSelected = false;
+    }
+    this.selectedUserAndGroups.splice(i, 1);
+    this.form.get('users_and_user_groups').setValue(this.selectedUserAndGroups.map(a => a.name));
+  }
+
+  onCheckboxChange(weekday: string) {
+    const weekdaysArray = this.form.get('weekday').value as string[];
+    if (weekdaysArray.includes(weekday)) {
+      weekdaysArray.splice(weekdaysArray.indexOf(weekday), 1);
+    } else {
+      weekdaysArray.push(weekday);
+    }
+    this.form.get('weekday').setValue(weekdaysArray);
+  }
+
+  // addInfrastructure(index: number) {
+  //   let formGroup = <FormGroup>this.infrastructures.at(index);
+  //   if (formGroup.invalid) {
+  //     this.formErrors.infrastructure[index] = this.utilService.validateForm(formGroup, this.validationMessages.infrastructure, this.formErrors.infrastructure[index]);
+  //     formGroup.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
+  //       .subscribe((data: any) => {
+  //         this.formErrors.infrastructure[index] = this.utilService.validateForm(formGroup, this.validationMessages.infrastructure, this.formErrors.infrastructure[index]);
+  //       });
+  //   }
+  //   else {
+  //     const mg = this.builder.group({
+  //       'infrastructure_level': ['', [Validators.required]],
+  //     });
+  //     this.manageInfrastructureFormArray(mg);
+  //     this.formErrors.infrastructure.push(this.crudService.resetInfrastructureErrors());
+  //     this.infrastructures.push(mg);
+  //     this.infraList.push([]);
+  //     this.excludeList.push([]);
+  //   }
+  // }
+
+  // removeInfrastructure(index: number) {
+  //   this.infrastructures.removeAt(index);
+  //   this.formErrors.infrastructure.splice(index, 1);
+  //   this.infraList.splice(index, 1);
+  //   this.excludeList.splice(index, 1);
+  // }
+
+  //For filters
+  // getDropdownData() {
+  //   this.sources = [];
+  //   this.eventTypes = [];
+  //   this.eventCategories = [];
+  //   let config = queryBuilderConfig;
+  //   this.ruleSvc.getDropdownData().pipe(takeUntil(this.ngUnsubscribe))
+  //     .subscribe(({ sources, eventTypes, eventCategories }) => {
+  //       if (sources) {
+  //         this.sources = _clone(sources);
+  //       } else {
+  //         this.sources = [];
+  //         this.notification.error(new Notification("Error while fetching event sources"));
+  //       }
+  //       this.setEventSources(config);
+
+  //       if (eventTypes) {
+  //         this.eventTypes = _clone(eventTypes);
+  //       } else {
+  //         this.eventTypes = [];
+  //         this.notification.error(new Notification("Error while fetching event types"));
+  //       }
+  //       this.setEventTypes(config);
+
+  //       if (eventCategories) {
+  //         this.eventCategories = _clone(eventCategories);
+  //       } else {
+  //         this.eventCategories = [];
+  //         this.notification.error(new Notification("Error while fetching event categories"));
+  //       }
+  //       this.setEventCategories(config);
+  //       this.queryBuilderConfig = config;
+  //       // setTimeout(() => {
+  //       //   this.buildForm(this.maintenance);
+  //       //   this.spinner.stop('main');
+  //       // }, 100);
+  //     });
+  // }
+
+
   setEventTypes(config: any) {
     let types = [];
     if (this.eventTypes.length) {
@@ -782,6 +915,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
       config.fields['Event Type'].defaultValue = null;
     }
   }
+
 
   setEventCategories(config: any) {
     let categories = [];
@@ -805,7 +939,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
       this.tagsAutocompleteItems = res;
     });
   }
-  
+
   onTagInputChange(newValue: any) {
     this.form.get('description').setValue(this.crudService.basicRulesetToSQL(this.form.get('filter_rule_meta').value));
   }
@@ -835,6 +969,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
   onSubmit() {
     if (this.form.invalid) {
       this.formErrors = this.utilService.validateForm(this.form, this.validationMessages, this.formErrors);
+      console.log(this.formErrors)
       this.form.valueChanges.pipe(takeUntil(this.ngUnsubscribe))
         .subscribe((val: any) => {
           this.formErrors = this.utilService.validateForm(this.form, this.validationMessages, this.formErrors);
@@ -852,6 +987,7 @@ export class UnitySupportScheduledMaintenanceCrudComponent implements OnInit, On
         });
       } else {
         this.spinner.start('main');
+        console.log(this.form.getRawValue())
         this.crudService.createSchedule(this.form.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
           this.spinner.stop('main');
           this.notification.success(new Notification('Schedule maintenance created successfully.'));
