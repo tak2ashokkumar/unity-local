@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple example</title>
+</head>
+<body>
+<button onclick="generate()">Generate pdf</button>
+
+<script src="libs/jspdf.min.js"></script>
+<script src="libs/jspdf.plugin.autotable.src.js"></script>
+
+<script>
+    function generate() {
+        var columns = ["ID", "Country", "Rank", "Capital"];
+        var data = [
+            [1, "Denmark", 7.526, "Copenhagen"],
+            [2, "Switzerland", 	7.509, "Bern"],
+            [3, "Iceland", 7.501, "Reykjavík"],
+            [4, "Norway", 7.498, "Oslo"],
+            [5, "Finland", 7.413, "Helsinki"]
+        ];
+
+        var doc = new jsPDF('p', 'pt');
+        doc.autoTable(columns, data);
+        doc.save("table.pdf");
+    }
+</script>
+</body>
+</html>

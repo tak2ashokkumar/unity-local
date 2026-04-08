@@ -1,0 +1,20 @@
+<ol class="breadcrumb breadcrumb-arrow">
+    <li ng-repeat="crumb in breadcrumbs" ng-class="{ active: $last, disabled : crumb.disabled }">
+
+        <a href="{{crumb.link}}" ng-if="breadcrumbs.length < 5" ng-class="{ active: $last, disabled : crumb.disabled }" ng-click="getActiveTab(crumb)">
+        	<p ng-if="crumb.displayName.length < 16">{{crumb.displayName}}</p>
+        	<p ng-if="crumb.displayName.length > 15">{{(crumb.displayName | limitTo : 15) + '...'}}</p>
+        </a>
+
+        <a href="{{crumb.link}}" ng-if="breadcrumbs.length == 5" ng-class="{ active: $last, disabled : crumb.disabled }" ng-click="getActiveTab(crumb)">
+        	<p ng-if="crumb.displayName.length < 13">{{crumb.displayName}}</p>
+        	<p ng-if="crumb.displayName.length > 12">{{(crumb.displayName | limitTo : 12) + '...'}}</p>
+        </a>
+
+        <a href="{{crumb.link}}" ng-if="breadcrumbs.length > 5" ng-class="{ active: $last, disabled : crumb.disabled }" ng-click="getActiveTab(crumb)">
+        	<p ng-if="crumb.displayName.length < 11">{{crumb.displayName}}</p>
+        	<p ng-if="crumb.displayName.length > 10">{{(crumb.displayName | limitTo : 10) + '...'}}</p>
+        </a>
+        
+    </li>
+</ol>

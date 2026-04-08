@@ -1,0 +1,48 @@
+{
+  "name": "jspdf-autotable",
+  "version": "2.1.0",
+  "description": "Generate pdf tables with javascript (jsPDF plugin)",
+  "main": "dist/jspdf.plugin.autotable.src.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {
+    "jspdf": "^1.3.2"
+  },
+  "devDependencies": {
+    "babel-preset-es2015-rollup": "^1.1.1",
+    "core-js": "^2.4.1",
+    "nodemon": "^1.8.1",
+    "rollup": "^0.34.1",
+    "rollup-plugin-babel": "^2.6.1",
+    "rollup-plugin-commonjs": "^3.1.0",
+    "rollup-plugin-node-resolve": "^1.7.1",
+    "uglify-js": "^2.7.0"
+  },
+  "scripts": {
+    "start": "nodemon --watch src build.js develop & static examples -a 0.0.0.0",
+    "build": "node build.js develop",
+    "examples": "cd examples/browserify && npm install && npm run build && cd ../webpack && npm install && npm run build && cd ../../",
+    "dist": "npm run examples && node build.js build",
+    "version": "npm run dist && git add -A dist && git add -A examples && git add README.md",
+    "hosted": "git checkout gh-pages && npm run build && git add -A && git commit -m \"Updated to latest version\" && git push && git checkout master && git clean -f -d",
+    "deploy": "git push && git push --tags && npm publish && npm run hosted",
+    "clean": "git checkout dist examples/libs/jspdf.plugin.autotable.src.js",
+    "examplesUpdate": "cd examples/webpack && npm update && npm run build && cd ../browserify && npm update && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simonbengtsson/jsPDF-AutoTable.git"
+  },
+  "keywords": [
+    "pdf",
+    "table",
+    "jspdf"
+  ],
+  "author": "Simon Bengtsson <dev@simonbengtsson.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simonbengtsson/jsPDF-AutoTable/issues"
+  },
+  "homepage": "https://simonbengtsson.github.io/jsPDF-AutoTable/"
+}
