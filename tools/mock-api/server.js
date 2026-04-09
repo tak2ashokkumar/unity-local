@@ -49,12 +49,10 @@ app.use((req, res) => {
     fs.mkdirSync(dir, { recursive: true });
 
     const template = {
-        message: "Auto-generated mock file",
-        endpoint: req.path,
-        method: req.method,
-        query: req.query,
-        body: req.body || {},
-        data: []
+      count: 0,
+      next: null,
+      previous: null,
+      results: []
     };
 
     fs.writeFileSync(filePath, JSON.stringify(template, null, 2));

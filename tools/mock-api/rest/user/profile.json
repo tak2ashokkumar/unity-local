@@ -1,0 +1,204 @@
+{
+  "customer": {
+    "id": 1,
+    "url": "https://unity.unitedlayer.com/rest/org/1/",
+    "uuid": "04faed5d-edbf-4684-808a-2ee942157484",
+    "name": "UnitedLayer",
+    "organization_type": "INTERNAL",
+    "address1": "200 Paul Ave Suite 110",
+    "address2": null,
+    "city": "San Francisco",
+    "state": "California",
+    "postal_code": "94124",
+    "country": "United States",
+    "domain": "https://www.unitedlayer.com",
+    "phone": "+1 866-291-4914",
+    "ulid": 1,
+    "customer_type": "UL",
+    "parent_org": "UnitedLayer",
+    "default_snmp_community": null,
+    "default_snmp_version": "2c",
+    "email": "support@unitedlayer.com",
+    "salesforce_id": null,
+    "ticketorganization": 255774268,
+    "vpn_status": false,
+    "onboarding_status": 6,
+    "is_active": true,
+    "logo": "",
+    "storage": null,
+    "unity_modules": [
+      {
+        "module_name": "Dashboard",
+        "module_id": 1
+      },
+      {
+        "module_name": "Monitoring",
+        "module_id": 2
+      },
+      {
+        "module_name": "Activity Log",
+        "module_id": 3
+      },
+      {
+        "module_name": "Public Cloud",
+        "module_id": 4
+      },
+      {
+        "module_name": "UnityConnect",
+        "module_id": 5
+      },
+      {
+        "module_name": "DevOps-as-a-Service",
+        "module_id": 6
+      },
+      {
+        "module_name": "VM Backup",
+        "module_id": 7
+      },
+      {
+        "module_name": "VM Migration",
+        "module_id": 8
+      },
+      {
+        "module_name": "Deployment Engine",
+        "module_id": 9
+      },
+      {
+        "module_name": "Ticket Management",
+        "module_id": 10
+      },
+      {
+        "module_name": "Maintenance",
+        "module_id": 11
+      },
+      {
+        "module_name": "Cabinet Vizualization",
+        "module_id": 12
+      },
+      {
+        "module_name": "Datacenter",
+        "module_id": 13
+      },
+      {
+        "module_name": "Private Cloud",
+        "module_id": 14
+      },
+      {
+        "module_name": "Cost Calculator",
+        "module_id": 15
+      },
+      {
+        "module_name": "Alerts",
+        "module_id": 16
+      },
+      {
+        "module_name": "Devices",
+        "module_id": 17
+      },
+      {
+        "module_name": "Devops-as-a-Service",
+        "module_id": 18
+      },
+      {
+        "module_name": "Services",
+        "module_id": 19
+      },
+      {
+        "module_name": "Service Catalog",
+        "module_id": 20
+      },
+      {
+        "module_name": "Cloud Cost",
+        "module_id": 22
+      },
+      {
+        "module_name": "UnityReport",
+        "module_id": 31
+      }
+    ],
+    "advanced_discovery": false,
+    "is_management_enabled": true,
+    "location": null,
+    "lat": null,
+    "long": null,
+    "monitor_by": "hybrid",
+    "region": 22
+  },
+  "user_accesslist": [
+    {
+      "url": "https://unity.unitedlayer.com/rest/access_type/1/",
+      "id": 1,
+      "name": "Portal Access",
+      "description": "Allows access to portal."
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/access_type/2/",
+      "id": 2,
+      "name": "Notifications",
+      "description": "Receives notifications regarding data center maintenance events and changes in policy."
+    },
+    {
+      "url": "https://unity.unitedlayer.com/rest/access_type/3/",
+      "id": 3,
+      "name": "Abuse",
+      "description": "Receives abuse reports."
+    }
+  ],
+  "last_login": "2026-04-09T05:22:57.209637Z",
+  "user": {
+    "url": "https://unity.unitedlayer.com/rest/user/988/",
+    "id": 988,
+    "org": {
+      "url": "https://unity.unitedlayer.com/rest/fast/org/1/",
+      "id": 1,
+      "name": "UnitedLayer",
+      "storage": null,
+      "uuid": "04faed5d-edbf-4684-808a-2ee942157484"
+    },
+    "is_active": true,
+    "is_staff": true,
+    "is_customer_admin": true,
+    "access_types": [
+      {
+        "url": "https://unity.unitedlayer.com/rest/access_type/1/",
+        "id": 1,
+        "name": "Portal Access",
+        "description": "Allows access to portal."
+      },
+      {
+        "url": "https://unity.unitedlayer.com/rest/access_type/2/",
+        "id": 2,
+        "name": "Notifications",
+        "description": "Receives notifications regarding data center maintenance events and changes in policy."
+      },
+      {
+        "url": "https://unity.unitedlayer.com/rest/access_type/3/",
+        "id": 3,
+        "name": "Abuse",
+        "description": "Receives abuse reports."
+      }
+    ],
+    "ticket_user": null,
+    "uuid": "55a71aa8-b36c-482f-ade4-0ea55fd3ad3c",
+    "email": "svijayakumar-unity@unitedlayer.com",
+    "first_name": "Sagar",
+    "last_name": "V",
+    "salesforce_id": "SV5679",
+    "user_roles": [
+      {
+        "url": "https://unity.unitedlayer.com/rest/role/13/",
+        "id": 13,
+        "name": "Administrator"
+      }
+    ],
+    "ticket_group": [],
+    "timezone": "Asia/Kolkata",
+    "welcome_page": false,
+    "full_name": "Sagar V",
+    "user_type": "Tenant"
+  },
+  "release_version": "v3.5.0",
+  "user_id": "svijayakumar-unity@unitedlayer.com",
+  "release_date": "2017-04-10T13:37",
+  "has_two_factor": false
+}

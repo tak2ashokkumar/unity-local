@@ -1,0 +1,223 @@
+{
+  "count": 8,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 2,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/2/",
+      "name": "lb1-903.sf10",
+      "backend_url": "http://lb1-903.sf10.unitedlayer.com",
+      "proxy_url": "lb1903sf10",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/301/",
+          "id": 301,
+          "name": "ConsumerAffairs.com",
+          "storage": "40.6",
+          "uuid": "da6056cb-7ec9-4f50-bf61-d73b719f0000"
+        }
+      ],
+      "uuid": "5dc03802-3d94-4e83-b744-335e5ae29cc3",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1582/",
+        "id": 1582,
+        "uuid": "1509084f-ed21-4e0f-a9ba-d67974d1b0c3",
+        "name": "lb1a-503.sf10.unitedlayer.com",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb1a-503.sf10.unitedlayer.com - CrownPeak Technology"
+      },
+      "proxy_fqdn": "https://lb1903sf10.uproxy.unitedlayer.com"
+    },
+    {
+      "id": 3,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/3/",
+      "name": "lb2-903.sf10",
+      "backend_url": "http://lb2-903.sf10.unitedlayer.com",
+      "proxy_url": "lb2903sf10",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/301/",
+          "id": 301,
+          "name": "ConsumerAffairs.com",
+          "storage": "40.6",
+          "uuid": "da6056cb-7ec9-4f50-bf61-d73b719f0000"
+        }
+      ],
+      "uuid": "5a093165-9562-4cd1-beda-7b628c298a25",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1583/",
+        "id": 1583,
+        "uuid": "88127803-4619-4060-b761-5917dcc2f734",
+        "name": "lb1b-503.sf10.unitedlayer.com",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb1b-503.sf10.unitedlayer.com - CrownPeak Technology"
+      },
+      "proxy_fqdn": "https://lb2903sf10.uproxy.unitedlayer.com"
+    },
+    {
+      "id": 6,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/6/",
+      "name": "granlb3to1",
+      "backend_url": "http://10.39.0.4",
+      "proxy_url": "granlb3to1",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/215/",
+          "id": 215,
+          "name": "Granicus, Inc",
+          "storage": null,
+          "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
+        }
+      ],
+      "uuid": "c5c0ce15-d763-4940-8cbe-5145f31ece49",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1392/",
+        "id": 1392,
+        "uuid": "62013547-3d92-433b-91fa-ffae8e7cb2b4",
+        "name": "lb3.to1",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb3.to1 - Granicus, Inc"
+      },
+      "proxy_fqdn": "https://granlb3to1.uproxy.unitedlayer.com"
+    },
+    {
+      "id": 7,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/7/",
+      "name": "hostanalytics-lb2.lv1",
+      "backend_url": "https://lb2.lv1.unitedlayer.com",
+      "proxy_url": "hostanalyticslb2lv1",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/212/",
+          "id": 212,
+          "name": "Host Analytics, Inc.",
+          "storage": "26",
+          "uuid": "cb11f6d8-e05e-4993-b55b-c76aa062da79"
+        }
+      ],
+      "uuid": "373b4822-2cc0-4005-9327-f7c2a8c39c26",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1137/",
+        "id": 1137,
+        "uuid": "6737ebde-8720-43ec-a038-4be3b5e66e0e",
+        "name": "lb2.lv1",
+        "object_class": "LoadBalancer",
+        "is_shared": true,
+        "display_name": "lb2.lv1 - Tire's Warehouse"
+      },
+      "proxy_fqdn": "https://hostanalyticslb2lv1.uproxy.unitedlayer.com"
+    },
+    {
+      "id": 8,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/8/",
+      "name": "blackstone-lb1-513a52.sf9",
+      "backend_url": "https://172.16.3.2/",
+      "proxy_url": "blackstone-lb1-513a52-sf9",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/214/",
+          "id": 214,
+          "name": "Blackstone",
+          "storage": null,
+          "uuid": "dd84a858-c4b5-4b47-a8f5-f49e39a77805"
+        }
+      ],
+      "uuid": "256db95e-f524-4b96-8d23-56cf66092c7b",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1535/",
+        "id": 1535,
+        "uuid": "53fc8f01-2616-4aef-8602-1668fbde8a39",
+        "name": "lb1a-513a52.sf9",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb1a-513a52.sf9 - Blackstone"
+      },
+      "proxy_fqdn": "https://blackstone-lb1-513a52-sf9.uproxy.unitedlayer.com"
+    },
+    {
+      "id": 9,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/9/",
+      "name": "granicus-lb1-513a40.sf9",
+      "backend_url": "http://10.49.0.5",
+      "proxy_url": "granicus-lb1-513a40-sf9",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/215/",
+          "id": 215,
+          "name": "Granicus, Inc",
+          "storage": null,
+          "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
+        }
+      ],
+      "uuid": "11b2f038-e659-4a38-a7b8-ea1c93e5d82c",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1386/",
+        "id": 1386,
+        "uuid": "06f5b53b-a4ae-477f-86a8-9eec4ba99614",
+        "name": "lb1-513a40.sf9",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb1-513a40.sf9 - Granicus, Inc"
+      },
+      "proxy_fqdn": "https://granicus-lb1-513a40-sf9.uproxy.unitedlayer.com"
+    },
+    {
+      "id": 10,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/10/",
+      "name": "granicus-lb1a-va1",
+      "backend_url": "http://10.29.0.5",
+      "proxy_url": "granicus-lb1a-va1",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/215/",
+          "id": 215,
+          "name": "Granicus, Inc",
+          "storage": null,
+          "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
+        }
+      ],
+      "uuid": "e605d5a6-db79-4747-be62-0eaf0404e3f6",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1388/",
+        "id": 1388,
+        "uuid": "b155f7b7-7a0d-4eea-a4dd-876f9261deb6",
+        "name": "lb1a.va1",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb1a.va1 - Granicus, Inc"
+      },
+      "proxy_fqdn": "https://granicus-lb1a-va1.uproxy.unitedlayer.com"
+    },
+    {
+      "id": 12,
+      "url": "https://unity.unitedlayer.com/rest/citrix_vpx_device/12/",
+      "name": "granicus-lb1.va1",
+      "backend_url": "http://10.29.0.6",
+      "proxy_url": "granicus-lb1-va1",
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/215/",
+          "id": 215,
+          "name": "Granicus, Inc",
+          "storage": null,
+          "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
+        }
+      ],
+      "uuid": "48110e5a-fb67-4320-81b1-e1a3d64bf9fd",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/1390/",
+        "id": 1390,
+        "uuid": "ad24cf11-2f6c-42b8-a302-39de5479ea05",
+        "name": "lb1b.va1",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb1b.va1 - Granicus, Inc"
+      },
+      "proxy_fqdn": "https://granicus-lb1-va1.uproxy.unitedlayer.com"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "count": 6,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 74,
+      "url": "https://unity.unitedlayer.com/rest/zabbix/os_templates/74/",
+      "interface_type": "SNMP",
+      "zabbix_instance": {
+        "id": 11,
+        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+        "account_name": "zabbix-SF prod"
+      },
+      "zabbix_template": {
+        "id": 350,
+        "url": "https://unity.unitedlayer.com/rest/zabbix/zabbix_templates/350/",
+        "template_id": 10752,
+        "template_name": "UNITY_Windows_SNMP"
+      },
+      "os_type": "Windows"
+    },
+    {
+      "id": 75,
+      "url": "https://unity.unitedlayer.com/rest/zabbix/os_templates/75/",
+      "interface_type": "SNMP",
+      "zabbix_instance": {
+        "id": 11,
+        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+        "account_name": "zabbix-SF prod"
+      },
+      "zabbix_template": {
+        "id": 346,
+        "url": "https://unity.unitedlayer.com/rest/zabbix/zabbix_templates/346/",
+        "template_id": 10640,
+        "template_name": "Unity_Linux_OS_SNMP"
+      },
+      "os_type": "Linux"
+    },
+    {
+      "id": 76,
+      "url": "https://unity.unitedlayer.com/rest/zabbix/os_templates/76/",
+      "interface_type": "Agent",
+      "zabbix_instance": {
+        "id": 11,
+        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+        "account_name": "zabbix-SF prod"
+      },
+      "zabbix_template": {
+        "id": 345,
+        "url": "https://unity.unitedlayer.com/rest/zabbix/zabbix_templates/345/",
+        "template_id": 10641,
+        "template_name": "Unity_Linux_OS_Agent"
+      },
+      "os_type": "Linux"
+    },
+    {
+      "id": 77,
+      "url": "https://unity.unitedlayer.com/rest/zabbix/os_templates/77/",
+      "interface_type": "Agent",
+      "zabbix_instance": {
+        "id": 11,
+        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+        "account_name": "zabbix-SF prod"
+      },
+      "zabbix_template": {
+        "id": 374,
+        "url": "https://unity.unitedlayer.com/rest/zabbix/zabbix_templates/374/",
+        "template_id": 10750,
+        "template_name": "UNITY_Windows_Agent"
+      },
+      "os_type": "Windows"
+    },
+    {
+      "id": 78,
+      "url": "https://unity.unitedlayer.com/rest/zabbix/os_templates/78/",
+      "interface_type": "Agent",
+      "zabbix_instance": {
+        "id": 11,
+        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+        "account_name": "zabbix-SF prod"
+      },
+      "zabbix_template": {
+        "id": 385,
+        "url": "https://unity.unitedlayer.com/rest/zabbix/zabbix_templates/385/",
+        "template_id": 10764,
+        "template_name": "Unity_macOS_by _Agent"
+      },
+      "os_type": "MacOS"
+    },
+    {
+      "id": 79,
+      "url": "https://unity.unitedlayer.com/rest/zabbix/os_templates/79/",
+      "interface_type": "SNMP",
+      "zabbix_instance": {
+        "id": 11,
+        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+        "account_name": "zabbix-SF prod"
+      },
+      "zabbix_template": {
+        "id": 530,
+        "url": "https://unity.unitedlayer.com/rest/zabbix/zabbix_templates/530/",
+        "template_id": 11018,
+        "template_name": "TEMPLATE - VMWARE - STANDALONE ESXI HOST"
+      },
+      "os_type": "ESXi"
+    }
+  ]
+}

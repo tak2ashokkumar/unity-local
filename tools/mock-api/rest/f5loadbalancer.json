@@ -1,0 +1,34 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 10,
+      "url": "https://unity.unitedlayer.com/rest/f5loadbalancer/10/",
+      "name": "lb1-4234.lv1-UL",
+      "backend_url": null,
+      "proxy_url": null,
+      "customers": [
+        {
+          "url": "https://unity.unitedlayer.com/rest/fast/org/328/",
+          "id": 328,
+          "name": "My UL Demo, LLC",
+          "storage": "5",
+          "uuid": "ec9f8028-70f3-4b8d-aac9-1662730909ec"
+        }
+      ],
+      "uuid": "b6e206c7-3ce5-4e84-910c-0f80b6405c02",
+      "load_balancer": {
+        "url": "https://unity.unitedlayer.com/rest/loadbalancer/2003/",
+        "id": 2003,
+        "uuid": "6ba0f31e-ecc5-402c-9716-408026a78a02",
+        "name": "lb1-4234.lv1-UL",
+        "object_class": "LoadBalancer",
+        "is_shared": false,
+        "display_name": "lb1-4234.lv1-UL - My UL Demo, LLC"
+      },
+      "proxy_fqdn": null
+    }
+  ]
+}
