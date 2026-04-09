@@ -1,0 +1,70 @@
+{% for item in menu %}
+  <li>
+    <a href="">
+      {% if item.fa %}<i class="fa {{ item.fa }} fa-fw fa-lg"></i>
+      {% elif item.glyphicon %}<i class="{{ item.glyphicon }} fa-fw fa-lg"></i>{% endif %}
+      <span class="menu-item-text">{{ item.title }}</span><span class="fa arrow fa-lg"></span>
+    </a>
+    {% if "submenu" in item %}
+      <ul class="nav nav-second-level">
+        {% for j in item.submenu %}
+          <li>
+            <a class="menu-item {% if j.disabled %} menu-disabled{% endif %}" href="{{ j.href }}">
+              {% if j.fa %}<i class="{{ j.fa }} fa fa-fw "></i>{% endif %}
+              {% if j.glyphicon %}<i class="{{ j.glyphicon }} fa-fw fa-lg"></i>{% endif %}
+              <span class="menu-item-text"> {{ j.name }}</span>
+              {% if j.arrow %}
+                <span class="fa arrow fa-lg"></span>
+              {% endif %}
+            </a>
+            {% if "submenu" in j %}
+              <ul class="nav nav-third-level">
+                {% for k in j.submenu %}
+                  <li>
+                    <a class="menu-item {% if k.disabled %} menu-disabled{% endif %}" href="{{ k.href }}">
+                      {% if k.fa %}<i class="{{ k.fa }} fa fa-fw fa-lg"></i>{% endif %}
+                      {% if k.glyphicon %}<i class="{{ k.glyphicon }} fa-fw fa-lg"></i>{% endif %}
+                      <span class="menu-item-text">{{ k.name }}</span>
+                      {% if k.arrow %}
+                        <span class="fa arrow fa-lg"></span>
+                      {% endif %}
+                    </a>
+                    {% if "submenu" in k %}
+                      <ul class="nav nav-fourth-level">
+                        {% for l in k.submenu %}
+                          <li>
+                            <a class="menu-item {% if l.disabled %} menu-disabled{% endif %}" href="{{ l.href }}">
+                              {% if l.fa %}<i class="{{ l.fa }} fa fa-fw fa-1x"></i>{% endif %}
+                              {% if l.glyphicon %}<i class="{{ l.glyphicon }} fa-fw fa-1x"></i>{% endif %}
+                              <span class="menu-item-text">{{ l.name }}</span>
+                              {% if l.arrow %}
+                                <span class="fa arrow fa-1x"></span>
+                              {% endif %}
+                            </a>
+                            {% if "submenu" in l %}
+                              <ul class="nav nav-fourth-level">
+                                {% for m in l.submenu %}
+                                  <li>
+                                    <a class="menu-item {% if m.disabled %} menu-disabled{% endif %}" href="{{ m.href }}">
+                                      {% if m.fa %}<i class="{{ m.fa }} fa fa-fw fa-1x"></i>{% endif %}
+                                      {% if m.glyphicon %}<i class="{{ m.glyphicon }} fa-fw fa-1x"></i>{% endif %}
+                                      <span class="menu-item-text">{{ m.name }}</span>
+                                    </a>
+                                  </li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </li>
+{% endfor %}

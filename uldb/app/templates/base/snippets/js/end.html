@@ -1,0 +1,316 @@
+<script>
+
+  (function(e){"use strict";function r(t,n){this.opts=e.extend({handleWheel:!0,handleScrollbar:!0,handleKeys:!0,scrollEventKeys:[32,33,34,35,36,37,38,39,40]},n);this.$container=t;this.$document=e(document);this.lockToScrollPos=[0,0];this.disable()}var t,n;n=r.prototype;n.disable=function(){var e=this;e.opts.handleWheel&&e.$container.on("mousewheel.disablescroll DOMMouseScroll.disablescroll touchmove.disablescroll",e._handleWheel);if(e.opts.handleScrollbar){e.lockToScrollPos=[e.$container.scrollLeft(),e.$container.scrollTop()];e.$container.on("scroll.disablescroll",function(){e._handleScrollbar.call(e)})}e.opts.handleKeys&&e.$document.on("keydown.disablescroll",function(t){e._handleKeydown.call(e,t)})};n.undo=function(){var e=this;e.$container.off(".disablescroll");e.opts.handleKeys&&e.$document.off(".disablescroll")};n._handleWheel=function(e){e.preventDefault()};n._handleScrollbar=function(){this.$container.scrollLeft(this.lockToScrollPos[0]);this.$container.scrollTop(this.lockToScrollPos[1])};n._handleKeydown=function(e){for(var t=0;t<this.opts.scrollEventKeys.length;t++)if(e.keyCode===this.opts.scrollEventKeys[t]){e.preventDefault();return}};e.fn.disablescroll=function(e){!t&&(typeof e=="object"||!e)&&(t=new r(this,e));t&&typeof e=="undefined"?t.disable():t&&t[e]&&t[e].call(t)};window.UserScrollDisabler=r})(jQuery);
+
+  (function () {
+      // hold onto the drop down menu
+      var dropdownMenu;
+
+      // and when you show it, move it to the body
+      $(window).on('show.bs.dropdown', function (e) {
+
+          // grab the menu
+          dropdownMenu = $(e.target).find('.actions_menu');
+          //dmParent = dropdownMenu.parent().parent().parent().parent().parent().parent().parent()
+          // dmParent.addClass("overflowHidden")
+          var $nonScrollable = $("body");
+          $nonScrollable.disablescroll();
+
+          // detach it and append it to the body
+          $('#drop-down-div').append(dropdownMenu.detach());
+
+          // grab the new offset position
+          var eOffset = $(e.target).offset();
+
+          // make sure to place it where it would normally go (this could be improved)
+          dropdownMenu.css({
+              'display': 'block',
+              'top': eOffset.top + $(e.target).outerHeight(),
+              'left': eOffset.left,
+              'width': "200"
+          });
+      });
+
+      // and when you hide it, reattach the drop down, and hide it normally
+      $(window).on('hide.bs.dropdown', function (e) {
+          $(e.target).append(dropdownMenu.detach());
+          dropdownMenu.hide();
+          var $nonScrollable = $("body");
+          $nonScrollable.disablescroll("undo");
+          $('#drop-down-div').empty();
+      });
+
+  })();
+{##}
+{#	function validate_spinner(field_id, min, max){#}
+{#        $('#'+field_id).on('change keyup', function() {#}
+{#          var sanitized = $(this).val().replace(/[^0-9]/g, '');#}
+{#          $('#'+field_id).val(sanitized);#}
+{#        });#}
+{#        var tempVal=$("#"+field_id).val();#}
+{#        var tempValInt = parseInt(tempVal);#}
+{#        if( (tempValInt >= min && tempValInt <= max) ){#}
+{#            if( !($("#min_ram_msg_id").text("")) ){#}
+{#                console.log("ram spinner inside of if..."+tempValInt);#}
+{#                $("#min_ram_msg_id").text("");#}
+{#            }else if( !($("#min_disk_msg_id").text("")) ){#}
+{#                console.log("disk spinner inside of if..."+tempValInt);#}
+{#                $("#min_disk_msg_id").text("");#}
+{#            }#}
+{#        }#}
+{#        else{#}
+{#            if(field_id == 'min_ram_id'){#}
+{#                $("#min_ram_msg_id").text("Value should be in between "+min +" and " +max);#}
+{#                $("#"+field_id).val("");#}
+{#                $("#min_ram_msg_id").css('color','red');#}
+{#            }else if(field_id == 'min_disk_id'){#}
+{#                $("#min_disk_msg_id").text("Value should be in between "+min +" and " +max);#}
+{#                $("#"+field_id).val("");#}
+{#                $("#min_disk_msg_id").css('color','red');#}
+{#            }#}
+{#        }#}
+{#    }#}
+{#  function set_limit(field_id){#}
+{#   $('#'+field_id).on('change keyup', function() {#}
+{#      var sanitized = $(this).val().replace(/[^0-9]/g, '');#}
+{#      $('#'+field_id).val(sanitized);#}
+{#    });#}
+{#    if((field_id=="memory_limit")||(field_id=="memory_reservation")){#}
+{#    var tempVal=$("#"+field_id).val();#}
+{#        if(tempVal>28301){#}
+{#            $("#"+field_id).val(28301);#}
+{#        }#}
+{#    }#}
+{#    if((field_id=="cpu_limit")||(field_id=="cpu_reservation")){#}
+{#    var tempVal=$("#"+field_id).val();#}
+{#        if(tempVal>22107){#}
+{#            $("#"+field_id).val(22107);#}
+{#        }#}
+{#    }#}
+{#    if(field_id=="cpu_shares"){#}
+{#    var tempVal=$("#"+field_id).val();#}
+{#        if(tempVal>8000){#}
+{#            $("#"+field_id).val(8000);#}
+{#        }#}
+{#    }#}
+{#    if(field_id=="memory_shares"){#}
+{#    var tempVal=$("#"+field_id).val();#}
+{#        if(tempVal>4000000){#}
+{#            $("#"+field_id).val(4000000);#}
+{#        }#}
+{#    }#}
+{#   }#}
+{#	function validate_number_field(field_id){#}
+{#       $('#'+field_id).on('change keyup', function() {#}
+{#          var sanitized = $(this).val().replace(/[^0-9]/g, '');#}
+{#          $('#'+field_id).val(sanitized);#}
+{#        });#}
+{#        var tempVal=$("#"+field_id).val();#}
+{#        if(tempVal>65536){#}
+{#            $("#"+field_id).val(65536);#}
+{#        }#}
+{#    }#}
+{#	function is_number_key(field_id){#}
+{#        $('#'+field_id).on('change keyup', function() {#}
+{#            var sanitized = $(this).val().replace(/[^0-9]/g, '');#}
+{#            $('#'+field_id).val(sanitized);#}
+{#        });#}
+{#        var tempVal=$("#"+field_id).val();#}
+{#        return true;#}
+{#   }#}
+{#   function set_ipval(field_id){#}
+{#   $('#'+field_id).on('change keyup', function() {#}
+{#      var sanitized = $(this).val().replace(/[^0-9]/g, '');#}
+{#      $('#'+field_id).val(sanitized);#}
+{#    });#}
+{#    var tempVal=$("#"+field_id).val();#}
+{#        if(tempVal.length=3&&tempVal>255){#}
+{#            $("#"+field_id).val(255);#}
+{#        }#}
+{#   }#}
+{#   function set_ipval_autofocus(field_id, next_field_id){#}
+{#       $('#'+field_id).on('change keyup', function() {#}
+{#          var sanitized = $(this).val().replace(/[^0-9]/g, '');#}
+{#          $('#'+field_id).val(sanitized);#}
+{#       });#}
+{#       var tempVal=$("#"+field_id).val();#}
+{#       if(tempVal.length==3&&tempVal>255){#}
+{#           $("#"+field_id).val(255);#}
+{#       }#}
+{#       if((field_id=="ip_field_1")||(field_id=="ip_field_4")){#}
+{#          if(tempVal.length>=1){#}
+{#              if((tempVal<1)||(tempVal>254)){#}
+{#                $("#"+field_id).val("");#}
+{#              }#}
+{#          }#}
+{#      }#}
+{#      if((field_id=="ip_field_3")||(field_id=="ip_field_2")){#}
+{#          if(tempVal.length==3){#}
+{#              if(tempVal>255){#}
+{#                $("#"+field_id).val("255");#}
+{#              }#}
+{#          }#}
+{#      }#}
+{#	  if((field_id=="ip_field_10")||(field_id=="ip_field_40")){#}
+{#          if(tempVal.length>=1){#}
+{#              if((tempVal<1)||(tempVal>254)){#}
+{#                $("#"+field_id).val("");#}
+{#              }#}
+{#          }#}
+{#      }#}
+{#      if((field_id=="ip_field_30")||(field_id=="ip_field_20")){#}
+{#          if(tempVal.length==3){#}
+{#              if(tempVal>255){#}
+{#                $("#"+field_id).val("255");#}
+{#              }#}
+{#          }#}
+{#      }#}
+{#        if( (field_id=="ip_field_11") ){#}
+{#           if(tempVal.length>=1){#}
+{#               if((tempVal<1)||(tempVal>254)){#}
+{#                 $("#"+field_id).val("");#}
+{#               }#}
+{#            }#}
+{#        }#}
+{#        if( (field_id=="ip_field_41") ){#}
+{#            if(tempVal.length>=1){#}
+{#              if((tempVal<0)||(tempVal>254)){#}
+{#                $("#"+field_id).val("");#}
+{#              }#}
+{#            }#}
+{#        }#}
+{#      if( (field_id=="ip_field_42") ){#}
+{#           if(tempVal.length>=1){#}
+{#               if((tempVal<1)||(tempVal>32)){#}
+{#                   $("#"+field_id).val("32");#}
+{#               }#}
+{#           }#}
+{#      }#}
+{#      if((field_id=="ip_field_31")||(field_id=="ip_field_21") ||(field_id=="ip_field_21")){#}
+{#          if(tempVal.length==3){#}
+{#              if(tempVal>255){#}
+{#                $("#"+field_id).val("255");#}
+{#              }#}
+{#          }#}
+{#      }#}
+{##}
+{#      if(tempVal.length==3 && next_field_id!=''){#}
+{#           $("#"+next_field_id).focus();#}
+{#      }#}
+{#   }#}
+{#    function set_portval(field_id){#}
+{#   $('#'+field_id).on('change keyup', function() {#}
+{#      var sanitized = $(this).val().replace(/[^0-9]/g, '');#}
+{#      $('#'+field_id).val(sanitized);#}
+{#    });#}
+{#    var tempVal=$("#"+field_id).val();#}
+{#        if(tempVal.length=5&&tempVal>65536){#}
+{#            $("#"+field_id).val(65536);#}
+{#        }#}
+{#   }#}
+  function credentials_checkPass(password,confirmpassword){
+      var credentials_secret = document.getElementById(password);
+      var credentials_confirm_secret = document.getElementById(confirmpassword);
+      var message = document.getElementById('confirmMessage');
+      message.innerHTML="";
+      var btnStatus = jQuery(".btn-primary");
+      var goodColor = "#66cc66";
+      var badColor = "#ff6666";
+      if(credentials_secret.value == credentials_confirm_secret.value){
+          message.style.color = goodColor;
+          message.innerHTML = "Passwords Match!"
+          btnStatus.removeAttr("disabled");
+      }
+      else{
+          message.style.color = badColor;
+          message.innerHTML = "Passwords Do Not Match!";
+          btnStatus.attr("disabled", "true");
+      }
+  };
+  $(document).ready(function () {
+    var W_COLLAPSE_WIDTH = 768;
+    var sidebar = $(".sidebar");
+    var footer_height = function () {
+      return $("#footer").outerHeight();
+    };
+
+    var page_wrapper = $("#page-wrapper");
+
+    var resizeSidebar = function () {
+{#      if (sidebar.children().first().hasClass('collapse')) {#}
+      if ($(window).width() <= W_COLLAPSE_WIDTH) {
+        sidebar.css("height", '');
+      } else {
+        sidebar.css("height", $(window).innerHeight() + 'px');
+      }
+    };
+
+    page_wrapper.css("overflow", "auto");
+    var resizeMain = function () {
+{#      page_wrapper.css("height",#}
+{#          $(window).innerHeight() - footer_height() - 200#}
+{#          + 'px'#}
+{#      );#}
+      page_wrapper.height($(window).innerHeight() - footer_height());
+{#      console.log(page_wrapper.height());#}
+    };
+
+    resizeMain();
+
+    $(".main").css("height", $(window).height() - 50 + 'px');
+    $(".wrapperbody").css("overflow", "hidden");
+
+
+    sidebar.css("overflow-y", "auto");
+    sidebar.css("overflow-x", "hidden");
+    resizeSidebar();
+    $(window).resize(function () {
+      resizeMain();
+      resizeSidebar();
+    });
+    $(".menu-item").click(function () {
+      $(".main").css("height", $(window).height() - 50 + 'px');
+    });
+  });
+</script>
+<script>
+  angular.module('uldb').config(['$httpProvider', function ($httpProvider) {
+    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+    $httpProvider.defaults.withCredentials = true;
+    $httpProvider.defaults.headers.common['X-CSRF-Token'] = '{{ csrf_token | escapejs }}';
+
+    // disable caching
+    $httpProvider.defaults.cache = false;
+    $httpProvider.defaults.headers.common['Cache-Control'] = 'no-cache';
+  }]);
+</script>
+<script>
+  $(document).ready(function () {
+    // $('#test_table').floatThead({
+    //   position: 'absolute'
+    // });
+  });
+</script>
+<script>
+//$(document).ready(function(){
+
+//     // select the target node
+//     var target = document.getElementById('page-wrapper');
+
+//     // create an observer instance
+//     var observer = new MutationObserver(function(mutations) {
+//       mutations.forEach(function(mutation) {
+//         // console.log(mutation.type);
+//         $( "#drop-down-div" ).empty();
+//       });
+//     });
+
+//     // configuration of the observer:
+//     var config = { attributes: true, childList: true, characterData: true };
+
+//     // pass in the target node, as well as the observer options
+//     observer.observe(target, config);
+// });
+</script>
+<div id="drop-down-div"></div>

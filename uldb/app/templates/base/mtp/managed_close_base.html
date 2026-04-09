@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <script type="text/javascript">
+        setTimeout(function () {
+            window.localStorage.setItem("stoppedimpersonation", "close");
+            window.close();
+            if (!window.closed) {
+                const hostParts = window.location.host.split('.');
+                let redirectTo = hostParts.slice(-(hostParts.length - 1)).join('.');
+                window.location.href = window.location.protocol + "//" + redirectTo;
+            }
+        }, 10);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+{% load staticfiles %}
+{% load hijack_tags %}
+{% load pipeline %}
+
+<!DOCTYPE html PUBLIC"-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html> 
+<head> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>VM Console</title>
+</head> 
+<body>
+<link rel="stylesheet" type="text/css" href="{% static 'WebMKS_SDK_2.1.0/css/wmks-all.css' %}" />
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{% static 'WebMKS_SDK_2.1.0/wmks.min.js' %}"></script>
+{% if error %}
+<div > {{error}}</div> 
+{% else %}
+<div id="wmksContainer" style="position:absolute;width:100%;height:100%"></div> 
+<script>
+var options = {
+    //useVNCHandshake: false
+  };
+
+var wmks = WMKS.createWMKS("wmksContainer",options)
+  .register(WMKS.CONST.Events.CONNECTION_STATE_CHANGE, function(event,data){
+    if(data.state == WMKS.CONST.ConnectionState.CONNECTED){
+      console.log("connection state change : connected");}
+  });
+try {
+wmks.connect("{{url}}");
+    console.log('connect succeeded');
+  } catch (err) {
+    console.log('connect failed: ' + err);
+  }
+</script> 
+{% endif %}
+</body>
+</html>
+

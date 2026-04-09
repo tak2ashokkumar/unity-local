@@ -1,0 +1,72 @@
+{% load uldb_filters %}
+{% load hijack_tags %}
+{% load staticfiles %}
+{% load i18n %}
+
+<header>
+    <div class="header-band-lg shadow" ng-init="setLoggedInUser({{user.email|jsonify}},
+    {{user.is_customer_admin|jsonify}}, {{user.welcome_page|jsonify}}, {{user.agreement_email_sent|jsonify}},
+    {{user.timezone|jsonify }})">
+        <div class="row">
+            <div ng-if="!{{user.org.logo|jsonify}}" class="Left-band side-bar-width">
+                <div class="unitylogo">
+                    <a href="#"><img alt="Unity" class="unity-logo-img" id="Image-175275" src="{% static 'images/Unity-logo2.png' %}" /></a>
+                </div>
+                <div class="logo-text">
+                    <h2> UNITY </h2> 
+                </div>
+            </div>
+            <div ng-if="{{user.org.logo|jsonify}}" class="Left-band side-bar-width text-align-center" >
+                <img class="companylogo" src="data:image/png;base64,{{ user.org.logo }}">
+            </div>
+
+            <div class="header-nav-left">
+                <ui-breadcrumbs displayname-property="data.displayName" 
+                    abstract-proxy-property="data.breadcrumbProxy"
+                    template-url="{% static 'bower_components/angular-utils-ui-breadcrumbs/custom_breadcrumbs_template.html' %}" >
+                </ui-breadcrumbs>
+            </div>
+            <div class="header-nav-right" ng-init="setUserWelcomePage({{user.welcome_page|jsonify}})">
+                {% hijack_notification %}
+                <div class="top_nav">
+                    <div class="nav_container" ng-init="getUserTimeZone()">
+                        <ul class="nav">
+                            <li class="nav-link">
+                                <span class="fa fa-envelope" tooltip-placement="left" tooltip-class="customClass" uib-tooltip="Report an issue" ng-click="help_mail_popup()"></span>
+                                <span class="company-name no_pointer_events">
+                                    <a href="" class="text_elipsis">{{user.org}}</a>
+                                </span>
+                                <span class="fa fa-bell-o rotate40-deg"></span>
+                                <span class="label">0</span>
+                            </li>
+                            <li class="nav-link userTimezone">{%verbatim%}{{user_timezone}}{%endverbatim%}</li>
+                            <li class="user-detail">
+                                <div class="dropdown cousor_pointer">
+                                    <div class="user-name text_elipsis dropdown-toggle" id="menu1" data-toggle="dropdown">{{ user.first_name }}<span class="dropdown-arrow"></span></div>
+                                    <ul class="dropdown-menu high-zindex" role="menu" aria-labelledby="menu1">
+                                        <li role="User Deatils"><a role="menuitem" tabindex="-1" ui-sref="about({uuidp : 'about'})" ui-sref-opts="{reload : true}">Welcome Page</a></li>
+                                        <li role="User Deatils" class="divider"></li>
+                                        <li role="User Deatils"><a role="menuitem" tabindex="-1" ui-sref="account()" >Profile Settings</a></li>
+                                        <li role="User Deatils" class="divider"></li>
+                                        {% if request|is_hijacked %}
+                                            <li role="User Deatils"><a role="menuitem" tabindex="-1" ng-click="stop_impersonation()" style="color: red;">Stop Impersonating</a></li>
+                                        {% else %}
+                                            <li role="User Deatils"><a role="menuitem" tabindex="-1" ng-click="logout()">Log out</a></li>
+                                        {% endif %}
+
+                                    </ul>
+                                </div>
+                                <div class="user-pic">
+                                    <img src="{% static 'images/default_user.jpg' %}" width="125" height="125" title="">
+                                </div>
+                                {% if request|is_hijacked %}
+                                    <span class="label">i</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

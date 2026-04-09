@@ -1,0 +1,105 @@
+{% load staticfiles %}
+{% load hijack_tags %}
+{% load pipeline %}
+
+<!DOCTYPE html>
+<html lang="en" ng-app="uldb">
+<head>
+  <title ng-bind="header || 'Unity'">aiops</title>
+
+</head>
+
+<body >
+<table>
+<tr >
+<td width="70%" style=" background-color: lavender;">
+<form action="" method="post" enctype="multipart/form-data">
+ {% csrf_token %}
+ <table>
+  <tr>
+  <td>Browse File  </td>
+  <td><input type="file"  name="data_file" required>   </td>
+  </tr>
+
+  <tr>
+  <td>Clear aiops data</td>
+  <td><input type="checkbox"  name="clear_data" value=1 > </td>
+  </tr>
+
+<!--   <tr>
+  <td>Time delay range</td>
+  <td><input type="number"  name="delay_range" min="1" required> </td>
+  </tr> -->
+
+<!--   <tr>
+  <td>Source</td>
+  <td>
+      <select name="data_source" required>
+        <option value="">Select</option>
+        <option value="unity">Unity</option>
+        <option value="wipro">Wipro</option>
+      </select>
+   </td>
+  </tr> -->
+
+
+<!--   <tr>
+  <td>Severity</td>
+  <td>
+  <fieldset>
+        <legend>Severity Map</legend>
+        <label for="severity_info">Information</label>
+        <input type="text" id="severity_info" name="severity_info"><br><br>
+        <label for="severity_warning">Warning</label>
+        <input type="text" id="severity_warning" name="severity_warning"><br><br>
+        <label for="severity_critical">Critical</label>
+        <input type="text" id="severity_critical" name="severity_critical"><br><br>
+
+  </fieldset>
+   </td>
+  </tr> -->
+
+ </table>
+
+  <input type="submit" value="Submit">
+</form>
+</td>
+<td width="30%" style=" background-color: lavender;">
+<p1>Excel format</p1>
+<ul>
+  <li>Column 1: Event Id</li>
+  <li>Column 2: Device name</li>
+  <li>Column 3: Device type
+    <ul>
+        <li>switch, firewall , load_balancer,storage,hypervisor,bms, pdu, mac_device , mobile, custom </li>
+    </ul>
+  </li>
+  <li>Column 4: Description</li>
+  <li>Column 5: Severity</li>
+      <ul>
+        <li>Information, Warning, Critical</li>
+    </ul>
+  <li>Column 6: Source</li>
+    <ul>
+        <li>Azure, Nagios, SolarWinds, Unity, Zabbix, GCP, Oci, Aws, Opsramp, Dynatrace, Splunk, AppDynamics, LogicMonitor 
+        </li>
+    </ul>
+  <li>Column 7: Status</li>
+      <ul>
+        <li>Open, Resolved</li>
+    </ul>
+  <li>Column 8: Time delay in sec</li>
+
+</ul>
+</td>
+</tr>
+
+</table>
+
+
+
+
+
+
+</body>
+</html>

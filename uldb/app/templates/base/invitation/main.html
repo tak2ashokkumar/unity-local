@@ -1,0 +1,66 @@
+{% load staticfiles %}
+{% load rest_framework %}
+<!DOCTYPE html>
+<html lang="en" ng-app="uldb">
+<head>
+  <title>UnitedLayer Unity</title>
+  {% include 'base/snippets/header.html' %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/client-layout.css' %}">
+</head>
+
+<body>
+<div class="container">
+  <div class="col-sm-4 col-sm-offset-4">
+    <h1>Account Setup</h1>
+
+    {% if step == 'signup' %}
+    <div>
+      <p>Welcome to UnitedLayer Unity! Please create a password to continue.</p>
+    </div>
+
+    <div>
+      {% for err in errors %}
+        <strong class="text-danger">{{ err }}</strong>
+      {% endfor %}
+    </div>
+
+    <form role="form" method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Email Address</label>
+        <pre>{{ invitation }}</pre>
+      </div>
+
+      <div class="form-group">
+        <label for="password1">Password</label>
+        <input type="password" autocomplete="new-password" class="form-control" placeholder="Password"
+               id="password1" name="password1">
+      </div>
+
+      <div class="form-group">
+        <label for="password2">Repeat password</label>
+        <input type="password" autocomplete="new-password" class="form-control" placeholder="Password"
+               id="password2" name="password2">
+      </div>
+
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+    {% elif step == 'error' %}
+      <h3>This Invitation link is not valid. Please contact administrator.</h3>
+    {% else %}
+      <h3>Continue to access Unity.</h3>
+      <p><a class="btn btn-success" href="/">Login</a></p>
+    {% endif %}
+
+
+  </div>
+
+
+</div>
+
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bower_components/startbootstrap-sb-admin-2/dist/js/sb-admin-2.js' %}"></script>
+<script src="{% static 'bower_components/metisMenu/dist/metisMenu.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,679 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="Generator" content="Drupal 8 (https://www.drupal.org)" />
+    <meta name="MobileOptimized" content="width" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="https://unityone.ai/sites/default/files/favi.png" type="image/png" />
+    <link rel="canonical" href="https://unityone.ai/free-trial" />
+    <link rel="shortlink" href="https://unityone.ai/node/159" />
+    <link rel="revision" href="https://unityone.ai/free-trial" />
+
+    <title>EULA | Unity</title>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'eula/hidden.module.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'eula/sticky-header.module.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'eula/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'eula/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'eula/skin.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'eula/font-awesome.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'eula/update.css' %}">
+
+
+    <style>
+        .eula-footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+        }
+
+        .eula-footer .container {
+            padding: 0 !important;
+        }
+
+        .eula-footer .agree {
+            vertical-align: middle;
+        }
+
+        .eula-submit,
+        .eula-disagree {
+            float: right;
+            margin-left: 5px;
+        }
+
+        .eula-disagree {
+            background-color: #d9534f;
+        }
+
+        .eula-submit:disabled,
+        .eula-submit:disabled:hover,
+        .eula-submit:disabled:focus {
+            background-color: #e5e6e7 !important;
+            color: #000 !important;
+            border: 1px solid transparent;
+        }
+
+        .eula-footer input[type="checkbox"] {
+            position: absolute;
+            right: 9000px;
+        }
+
+        .eula-footer input[type="checkbox"]+.fa.disabled,
+        .eula-footer input[type="checkbox"]+.fa.disabled:before {
+            color: #fff;
+            cursor: default !important;
+        }
+
+        .eula-footer input[type="checkbox"]+.fa:before {
+            /* margin-right: 5px; */
+            cursor: pointer;
+        }
+
+        .eula-footer .agree-span {
+            margin-left: 5px;
+        }
+
+        .eula-wrapper {
+            border: none;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .eula-content {
+            margin-top: 40px;
+            margin-bottom: 60px;
+            border: none;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+            border-radius: 6px;
+        }
+
+        #eula-submit-disabled {
+            display: inline-block;
+        }
+
+        #eula-submit-disabled .btn[disabled] {
+            pointer-events: none;
+        }
+
+        #eula-submit-disabled {
+            float: right;
+            cursor: not-allowed;
+        }
+        .eula-content .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+    </style>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+        crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body data-spy="scroll" data-target="#fbar2" data-offset="400">
+    <div id="preloader"></div>
+    <a href="#main-content" class="visually-hidden focusable">
+        Skip to main content
+    </a>
+
+    <div class="dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
+        <header class="fixed-top scroll-change signflow-menu-dp" data-menu-anima="fade-bottom">
+            <div class="navbar navbar-default mega-menu-fullwidth navbar-fixed-top" role="navigation">
+                <div class="navbar navbar-main">
+                    <div class="container">
+
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <a id="block-signflow-branding" class="navbar-brand"><img src="{% static 'eula/unity-ai-logo-tm.png' %}"
+                                    alt="Unity" /></a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+        <div id="block-signflow-content">
+            <article data-history-node-id="159" role="article" about="/free-trial" typeof="schema:WebPage">
+                <span property="schema:name" content="free-trial" class="hidden"></span>
+                <div>
+                    <div class="container eula-content">
+                        <hr class="space s">
+                        <h4 class="mbh3">UNITYONE END USER LICENSE AGREEMENT</h4>
+                        {% if msg %}
+                        <div class="alert alert-danger" role="alert">
+                            <b>{{ msg }}</b>
+                        </div>
+                        {% endif %}
+
+                        <p>IMPORTANT: PLEASE READ THESE UNITYONE (“UnityOne”) UNITY MULTICLOUD MANAGEMENT PLATFORM
+                            TERMS
+                            (THE “SAAS AGREEMENT”) CAREFULLY BEFORE USING THE SOFTWARE AND SERVICES OFFERED BY
+                            UnityOne. BY
+                            SIGNING A UnityOne SERVICE AGREEMENT OR SIGNING OR ORDER DOCUMENT WHICH REFERENCES THIS
+                            AGREEMENT INCLUDING ANY AMENDMENT OR SCHEDULE THERETO , YOU OR THE ENTITY THAT YOU
+                            REPRESENT (“CUSTOMER”) ARE UNCONDITIONALLY CONSENTING TO BE BOUND BY AND ARE BECOMING A
+                            PARTY TO THIS UNITY MULTICLOUD MANAGEMENT PLATFORM TERMS CONSISTING OF THIS PARAGRAPH
+                            AND
+                            THE FOLLOWING TERMS AND CONDITIONS IN THE SAAS AGREEMENT. PROVISION OF THE PRODUCT IS
+                            CONDITIONED ON, AND CUSTOMER’S USE OF THE SAAS PRODUCT SHALL CONSTITUTE, CUSTOMER’S
+                            ASSENT
+                            TO THE TERMS OF THIS SAAS AGREEMENT TO THE EXCLUSION OF ALL OTHER TERMS. THE TERMS OF
+                            ANY
+                            CUSTOMER SERVICE AGREEMENT, PURCHASE ORDER, ORDER, CONFIRMATION OR SIMILAR DOCUMENT
+                            PROVIDED BY CUSTOMER WILL HAVE NO EFFECT AND WILL NOT BE CONSIDERED AGREED TO BY
+                            UnityOne. IF
+                            THESE TERMS ARE CONSIDERED AN OFFER, ACCEPTANCE IS EXPRESSLY AND STRICTLY LIMITED TO
+                            SUCH
+                            TERMS OF THIS AGREEMENT.</p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p><b>1. LICENSE GRANT.</b></p>
+
+                        <p>The SOFTWARE and all rights, without limitation including proprietary rights therein, are
+                            owned by
+                            UnityOne or its suppliers and are protected by copyright laws and international copyright
+                            treaties, as well as other
+                            intellectual property laws and treaties. The SOFTWARE is licensed, not sold. You
+                            acknowledge
+                            that no title to the
+                            intellectual property in the SOFTWARE is transferred to you. You further acknowledge that
+                            title and full ownership
+                            rights to the SOFTWARE will remain the exclusive property of UnityOne and you will not
+                            acquire any rights to the
+                            SOFTWARE except as expressly set forth in this license. You agree that any copies of the
+                            SOFTWARE will contain the
+                            same proprietary notices which appear on and in the SOFTWARE.
+                        </p>
+
+                        <p>&nbsp;</p>
+
+                        <p dir="ltr"><b>2. OWNERSHIP</b></p>
+
+                        <p dir="ltr">The SOFTWARE is owned and copyrighted by UnityOne. Your license confers no title
+                            or
+                            ownership in
+                            the SOFTWARE and should not be construed as a sale of any right in the SOFTWARE.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>3. COPYRIGHT</b></p>
+
+                        <p dir="ltr">The SOFTWARE and all rights, without limitation including proprietary rights
+                            therein, are owned by
+                            UnityOne or its suppliers and are protected by copyright laws and international copyright
+                            treaties, as well as other
+                            intellectual property laws and treaties. The SOFTWARE is licensed, not sold. You
+                            acknowledge
+                            that no title to the
+                            intellectual property in the SOFTWARE is transferred to you. You further acknowledge that
+                            title and full ownership
+                            rights to the SOFTWARE will remain the exclusive property of UnityOne and you will not
+                            acquire any rights to the
+                            SOFTWARE except as expressly set forth in this license. You agree that any copies of the
+                            SOFTWARE will contain the
+                            same proprietary notices which appear on and in the SOFTWARE.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>4. REVERSE ENGINEERING</b></p>
+
+                        <p dir="ltr"> You agree that you will not attempt to reverse compile, modify, translate, or
+                            disassemble the SOFTWARE in whole or in part.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>5. NO OTHER WARRANTIES</b></p>
+
+                        <p dir="ltr"> THE SOFTWARE PRODUCT IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+                            UnityOne DISCLAIMS ALL OTHER WARRANTIES WITH RESPECT TO THE SOFTWARE, EITHER EXPRESS OR
+                            IMPLIED,
+                            INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+                            PARTICULAR
+                            PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. SOME JURISDICTIONS DO NOT ALLOW THE
+                            EXCLUSION OF IMPLIED WARRANTIES OR LIMITATIONS ON HOW LONG AN IMPLIED WARRANTY MAY LAST, OR
+                            THE EXCLUSION OR LIMITATION OF INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THE ABOVE
+                            LIMITATIONS
+                            OR EXCLUSIONS MAY NOT APPLY TO YOU. THIS WARRANTY GIVES YOU SPECIFIC LEGAL RIGHTS AND YOU
+                            MAY
+                            ALSO HAVE OTHER RIGHTS WHICH VARY FROM JURISDICTION TO JURISDICTION.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>6. SEVERABILITY</b></p>
+
+                        <p dir="ltr">In the event of invalidity of any provision of this license, the parties agree
+                            that
+                            such invalidity shall
+                            not affect the validity of the remaining portions of this license.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>7. NO LIABILITY FOR CONSEQUENTIAL DAMAGES</b></p>
+
+                        <p dir="ltr">IN NO EVENT SHALL UnityOne OR ITS SUPPLIERS BE LIABLE TO
+                            YOU FOR ANY CONSEQUENTIAL, SPECIAL, INCIDENTAL OR INDIRECT DAMAGES OF ANY KIND ARISING OUT
+                            OF
+                            THE DELIVERY, PERFORMANCE OR USE OF THE SOFTWARE, EVEN IF UnityOne HAS BEEN ADVISED OF THE
+                            POSSIBILITY OF SUCH DAMAGES. IN NO EVENT WILL UnityOne BE HELD LIABLE FOR ANY CLAIM,
+                            WHETHER
+                            IN
+                            CONTRACT, TORT OR ANY OTHER THEORY OF LIABILITY, IN EXCESS OF THE LICENSE FEE PAID BY YOU,
+                            IF ANY.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>8. GOVERNING LAW</b></p>
+
+                        <p dir="ltr">This agreement is governed by the laws of the State of Delaware. If for any
+                            provision or portion
+                            thereof of this License agreement is found to be unenforceable by a court of competent
+                            jurisdiction, that provision shall
+                            be enforced in such manner as to effect the intention of the parties hereof, and the
+                            remainder of the License
+                            agreement shall continue in full force and effect.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>9. GENERAL PROVISION</b></p>
+
+                        <p dir="ltr">This is the entire agreement between you and UnityOne, which supersedes any prior
+                            agreement or understanding, whether written, or oral, relating to the subject matter of
+                            this
+                            license. If any part of this
+                            agreement is found void and unenforceable, it will not affect the validity of the balance
+                            of
+                            the agreement, which shall
+                            remain valid and enforceable according to its terms. This agreement shall automatically
+                            terminate upon failure by you
+                            to comply with its terms. UnityOne, on its sole discretion, may modify this agreement in
+                            writing at any time.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>10. PAYMENT AND TERM</b></p>
+
+                        <p dir="ltr">Customer will pay Company the then applicable fees described in the Service Order
+                            Form
+                            for the Services and Implementation Services in accordance with the terms therein. If
+                            Customer’s use of the Services
+                            exceeds the Service Capacity set forth on the Order Form or otherwise requires the payment
+                            of additional fees (per the
+                            terms of this Agreement), the Customer shall be billed for such usage and Customer agrees
+                            to
+                            pay the additional fees
+                            in the manner provided herein. UnityOne is on a Month to Month payment plan and Customer
+                            shall pay all applicable
+                            federal, state, and local taxes, arising out of the Agreement (except those based upon
+                            UnityOne’s income). Customer
+                            acknowledges that Customer can pay in advance for a year and avail a 20% discount. Customer
+                            also acknowledges
+                            that Customer can cancel this agreement anytime and will not be Invoiced anymore under the
+                            Advance Payment Plan.
+                            UnityOne may charge interest on all due and unpaid fees at the rate of 1.5% per month (or
+                            the maximum interest rate
+                            permitted by law, whichever is lower). Customer shall pay to UnityOne all costs of
+                            collection, including attorneys’ fees,
+                            costs and expenses incurred in connection therewith. Customer also acknowledges that on
+                            severing the agreement, all
+                            the data pertaining to the Customer in UnityOne will be erased within 30 days since date of
+                            termination/severing of the
+                            agreement.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>11. INDEMNIFICATION AND LIMITATION OF LIABILITY</b></p>
+
+                        <p dir="ltr">Customer agrees to indemnify, defend and/or handle at its own cost and expense any
+                            claim or action against
+                            UnityOne, its parent companies and its affiliates and their successors, and their
+                            respective
+                            officers, directors,
+                            employees, shareholders, representatives, and agents (each an “Indemnified Party”) from and
+                            against any action or
+                            Claims (defined below) by a third party arising out of, or relating directly or indirectly
+                            to the Agreement, the License (if
+                            any) granted under the Agreement and the use of the Services by Customer or any person or
+                            entity acting through or
+                            on behalf of Customer, excepting therefrom Claims arising out of the gross negligence or
+                            intentional misconduct of
+                            UnityOne as determined by a court of competent jurisdiction. For purposes of the Agreement,
+                            the term “Claims” means
+                            any and all claims, causes of action (whether based on tort or contract law principles, law
+                            or equity, or otherwise),
+                            charges, assessments, fines, and penalties of any kind (including consultant and expert
+                            expenses, court costs, and
+                            reasonable attorneys’ fees and costs). Claims include claims for injury to any person
+                            (including death at any time
+                            resulting from that injury), and loss of, injury or damage to, or destruction of real or
+                            personal property. The provisions of
+                            this section shall survive the expiration or earlier termination of the Agreement. An
+                            Indemnified Party shall give
+                            Customer prompt notice of any claim asserted or threatened against it and the basis of
+                            which
+                            the Indemnified Party
+                            intends to seek indemnification, but the obligations of the Customer shall not be
+                            conditioned upon receipt of such
+                            notice except to the extent that Customer is actually prejudiced by such failure to give
+                            notice. Customer shall promptly
+                            assume the defense of the Indemnified Party with counsel reasonably satisfactory to the
+                            Indemnified Party and the
+                            fees and expenses of such counsel shall be at the sole cost and expense of the Customer.
+                            Notwithstanding the
+                            foregoing, the Indemnified Party shall be entitled, at its expense, to employ counsel
+                            separate from counsel for the
+                            Customer and from any other party in such action, proceeding, or investigation. An
+                            Indemnified Party may not agree to
+                            a settlement of a Claim without the prior written approval of the Customer, which approval
+                            shall not be unreasonably
+                            withheld. Customer may not agree to a settlement of a Claim against an Indemnified Party
+                            unless such settlement
+                            includes a full release of the Indemnified Party.
+                        </p>
+
+                        <p>
+                            UnityOne agrees to indemnify, defend and/or handle at its own cost and expense any claim or
+                            action against
+                            Customer, its officers, directors, employees, representatives and agents based upon or in
+                            connection with any Claim by
+                            a third party arising out UnityOne’s gross negligence or intentional misconduct. The
+                            provisions of this section shall
+                            survive the expiration or earlier termination of the Agreement. UnityOne shall be given
+                            prompt notice of any claim
+                            asserted or threatened against and the basis on which indemnification is sought. UnityOne
+                            shall solely conduct the
+                            defense of any such claim or action and all negotiations for its settlement or compromise;
+                            provided, however, that (i) no
+                            settlement or compromise affecting the financial or legal obligations of Customer shall be
+                            entered into or agreed to
+                            without Customer’s prior approval unless such settlement contains an unconditional release
+                            by the claimant or the
+                            plaintiff of Customer, its officers, directors, employees, representatives, and agents from
+                            all liability in respect of such
+                            claim or action and (ii) Customer has the right to participate, at its own expense, in the
+                            defense and/or settlement of
+                            any such claim or action in order to protect its own interests. UnityOne shall have no
+                            liability for any damage to
+                            Customer’s personal property or Equipment.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>12. U.S. GOVERNMENT RESTRICTED RIGHTS</b></p>
+
+                        <p dir="ltr">Any use of the Service by or on behalf of the United States of America,
+                            its agencies and/or instrumentalities (“U.S. Government”), is provided with Restricted
+                            Rights. Use, duplication, or
+                            disclosure by the U.S. Government is subject to restrictions as set forth in subparagraph
+                            I(1)(ii) of the Rights in Technical
+                            Data and Computer Software clause at DFARS 252.227-7013 or subparagraphs I(1) and (2) of
+                            the
+                            Commercial Computer
+                            Software – Restricted Rights at 48 CFR 52.227-19, as applicable.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>13. GENERAL</b></p>
+
+                        <p dir="ltr"><b>Assignment</b> Customer may not assign, transfer or convey the Agreement, or
+                            any
+                            rights
+                            or obligations thereunder, by
+                            merger, share exchange, asset sale, reorganization, operation of law or otherwise, to any
+                            other party without
+                            UnityOne’s prior written consent, which consent shall not be unreasonably withheld provided
+                            that (i) the proposed
+                            assignee assumes all of the Customer’s obligations under the Agreement, (ii) Customer is in
+                            compliance with all of the
+                            terms, covenants and conditions of the Agreement, and (iii) the Tangible Net Worth of the
+                            proposed assignee is not
+                            less than the Tangible Net Worth of Customer as of the date of the assignment. The term
+                            “Tangible Net Worth” means
+                            the excess of total assets over total liabilities (in each case, determined in accordance
+                            with GAAP) excluding from the
+                            determination of total assets all assets which would be classified as intangible assets
+                            under GAAP, including, without
+                            limitation, goodwill, licenses, patents, trademarks, trade names, copyrights, and
+                            franchises. Any assignment of the
+                            Agreement without the consent of UnityOne shall be void ab initio. The Agreement shall be
+                            binding upon, and
+                            enforceable by, and shall inure to the benefit of the Parties hereto and their respective
+                            successors and permitted
+                            assigns. In the event that UnityOne assigns its interest in the Agreement, UnityOne shall
+                            be
+                            released from any liability
+                            arising thereafter based upon any of the terms, covenants or conditions, express or
+                            implied,
+                            which are contained in the
+                            Agreement. In such event, Customer agrees to look solely to UnityOne's successor in
+                            interest
+                            for any liability under
+                            the Agreement after such assignment. Customer agrees to attorn in writing to UnityOne's
+                            successor in interest if
+                            requested to do so.
+                        </p>
+
+                        <p dir="ltr"><b>Notice</b> Unless otherwise specifically provided herein, all notices required
+                            under the Agreement shall be in writing and
+                            (unless otherwise provided herein) shall be delivered via personal delivery, facsimile,
+                            overnight mail by a nationally
+                            recognized overnight service, by U.S. Mail, postage prepaid, to UnityOne at: 200 Paul
+                            Avenue, Suite 110, San
+                            Francisco, California 94124, or to Customer at the address set forth on the signature page
+                            of the most recent Service
+                            Order Form, unless, by notice, a Party changes or supplements the addressee and addresses
+                            for giving notice.
+                        </p>
+
+                        <p dir="ltr"><b>Publicity; Press Releases</b> Neither Party shall be entitled to use the name,
+                            service or
+                            trademarks, logos or otherwise
+                            identify or refer to the other Party in any press releases, publicity, marketing or
+                            promotional material without the prior,
+                            express approval of such other Party in each instance. Customer authorizes UnityOne to use
+                            customer’s name, logos
+                            and trademarks in publicity, marketing or promotional material and to release Customer’s
+                            name to other UnityOne
+                            potential and current customers.
+                        </p>
+
+                        <p dir="ltr"><b>Arbitration</b> For any disputes, Customer and UnityOne shall initially
+                            commence
+                            good faith efforts to resolve disputes by
+                            escalating to successively higher levels of management (if necessary). The parties shall
+                            use
+                            commercially reasonable,
+                            good faith efforts to resolve any dispute, controversy, or claim arising out of or relating
+                            to any disputed amounts by
+                            mediation or arbitration before resorting to the filing of suit in a court of competent
+                            jurisdiction. Any such arbitration
+                            would be administered under the rules of the American Arbitration Association (AAA) in
+                            force
+                            when the Notice of
+                            Arbitration is submitted. The law of this arbitration clause shall be the laws of the state
+                            of California. The seat of
+                            arbitration shall be in San Francisco, California. The number of arbitrators shall be one.
+                            The arbitration proceedings
+                            shall be conducted in English. For the avoidance of doubt, each party’s obligations under
+                            this Lease shall continue
+                            during the dispute resolution.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>14. SURVIVAL</b></p>
+
+                        <p dir="ltr">The provisions of Article 10, Article 11, and Article 14 hereof, shall survive the
+                            cancellation, expiration or
+                            termination of the Agreement.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+
+                        <p dir="ltr">
+                            <b>15. ENTIRE AGREEMENT</b></p>
+
+                        <p dir="ltr">All Service Order Forms preexisting the date hereof shall be governed by this End
+                            User
+                            License Agreement. The End User License Agreement, together with the Service Order Forms,
+                            constitutes the entire
+                            agreement between the parties and supersedes any prior or inconsistent agreements,
+                            negotiations, representations
+                            and promises, written or oral with respect to the subject matter hereof. In the event of a
+                            conflict between the End User
+                            License Agreement and any Service Order Form, the terms of the End User License Agreement
+                            shall prevail.
+                            Customer acknowledges that it has read the Agreement, and agrees to be bound thereto and
+                            that the End User
+                            License Agreement and the Service Order Forms supersedes all previous communications, oral
+                            or in writing, relating to
+                            the subject matter hereof.
+                        </p>
+
+                        <p dir="ltr">&nbsp;</p>
+                    </div>
+                    <hr class="space s">
+                </div>
+            </article>
+        </div>
+        <i class="scroll-top scroll-top-mobile show fa fa-sort-asc"></i>
+        <footer class="eula-footer">
+            <div class="container">
+                <div class="row ">
+                    <div class="col-md-12 " style="padding:10px;">
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <input type="checkbox" name="check" id="accept">
+                            <i class="fa agree fa-square disabled check-icon" id="check-icon-disabled" data-toggle="tooltip"
+                                title="Please read whole agreement"></i>
+                            <i class="fa agree fa-square check-icon hidden" id="check-icon-enabled"></i>
+                            <i class="fa agree fa-check-square check-icon hidden" id="check-icon-checked"></i>
+
+                            <span class="agree agree-span">I accept the terms of the End User License Agreement.</span>
+                            <button class="btn-sm btn eula-disagree" name="submit" type="button" id="eula-disagree"
+                                tabindex="-1">Disagree</button>
+
+                            <button class="btn-sm btn eula-submit hidden" name="submit" type="submit" id="eula-submit-enabled"
+                                tabindex="-1">Agree</button>
+
+                            <div id="eula-submit-disabled" data-toggle="tooltip" title="Accept agreement">
+                                <button class="btn-sm btn eula-submit" name="submit" type="button" tabindex="-1"
+                                    disabled="disabled">Agree</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script type="text/javascript" src="{% static 'eula/ready.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'eula/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'eula/script.js' %}"></script>
+    <script type="text/javascript" src="{% static 'eula/bootstrap.min.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("html, body").animate({ scrollTop: 0 });
+            $(document).off('click', '.check-icon').on('click', '.check-icon', function () {
+                if ($(this).attr('id') === 'check-icon-disabled')
+                    return;
+                if ($('#accept').is(':checked')) {
+                    $('#accept').attr('checked', false);
+                    $('#eula-submit-enabled').addClass('hidden');
+                    $('#eula-submit-disabled').removeClass('hidden');
+
+                    $('#check-icon-enabled').removeClass('hidden');
+                    $('#check-icon-checked').addClass('hidden');
+                } else {
+                    $('#accept').attr('checked', true);
+                    $('#eula-submit-enabled').removeClass('hidden');
+                    $('#eula-submit-disabled').addClass('hidden');
+
+                    $('#check-icon-checked').removeClass('hidden');
+                    $('#check-icon-enabled').addClass('hidden');
+                }
+            });
+
+            function debouncer(a, b, c) { var d; return function () { var e = this, f = arguments, g = function () { d = null, c || a.apply(e, f) }, h = c && !d; clearTimeout(d), d = setTimeout(g, b), h && a.apply(e, f) } }
+            function getScrollXY() { var a = 0, b = 0; return "number" == typeof window.pageYOffset ? (b = window.pageYOffset, a = window.pageXOffset) : document.body && (document.body.scrollLeft || document.body.scrollTop) ? (b = document.body.scrollTop, a = document.body.scrollLeft) : document.documentElement && (document.documentElement.scrollLeft || document.documentElement.scrollTop) && (b = document.documentElement.scrollTop, a = document.documentElement.scrollLeft), [a, b] }
+            function getDocHeight() { var a = document; return Math.max(a.body.scrollHeight, a.documentElement.scrollHeight, a.body.offsetHeight, a.documentElement.offsetHeight, a.body.clientHeight, a.documentElement.clientHeight) }
+            var CheckIfScrollBottom = debouncer(function () {
+                if ((getDocHeight() >= Math.round(getScrollXY()[1] + window.innerHeight - 10)) && (getDocHeight() < Math.round(getScrollXY()[1] + window.innerHeight + 10))) {
+                    $('#check-icon-disabled').addClass('hidden');
+                    $('#check-icon-enabled').removeClass('hidden');
+                }
+            }, 250);
+
+            document.addEventListener('scroll', CheckIfScrollBottom);
+
+            // $(document).off('click', '#eula-submit-enabled').on('click', '#eula-submit-enabled', function () {
+            //     $.ajax({
+            //         type: "POST",
+            //         url: "/customer/uldbusers/send_agreement_email/",
+            //         data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+            //         success: function () {
+            //             console.log("submitted EULA successfully");
+            //             // window.location.href = "/main/";
+            //         }
+            //     });
+            // });
+
+            $(document).off('click', '#eula-disagree').on('click', '#eula-disagree', function () {
+                $.ajax({
+                    type: "POST",
+                    url: "/logout/",
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    success: function () {
+                        window.location.href = "/";
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Eula Template</title>
+</head>
+<body>
+    <a href="/main#/"> Click me to go to Unity</a>
+</body>
+</html> -->

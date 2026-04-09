@@ -22,11 +22,18 @@ const unityProxy = createProxyMiddleware({
   changeOrigin: true
 });
 
+/* ADMIN PORTAL PROXY (Angular 1.x) */
+const adminProxy = createProxyMiddleware({
+  target: "http://localhost:8095",
+  changeOrigin: true
+});
+
 /* ROUTER */
 app.use((req, res, next) => {
   let isMockRequest = req.url.startsWith("/customer") ||
     req.url.startsWith("/rest") ||
-     req.url.startsWith("/orchestration") ||
+    req.url.startsWith("/func") ||
+    req.url.startsWith("/orchestration") ||
     req.url.startsWith("/chatbot") ||
     req.url.startsWith("/mcp") ||
     req.url.startsWith("/task")
@@ -34,6 +41,18 @@ app.use((req, res, next) => {
   if (isMockRequest) {
     console.log("→ MOCK:", req.url);
     return mockProxy(req, res, next);
+  }
+
+  // Admin Portal (Legacy) Routing - Intercept everything needed for the Admin UI
+  const isAdminRequest = req.path.startsWith("/admin") ||
+    req.path.startsWith("/api/scripts") ||
+    req.path.startsWith("/api/menu") ||
+    req.path === "/favicon.ico" ||
+    (req.path.startsWith("/static/") && !req.path.startsWith("/static/assets/"));
+
+  if (isAdminRequest) {
+    console.log("→ ADMIN PORTAL:", req.url);
+    return adminProxy(req, res, next);
   }
 
   console.log("→ UNITY:", req.url);

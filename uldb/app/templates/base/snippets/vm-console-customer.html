@@ -1,0 +1,149 @@
+{% load staticfiles %}
+{% load hijack_tags %}
+{% load pipeline %}
+
+<!DOCTYPE html>
+<html lang="en" ng-app="uldb">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title ng-bind="header || 'Unity'">Unity</title>
+
+  <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'fonts/Roboto/css/fonts.css' %}"> -->
+
+  <link href="{% static 'bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css' %}" rel="stylesheet"/>
+  <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet"/>
+  <link href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet"/>
+  <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet"> -->
+  
+  <!-- <link href="{% static 'css/bootstrap-newapp2.min.css' %}" rel="stylesheet" type="text/css" /> -->
+  <link href="{% static 'bower_components/nvd3/build/nv.d3.min.css' %}" rel="stylesheet" type="text/css" />
+
+  <link href="{% static 'bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css' %}" rel="stylesheet" type="text/css" />
+
+  <link href="{% static 'bower_components/angular-bootstrap-datetimepicker/src/css/datetimepicker.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'bower_components/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet" type="text/css" />
+  <!-- <link href="{% static 'bower_components/metisMenu/dist/metisMenu.min.css' %}" rel="stylesheet" type="text/css" /> -->
+  <link href="{% static 'bower_components/ng-tags-input/ng-tags-input.bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'bower_components/ng-tags-input/ng-tags-input.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'bower_components/ng-notify/src/styles/ng-notify.css' %}" rel="stylesheet" type="text/css"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'lib/term.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}" />
+  <!--angular-busy-->
+  <link href="{% static 'bower_components/angular-busy/dist/angular-busy.min.css' %}" rel="stylesheet" />
+
+  <!-- <link href="{% static 'css/main-layout.css' %}" rel="stylesheet" type="text/css" /> -->
+  <!-- <link href="{% static 'css/admintemplate.css' %}" rel="stylesheet" type="text/css" /> -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/common.css' %}">
+
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'bower_components/jquery-ui/jquery-ui.min.js' %}"></script>
+<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+
+<script src="{% static 'bower_components/angular/angular.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-sanitize/angular-sanitize.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-animate/angular-animate.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-ui-router/release/angular-ui-router.js' %}"></script>
+<script src="{% static 'bower_components/angular-route/angular-route.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-aria/angular-aria.min.js' %}"></script>
+<script src="{% static 'bower_components/ng-scrollbars/dist/scrollbars.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-messages/angular-messages.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-material/angular-material.min.js' %}"></script>
+<script src="{% static 'bower_components/vis/dist/vis.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-visjs/angular-vis.js' %}"></script>
+<script src="{% static 'bower_components/angular-local-storage/dist/angular-local-storage.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-utils-ui-breadcrumbs/uiBreadcrumbs.js' %}"></script>
+<script src="{% static 'bower_components/ng-notify/src/scripts/ng-notify.js' %}"></script>
+
+<script src="{% static 'lib/sidebar.min.js' %}"></script>
+<script src="{% static 'lib/prototype.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'bower_components/angular-busy/dist/angular-busy.min.js' %}"></script>
+{#  <script src="{% static 'bower_components/angular-google-maps/dist/angular-google-maps.min.js' %}" charset="utf-8"></script>#}
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-145237328-1"></script>
+<!-- <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-145237328-1');
+</script> -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ 
+  ga('create', 'UA-145237328-1', 'auto');
+  ga('send', 'pageview');
+ 
+</script>
+</head>
+
+<body ng-controller = "UserMenuController" ng-cloak>
+  <div class="container-fluid full-height no-padding">
+      <div ui-view></div>
+  </div>
+
+{% include 'base/snippets/js/angular_base.html' %}
+
+<script src="{% static 'bower_components/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.min.js' %}"></script>
+<script src="{% static 'rest/app/clientApp.js' %}"></script>
+{% javascript 'unity-app-customer' %}
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'css/wmks-all.css' %}"> -->
+<style type="text/css">
+    #terminal-container {
+      /*width: 960px !important;
+      height: 600px !important;*/
+      border-style: ridge;
+      border-width: 15px;
+      border-color : #a9b0bc;
+      width:85% !important;
+      height:100vh !important;
+      margin-left : 15% !important;
+      margin-right: 0px !important;
+      top:0 !important;
+      padding: 0px 0px 0px 0px !important;
+      position:absolute;
+    }
+    #side-wrapper {
+      background: #576071 none repeat scroll 0 0;
+      color: #a7b1c2;
+      height: 100% !important;
+      overflow-x: hidden;
+      position: fixed;
+      white-space: nowrap;
+      width: 15%;
+  }
+  .leftnav-title {
+      font-weight: normal;
+      padding: 0px 0px 0px 0px !important;
+      width: 100%;
+  }
+</style>
+
+<script type="text/javascript" src="{% static 'bower_components/chart.js/dist/Chart.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/angular-chart.js/dist/angular-chart.min.js' %}"></script>
+
+<script src="{% static 'lib/wmks.js' %}"></script>
+
+<!-- Terraform Console  -->
+<script src="{% static 'lib/xterm.js' %}"></script>
+<script src="{% static 'lib/fit.js' %}"></script>
+<!-- Terraform Console  -->
+
+{% include 'base/snippets/js/end.html' %}
+<script>
+    angular.module('uldb').config(['$httpProvider', function ($httpProvider) {
+      $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+      $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+      $httpProvider.defaults.withCredentials = true;
+      $httpProvider.defaults.headers.common['X-CSRF-Token'] = '{{ csrf_token | escapejs }}';
+    }]);
+</script>
+</body>
+</html>

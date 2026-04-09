@@ -1,0 +1,106 @@
+{% extends "two_factor/_base.html" %}
+
+{% block style %}
+<style>
+  {% with '232788'|random as idx %}
+    html {
+      height: 100%;
+    }
+    html, body, article, .focus-content::before {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    body {
+      background: url('/static/img/fp/{{ idx }}.jpg') no-repeat center center fixed;
+      background-size: cover;
+      height: 100%;
+    }
+
+    #custom-form th {
+      padding: 0 10px;
+    }
+    #custom-form td > input {
+      padding: 0 10px;
+      margin-bottom: 10px;
+    }
+    #id_method-method {
+      width: 200px;
+    }
+
+    .glass::before {
+      z-index: -1;
+      display: block;
+      content: ' ';
+      background: url('/static/img/fp/{{ idx }}.jpg') no-repeat center center fixed;
+
+      height: 100%;
+      filter: blur(5px);
+      background-size: cover;
+      opacity: 0.4;
+
+    }
+     .glass {
+      position: relative;
+      border-radius: 5px;
+      background-color: white;
+      -webkit-box-shadow: 0px 0px 3px 0px rgba(102, 102, 102, 0.33);
+      -moz-box-shadow: 0px 0px 3px 0px rgba(102, 102, 102, 0.33);
+      box-shadow: 0px 0px 3px 0px rgba(102, 102, 102, 0.33);
+      margin: auto;
+      width: 360px;
+
+    }
+    .focus-content {
+
+      border-radius: 5px;
+      padding: 50px;
+
+    }
+    #login_logo {
+      width: 100%;
+    }
+    .form-title {
+      font-family: 'Open Sans', "Helvetica Neue", Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      margin-top: 0px;
+      margin-bottom: 0px;
+    }
+    .outer-wrapper {
+      display: table;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+    }
+    .container {
+      width: 360px;
+      margin: auto;
+      vertical-align: middle;
+      display: table-cell;
+    }
+
+  {% endwith %}
+</style>
+{% endblock %}
+
+{% block content_wrapper %}
+  <div class="row logindiv">
+    <div class="row formmain">
+      <div class="row">
+          {% block content %}{% endblock %}
+      </div>
+
+    </div>
+  </div>
+<!--   <div class="outer-wrapper">
+  <div class="container gl">
+    <div class="glass">
+      <div class="focus-content">
+        {# block content %}{% endblock #}
+      </div>
+    </div>
+  </div>
+  </div> -->
+
+{% endblock %}

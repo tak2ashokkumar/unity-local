@@ -1,0 +1,98 @@
+import logging
+import ssl
+from cloud.vmware.tasks import collect_properties, get_container_view
+from pyVmomi import vim
+from cloud.VmwareAdapter.models import VmwareVmMigration
+from cloud.vmware.models import VMwareVcenter, ESXi
+from cloud.vmware.utils import get_vcenter_conn
+from cloud.CloudService.models import PrivateCloud
+logger = logging.getLogger(__name__)
+
+def update_used_storage():
+    uuid = '932af2a3-feb4-490b-b213-0685b0d5da1f'
+    vcenter = VMwareVcenter.objects.get(private_cloud__uuid=uuid)
+    vcenter_connect_dict = get_vcenter_conn(
+        vcenter.hostname,
+        vcenter.username,
+        vcenter.password,
+        vcenter.port,
+        vcenter.private_cloud.organization_id,
+        vcenter.collector.uuid if vcenter.collector else None
+    )
+    if vcenter_connect_dict['connect']:
+        service_instance = vcenter_connect_dict['connect']
+    else:
+        raise Exception(str(vcenter_connect_dict['msg']))
+    cloud = PrivateCloud.objects.get(uuid=uuid)
+    cloud_name = cloud.name
+
+
+    logger.debug(cloud.platform_type)
+    vcenters = VMwareVcenter.objects.filter(private_cloud=cloud)
+
+    logger.debug(vcenters)
+
+    errors = []
+    for vcs in vcenters:
+        try:
+            count = 0
+            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+            context.verify_mode = ssl.CERT_NONE
+            logger.debug("%s - %s - %s - %s", vcenter.hostname, vcenter.username, vcenter.password, cloud.platform_type)
+            vm_properties = ["summary.config.uuid", "config.name", "storage.perDatastoreUsage", "summary.quickStats", "summary.config.guestFullName"]
+            view = get_container_view(service_instance, obj_type=[vim.VirtualMachine])
+            vm_data = collect_properties(service_instance, view_ref=view, obj_type=vim.VirtualMachine, path_set=vm_properties,
+                                        include_mors=True)
+            resource_pool_obj = None
+            if vcenter.resource_pool_name:
+                resource_pool_obj = get_object_by_name(service_instance, [vim.ResourcePool], vcenter.resource_pool_name)
+            if resource_pool_obj:
+                vm_data = [
+                    vm for vm in vm_data
+                    if vm.get('obj') and vm['obj'].resourcePool == resource_pool_obj
+                ]
+            api_data = []
+            used_mem_storage = dict()
+            for vm in vm_data:
+                tpl = ()                
+                if vm.get("summary.config.uuid") and vm.get("config.name"):
+                    tpl = tpl + (vm.get("summary.config.uuid"), vm.get("config.name"))
+                    instance_id = vm.get("summary.config.uuid")
+                    instance_name = vm.get("config.name")                    
+                
+                if instance_name in ["STGCLMMD1007_old", "112117-VerneNetDebugDebian02"] and hasattr(vm, "summary.config.guestFullName"):
+                    os_name = vm.get("summary.config.guestFullName")
+                    if 'linux' in os_name.lower():
+                        self.os_type = "Linux"
+                    elif "windows" in os_name.lower():
+                        os_type = "Windows"
+                    else:
+                        os_type = "Other"
+                    vm_obj = VmwareVmMigration.objects.get(
+                            cloud=cloud, instance_id=instance_id, name=instance_name
+                        )
+                    vm_obj.os_name = os_name
+                    vm_obj.os_type = os_type
+                    vm_obj.save()
+
+                #     print(vm.get("config.name"))
+                #     used_mem_storage[vm.get("summary.config.uuid")] = dict()
+                # else:
+                #     continue
+                # size = 0
+                # if vm.get("storage.perDatastoreUsage") and vm.get("storage.perDatastoreUsage") is not None:
+                #     for ds in vm.get("storage.perDatastoreUsage"):
+                #         size += ds.committed
+                #     used_mem_storage[vm.get("summary.config.uuid")]['used_storage'] = size
+                # api_data.append(tpl)               
+                # print(instance_name, size, 'found in db' if vm_obj else 'not found')
+        except Exception as e:
+            import traceback
+            logger.error(traceback.format_exc())
+            errors.append((vcs.hostname, e))
+            continue
+
+
+
+def run()
+    update_used_storage()

@@ -1,0 +1,286 @@
+{% load staticfiles %}
+{% load hijack_tags %}
+{% load pipeline %}
+
+<!DOCTYPE html>
+<html lang="en" ng-app="uldb">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title ng-bind="header || 'Unity'">Unity</title>
+
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/ULfavicon.ico' %}"/>
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'fonts/Roboto/css/fonts.css' %}"> -->
+
+  <link href="{% static 'bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css' %}" rel="stylesheet"/>
+  <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet"/>
+  <link href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet"/>
+  <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet"> -->
+
+  <link href="{% static 'glyphter-font/css/Unity.css' %}" rel="stylesheet"/>
+
+  
+  <!-- <link href="{% static 'css/bootstrap-newapp2.min.css' %}" rel="stylesheet" type="text/css" /> -->
+  <link href="{% static 'bower_components/nvd3/build/nv.d3.min.css' %}" rel="stylesheet" type="text/css" />
+
+  <link href="{% static 'bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css' %}" rel="stylesheet" type="text/css" />
+
+  <link href="{% static 'bower_components/angular-bootstrap-datetimepicker/src/css/datetimepicker.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'bower_components/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet" type="text/css" />
+  <!-- <link href="{% static 'bower_components/metisMenu/dist/metisMenu.min.css' %}" rel="stylesheet" type="text/css" /> -->
+  <link href="{% static 'bower_components/ng-tags-input/ng-tags-input.bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'bower_components/ng-tags-input/ng-tags-input.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static 'bower_components/ng-notify/src/styles/ng-notify.css' %}" rel="stylesheet" type="text/css"/>
+  <link href="{% static 'bower_components/angular-bootstrap-calendar/dist/css/angular-bootstrap-calendar.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{% static 'lib/term.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}" />
+  <!--angular-busy-->
+  <link href="{% static 'bower_components/angular-busy/dist/angular-busy.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'bower_components/angularjs-slider/dist/rzslider.min.css' %}" rel="stylesheet" type="text/css" />
+
+  <!-- <link href="{% static 'css/main-layout.css' %}" rel="stylesheet" type="text/css" /> -->
+  <!-- <link href="{% static 'css/admintemplate.css' %}" rel="stylesheet" type="text/css" /> -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/common.css' %}">
+  <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Orbitron'>
+
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'bower_components/jquery-ui/jquery-ui.min.js' %}"></script>
+<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+
+<script src="{% static 'bower_components/angular/angular.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-sanitize/angular-sanitize.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-animate/angular-animate.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-ui-router/release/angular-ui-router.js' %}"></script>
+<script src="{% static 'bower_components/angular-route/angular-route.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-aria/angular-aria.min.js' %}"></script>
+<script src="{% static 'bower_components/ng-scrollbars/dist/scrollbars.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-messages/angular-messages.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-material/angular-material.min.js' %}"></script>
+<script src="{% static 'bower_components/vis/dist/vis.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-visjs/angular-vis.js' %}"></script>
+<script src="{% static 'bower_components/angular-local-storage/dist/angular-local-storage.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-utils-ui-breadcrumbs/uiBreadcrumbs.js' %}"></script>
+<script src="{% static 'bower_components/ng-notify/src/scripts/ng-notify.js' %}"></script>
+<script src="{% static 'bower_components/angularjs-slider/dist/rzslider.min.js' %}"></script>
+<script src="{% static 'bower_components/angular-vertilize/angular-vertilize.js' %}"></script>
+
+
+<script src="{% static 'lib/sidebar.min.js' %}"></script>
+<script src="{% static 'lib/prototype.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'bower_components/angular-busy/dist/angular-busy.min.js' %}"></script>
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-145237328-1"></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  
+  var ga_tracking_id = "{{ga_tracking_id}}";
+  ga('create', ga_tracking_id, 'auto');
+</script>
+
+{#  <script src="{% static 'bower_components/angular-google-maps/dist/angular-google-maps.min.js' %}" charset="utf-8"></script>#}
+</head>
+
+<body ng-controller = "UserMenuController" ng-cloak>
+  <div class="container-fluid full-height no-padding">
+      <div id="holder" class="holder-grey">
+          {% include 'base/common/header-content.html' %}
+          <div class="content-area-inside" id="content-area">
+              {% include 'base/common/left-panel.html' %}
+              <!-- <div ui-view></div> -->
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 main-content-wrapper right-content" ng-controller="FloatingTerminalMgmtController">
+                  <!--Content Start-->
+                  <div ui-view></div>
+
+                  <div class="right-content terminal-wrapper">
+                      <div id="terminalnav" class="terminalnav">
+                        <div class="row actions_row">
+                          <div class="col-xs-12 action-icon-row">
+                            <a class="actionicons" ng-bind="terminalName" style="float: left;color:#fff;"></a>
+                            <a href="javascript:void(0)" class="actionicons" ng-click="closeNav()"><i class="fa fa-window-close-o"></i></a>
+                            <a href="javascript:void(0)" class="actionicons" ng-click="maximize()"><i class="fa fa-window-maximize"></i></a>
+                            <a href="javascript:void(0)" class="actionicons" ng-click="minimize()"><i class="fa fa-window-restore"></i></a>
+                          </div>
+                        </div>
+                        <div id="floating-terminal" class="app-terminal"></div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+{% include 'base/snippets/js/angular_base.html' %}
+
+<script src="{% static 'bower_components/angular-bootstrap-calendar/dist/js/angular-bootstrap-calendar-tpls.min.js' %}"></script>
+
+<script src="{% static 'rest/app/clientApp.js' %}"></script>
+{% javascript 'unity-app-customer' %}
+{#<script src="{% static 'rest/app/client/constants/client_paths.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/constants/client_validation_msgs.js' %}"></script>#}
+{#<script src="{% static 'rest/app/filters.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/customer-api.js' %}"></script>#}
+{#<script src="{% static 'rest/app/services/DjangoService.js' %}"></script>#}
+{#<script src="{% static 'rest/app/services/HostMonitorService.js' %}"></script>#}
+{#<script src="{% static 'rest/app/services/task.js' %}"></script>#}
+{#<script src="{% static 'rest/app/services/GraphingService.js' %}"></script>#}
+{#<script src="{% static 'rest/app/services/abstract.js' %}"></script>#}
+{#<script src="{% static 'rest/app/services/BillingService.js' %}"></script>#}
+{#<script src="{% static 'rest/app/services/nagios-service.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/MaintenanceService.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/customer-uldb-service.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/customer-uldb-utils.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/customer-abstract.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/clientdashboardservice.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/DataFormattingService.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/services/azure/AzureService.js' %}"></script>#}
+{##}
+{#<script src="{% static 'rest/app/client/controllers/generic.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/cloud-customer.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/generic-detail.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/monitoring.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/clientdashboardcontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/clientdatacentercontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/clientcloudcontroller.js' %}"></script>#}
+{##}
+{#<script src="{% static 'rest/app/client/controllers/azure/azurecontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/azure/azuredashboardcontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/azure/azureresourcegroupcontroller.js' %}"></script>#}
+{##}
+{#<script src="{% static 'rest/app/client/controllers/observium/pdu/pdumenu.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/observium/firewall/firewallmenu.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/observium/aws/awsmenu.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/observium/hypervisor/hypervisormenu.js' %}"></script>#}
+
+{##}
+{#<script src="{% static 'rest/app/client/controllers/ticket.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/dashboard.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/billing.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/customerproxycontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/customerdetailproxycontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/clientzendeskticketcontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/clientmaintenancecontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/clientusercontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/clientunitedconnectcontroller.js' %}"></script>#}
+<script src="{% static 'rest/app/directives.js' %}"></script>
+{#<script src="{% static 'rest/app/client/directives/generic.js' %}"></script>#}
+{##}
+{#<!-- AWS -->#}
+{##}
+{#<script src="{% static 'rest/app/client/controllers/aws/clientawsattachautoscalingcontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/aws/clientawscontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/aws/clientawsimagecontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/aws/clientawsusercontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/aws/clientawsattachinterfacecontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/aws/clientawsdashboardcontroller.js' %}"></script>#}
+{#<script src="{% static 'rest/app/client/controllers/aws/clientawssnapshotcontroller.js' %}"></script>#}
+{##}
+{#<script src="{% static 'rest/app/client/services/aws/CustomerAwsService.js' %}"></script>#}
+
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'css/wmks-all.css' %}"> -->
+<style type="text/css">
+    #mainCanvas{
+        position:absolute !important;
+        width:100% !important;
+        height:100% !important;
+    }
+    
+     #terminal-container {
+      /*width: 960px !important;
+      height: 600px !important;*/
+      border-style: ridge;
+      border-width: 15px;
+      border-color : #a9b0bc;
+      width:100% !important;
+      height: 80vh !important;
+      /*position: fixed;*/
+      /*height:100% !important;*/
+      margin: 0 auto !important;
+      padding: 0px 0px 0px 0px !important;
+    }
+
+    /*#terminal-border {
+      border-style: ridge;
+      border-width: 15px;
+      border-color : #a9b0bc;
+    }*/
+
+    .boxclose {
+      background: #605f61;
+      border: 1px solid #aeaeae;
+      border-radius: 25px;
+      color: #fff;
+      cursor: pointer;
+      display: inline-block;
+      float: right;
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 0;
+      margin-right: -25px;
+      margin-top: -25px;
+      padding: 11px 3px;
+    }
+</style>
+
+<script type="text/javascript" src="{% static 'bower_components/chart.js/dist/Chart.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/chart.js/dist/Chart.bundle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'bower_components/angular-chart.js/dist/angular-chart.min.js' %}"></script>
+
+<script src="{% static 'lib/wmks.js' %}"></script>
+
+<!-- Terraform Console  -->
+<script src="{% static 'lib/xterm.js' %}"></script>
+<script src="{% static 'lib/fit.js' %}"></script>
+<!-- Terraform Console  -->
+
+{% include 'base/snippets/js/end.html' %}
+<style>
+  .terminalnav {
+      height: 0px;
+      width: calc(100% - 260px) !important;
+      position: fixed;
+      z-index: 1;
+      bottom: 0px;
+      background-color: #8795ae;
+      overflow: hidden;
+  }
+
+  .terminalnav .action-icon-row {
+    height: 30px;
+  }
+
+  .terminalnav .actionicons:hover {
+      color: #f1f1f1;
+  }
+
+  .terminalnav .actionicons {
+      float: right;
+      text-decoration: none;
+      font-size: 12px;
+      color: #fff;
+      padding: 8px;
+  }
+
+  #floating-terminal{
+    background-color: #000;
+    height: calc(100% - 30px);
+    padding-left: 10px;
+  }
+
+
+  .action-icon-row{
+    border-bottom: 1px solid #fff;
+    /*border-left: 1px solid #fff;*/
+  }
+
+  .ui-resizable-handle.ui-resizable-n {
+      border-top: 10px solid #acb4bc;
+  }
+</style>
+</body>
+</html>

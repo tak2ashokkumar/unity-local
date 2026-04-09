@@ -1,0 +1,229 @@
+{% load staticfiles %}
+{% load hijack_tags %}
+{% load pipeline %}
+
+<!DOCTYPE html>
+<html lang="en" ng-app="uldb">
+<head>
+  <title>Unity | Admin Panel</title>
+  {#  {% include 'base/snippets/header.html' %}#}
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+
+  <link rel="stylesheet" type="text/css" href="{% static 'bower_components/angular-bootstrap-datetimepicker/src/css/datetimepicker.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/angular-datatables.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'lib/datatables.bootstrap.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'lib/term.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'bower_components/angular-material/angular-material.min.css' %}">
+  <link href="{% static 'bower_components/angular-busy/dist/angular-busy.min.css' %}" rel="stylesheet" />
+  {% stylesheet 'styles' %}
+  <link href="{% static 'bower_components/ng-notify/src/styles/ng-notify.css' %}" rel="stylesheet" type="text/css"/>
+  <link href="{% static 'bower_components/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
+
+  <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+  <script src="{% static 'bower_components/jquery-ui/jquery-ui.min.js' %}"></script>
+  <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'bower_components/angular/angular.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'bower_components/angular-sanitize/angular-sanitize.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'bower_components/angularjs-dropdown-multiselect/src/angularjs-dropdown-multiselect.js' %}"></script>
+  <script type="text/javascript" src="{% static 'bower_components/angular-busy/dist/angular-busy.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'lib/angular-datatables.js' %}"></script>
+  <script type="text/javascript" src="{% static 'lib/angular-datatables.bootstrap.js' %}"></script>
+  {% javascript 'angular' %}
+  {% javascript 'base-app' %}
+
+</head>
+
+<body class="wrapperbody">
+
+<div id="wrapper">
+  <div class="navbar-default sidebar" role="navigation">
+    <div class="navbar-brand" href="#/servers">
+      <img id="logo" src="{% static 'img/logo2.png' %}">
+    </div>
+
+    <div class="sidebar-nav navbar-collapse">
+      <ul class="nav" id="side-menu">
+        {% include 'base/common/sidebar.html' %}
+      </ul>
+    </div>
+    {% hijack_notification %}
+    <!-- /.sidebar-collapse -->
+  </div>
+
+  <div id="page-wrapper">
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="navbar-header navbar-left" id="notificationArea">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span></button> 
+        {% verbatim %}<h4 class="navbar-title" ng-cloak>{{ title.plural }}</h4>{% endverbatim %}
+      </div>
+      <!-- /.navbar-header -->
+
+      <ul class="nav navbar-top-links navbar-right">
+        <li><a href="#">Home</a></li>
+        <li><a href="#/account">Account</a></li>
+        <!--<li><a href="#" class="logout">Logout</a></li>-->
+        <li class="dropdown">
+          <a class="dropdown-toggle" data-toggle="dropdown">
+
+            <span class="username_span">{{ user }}</span>
+
+            <b class="caret"></b></a>
+          <ul class="dropdown-menu" ng-controller="UserMenuController">
+            <li><a ng-click="ShowAboutDetails()"><i class="fa fa-check-square-o fa-1x"></i> About</a></li>
+            <li class="divider"></li>
+            <li><a class="logout" ng-click="logout()"><i class="fa fa-sign-out fa-1x"></i> Log out</a></li>
+          </ul>
+        </li>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </ul>
+
+    </nav>
+    <div id="pageview" class="container" ng-view></div>
+  </div>
+  <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+
+{% javascript 'vendor' %}
+
+{#<script src="{% static 'rest/app/adminApp.js' %}"></script>#}
+
+{% javascript 'unity-app' %}
+{% javascript 'v3' %}
+
+<!-- Terraform Console  -->
+<script src="{% static 'lib/xterm.js' %}"></script>
+<script src="{% static 'lib/fit.js' %}"></script>
+<!-- Terraform Console  -->
+<style type="text/css">
+  @media (min-width: 1890px) and (max-width: 2560px) {
+      .terminal {
+          background-color: #000 !important;
+          border-style: ridge;
+          border-width: 15px;
+          border-color : #23AF71;
+          width:87%;
+          height:93.5%;
+          top: 0 !important;
+          color: #fff !important;
+          font-family: courier-new, courier, monospace !important;
+          font-feature-settings: "liga" 0 !important;
+          position: absolute !important;
+      }
+
+      .xterm-container {
+        position:fixed;
+        width:87%;
+        height:93.5%;
+        top:6.6%;
+        left:13%;
+      }
+
+
+  }
+  @media (min-width: 1025px) and (max-width: 1889px) { 
+      .terminal {
+          background-color: #000 !important;
+          border-style: ridge;
+          border-width: 15px;
+          border-color : #23AF71;
+          height: 92%;
+          width: 83.8%;
+          top: 0 !important;
+          color: #fff !important;
+          font-family: courier-new, courier, monospace !important;
+          font-feature-settings: "liga" 0 !important;
+          position: absolute !important;
+      }
+
+      .xterm-container {
+        position:fixed;
+        width:83.8%;
+        height:92%;
+        top:8%;
+        left:16.2%;
+      }
+
+  }
+  /* Moodal Start*/
+
+  .modal-dialog {
+      margin: 10% auto !important;
+      width: 50% !important;
+  }
+
+  .modal-content {
+      border-radius: 0px !important;
+  }
+
+  .modal-header {
+      border-bottom: 2px solid #d2d2d2 !important;
+      padding: 12px 15px !important;
+      background-color: #67B998 !important;
+  }
+
+  .modal-body {
+      /*position: relative;*/
+      padding: 15px;
+      float: left;
+      width: 100%;
+  }
+
+  label {
+      font-weight: normal !important;
+  }
+
+  .modal-footer {
+      border: none !important;
+  }
+
+  .modal-buttons {
+      border: none !important;
+      padding-top: 20px !important;
+  }
+
+  .paddingR {
+      padding-right: 10px !important;
+  }
+
+  .paddingL {
+      padding-left: 10px !important;
+  }
+  
+  /* AlertService notification close icon */
+  .ngn-dismiss {
+      background-color: #ffffff;
+      box-shadow: none;
+      color: #da4c46;
+      font-size: 24px;
+      line-height: 29px;
+      opacity: 1;
+      text-shadow: none;
+  }
+
+  .ngn-dismiss:hover {
+      background-color: #f3dddc;
+  }
+  .ngn-dismiss-custom{
+      top: 11px !important;
+      right: 300px !important;
+  }
+
+</style>
+<script src="{% static 'bower_components/ng-notify/src/scripts/ng-notify.js' %}"></script>
+{% include 'base/snippets/js/angular_base.html' %}
+{% include 'base/snippets/js/end.html' %}
+
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Unity | Admin Panel</title>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="image/png" href="/static/favicon.ico" />
+
+    <!-- Google Fonts as seen in Production init.html -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
+
+    <!-- CSS Bundle ('styles' from settings.py) -->
+    <link rel="stylesheet" type="text/css" href="/static/fonts/Roboto/css/fonts.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap1.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-newapp2.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/nvd3/build/nv.d3.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/angular-bootstrap-datetimepicker/src/css/datetimepicker.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/metisMenu/dist/metisMenu.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/main-layout.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/v3/uladmin.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/admintemplate.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/ng-tags-input/ng-tags-input.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/ng-tags-input/ng-tags-input.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/hijack/hijack-styles.css">
+    <link rel="stylesheet" type="text/css" href="/static/WebMKS_SDK_2.1.0/css/wmks-all.css">
+
+    <!-- Supplemental CSS from Production init.html -->
+    <link rel="stylesheet" type="text/css" href="/static/css/angular-datatables.css">
+    <link rel="stylesheet" type="text/css" href="/static/lib/datatables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/lib/term.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/angular-material/angular-material.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/angular-busy/dist/angular-busy.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/ng-notify/src/styles/ng-notify.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/bootstrap-daterangepicker/daterangepicker.css" />
+    
+    <!-- SB Admin 2 Base -->
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/startbootstrap-sb-admin-2/dist/css/sb-admin-2.css">
+    
+    <!-- FINAL PRODUCTION OVERRIDES -->
+    <link rel="stylesheet" type="text/css" href="/static/css/admin-layout2.css">
+
+    <style>
+        /* Reset and Structural Parity */
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100%;
+            width: 100%;
+            overflow-x: hidden !important;
+        }
+
+        #wrapper { width: 100%; height: 100%; }
+
+        .sidebar {
+            z-index: 1000 !important;
+            background-color: #333 !important;
+            box-shadow: 0 2px 2px 0 rgb(0, 0, 0) !important;
+            height: 100vh !important;
+            position: fixed !important;
+            width: 250px !important;
+            margin-top: 0 !important;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar .navbar-brand {
+            height: 64px !important;
+            width: 250px !important;
+            padding: 11px 15px !important;
+            background-color: #333 !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #444;
+        }
+
+        #logo {
+            max-height: 42px !important;
+            max-width: 220px !important;
+        }
+
+        /* Content Area */
+        #page-wrapper {
+            margin-left: 250px !important;
+            padding: 0 !important;
+            min-height: 100vh;
+            background-color: #f8f8f8;
+            position: relative;
+        }
+
+        /* Top Navbar - use Bootstrap's own float layout, NOT flexbox */
+        .navbar-static-top {
+            background-color: rgba(39, 155, 108, 0.7) !important;
+            border: none !important;
+            margin: 0 !important;
+            width: 100% !important;
+            min-height: 64px !important;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .14) !important;
+        }
+
+        /* Title on the left */
+        .navbar-header.navbar-left {
+            padding-left: 20px !important;
+            line-height: 64px;
+            float: left !important;
+        }
+
+        .navbar-title {
+            color: white !important;
+            font-size: 18px !important;
+            font-weight: 400 !important;
+            margin: 0 !important;
+            line-height: 64px;
+            display: inline-block;
+        }
+
+        /* Right-side nav links */
+        .navbar-top-links {
+            float: right !important;
+        }
+        .navbar-top-links li a {
+            color: white !important;
+            padding: 20px 15px !important;
+            line-height: 24px !important;
+            display: inline-block;
+        }
+
+        /* Dashboard/Table Area */
+        #pageview.container-fluid {
+            width: 100% !important;
+            padding: 20px 30px !important;
+            margin: 0 !important;
+        }
+
+        /* 
+           UNIVERSAL TAG-DEPTH INDENTATION
+           Guarantees Level 2, 3, and 4 items are progressively indented.
+        */
+
+        /* Remove ALL borders from sidebar list items at every level */
+        .sidebar ul li {
+            border-bottom: none !important;
+        }
+
+        .sidebar ul li a { 
+            padding-top: 12px; 
+            padding-bottom: 12px; 
+            font-size: 13px; 
+            border-bottom: none !important; 
+            color: #ddd !important; 
+        }
+        
+        /* Level 2 Submenu (Direct children of root li) */
+        .sidebar ul ul li a { padding-left: 52px !important; }
+        
+        /* Level 3 Submenu (Nested inside Level 2) */
+        .sidebar ul ul ul li a { padding-left: 86px !important; }
+        
+        /* Level 4 Submenu (Nested inside Level 3) */
+        .sidebar ul ul ul ul li a { padding-left: 120px !important; }
+
+        .sidebar-nav .nav > li > a:hover {
+            background-color: rgba(103, 184, 151, 0.8) !important;
+            color: white !important;
+        }
+        
+        .sidebar .arrow { margin-top: 4px; }
+
+        [ng-cloak] { display: none !important; }
+        #drop-down-div { position: absolute; z-index: 9999; }
+    </style>
+</head>
+
+<body class="wrapperbody" ng-cloak>
+    <div id="wrapper" ng-controller="ShellController">
+        <!-- Sidebar -->
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="navbar-brand">
+                <img id="logo" src="/static/img/logo2.png">
+            </div>
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li ng-repeat="item in menu" ng-include="'menuItem.html'"></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Page Wrapper -->
+        <div id="page-wrapper">
+            <nav class="navbar navbar-default navbar-static-top" role="navigation">
+                <div class="navbar-header navbar-left" id="notificationArea">
+                    <h4 class="navbar-title">{{ title.plural }}</h4>
+                </div>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#/account">Account</a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <span class="username_span">admin@unitedlayer.com</span>
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><i class="fa fa-check-square-o fa-fw"></i> About</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#"><i class="fa fa-sign-out fa-fw"></i> Log out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div id="pageview" class="container-fluid">
+                <div ng-view></div>
+                <div ui-view></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clean Recursive Menu Template -->
+    <script type="text/ng-template" id="menuItem.html">
+        <a ng-if="!item.submenu" ng-href="{{item.href}}" class="menu-item">
+            <i ng-if="item.fa" class="fa {{item.fa}} fa-fw fa-lg"></i>
+            <i ng-if="item.glyphicon" class="{{item.glyphicon}} fa-fw fa-lg"></i>
+            <span class="menu-item-text">{{item.title || item.name}}</span>
+        </a>
+        <a ng-if="item.submenu" href="" class="menu-item">
+            <i ng-if="item.fa" class="fa {{item.fa}} fa-fw fa-lg"></i>
+            <i ng-if="item.glyphicon" class="{{item.glyphicon}} fa-fw fa-lg"></i>
+            <span class="menu-item-text">{{item.title || item.name}}</span>
+            <span class="fa arrow fa-lg"></span>
+        </a>
+        <ul ng-if="item.submenu" class="nav nav-second-level">
+            <li ng-repeat="item in item.submenu" ng-include="'menuItem.html'"></li>
+        </ul>
+    </script>
+
+    <div id="drop-down-div"></div>
+
+    <!-- JS Sequence -->
+    <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/static/bower_components/jquery-ui/jquery-ui.min.js"></script>
+    <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/static/bower_components/lodash/lodash.js"></script>
+    <script src="/static/bower_components/moment/moment.js"></script>
+    <script src="/static/bower_components/d3/d3.min.js"></script>
+
+    <script src="/static/bower_components/angular/angular.min.js"></script>
+    <script src="/static/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/static/bower_components/angular-aria/angular-aria.js"></script>
+    <script src="/static/bower_components/angular-messages/angular-messages.js"></script>
+    <script src="/static/bower_components/angular-material/angular-material.js"></script>
+    <script src="/static/bower_components/angular-route/angular-route.min.js"></script>
+    <script src="/static/bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="/static/bower_components/angular-resource/angular-resource.min.js"></script>
+
+    <script src="/static/bower_components/nvd3/build/nv.d3.min.js"></script>
+    <script src="/static/bower_components/angular-nvd3/dist/angular-nvd3.min.js"></script>
+    <script src="/static/bower_components/metisMenu/dist/metisMenu.js"></script>
+    <script src="/static/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="/static/bower_components/angular-busy/dist/angular-busy.min.js"></script>
+    <script src="/static/bower_components/ng-notify/src/scripts/ng-notify.js"></script>
+    <script src="/static/bower_components/ng-tags-input/ng-tags-input.min.js"></script>
+    <script src="/static/bower_components/angular-bootstrap-datetimepicker/src/js/datetimepicker.js"></script>
+    <script src="/static/bower_components/angular-date-time-input/src/dateTimeInput.js"></script>
+    <script src="/static/bower_components/ng-file-upload/ng-file-upload.min.js"></script>
+    <script src="/static/bower_components/angular-floatThead-master/angular-floatThead.js"></script>
+    <script src="/static/bower_components/jquery.floatThead/dist/jquery.floatThead.min.js"></script>
+    <script src="/static/bower_components/angular-charts/chart.js"></script>
+    <script src="/static/bower_components/angular-charts/angular-chart.js"></script>
+    <script src="/static/bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
+    <script src="/static/bower_components/angularjs-dropdown-multiselect/src/angularjs-dropdown-multiselect.js"></script>
+    <script src="/static/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="/static/bower_components/angular-daterangepicker/js/angular-daterangepicker.js"></script>
+    <script src="/static/bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js"></script>
+    <script src="/static/bower_components/angular-bootstrap-multiselect/dist/angular-bootstrap-multiselect.js"></script>
+    <script src="/static/bower_components/datatables.net/js/jquery.dataTables.js"></script>
+    <script src="/static/lib/angular-datatables.js"></script>
+    <script src="/static/lib/angular-datatables.bootstrap.js"></script>
+
+    <script>
+        (function() {
+            $(document).ready(function () {
+                var sidebar = $(".sidebar");
+                var page_wrapper = $("#page-wrapper");
+
+                var resizeMain = function () {
+                    var winHeight = $(window).innerHeight();
+                    sidebar.height(winHeight);
+                    // Allow page_wrapper to grow with content but stay at least full height
+                    page_wrapper.css('min-height', winHeight + 'px');
+                };
+
+                resizeMain();
+                $(window).resize(resizeMain);
+            });
+
+            fetch('/api/scripts')
+                .then(r => r.json())
+                .then(scripts => {
+                    const filteredScripts = scripts.filter(src => {
+                        return !src.includes('clientApp.js') && !src.includes('/client/');
+                    });
+
+                    filteredScripts.sort((a, b) => {
+                        if (a.includes('adminApp.js')) return -1;
+                        if (b.includes('adminApp.js')) return 1;
+                        return 0;
+                    });
+
+                    let index = 0;
+                    function loadNext() {
+                        if (index >= filteredScripts.length) {
+                             bootstrapApp();
+                            return;
+                        }
+                        const src = filteredScripts[index++];
+                        const s = document.createElement('script');
+                        s.src = src;
+                        s.onload = loadNext;
+                        s.onerror = loadNext;
+                        document.body.appendChild(s);
+                    }
+                    loadNext();
+                });
+
+            function bootstrapApp() {
+                angular.module('uldb').config(['$httpProvider', function ($httpProvider) {
+                    $httpProvider.defaults.withCredentials = true;
+                    $httpProvider.defaults.cache = false;
+                }]);
+
+                angular.module('uldb')
+                .controller('ShellController', ['$scope', '$http', '$timeout', function($scope, $http, $timeout) {
+                    $scope.menu = [];
+                    $http.get('/api/menu').then(function(response) {
+                        $scope.menu = response.data;
+                        $timeout(function() { $('#side-menu').metisMenu(); }, 1000);
+                    });
+                }]);
+                angular.bootstrap(document, ['uldb']);
+            }
+        })();
+    </script>
+</body>
+</html>

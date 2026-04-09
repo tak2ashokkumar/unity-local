@@ -1,0 +1,37 @@
+{% for item in menu %}
+  <li>
+    <a href="">
+      {% if item.fa %}<i class="fa {{ item.fa }} fa-fw fa-lg"></i>
+      {% elif item.glyphicon %}<i class="{{ item.glyphicon }}"></i>{% endif %}
+      <span class="menu-item-text">{{ item.title }}</span><span class="fa arrow fa-lg"></span>
+    </a>
+    {% if "submenu" in item %}
+      <ul class="nav nav-second-level">
+        {% for j in item.submenu %}
+          <li>
+            <a class="menu-item {% if j.disabled %} menu-disabled{% endif %}" href="{{ j.href }}">
+              {% if j.fa %}<i class="{{ j.fa }} fa fa-fw "></i>{% endif %}
+              {% if j.glyphicon %}<i class="{{ j.glyphicon }}"></i>{% endif %}<span class="menu-item-text"> {{ j.name }}</span>
+              {% if j.arrow %}
+                <span class="fa arrow fa-lg"></span>
+              {% endif %}
+            </a>
+            {% if "submenu" in j %}
+              {% for k in j.submenu %}
+                <ul class="nav nav-third-level">
+                  <li>
+                    <a class="menu-item {% if k.disabled %} menu-disabled{% endif %}" href="{{ k.href }}">
+                      {% if k.fa %}<i class="{{ k.fa }} fa fa-fw fa-lg"></i>{% endif %}
+                      {% if k.glyphicon %}<i class="{{ k.glyphicon }}"></i>{% endif %}
+                      <span class="menu-item-text">{{ k.name }}</span>
+                    </a>
+                  </li>
+                </ul>
+              {% endfor %}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </li>
+{% endfor %}

@@ -1,0 +1,66 @@
+{% load uldb_filters %}
+{% load staticfiles %}
+
+<aside id="side-wrapper" class="side-bar-width" ng-scrollbars ng-scrollbars-config="scrollbarConfig" ng-init="setRootMenu({{menu|jsonify}})">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div uib-accordion close-others="oneAtATime">
+            {% for item in menu %}
+                <ul class="nav nav-pills nav-stacked demo collapsed united-panel" id="tree-menu" uib-accordion-group is-open="open[{{forloop.counter0}}]">
+                    <li uib-accordion-heading ng-class="{isOpen: status.isOpen}">
+                        <div class="leftnav">
+                            <a ng-click="iconClick()">
+                                {% if item.svg %}<img class="leftnavicon" src="{% static 'fonts/SVGicons/'%}{{ item.svg }}">{% endif %}
+                            </a>
+                            <span class="leftnav-title">{{ item.title }}</span>
+                            <i ng-show="toggleMinimized" class="pull-right fa fa-plus opencloseicon_{{forloop.counter0}}" ng-class="{'fa-minus': open[{{forloop.counter0}}], 'fa-plus': !open[{{forloop.counter0}}] }"></i>
+                        </div>
+                    </li>
+                    {% if "submenu" in item %}
+                        {% for j in item.submenu %}
+                            {% if not j.hide %}
+                                <ul class="first-level nested">
+                                    <li>
+                                        <!-- {{user.is_customer_admin}} -->
+                                        {% if j.admin_only and user.is_customer_admin %}
+                                            <a class="{% if j.disabled %} menu-disabled{% endif %}" href="{{ j.href }}" ng-click="selectMenuItem({{j|jsonify}})">
+                                            <!-- {% if j.fa %}<i class="{{ j.fa }} fa fa-fw "></i>{% endif %}
+                                            {% if j.glyphicon %}<i class="{{ j.glyphicon }} fa-fw fa-lg"></i>{% endif %} -->
+                                                {% if j.svg %}<img class="leftnavsubicon" src="{% static 'fonts/SVGicons/'%}{{ j.svg }} ">{% endif %}
+                                                {% if j.fa %}<i class="fa {{ j.fa }} fa-fw" style="margin-right: 8px;"></i>{% endif %}
+                                                {{j.name}}
+                                            </a>
+                                        {% endif %}
+
+                                        {% if not j.admin_only %}
+                                            <a class="{% if j.disabled or j.disable_module %} menu-disabled{% endif %}" href="{{ j.href }}" ng-click="selectMenuItem({{j|jsonify}})">
+                                            <!-- {% if j.fa %}<i class="{{ j.fa }} fa fa-fw "></i>{% endif %}
+                                            {% if j.glyphicon %}<i class="{{ j.glyphicon }} fa-fw fa-lg"></i>{% endif %} -->
+                                                {% if j.svg %}<img class="leftnavsubicon" src="{% static 'fonts/SVGicons/'%}{{ j.svg }} ">{% endif %}
+                                                {% if j.fa %}<i class="fa {{ j.fa }} fa-fw" style="margin-right: 8px;"></i>{% endif %}
+                                                {{j.name}}
+                                            </a>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+            </ul>
+            {% endfor %}
+            <ul class="nav nav-pills nav-stacked demo collapsed united-panel" uib-accordion-group id="tree-menu" ng-click="help_mail_popup()">
+                <li uib-accordion-heading >
+                    <div class="leftnav">
+                        <i class="fa fa-envelope fa-fw fa-lg leftnavicon" style="margin-right: 7px;"></i>
+                        <span class="leftnav-title">Report an Issue</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</aside>
+
+
+<div>
+    <a data-toggle="sidebar" ng-click="toggle()" id="sidebarClick" is-open="false" class="navbar-brand" href="#"><i id="arrow" class="fa fa-chevron-left" aria-hidden="true"></i>
+    </a>
+</div>

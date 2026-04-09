@@ -1,0 +1,216 @@
+[
+  {
+    "title": "UnitedView",
+    "fa": " fa-home ",
+    "submenu": [
+      {"name": "Dashboard", "href": "#/dashboard", "fa": "fa-map-o"},
+      {"name": "System Monitoring", "href": "", "arrow": true, "fa": "fa-heartbeat", "submenu": [
+        {"name": "Networking", "href": "#/integ/net", "fa": "fa-area-chart"}
+      ]},
+      {"name": "Activity Log", "href": "#/activity/logs", "fa": "fa-list-ol"}
+    ]
+  },
+  {
+    "title": "UnitedCloud",
+    "glyphicon": "glyphicon glyphicon-wrench",
+    "submenu": [
+      {"name": "Private Cloud", "href": "#/cloud", "fa": "fa-cloud"},
+      {"name": "Public Cloud", "href": "", "fa": "fa-cloud", "arrow": true, "submenu": [
+        {"name": "AWS", "href": "#/aws-dashboard", "fa": "fa-cube"},
+        {"name": "Azure", "href": "#/azure-dashboard", "fa": "fa-desktop"}
+      ]},
+      {"name": "Devices", "href": "", "fa": "fa-list-ul", "arrow": true, "submenu": [
+        {"name": "Servers", "href": "#/servers", "fa": "fa-server"},
+        {"name": "Virtual Machines", "href": "#/vm", "fa": "fa-cloud"},
+        {"name": "SANs", "href": "#/sans", "fa": "fa-database"},
+        {"name": "Switches", "href": "#/switch", "fa": "fa-sitemap"},
+        {"name": "Firewalls", "href": "#/firewall", "fa": "fa-fire"},
+        {"name": "Load Balancers", "href": "#/loadbalancer", "fa": "fa-balance-scale"},
+        {"name": "Terminal Servers", "href": "#/terminalserver", "fa": "fa-list-ul"},
+        {"name": "Other Device", "href": "#/customdevice", "fa": "fa-list-ul"}
+      ]},
+      {"name": "IP Management", "href": "", "fa": "fa-sitemap", "arrow": true, "submenu": [
+        {"name": "Public IPv4", "href": "#/ipv4_public/assignments"},
+        {"name": "Private IPv4", "href": "#/ipv4_private/assignments"},
+        {"name": "IPv6", "href": "#/ipv6blocks"},
+        {"name": "VLANs", "href": "#/vlan"}
+      ]},
+      {"name": "Colo", "href": "", "fa": "fa-building", "arrow": true, "submenu": [
+        {"name": "Cabinets", "href": "#/cabinet", "fa": "fa-cube"},
+        {"name": "PDUs", "href": "#/pdu", "fa": "fa-plug"},
+        {"name": "Cages", "href": "#/cage", "fa": "fa-cubes"},
+        {"name": "Power Circuits", "href": "#/powercircuit", "fa": "fa-plug"},
+        {"name": "Colocation Cloud", "href": "#colo_cloud", "fa": "fa-cloud"}
+      ]},
+      {"name": "UnityConnect", "href": "#/cloud", "fa": "fa-cloud", "arrow": true, "submenu": [
+        {"name": "UnityConnect", "href": "#/unityconnect", "fa": "fa-cloud"},
+        {"name": "UCPort", "href": "#/manage_unityconnect", "fa": "fa-plug"},
+        {"name": "VXC", "href": "#/manage_unityconnect/vxc", "fa": "fa-exchange"}
+      ]}
+    ]
+  },
+  {
+    "title": "UnitedServices",
+    "fa": "fa-rocket",
+    "submenu": [
+      {"name": "DevOps-as-a-Service", "href": "", "fa": "fa-gears", "arrow": true, "submenu": [
+        {"name": "DevOps Scripts", "href": "#/services/devops-scripts", "fa": "fa-cube"},
+        {"name": "Terraform", "href": "#/services/terraform", "fa": "fa-cube"},
+        {"name": "VM Migration", "href": "#/services/vm_migration", "glyphicon": "glyphicon glyphicon-export"},
+        {"name": "VM Backup", "href": "#/services/vm_backup", "glyphicon": "glyphicon glyphicon-saved"},
+        {"name": "DB Instance", "href": "#/services/db_instance", "glyphicon": "glyphicon glyphicon-saved"},
+        {"name": "Patch Management", "href": "", "fa": "fa-user", "disabled": true},
+        {"name": "Create Snapshot", "href": "", "fa": "fa-user", "disabled": true},
+        {"name": "FW Configuration Backup", "href": "", "fa": "fa-user", "disabled": true},
+        {"name": "LB Configuration Backup", "href": "", "fa": "fa-user", "disabled": true},
+        {"name": "Router/Switch Configuration Backup", "href": "", "fa": "fa-user", "disabled": true}
+      ]}
+    ]
+  },
+  {
+    "title": "Support",
+    "fa": "fa-support",
+    "submenu": [
+      {"name": "Admin Tickets", "href": "#/admin_tickets", "fa": "fa-ticket"},
+      {"name": "Change Management", "href": "#/change_ticket", "fa": "fa-columns"},
+      {"name": "Incident Management", "href": "#/existing_ticket", "fa": "fa-tags"},
+      {"name": "Service Requests", "href": "#/tickets", "fa": "fa-question-circle"},
+      {"name": "Unity Feedback", "href": "#/unity_feedback", "fa": "fa-comments"},
+      {"name": "Maintenance", "href": "#/maintenance-schedules", "fa": "fa-calendar"}
+    ]
+  },
+  {
+    "title": "UnitedSetup",
+    "fa": "fa-wrench",
+    "submenu": [
+      {"name": "Tenant Management", "href": "", "fa": "fa-user-circle", "arrow": true, "submenu": [
+        {"name": "Organizations", "href": "#/organization", "fa": "fa-building"},
+        {"name": "Users", "href": "#/user", "fa": "fa-user"},
+        {"name": "Storage", "href": "#/storage_management", "fa": "fa-user"}
+      ]},
+      {"name": "Billing & Invoicing", "href": "", "fa": "fa-credit-card", "arrow": true, "submenu": [
+        {"name": "Products", "href": "#/sf_product2", "fa": "fa-th-list"},
+        {"name": "Opportunities", "href": "#/sf_opportunity", "fa": "fa-clone"},
+        {"name": "Service Contracts", "href": "#/service_contract", "fa": "fa-sticky-note-o"},
+        {"name": "Import Opportunities", "href": "#/sf_import_oppty", "fa": "fa-mail-forward"}
+      ]},
+      {"name": "Customer Integrations", "href": "", "fa": "fa-exchange", "arrow": true, "submenu": [
+        {"name": "Zendesk Integration", "href": "#/integ/support"}
+      ]},
+      {"name": "Server Components", "href": "", "fa": "fa-briefcase", "arrow": true, "submenu": [
+        {"name": "CPUs", "href": "#/cpu"},
+        {"name": "Memory", "href": "#/memory"},
+        {"name": "Disks", "href": "#/disk"},
+        {"name": "Motherboard", "href": "#/motherboard"},
+        {"name": "NICs", "href": "#/nic"},
+        {"name": "IPMI", "href": "#/ipmi"},
+        {"name": "Operating Systems", "href": "#/os"}
+      ]},
+      {"name": "Cloud Setup", "href": "", "fa": "fa-cloud", "arrow": true, "submenu": [
+        {"name": "Private Cloud", "href": "#cloud_setup/private_cloud", "fa": "fa-cloud"},
+        {"name": "VMware", "href": "", "glyphicon": "glyphicon glyphicon-wrench", "arrow": true, "submenu": [
+          {"name": "vCenter API Account", "href": "#/vmware-dashboard", "fa": "fa-cloud"},
+          {"name": "vCenter Proxy", "href": "#/vmware-vcenter", "fa": "fa-cloud"},
+          {"name": "VMware ESXi Proxy", "href": "#/vmware-esxi", "fa": "fa-cloud"}
+        ]},
+        {"name": "OpenStack", "href": "", "fa": "fa-server", "arrow": true, "submenu": [
+          {"name": "OpenStack API Account", "href": "#/openstack-dashboard", "fa": "fa-cloud"},
+          {"name": "OpenStack Proxy", "href": "#/openstack-proxy", "fa": "fa-cloud"}
+        ]},
+        {"name": "Networking", "href": "", "fa": "fa-sitemap", "arrow": true, "submenu": [
+          {"name": "Switches", "href": "#/switch", "fa": "fa-sitemap"},
+          {"name": "Firewalls", "href": "#/firewall", "fa": "fa-fire"},
+          {"name": "Load Balancers", "href": "#/loadbalancer", "fa": "fa-balance-scale"}
+        ]}
+      ]},
+      {"name": "Supported Hardware", "href": "", "fa": "fa-cog", "arrow": true, "submenu": [
+        {"name": "Manufacturers", "href": "", "arrow": true, "submenu": [
+          {"name": "PDU", "href": "#/pdu_manufacturers"},
+          {"name": "Storage", "href": "#/storage_manufacturers"},
+          {"name": "Mobile", "href": "#/mobile_manufacturers"},
+          {"name": "System", "href": "#/system_manufacturers"},
+          {"name": "Manufacturers", "href": "#/manufacturers"}
+        ]},
+        {"name": "Models", "href": "", "arrow": true, "submenu": [
+          {"name": "PDU", "href": "#/pdumodel"},
+          {"name": "Switch", "href": "#/switchmodel"},
+          {"name": "Firewall", "href": "#/firewallmodel"},
+          {"name": "Load Balancer", "href": "#/loadbalancermodel"},
+          {"name": "Server", "href": "#/server_model"},
+          {"name": "Storage", "href": "#/storage_model"},
+          {"name": "Mobile", "href": "#/mobile_model"},
+          {"name": "Motherboard", "href": "#/motherboardmodel"},
+          {"name": "CPU", "href": "#/cputype"},
+          {"name": "Memory", "href": "#/memorytype"},
+          {"name": "Disk", "href": "#/disktype"},
+          {"name": "NIC", "href": "#/nictype"},
+          {"name": "IPMI", "href": "#/ipmi_model"},
+          {"name": "Terminal Server", "href": "#/terminalservermodel"}
+        ]},
+        {"name": "Controller Types", "href": "", "arrow": true, "submenu": [
+          {"name": "SAS", "href": "#/sascontrollertype"},
+          {"name": "Disk", "href": "#/diskcontrollertype"},
+          {"name": "RAID", "href": "#/raidcontrollertype"}
+        ]},
+        {"name": "Miscellaneous", "href": "", "arrow": true, "submenu": [
+          {"name": "Product Types", "href": "#/producttype"},
+          {"name": "Chassis", "href": "#/chassistype"},
+          {"name": "Peripheral Types", "href": "#/peripheraltype"},
+          {"name": "Cluster Types", "href": "#/clustertype"},
+          {"name": "Cloud Types", "href": "#/cloudtype"}
+        ]}
+      ]},
+      {"name": "Facilities Config", "href": "", "fa": "fa-globe", "arrow": true, "submenu": [
+        {"name": "Datacenters", "href": "#/datacenter"},
+        {"name": "Locations", "href": "#/location"},
+        {"name": "Cabinet Types", "href": "#/cabinettype"},
+        {"name": "Cabinet Options", "href": "#/cabinetoption"},
+        {"name": "Circuit Options", "href": "#/circuitoption"},
+        {"name": "Voltage Types", "href": "#/voltagetype"},
+        {"name": "Amp Types", "href": "#/ampstype"},
+        {"name": "Outlet Types", "href": "#/outlettype"},
+        {"name": "Electrical Panels", "href": "#/electricalpanel"},
+        {"name": "Electrical Circuits", "href": "#/electricalcircuit"}
+      ]},
+      {"name": "IP Config", "href": "", "fa": "fa-wrench", "arrow": true, "submenu": [
+        {"name": "IPv4 ARIN Allocations", "href": "#/ipv4_public/allocations"},
+        {"name": "IPv6 Allocations", "href": "#/ipv6alloc"},
+        {"name": "Private Allocations", "href": "#/ipv4_private/allocations"}
+      ]},
+      {"name": "Monitoring", "fa": "fa-area-chart", "arrow": true, "submenu": [
+        {"name": "Configuration", "fa": "fa-cog", "href": "#/monitoring/configure"},
+        {"name": "Zabbix", "fa": "fa-bar-chart", "arrow": true, "submenu": [
+          {"name": "Instance", "href": "#/zabbix/instance"},
+          {"name": "Customer Map", "href": "#/zabbix/customer_instance_map"},
+          {"name": "Template definition", "href": "#/zabbix/template_definition"},
+          {"name": "Template mapping", "href": "#/zabbix/template_mapping"},
+          {"name": "Device Map", "href": "#/zabbix/device_map"},
+          {"name": "Agent Details", "href": "#/zabbix/agent_details"}
+        ]},
+        {"name": "Observium", "fa": "fa-line-chart", "arrow": true, "submenu": [
+          {"name": "Instance", "href": "#/observium/instance"},
+          {"name": "Device Map", "href": "#/observium/device_map"},
+          {"name": "Bill Map", "href": "#/observium/billing_map"},
+          {"name": "Port Map", "href": "#/observium/switch_ports"}
+        ]}
+      ]},
+      {"name": "AIOPS", "href": "", "fa": "fa-bell", "arrow": true, "submenu": [
+        {"name": "Sources", "href": "#/aiops/sources", "fa": "fa-building"}
+      ]},
+      {"name": "Discovery", "fa": "fa-area-chart", "arrow": true, "submenu": [
+        {"name": "OpenAudit", "fa": "fa-cog", "href": "#/discovery/open_audit"}
+      ]},
+      {"name": "AWS AMI", "href": "#/aws_amis", "fa": "fa fa-floppy-o"},
+      {"name": "Device Reports", "href": "#/device_reports", "fa": "fa fa-bar-chart"},
+      {"name": "Service Catalogues", "href": "#/service_catalogue", "fa": "fa fa-list"},
+      {"name": "Advanced", "href": "", "fa": "fa-rocket", "arrow": true, "submenu": [
+        {"name": "Import Tool", "href": "#/import2", "fa": "fa-mail-forward"},
+        {"name": "Impersonate User", "href": "#/hijack", "fa": "fa-low-vision"},
+        {"name": "Celery Jobs", "href": "#/integ/celery_monitor", "fa": "fa-tasks"},
+        {"name": "Developer Options", "href": "#/101010", "fa": "fa-save"},
+        {"name": "Proxy Cookies", "href": "#/proxy-cookies-1", "fa": "fa-circle"},
+        {"name": "Release Notes", "href": "#/release", "fa": "fa-sticky-note"}
+      ]}
+    ]
+  }
+]

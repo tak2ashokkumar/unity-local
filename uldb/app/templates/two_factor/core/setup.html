@@ -1,0 +1,111 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="focus-content">
+  <div class="middle-wrapper" style="padding-bottom:20px;">
+      <div class="row cardbox-header"> 
+          <span class="pull-left"> {% block title %}{% trans "Enable Two-Factor Authentication" %}{% endblock %}</span> 
+          <span class="pull-right">
+            <span style="font-size:13px; color : #6d6d6d"> If you don't want to enable, click </span>
+            <a target="_parent" class="btn btn-cancel" href="/main#/settings/profile" style="padding : 2px 8px !important">Cancel</a>
+          </span>
+      </div>
+      <div class="row Dashwrap">
+          {% if wizard.steps.current == 'welcome' %}
+
+              <p>
+                  {% blocktrans %}Click <strong>Next</strong> to set up two-factor authentication. 
+                  {% endblocktrans %}
+              </p>
+
+          {% elif wizard.steps.current == 'method' %}
+
+              <p>
+                  {% blocktrans %}Please select which authentication method you would like to use.{% endblocktrans %}
+              </p>
+
+          {% elif wizard.steps.current == 'generator' %}
+
+              <p>
+                  {% blocktrans %}To start using a security token generator, 
+                  please use an TOTP-based security token generator app on your smartphone to scan
+                  the QR code shown below.{% endblocktrans %}
+              </p>
+
+              <p>
+                  The following TOTP client implementations are known to work:
+              </p>
+
+              <ul>
+                  <li>Google Authenticator</li>
+                  <li>Microsoft Authenticator</li>
+                  <li>Duo Mobile</li>
+                  <li>FreeOTP</li>
+              </ul>
+
+              <p><img style="display:block; margin: auto" src="{{ QR_URL }}" alt="QR Code" /></p>
+
+          {% elif wizard.steps.current == 'sms' %}
+
+              <p>
+                  {% blocktrans %}Please enter the phone number you wish to receive the text messages on.
+                  This number will be validated in the next step. {% endblocktrans %}
+              </p>
+          {% elif wizard.steps.current == 'call' %}
+
+              <p>
+                  {% blocktrans %}Please enter the phone number you wish to be called on.
+                  This number will be validated in the next step. {% endblocktrans %}
+              </p>
+
+          {% elif wizard.steps.current == 'validation' %}
+
+              {% if challenge_succeeded %}
+
+                  {% if device.method == 'call' %}
+
+                      <p>
+                          {% blocktrans %}We are calling your phone right now, please enter the digits you hear.{% endblocktrans %}
+                      </p>
+
+                  {% elif device.method == 'sms' %}
+
+                      <p>
+                          {% blocktrans %}We sent you a text message, please enter the tokens we sent.{% endblocktrans %}
+                      </p>
+
+                  {% endif %}
+
+              {% else %}
+
+                  <p class="alert alert-warning" role="alert">
+                      {% blocktrans %}We've encountered an issue with the selected authentication method.
+                      Please go back and verify that you entered your information correctly, try again, or use a different authentication method instead. If the issue persists, contact the site administrator.{% endblocktrans %}
+                  </p>
+
+              {% endif %} 
+
+          {% elif wizard.steps.current == 'yubikey' %}
+
+              <p>
+                  {% blocktrans %}To identify and verify your YubiKey, please insert a token in the field below. 
+                  Your YubiKey will be linked to your account.{% endblocktrans %}
+              /p>
+
+          {% endif %}  
+
+          <form action="" method="post">{% csrf_token %}
+            {% include "two_factor/_wizard_forms.html" %}
+
+            {# hidden submit button to enable [enter] key #}
+            <div style="margin-left: -9999px"><input type="submit" value=""/></div>
+
+            {% include "two_factor/_wizard_actions.html" %}
+          </form>
+
+      </div>
+  </div>
+</div>
+  
+{% endblock %}
