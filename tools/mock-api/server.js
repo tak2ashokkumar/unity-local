@@ -36,8 +36,9 @@ app.use((req, res) => {
   const filePath = path.join(baseDir, urlPath + ".json");
 
   if (fs.existsSync(filePath)) {
-    const data = fs.readFileSync(filePath);
-    res.json(JSON.parse(data));
+    const raw = fs.readFileSync(filePath, "utf8");
+    const rewritten = raw.replace(/https:\/\/unity\.unitedlayer\.com/g, `http://localhost:${PORT}`);
+    res.json(JSON.parse(rewritten));
   } else {
     // res.status(404).json({
     //   error: "Mock API not found",

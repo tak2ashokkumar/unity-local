@@ -4,7 +4,7 @@
   "previous": null,
   "results": [
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/1/",
+      "url": "http://localhost:3001/rest/motherboardmodel/1/",
       "id": 1,
       "name": "X8DTU-6F+-LR",
       "num_cpu_sockets": 2,
@@ -15,7 +15,7 @@
       "num_nic_ports": 2,
       "has_onboard_ipmi": true,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/1/",
+        "url": "http://localhost:3001/rest/cpusockettype/1/",
         "id": 1,
         "uuid": "fd5721bb-e307-4173-8d60-ed82f79cf695",
         "name": "Dual Socket R (LGA 2011)",
@@ -23,19 +23,19 @@
         "updated_at": "2016-09-03T20:26:10.156003-07:00"
       },
       "ipmi_controller": {
-        "url": "https://unity.unitedlayer.com/rest/ipmitype/1/",
+        "url": "http://localhost:3001/rest/ipmitype/1/",
         "id": 1,
         "controller": "Realtek RTL8211E PHY"
       },
       "nic_model": {
-        "url": "https://unity.unitedlayer.com/rest/nictype/1/",
+        "url": "http://localhost:3001/rest/nictype/1/",
         "id": 1,
         "controller": "i350-AM2 Dual Port Gigabit Ethernet"
       },
       "manufacturer": null
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/2/",
+      "url": "http://localhost:3001/rest/motherboardmodel/2/",
       "id": 2,
       "name": "X9DAX-7F",
       "num_cpu_sockets": 2,
@@ -46,7 +46,7 @@
       "num_nic_ports": 2,
       "has_onboard_ipmi": true,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/2/",
+        "url": "http://localhost:3001/rest/cpusockettype/2/",
         "id": 2,
         "uuid": "10e537be-3be4-47b9-85fd-aac51457a6b8",
         "name": "Quad Socket G34",
@@ -54,19 +54,19 @@
         "updated_at": "2016-09-03T20:26:10.156003-07:00"
       },
       "ipmi_controller": {
-        "url": "https://unity.unitedlayer.com/rest/ipmitype/2/",
+        "url": "http://localhost:3001/rest/ipmitype/2/",
         "id": 2,
         "controller": "Realtek RTL8201F PHY"
       },
       "nic_model": {
-        "url": "https://unity.unitedlayer.com/rest/nictype/2/",
+        "url": "http://localhost:3001/rest/nictype/2/",
         "id": 2,
         "controller": "X540 Dual Port 10GBase-T"
       },
       "manufacturer": null
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/5/",
+      "url": "http://localhost:3001/rest/motherboardmodel/5/",
       "id": 5,
       "name": "SC1425-D7449",
       "num_cpu_sockets": 2,
@@ -77,7 +77,7 @@
       "num_nic_ports": 2,
       "has_onboard_ipmi": true,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/7/",
+        "url": "http://localhost:3001/rest/cpusockettype/7/",
         "id": 7,
         "uuid": "2fd2bd15-8769-476a-ac72-935674a4b803",
         "name": "Socket 604",
@@ -86,14 +86,14 @@
       },
       "ipmi_controller": null,
       "nic_model": {
-        "url": "https://unity.unitedlayer.com/rest/nictype/7/",
+        "url": "http://localhost:3001/rest/nictype/7/",
         "id": 7,
         "controller": "82541GI"
       },
       "manufacturer": null
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/30/",
+      "url": "http://localhost:3001/rest/motherboardmodel/30/",
       "id": 30,
       "name": "X9DRW-7TPF ",
       "num_cpu_sockets": 2,
@@ -104,7 +104,7 @@
       "num_nic_ports": 4,
       "has_onboard_ipmi": true,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/1/",
+        "url": "http://localhost:3001/rest/cpusockettype/1/",
         "id": 1,
         "uuid": "fd5721bb-e307-4173-8d60-ed82f79cf695",
         "name": "Dual Socket R (LGA 2011)",
@@ -113,14 +113,14 @@
       },
       "ipmi_controller": null,
       "nic_model": {
-        "url": "https://unity.unitedlayer.com/rest/nictype/9/",
+        "url": "http://localhost:3001/rest/nictype/9/",
         "id": 9,
         "controller": "82599 Dual Port 10G SFP+"
       },
       "manufacturer": null
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/3/",
+      "url": "http://localhost:3001/rest/motherboardmodel/3/",
       "id": 3,
       "name": "P4SGR",
       "num_cpu_sockets": 1,
@@ -131,7 +131,7 @@
       "num_nic_ports": 2,
       "has_onboard_ipmi": false,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/5/",
+        "url": "http://localhost:3001/rest/cpusockettype/5/",
         "id": 5,
         "uuid": "3fdc3ad3-5dd7-478d-8c6c-70f82a84ee19",
         "name": "Socket 478",
@@ -139,23 +139,23 @@
         "updated_at": "2016-09-03T20:26:10.156003-07:00"
       },
       "ipmi_controller": {
-        "url": "https://unity.unitedlayer.com/rest/ipmitype/2/",
+        "url": "http://localhost:3001/rest/ipmitype/2/",
         "id": 2,
         "controller": "Realtek RTL8201F PHY"
       },
       "nic_model": {
-        "url": "https://unity.unitedlayer.com/rest/nictype/5/",
+        "url": "http://localhost:3001/rest/nictype/5/",
         "id": 5,
         "controller": "Intel® 82540EM Gigabit Ethernet"
       },
       "manufacturer": {
-        "url": "https://unity.unitedlayer.com/rest/manufacturer/1/",
+        "url": "http://localhost:3001/rest/manufacturer/1/",
         "id": 1,
         "name": "Supermicro"
       }
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/16/",
+      "url": "http://localhost:3001/rest/motherboardmodel/16/",
       "id": 16,
       "name": "X10DRL-C",
       "num_cpu_sockets": 2,
@@ -166,7 +166,7 @@
       "num_nic_ports": 2,
       "has_onboard_ipmi": true,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/8/",
+        "url": "http://localhost:3001/rest/cpusockettype/8/",
         "id": 8,
         "uuid": "43741458-5d33-490d-aa07-4a966a0bfc07",
         "name": "Dual Socket R3 LGA2011",
@@ -174,19 +174,19 @@
         "updated_at": "2016-09-03T20:26:10.156003-07:00"
       },
       "ipmi_controller": {
-        "url": "https://unity.unitedlayer.com/rest/ipmitype/1/",
+        "url": "http://localhost:3001/rest/ipmitype/1/",
         "id": 1,
         "controller": "Realtek RTL8211E PHY"
       },
       "nic_model": null,
       "manufacturer": {
-        "url": "https://unity.unitedlayer.com/rest/manufacturer/1/",
+        "url": "http://localhost:3001/rest/manufacturer/1/",
         "id": 1,
         "name": "Supermicro"
       }
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/29/",
+      "url": "http://localhost:3001/rest/motherboardmodel/29/",
       "id": 29,
       "name": "X9DRL-7F",
       "num_cpu_sockets": 2,
@@ -197,7 +197,7 @@
       "num_nic_ports": 2,
       "has_onboard_ipmi": true,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/8/",
+        "url": "http://localhost:3001/rest/cpusockettype/8/",
         "id": 8,
         "uuid": "43741458-5d33-490d-aa07-4a966a0bfc07",
         "name": "Dual Socket R3 LGA2011",
@@ -209,7 +209,7 @@
       "manufacturer": null
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/4/",
+      "url": "http://localhost:3001/rest/motherboardmodel/4/",
       "id": 4,
       "name": "X8DTU-LN4F+",
       "num_cpu_sockets": 2,
@@ -220,7 +220,7 @@
       "num_nic_ports": 4,
       "has_onboard_ipmi": true,
       "cpu_socket_type": {
-        "url": "https://unity.unitedlayer.com/rest/cpusockettype/4/",
+        "url": "http://localhost:3001/rest/cpusockettype/4/",
         "id": 4,
         "uuid": "f0f0506b-1dc9-4f52-a06c-0d5abfd79967",
         "name": "LGA 1366",
@@ -228,7 +228,7 @@
         "updated_at": "2016-09-03T20:26:10.156003-07:00"
       },
       "ipmi_controller": {
-        "url": "https://unity.unitedlayer.com/rest/ipmitype/3/",
+        "url": "http://localhost:3001/rest/ipmitype/3/",
         "id": 3,
         "controller": "Realtek RTL8201N PHY"
       },
@@ -236,7 +236,7 @@
       "manufacturer": null
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/motherboardmodel/38/",
+      "url": "http://localhost:3001/rest/motherboardmodel/38/",
       "id": 38,
       "name": "X9DRW-7TPF",
       "num_cpu_sockets": 2,

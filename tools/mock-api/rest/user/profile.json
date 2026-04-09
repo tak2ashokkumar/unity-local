@@ -1,7 +1,7 @@
 {
   "customer": {
     "id": 1,
-    "url": "https://unity.unitedlayer.com/rest/org/1/",
+    "url": "http://localhost:3001/rest/org/1/",
     "uuid": "04faed5d-edbf-4684-808a-2ee942157484",
     "name": "UnitedLayer",
     "organization_type": "INTERNAL",
@@ -126,19 +126,19 @@
   },
   "user_accesslist": [
     {
-      "url": "https://unity.unitedlayer.com/rest/access_type/1/",
+      "url": "http://localhost:3001/rest/access_type/1/",
       "id": 1,
       "name": "Portal Access",
       "description": "Allows access to portal."
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/access_type/2/",
+      "url": "http://localhost:3001/rest/access_type/2/",
       "id": 2,
       "name": "Notifications",
       "description": "Receives notifications regarding data center maintenance events and changes in policy."
     },
     {
-      "url": "https://unity.unitedlayer.com/rest/access_type/3/",
+      "url": "http://localhost:3001/rest/access_type/3/",
       "id": 3,
       "name": "Abuse",
       "description": "Receives abuse reports."
@@ -146,10 +146,10 @@
   ],
   "last_login": "2026-04-09T05:22:57.209637Z",
   "user": {
-    "url": "https://unity.unitedlayer.com/rest/user/988/",
+    "url": "http://localhost:3001/rest/user/988/",
     "id": 988,
     "org": {
-      "url": "https://unity.unitedlayer.com/rest/fast/org/1/",
+      "url": "http://localhost:3001/rest/fast/org/1/",
       "id": 1,
       "name": "UnitedLayer",
       "storage": null,
@@ -160,19 +160,19 @@
     "is_customer_admin": true,
     "access_types": [
       {
-        "url": "https://unity.unitedlayer.com/rest/access_type/1/",
+        "url": "http://localhost:3001/rest/access_type/1/",
         "id": 1,
         "name": "Portal Access",
         "description": "Allows access to portal."
       },
       {
-        "url": "https://unity.unitedlayer.com/rest/access_type/2/",
+        "url": "http://localhost:3001/rest/access_type/2/",
         "id": 2,
         "name": "Notifications",
         "description": "Receives notifications regarding data center maintenance events and changes in policy."
       },
       {
-        "url": "https://unity.unitedlayer.com/rest/access_type/3/",
+        "url": "http://localhost:3001/rest/access_type/3/",
         "id": 3,
         "name": "Abuse",
         "description": "Receives abuse reports."
@@ -186,7 +186,7 @@
     "salesforce_id": "SV5679",
     "user_roles": [
       {
-        "url": "https://unity.unitedlayer.com/rest/role/13/",
+        "url": "http://localhost:3001/rest/role/13/",
         "id": 13,
         "name": "Administrator"
       }

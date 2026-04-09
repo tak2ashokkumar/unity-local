@@ -99,6 +99,6 @@ admin() {
 }
 
 serveadmin() {
-    agadmin || return
+    admin || return
     node server.js
 }

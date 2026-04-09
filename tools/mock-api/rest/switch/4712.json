@@ -1,0 +1,39 @@
+{
+  "url": "http://localhost:3001/rest/switch/4712/",
+  "id": 4712,
+  "name": "sw1-503.sf10-Wipro",
+  "management_ip": "10.1.0.27",
+  "asset_tag": null,
+  "serial_number": null,
+  "model": {
+    "id": 8,
+    "name": "WS-C4948-10GE"
+  },
+  "cabinet": {
+    "url": "http://localhost:3001/rest/fast/cabinet/1401/",
+    "id": 1401,
+    "uuid": "4e38f7bd-76da-4977-8f77-cd7e3e35715b",
+    "name": "CB1-Wipro-SF"
+  },
+  "customers": [
+    {
+      "url": "http://localhost:3001/rest/fast/org/372/",
+      "id": 372,
+      "name": "UnityDemo-Wipro",
+      "storage": null,
+      "uuid": "c1c15413-a1ef-4615-aeb0-9dc770de253c"
+    }
+  ],
+  "status": "NA",
+  "salesforce_id": null,
+  "object_class": "Switch",
+  "observium_host": null,
+  "juniper_switch": [],
+  "cisco_switch": [],
+  "is_shared": false,
+  "is_unitedconnect": false,
+  "position": 5,
+  "size": 2,
+  "ip_address": "10.1.0.27",
+  "snmp_community": "ul4ever"
+}
