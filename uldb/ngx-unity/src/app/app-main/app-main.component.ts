@@ -8,6 +8,7 @@ import { AppLevelService } from '../app-level.service';
 import { MapService } from '../map.service';
 import { AppSearchService } from '../shared/app-search/app-search.service';
 import { FloatingTerminalService } from '../shared/floating-terminal/floating-terminal.service';
+import { PermissionService } from '../shared/permissions/permission.service';
 import { UserInfoService } from '../shared/user-info.service';
 import { AppMainService, ChatbotDataType } from './app-main.service';
 import { GET_UNITY_NAV_DATA, UnityNavData } from './unity-nav';
@@ -36,6 +37,7 @@ export class AppMainComponent implements OnInit, OnDestroy {
     private searchService: AppSearchService,
     public user: UserInfoService,
     public appService: AppLevelService,
+    private permissionService: PermissionService,
     public mapService: MapService,
     private terminalService: FloatingTerminalService,
     private mainService: AppMainService,
@@ -43,7 +45,7 @@ export class AppMainComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Nav items and custom tenant logo
-    this.navItems = GET_UNITY_NAV_DATA(this.appService, this.user);
+    this.navItems = GET_UNITY_NAV_DATA(this.permissionService, this.user);
     if (this.user.logo) {
       this.unityLogo = this.user.logo.includes('data:image')
         ? this.user.logo

@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
-import { UnityModules, UnityPermissionSet } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
+import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { JiraInstanceProjects } from 'src/app/shared/SharedEntityTypes/jira.type';
 import { TicketMgmtList } from 'src/app/shared/SharedEntityTypes/ticket-mgmt-list.type';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
@@ -25,7 +26,8 @@ export class DashboardTicketMgmtComponent implements OnInit, OnDestroy {
   defaultType: TicketMgmtList;
   constructor(private dashTcktSvc: DashboardTicketMgmtService,
     private router: Router,
-    private user: UserInfoService) { }
+    private user: UserInfoService,
+    private permissionService: PermissionService) { }
 
   ngOnInit() {
     this.getDefaultTcktMgmtList();
@@ -118,8 +120,7 @@ export class DashboardTicketMgmtComponent implements OnInit, OnDestroy {
   }
 
   hasTicketMgmtAccess() {
-    let ticketMgmtPermissionSet = new UnityPermissionSet(UnityModules.TICKET_MANAGEMENT);
-    return ticketMgmtPermissionSet ? ticketMgmtPermissionSet.view : false;
+    return this.permissionService.hasViewAccess(UnityModules.TICKET_MANAGEMENT);
   }
 
   goTo(path: string) {

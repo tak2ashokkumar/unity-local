@@ -5,7 +5,8 @@ import { map, take } from 'rxjs/operators';
 import { StorageService, StorageType } from './app-storage/storage.service';
 import { UnityUserApplicableModulePermission, UnityUserType, User } from './SharedEntityTypes/loggedin-user.type';
 import { PaginatedResult } from './SharedEntityTypes/paginated.type';
-import { UnityModules } from '../app.component';
+import { UnityModules } from './permissions/unity-modules';
+import { getUnityManagePermissionName, getUnityViewPermissionName } from './permissions/unity-permission-set';
 
 @Injectable({
   providedIn: 'root'
@@ -236,8 +237,7 @@ export class UserInfoService {
   }
 
   getViewPermissionName(input: UnityModules) {
-    return input == UnityModules.TICKET_MANAGEMENT ? `View Tickets` :
-      input == UnityModules.USER_MANAGEMENT ? `View Users` : `View ${input}`;
+    return getUnityViewPermissionName(input);
   }
 
   hasViewAccess(input: UnityModules) {
@@ -250,8 +250,7 @@ export class UserInfoService {
   }
 
   getManagePermissionName(input: UnityModules) {
-    return input == UnityModules.TICKET_MANAGEMENT ? `Manage Tickets` :
-      input == UnityModules.USER_MANAGEMENT ? `Manage Users` : `Manage ${input}`;
+    return getUnityManagePermissionName(input);
   }
 
   hasManageAccess(input: UnityModules) {

@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { UnitySetupIntegrationService } from '../unity-setup-integration.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 import { environment } from 'src/environments/environment';
 import { takeUntil } from 'rxjs/operators';
 import { cloneDeep as _clone } from 'lodash-es';

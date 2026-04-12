@@ -1,5 +1,5 @@
 import { AfterViewInit, Directive, ElementRef, Input, Renderer2, RendererStyleFlags2 } from '@angular/core';
-import { AppLevelService } from 'src/app/app-level.service';
+import { PermissionService } from '../permissions/permission.service';
 import { UnityUserApplicableModulePermission } from '../SharedEntityTypes/loggedin-user.type';
 
 @Directive({
@@ -13,7 +13,7 @@ export class AccessControlDirective implements AfterViewInit {
 
   constructor(private el: ElementRef,
     private renderer: Renderer2,
-    private appLevelSvc: AppLevelService) { }
+    private permissionService: PermissionService) { }
 
   ngAfterViewInit(): void {
     let moduleOrArr = this.moduleName.split('|');
@@ -21,7 +21,7 @@ export class AccessControlDirective implements AfterViewInit {
     // for user level access control
     if (!this.modulePermissions?.length) {
       for (let i = 0; i < moduleOrArr.length; i++) {
-        modulePerms = this.appLevelSvc.getAccess(moduleOrArr[i].trim());
+        modulePerms = this.permissionService.getAccess(moduleOrArr[i].trim()) || [];
         if (modulePerms && modulePerms.length) {
           break;
         }

@@ -1,5 +1,6 @@
-import { AppLevelService } from "../app-level.service";
-import { UnityModules, UnityPermissionSet } from "../app.component";
+import { getUnityViewPermissionName, UnityModules } from "../shared/permissions/unity-permission-set";
+import { UNITY_ROUTE_ACCESS, UnityNavRouteAccess } from "../shared/permissions/unity-route-access";
+import { PermissionService } from "../shared/permissions/permission.service";
 import { canAccessAiAgents, canAccessAiInfraManagement, canAccessCostAnalysis } from "../shared/left-panel-access.util";
 import { UserInfoService } from "../shared/user-info.service";
 
@@ -14,6 +15,7 @@ export interface UnityNavData {
     attributes?: object;
     divider?: boolean;
     class?: string;
+    routeAccess?: UnityNavRouteAccess;
 }
 
 const removeNavItem = (navItems: UnityNavData[], targetItemNames: string[]) => {
@@ -24,7 +26,7 @@ const removeNavItem = (navItems: UnityNavData[], targetItemNames: string[]) => {
     return navItems;
 }
 
-const filterRequiredNavItems = (navItem: UnityNavData, svc: AppLevelService) => {
+const filterRequiredNavItems = (navItem: UnityNavData, svc: PermissionService) => {
     const moduleNameFromNavItem = navItem.attributes['module'];
     const modulePerms = svc.getAccess(moduleNameFromNavItem);
     if (moduleNameFromNavItem && modulePerms) {
@@ -44,7 +46,7 @@ const filterRequiredNavItems = (navItem: UnityNavData, svc: AppLevelService) => 
     return;
 }
 
-const filterRequiredUnitedCloudNavItems = (navItem: UnityNavData, svc: AppLevelService) => {
+const filterRequiredUnitedCloudNavItems = (navItem: UnityNavData, svc: PermissionService) => {
     const moduleNameFromNavItem = navItem.attributes['module'];
     if (moduleNameFromNavItem) {
         if (moduleNameFromNavItem instanceof Array) {
@@ -72,7 +74,7 @@ const filterRequiredUnitedCloudNavItems = (navItem: UnityNavData, svc: AppLevelS
     return;
 }
 
-const filterRequiredUnityCostAnalysisNavItems = (navItem: UnityNavData, svc: AppLevelService) => {
+const filterRequiredUnityCostAnalysisNavItems = (navItem: UnityNavData, svc: PermissionService) => {
     const moduleNameFromNavItem = navItem.attributes['module'];
     const modulePerms = svc.getAccess(moduleNameFromNavItem);
     if (moduleNameFromNavItem && modulePerms) {
@@ -81,8 +83,7 @@ const filterRequiredUnityCostAnalysisNavItems = (navItem: UnityNavData, svc: App
                 return navItem;
             }
         } else {
-            let permissionSet = new UnityPermissionSet(moduleNameFromNavItem);
-            if (modulePerms.includes(permissionSet.moduleViewPermission)) {
+            if (modulePerms.includes(getUnityViewPermissionName(moduleNameFromNavItem))) {
                 return navItem;
             }
         }
@@ -90,19 +91,18 @@ const filterRequiredUnityCostAnalysisNavItems = (navItem: UnityNavData, svc: App
     return;
 }
 
-const filterRequiredUnitySupportNavItems = (navItem: UnityNavData, svc: AppLevelService) => {
+const filterRequiredUnitySupportNavItems = (navItem: UnityNavData, svc: PermissionService) => {
     const moduleNameFromNavItem = navItem.attributes['module'];
     const modulePerms = svc.getAccess(moduleNameFromNavItem);
     if (moduleNameFromNavItem && modulePerms) {
-        let permissionSet = new UnityPermissionSet(moduleNameFromNavItem);
-        if (modulePerms.includes(permissionSet.moduleViewPermission)) {
+        if (modulePerms.includes(getUnityViewPermissionName(moduleNameFromNavItem))) {
             return navItem;
         }
     }
     return;
 }
 
-const filterRequiredUnitySetupNavItems = (navItem: UnityNavData, svc: AppLevelService) => {
+const filterRequiredUnitySetupNavItems = (navItem: UnityNavData, svc: PermissionService) => {
     const moduleNameFromNavItem = navItem.attributes['module'];
     if (moduleNameFromNavItem) {
         if (moduleNameFromNavItem instanceof Array) {
@@ -191,6 +191,7 @@ const UNITY_SETUP_COST_PLAN_NAV_ITEMS = () => {
             name: 'Resource Model',
             url: '/setup/cost-plan/resource-model/',
             variant: 'branched',
+            routeAccess: UNITY_ROUTE_ACCESS.SETUP_COST_PLAN_RESOURCE_MODEL
         }
     ]
     return navItems;
@@ -245,7 +246,7 @@ const UNITY_SETUP_USER_MGMT_NAV_ITEMS = () => {
     ]
     return navItems;
 }
-const UNITY_SETUP_NAV_ITEMS = (svc: AppLevelService, orgName: string) => {
+const UNITY_SETUP_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
     let integrationsMenuName = orgName ? `Integration \u2605` : 'Integration';
     let credentialsMenuName = orgName ? `Secrets Management` : 'Credentials';
 
@@ -386,7 +387,7 @@ const UNITY_SETUP_NAV_ITEMS = (svc: AppLevelService, orgName: string) => {
     navItems = navItems.map(nav => nav.attributes ? filterRequiredUnitySetupNavItems(nav, svc) : nav)
     return navItems.filter(n => n);
 }
-const UNITY_SETUP_NAV_DATA = (svc: AppLevelService, orgName: string) => {
+const UNITY_SETUP_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `${orgName} Administration` : 'UnitySetup';
     let navItems: UnityNavData = {
         name: `${menuName}`,
@@ -398,7 +399,7 @@ const UNITY_SETUP_NAV_DATA = (svc: AppLevelService, orgName: string) => {
 }
 
 
-const UNITY_SUPPORT_NAV_ITEMS = (svc: AppLevelService, selfBrandedOrgName: string) => {
+const UNITY_SUPPORT_NAV_ITEMS = (svc: PermissionService, selfBrandedOrgName: string) => {
     let menuName = selfBrandedOrgName ? `Feedback` : 'Unity Feedback';
     let navItems: UnityNavData[] = [
         {
@@ -430,13 +431,14 @@ const UNITY_SUPPORT_NAV_ITEMS = (svc: AppLevelService, selfBrandedOrgName: strin
                 name: 'Documentation',
                 url: '/support/documentation/userguide',
                 icon: 'fa cfa-document',
+                routeAccess: UNITY_ROUTE_ACCESS.SUPPORT_DOCUMENTATION_USERGUIDE
             }
         ];
     }
     navItems = navItems.map(nav => nav.attributes ? filterRequiredUnitySupportNavItems(nav, svc) : nav);
     return navItems.filter(n => n);
 }
-const UNITY_SUPPORT_NAV_DATA = (svc: AppLevelService, orgName: string) => {
+const UNITY_SUPPORT_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `ITSM` : 'Support';
     const navItems = {
         name: `${menuName}`,
@@ -447,7 +449,7 @@ const UNITY_SUPPORT_NAV_DATA = (svc: AppLevelService, orgName: string) => {
     return navItems.children && navItems.children.length ? navItems : null;
 }
 
-const UNITY_REPORT_NAV_DATA = (svc: AppLevelService, orgName: string) => {
+const UNITY_REPORT_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `Reports` : 'UnityReports';
     const navItems = {
         name: `${menuName}`,
@@ -455,12 +457,13 @@ const UNITY_REPORT_NAV_DATA = (svc: AppLevelService, orgName: string) => {
         icon: 'far fa-newspaper',
         attributes: {
             module: UnityModules.UNITY_REPORT,
-        }
+        },
+        routeAccess: UNITY_ROUTE_ACCESS.REPORTS_MANAGE_NEW_REPORTS
     }
     return filterRequiredNavItems(navItems, svc);
 }
 
-const UNITY_COST_ANALYSIS_NAV_ITEMS = (svc: AppLevelService) => {
+const UNITY_COST_ANALYSIS_NAV_ITEMS = (svc: PermissionService) => {
     let navItems: UnityNavData[] = [
         {
             name: 'Public Cloud',
@@ -498,7 +501,7 @@ const UNITY_COST_ANALYSIS_NAV_ITEMS = (svc: AppLevelService) => {
     navItems = navItems.map(nav => nav.attributes ? filterRequiredUnityCostAnalysisNavItems(nav, svc) : nav);
     return navItems.filter(n => n);
 }
-const UNITY_COST_ANALYSIS_NAV_DATA = (svc: AppLevelService, userSvc: UserInfoService) => {
+const UNITY_COST_ANALYSIS_NAV_DATA = (svc: PermissionService, userSvc: UserInfoService) => {
     if (!canAccessCostAnalysis(userSvc)) return null;
     const orgName = userSvc.selfBrandedOrgName;
     let menuName = orgName ? `FINOPS` : 'Cost Analysis';
@@ -514,7 +517,7 @@ const UNITY_COST_ANALYSIS_NAV_DATA = (svc: AppLevelService, userSvc: UserInfoSer
     return filterRequiredUnityCostAnalysisNavItems(navItems, svc);
 }
 
-const UNITY_AI_AGENTS_NAV_ITEMS = (svc: AppLevelService, orgName: string) => {
+const UNITY_AI_AGENTS_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
     let finopsMenuName = orgName ? `Security Agent` : 'Finops Agent';
     let ITSMMenuName = orgName ? `NOC Agent` : 'ITSM Agent';
     const navItems = [
@@ -534,7 +537,7 @@ const UNITY_AI_AGENTS_NAV_ITEMS = (svc: AppLevelService, orgName: string) => {
     return navItems;
 }
 
-const UNITY_AI_AGENTS_NAV_DATA = (svc: AppLevelService, orgName: string) => {
+const UNITY_AI_AGENTS_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `AI Agents Team` : 'AI Agents';
     const navItems = {
         name: `${menuName}`,
@@ -545,7 +548,7 @@ const UNITY_AI_AGENTS_NAV_DATA = (svc: AppLevelService, orgName: string) => {
     return navItems.children && navItems.children.length ? navItems : null;
 }
 
-const UNITY_AI_OBSERVABILITY_NAV_ITEMS = (svc: AppLevelService, orgName: string) => {
+const UNITY_AI_OBSERVABILITY_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
     let LLMMenuName = orgName ? `LLM Performance` : 'LLM';
     let VectorDBMenuName = orgName ? `Vector DB Performance` : 'Vector DB';
     let GPUMenuName = orgName ? `GPU Performance` : 'GPU';
@@ -569,7 +572,7 @@ const UNITY_AI_OBSERVABILITY_NAV_ITEMS = (svc: AppLevelService, orgName: string)
     ]
     return navItems;
 }
-const UNITY_AI_NAV_DATA = (svc: AppLevelService, orgName: string) => {
+const UNITY_AI_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `AI Performance` : 'AI Observability';
     const navItems = {
         name: `${menuName}`,
@@ -579,7 +582,7 @@ const UNITY_AI_NAV_DATA = (svc: AppLevelService, orgName: string) => {
     }
     return navItems.children && navItems.children.length ? navItems : null;
 }
-const UNITY_SERVICES_NAV_ITEMS = (svc: AppLevelService, orgName: string, isTenantOrg: boolean) => {
+const UNITY_SERVICES_NAV_ITEMS = (svc: PermissionService, orgName: string, isTenantOrg: boolean) => {
     let orchestrationMenuName = orgName ? `Agentic Orchestration` : 'Devops Automation';
     let navItems: UnityNavData[] = [
         {
@@ -588,7 +591,8 @@ const UNITY_SERVICES_NAV_ITEMS = (svc: AppLevelService, orgName: string, isTenan
             icon: 'fas fa-greater-than-equal',
             attributes: {
                 module: UnityModules.AIML_EVENT_MANAGEMENT,
-            }
+            },
+            routeAccess: UNITY_ROUTE_ACCESS.SERVICES_AIML
         },
         {
             name: `${orchestrationMenuName}`,
@@ -612,7 +616,8 @@ const UNITY_SERVICES_NAV_ITEMS = (svc: AppLevelService, orgName: string, isTenan
             icon: 'fas fa-leaf',
             attributes: {
                 module: UnityModules.SUSTAINABILITY,
-            }
+            },
+            routeAccess: UNITY_ROUTE_ACCESS.SERVICES_SUSTAINABILITY
         },
         {
             name: 'Network Configuration',
@@ -653,7 +658,7 @@ const UNITY_SERVICES_NAV_ITEMS = (svc: AppLevelService, orgName: string, isTenan
     navItems = navItems.map(nav => nav.attributes ? filterRequiredNavItems(nav, svc) : nav)
     return navItems.filter(n => n);
 }
-const UNITY_SERVICES_NAV_DATA = (svc: AppLevelService, orgName: string, isTenantOrg: boolean) => {
+const UNITY_SERVICES_NAV_DATA = (svc: PermissionService, orgName: string, isTenantOrg: boolean) => {
     let menuName = orgName ? `Cloud Intelligence` : 'UnityServices';
     const navItems = {
         name: `${menuName}`,
@@ -664,7 +669,7 @@ const UNITY_SERVICES_NAV_DATA = (svc: AppLevelService, orgName: string, isTenant
     return navItems.children && navItems.children.length ? navItems : null;
 }
 
-const UNITED_CLOUD_NAV_ITEMS = (svc: AppLevelService, orgName: string) => {
+const UNITED_CLOUD_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
     let publicCloudMenuName = orgName ? `Public Cloud \u2605` : 'Public Cloud';
     let menuName = orgName ? `UnitedConnect®` : 'UnityConnect';
     let navItems: UnityNavData[] = [
@@ -758,7 +763,7 @@ const UNITED_CLOUD_NAV_ITEMS = (svc: AppLevelService, orgName: string) => {
     navItems = navItems.map(nav => nav.attributes ? filterRequiredUnitedCloudNavItems(nav, svc) : nav)
     return navItems.filter(n => n);
 }
-const UNITED_CLOUD_NAV_DATA = (svc: AppLevelService, orgName: string) => {
+const UNITED_CLOUD_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `Cloud Management` : 'UnityCloud';
     const navItems = {
         name: `${menuName}`,
@@ -769,7 +774,7 @@ const UNITED_CLOUD_NAV_DATA = (svc: AppLevelService, orgName: string) => {
     return navItems.children && navItems.children.length ? navItems : null;
 }
 
-const UNITY_VIEW_NAV_ITEMS = (svc: AppLevelService) => {
+const UNITY_VIEW_NAV_ITEMS = (svc: PermissionService) => {
     let navItems: UnityNavData[] = [
         // {
         //     name: 'Dashboard',
@@ -824,7 +829,7 @@ const UNITY_VIEW_NAV_ITEMS = (svc: AppLevelService) => {
     navItems = navItems.map(nav => nav.attributes ? filterRequiredNavItems(nav, svc) : nav)
     return navItems.filter(n => n);
 }
-const UNITED_VIEW_NAV_DATA = (svc: AppLevelService, orgName: string) => {
+const UNITED_VIEW_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `Observability` : 'UnityView';
     const navItems = {
         name: `${menuName}`,
@@ -835,7 +840,7 @@ const UNITED_VIEW_NAV_DATA = (svc: AppLevelService, orgName: string) => {
     return navItems.children && navItems.children.length ? navItems : null;
 }
 
-const DASBOARD_NAV_ITEMS = (svc: AppLevelService) => {
+const DASBOARD_NAV_ITEMS = (svc: PermissionService) => {
     let navItems: UnityNavData[] = [
         {
             name: 'Default',
@@ -858,7 +863,7 @@ const DASBOARD_NAV_ITEMS = (svc: AppLevelService) => {
     return navItems.filter(n => n);
 }
 
-const DASHBOARD_NAV_DATA = (svc: AppLevelService) => {
+const DASHBOARD_NAV_DATA = (svc: PermissionService) => {
     const navItems = {
         name: 'Dashboard',
         url: '/app-dashboard',
@@ -868,7 +873,7 @@ const DASHBOARD_NAV_DATA = (svc: AppLevelService) => {
     return navItems.children && navItems.children.length ? navItems : null;
 }
 
-const HOME_NAV_DATA = (svc: AppLevelService) => {
+const HOME_NAV_DATA = (svc: PermissionService) => {
     const navItems = {
         name: 'Home',
         url: '/home',
@@ -879,7 +884,7 @@ const HOME_NAV_DATA = (svc: AppLevelService) => {
 }
 
 
-export const GET_UNITY_NAV_DATA = (svc: AppLevelService, userSvc: UserInfoService,) => {
+export const GET_UNITY_NAV_DATA = (svc: PermissionService, userSvc: UserInfoService,) => {
     let selfBrandedOrgName = userSvc.selfBrandedOrgName;
     let isTenantOrg = userSvc.isTenantOrg;
     let nav = [

@@ -1,6 +1,6 @@
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { HttpClientJsonpModule } from '@angular/common/http';
-import { APP_INITIALIZER, Injector, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -39,7 +39,6 @@ import { UserInfoService } from './shared/user-info.service';
 import { SidebarModule } from './sidebar/sidebar.module';
 import { UnityChatbotModule } from './unity-chatbot/unity-chatbot.module';
 
-export let AppInjector: Injector;
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
 };
@@ -120,7 +119,4 @@ export function useThemeFactory(service: UnityThemeService) { return () => servi
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(private injector: Injector) {
-    AppInjector = this.injector;
-  }
 }

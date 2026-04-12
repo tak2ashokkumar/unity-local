@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
 

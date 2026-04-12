@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { UnitySetupIntegrationService } from '../../unity-setup-integration.service';

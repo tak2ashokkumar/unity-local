@@ -7,7 +7,7 @@ import { PublicCloudOciCrudService } from 'src/app/shared/public-cloud-oci-crud/
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { UnitySetupIntegrationService } from '../unity-setup-integration.service';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 
 @Component({
   selector: 'usi-public-cloud-oracle-widget',

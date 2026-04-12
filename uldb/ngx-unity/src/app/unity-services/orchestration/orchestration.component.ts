@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { UnityModules, UnityPermissionSet } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
+import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { TabData } from 'src/app/shared/tabdata';
 
 @Component({
@@ -14,7 +15,8 @@ export class OrchestrationComponent implements OnInit, OnDestroy {
   subscr: Subscription;
   categoryId: string = '';
 
-  constructor(private router: Router) {
+  constructor(private router: Router,
+    private permissionService: PermissionService) {
     this.subscr = this.router.events.subscribe(event => {
       this.updateCategoryId(this.router.url);
       this.setTabItems();
@@ -35,7 +37,7 @@ export class OrchestrationComponent implements OnInit, OnDestroy {
 
   setTabItems() {
     let tabItems: TabData[] = [];
-    let modulePermSet = new UnityPermissionSet(UnityModules.DEVOPS_AUTOMATION);
+    let modulePermSet = this.permissionService.getPermissionSet(UnityModules.DEVOPS_AUTOMATION);
     tabData.forEach(td => {
       if (td.task) {
         let taskArr: string[] = td.task.split('|');

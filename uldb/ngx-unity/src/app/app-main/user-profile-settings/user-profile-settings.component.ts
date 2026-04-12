@@ -7,7 +7,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppDashboardListType } from 'src/app/app-dashboard/app-dashboard.type';
 import { AppLevelService } from 'src/app/app-level.service';
-import { UnityModules, UnityPermissionSet } from 'src/app/app.component';
+import { UnityModules, UnityPermissionSet } from 'src/app/shared/permissions/unity-permission-set';
+import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { TicketMgmtList } from 'src/app/shared/SharedEntityTypes/ticket-mgmt-list.type';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -113,12 +114,13 @@ export class UserProfileSettingsComponent implements OnInit, OnDestroy {
     private modalService: BsModalService,
     private appService: AppLevelService,
     public userInfo: UserInfoService,
+    private permissionService: PermissionService,
     private notification: AppNotificationService,
     private spinner: AppSpinnerService,
     private router: Router,
     private route: ActivatedRoute) {
-    this.aimlPermissionSet = new UnityPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
-    this.monitoringPermissionSet = new UnityPermissionSet(UnityModules.MONITORING);
+    this.aimlPermissionSet = this.permissionService.getPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
+    this.monitoringPermissionSet = this.permissionService.getPermissionSet(UnityModules.MONITORING);
   }
 
   ngOnInit() {

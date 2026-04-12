@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { UnityModules, UnityPermissionSet } from 'src/app/app.component';
+import { UnityModules, UnityPermissionSet } from 'src/app/shared/permissions/unity-permission-set';
 import { MapService } from 'src/app/map.service';
+import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 
 
@@ -21,15 +22,16 @@ export class DashboardComponent implements OnInit {
   dashboardPermissionSet: UnityPermissionSet;
   constructor(private cdr: ChangeDetectorRef,
     public mapService: MapService,
-    private user: UserInfoService) {
+    private user: UserInfoService,
+    private permissionService: PermissionService) {
     this.isAIMLEnabled = this.user.isAIMLEnabled;
-    this.privateCloudPermissionSet = new UnityPermissionSet(UnityModules.PRIVATE_CLOUD);
-    this.publicCloudPermissionSet = new UnityPermissionSet(UnityModules.PUBLIC_CLOUD);
-    this.datacenterPermissionSet = new UnityPermissionSet(UnityModules.DATACENTER);
-    this.ticketMgmtPermissionSet = new UnityPermissionSet(UnityModules.TICKET_MANAGEMENT);
-    this.aimlPermissionSet = new UnityPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
-    this.maintenancePermissionSet = new UnityPermissionSet(UnityModules.MAINTENENCE);
-    this.dashboardPermissionSet = new UnityPermissionSet(UnityModules.DASHBOARD);
+    this.privateCloudPermissionSet = this.permissionService.getPermissionSet(UnityModules.PRIVATE_CLOUD);
+    this.publicCloudPermissionSet = this.permissionService.getPermissionSet(UnityModules.PUBLIC_CLOUD);
+    this.datacenterPermissionSet = this.permissionService.getPermissionSet(UnityModules.DATACENTER);
+    this.ticketMgmtPermissionSet = this.permissionService.getPermissionSet(UnityModules.TICKET_MANAGEMENT);
+    this.aimlPermissionSet = this.permissionService.getPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
+    this.maintenancePermissionSet = this.permissionService.getPermissionSet(UnityModules.MAINTENENCE);
+    this.dashboardPermissionSet = this.permissionService.getPermissionSet(UnityModules.DASHBOARD);
   }
 
   ngOnInit() { }

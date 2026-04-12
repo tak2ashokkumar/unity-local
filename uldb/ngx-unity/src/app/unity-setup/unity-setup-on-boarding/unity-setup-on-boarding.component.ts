@@ -3,8 +3,8 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, Subscription } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
-import { AppLevelService } from 'src/app/app-level.service';
-import { UnityModules, UnityPermissionSet } from 'src/app/app.component';
+import { UnityModules, UnityPermissionSet } from 'src/app/shared/permissions/unity-permission-set';
+import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -37,9 +37,10 @@ export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
     private notification: AppNotificationService,
     private onbSvc: UnitySetupOnBoardingService,
     private modalService: BsModalService,
-    private userInfo: UserInfoService) {
-    this.unityCollectorPermissionSet = new UnityPermissionSet(UnityModules.UNITY_COLLECTOR);
-    this.onboardingPermissionSet = new UnityPermissionSet(UnityModules.ONBOARDING);
+    private userInfo: UserInfoService,
+    private permissionService: PermissionService) {
+    this.unityCollectorPermissionSet = this.permissionService.getPermissionSet(UnityModules.UNITY_COLLECTOR);
+    this.onboardingPermissionSet = this.permissionService.getPermissionSet(UnityModules.ONBOARDING);
     this.route.data.pipe(take(1)).subscribe((data: { collectors: PaginatedResult<any> }) => {
       this.collectorsCount = data.collectors.count;
       this.setDiscoveryTab();

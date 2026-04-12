@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 import { CRUDActionTypes, ServerSidePlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { PcCrudService } from 'src/app/shared/pc-crud/pc-crud.service';
 import { PrivateCloudCountType, PrivateCLoudFastType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';

@@ -7,7 +7,7 @@ import { UsiJiraCrudService } from '../usi-jira-crud/usi-jira-crud.service';
 import { takeUntil } from 'rxjs/operators';
 import { UnitySetupIntegrationService } from '../../unity-setup-integration.service';
 import { Subject } from 'rxjs';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 
 @Component({
   selector: 'usi-jira-widget',

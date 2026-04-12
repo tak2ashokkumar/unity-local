@@ -12,7 +12,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ModulesAndPermissionsType } from '../usum-permission-sets.type';
 import { PermissionSetType } from 'src/app/shared/SharedEntityTypes/user-mgmt.type';
 import { cloneDeep as _clone } from 'lodash-es';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 
 @Component({

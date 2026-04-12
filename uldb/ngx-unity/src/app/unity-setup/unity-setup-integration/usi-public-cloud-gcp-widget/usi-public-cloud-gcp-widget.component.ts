@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 import { UnitySetupIntegrationService } from '../unity-setup-integration.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 
 @Component({
   selector: 'usi-public-cloud-gcp-widget',

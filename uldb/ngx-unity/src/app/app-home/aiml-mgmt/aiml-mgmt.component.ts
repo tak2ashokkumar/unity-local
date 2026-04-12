@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules, UnityPermissionSet } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
+import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -22,7 +23,8 @@ export class AimlMgmtComponent implements OnInit, OnDestroy {
     private spinner: AppSpinnerService,
     private notification: AppNotificationService,
     private route: ActivatedRoute,
-    private router: Router,) { }
+    private router: Router,
+    private permissionService: PermissionService) { }
 
   ngOnInit(): void {
   }
@@ -61,8 +63,7 @@ export class AimlMgmtComponent implements OnInit, OnDestroy {
   }
 
   hasAIMLAccess() {
-    let aimlPermissionSet = new UnityPermissionSet(UnityModules.AIML_EVENT_MANAGEMENT);
-    return aimlPermissionSet ? aimlPermissionSet.view : false;
+    return this.permissionService.hasViewAccess(UnityModules.AIML_EVENT_MANAGEMENT);
   }
 
   goTo(path?: string) {

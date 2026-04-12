@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { UnityModules, UnityPermissionSet } from 'src/app/app.component';
+import { UnityModules, UnityPermissionSet } from 'src/app/shared/permissions/unity-permission-set';
+import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 
 
@@ -12,10 +13,11 @@ export class InfraAsAServiceComponent implements OnInit {
   privateCloudPermissionSet: UnityPermissionSet;
   publicCloudPermissionSet: UnityPermissionSet;
   servicesPermissionSet: UnityPermissionSet;
-  constructor(private user: UserInfoService,) {
-    this.privateCloudPermissionSet = new UnityPermissionSet(UnityModules.PRIVATE_CLOUD);
-    this.publicCloudPermissionSet = new UnityPermissionSet(UnityModules.PUBLIC_CLOUD);
-    this.servicesPermissionSet = new UnityPermissionSet(UnityModules.SERVICES);
+  constructor(private user: UserInfoService,
+    private permissionService: PermissionService) {
+    this.privateCloudPermissionSet = this.permissionService.getPermissionSet(UnityModules.PRIVATE_CLOUD);
+    this.publicCloudPermissionSet = this.permissionService.getPermissionSet(UnityModules.PUBLIC_CLOUD);
+    this.servicesPermissionSet = this.permissionService.getPermissionSet(UnityModules.SERVICES);
   }
 
   ngOnInit() {

@@ -6,7 +6,7 @@ import { UnitySetupIntegrationService } from '../../unity-setup-integration.serv
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { TICKET_MGMT_TYPE } from 'src/app/shared/app-utility/app-utility.service';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 
 @Component({
   selector: 'usi-servicenow-widget',

@@ -7,7 +7,7 @@ import { CRUDActionTypes, TICKET_MGMT_TYPE } from 'src/app/shared/app-utility/ap
 import { UnitySetupIntegrationService } from '../../unity-setup-integration.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { UnityModules } from 'src/app/app.component';
+import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 
 @Component({
   selector: 'usi-ms-dynamics-crm-widget',

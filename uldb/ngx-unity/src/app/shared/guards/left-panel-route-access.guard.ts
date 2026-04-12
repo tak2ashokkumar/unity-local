@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { AppLevelService } from '../../app-level.service';
 import { GET_UNITY_NAV_DATA, UnityNavData } from '../../app-main/unity-nav';
+import { PermissionService } from '../permissions/permission.service';
 import { UserInfoService } from '../user-info.service';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { UserInfoService } from '../user-info.service';
 export class LeftPanelRouteAccessGuard implements CanActivate, CanActivateChild {
 
   constructor(
-    private readonly appService: AppLevelService,
+    private readonly permissionService: PermissionService,
     private readonly router: Router,
     private readonly userService: UserInfoService) { }
 
@@ -36,8 +36,7 @@ export class LeftPanelRouteAccessGuard implements CanActivate, CanActivateChild 
   private getAllowedPaths(): { exact: Set<string>; prefixes: string[] } {
     const exact = new Set<string>();
     const prefixes = new Set<string>();
-    this.collectAllowedPaths(GET_UNITY_NAV_DATA(this.appService, this.userService), exact, prefixes);
-    this.addKnownChildRouteAliases(exact, prefixes);
+    this.collectAllowedPaths(GET_UNITY_NAV_DATA(this.permissionService, this.userService), exact, prefixes);
 
     return {
       exact,
@@ -58,26 +57,20 @@ export class LeftPanelRouteAccessGuard implements CanActivate, CanActivateChild 
         }
       }
 
+      this.addRouteAccessAliases(item, exact, prefixes);
+
       if (children.length) {
         this.collectAllowedPaths(children, exact, prefixes);
       }
     });
   }
 
-  private addKnownChildRouteAliases(exact: Set<string>, prefixes: Set<string>): void {
-    const aliases = [
-      { source: '/reports/manage/new-reports', alias: '/reports/manage' },
-      { source: '/services/aiml', alias: '/services/aiml-summary' },
-      { source: '/services/aiml', alias: '/services/aiml-event-mgmt' },
-      { source: '/services/greeenIT/dashboard', alias: '/services/greeenIT' },
-      { source: '/setup/cost-plan/resource-model', alias: '/setup/cost-plan/resource-mapping' },
-      { source: '/support/documentation/userguide', alias: '/support/documentation' }
-    ];
-
-    aliases.forEach(({ source, alias }) => {
-      if (exact.has(source) || prefixes.has(source)) {
-        exact.add(alias);
-        prefixes.add(alias);
+  private addRouteAccessAliases(item: UnityNavData, exact: Set<string>, prefixes: Set<string>): void {
+    (item.routeAccess?.aliases || []).forEach(alias => {
+      const normalizedAlias = this.normalizeUrl(alias);
+      if (normalizedAlias) {
+        exact.add(normalizedAlias);
+        prefixes.add(normalizedAlias);
       }
     });
   }
