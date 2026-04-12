@@ -1,72 +1,209 @@
-import { Component, Input, Inject, HostBinding, OnInit, OnDestroy, Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { Component, HostBinding, Inject, Input, OnChanges, OnDestroy, OnInit, Renderer2, SimpleChanges } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
+import { UnityNavData } from 'src/app/app-main/unity-nav';
 
-export const sidebarCssClasses: Array<string> = [
-  'sidebar-show',
-  'sidebar-sm-show',
-  'sidebar-md-show',
-  'sidebar-lg-show',
-  'sidebar-xl-show'
-];
+type NavStateContext = {
+  items: UnityNavData[];
+  parentKey: string;
+};
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './app-sidebar.component.html',
   styleUrls: ['./app-sidebar.component.scss']
 })
-export class AppSidebarComponent implements OnInit, OnDestroy {
+export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() compact: boolean;
+  @Input() disabled = false;
   @Input() display: any;
   @Input() fixed: boolean;
   @Input() minimized: boolean;
+  @Input() navItems: UnityNavData[] = [];
   @Input() offCanvas: boolean;
 
   @HostBinding('class.sidebar') sidebarClass = true;
 
+  private readonly destroy$ = new Subject<void>();
+  private readonly appliedBodyClasses = new Set<string>();
+
+  activeKeys = new Set<string>();
+  expandedKeys = new Set<string>();
+
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
-    private renderer: Renderer2) { }
+    private readonly renderer: Renderer2,
+    private readonly router: Router) { }
 
   ngOnInit(): void {
-    this.displayBreakpoint(this.display);
-    this.isCompact(this.compact);
-    this.isFixed(this.fixed);
-    this.isMinimized(this.minimized);
-    this.isOffCanvas(this.offCanvas);
+    this.applyBodyClasses();
+    this.rebuildActiveState();
+
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((_event: NavigationEnd) => {
+        this.expandedKeys.clear();
+        this.rebuildActiveState();
+      });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.compact || changes.display || changes.fixed || changes.minimized || changes.offCanvas) {
+      this.applyBodyClasses();
+    }
+
+    if (changes.navItems && !changes.navItems.firstChange) {
+      this.expandedKeys.clear();
+      this.rebuildActiveState();
+    }
   }
 
   ngOnDestroy(): void {
-    this.renderer.removeClass(this.document.body, 'sidebar-fixed');
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.clearBodyClasses();
   }
 
-  isCompact(compact: boolean = this.compact): void {
-    if (compact) {
-      this.renderer.addClass(this.document.body, 'sidebar-compact');
+  isDivider(item: UnityNavData): boolean { return !!item.divider; }
+  isDropdown(item: UnityNavData): boolean { return !!item.children?.length; }
+  isExternalLink(item: UnityNavData): boolean { return item.url?.startsWith('http') ?? false; }
+  isHidden(item: UnityNavData): boolean { return !!this.getAttributes(item).hide; }
+  isTitle(item: UnityNavData): boolean { return !!item.title; }
+
+  trackByNav(index: number, item: UnityNavData): string {
+    return item.url ?? item.name ?? `${index}`;
+  }
+
+  getItemKey(parentKey: string, item: UnityNavData, index: number): string {
+    return `${parentKey}/${item.url ?? item.name ?? index}`;
+  }
+
+  getItemClasses(item: UnityNavData, key: string): string[] {
+    const classes = ['nav-item'];
+    if (this.isDropdown(item)) {
+      classes.push('nav-dropdown');
+      if (this.isOpen(key)) {
+        classes.push('open');
+      }
+    }
+    if (item.class) {
+      classes.push(item.class);
+    }
+    return classes;
+  }
+
+  getLinkClasses(item: UnityNavData): Record<string, boolean> {
+    const disabled = this.isDisabled(item);
+    const classes: Record<string, boolean> = {
+      'nav-link': true,
+      'disabled': disabled,
+      'btn-link': disabled
+    };
+
+    if (item.variant) {
+      classes[`nav-link-${item.variant}`] = true;
+    }
+
+    return classes;
+  }
+
+  isBadge(item: UnityNavData): boolean { return !!item.badge; }
+  isBetaItem(item: UnityNavData): boolean { return !!this.getAttributes(item).isBeta; }
+  isDisabled(item: UnityNavData): boolean { return !!this.getAttributes(item).disabled; }
+  isIcon(item: UnityNavData): boolean { return !!item.icon; }
+
+  isOpen(key: string): boolean {
+    return this.expandedKeys.has(key) || this.activeKeys.has(key);
+  }
+
+  hideMobile(): void {
+    if (this.document.body.classList.contains('sidebar-show')) {
+      this.renderer.removeClass(this.document.body, 'sidebar-show');
     }
   }
 
-  isFixed(fixed: boolean = this.fixed): void {
-    if (fixed) {
-      this.renderer.addClass(this.document.body, 'sidebar-fixed');
+  toggleDropdown(key: string, $event: Event): void {
+    $event.preventDefault();
+    if (this.expandedKeys.has(key)) {
+      this.expandedKeys.delete(key);
+      return;
+    }
+    this.expandedKeys.add(key);
+  }
+
+  private applyBodyClasses(): void {
+    this.clearBodyClasses();
+
+    if (this.display !== false) {
+      const cssClass = this.display ? `sidebar-${this.display}-show` : 'sidebar-show';
+      this.addBodyClass(cssClass);
+    }
+
+    if (this.compact) {
+      this.addBodyClass('sidebar-compact');
+    }
+
+    if (this.fixed) {
+      this.addBodyClass('sidebar-fixed');
+    }
+
+    if (this.minimized) {
+      this.addBodyClass('sidebar-minimized');
+    }
+
+    if (this.offCanvas) {
+      this.addBodyClass('sidebar-off-canvas');
     }
   }
 
-  isMinimized(minimized: boolean = this.minimized): void {
-    if (minimized) {
-      this.renderer.addClass(this.document.body, 'sidebar-minimized');
-    }
+  private addBodyClass(cssClass: string): void {
+    this.renderer.addClass(this.document.body, cssClass);
+    this.appliedBodyClasses.add(cssClass);
   }
 
-  isOffCanvas(offCanvas: boolean = this.offCanvas): void {
-    if (offCanvas) {
-      this.renderer.addClass(this.document.body, 'sidebar-off-canvas');
-    }
+  private clearBodyClasses(): void {
+    this.appliedBodyClasses.forEach(cssClass => this.renderer.removeClass(this.document.body, cssClass));
+    this.appliedBodyClasses.clear();
   }
 
-  displayBreakpoint(display: any = this.display): void {
-    if (display !== false) {
-      const cssClass = display ? `sidebar-${display}-show` : sidebarCssClasses[0];
-      this.renderer.addClass(this.document.body, cssClass);
-    }
+  private getAttributes(item: UnityNavData): { [key: string]: any } {
+    return (item.attributes as { [key: string]: any }) || {};
+  }
+
+  private rebuildActiveState(): void {
+    this.activeKeys.clear();
+    this.walkNavState({
+      items: this.navItems || [],
+      parentKey: 'root'
+    });
+  }
+
+  private walkNavState(context: NavStateContext): boolean {
+    let hasActiveItem = false;
+
+    context.items.forEach((item, index) => {
+      const key = this.getItemKey(context.parentKey, item, index);
+
+      if (this.isHidden(item)) {
+        return;
+      }
+
+      const isCurrentRoute = !!item.url && this.router.isActive(item.url, false);
+      const hasActiveChild = item.children?.length
+        ? this.walkNavState({ items: item.children, parentKey: key })
+        : false;
+
+      if (isCurrentRoute || hasActiveChild) {
+        this.activeKeys.add(key);
+        hasActiveItem = true;
+      }
+    });
+
+    return hasActiveItem;
   }
 }

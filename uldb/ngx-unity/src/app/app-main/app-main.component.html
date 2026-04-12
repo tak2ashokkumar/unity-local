@@ -88,16 +88,14 @@
     </ul>
 </app-header>
 <div class="app-body">
-    <app-sidebar [fixed]="true" [display]="'lg'" *ngIf="navItems.length">
-        <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="sidebarMinimized">
-            <li class="nav-item">
-                <a class="nav-link" href="javascript:void(0);" (click)="reportAnIssue()">
-                    <i class="nav-icon fa fa-envelope"></i>
-                    Report an Issue</a>
-            </li>
-        </app-sidebar-nav>
+    <app-sidebar [fixed]="true" [display]="'lg'" [navItems]="navItems" [disabled]="sidebarMinimized" *ngIf="navItems.length">
+        <li sidebar-extra-nav class="nav-item">
+            <a class="nav-link" href="javascript:void(0);" (click)="reportAnIssue()">
+                <i class="nav-icon fa fa-envelope"></i>
+                Report an Issue</a>
+        </li>
         <!-- Bottom bar: trial button (left) + minimizer chevron (right) in one row -->
-        <div class="sidebar-bottom-bar">
+        <div sidebar-footer class="sidebar-bottom-bar">
             <div class="sidebar-trial-wrapper" *ngIf="!sidebarMinimized && isPlayground">
 
                 <button type="button" class="sidebar-trial-btn" (click)="openFreeTrial()"
@@ -106,7 +104,8 @@
                     <span>Upgrade to free trial</span>
                 </button>
             </div>
-            <app-sidebar-minimizer></app-sidebar-minimizer>
+            <button class="sidebar-minimizer" type="button" aria-label="Toggle sidebar" appSidebarMinimizer
+                appBrandMinimizer></button>
         </div>
     </app-sidebar>
     <app-notification></app-notification>

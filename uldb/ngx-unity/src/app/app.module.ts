@@ -26,6 +26,7 @@ import { TwoFactorAuthComponent } from './app-main/two-factor-auth/two-factor-au
 import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
 import { UserProfileSettingsComponent } from './app-main/user-profile-settings/user-profile-settings.component';
 import { AppRoutingModule } from './app-routing.module';
+import { AppNoAccessComponent } from './app-no-access/app-no-access.component';
 import { AppTermialViewComponent } from './app-termial-view/app-termial-view.component';
 import { AppWelcomePageComponent } from './app-welcome-page/app-welcome-page.component';
 import { AppComponent } from './app.component';
@@ -57,6 +58,7 @@ export function useThemeFactory(service: UnityThemeService) { return () => servi
     UserProfileSettingsComponent,
     TwoFactorAuthComponent,
     AppWelcomePageComponent,
+    AppNoAccessComponent,
     GlobalSearchComponent,
     UserProfileAddModelComponent,
   ],

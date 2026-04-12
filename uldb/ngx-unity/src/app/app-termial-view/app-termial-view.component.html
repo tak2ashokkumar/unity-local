@@ -10,9 +10,9 @@
 </app-header>
 
 <div class="app-body">
-  <app-sidebar [fixed]="true" [display]="'lg'">
-    <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="sidebarMinimized"></app-sidebar-nav>
-    <app-sidebar-minimizer></app-sidebar-minimizer>
+  <app-sidebar [fixed]="true" [display]="'lg'" [navItems]="navItems" [disabled]="sidebarMinimized">
+    <button sidebar-footer class="sidebar-minimizer" type="button" aria-label="Toggle sidebar" appSidebarMinimizer
+      appBrandMinimizer></button>
   </app-sidebar>
   <app-notification></app-notification>
   <app-spinner [name]="'main'"></app-spinner>

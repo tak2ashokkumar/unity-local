@@ -4,12 +4,16 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AppMainComponent } from './app-main/app-main.component';
 import { TwoFactorAuthComponent } from './app-main/two-factor-auth/two-factor-auth.component';
 import { UserProfileSettingsComponent } from './app-main/user-profile-settings/user-profile-settings.component';
+import { AppNoAccessComponent } from './app-no-access/app-no-access.component';
 import { AppTermialViewComponent } from './app-termial-view/app-termial-view.component';
 import { AppWelcomePageComponent } from './app-welcome-page/app-welcome-page.component';
 import { DefaultComponent } from './default/default.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
 import { WelcomePageGuardService } from './welcome-page-guard.service';
 import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
+import { LeftPanelRouteAccessGuard } from './shared/guards/left-panel-route-access.guard';
+import { AiInfraMgmtGuard } from './unity-ai-infra-mgmt/ai-infra-mgmt.guard';
+import { CostAnalysisGuard } from './unity-cost-analysis/cost-analysis.guard';
 
 export const routes: Routes = [
   {
@@ -25,6 +29,8 @@ export const routes: Routes = [
       // ...APP_DASHBOARD_ROUTES,
       {
         path: 'app-dashboard',
+        canActivate: [LeftPanelRouteAccessGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard],
         data: {
           breadcrumb: {
             title: 'Dashboard'
@@ -37,7 +43,18 @@ export const routes: Routes = [
         loadChildren: () => import('src/app/app-home/app-home.module').then(m => m.AppHomeModule)
       },
       {
+        path: 'no-access',
+        component: AppNoAccessComponent,
+        data: {
+          breadcrumb: {
+            title: 'No Access'
+          }
+        }
+      },
+      {
         path: 'unityview',
+        canActivate: [LeftPanelRouteAccessGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard],
         data: {
           breadcrumb: {
             title: 'Unity View'
@@ -47,6 +64,8 @@ export const routes: Routes = [
       },
       {
         path: 'unitycloud',
+        canActivate: [LeftPanelRouteAccessGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard],
         data: {
           breadcrumb: {
             title: 'Unity Cloud'
@@ -56,6 +75,8 @@ export const routes: Routes = [
       },
       {
         path: 'services',
+        canActivate: [LeftPanelRouteAccessGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard],
         data: {
           breadcrumb: {
             title: 'Unity Services'
@@ -65,6 +86,8 @@ export const routes: Routes = [
       },
       {
         path: 'cost-analysis',
+        canActivate: [LeftPanelRouteAccessGuard, CostAnalysisGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard, CostAnalysisGuard],
         data: {
           breadcrumb: {
             title: 'Cost Analysis'
@@ -74,6 +97,8 @@ export const routes: Routes = [
       },
       {
         path: 'unity-ai-infra-mgmt',
+        canActivate: [LeftPanelRouteAccessGuard, AiInfraMgmtGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard, AiInfraMgmtGuard],
         data: {
           breadcrumb: {
             title: 'AI Infra Management'
@@ -83,6 +108,8 @@ export const routes: Routes = [
       },
       {
         path: 'reports',
+        canActivate: [LeftPanelRouteAccessGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard],
         data: {
           breadcrumb: {
             title: 'Unity Reports'
@@ -92,6 +119,8 @@ export const routes: Routes = [
       },
       {
         path: 'setup',
+        canActivate: [LeftPanelRouteAccessGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard],
         data: {
           breadcrumb: {
             title: 'Unity Setup'
@@ -101,6 +130,8 @@ export const routes: Routes = [
       },
       {
         path: 'support',
+        canActivate: [LeftPanelRouteAccessGuard],
+        canActivateChild: [LeftPanelRouteAccessGuard],
         data: {
           breadcrumb: {
             title: 'Support',

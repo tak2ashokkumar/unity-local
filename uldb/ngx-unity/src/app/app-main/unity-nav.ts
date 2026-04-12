@@ -1,5 +1,6 @@
 import { AppLevelService } from "../app-level.service";
 import { UnityModules, UnityPermissionSet } from "../app.component";
+import { canAccessAiAgents, canAccessAiInfraManagement, canAccessCostAnalysis } from "../shared/left-panel-access.util";
 import { UserInfoService } from "../shared/user-info.service";
 
 export interface UnityNavData {
@@ -497,8 +498,9 @@ const UNITY_COST_ANALYSIS_NAV_ITEMS = (svc: AppLevelService) => {
     navItems = navItems.map(nav => nav.attributes ? filterRequiredUnityCostAnalysisNavItems(nav, svc) : nav);
     return navItems.filter(n => n);
 }
-const UNITY_COST_ANALYSIS_NAV_DATA = (svc: AppLevelService, orgName: string) => {
-    if (orgName) return null;
+const UNITY_COST_ANALYSIS_NAV_DATA = (svc: AppLevelService, userSvc: UserInfoService) => {
+    if (!canAccessCostAnalysis(userSvc)) return null;
+    const orgName = userSvc.selfBrandedOrgName;
     let menuName = orgName ? `FINOPS` : 'Cost Analysis';
     const navItems = {
         name: `${menuName}`,
@@ -887,15 +889,15 @@ export const GET_UNITY_NAV_DATA = (svc: AppLevelService, userSvc: UserInfoServic
         UNITED_CLOUD_NAV_DATA(svc, selfBrandedOrgName),
         UNITY_SERVICES_NAV_DATA(svc, selfBrandedOrgName, isTenantOrg),
         UNITY_AI_NAV_DATA(svc, selfBrandedOrgName),
-        UNITY_COST_ANALYSIS_NAV_DATA(svc, selfBrandedOrgName),
+        UNITY_COST_ANALYSIS_NAV_DATA(svc, userSvc),
         UNITY_REPORT_NAV_DATA(svc, selfBrandedOrgName),
         UNITY_SUPPORT_NAV_DATA(svc, selfBrandedOrgName),
         UNITY_SETUP_NAV_DATA(svc, selfBrandedOrgName),
     ];
-    if (selfBrandedOrgName) {
+    if (canAccessAiInfraManagement(userSvc)) {
         nav.splice(5, 0, UNITY_AI_INFRA_MGMT_NAV_DATA());
     }
-    if (isTenantOrg) {
+    if (canAccessAiAgents(userSvc)) {
         nav.splice(selfBrandedOrgName ? 6 : 5, 0, UNITY_AI_AGENTS_NAV_DATA(svc, selfBrandedOrgName));
     }
     return nav.filter(n => n);

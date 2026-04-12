@@ -1,4 +1,5 @@
 import { Routes } from "@angular/router";
+import { AiAgentsGuard } from "./ai-agents.guard";
 import { AiAgentsComponent } from "./ai-agents.component";
 import { AiAgentsNetworkAgentComponent } from "./ai-agents-network-agent/ai-agents-network-agent.component";
 import { AiAgentsFinopsAgentComponent } from "./ai-agents-finops-agent/ai-agents-finops-agent.component";
@@ -14,6 +15,8 @@ export const AI_AGENTS_ROUTES: Routes = [
     {
         path: 'ai-agents',
         component: AiAgentsComponent,
+        canActivate: [AiAgentsGuard],
+        canActivateChild: [AiAgentsGuard],
         data: {
             breadcrumb: {
                 title: 'AI Agents',
