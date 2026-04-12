@@ -94,6 +94,9 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
         classes.push('open');
       }
     }
+    if (this.activeKeys.has(key)) {
+      classes.push('active-nav-item');
+    }
     if (item.class) {
       classes.push(item.class);
     }
@@ -237,8 +240,21 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
     const routeUrls = [
       item.url,
       ...(item.routeAccess?.aliases || [])
-    ];
+    ].reduce((urls, url) => {
+      urls.push(url);
+
+      const normalizedUrl = this.normalizeRouteUrl(url);
+      if (normalizedUrl !== url) {
+        urls.push(normalizedUrl);
+      }
+
+      return urls;
+    }, [] as string[]);
     return routeUrls.some(url => this.router.isActive(url, false));
+  }
+
+  private normalizeRouteUrl(url: string): string {
+    return url.length > 1 ? url.replace(/\/+$/, '') : url;
   }
 
 }
