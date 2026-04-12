@@ -1,107 +1,107 @@
 {
-  "count": 23,
-  "next": "http://10.192.11.207:8000/chatbot/history/query/?page=2&page_size=10",
+  "count": 45,
+  "next": "https://unity.unitedlayer.com/chatbot/history/query/?page=2&page_size=10",
   "previous": null,
   "results": [
     {
-      "id": 506,
-      "user": "UnityDemo",
-      "query": "How many hypervisors are there in my organization?",
-      "module": "Unity Cloud",
-      "tokens": 8883,
-      "response_time_ms": 3274,
+      "id": 4527,
+      "user": "TenantA01",
+      "query": "What is the current month cost of AWS Cloud?",
+      "module": "Unity Setup",
+      "tokens": 13203,
+      "response_time_ms": 2371,
       "user_reaction": "average",
       "is_successful": true
     },
     {
-      "id": 505,
-      "user": "UnityDemo",
-      "query": "Give me a list of my AWS services.",
-      "module": "Unity Cloud",
-      "tokens": 8878,
-      "response_time_ms": 2492,
+      "id": 4526,
+      "user": "TenantA01",
+      "query": "What is the current month cost of Oracle Cloud?",
+      "module": "Unity Setup",
+      "tokens": 13203,
+      "response_time_ms": 7910,
+      "user_reaction": "dislike",
+      "is_successful": true
+    },
+    {
+      "id": 4525,
+      "user": "TenantA01",
+      "query": "How many firewalls and switches are up/down in the organization?",
+      "module": "Unity Setup",
+      "tokens": 13208,
+      "response_time_ms": 2032,
+      "user_reaction": "like",
+      "is_successful": true
+    },
+    {
+      "id": 4524,
+      "user": "TenantA01",
+      "query": "How many firewalls and switches are up/down in the organization?",
+      "module": "Unity Setup",
+      "tokens": 13193,
+      "response_time_ms": 1538,
+      "user_reaction": "like",
+      "is_successful": false
+    },
+    {
+      "id": 4523,
+      "user": "TenantA01",
+      "query": "Fetch ServiceNow tickets with priority Moderate in the last 9 days.",
+      "module": "Unity Setup",
+      "tokens": 13220,
+      "response_time_ms": 2532,
+      "user_reaction": "dislike",
+      "is_successful": false
+    },
+    {
+      "id": 4522,
+      "user": "TenantA01",
+      "query": "Fetch ServiceNow tickets with priority Moderate in the last 9 days.",
+      "module": "Unity Setup",
+      "tokens": 13285,
+      "response_time_ms": 5538,
       "user_reaction": "average",
       "is_successful": true
     },
     {
-      "id": 504,
-      "user": "UnityDemo",
-      "query": "Give me a list of my AWS services.",
-      "module": "Unity Cloud",
-      "tokens": 8878,
-      "response_time_ms": 1869,
-      "user_reaction": "average",
-      "is_successful": true
-    },
-    {
-      "id": 503,
-      "user": "UnityDemo",
-      "query": "How many switches are there in my organization?",
-      "module": "Unity Cloud",
-      "tokens": 8878,
-      "response_time_ms": 1304,
-      "user_reaction": "average",
-      "is_successful": true
-    },
-    {
-      "id": 502,
-      "user": "UnityDemo",
-      "query": "How many hypervisors are there in my organization?",
-      "module": "Unity Cloud",
-      "tokens": 8883,
-      "response_time_ms": 1814,
-      "user_reaction": "average",
-      "is_successful": true
-    },
-    {
-      "id": 501,
-      "user": "UnityDemo",
-      "query": "Give me a list of my Azure services.",
-      "module": "Unity Cloud",
-      "tokens": 8877,
-      "response_time_ms": 2891,
-      "user_reaction": "average",
-      "is_successful": true
-    },
-    {
-      "id": 500,
-      "user": "UnityDemo",
-      "query": "How many public clouds are available in my organization?",
-      "module": "Unity Cloud",
-      "tokens": 8877,
-      "response_time_ms": 2167,
-      "user_reaction": "average",
-      "is_successful": true
-    },
-    {
-      "id": 288,
-      "user": "UnityDemo",
-      "query": "Cost overview",
-      "module": "Cost Analysis",
-      "tokens": 6348,
-      "response_time_ms": 1021,
+      "id": 4521,
+      "user": "TenantA01",
+      "query": "Fetch ServiceNow tickets with priority Moderate in the last 9 days.",
+      "module": "Unity Setup",
+      "tokens": 13220,
+      "response_time_ms": 1977,
       "user_reaction": "average",
       "is_successful": false
     },
     {
-      "id": 287,
-      "user": "UnityDemo",
-      "query": "Show me cost overview",
-      "module": "Cost Analysis",
-      "tokens": 6349,
-      "response_time_ms": 956,
+      "id": 4520,
+      "user": "TenantA01",
+      "query": "Show all services available in the service catalog.",
+      "module": "Unity Setup",
+      "tokens": 13189,
+      "response_time_ms": 1189,
       "user_reaction": "average",
-      "is_successful": false
+      "is_successful": true
     },
     {
-      "id": 89,
-      "user": "UnityDemo",
-      "query": "private",
-      "module": "dashboard",
-      "tokens": 2015,
-      "response_time_ms": 1023,
+      "id": 4519,
+      "user": "TenantA01",
+      "query": "List workflows that succeeded in the last 24 hours.",
+      "module": "Unity Setup",
+      "tokens": 13203,
+      "response_time_ms": 4143,
       "user_reaction": "average",
-      "is_successful": false
+      "is_successful": true
+    },
+    {
+      "id": 4518,
+      "user": "TenantA01",
+      "query": "List the last 10/20/30 login activities.",
+      "module": "Unity Setup",
+      "tokens": 13203,
+      "response_time_ms": 5928,
+      "user_reaction": "average",
+      "is_successful": true
     }
   ]
 }

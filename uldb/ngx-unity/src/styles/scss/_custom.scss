@@ -4,8 +4,8 @@
   padding: 0 20px;
 }
 
-// ── Main column: stretch to full viewport height ────────────────────────────
-// CoreUI's flex height chain (app-root → .app-body → .main) is broken when
+// Main column: stretch to full viewport height
+// CoreUI's flex height chain (app-root .app-body .main) is broken when
 // the Angular router inserts <app-main> between app-root and .app-body.
 // Without a definite height, margin-top:auto on the footer has zero free
 // space and the footer floats immediately after content.
@@ -21,7 +21,7 @@
   margin-top: auto;
 }
 
-// Ensure content never touches the footer — consistent bottom breathing room
+// Ensure content never touches the footer consistent bottom breathing room
 .app-body>.main>div {
   padding-bottom: 1.5rem;
 }
@@ -37,7 +37,7 @@
     padding: 0.75rem 0.5rem;
   }
 
-  //branch part for tree structure
+  // branch part for tree structure
   ul.tree {
     list-style: none;
 
@@ -100,73 +100,96 @@
   }
 
   .nav-dropdown>.nav-dropdown-items>.nav-item>.nav-link {
-    padding-left: 1.5rem;
+    padding-left: 1.2rem;
   }
 }
 
-// ── Sidebar bottom bar: trial button (left) + minimiser chevron (right) ────
+// Sidebar bottom bar: trial button (left) + minimiser chevron (right)
 // The wrapper is a flex-row placed at the bottom of the sidebar flex-column.
 // Replace() moves <button.sidebar-minimizer> into this wrapper, making the
 // two buttons natural siblings in a row.
 //
 // CoreUI sets .sidebar-minimizer { flex: 0 0 50px } for the column context.
-// In a row context that same flex-basis becomes the button's WIDTH — still 50px,
-// which equals $sidebar-minimized-width. ✓
+// In this custom bottom row, scope overrides away
+// from CoreUI's fixed minimized-state behavior.
 //
 // Minimised state: CoreUI makes .sidebar-minimizer position:fixed, so it leaves
 // the bar's flow entirely. We collapse the now-empty bar to zero height so it
 // doesn't create a blank gap below the nav items.
+$sidebar-bottom-bar-height: $sidebar-minimizer-height;
+
 .sidebar .sidebar-bottom-bar {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  flex: 0 0 $sidebar-minimizer-height; // 50px height in sidebar column context
+  flex: 0 0 $sidebar-bottom-bar-height;
+  min-height: $sidebar-bottom-bar-height;
+  background-color: var(--unity-nav-parent-active-bg, var(--unity-bg-sidebar-active));
 }
 
-// Keep minimizer square (50px × 50px) in the row context
-.sidebar .sidebar-bottom-bar .sidebar-minimizer {
-  flex: 0 0 $sidebar-minimizer-height;
-  min-width: $sidebar-minimizer-height;
-  margin-left: auto; //pushes minimizer btn to the right end when org isnt playground
+// Keep the minimizer compact in the row context.
+body:not(.sidebar-minimized) .sidebar .sidebar-bottom-bar .sidebar-minimizer {
+  flex: 0 0 $sidebar-bottom-bar-height;
+  min-width: $sidebar-bottom-bar-height;
+  height: $sidebar-bottom-bar-height;
+  margin-left: auto; // pushes minimizer btn to the right end when org isnt playground
+  background-color: transparent;
 }
 
-// Collapse bar when minimised — minimizer is already position:fixed at this point
+body:not(.sidebar-minimized) .sidebar .sidebar-bottom-bar .sidebar-minimizer::before {
+  width: $sidebar-bottom-bar-height;
+  height: $sidebar-bottom-bar-height;
+  background-size: $sidebar-bottom-bar-height * 0.25;
+}
+
+body:not(.sidebar-minimized) .sidebar .sidebar-bottom-bar .sidebar-minimizer:only-child {
+  flex: 1 1 100%;
+  min-width: 0;
+  margin-left: 0;
+  background-color: transparent;
+}
+
+body:not(.sidebar-minimized) .sidebar .sidebar-bottom-bar .sidebar-minimizer:hover {
+  background-color: transparent;
+}
+
+// Collapse bar when minimised minimizer is already position:fixed at this point
 .sidebar-minimized .sidebar .sidebar-bottom-bar {
   flex: 0 0 0;
   overflow: hidden;
 }
 
-// ── Minimized sidebar: hover popout improvements ──────────────────────────
+// Minimized sidebar: hover popout improvements
 .sidebar-minimized .sidebar {
 
   // Hover popout panel: fixed width, capped height, vertical scroll only.
   //
   // min-width: $sidebar-width (225px) aligns the popout's right edge with the header row.
-  //   Header row = $sidebar-width + $sidebar-minimized-width = 275px total.
-  //   Popout starts at left: $sidebar-minimized-width (50px) → right edge = 50+225 = 275px. ✓
+  // Header row = $sidebar-width + $sidebar-minimized-width = 275px total.
+  // Popout starts at left: $sidebar-minimized-width (50px) right edge = 50+225 = 275px.
   //
-  // max-height: 200px — ensures overflow-y:auto fires for menus with 5+ items.
-  //   A large calc(100vh) value would exceed any menu's content height, so no scrollbar
-  //   would ever appear and items near the bottom of the viewport would simply be cut.
+  // max-height: 200px ensures overflow-y:auto fires for menus with 5+ items.
+  // A large calc(100vh) value would exceed any menu's content height, so no scrollbar
+  // would ever appear and items near the bottom of the viewport would simply be cut.
   //
-  // scrollbar-gutter: stable — always reserves the 6px gutter inside the 225px width,
-  //   whether the scrollbar is showing or not.  This keeps the panel's outer boundary
-  //   constant (no 6px jump) and keeps the right edge flush with the header row.
+  // scrollbar-gutter: stable always reserves the 6px gutter inside the 225px width,
+  // whether the scrollbar is showing or not. This keeps the panel's outer boundary
+  // constant (no 6px jump) and keeps the right edge flush with the header row.
   //
-  // overflow-y: auto — vertical scroll when content > 200px.
-  //   By CSS spec, overflow-y:auto also turns overflow-x from 'visible' to 'auto'.
-  //   We prevent any horizontal scrollbar via text-overflow:ellipsis on nav-links
-  //   (see below), so overflow-x:auto never has anything to scroll.
+  // overflow-y: auto vertical scroll when content > 200px.
+  // By CSS spec, overflow-y:auto also turns overflow-x from 'visible' to 'auto'.
+  // We prevent any horizontal scrollbar via text-overflow:ellipsis on nav-links
+  // (see below), so overflow-x:auto never has anything to scroll.
   .nav>.nav-dropdown:hover>.nav-dropdown-items {
     min-width: $sidebar-width;
     max-height: 185px;
     overflow-y: auto;
     scrollbar-gutter: stable;
-    // Thin scrollbar — Firefox
+    // Thin scrollbar Firefox
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 
-    // Thin scrollbar — WebKit
+    // Thin scrollbar WebKit
     &::-webkit-scrollbar {
       width: 6px;
     }
@@ -188,14 +211,14 @@
   // Prevent horizontal overflow on nav-links inside the popout.
   // white-space:nowrap keeps each item on one line; overflow:hidden + text-overflow:ellipsis
   // truncates any name that exceeds the available content width (225px - 6px gutter = 219px)
-  // with a trailing "…" instead of causing a horizontal scrollbar.
+  // with a trailing " " instead of causing a horizontal scrollbar.
   .nav>.nav-dropdown:hover>.nav-dropdown-items .nav-link {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  // Sub-submenu: collapsed by default, toggled open/closed on click — same as maximised sidebar.
+  // Sub-submenu: collapsed by default, toggled open/closed on click same as maximised sidebar.
   // We gate on .open (added/removed by AppNavDropdownToggleDirective click handler) rather
   // than forcing all sub-dropdowns open unconditionally.
   .nav>.nav-dropdown:hover .nav-dropdown-items {
@@ -209,7 +232,7 @@
       background: darken($sidebar-bg, 5%);
     }
 
-    // tree-variant (variant:"branched") children — visible only when parent has .open
+    // tree-variant (variant:"branched") children visible only when parent has .open
     li.open>ul.tree {
       visibility: visible !important;
       margin-top: 0;
@@ -228,7 +251,6 @@
   }
 }
 
-//*****************************************************************************
 
 .tree-view {
   border-left: 3px solid $secondary;
@@ -371,13 +393,89 @@ th[sortable-column] {
   z-index: 200;
 }
 
-.sidebar .nav-dropdown .nav-link,
-.sidebar .nav-link .nav-icon {
-  color: $white;
+.sidebar .nav>.nav-item {
+  margin: 1px 0;
+}
 
-  &:hover {
-    color: $white;
-  }
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--unity-nav-link-color);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.sidebar .nav-link .nav-icon {
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
+  margin-right: 0.45rem;
+  color: inherit;
+  font-size: 1rem;
+  opacity: 0.82;
+  text-align: center;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.sidebar .nav-link>span:first-of-type {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar .nav-link .badge {
+  float: none;
+  margin-left: auto;
+}
+
+.sidebar .nav-dropdown .nav-dropdown-items .nav-link {
+  min-height: 40px;
+  color: var(--unity-nav-submenu-link-color, var(--unity-nav-link-color));
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.sidebar .nav-dropdown-toggle {
+  padding-right: 2rem;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link:focus {
+  color: var(--unity-nav-link-hover-color);
+  background-color: var(--unity-nav-link-hover-bg, var(--unity-nav-link-active-bg));
+}
+
+.sidebar .nav-dropdown.open {
+  background-color: var(--unity-nav-parent-active-bg, var(--unity-bg-sidebar-active));
+}
+
+.sidebar .nav-item.open>.nav-link,
+.sidebar .nav-link.active-parent {
+  color: var(--unity-nav-link-hover-color);
+  background-color: var(--unity-nav-parent-active-bg, var(--unity-bg-sidebar-active));
+  font-weight: 500;
+}
+
+.sidebar .nav-link.active {
+  color: var(--unity-nav-link-hover-color);
+  background-color: var(--unity-nav-link-active-bg) !important;
+  box-shadow: inset 3px 0 0 var(--unity-nav-link-active-indicator, var(--unity-color-primary));
+  font-weight: 600;
+}
+
+.sidebar .nav-link.active .nav-icon {
+  color: inherit;
+  opacity: 1;
+}
+
+.sidebar .nav-link:hover .nav-icon,
+.sidebar .nav-link:focus .nav-icon,
+.sidebar .nav-link.active-parent .nav-icon {
+  opacity: 1;
 }
 
 .nav-tabs .nav-link {
@@ -680,10 +778,6 @@ em {
 .disabled-widget {
   opacity: 0.5;
   pointer-events: none;
-}
-
-.sidebar .nav-link .nav-icon {
-  font-size: 1rem;
 }
 
 .status-icon {

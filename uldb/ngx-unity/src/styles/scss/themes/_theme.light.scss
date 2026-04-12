@@ -1,13 +1,11 @@
-// ============================================================
-//  UNITY — LIGHT THEME TOKENS
-//  Applied as :root defaults.  body.theme-light reinforces them.
-//  All component SCSS must reference var(--unity-*)  tokens.
-// ============================================================
+// UNITY LIGHT THEME TOKENS
+// Applied as :root defaults. body.theme-light reinforces them.
+// All component SCSS must reference var(--unity-*) tokens.
 
 :root,
 body.theme-light {
 
-    // ── Page & Layout backgrounds ───────────────────────────
+    // Page & Layout backgrounds
     --unity-bg-body: #f4f3ef;
     --unity-bg-surface: #ffffff;
     --unity-bg-surface-raised: #f8f9fa;
@@ -16,7 +14,7 @@ body.theme-light {
     --unity-bg-header: #ffffff;
     --unity-bg-overlay: rgba(0, 0, 0, 0.5);
 
-    // ── Text ────────────────────────────────────────────────
+    // Text
     --unity-text-primary: #23282c;
     --unity-text-secondary: #73818f;
     --unity-text-disabled: #b8b8b8;
@@ -25,7 +23,7 @@ body.theme-light {
     --unity-text-link-hover: #0b69c2;
     --unity-text-on-primary: #ffffff;
 
-    // ── Brand / semantic ────────────────────────────────────
+    // Brand / semantic
     --unity-color-primary: #378ad8;
     --unity-color-primary-hover: #0b69c2;
     --unity-color-primary-light: #d8ecff;
@@ -37,20 +35,20 @@ body.theme-light {
     --unity-color-danger-light: #ffe9e9;
     --unity-color-info: #63c2de;
 
-    // ── Borders & Dividers ───────────────────────────────────
+    // Borders & Dividers
     --unity-border-color: #c8ced3;
     --unity-border-color-strong: #73818f;
     --unity-border-focus: #378ad8;
     --unity-border-disabled: #ddd;
     --unity-divider-color: #e0e0e0;
 
-    // ── Interactive states ───────────────────────────────────
+    // Interactive states
     --unity-hover-bg: #f0f3f5;
     --unity-active-bg: #d8ecff;
     --unity-disabled-bg: #f5f5f5;
     --unity-focus-ring: rgba(55, 138, 216, 0.25);
 
-    // ── Form elements ────────────────────────────────────────
+    // Form elements
     --unity-input-bg: #ffffff;
     --unity-input-border: #c8ced3;
     --unity-input-border-focus: #378ad8;
@@ -60,13 +58,13 @@ body.theme-light {
     --unity-input-disabled-bg: #f5f5f5;
     --unity-input-disabled-text: #b8b8b8;
 
-    // ── Cards ────────────────────────────────────────────────
+    // Cards
     --unity-card-bg: #ffffff;
     --unity-card-border: rgba(0, 0, 0, 0.125);
     --unity-card-header-bg: transparent;
     --unity-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
-    // ── Tables ───────────────────────────────────────────────
+    // Tables
     --unity-table-header-bg: #f0f3f5;
     --unity-table-header-text: #23282c;
     --unity-table-row-bg: #ffffff;
@@ -74,44 +72,48 @@ body.theme-light {
     --unity-table-row-hover-bg: #e8f4ff;
     --unity-table-border: #dee2e6;
 
-    // ── Navigation / Sidebar ─────────────────────────────────
+    // Navigation / Sidebar
     --unity-nav-link-color: rgba(255, 255, 255, 0.7);
+    --unity-nav-submenu-link-color: rgba(255, 255, 255, 0.78);
     --unity-nav-link-hover-color: #ffffff;
-    --unity-nav-link-active-bg: rgba(255, 255, 255, 0.1);
+    --unity-nav-link-hover-bg: rgba(255, 255, 255, 0.08);
+    --unity-nav-parent-active-bg: rgba(0, 0, 0, 0.12);
+    --unity-nav-link-active-bg: rgba(0, 0, 0, 0.24);
+    --unity-nav-link-active-indicator: #63c2de;
 
-    // ── Modals ───────────────────────────────────────────────
+    // Modals
     --unity-modal-bg: #ffffff;
     --unity-modal-header-border: #dee2e6;
     --unity-modal-footer-border: #dee2e6;
     --unity-modal-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
 
-    // ── Dropdowns ────────────────────────────────────────────
+    // Dropdowns
     --unity-dropdown-bg: #ffffff;
     --unity-dropdown-border: rgba(0, 0, 0, 0.15);
     --unity-dropdown-item-hover: #f0f3f5;
     --unity-dropdown-item-active: #d8ecff;
     --unity-dropdown-text: #23282c;
 
-    // ── Badges & Tags ────────────────────────────────────────
+    // Badges & Tags
     --unity-badge-bg: #e0e0e0;
     --unity-badge-text: #23282c;
 
-    // ── Tooltips ─────────────────────────────────────────────
+    // Tooltips
     --unity-tooltip-bg: #23282c;
     --unity-tooltip-text: #ffffff;
 
-    // ── Charts ───────────────────────────────────────────────
+    // Charts
     --unity-chart-grid-color: rgba(0, 0, 0, 0.08);
     --unity-chart-axis-text: #73818f;
     --unity-chart-tooltip-bg: #ffffff;
     --unity-chart-tooltip-text: #23282c;
     --unity-chart-tooltip-border: #c8ced3;
 
-    // ── Scrollbar ────────────────────────────────────────────
+    // Scrollbar
     --unity-scrollbar-thumb: #c8ced3;
     --unity-scrollbar-track: #f4f3ef;
 
-    // ── Misc ─────────────────────────────────────────────────
+    // Misc
     --unity-code-bg: #f4f3ef;
     --unity-code-text: #cc0000;
     --unity-skeleton-bg: #e0e0e0;

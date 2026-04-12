@@ -6,7 +6,6 @@ import { AppSidebarComponent } from './app-sidebar/app-sidebar.component';
 import {
   AppHtmlAttrDirective,
   BrandMinimizeDirective,
-  HideMenuForNonAdminDirective,
   MobileSidebarToggleDirective,
   SidebarDropdownToggleDirective,
   SidebarMinimizeDirective,
@@ -19,7 +18,6 @@ import {
     AppSidebarComponent,
     AppHtmlAttrDirective,
     BrandMinimizeDirective,
-    HideMenuForNonAdminDirective,
     MobileSidebarToggleDirective,
     SidebarDropdownToggleDirective,
     SidebarMinimizeDirective,
@@ -35,7 +33,6 @@ import {
     AppSidebarComponent,
     AppHtmlAttrDirective,
     BrandMinimizeDirective,
-    HideMenuForNonAdminDirective,
     MobileSidebarToggleDirective,
     SidebarDropdownToggleDirective,
     SidebarMinimizeDirective,

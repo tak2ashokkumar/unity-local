@@ -1,11 +1,34 @@
 {
-  "message": "Auto-generated mock file",
-  "endpoint": "/customer/unity_discovery/unity_view/topology/",
-  "method": "GET",
-  "query": {
-    "view": "dc_view",
-    "node": "org"
-  },
-  "body": {},
-  "data": []
+  "nodes": [
+    {
+      "status": "-1",
+      "name": "Tenant A01",
+      "device_type": "organization",
+      "uuid": "93d513c5-01db-4ebb-b403-531e82cac146"
+    },
+    {
+      "status": "-1",
+      "ip_address": "",
+      "uuid": "bf58cb83-9b41-43c1-9b7a-b95eb0905f7d",
+      "device_type": "colocloud",
+      "name": "Test-DC"
+    },
+    {
+      "status": "-1",
+      "ip_address": "",
+      "uuid": "c2a79afb-c3c3-4782-89e5-09d8a13480a0",
+      "device_type": "colocloud",
+      "name": "SV1 DC1"
+    }
+  ],
+  "links": [
+    {
+      "source_uuid": "93d513c5-01db-4ebb-b403-531e82cac146",
+      "target_uuid": "bf58cb83-9b41-43c1-9b7a-b95eb0905f7d"
+    },
+    {
+      "source_uuid": "93d513c5-01db-4ebb-b403-531e82cac146",
+      "target_uuid": "c2a79afb-c3c3-4782-89e5-09d8a13480a0"
+    }
+  ]
 }

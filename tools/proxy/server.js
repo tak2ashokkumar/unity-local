@@ -36,7 +36,8 @@ app.use((req, res, next) => {
     req.url.startsWith("/orchestration") ||
     req.url.startsWith("/chatbot") ||
     req.url.startsWith("/mcp") ||
-    req.url.startsWith("/task")
+    req.url.startsWith("/task") ||
+    req.url.startsWith("/ssr")
 
   if (isMockRequest) {
     console.log("→ MOCK:", req.url);

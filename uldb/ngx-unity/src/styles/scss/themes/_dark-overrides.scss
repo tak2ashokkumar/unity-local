@@ -1,12 +1,10 @@
-// ============================================================
-//  UNITY — DARK THEME COMPONENT OVERRIDES
-//  All rules are scoped under  body.theme-dark
-//  Tokens come from  _theme.dark.scss  via CSS custom props.
-// ============================================================
+// UNITY DARK THEME COMPONENT OVERRIDES
+// All rules are scoped under body.theme-dark
+// Tokens come from _theme.dark.scss via CSS custom props.
 
 body.theme-dark {
 
-    // ── 1. Base page ──────────────────────────────────────────
+    // 1. Base page
     background-color: var(--unity-bg-body);
     color: var(--unity-text-primary);
 
@@ -53,7 +51,7 @@ body.theme-dark {
         background-color: transparent !important;
     }
 
-    // Bootstrap text utilities — remap semantic colours for dark-mode contrast
+    // Bootstrap text utilities remap semantic colours for dark-mode contrast
     .text-success {
         color: var(--unity-color-success) !important;
     }
@@ -74,7 +72,7 @@ body.theme-dark {
         border-color: var(--unity-border-color);
     }
 
-    // ── 2. CoreUI App shell ───────────────────────────────────
+    // 2. CoreUI App shell
 
     // Top header bar
     .app-header,
@@ -112,18 +110,25 @@ body.theme-dark {
             &:hover,
             &:focus {
                 color: var(--unity-nav-link-hover-color);
-                background-color: var(--unity-nav-link-active-bg);
+                background-color: var(--unity-nav-link-hover-bg);
             }
         }
 
-        .nav-link.active,
-        .nav-item.open>.nav-link {
+        .nav-item.open>.nav-link,
+        .nav-link.active-parent {
+            color: var(--unity-nav-link-hover-color);
+            background-color: var(--unity-nav-parent-active-bg);
+        }
+
+        .nav-link.active {
             color: var(--unity-nav-link-hover-color);
             background-color: var(--unity-nav-link-active-bg);
+            box-shadow: inset 3px 0 0 var(--unity-nav-link-active-indicator);
+            font-weight: 600;
         }
 
         .nav-dropdown.open {
-            background-color: rgba(0, 0, 0, 0.15);
+            background-color: var(--unity-nav-parent-active-bg);
         }
 
         .sidebar-minimizer {
@@ -159,7 +164,7 @@ body.theme-dark {
         }
     }
 
-    // ── 3. Cards ─────────────────────────────────────────────
+    // 3. Cards
 
     .card {
         background-color: var(--unity-card-bg);
@@ -188,7 +193,7 @@ body.theme-dark {
         color: var(--unity-text-secondary);
     }
 
-    // ── 4. Tables ────────────────────────────────────────────
+    // 4. Tables
 
     .table {
         color: var(--unity-text-primary);
@@ -231,7 +236,7 @@ body.theme-dark {
         border-color: var(--unity-table-border);
     }
 
-    // ── 5. Forms ─────────────────────────────────────────────
+    // 5. Forms
 
     .form-control,
     .custom-select {
@@ -281,13 +286,13 @@ body.theme-dark {
         color: var(--unity-text-primary);
     }
 
-    // Checkboxes & radios — show native outline when bg is dark
+    // Checkboxes & radios show native outline when bg is dark
     .custom-control-label::before {
         background-color: var(--unity-input-bg);
         border-color: var(--unity-input-border);
     }
 
-    // ── 6. Modals ────────────────────────────────────────────
+    // 6. Modals
 
     .modal-content {
         background-color: var(--unity-modal-bg);
@@ -328,7 +333,7 @@ body.theme-dark {
         background-color: #000;
     }
 
-    // ── 7. Dropdowns ─────────────────────────────────────────
+    // 7. Dropdowns
 
     .dropdown-menu {
         background-color: var(--unity-dropdown-bg);
@@ -365,7 +370,7 @@ body.theme-dark {
         color: var(--unity-text-secondary);
     }
 
-    // ── 8. Navigation Tabs ────────────────────────────────────
+    // 8. Navigation Tabs
 
     .nav-tabs {
         border-bottom-color: var(--unity-border-color);
@@ -399,7 +404,7 @@ body.theme-dark {
         background-color: var(--unity-bg-surface);
     }
 
-    // Plain .nav tabs (custom-nav-container, no .nav-tabs class — e.g. private-cloud row tabs)
+    // Plain .nav tabs (custom-nav-container, no .nav-tabs class e.g. private-cloud row tabs)
     .custom-nav-container .nav-link {
         color: var(--unity-text-secondary);
 
@@ -431,7 +436,7 @@ body.theme-dark {
         }
     }
 
-    // ── 9. Alerts ────────────────────────────────────────────
+    // 9. Alerts
 
     .alert {
         border-color: var(--unity-border-color);
@@ -458,7 +463,7 @@ body.theme-dark {
         }
     }
 
-    // ── 10. Badges ───────────────────────────────────────────
+    // 10. Badges
 
     .badge-light,
     .badge-secondary {
@@ -466,7 +471,7 @@ body.theme-dark {
         color: var(--unity-badge-text);
     }
 
-    // ── 11. List groups ──────────────────────────────────────
+    // 11. List groups
 
     .list-group-item {
         background-color: var(--unity-bg-surface);
@@ -490,7 +495,7 @@ body.theme-dark {
         }
     }
 
-    // ── 12. Pagination ───────────────────────────────────────
+    // 12. Pagination
 
     .page-link {
         background-color: var(--unity-bg-surface);
@@ -515,7 +520,7 @@ body.theme-dark {
         border-color: var(--unity-border-color);
     }
 
-    // ── 13. Popovers ─────────────────────────────────────────
+    // 13. Popovers
 
     .popover {
         background-color: var(--unity-bg-surface);
@@ -540,7 +545,7 @@ body.theme-dark {
         }
     }
 
-    // ── 14. Tooltips ─────────────────────────────────────────
+    // 14. Tooltips
 
     .tooltip .tooltip-inner {
         background-color: var(--unity-tooltip-bg);
@@ -548,13 +553,13 @@ body.theme-dark {
         border: 1px solid var(--unity-border-color);
     }
 
-    // ── 15. Progress bars ────────────────────────────────────
+    // 15. Progress bars
 
     .progress {
         background-color: var(--unity-border-color);
     }
 
-    // ── 16. Buttons ──────────────────────────────────────────
+    // 16. Buttons
 
     // Secondary / outline variants need adjustment on dark bg
     .btn-secondary {
@@ -624,7 +629,7 @@ body.theme-dark {
         }
     }
 
-    // ── 17. ng-select ────────────────────────────────────────
+    // 17. ng-select
 
     .ng-select {
         .ng-select-container {
@@ -689,7 +694,7 @@ body.theme-dark {
         }
     }
 
-    // ── 18. ngx-bootstrap datepicker ─────────────────────────
+    // 18. ngx-bootstrap datepicker
 
     .bs-datepicker-container {
         background-color: var(--unity-bg-surface);
@@ -751,7 +756,7 @@ body.theme-dark {
         color: var(--unity-text-primary);
     }
 
-    // ── 19. Owl DateTime picker ───────────────────────────────
+    // 19. Owl DateTime picker
 
     .owl-dt-container {
         background: var(--unity-bg-surface);
@@ -802,7 +807,7 @@ body.theme-dark {
         background-color: var(--unity-text-secondary);
     }
 
-    // ── 20. Multiselect dropdown ─────────────────────────────
+    // 20. Multiselect dropdown
 
     .dropdown-toggle.btn-default {
         background-color: var(--unity-input-bg);
@@ -814,7 +819,7 @@ body.theme-dark {
         color: var(--unity-text-secondary) !important;
     }
 
-    // ── 21. Scrollbar ────────────────────────────────────────
+    // 21. Scrollbar
 
     * {
         scrollbar-color: var(--unity-scrollbar-thumb) var(--unity-scrollbar-track);
@@ -839,13 +844,13 @@ body.theme-dark {
         background: var(--unity-border-color-strong);
     }
 
-    // ── 22. App spinner ──────────────────────────────────────
+    // 22. App spinner
 
     app-spinner .spinner-border {
         color: var(--unity-spinner-color);
     }
 
-    // ── 23. CodeMirror ───────────────────────────────────────
+    // 23. CodeMirror
 
     .CodeMirror {
         background: var(--unity-bg-surface);
@@ -866,7 +871,7 @@ body.theme-dark {
         color: var(--unity-text-secondary);
     }
 
-    // ── 24. vis-timeline (hardcoded overrides) ────────────────
+    // 24. vis-timeline (hardcoded overrides)
 
     .vis-item {
         background-color: var(--unity-color-primary) !important;
@@ -887,13 +892,13 @@ body.theme-dark {
         border-color: var(--unity-border-color);
     }
 
-    // ── 25. custom panel accordion ────────────────────────────
+    // 25. custom panel accordion
 
     .panel-group .panel .panel .panel-heading.card-header.panel-enabled {
         background-color: var(--unity-bg-surface) !important;
     }
 
-    // ── 26. Custom tab-container ──────────────────────────────
+    // 26. Custom tab-container
 
     .tab-container[arialabel="customTabs"] .nav-tabs .nav-link {
         background: var(--unity-bg-surface) !important;
@@ -901,7 +906,7 @@ body.theme-dark {
         border-left-color: var(--unity-border-color) !important;
     }
 
-    // ── 27. app-main-tab (Unity custom first-level tab bar) ──
+    // 27. app-main-tab (Unity custom first-level tab bar)
 
     // Strip container
     app-main-tab .tabs-level1 {
@@ -958,7 +963,7 @@ body.theme-dark {
         border-bottom-color: var(--unity-border-color);
     }
 
-    // ── 28. read-only overlay ─────────────────────────────────
+    // 28. read-only overlay
 
     &.read-only {
         button.action-icons-disabled {
@@ -970,7 +975,7 @@ body.theme-dark {
         }
     }
 
-    // ── 29. topology / vis-network popover ────────────────────
+    // 29. topology / vis-network popover
 
     .topology-card {
         .popover {
@@ -982,7 +987,7 @@ body.theme-dark {
         }
     }
 
-    // ── 30. topology modal nav tabs ──────────────────────────
+    // 30. topology modal nav tabs
 
     .topology-modal {
         .nav-tabs .nav-link {
@@ -994,7 +999,7 @@ body.theme-dark {
         }
     }
 
-    // ── 31. angular-calendar ─────────────────────────────────
+    // 31. angular-calendar
 
     .cal-month-view,
     .cal-week-view,
@@ -1041,7 +1046,7 @@ body.theme-dark {
         }
     }
 
-    // ── 32. Sequential workflow designer ─────────────────────
+    // 32. Sequential workflow designer
 
     .sqd-designer-angular,
     .sqd-designer {
@@ -1049,7 +1054,7 @@ body.theme-dark {
         color: var(--unity-text-primary);
     }
 
-    // ── 33. ngx-chips (tag-input) ─────────────────────────────
+    // 33. ngx-chips (tag-input)
 
     tag-input .ng2-tag-input {
         border-bottom-color: var(--unity-input-border) !important;
@@ -1065,14 +1070,14 @@ body.theme-dark {
         }
     }
 
-    // ── 34. perfect-scrollbar ─────────────────────────────────
+    // 34. perfect-scrollbar
 
     .ps__thumb-y,
     .ps__thumb-x {
         background-color: var(--unity-scrollbar-thumb) !important;
     }
 
-    // ── 35. app notification (toast) ─────────────────────────
+    // 35. app notification (toast)
 
     .notification .alert {
         background-color: var(--unity-bg-surface);
@@ -1082,7 +1087,7 @@ body.theme-dark {
             0 0 0 1px rgba(255, 255, 255, 0.05);
     }
 
-    // ── 36. ng-select default theme overrides ─────────────────
+    // 36. ng-select default theme overrides
     // (the default.theme.css from @ng-select is loaded globally)
 
     .ng-select.ng-select-single .ng-select-container,
@@ -1092,7 +1097,7 @@ body.theme-dark {
         color: var(--unity-input-text);
     }
 
-    // ── 37. Global search modal ───────────────────────────────
+    // 37. Global search modal
 
     .modal-dialog.global-search-modal .modal-content {
         background-color: var(--unity-modal-bg);
@@ -1100,7 +1105,7 @@ body.theme-dark {
         border: none;
     }
 
-    // ── 38. Minimized sidebar — nested dropdown bg ────────────
+    // 38. Minimized sidebar nested dropdown bg
     // darken($sidebar-bg, 5%) in _custom.scss uses the light-theme hardcoded value.
     // Override here so the nested items use the dark sidebar token instead.
     &.sidebar-minimized .sidebar .nav>.nav-dropdown:hover .nav-dropdown-items {

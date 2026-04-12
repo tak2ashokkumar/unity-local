@@ -2,76 +2,77 @@
   <ul class="nav">
     <ng-template #renderNavItems let-items let-parentKey="parentKey">
       <ng-container *ngFor="let item of items; let index = index; trackBy: trackByNav">
-        <ng-container *ngIf="getItemKey(parentKey, item, index) as itemKey">
-          <li *ngIf="isDivider(item)" class="nav-divider"></li>
+        <ng-container *ngIf="!isHidden(item)">
+          <ng-container *ngIf="getItemKey(parentKey, item, index) as itemKey">
+            <li *ngIf="isDivider(item)" class="nav-divider"></li>
 
-          <li *ngIf="isTitle(item)" class="nav-title" [ngClass]="item.class">
-            {{ item.name }}
-          </li>
+            <li *ngIf="isTitle(item)" class="nav-title" [ngClass]="item.class">
+              {{ item.name }}
+            </li>
 
-          <li *ngIf="!isDivider(item) && !isTitle(item)"
-            [ngClass]="getItemClasses(item, itemKey)"
-            [hideMenuForNonAdmin]="item.attributes">
-            <ng-container *ngIf="isDropdown(item); else sidebarLink">
-              <a class="nav-link nav-dropdown-toggle"
-                [ngClass]="getLinkClasses(item)"
-                appSidebarDropdownToggle
-                [appSidebarDropdownToggle]="isOpen(itemKey)"
-                href="javascript:void(0);"
-                (click)="toggleDropdown(itemKey, $event)">
-                <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
-                <span>{{ item.name }}</span>
-                <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
-              </a>
+            <li *ngIf="!isDivider(item) && !isTitle(item)"
+              [ngClass]="getItemClasses(item, itemKey)">
+              <ng-container *ngIf="isDropdown(item); else sidebarLink">
+                <a class="nav-link nav-dropdown-toggle"
+                  [ngClass]="getLinkClasses(item, itemKey)"
+                  appSidebarDropdownToggle
+                  [appSidebarDropdownToggle]="isOpen(itemKey)"
+                  href="javascript:void(0);"
+                  [attr.aria-disabled]="isDisabled(item) ? true : null"
+                  [attr.tabindex]="isDisabled(item) ? -1 : null"
+                  (click)="toggleDropdown(item, itemKey, $event)">
+                  <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
+                  <span [attr.title]="item.name">{{ item.name }}</span>
+                  <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
+                </a>
 
-              <ul class="nav-dropdown-items" [class.tree]="item.variant === 'branched'">
-                <ng-container
-                  [ngTemplateOutlet]="renderNavItems"
-                  [ngTemplateOutletContext]="{ $implicit: item.children, parentKey: itemKey }"></ng-container>
-              </ul>
-            </ng-container>
+                <ul class="nav-dropdown-items" [class.tree]="item.variant === 'branched'">
+                  <ng-container
+                    [ngTemplateOutlet]="renderNavItems"
+                    [ngTemplateOutletContext]="{ $implicit: item.children, parentKey: itemKey }"></ng-container>
+                </ul>
+              </ng-container>
 
-            <ng-template #sidebarLink>
-              <a *ngIf="isDisabled(item)"
-                [attr.disabled]="true"
-                [attr.aria-disabled]="true"
-                [appHtmlAttr]="item.attributes"
-                [ngClass]="getLinkClasses(item)"
-                href="javascript:void(0);"
-                tabindex="-1">
-                <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
-                <span>{{ item.name }}</span>
-                <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
-                <span *ngIf="isBetaItem(item)" class="font-lg">(beta)</span>
-              </a>
+              <ng-template #sidebarLink>
+                <a *ngIf="isDisabled(item)"
+                  [attr.disabled]="true"
+                  [attr.aria-disabled]="true"
+                  [appHtmlAttr]="item.attributes"
+                  [ngClass]="getLinkClasses(item, itemKey)"
+                  href="javascript:void(0);"
+                  tabindex="-1">
+                  <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
+                  <span [attr.title]="item.name">{{ item.name }}</span>
+                  <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
+                  <span *ngIf="isBetaItem(item)" class="font-lg">(beta)</span>
+                </a>
 
-              <a *ngIf="!isDisabled(item) && isExternalLink(item)"
-                [appHtmlAttr]="item.attributes"
-                [ngClass]="getLinkClasses(item)"
-                [href]="item.url"
-                rel="noopener noreferrer"
-                target="_blank">
-                <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
-                <span>{{ item.name }}</span>
-                <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
-                <span *ngIf="isBetaItem(item)" class="font-lg">(beta)</span>
-              </a>
+                <a *ngIf="!isDisabled(item) && isExternalLink(item)"
+                  [appHtmlAttr]="item.attributes"
+                  [ngClass]="getLinkClasses(item, itemKey)"
+                  [href]="item.url"
+                  rel="noopener noreferrer"
+                  target="_blank">
+                  <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
+                  <span [attr.title]="item.name">{{ item.name }}</span>
+                  <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
+                  <span *ngIf="isBetaItem(item)" class="font-lg">(beta)</span>
+                </a>
 
-              <a *ngIf="!isDisabled(item) && !isExternalLink(item)"
-                [appHtmlAttr]="item.attributes"
-                [ngClass]="getLinkClasses(item)"
-                routerLinkActive
-                #rla="routerLinkActive"
-                [attr.aria-current]="rla.isActive ? 'page' : null"
-                [routerLink]="[item.url]"
-                (click)="hideMobile()">
-                <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
-                <span>{{ item.name }}</span>
-                <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
-                <span *ngIf="isBetaItem(item)" class="font-lg">(beta)</span>
-              </a>
-            </ng-template>
-          </li>
+                <a *ngIf="!isDisabled(item) && !isExternalLink(item)"
+                  [appHtmlAttr]="item.attributes"
+                  [ngClass]="getLinkClasses(item, itemKey)"
+                  [attr.aria-current]="isActiveLink(item) ? 'page' : null"
+                  [routerLink]="[item.url]"
+                  (click)="hideMobile()">
+                  <i *ngIf="isIcon(item)" [ngClass]="['nav-icon', item.icon]" aria-hidden="true"></i>
+                  <span [attr.title]="item.name">{{ item.name }}</span>
+                  <span *ngIf="isBadge(item)" [ngClass]="'badge badge-' + item.badge.variant">{{ item.badge.text }}</span>
+                  <span *ngIf="isBetaItem(item)" class="font-lg">(beta)</span>
+                </a>
+              </ng-template>
+            </li>
+          </ng-container>
         </ng-container>
       </ng-container>
     </ng-template>

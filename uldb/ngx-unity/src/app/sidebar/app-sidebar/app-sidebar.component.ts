@@ -18,7 +18,7 @@ type NavStateContext = {
 export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
   @Input() compact: boolean;
   @Input() disabled = false;
-  @Input() display: any;
+  @Input() display: string | false;
   @Input() fixed: boolean;
   @Input() minimized: boolean;
   @Input() navItems: UnityNavData[] = [];
@@ -30,6 +30,7 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
   private readonly appliedBodyClasses = new Set<string>();
 
   activeKeys = new Set<string>();
+  collapsedKeys = new Set<string>();
   expandedKeys = new Set<string>();
 
   constructor(
@@ -48,6 +49,7 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
       )
       .subscribe((_event: NavigationEnd) => {
         this.expandedKeys.clear();
+        this.collapsedKeys.clear();
         this.rebuildActiveState();
       });
   }
@@ -59,6 +61,7 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
 
     if (changes.navItems && !changes.navItems.firstChange) {
       this.expandedKeys.clear();
+      this.collapsedKeys.clear();
       this.rebuildActiveState();
     }
   }
@@ -97,12 +100,14 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
     return classes;
   }
 
-  getLinkClasses(item: UnityNavData): Record<string, boolean> {
+  getLinkClasses(item: UnityNavData, key: string): Record<string, boolean> {
     const disabled = this.isDisabled(item);
     const classes: Record<string, boolean> = {
       'nav-link': true,
       'disabled': disabled,
-      'btn-link': disabled
+      'btn-link': disabled,
+      'active': this.isActiveLink(item),
+      'active-parent': this.isDropdown(item) && this.activeKeys.has(key)
     };
 
     if (item.variant) {
@@ -118,7 +123,15 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
   isIcon(item: UnityNavData): boolean { return !!item.icon; }
 
   isOpen(key: string): boolean {
+    if (this.collapsedKeys.has(key)) {
+      return false;
+    }
+
     return this.expandedKeys.has(key) || this.activeKeys.has(key);
+  }
+
+  isActiveLink(item: UnityNavData): boolean {
+    return !this.isDropdown(item) && this.isRouteActive(item);
   }
 
   hideMobile(): void {
@@ -127,12 +140,21 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  toggleDropdown(key: string, $event: Event): void {
+  toggleDropdown(item: UnityNavData, key: string, $event: Event): void {
     $event.preventDefault();
-    if (this.expandedKeys.has(key)) {
-      this.expandedKeys.delete(key);
+    if (this.isDisabled(item)) {
       return;
     }
+
+    if (this.isOpen(key)) {
+      this.expandedKeys.delete(key);
+      if (this.activeKeys.has(key)) {
+        this.collapsedKeys.add(key);
+      }
+      return;
+    }
+
+    this.collapsedKeys.delete(key);
     this.expandedKeys.add(key);
   }
 
@@ -193,7 +215,7 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
         return;
       }
 
-      const isCurrentRoute = !!item.url && this.router.isActive(item.url, false);
+      const isCurrentRoute = this.isRouteActive(item);
       const hasActiveChild = item.children?.length
         ? this.walkNavState({ items: item.children, parentKey: key })
         : false;
@@ -206,4 +228,17 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
 
     return hasActiveItem;
   }
+
+  private isRouteActive(item: UnityNavData): boolean {
+    if (this.isExternalLink(item) || !item.url) {
+      return false;
+    }
+
+    const routeUrls = [
+      item.url,
+      ...(item.routeAccess?.aliases || [])
+    ];
+    return routeUrls.some(url => this.router.isActive(url, false));
+  }
+
 }

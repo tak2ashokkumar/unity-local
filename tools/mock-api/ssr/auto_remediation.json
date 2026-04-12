@@ -1,0 +1,455 @@
+{
+  "count": 4,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "uuid": "7a9183a4-4876-4924-944c-dd85c95a098c",
+      "name": "apache service down",
+      "description": null,
+      "ip_addresses": [],
+      "device_types": [
+        "vmware"
+      ],
+      "devices": [
+        "test-vm"
+      ],
+      "trigger_ids": [
+        {
+          "name": "apache service down",
+          "device_triggers": [
+            353256
+          ]
+        }
+      ],
+      "task_type": "Remediation Task",
+      "remediation_task": "Service Restart - Linux",
+      "enabled": true,
+      "created_at": "2025-04-22T23:41:45.316864-07:00",
+      "updated_at": "2025-04-22T23:49:52.661811-07:00",
+      "edited_by": "Tenant A01",
+      "created_by": 1928,
+      "remediation_status": null,
+      "last_remediation": null,
+      "created_by_name": "Tenant A01"
+    },
+    {
+      "uuid": "091bc814-1d48-45b3-8232-d14d7d67685c",
+      "name": "alpha-collector-MTPdemo2_New-MyTrigger",
+      "description": null,
+      "ip_addresses": [],
+      "device_types": [
+        "vm"
+      ],
+      "devices": [
+        "alpha-collector-MTPdemo2_New"
+      ],
+      "trigger_ids": [
+        {
+          "name": "MyTrigger",
+          "device_triggers": [
+            352098
+          ]
+        }
+      ],
+      "task_type": "Script",
+      "script": "MyScript",
+      "enabled": true,
+      "created_at": "2025-04-22T00:36:22.138981-07:00",
+      "updated_at": "2025-04-22T00:36:22.139018-07:00",
+      "edited_by": null,
+      "created_by": 1928,
+      "remediation_status": "Failed",
+      "last_remediation": "2025-10-02T08:03:44.841178Z",
+      "created_by_name": "Tenant A01"
+    },
+    {
+      "uuid": "c9100ef3-7c79-41d3-9eae-550cb4e47fe8",
+      "name": "vm reboot",
+      "description": null,
+      "ip_addresses": [],
+      "device_types": [
+        "vmware"
+      ],
+      "devices": [
+        "unity-lab-lnx-vm10"
+      ],
+      "trigger_ids": [
+        {
+          "name": "Unavailable by ICMP ping",
+          "device_triggers": [
+            318969
+          ]
+        }
+      ],
+      "task_type": "Remediation Task",
+      "remediation_task": "Power On VM",
+      "enabled": true,
+      "created_at": "2025-01-03T05:33:29.250510-08:00",
+      "updated_at": "2025-01-08T03:16:52.518639-08:00",
+      "edited_by": "Tenant A01",
+      "created_by": 1928,
+      "remediation_status": "Success",
+      "last_remediation": "2025-01-06T19:02:17.735807Z",
+      "created_by_name": "Tenant A01"
+    },
+    {
+      "uuid": "16e42a81-d959-41f9-886c-4ce537a2b677",
+      "name": "Service Restart in untiy-lab-lnx",
+      "description": null,
+      "ip_addresses": [],
+      "device_types": [
+        "switch",
+        "firewall",
+        "load_balancer",
+        "hypervisor",
+        "baremetal",
+        "mac_device",
+        "storage",
+        "virtual_machine",
+        "vmware",
+        "esxi",
+        "hyperv"
+      ],
+      "devices": [
+        "unity-lab-lnx-vm10"
+      ],
+      "trigger_ids": [
+        {
+          "name": "systemd-remount-fs.service: Service is not running",
+          "device_triggers": [
+            319849
+          ]
+        },
+        {
+          "name": "cloud-config.service: Service is not running",
+          "device_triggers": [
+            319873
+          ]
+        },
+        {
+          "name": "open-iscsi.service: Service is not running",
+          "device_triggers": [
+            319865
+          ]
+        },
+        {
+          "name": "networkd-dispatcher.service: Service is not running",
+          "device_triggers": [
+            319863
+          ]
+        },
+        {
+          "name": "udisks2.service: Service is not running",
+          "device_triggers": [
+            319859
+          ]
+        },
+        {
+          "name": "vgauth.service: Service is not running",
+          "device_triggers": [
+            319838
+          ]
+        },
+        {
+          "name": "unattended-upgrades.service: Service is not running",
+          "device_triggers": [
+            319857
+          ]
+        },
+        {
+          "name": "systemd-networkd-wait-online.service: Service is not running",
+          "device_triggers": [
+            319842
+          ]
+        },
+        {
+          "name": "cloud-init.service: Service is not running",
+          "device_triggers": [
+            319831
+          ]
+        },
+        {
+          "name": "snapd.core-fixup.service: Service is not running",
+          "device_triggers": [
+            319860
+          ]
+        },
+        {
+          "name": "secureboot-db.service: Service is not running",
+          "device_triggers": [
+            319875
+          ]
+        },
+        {
+          "name": "cron.service: Service is not running",
+          "device_triggers": [
+            319845
+          ]
+        },
+        {
+          "name": "irqbalance.service: Service is not running",
+          "device_triggers": [
+            319862
+          ]
+        },
+        {
+          "name": "ssh.service: Service is not running",
+          "device_triggers": [
+            319841
+          ]
+        },
+        {
+          "name": "rsyslog.service: Service is not running",
+          "device_triggers": [
+            319835
+          ]
+        },
+        {
+          "name": "snapd.service: Service is not running",
+          "device_triggers": [
+            319853
+          ]
+        },
+        {
+          "name": "pollinate.service: Service is not running",
+          "device_triggers": [
+            319840
+          ]
+        },
+        {
+          "name": "open-vm-tools.service: Service is not running",
+          "device_triggers": [
+            319867
+          ]
+        },
+        {
+          "name": "mysql.service: Service is not running",
+          "device_triggers": [
+            319836
+          ]
+        },
+        {
+          "name": "snap.lxd.activate.service: Service is not running",
+          "device_triggers": [
+            319833
+          ]
+        },
+        {
+          "name": "grub-initrd-fallback.service: Service is not running",
+          "device_triggers": [
+            319830
+          ]
+        },
+        {
+          "name": "cloud-final.service: Service is not running",
+          "device_triggers": [
+            319871
+          ]
+        },
+        {
+          "name": "setvtrgb.service: Service is not running",
+          "device_triggers": [
+            319839
+          ]
+        },
+        {
+          "name": "netplan-ovs-cleanup.service: Service is not running",
+          "device_triggers": [
+            319854
+          ]
+        },
+        {
+          "name": "ModemManager.service: Service is not running",
+          "device_triggers": [
+            319879
+          ]
+        },
+        {
+          "name": "finalrd.service: Service is not running",
+          "device_triggers": [
+            319852
+          ]
+        },
+        {
+          "name": "console-setup.service: Service is not running",
+          "device_triggers": [
+            319878
+          ]
+        },
+        {
+          "name": "lvm2-monitor.service: Service is not running",
+          "device_triggers": [
+            319869
+          ]
+        },
+        {
+          "name": "ubuntu-advantage.service: Service is not running",
+          "device_triggers": [
+            319843
+          ]
+        },
+        {
+          "name": "systemd-pstore.service: Service is not running",
+          "device_triggers": [
+            319881
+          ]
+        },
+        {
+          "name": "snmpd.service: Service is not running",
+          "device_triggers": [
+            319844
+          ]
+        },
+        {
+          "name": "keyboard-setup.service: Service is not running",
+          "device_triggers": [
+            319832
+          ]
+        },
+        {
+          "name": "dmesg.service: Service is not running",
+          "device_triggers": [
+            319868
+          ]
+        },
+        {
+          "name": "lxd-agent.service: Service is not running",
+          "device_triggers": [
+            319837
+          ]
+        },
+        {
+          "name": "snapd.apparmor.service: Service is not running",
+          "device_triggers": [
+            319877
+          ]
+        },
+        {
+          "name": "systemd-fsck-root.service: Service is not running",
+          "device_triggers": [
+            319851
+          ]
+        },
+        {
+          "name": "ua-reboot-cmds.service: Service is not running",
+          "device_triggers": [
+            319864
+          ]
+        },
+        {
+          "name": "blk-availability.service: Service is not running",
+          "device_triggers": [
+            319848
+          ]
+        },
+        {
+          "name": "cloud-init-local.service: Service is not running",
+          "device_triggers": [
+            319876
+          ]
+        },
+        {
+          "name": "snapd.seeded.service: Service is not running",
+          "device_triggers": [
+            319847
+          ]
+        },
+        {
+          "name": "apparmor.service: Service is not running",
+          "device_triggers": [
+            319829
+          ]
+        },
+        {
+          "name": "multipathd.service: Service is not running",
+          "device_triggers": [
+            319880
+          ]
+        },
+        {
+          "name": "systemd-timesyncd.service: Service is not running",
+          "device_triggers": [
+            319850
+          ]
+        },
+        {
+          "name": "zabbix-agent2.service: Service is not running",
+          "device_triggers": [
+            319866
+          ]
+        },
+        {
+          "name": "systemd-resolved.service: Service is not running",
+          "device_triggers": [
+            319882
+          ]
+        },
+        {
+          "name": "ufw.service: Service is not running",
+          "device_triggers": [
+            319861
+          ]
+        },
+        {
+          "name": "thermald.service: Service is not running",
+          "device_triggers": [
+            319858
+          ]
+        },
+        {
+          "name": "systemd-networkd.service: Service is not running",
+          "device_triggers": [
+            319856
+          ]
+        },
+        {
+          "name": "apache2.service: Service is not running",
+          "device_triggers": [
+            319872
+          ]
+        },
+        {
+          "name": "grub-common.service: Service is not running",
+          "device_triggers": [
+            319870
+          ]
+        },
+        {
+          "name": "e2scrub_reap.service: Service is not running",
+          "device_triggers": [
+            319846
+          ]
+        },
+        {
+          "name": "snapd.autoimport.service: Service is not running",
+          "device_triggers": [
+            319855
+          ]
+        },
+        {
+          "name": "snapd.recovery-chooser-trigger.service: Service is not running",
+          "device_triggers": [
+            319874
+          ]
+        },
+        {
+          "name": "getty@tty1.service: Service is not running",
+          "device_triggers": [
+            319834
+          ]
+        }
+      ],
+      "task_type": "Remediation Task",
+      "remediation_task": "Service Restart - Linux",
+      "enabled": true,
+      "created_at": "2024-12-10T05:23:28.143848-08:00",
+      "updated_at": "2025-01-08T03:16:51.893032-08:00",
+      "edited_by": "Tenant A01",
+      "created_by": 1928,
+      "remediation_status": "Success",
+      "last_remediation": "2025-01-08T11:17:59.143890Z",
+      "created_by_name": "Tenant A01"
+    }
+  ]
+}

@@ -1,10 +1,23 @@
-{
-  "message": "Auto-generated mock file",
-  "endpoint": "/customer/public_cloud_fast/",
-  "method": "GET",
-  "query": {
-    "page_size": "0"
+[
+  {
+    "id": 213,
+    "vms": 8,
+    "cloud_type": "Azure",
+    "uuid": "d53c98b3-3b3e-4303-b972-2982c1c39d57",
+    "account_name": "Azure"
   },
-  "body": {},
-  "data": []
-}
+  {
+    "id": 227,
+    "vms": 0,
+    "cloud_type": "Azure",
+    "uuid": "bb9d0b03-9e3e-4213-baf5-65e847a69b14",
+    "account_name": "AZURE-LAB"
+  },
+  {
+    "id": 214,
+    "vms": 2,
+    "cloud_type": "AWS",
+    "uuid": "03c071d6-7f52-433e-8da1-8b6e2715f243",
+    "account_name": "AWS account"
+  }
+]

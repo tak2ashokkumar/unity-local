@@ -1,46 +1,44 @@
-// ============================================================
-//  UNITY — DARK THEME TOKENS  (Google Stitch palette)
-//  Source palette: stitch.withgoogle.com  ".editor_dark"
+// UNITY DARK THEME TOKENS (Google Stitch palette)
+// Source palette: stitch.withgoogle.com ".editor_dark"
 //
-//  Stitch dark-mode background scale:
-//    Top-layer / deepest  →  #151315  (colors-primary-900)
-//    Page body            →  #191a1f  (colors-primary-850)
-//    Cards / panels       →  #23272f  (colors-primary-700)
-//    Wash / hover strip   →  #373840  (colors-primary-600)
-//    Inputs / inset       →  #2a2a2a  (colors-neutral-775)
-//    Pressed / active     →  #404040  (colors-neutral-600)
+// Stitch dark-mode background scale:
+// Top-layer / deepest #151315 (colors-primary-900)
+// Page body #191a1f (colors-primary-850)
+// Cards / panels #23272f (colors-primary-700)
+// Wash / hover strip #373840 (colors-primary-600)
+// Inputs / inset #2a2a2a (colors-neutral-775)
+// Pressed / active #404040 (colors-neutral-600)
 //
-//  Accent palette pulled from Stitch:
-//    Blue-500  #5e9bff   Blue-300  #bdd6ff
-//    Emerald   #0bd972   Red       #f84563
-//    Orange    #ff8e59   Violet    #9c75ff
-// ============================================================
+// Accent palette pulled from Stitch:
+// Blue-500 #5e9bff Blue-300 #bdd6ff
+// Emerald #0bd972 Red #f84563
+// Orange #ff8e59 Violet #9c75ff
 
 body.theme-dark {
 
-    // ── Page & Layout backgrounds ───────────────────────────
+    // Page & Layout backgrounds
     --unity-bg-body:            #191a1f;   // colors-primary-850
-    --unity-bg-surface:         #23272f;   // colors-primary-700  — cards, panels
-    --unity-bg-surface-raised:  #373840;   // colors-primary-600  — raised elements, table headers
-    --unity-bg-sidebar:         #151315;   // colors-primary-900  — deepest level
+    --unity-bg-surface:         #23272f;   // colors-primary-700 cards, panels
+    --unity-bg-surface-raised:  #373840;   // colors-primary-600 raised elements, table headers
+    --unity-bg-sidebar:         #151315;   // colors-primary-900 deepest level
     --unity-bg-sidebar-active:  #23272f;   // colors-primary-700
-    --unity-bg-header:          #23272f;   // colors-primary-700  — header bar
+    --unity-bg-header:          #23272f;   // colors-primary-700 header bar
     --unity-bg-overlay:         rgba(0, 0, 0, 0.72);
 
-    // ── Text ────────────────────────────────────────────────
-    --unity-text-primary:       #fafafa;   // colors-neutral-50   — near-white, high contrast
-    --unity-text-secondary:     #cfcfcf;   // colors-neutral-150  — secondary labels
+    // Text
+    --unity-text-primary:       #fafafa;   // colors-neutral-50 near-white, high contrast
+    --unity-text-secondary:     #cfcfcf;   // colors-neutral-150 secondary labels
     --unity-text-disabled:      #6f6f6f;   // colors-neutral-500
     --unity-text-inverse:       #191919;   // colors-neutral-900
     --unity-text-link:          #5e9bff;   // colors-blue-500
     --unity-text-link-hover:    #bdd6ff;   // colors-blue-300
     --unity-text-on-primary:    #ffffff;
 
-    // ── Brand / semantic ────────────────────────────────────
+    // Brand / semantic
     --unity-color-primary:       #5e9bff;  // colors-blue-500
     --unity-color-primary-hover: #bdd6ff;  // colors-blue-300
     --unity-color-primary-light: #1c2236;  // muted blue tint for bg use
-    --unity-color-success:       #0bd972;  // colors-emerald-300  — vivid green
+    --unity-color-success:       #0bd972;  // colors-emerald-300 vivid green
     --unity-color-success-light: #1c221f;  // colors-emerald-950
     --unity-color-warning:       #ff8e59;  // colors-orange-500
     --unity-color-warning-light: #2a1a10;  // dark orange tint
@@ -48,21 +46,21 @@ body.theme-dark {
     --unity-color-danger-light:  #25101a;  // dark red tint
     --unity-color-info:          #9c75ff;  // colors-violet-400
 
-    // ── Borders & Dividers ───────────────────────────────────
-    --unity-border-color:        #373840;  // colors-primary-600  — default separator
-    --unity-border-color-strong: #6f6f6f;  // colors-neutral-500  — emphatic border
+    // Borders & Dividers
+    --unity-border-color:        #373840;  // colors-primary-600 default separator
+    --unity-border-color-strong: #6f6f6f;  // colors-neutral-500 emphatic border
     --unity-border-focus:        #5e9bff;  // colors-blue-500
     --unity-border-disabled:     #2a2a2a;  // colors-neutral-775
     --unity-divider-color:       #2a2a2a;  // colors-neutral-775
 
-    // ── Interactive states ───────────────────────────────────
-    --unity-hover-bg:   #373840;           // colors-primary-600  — state-hover
-    --unity-active-bg:  #2a2730;           // colors-violet-900   — subtle violet tint on active
+    // Interactive states
+    --unity-hover-bg:   #373840;           // colors-primary-600 state-hover
+    --unity-active-bg:  #2a2730;           // colors-violet-900 subtle violet tint on active
     --unity-disabled-bg:#23272f;           // colors-primary-700
     --unity-focus-ring: rgba(94, 155, 255, 0.25);  // blue-500 @ 25%
 
-    // ── Form elements ────────────────────────────────────────
-    --unity-input-bg:            #2a2a2a;  // colors-neutral-775  — inset surface
+    // Form elements
+    --unity-input-bg:            #2a2a2a;  // colors-neutral-775 inset surface
     --unity-input-border:        #373840;  // colors-primary-600
     --unity-input-border-focus:  #5e9bff;  // colors-blue-500
     --unity-input-border-invalid:#f84563;  // colors-red-400
@@ -71,62 +69,66 @@ body.theme-dark {
     --unity-input-disabled-bg:   #23272f;  // colors-primary-700
     --unity-input-disabled-text: #6f6f6f;  // colors-neutral-500
 
-    // ── Cards ────────────────────────────────────────────────
-    //  Stitch cards sit on body (#191a1f), surface is #23272f.
-    //  A hairline inner highlight + deep shadow gives depth.
+    // Cards
+    // Stitch cards sit on body (#191a1f), surface is #23272f.
+    // A hairline inner highlight + deep shadow gives depth.
     --unity-card-bg:         #23272f;
     --unity-card-border:     #373840;
     --unity-card-header-bg:  transparent;
     --unity-card-shadow:     0 1px 3px rgba(0,0,0,0.45),
                              0 4px 16px rgba(0,0,0,0.28);
 
-    // ── Tables ───────────────────────────────────────────────
-    --unity-table-header-bg:    #151315;   // deepest — creates contrast with rows
+    // Tables
+    --unity-table-header-bg:    #151315;   // deepest creates contrast with rows
     --unity-table-header-text:  #fafafa;
     --unity-table-row-bg:       #23272f;
     --unity-table-row-alt-bg:   #2a2a2a;  // slight zebra stripe
     --unity-table-row-hover-bg: #373840;  // wash hover
     --unity-table-border:       #373840;
 
-    // ── Navigation / Sidebar ─────────────────────────────────
+    // Navigation / Sidebar
     --unity-nav-link-color:       rgba(207, 207, 207, 0.65);  // neutral-150 @ 65%
+    --unity-nav-submenu-link-color: rgba(207, 207, 207, 0.78);
     --unity-nav-link-hover-color: #fafafa;
-    --unity-nav-link-active-bg:   rgba(94, 155, 255, 0.12);   // blue tint
+    --unity-nav-link-hover-bg:    rgba(255, 255, 255, 0.07);
+    --unity-nav-parent-active-bg: rgba(255, 255, 255, 0.05);
+    --unity-nav-link-active-bg:   rgba(94, 155, 255, 0.18);   // blue tint
+    --unity-nav-link-active-indicator: #5e9bff;
 
-    // ── Modals ───────────────────────────────────────────────
+    // Modals
     --unity-modal-bg:            #23272f;
     --unity-modal-header-border: #373840;
     --unity-modal-footer-border: #373840;
     --unity-modal-shadow:        0 4px 24px rgba(0,0,0,0.60),
                                  0 0 0 1px rgba(255,255,255,0.05);
 
-    // ── Dropdowns ────────────────────────────────────────────
+    // Dropdowns
     --unity-dropdown-bg:          #23272f;
     --unity-dropdown-border:      #373840;
     --unity-dropdown-item-hover:  #373840;
     --unity-dropdown-item-active: #2a2730;
     --unity-dropdown-text:        #fafafa;
 
-    // ── Badges & Tags ────────────────────────────────────────
+    // Badges & Tags
     --unity-badge-bg:    #373840;
     --unity-badge-text:  #fafafa;
 
-    // ── Tooltips ─────────────────────────────────────────────
+    // Tooltips
     --unity-tooltip-bg:   #373840;
     --unity-tooltip-text: #fafafa;
 
-    // ── Charts ───────────────────────────────────────────────
+    // Charts
     --unity-chart-grid-color:    rgba(255, 255, 255, 0.07);
     --unity-chart-axis-text:     #cfcfcf;  // neutral-150
     --unity-chart-tooltip-bg:    #373840;
     --unity-chart-tooltip-text:  #fafafa;
     --unity-chart-tooltip-border:#6f6f6f;
 
-    // ── Scrollbar ────────────────────────────────────────────
-    --unity-scrollbar-thumb: #373840;  // wash — visible but subtle
+    // Scrollbar
+    --unity-scrollbar-thumb: #373840;  // wash visible but subtle
     --unity-scrollbar-track: #191a1f;  // body
 
-    // ── Misc ─────────────────────────────────────────────────
+    // Misc
     --unity-code-bg:       #2a2a2a;   // input surface
     --unity-code-text:     #f84563;   // red accent
     --unity-skeleton-bg:   #373840;   // wash

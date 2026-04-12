@@ -90,7 +90,7 @@ $bg-color: #efe6e2;
       margin-left: $margin * 2;
 
       div {
-        margin: $margin/2 0;
+        margin: ($margin * 0.5) 0;
       }
 
       &:before {
@@ -156,7 +156,7 @@ $bg-color: #efe6e2;
       align-items: center;
 
       div {
-        margin: $margin $margin/2;
+        margin: $margin ($margin * 0.5);
       }
 
       &:before {

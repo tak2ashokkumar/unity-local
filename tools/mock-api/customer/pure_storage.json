@@ -1,10 +1,122 @@
-{
-  "message": "Auto-generated mock file",
-  "endpoint": "/customer/pure_storage/",
-  "method": "GET",
-  "query": {
-    "page_size": "0"
-  },
-  "body": {},
-  "data": []
-}
+[
+  {
+    "url": "https://unity.unitedlayer.com/customer/storagedevices/2d9161c8-5f0b-4b3f-ae3a-ce81872ec45e/",
+    "id": 506,
+    "ip_address": "10.192.4.164",
+    "snmp_community": null,
+    "snmp_version": null,
+    "snmp_authlevel": null,
+    "snmp_authname": null,
+    "snmp_authpass": null,
+    "snmp_authalgo": null,
+    "snmp_cryptopass": null,
+    "snmp_cryptoalgo": null,
+    "uuid": "2d9161c8-5f0b-4b3f-ae3a-ce81872ec45e",
+    "name": "PureStorage",
+    "customer": {
+      "url": "https://unity.unitedlayer.com/rest/fast/org/508/",
+      "id": 508,
+      "name": "Tenant A01",
+      "storage": null,
+      "uuid": "93d513c5-01db-4ebb-b403-531e82cac146"
+    },
+    "private_cloud": null,
+    "os": {
+      "url": "https://unity.unitedlayer.com/rest/os/315/",
+      "id": 315,
+      "name": "Purity//FA",
+      "version": "5.3.12",
+      "full_name": "Purity//FA 5.3.12",
+      "platform_type": "PureStorage"
+    },
+    "manufacturer": {
+      "url": "https://unity.unitedlayer.com/rest/storage_manufacturer/18/",
+      "id": 18,
+      "name": "PureStorage"
+    },
+    "model": {
+      "url": "https://unity.unitedlayer.com/rest/storage_model/244/",
+      "id": 244,
+      "name": "FlashArray"
+    },
+    "management_ip": "10.192.4.164",
+    "asset_tag": null,
+    "cabinet": null,
+    "position": 0,
+    "size": 0,
+    "tags": [],
+    "datacenter": {
+      "url": "https://unity.unitedlayer.com/rest/colo_cloud/497/",
+      "id": 497,
+      "uuid": "c2a79afb-c3c3-4782-89e5-09d8a13480a0",
+      "display_name": "SV1 DC1-Tenant A01",
+      "created_at": "2024-11-29T03:20:47.215316-08:00",
+      "updated_at": "2024-12-04T22:25:58.101354-08:00",
+      "name": "SV1 DC1",
+      "location": "Silicon Valley, CA, USA",
+      "lat": "37.387474",
+      "long": "-122.0575434",
+      "status": [
+        {
+          "status": "NA",
+          "category": "Datacenter"
+        },
+        {
+          "status": "NA",
+          "category": "Physical Devices"
+        }
+      ],
+      "customer": "https://unity.unitedlayer.com/rest/org/508/",
+      "cabinets": [
+        "https://unity.unitedlayer.com/rest/cabinet/1505/",
+        "https://unity.unitedlayer.com/rest/cabinet/1512/"
+      ]
+    },
+    "is_cluster": false,
+    "host_url": "https://10.192.4.164/",
+    "username": "testuser",
+    "password": "testuser",
+    "port": null,
+    "monitor": false,
+    "mtp_templates": [],
+    "collector": null,
+    "custom_attribute_data": null,
+    "purity_api_token": "490646f9-3969-d104-ea84-1464cb971057",
+    "purity_api_version": "1.18",
+    "is_purity": true,
+    "created_at": "2025-07-09T03:02:19.209155-07:00",
+    "updated_at": "2026-02-09T02:45:04.015001-08:00",
+    "domain": null,
+    "credentials": null,
+    "credentials_type": null,
+    "credentials_m2m": [],
+    "observium_id": null,
+    "logical_cpu": null,
+    "note": null,
+    "status": "0",
+    "serial_number": null,
+    "system_object_oid": null,
+    "dns_name": null,
+    "discovery_method": null,
+    "first_discovered": null,
+    "environment": null,
+    "last_discovered": null,
+    "service_pack": null,
+    "last_rebooted": null,
+    "cpu": null,
+    "storage_capacity": null,
+    "storage_used": null,
+    "memory": null,
+    "fan": null,
+    "pdu1": null,
+    "pdu2": null,
+    "power_socket2": null,
+    "redfish": false,
+    "firmware_version": null,
+    "last_updated": null,
+    "power_socket1": null,
+    "description": null,
+    "interfaces": [],
+    "uptime": null
+  }
+]

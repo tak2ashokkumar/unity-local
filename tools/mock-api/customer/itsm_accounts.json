@@ -1,10 +1,14 @@
-{
-  "message": "Auto-generated mock file",
-  "endpoint": "/customer/itsm_accounts/",
-  "method": "GET",
-  "query": {
-    "page_size": "0"
+[
+  {
+    "uuid": "996e9dab-32b9-4538-a46e-5cbf99d50413",
+    "name": "Service Now Inst",
+    "type": "ServiceNow",
+    "default": true
   },
-  "body": {},
-  "data": []
-}
+  {
+    "uuid": "f4ce62fa-58d2-4d15-b891-cba93baae1c5",
+    "name": "CRM",
+    "type": "DynamicsCrm",
+    "default": false
+  }
+]

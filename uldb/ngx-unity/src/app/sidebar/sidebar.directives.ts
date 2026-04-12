@@ -175,29 +175,6 @@ export class AppHtmlAttrDirective implements OnInit {
 }
 
 @Directive({
-  selector: '[hideMenuForNonAdmin]'
-})
-export class HideMenuForNonAdminDirective implements OnInit {
-  hide = false;
-
-  constructor(private eleRef: ElementRef,
-    private renderer: Renderer2) {
-  }
-
-  @Input() set hideMenuForNonAdmin(attribute: { [key: string]: any }) {
-    if (attribute && attribute.hide) {
-      this.hide = attribute.hide;
-    }
-  }
-
-  ngOnInit(): void {
-    if (this.hide) {
-      this.renderer.setStyle(this.eleRef.nativeElement, 'display', 'none');
-    }
-  }
-}
-
-@Directive({
   selector: '[appSidebarDropdownToggle]'
 })
 export class SidebarDropdownToggleDirective {

@@ -1,15 +1,15 @@
 @import "variables";
 
-// ── Main content column ───────────────────────────────────
+// Main content column
 // CoreUI's .main is flex:1 inside .app-body (a flex-row container), so it already
-// fills the full viewport height.  Turning it into a flex column lets margin-top:auto
+// fills the full viewport height. Turning it into a flex column lets margin-top:auto
 // on the footer push it to the very bottom of the available space.
 .main {
   display: flex;
   flex-direction: column;
 }
 
-// ── App footer ────────────────────────────────────────────
+// App footer
 .unity-app-footer {
   margin-top: auto; // pushed to bottom of the flex column above
   display: flex;
@@ -49,7 +49,7 @@
   }
 }
 
-// ── Dark theme overrides ──────────────────────────────────
+// Dark theme overrides
 :host-context(body.theme-dark) {
   .reset-action-icon {
     color: var(--unity-text-secondary);
@@ -73,12 +73,12 @@
 }
 
 
-// ── Free trial sidebar button ──────────────────────────────────
+// Free trial sidebar button
 // .sidebar-bottom-bar layout is set globally in _custom.scss (needed to
 // override CoreUI's .sidebar-minimizer specificity from outside this component)
 
 .sidebar-trial-wrapper {
-  flex: 1; // fill all space left of the 50px minimizer chevron
+  flex: 1; // fill all space left of the minimizer chevron
   position: relative; // popup anchors to this
   min-width: 0; // allow text truncation inside
 }
@@ -87,7 +87,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  height: 100%; // fill the 50px bar height
+  height: 100%; // fill the bottom bar height
   padding: 0 1rem;
   gap: 0.6rem;
   background: linear-gradient(90deg, #6d28d9 0%, #4f46e5 100%);
