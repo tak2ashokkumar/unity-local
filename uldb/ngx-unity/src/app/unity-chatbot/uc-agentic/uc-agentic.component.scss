@@ -3,7 +3,7 @@
 .chat-card {
   display: flex;
   flex-direction: column;
-  height: calc(85vh - var(--top-bar-height));
+  height: calc(85vh - var(--top-bar-height, 0px));
   background: transparent;
   border: 0;
   margin-bottom: 0;
@@ -38,7 +38,7 @@
   // line-height: 1;
   // vertical-align: text-bottom;
 
-  /* reserve height so adding dots doesn’t move text */
+  /* reserve height so adding dots does not move text */
   min-width: 1em;
   /* enough space for 3 dots */
   // height: 1em;
@@ -49,7 +49,7 @@
   content: "";
   /* initial empty content */
   display: inline-block;
-  /* make sure it’s inline */
+  /* make sure it is inline */
   animation: dots 1.5s steps(3, end) infinite;
 }
 

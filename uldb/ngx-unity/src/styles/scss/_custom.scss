@@ -166,6 +166,39 @@ body:not(.sidebar-minimized) .sidebar .sidebar-bottom-bar .sidebar-minimizer:hov
 
 // Minimized sidebar: hover popout improvements
 .sidebar-minimized .sidebar {
+  .nav>.nav-item {
+    width: $sidebar-minimized-width;
+    overflow: hidden;
+
+    &:hover {
+      width: $sidebar-width + $sidebar-minimized-width;
+      overflow: visible;
+
+      >.nav-link {
+        width: $sidebar-width + $sidebar-minimized-width;
+      }
+    }
+  }
+
+  .nav>.nav-item>.nav-link {
+    width: $sidebar-minimized-width;
+    padding-right: 0;
+    padding-left: 0;
+    overflow: hidden;
+  }
+
+  .nav>.nav-item>.nav-link .nav-icon {
+    flex: 0 0 $sidebar-minimized-width;
+    width: $sidebar-minimized-width;
+    margin-right: 0;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .nav>.nav-item>.nav-link>span:first-of-type {
+    flex: 0 0 auto;
+    overflow: visible;
+  }
 
   // Hover popout panel: fixed width, capped height, vertical scroll only.
   //
