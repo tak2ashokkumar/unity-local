@@ -33,10 +33,10 @@ export class VmsListNutanixComponent implements OnInit {
     private spinner: AppSpinnerService,
     private ticketService: SharedCreateTicketService,
     private storageService: StorageService) {
-      this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
-      this.route.parent.paramMap.subscribe((params: ParamMap) => {
-        this.pcId = params.get('pcId');
-      });
+    this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
+    this.route.parent.paramMap.subscribe((params: ParamMap) => {
+      this.pcId = params.get('pcId');
+    });
   }
 
   ngOnInit(): void {
@@ -83,17 +83,17 @@ export class VmsListNutanixComponent implements OnInit {
   }
 
   getVMData() {
-    if(this.pcId){
+    if (this.pcId) {
       this.getVMdataByCloudId();
     }
-    else{
+    else {
       this.getNutanixVMdata();
     }
   }
 
-  getVMdataByCloudId(){
+  getVMdataByCloudId() {
     this.svc.getVMs(this.pcId, this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.count = res.results?.length;
+      this.count = res.count;
       this.viewData = this.svc.converToViewData(res.results);
       this.spinner.stop('main');
     }, () => {
@@ -101,9 +101,9 @@ export class VmsListNutanixComponent implements OnInit {
     });
   }
 
-  getNutanixVMdata(){
+  getNutanixVMdata() {
     this.svc.getAllNutanixVms(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.count = res.results?.length;
+      this.count = res.count;
       this.viewData = this.svc.converToViewData(res.results);
       this.spinner.stop('main');
     }, () => {
@@ -111,9 +111,9 @@ export class VmsListNutanixComponent implements OnInit {
     });
   }
 
-  getPercentage(value: string): number{
-    const freeSpace = value?.replace('%','')?.trim();
-    const val = freeSpace ? (100 - Number(freeSpace))  : 0;
+  getPercentage(value: string): number {
+    const freeSpace = value?.replace('%', '')?.trim();
+    const val = freeSpace ? (100 - Number(freeSpace)) : 0;
     return val;
   }
 

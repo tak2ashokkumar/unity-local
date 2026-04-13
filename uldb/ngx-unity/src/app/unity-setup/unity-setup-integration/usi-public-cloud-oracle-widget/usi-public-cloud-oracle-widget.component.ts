@@ -4,16 +4,16 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CRUDActionTypes, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { PublicCloudOciCrudService } from 'src/app/shared/public-cloud-oci-crud/public-cloud-oci-crud.service';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { UnitySetupIntegrationService } from '../unity-setup-integration.service';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 
 @Component({
   selector: 'usi-public-cloud-oracle-widget',
   templateUrl: './usi-public-cloud-oracle-widget.component.html',
   styleUrls: ['./usi-public-cloud-oracle-widget.component.scss'],
-  providers:[UnitySetupIntegrationService]
+  providers: [UnitySetupIntegrationService]
 })
 export class UsiPublicCloudOracleWidgetComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();

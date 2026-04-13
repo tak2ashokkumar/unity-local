@@ -2,12 +2,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
-import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AimlMgmtService, DashboardAIMLSummaryAlertsCountViewData, DashboardAIMLSummaryViewData } from './aiml-mgmt.service';
+import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 
 @Component({
   selector: 'aiml-mgmt',

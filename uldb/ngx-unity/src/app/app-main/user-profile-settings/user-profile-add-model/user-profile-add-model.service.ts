@@ -37,7 +37,7 @@ export class UserProfileAddModelService {
         'model_and_provider': ['', [Validators.required]],
         'model_name': [data.model_name, [Validators.required, NoWhitespaceValidator]],
         'provider': [data.provider, [Validators.required]],
-        'api_key': ['', [Validators.required]],
+        'api_key': ['', []],
         'endpoint_url': [data.endpoint_url],
         'description': [data.description],
       });

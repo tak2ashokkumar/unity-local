@@ -8,10 +8,10 @@ import { AppLevelService } from '../app-level.service';
 import { MapService } from '../map.service';
 import { AppSearchService } from '../shared/app-search/app-search.service';
 import { FloatingTerminalService } from '../shared/floating-terminal/floating-terminal.service';
-import { PermissionService } from '../shared/permissions/permission.service';
 import { UserInfoService } from '../shared/user-info.service';
 import { AppMainService, ChatbotDataType } from './app-main.service';
 import { GET_UNITY_NAV_DATA, UnityNavData } from './unity-nav';
+import { PermissionService } from '../shared/unity-rbac-permissions/unity-rbac-permission.service';
 
 @Component({
   selector: 'app-main',

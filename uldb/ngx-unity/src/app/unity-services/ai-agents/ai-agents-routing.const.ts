@@ -1,5 +1,4 @@
 import { Routes } from "@angular/router";
-import { AiAgentsGuard } from "./ai-agents.guard";
 import { AiAgentsComponent } from "./ai-agents.component";
 import { AiAgentsNetworkAgentComponent } from "./ai-agents-network-agent/ai-agents-network-agent.component";
 import { AiAgentsFinopsAgentComponent } from "./ai-agents-finops-agent/ai-agents-finops-agent.component";
@@ -10,6 +9,7 @@ import { NetworkAgentConditionsComponent } from "./ai-agents-network-agent/ai-ag
 import { NetworkAgentEventsComponent } from "./ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-events/network-agent-events.component";
 import { NetworkAgentAlertsComponent } from "./ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-alerts/network-agent-alerts.component";
 import { NetworkAgentConditionInvestigationComponent } from "./ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/network-agent-condition-investigation.component";
+import { AiAgentsGuard } from "./ai-agents.guard";
 
 export const AI_AGENTS_ROUTES: Routes = [
     {

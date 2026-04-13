@@ -51,6 +51,7 @@
         </div>
     </ng-container>
     <ng-container *ngIf="onChat">
-        <uch-chat class="h-100" [selectedHistory]="selectedHistory" (goBack)="handleBack()"></uch-chat>
+        <uch-chat class="h-100" [selectedHistory]="selectedHistory" (goBack)="handleBack()"
+            (newChat)="onNewChat()"></uch-chat>
     </ng-container>
 </div>

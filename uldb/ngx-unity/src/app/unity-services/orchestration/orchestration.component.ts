@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
-import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { TabData } from 'src/app/shared/tabdata';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
+import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
 
 @Component({
   selector: 'orchestration',

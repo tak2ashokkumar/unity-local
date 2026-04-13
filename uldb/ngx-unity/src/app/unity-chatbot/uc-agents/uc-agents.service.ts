@@ -13,13 +13,47 @@ export class UcAgentsService {
 
   getResponse(data: any, accessToken: string, url: string) {
     const headers = new HttpHeaders().set('access_token', accessToken)
-    // const params = new HttpParams().set('query', data);
-    // if (isFirst) {
-    //   return this.http.get(`${url}create_thread`, { headers, params });
-    // } else {
-    //   return this.http.get(`${url}${threadId}`, { headers, params });
-    // }
     return this.http.post(`${url}chat`, data, { headers });
+  }
+
+  getStreamingResponse(data: any, url: string): Observable<string> {
+    return new Observable(observer => {
+      fetch(`${url}chat_sse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(response => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        const read = () => {
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              observer.complete();
+              return;
+            }
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+            let currentEvent = '';
+            lines.forEach(line => {
+              if (line.startsWith('event:')) {
+                currentEvent = line.replace('event:', '').trim();
+              } else if (line.startsWith('data:')) {
+                const data = line.replace('data:', '').trim();
+                try {
+                  const parsed = JSON.parse(data);
+                  currentEvent == 'token' && observer.next(parsed.content);
+                } catch {
+                  observer.next(data);
+                }
+              }
+            });
+            read();
+          }).catch(err => observer.error(err));
+        };
+        read();
+      }).catch(err => observer.error(err));
+    });
   }
 
   getModuleNames(): Observable<AIAgentsModule[]> {

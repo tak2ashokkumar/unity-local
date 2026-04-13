@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, Subscription, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ChatHistoryData, UnityChatBot, UntiyChatBotExploreMenu } from '../unity-chatbot.type';
 import { ModuleIcons, StaticModules, UcAgentsService } from './uc-agents.service';
@@ -45,6 +45,16 @@ export class UcAgentsComponent implements OnInit, OnDestroy, AfterViewChecked {
   comingSoon: boolean = false;
   apiUrl: string = '';
 
+  userQueryIndex: number;
+  isStreaming = false;
+  hasReachedTop = false;
+  typingQueue: string[] = [];
+  typingInterval: any;
+
+  private timerSub: Subscription;
+  waitMessage: string = '';
+
+
   constructor(private service: UcAgentsService,
     private router: Router,
     private userInforService: UserInfoService) { }
@@ -57,39 +67,98 @@ export class UcAgentsComponent implements OnInit, OnDestroy, AfterViewChecked {
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+    this.cleanup();
+
   }
 
   ngAfterViewChecked(): void {
     if (this.shouldScroll) {
-      this.scrollToBottom();
+      this.checkIfQueryAtTop();
+      this.shouldScroll && this.scrollToBottom();;
+
     }
   }
 
+  checkIfQueryAtTop() {
+    if (this.userQueryIndex === null) return;
+    const container = this.messagesContainer.nativeElement;
+    const messageElements = container.querySelectorAll('.chat-row');
+    const targetEl = messageElements[this.userQueryIndex];
+    if (!targetEl) return;
+
+    const isAtTop = targetEl.offsetTop - container.offsetTop <= container.scrollTop + 40;
+
+    if (isAtTop) {
+      // this.shouldScroll = false;
+      this.hasReachedTop = true;
+    }
+  }
+
+  // getResponse(chat: string, isDefault?: boolean) {
+  //   this.isTyping = true;
+  //   let postData = { customer_id: this.userInforService.userOrgId, query: chat };
+  //   this.service.getResponse(postData, this.accessToken, this.apiUrl).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: NetworkAgent) => {
+  //     this.isTyping = false;
+  //     this.manageResponse(res);
+  //     this.shouldScroll = false;
+  //   }, (err: HttpErrorResponse) => {
+  //     this.isTyping = false;
+  //     this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
+  //     this.shouldScroll = false;
+  //   });
+  // }
+
   getResponse(chat: string, isDefault?: boolean) {
     this.isTyping = true;
-    // const prevQueryMetaData = !this.previousResponse || this.previousResponse?.reset_thread ? {} : { 'prev_query_id': this.previousResponse?.query_id, 'prev_chat': this.previousResponse?.messages }
-    // let postData = { query: chat, is_new: !this.previousResponse || this.previousResponse?.reset_thread, order: this.previousResponse?.order, prev_query_metadata: prevQueryMetaData, source_page: this.router.url }
-    // postData['is_default'] = isDefault ?? false;
-    // postData['module'] = this.modules.find(m => m.isActive)?.name ?? this.activeModule?.module_name ?? '';
+    this.isStreaming = true;
     let postData = { customer_id: this.userInforService.userOrgId, query: chat };
-    // const isFirst = this.chatHistoryData.length > 1 ? false : true;
-    this.service.getResponse(postData, this.accessToken, this.apiUrl).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: NetworkAgent) => {
-      // this.previousResponse = res;
-      this.isTyping = false;
-      this.manageResponse(res);
-      // this.chatHistoryData.push({ user: 'bot', message: res.response });
-      // this.resetThread = res.reset_thread;
-      this.shouldScroll = false;
-      // if (this.resetThread) {
-      //   setTimeout(() => this.scrollToBottom(), 0);
-      // }
-      // this.threadId = res.thread_id;
-    }, (err: HttpErrorResponse) => {
-      this.isTyping = false;
-      this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
-      // this.resetThread = true;
-      this.shouldScroll = false;
+
+    this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
+    const lastIndex = this.chatHistoryData.length - 1;
+    this.startWaitMessages();
+    this.service.getStreamingResponse(postData, this.apiUrl).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: (token: string) => {
+        this.typingQueue.push(token);
+
+        if (!this.typingInterval) {
+          this.startTypingEffect();
+        }
+      },
+      error: (err) => {
+        this.isTyping = false;
+        this.isStreaming = false;
+        this.chatHistoryData[lastIndex].message = 'Sorry, I am having trouble right now.';
+        this.shouldScroll = false;
+        clearInterval(this.typingInterval);
+        this.typingInterval = null;
+        this.cleanup();
+      },
+      complete: () => {
+        this.isTyping = false;
+        this.isStreaming = false;
+        // this.shouldScroll = false;
+        this.cleanup();
+      }
     });
+  }
+
+  startTypingEffect() {
+    this.typingInterval = setInterval(() => {
+      if (this.typingQueue.length > 0) {
+        const char = this.typingQueue.shift();
+        this.chatHistoryData[this.chatHistoryData.length - 1].message += char;
+        this.isTyping = false;
+        this.cleanup();
+        if (!this.hasReachedTop) {
+          this.shouldScroll = true;
+        }
+      } else {
+        this.cleanup();
+        clearInterval(this.typingInterval);
+        this.typingInterval = null;
+        this.shouldScroll = false;
+      }
+    }, 100);
   }
 
   getModuleNames() {
@@ -160,50 +229,6 @@ export class UcAgentsComponent implements OnInit, OnDestroy, AfterViewChecked {
     } else {
       this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
     }
-    // if (res.response.length && res.response.length == 1) {
-    //   if (res.response[0].type == 'text') {
-    //     this.chatHistoryData.push({ user: 'bot', message: (res.response[0].data as string), type: 'text' });
-    //   }
-    //  else if (res.response[0].type == 'table') {
-    //   const tableData = this.tableService.convertToTableViewData(res.response[0].data as UnityChatBotResponseTableData);
-    //   this.chatHistoryData.push({ user: 'bot', message: (tableData as ChatbotTableViewData), type: 'table' });
-    // } else if (res.response[0].type == 'pie_chart') {
-    //   const chartData = this.chartService.convertToPieChartViewData(res.response[0].data as UnityChatBotResponseChartData);
-    //   this.chatHistoryData.push({ user: 'bot', message: (chartData as UnityChartDetails), type: 'chart' });
-    // } else if (res.response[0].type == 'bar_chart') {
-    //   const chartData = this.chartService.convertToBarChartViewData(res.response[0].data as UnityChatBotResponseChartData);
-    //   this.chatHistoryData.push({ user: 'bot', message: (chartData as UnityChartDetails), type: 'chart' });
-    // } else if (res.response[0].type == 'donut_chart') {
-    //   const chartData = this.chartService.convertToPieChartViewData(res.response[0].data as UnityChatBotResponseChartData, res.response[0].type);
-    //   this.chatHistoryData.push({ user: 'bot', message: (chartData as UnityChartDetails), type: 'chart' });
-    // }
-    //   else {
-    //     this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
-    //   }
-    // } else if (res.response.length && res.response.length > 1) {
-    //   let responseArray = res.response;
-    //   responseArray = res.response.sort((a, b) => a.order - b.order);
-    //   responseArray.forEach(r => {
-    //     if (r.type == 'text') {
-    //       this.chatHistoryData.push({ user: 'bot', message: (r.data as string), type: 'text' });
-    //     }
-    //     // else if (r.type == 'table') {
-    //     //   const tableData = this.tableService.convertToTableViewData(r.data as UnityChatBotResponseTableData);
-    //     //   this.chatHistoryData.push({ user: 'bot', message: (tableData as ChatbotTableViewData), type: 'table' });
-    //     // } else if (r.type == 'pie_chart') {
-    //     //   const chartData = this.chartService.convertToPieChartViewData(r.data as UnityChatBotResponseChartData);
-    //     //   this.chatHistoryData.push({ user: 'bot', message: (chartData as UnityChartDetails), type: 'chart' });
-    //     // } else if (r.type == 'bar_chart') {
-    //     //   const chartData = this.chartService.convertToBarChartViewData(r.data as UnityChatBotResponseChartData);
-    //     //   this.chatHistoryData.push({ user: 'bot', message: (chartData as UnityChartDetails), type: 'chart' });
-    //     // } else if (r.type == 'donut_chart') {
-    //     //   const chartData = this.chartService.convertToPieChartViewData(r.data as UnityChatBotResponseChartData, r.type);
-    //     //   this.chatHistoryData.push({ user: 'bot', message: (chartData as UnityChartDetails), type: 'chart' });
-    //     // }
-    //   })
-    // } else {
-    //   this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
-    // }
     // this.chatHistoryData.getLast()['liked'] = false;
     // this.chatHistoryData.getLast()['disliked'] = false;
     // this.chatHistoryData.getLast()['comment'] = false;
@@ -226,6 +251,7 @@ export class UcAgentsComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (query.trim()) {
       this.shouldScroll = true;
       this.chatHistoryData.push({ user: 'user', message: query, type: 'text' });
+      this.userQueryIndex = this.chatHistoryData.length - 1
       this.getResponse(query, true);
       if (this.chatHistoryData.length) {
         this.modules.forEach(m => m.isActive = false);
@@ -235,7 +261,7 @@ export class UcAgentsComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   onSubmit() {
-    if (this.isTyping) {
+    if (this.typingQueue.length) {
       this.shouldScroll = false;
       return;
     }
@@ -243,9 +269,28 @@ export class UcAgentsComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (this.form.get('chat').value.trim()) {
       this.shouldScroll = true;
       this.chatHistoryData.push({ user: 'user', message: this.form.get('chat').value, type: 'text' });
+      this.userQueryIndex = this.chatHistoryData.length - 1
       this.getResponse(this.form.get('chat').value);
       this.form.get('chat').setValue('');
     }
+  }
+
+  startWaitMessages() {
+    this.timerSub = timer(0, 1000).subscribe(sec => {
+      if (sec < 2) {
+        this.waitMessage = 'Thinking';
+      } else if (sec < 6) {
+        this.waitMessage = 'Processing';
+      } else {
+        this.waitMessage = 'Still working, almost there';
+      }
+    });
+  }
+
+
+  cleanup() {
+    this.timerSub?.unsubscribe();
+    this.waitMessage = '';
   }
 
   onExploreMenuHover() {

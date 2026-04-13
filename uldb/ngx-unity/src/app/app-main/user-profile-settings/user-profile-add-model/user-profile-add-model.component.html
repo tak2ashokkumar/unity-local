@@ -79,7 +79,7 @@
                     </div>
                     <div class="form-group row">
                         <label class="col-2 text-right col-form-label">
-                            API Key<em>*</em> :
+                            API Key<em *ngIf="action=='Create'">*</em> :
                         </label>
                         <div class="col-4">
                             <custom-password-field formControlName="api_key"

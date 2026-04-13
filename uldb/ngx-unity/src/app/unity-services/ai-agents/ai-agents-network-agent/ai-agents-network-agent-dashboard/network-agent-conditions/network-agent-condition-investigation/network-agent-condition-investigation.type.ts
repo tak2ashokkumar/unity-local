@@ -66,3 +66,20 @@ export interface SuggestedCommand {
   command: string;
   use_case: string;
 }
+
+export interface PromptResult {
+  id: number;
+  version: number;
+  uuid: string;
+  app_name: string;
+  environment: string;
+  model_name: string;
+  temperature: number;
+  prompt: string;
+  is_active: boolean;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+  customer: number;
+  prompt_name: string;
+}

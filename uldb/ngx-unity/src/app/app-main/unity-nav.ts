@@ -1,7 +1,7 @@
-import { getUnityViewPermissionName, UnityModules } from "../shared/permissions/unity-permission-set";
-import { UNITY_ROUTE_ACCESS, UnityNavRouteAccess } from "../shared/permissions/unity-route-access";
-import { PermissionService } from "../shared/permissions/permission.service";
 import { canAccessAiAgents, canAccessAiInfraManagement, canAccessCostAnalysis } from "../shared/left-panel-access.util";
+import { getUnityViewPermissionName, UnityModules } from "../shared/unity-rbac-permissions/unity-permission-set";
+import { PermissionService } from "../shared/unity-rbac-permissions/unity-rbac-permission.service";
+import { UNITY_ROUTE_ACCESS, UnityNavRouteAccess } from "../shared/unity-rbac-permissions/unity-route-access";
 import { UserInfoService } from "../shared/user-info.service";
 
 export interface UnityNavData {
@@ -671,7 +671,7 @@ const UNITY_SERVICES_NAV_DATA = (svc: PermissionService, orgName: string, isTena
 
 const UNITED_CLOUD_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
     let publicCloudMenuName = orgName ? `Public Cloud \u2605` : 'Public Cloud';
-    let menuName = orgName ? `UnitedConnect®` : 'UnityConnect';
+    let menuName = orgName ? `UnitedConnect�` : 'UnityConnect';
     let navItems: UnityNavData[] = [
         {
             name: 'Private Cloud',

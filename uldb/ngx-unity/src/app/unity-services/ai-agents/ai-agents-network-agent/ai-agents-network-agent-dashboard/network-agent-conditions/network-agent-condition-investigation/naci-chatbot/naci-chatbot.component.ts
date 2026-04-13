@@ -9,6 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NetworkAgentsChatResponseType } from './naci-chatbot.type';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SupportedLLMConfigData } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.type';
 
 @Component({
   selector: 'naci-chatbot',
@@ -46,6 +47,7 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getAIModels();
     const firstQuery = `Create a investigation plan and remediation steps along with RCA to resolve the condition ${this.conditionId}`
     this.getResponse(firstQuery);
     this.buildForm();
@@ -169,4 +171,65 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
   goBack() {
     this.router.navigate(['../../../../', 'dashboard', 'conditions'], { relativeTo: this.route })
   }
+
+    showModelDropdown = false;
+    activeModel: SupportedLLMConfigData;
+    llmModels: SupportedLLMConfigData[] = [];
+    typingQueue: string[] = [];
+    showStopButton: boolean = false;
+    getAIModels() {
+      this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+        this.llmModels = res;
+        this.llmModels.forEach(m => {
+          if (m.active_for_applications?.includes('assistant')) {
+            this.activeModel = m;
+          }
+        })
+      }, err => {
+        this.llmModels = [];
+        this.activeModel = null;
+      })
+    }
+  
+    toggleDropdown() {
+      this.showModelDropdown = !this.showModelDropdown;
+      console.log(this.showModelDropdown);
+    }
+  
+    changeActiveModel(model: SupportedLLMConfigData) {
+      if (this.activeModel?.id === model.id) {
+        this.showModelDropdown = false;
+        return;
+      }
+  
+      if (model.is_user_owned) {
+        this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+        model.active_for_applications.push('assistant');
+        this.changeActiveModelToSelected(model);
+      } else {
+        // this.goToConfig(model);
+      }
+  
+    }
+  
+    changeActiveModelToSelected(model: SupportedLLMConfigData) {
+      this.showModelDropdown = false;
+      this.service.changeActiveModel('Assistant', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+        this.activeModel = model;
+      }, err => {
+  
+      })
+    }
+  
+    goToConfig(model: SupportedLLMConfigData) {
+      // this.togglePopUp();
+      this.router.navigate(['/settings/profile/add-model']);
+    }
+  
+    getModelItemClass(model: SupportedLLMConfigData) {
+      return {
+        'active-model-item': model.active_for_applications?.includes('assistant'),
+        'bg-light text-muted': !model.is_user_owned
+      }
+    }
 }

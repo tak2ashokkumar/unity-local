@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { AfterViewChecked, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import moment from 'moment';
@@ -66,6 +66,15 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   showModelDropdown = false;
   llmModels: SupportedLLMConfigData[] = [];
   activeModel: SupportedLLMConfigData;
+
+  chatId: string;
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.active-ai-modal-model-selector')) {
+      this.showModelDropdown = false;
+    }
+  }
   constructor(private service: UnityChatbotService,
     private router: Router,
     private modalService: BsModalService,
@@ -138,41 +147,107 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     }
   }
 
-  getResponse(chat: string, isDefault?: boolean) {
-    this.isTyping = true;
-    // const prevQueryMetaData = !this.previousResponse || this.previousResponse?.reset_thread ? {} : { 'prev_query_id': this.previousResponse?.query_id, 'prev_chat': this.previousResponse?.messages }
-    // let postData = { query: chat, is_new: !this.previousResponse || this.previousResponse?.reset_thread, order: this.previousResponse?.order, prev_query_metadata: prevQueryMetaData, source_page: this.router.url }
-    // postData['is_default'] = isDefault ?? false;
-    // postData['module'] = this.modules.find(m => m.isActive)?.module_name ?? this.activeModule?.module_name ?? '';
-    let postData = { conversation_id: this.conversationId, query: chat, org_id: this.userInfoService.userOrgId }
-    this.startWaitMessages();
-    this.service.getResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: UnityChatBot) => {
-      this.previousResponse = res;
-      this.isTyping = false;
-      this.manageResponse(res);
-      this.conversationId = res.conversation_id;
-      // this.chatHistoryData.push({ user: 'bot', message: res.response });
-      // this.resetThread = res.reset_thread;
-      // if (this.resetThread) {
-      //   setTimeout(() => this.scrollToBottom(), 0);
-      // }
-      // if (res.response.suggested_questions?.length) {
+  // getResponse(chat: string) {
+  //   this.isTyping = true;
+  //   let postData = { conversation_id: this.conversationId, query: chat, org_id: this.userInfoService.userOrgId }
+  //   this.startWaitMessages();
+  //   this.service.getResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: UnityChatBot) => {
+  //     this.previousResponse = res;
+  //     this.isTyping = false;
+  //     this.manageResponse(res);
+  //     this.conversationId = res.conversation_id;
+  //     setTimeout(() => {
+  //       this.scrollToBottom();
+  //       this.shouldScroll = false;
+  //     });
+  //     this.cleanup();
+  //   }, (err: HttpErrorResponse) => {
+  //     this.isTyping = false;
+  //     this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
+  //     this.resetThread = true;
+  //     this.shouldScroll = false;
+  //     this.cleanup();
+  //   });
+  // }
 
-      // } else {
-      //   this.shouldScroll = false;
-      // }
-      setTimeout(() => {
-        this.scrollToBottom();
+  isStreaming: boolean = false;
+  typingInterval: any;
+  typingQueue: string[] = [];
+  hasReachedTop: boolean = false;
+  showStopButton: boolean = false;
+  getStreamingResponse(chat: string) {
+    this.isTyping = true;
+    this.isStreaming = true;
+    this.showStopButton = true;
+    let postData = { conversation_id: this.conversationId, query: chat, org_id: this.userInfoService.userOrgId };
+    this.startWaitMessages();
+
+    this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
+    const lastIndex = this.chatHistoryData.length - 1;
+
+    this.service.getStreamingResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: ({ event, data }) => {
+        if (event === 'start') {
+          this.conversationId = data.conversation_id;
+          this.cleanup();
+
+        } else if (event === 'chunk') {
+          this.typingQueue.push(data.delta);
+          if (!this.typingInterval) {
+            this.startTypingEffect();
+          }
+
+        } else if (event === 'done') {
+          this.chatId = data.chat_message_id ?? '';
+          this.conversationId = data.conversation_id;
+          this.chatHistoryData[lastIndex]['suggestedPrompt'] = data.suggested_questions?.length ? data.suggested_questions[0] : '';
+          this.chatHistoryData[lastIndex]['liked'] = false;
+          this.chatHistoryData[lastIndex]['disliked'] = false;
+          this.chatHistoryData[lastIndex]['comment'] = false;
+          this.chatHistoryData[lastIndex]['feedbackSubmitted'] = false;
+          // this.chatHistoryData[lastIndex]['botResponseId'] = data.chat_message_id ?? '';
+          this.chatHistoryData[lastIndex]['feedbackIconTooltip'] = 'Feedback';
+        }
+      },
+      error: (err) => {
+        this.showStopButton = false;
+        this.isTyping = false;
+        this.isStreaming = false;
+        this.chatHistoryData[lastIndex].message = 'Sorry, I am having trouble right now.';
+        this.resetThread = true;
         this.shouldScroll = false;
-      });
-      this.cleanup();
-    }, (err: HttpErrorResponse) => {
-      this.isTyping = false;
-      this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
-      this.resetThread = true;
-      this.shouldScroll = false;
-      this.cleanup();
+        clearInterval(this.typingInterval);
+        this.typingInterval = null;
+        this.cleanup();
+      },
+      complete: () => {
+        // this.showStopButton = false;
+        this.isTyping = false;
+        this.isStreaming = false;
+      }
     });
+  }
+
+  startTypingEffect() {
+    this.typingInterval = setInterval(() => {
+      if (this.typingQueue.length > 0) {
+        const char = this.typingQueue.shift();
+        this.chatHistoryData[this.chatHistoryData.length - 1].message += char;
+        this.isTyping = false;
+        this.cleanup();
+        if (!this.hasReachedTop) {
+          this.shouldScroll = true;
+        }
+      } else {
+        console.log('else');
+        this.showStopButton && (this.chatHistoryData.getLast().botResponseId = this.chatId);
+        this.showStopButton = false;
+        this.cleanup();
+        clearInterval(this.typingInterval);
+        this.typingInterval = null;
+        this.shouldScroll = false;
+      }
+    }, 100);
   }
 
   getModuleNames() {
@@ -249,6 +324,12 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     } else {
       this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
     }
+    this.chatHistoryData.getLast()['liked'] = false;
+    this.chatHistoryData.getLast()['disliked'] = false;
+    this.chatHistoryData.getLast()['comment'] = false;
+    this.chatHistoryData.getLast()['feedbackSubmitted'] = false;
+    this.chatHistoryData.getLast()['botResponseId'] = res.response.chat_message_id ? res.response.chat_message_id : '';
+    this.chatHistoryData.getLast()['feedbackIconTooltip'] = 'Feedback';
     // if (res.response.length && res.response.length == 1) {
     //   if (res.response[0].type == 'text') {
     //     this.chatHistoryData.push({ user: 'bot', message: (res.response[0].data as string), type: 'text' });
@@ -290,12 +371,6 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     // } else {
     //   this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
     // }
-    this.chatHistoryData.getLast()['liked'] = false;
-    this.chatHistoryData.getLast()['disliked'] = false;
-    this.chatHistoryData.getLast()['comment'] = false;
-    this.chatHistoryData.getLast()['feedbackSubmitted'] = false;
-    this.chatHistoryData.getLast()['botResponseId'] = res.response.chat_message_id ? res.response.chat_message_id : '';
-    this.chatHistoryData.getLast()['feedbackIconTooltip'] = 'Feedback';
   }
 
   scrollToBottom(): void {
@@ -436,7 +511,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     if (query.trim()) {
       this.shouldScroll = true;
       this.chatHistoryData.push({ user: 'user', message: query, type: 'text' });
-      this.getResponse(query, true);
+      this.getStreamingResponse(query);
       if (this.chatHistoryData.length) {
         this.modules.forEach(m => m.isActive = false);
         this.queries = [];
@@ -453,7 +528,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     if (this.form.get('chat').value.trim()) {
       this.shouldScroll = true;
       this.chatHistoryData.push({ user: 'user', message: this.form.get('chat').value, type: 'text' });
-      this.getResponse(this.form.get('chat').value);
+      this.getStreamingResponse(this.form.get('chat').value);
       this.form.get('chat').setValue('');
     }
   }
@@ -605,8 +680,13 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   onNewChat() {
+    this.onHistory = false;
+    this.showStopButton = false;
     this.isTyping = false;
     this.cleanup();
+    this.typingQueue = [];
+    clearInterval(this.typingInterval);
+    this.typingInterval = null;
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.conversationId = null;
@@ -667,5 +747,17 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
       'active-model-item': model.active_for_applications?.includes('assistant'),
       'bg-light text-muted': !model.is_user_owned
     }
+  }
+
+  stopResponse() {
+    this.chatHistoryData.getLast().botResponseId = this.chatId;
+    clearInterval(this.typingInterval);
+    this.typingInterval = null;
+    this.showStopButton = false;
+    this.isTyping = false;
+    this.cleanup();
+    this.typingQueue = [];
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 }

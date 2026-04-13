@@ -4,10 +4,10 @@ import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 import { UnitySetupIntegrationService } from '../../unity-setup-integration.service';
 import { UsiImportDataCrudService } from '../usi-import-data-crud/usi-import-data-crud.service';
 import { AwsImportDataType } from '../usi-import-data.service';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 
 @Component({
   selector: 'usi-import-data-widget',

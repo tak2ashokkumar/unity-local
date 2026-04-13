@@ -1,5 +1,5 @@
-import { Component, Inject, OnDestroy, OnInit, Renderer2 } from '@angular/core';
-import { NetworkAgentConditionDetailsViewData, NetworkAgentConditionInvestigationService } from './network-agent-condition-investigation.service';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { NetworkAgentConditionDetailsViewData, NetworkAgentConditionInvestigationService, PromptResultViewData } from './network-agent-condition-investigation.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DOCUMENT } from '@angular/common';
 import { NetworkAgentsChatResponseType } from './naci-chatbot/naci-chatbot.type';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'network-agent-condition-investigation',
@@ -50,6 +51,16 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
     chatResponse: NetworkAgentsChatResponseType;
   }[] = [];
 
+  showPromptTuning = false;
+  promptText: string = '';
+  promptCurrentCriteria: SearchCriteria;
+  promptViewData: PromptResultViewData[] = [];
+  selectedPrompt: PromptResultViewData;
+
+  @ViewChild('confirmSaveAs') confirmSaveAs: ElementRef;
+  confirmSaveAsModalRef: BsModalRef;
+  promptName: string = '';
+
   constructor(private svc: NetworkAgentConditionInvestigationService,
     @Inject(DOCUMENT) private document,
     private renderer: Renderer2,
@@ -58,12 +69,14 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
     private route: ActivatedRoute,
     private router: Router,
     private utilService: AppUtilityService,
+    private modalService: BsModalService,
     public storage: StorageService) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.conditionId = params.get('conditionId');
       this.conditionUuid = params.get('conditionUuid');
     });
     this.activityCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
+    this.promptCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
   }
 
   ngOnInit(): void {
@@ -294,6 +307,88 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
       this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);
     }
     this.spinner.stop('main');
+  }
+
+  togglePromptTuning() {
+    this.showPromptTuning = !this.showPromptTuning;
+    if (this.showPromptTuning) {
+      this.getAllPrompts();
+    }
+  }
+
+  getAllPrompts() {
+    this.svc.getAllPrompts(this.promptCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.promptViewData = this.svc.convertToPromptViewData(res.results);
+      this.initializePromptSelection();
+    }, (err: HttpErrorResponse) => {
+      this.notification.error(new Notification('Failed to get Prompt details. Please try again later.'));
+    })
+  }
+
+  initializePromptSelection() {
+    if (!this.promptViewData || this.promptViewData.length === 0) return;
+    const active = this.promptViewData.find(p => p.isActive);
+    this.selectedPrompt = active || this.promptViewData[0];
+    this.promptText = this.selectedPrompt.prompt;
+  }
+
+  onCancel() {
+    this.showPromptTuning = false;
+  }
+
+  onSave() {
+    const savePrompt = this.selectedPrompt;
+    savePrompt.prompt = this.promptText;
+    this.svc.promptSave(savePrompt).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.getAllPrompts();
+      this.notification.success(new Notification('Version is Saved.'));
+    }, (err: HttpErrorResponse) => {
+      this.notification.error(new Notification('Failed to Save Prompt. Please try again later.'));
+    })
+
+  }
+
+  onPromptChange() {
+    if (this.selectedPrompt) {
+      this.promptText = this.selectedPrompt.prompt;
+    }
+  }
+
+  onToggleActive(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (!this.selectedPrompt) return;
+    if (checked && !this.selectedPrompt.isActive) {
+      this.svc.activateVersion(this.selectedPrompt).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+        this.getAllPrompts();
+        this.notification.success(new Notification('Version Activated Successfully.'));
+      }, (err: HttpErrorResponse) => {
+        this.notification.error(new Notification('Failed to Activate Version. Please try again later.'));
+      })
+    }
+  }
+
+  onSaveAs() {
+    this.confirmSaveAsModalRef = this.modalService.show(this.confirmSaveAs, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  confirmSaveAsModal() {
+    if (!this.promptName || !this.promptName.trim()) {
+      this.notification.error(new Notification('Please enter a valid prompt name.'));
+      return;
+    }
+    const saveAsPrompt = {
+      ...this.selectedPrompt,
+      prompt: this.promptText,
+      promptName: this.promptName
+    }
+    this.svc.promptSaveAs(saveAsPrompt).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.confirmSaveAsModalRef.hide();
+      this.getAllPrompts();
+      this.notification.success(new Notification('New Prompt Version is created.'));
+    }, (err: HttpErrorResponse) => {
+      this.confirmSaveAsModalRef.hide();
+      this.notification.error(new Notification('Failed to Save As Version. Please try again later.'));
+    })
   }
 
 }

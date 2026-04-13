@@ -1,19 +1,19 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
-import { ModulePermissionSetView, ModulePermissionSetViewData, UsumPermissionSetsCrudService, viewPermissionEnableBasedOnMultiplePermissionName, viewPermissionEnabledBasedOnOnePermissionName } from './usum-permission-sets-crud.service';
-import { FormArray, FormGroup } from '@angular/forms';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
-import { takeUntil } from 'rxjs/operators';
-import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ModulesAndPermissionsType } from '../usum-permission-sets.type';
-import { PermissionSetType } from 'src/app/shared/SharedEntityTypes/user-mgmt.type';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { cloneDeep as _clone } from 'lodash-es';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
+import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
+import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
+import { PermissionSetType } from 'src/app/shared/SharedEntityTypes/user-mgmt.type';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
+import { ModulesAndPermissionsType } from '../usum-permission-sets.type';
+import { ModulePermissionSetView, ModulePermissionSetViewData, UsumPermissionSetsCrudService } from './usum-permission-sets-crud.service';
 
 @Component({
   selector: 'usum-permission-sets-crud',
@@ -277,5 +277,4 @@ export class UsumPermissionSetsCrudComponent implements OnInit, OnDestroy {
       this.router.navigate(['../'], { relativeTo: this.route });
     }
   }
-
 }

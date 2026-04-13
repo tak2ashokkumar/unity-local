@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CRUDActionTypes, TICKET_MGMT_TYPE } from 'src/app/shared/app-utility/app-utility.service';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
-import { UsiJiraCrudService } from '../usi-jira-crud/usi-jira-crud.service';
-import { takeUntil } from 'rxjs/operators';
 import { UnitySetupIntegrationService } from '../../unity-setup-integration.service';
-import { Subject } from 'rxjs';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
+import { UsiJiraCrudService } from '../usi-jira-crud/usi-jira-crud.service';
 
 @Component({
   selector: 'usi-jira-widget',

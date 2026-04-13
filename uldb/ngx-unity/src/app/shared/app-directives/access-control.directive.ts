@@ -1,6 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, Input, Renderer2, RendererStyleFlags2 } from '@angular/core';
-import { PermissionService } from '../permissions/permission.service';
 import { UnityUserApplicableModulePermission } from '../SharedEntityTypes/loggedin-user.type';
+import { PermissionService } from '../unity-rbac-permissions/unity-rbac-permission.service';
 
 @Directive({
   selector: '[accessControl]'

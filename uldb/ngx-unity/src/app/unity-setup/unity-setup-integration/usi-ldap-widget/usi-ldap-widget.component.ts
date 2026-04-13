@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { LDAPConfigType } from '../../unity-setup-ldap-config/unity-setup-ldap-config.type';
@@ -55,5 +55,4 @@ export class UsiLdapWidgetComponent implements OnInit, OnDestroy {
   viewLdapAccount() {
     this.router.navigate(['ldap-config'], { relativeTo: this.route });
   }
-
 }

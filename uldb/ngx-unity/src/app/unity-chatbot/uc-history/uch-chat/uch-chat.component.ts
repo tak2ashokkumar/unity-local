@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Subject, Subscription, timer } from 'rxjs';
 import { UnityAssistantChatHistory, UnityAssistantHistory } from '../uc-history.type';
 import { UchChatService } from './uch-chat.service';
@@ -9,6 +9,8 @@ import { IPageInfo, VirtualScrollerComponent } from 'ngx-virtual-scroller';
 import { FormGroup } from '@angular/forms';
 import { ChatHistoryData, UnityChatBot } from '../../unity-chatbot.type';
 import { HttpErrorResponse } from '@angular/common/http';
+import { SupportedLLMConfigData } from 'src/app/shared/SharedEntityTypes/ai-chatbot/llm-model.type';
+import { Router } from '@angular/router';
 // import { EventEmitter } from 'stream';
 
 @Component({
@@ -23,6 +25,7 @@ export class UchChatComponent implements OnInit, OnDestroy {
 
   @Input() selectedHistory: UnityAssistantHistory;
   @Output() goBack = new EventEmitter();
+  @Output() newChat = new EventEmitter();
 
   chatCurrentCriteria: SearchCriteria;
   chats: UnityAssistantChatHistory[] = [];
@@ -40,8 +43,16 @@ export class UchChatComponent implements OnInit, OnDestroy {
   chatHistoryData: Array<ChatHistoryData> = [];
   shouldScrollToBottom = false;
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.active-ai-modal-model-selector')) {
+      this.showModelDropdown = false;
+    }
+  }
   constructor(private service: UchChatService,
-    private userService: UserInfoService) {
+    private userService: UserInfoService,
+    private router: Router) {
     this.chatCurrentCriteria = {
       searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.TEN,
       params: [{
@@ -54,6 +65,7 @@ export class UchChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getAIModels();
     this.buildForm();
     this.chatCurrentCriteria.params[0].conversation_id = this.selectedHistory.conversation_id;
     this.getChats();
@@ -230,6 +242,66 @@ export class UchChatComponent implements OnInit, OnDestroy {
     });
   }
 
+  showModelDropdown = false;
+  activeModel: SupportedLLMConfigData;
+  llmModels: SupportedLLMConfigData[] = [];
+  typingQueue: string[] = [];
+  showStopButton: boolean = false;
+  getAIModels() {
+    this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.llmModels = res;
+      this.llmModels.forEach(m => {
+        if (m.active_for_applications?.includes('assistant')) {
+          this.activeModel = m;
+        }
+      })
+    }, err => {
+      this.llmModels = [];
+      this.activeModel = null;
+    })
+  }
+
+  toggleDropdown() {
+    this.showModelDropdown = !this.showModelDropdown;
+  }
+
+  changeActiveModel(model: SupportedLLMConfigData) {
+    if (this.activeModel?.id === model.id) {
+      this.showModelDropdown = false;
+      return;
+    }
+
+    if (model.is_user_owned) {
+      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+      model.active_for_applications.push('assistant');
+      this.changeActiveModelToSelected(model);
+    } else {
+      // this.goToConfig(model);
+    }
+
+  }
+
+  changeActiveModelToSelected(model: SupportedLLMConfigData) {
+    this.showModelDropdown = false;
+    this.service.changeActiveModel('Assistant', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.activeModel = model;
+    }, err => {
+
+    })
+  }
+
+  goToConfig(model: SupportedLLMConfigData) {
+    // this.togglePopUp();
+    this.router.navigate(['/settings/profile/add-model']);
+  }
+
+  getModelItemClass(model: SupportedLLMConfigData) {
+    return {
+      'active-model-item': model.active_for_applications?.includes('assistant'),
+      'bg-light text-muted': !model.is_user_owned
+    }
+  }
+
   cleanup() {
     this.timerSub?.unsubscribe();
     this.waitMessage = '';
@@ -237,5 +309,9 @@ export class UchChatComponent implements OnInit, OnDestroy {
 
   backToHistoryList(): void {
     this.goBack.emit(null);
+  }
+
+  onNewChat() {
+    this.newChat.emit();
   }
 }

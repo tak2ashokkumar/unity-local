@@ -72,7 +72,7 @@
             </div>
         </ng-container>
         <div class="d-flex flex-column w-100" style="max-width: 100%;">
-            <div *ngFor="let chat of chatHistoryData;let i = index" class="d-flex flex-column w-100"
+            <div *ngFor="let chat of chatHistoryData; let i = index" class="d-flex flex-column w-100 chat-row"
                 style="max-width: 100%;">
                 <div *ngIf="chat.user == 'bot'" class="d-flex flex-column justify-content-start mb-1 w-100"
                     style="max-width: 100%;">
@@ -125,8 +125,9 @@
                 </div>
             </div>
             <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
-                <div class="message-box bot-message">
-                    <div class="pulse-loader m-1">
+                <div class="message-box bot-message d-flex">
+                    <span>{{waitMessage}}</span>
+                    <div class="pulse-loader ml-1 align-self-end mb-1">
                         <div></div>
                         <div></div>
                         <div></div>
@@ -152,7 +153,7 @@
                         <span class="input-group-text bg-white border-right-radius" (click)="onSubmit()"
                             style="cursor: pointer;">
                             <i class="fas fa-paper-plane font-lg mr-1"
-                                [ngClass]="{'text-success': !isTyping, 'text-muted': isTyping}"></i>
+                                [ngClass]="{'text-success': !typingQueue.length, 'text-muted': isTyping}"></i>
                         </span>
                     </div>
                 </div>

@@ -26,7 +26,7 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
 
   @HostBinding('class.sidebar') sidebarClass = true;
 
-  private readonly destroy$ = new Subject<void>();
+  private readonly ngUnSubscribe = new Subject<void>();
   private readonly appliedBodyClasses = new Set<string>();
 
   activeKeys = new Set<string>();
@@ -42,11 +42,10 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
     this.applyBodyClasses();
     this.rebuildActiveState();
 
-    this.router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd),
-        takeUntil(this.destroy$)
-      )
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.ngUnSubscribe)
+    )
       .subscribe((_event: NavigationEnd) => {
         this.expandedKeys.clear();
         this.collapsedKeys.clear();
@@ -67,8 +66,8 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.ngUnSubscribe.next();
+    this.ngUnSubscribe.complete();
     this.clearBodyClasses();
   }
 
@@ -129,7 +128,6 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
     if (this.collapsedKeys.has(key)) {
       return false;
     }
-
     return this.expandedKeys.has(key) || this.activeKeys.has(key);
   }
 
@@ -256,5 +254,4 @@ export class AppSidebarComponent implements OnInit, OnChanges, OnDestroy {
   private normalizeRouteUrl(url: string): string {
     return url.length > 1 ? url.replace(/\/+$/, '') : url;
   }
-
 }

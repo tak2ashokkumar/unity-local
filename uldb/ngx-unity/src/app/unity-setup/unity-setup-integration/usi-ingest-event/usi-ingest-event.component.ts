@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { UnityModules } from 'src/app/shared/permissions/unity-modules';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
@@ -14,6 +13,7 @@ import { UsiEventIngestionNewRelicCrudService } from '../usi-event-ingestion-new
 import { UsiEventIngestionOpsrampCrudService } from '../usi-event-ingestion-opsramp/usi-event-ingestion-opsramp-crud/usi-event-ingestion-opsramp-crud.service';
 import { UsiEventIngestionZabbixCrudService } from '../usi-event-ingestion-zabbix/usi-event-ingestion-zabbix-crud/usi-event-ingestion-zabbix-crud.service';
 import { UsiEventIngestionDynatraceCrudService } from '../usi-event-ingeston-dynatrace/usi-event-ingestion-dynatrace-crud/usi-event-ingestion-dynatrace-crud.service';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 
 @Component({
   selector: 'usi-ingest-event',

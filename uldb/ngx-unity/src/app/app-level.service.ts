@@ -7,8 +7,8 @@ import { ExecutionStatus, StatusState, TaskError, TaskStatus } from './shared/Sh
 import { ACTIVITY_LOG, CHECK_TASK_STATUS_BY_TASK_ID, CHECK_TASK_STATUS_BY_TASK_ID_AS_PARAMS, GET_ALL_DEVICES_TAGS, GET_EXECUTION_STATUS_FOR_AGENTIC_WF_EXECUTE, GET_EXECUTION_STATUS_FOR_ON_CHAT, GET_MONITORING_CONFIG, LOGOUT, STOP_IMPERSONATING } from './shared/api-endpoint.const';
 import { Logger } from './shared/app-logger.service';
 import { DeviceMapping } from './shared/app-utility/app-utility.service';
-import { PermissionService } from './shared/permissions/permission.service';
 import { UserInfoService } from './shared/user-info.service';
+import { PermissionService } from './shared/unity-rbac-permissions/unity-rbac-permission.service';
 
 @Injectable({
   providedIn: 'root'

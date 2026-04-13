@@ -5,8 +5,8 @@ import { map, take } from 'rxjs/operators';
 import { StorageService, StorageType } from './app-storage/storage.service';
 import { UnityUserApplicableModulePermission, UnityUserType, User } from './SharedEntityTypes/loggedin-user.type';
 import { PaginatedResult } from './SharedEntityTypes/paginated.type';
-import { UnityModules } from './permissions/unity-modules';
-import { getUnityManagePermissionName, getUnityViewPermissionName } from './permissions/unity-permission-set';
+import { UnityModules } from './unity-rbac-permissions/unity-modules';
+import { getUnityManagePermissionName, getUnityViewPermissionName } from './unity-rbac-permissions/unity-permission-set';
 
 @Injectable({
   providedIn: 'root'

@@ -88,7 +88,8 @@
     </ul>
 </app-header>
 <div class="app-body">
-    <app-sidebar [fixed]="true" [display]="'lg'" [navItems]="navItems" [disabled]="sidebarMinimized" *ngIf="navItems.length">
+    <app-sidebar [fixed]="true" [display]="'lg'" [navItems]="navItems" [disabled]="sidebarMinimized"
+        *ngIf="navItems.length">
         <li sidebar-extra-nav class="nav-item">
             <a class="nav-link" href="javascript:void(0);" (click)="reportAnIssue()">
                 <i class="nav-icon fa fa-envelope"></i>

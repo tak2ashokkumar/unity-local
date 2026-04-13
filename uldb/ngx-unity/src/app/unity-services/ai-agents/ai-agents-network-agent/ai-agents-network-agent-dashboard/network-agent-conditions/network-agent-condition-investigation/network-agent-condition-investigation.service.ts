@@ -12,7 +12,7 @@ import { Observable, Subject } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { NetworkAgentConditionActivityDetail } from '../network-agent-conditions.type';
 import { NetworkAgentConditionActivityDetailViewData } from '../network-agent-conditions.service';
-import { ConditionResponse } from './network-agent-condition-investigation.type';
+import { ConditionResponse, PromptResult } from './network-agent-condition-investigation.type';
 import { AnswerType, ConditionData } from './naci-chatbot/naci-chatbot.type';
 
 @Injectable()
@@ -29,6 +29,21 @@ export class NetworkAgentConditionInvestigationService {
 
   toggle(StepName: string) {
     this.toggleAnnouncedSource.next(StepName);
+  }
+  getAllPrompts(criteria: SearchCriteria) {
+    return this.http.get<PaginatedResult<any>>(`/internal/mcp/prompts/?app_name=condition_agent`);
+  }
+
+  promptSaveAs(selectedPrompt: PromptResultViewData){
+    return this.http.post<any>(`/internal/mcp/prompts/${selectedPrompt.uuid}/save_as/`,{prompt: selectedPrompt.prompt,prompt_name: selectedPrompt.promptName});
+  }
+
+  promptSave(selectedPrompt: PromptResultViewData){
+    return this.http.patch<any>(`/internal/mcp/prompts/${selectedPrompt.uuid}/`,selectedPrompt);
+  }
+
+  activateVersion(activateVersion: PromptResultViewData){
+    return this.http.post(`/internal/mcp/prompts/${activateVersion.uuid}/activate/`,{});
   }
 
   getConditionDetails(conditionUuid: string) {
@@ -206,6 +221,30 @@ export class NetworkAgentConditionInvestigationService {
       view.createdDatetime = ad.created_datetime ? this.utilSvc.toUnityOneDateFormat(ad.created_datetime) : 'NA';
       viewdata.push(view);
     })
+    return viewdata;
+  }
+
+  convertToPromptViewData(data: PromptResult[]): PromptResultViewData[] {
+    let viewdata: PromptResultViewData[] = [];
+    data.forEach((ad) => {
+      let view = new PromptResultViewData();
+      view.id = ad.id;
+      view.version = ad.version;
+      view.uuid = ad.uuid;
+      view.appName = ad.app_name;
+      view.environment = ad.environment;
+      view.modelName = ad.model_name;
+      view.temperature = ad.temperature;
+      view.prompt = ad.prompt;
+      view.isActive = ad.is_active;
+      view.isDefault = ad.is_default;
+      view.createdAt = ad.created_at? this.utilSvc.toUnityOneDateFormat(ad.created_at): 'NA';
+      view.updatedAt = ad.updated_at? this.utilSvc.toUnityOneDateFormat(ad.updated_at): 'NA';
+      view.customer = ad.customer;
+      view.promptName = ad.prompt_name;
+      viewdata.push(view);
+    });
+
     return viewdata;
   }
 
@@ -392,4 +431,22 @@ export enum StageTitleMapping {
   REMEDIATION_SCRIPT = 'Remediation',
   VALIDATE_FIX = 'Run Remediation Script and Validate',
   DOCUMENT_AND_CLOSE = 'Document and Close'
+}
+
+export class PromptResultViewData {
+  constructor() { };
+  id: number;
+  version: number;
+  uuid: string;
+  appName: string;
+  environment: string;
+  modelName: string;
+  temperature: number;
+  prompt: string;
+  isActive: boolean;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+  customer: number;
+  promptName: string;
 }

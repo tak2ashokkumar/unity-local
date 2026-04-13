@@ -3,11 +3,11 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject, Subscription } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
-import { UnityModules, UnityPermissionSet } from 'src/app/shared/permissions/unity-permission-set';
-import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
+import { UnityModules, UnityPermissionSet } from 'src/app/shared/unity-rbac-permissions/unity-permission-set';
+import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { AdvancedDiscoveryConnectivityCrudService } from './advanced-discovery-connectivity/advanced-discovery-connectivity-crud/advanced-discovery-connectivity-crud.service';
 import { OnboardingTabStepType, UnitySetupOnBoardingService } from './unity-setup-on-boarding.service';
@@ -61,7 +61,7 @@ export class UnitySetupOnBoardingComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   ngOnDestroy() {
     this.subscr.unsubscribe();

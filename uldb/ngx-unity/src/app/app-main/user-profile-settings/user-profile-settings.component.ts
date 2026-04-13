@@ -7,8 +7,6 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppDashboardListType } from 'src/app/app-dashboard/app-dashboard.type';
 import { AppLevelService } from 'src/app/app-level.service';
-import { UnityModules, UnityPermissionSet } from 'src/app/shared/permissions/unity-permission-set';
-import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { TicketMgmtList } from 'src/app/shared/SharedEntityTypes/ticket-mgmt-list.type';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -19,6 +17,8 @@ import { TabData } from 'src/app/shared/tabdata';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { LlmConfigViewData, providerImages, UserProfileSettingsService, UserProfileViewData } from './user-profile-settings.service';
 import { UnityOrganizationSettings, UnityOrganizationSettingsTicketInstance } from './user-profile-settings.type';
+import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
+import { UnityModules, UnityPermissionSet } from 'src/app/shared/unity-rbac-permissions/unity-permission-set';
 
 @Component({
   selector: 'user-profile-settings',

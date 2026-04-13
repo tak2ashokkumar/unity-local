@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { TabNames } from '../unity-chatbot.service';
 import { UcHistoryService } from './uc-history.service';
 import { Subject } from 'rxjs';
@@ -27,6 +27,8 @@ export class UcHistoryComponent implements OnInit, OnDestroy {
   selectedHistory: UnityAssistantHistory;
   isHistoryLoading: boolean = false;
   noMoreHistory: boolean = false;
+
+  @Output() newChat = new EventEmitter();
 
   constructor(private service: UcHistoryService,
     private userService: UserInfoService,) {
@@ -118,5 +120,9 @@ export class UcHistoryComponent implements OnInit, OnDestroy {
     // this.infiniteHistoryList = [];
     // this.getHistory();
     this.onChat = false;
+  }
+
+  onNewChat(){
+    this.newChat.emit();
   }
 }

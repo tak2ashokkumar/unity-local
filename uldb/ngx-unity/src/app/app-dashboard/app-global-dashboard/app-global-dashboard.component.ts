@@ -1,8 +1,9 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { UnityModules, UnityPermissionSet } from 'src/app/shared/permissions/unity-permission-set';
 import { MapService } from 'src/app/map.service';
-import { PermissionService } from 'src/app/shared/permissions/permission.service';
 import { TabData } from 'src/app/shared/tabdata';
+import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
+import { UnityPermissionSet } from 'src/app/shared/unity-rbac-permissions/unity-permission-set';
+import { PermissionService } from 'src/app/shared/unity-rbac-permissions/unity-rbac-permission.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 
 @Component({

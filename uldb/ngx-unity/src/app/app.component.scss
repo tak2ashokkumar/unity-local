@@ -4,11 +4,13 @@
         right 0.25s,
         width 0.25s;
 }
+
 .tabs-level1 {
     position: relative;
     border-radius: 0;
     border-bottom: 1px solid #c8ced3;
 }
+
 .tabs-level1 {
     display: -ms-flexbox;
     display: flex;
@@ -20,23 +22,28 @@
     background-color: #fff;
     border-radius: 0;
 }
+
 .tabs-level1-item {
     margin-bottom: 0;
     cursor: pointer;
     padding: 0.75rem 0.5rem;
 }
+
 .tabs-level1-item.active {
     border-bottom: 2px solid #f48e1f;
     cursor: default;
 }
+
 .tabs-level1-item.active,
 .tabs-level1-item.active .tabs-level1-link {
     cursor: default;
 }
+
 .tabs-level1-link {
     padding: 0 0.5rem;
     border: none;
 }
+
 .tabs-level1-menu {
     margin-bottom: 0;
     cursor: pointer;

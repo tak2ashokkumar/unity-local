@@ -33,7 +33,7 @@
             </div>
         </div>
         <ng-container *ngIf="onHistory">
-            <uc-history style="height: calc(100% - 40px);"></uc-history>
+            <uc-history (newChat)="onNewChat()" style="height: calc(100% - 40px);"></uc-history>
         </ng-container>
         <ng-container *ngIf="!onHistory">
             <div class="card-body card-body-custom d-flex flex-column p-0">
@@ -245,8 +245,9 @@
                                         <button type="button"
                                             class="btn btn-pill active-ai-modal-model-btn d-flex align-items-center"
                                             (click)="toggleDropdown()">
-                                            <img [src]="activeModel?.image" class="active-ai-modal-model-icon mr-1">
-                                            {{activeModel?.text}}
+                                            <img *ngIf="activeModel?.image" [src]="activeModel?.image"
+                                                class="active-ai-modal-model-icon mr-1">
+                                            {{activeModel?.text || 'Select Model'}}
                                             <i class="fas fa-chevron-down ml-1"></i>
                                         </button>
                                         <div *ngIf="showModelDropdown" class="active-ai-modal-model-dropdown">
@@ -276,38 +277,25 @@
                                         </div>
                                     </div>
                                     <ng-container *ngIf="chatHistoryData.length > 1">
-                                        <button type="button" class="btn btn-sm ml-2 new-chat-button no-hover query-button"
+                                        <button type="button"
+                                            class="btn btn-sm ml-2 new-chat-button no-hover query-button"
                                             (click)="onNewChat()">
                                             <i class="fas fa-comment-medical font-md text-muted"></i>
                                         </button>
                                     </ng-container>
-                                    <button type="button" class="btn btn-sm mx-2 query-button"
-                                        [ngClass]="isTyping ? 'btn-secondary' : 'btn-success query-button-success'"
+                                    <button *ngIf="!showStopButton" type="button"
+                                        class="btn btn-sm mx-2 query-button"
+                                        [ngClass]="!typingQueue.length ? 'btn-success query-button-success' : 'btn-secondary'"
                                         (click)="onSubmit()">
                                         <i class="fas fa-arrow-up font-md text-white"></i>
                                     </button>
+                                    <button *ngIf="showStopButton" type="button"
+                                        class="btn btn-danger stop-button btn-sm mx-2 query-button d-flex align-items-center justify-content-center"
+                                        (click)="stopResponse()">
+                                        <i class="fas fa-square text-white"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <!-- <div class="row">
-                                <div class="col d-flex align-items-center">
-                                    <div class="input-group">
-                                        <input class="form-control border-left-radius" type="text"
-                                            formControlName="chat" placeholder="Ask me anything..."
-                                            (keyup.enter)="onSubmit()" style="height: 2.7rem;">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text bg-white border-right-radius"
-                                                (click)="onSubmit()" style="cursor: pointer;">
-                                                <i class="fas fa-paper-plane font-lg mr-1"
-                                                    [ngClass]="{'text-success': !isTyping, 'text-muted': isTyping}"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <ng-container *ngIf="chatHistoryData.length > 1">
-                                        <button type="button" class="action-icons action-icons-big fa fa-plus ml-2"
-                                            (click)="onNewChat()"></button>
-                                    </ng-container>
-                                </div>
-                            </div> -->
                         </form>
                     </div>
                 </ng-container>

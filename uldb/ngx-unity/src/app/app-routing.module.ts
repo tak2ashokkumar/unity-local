@@ -3,17 +3,17 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 import { AppMainComponent } from './app-main/app-main.component';
 import { TwoFactorAuthComponent } from './app-main/two-factor-auth/two-factor-auth.component';
+import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
 import { UserProfileSettingsComponent } from './app-main/user-profile-settings/user-profile-settings.component';
 import { AppNoAccessComponent } from './app-no-access/app-no-access.component';
 import { AppTermialViewComponent } from './app-termial-view/app-termial-view.component';
 import { AppWelcomePageComponent } from './app-welcome-page/app-welcome-page.component';
 import { DefaultComponent } from './default/default.component';
 import { GlobalSearchComponent } from './global-search/global-search.component';
+import { LeftPanelRouteAccessGuard } from './shared/app-guards/left-panel-route-access.guard';
+import { AiInfraMgmtGuard } from './unity-ai-infra-mgmt/unity-ai-infra-mgmt.guard';
+import { CostAnalysisGuard } from './unity-cost-analysis/unity-cost-analysis.guard';
 import { WelcomePageGuardService } from './welcome-page-guard.service';
-import { UserProfileAddModelComponent } from './app-main/user-profile-settings/user-profile-add-model/user-profile-add-model.component';
-import { LeftPanelRouteAccessGuard } from './shared/guards/left-panel-route-access.guard';
-import { AiInfraMgmtGuard } from './unity-ai-infra-mgmt/ai-infra-mgmt.guard';
-import { CostAnalysisGuard } from './unity-cost-analysis/cost-analysis.guard';
 
 export const routes: Routes = [
   {
@@ -24,6 +24,15 @@ export const routes: Routes = [
         path: 'default',
         component: DefaultComponent,
         canActivate: [WelcomePageGuardService]
+      },
+      {
+        path: 'no-access',
+        component: AppNoAccessComponent,
+        data: {
+          breadcrumb: {
+            title: 'No Access'
+          }
+        }
       },
       { path: 'welcomepage', component: AppWelcomePageComponent },
       // ...APP_DASHBOARD_ROUTES,
@@ -41,15 +50,6 @@ export const routes: Routes = [
       {
         path: 'home',
         loadChildren: () => import('src/app/app-home/app-home.module').then(m => m.AppHomeModule)
-      },
-      {
-        path: 'no-access',
-        component: AppNoAccessComponent,
-        data: {
-          breadcrumb: {
-            title: 'No Access'
-          }
-        }
       },
       {
         path: 'unityview',

@@ -57,6 +57,46 @@ export class UnityChatbotService {
     return this.http.post(`mcp/query/`, data);
   }
 
+  getStreamingResponse(data: any): Observable<any> {
+    return new Observable(observer => {
+      fetch(`mcp/stream`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(response => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        const read = () => {
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              observer.complete();
+              return;
+            }
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+
+            let currentEvent = '';
+            lines.forEach(line => {
+              if (line.startsWith('event:')) {
+                currentEvent = line.replace('event:', '').trim();
+              } else if (line.startsWith('data:')) {
+                const data = line.replace('data:', '').trim();
+                try {
+                  const parsed = JSON.parse(data);
+                  observer.next({ event: currentEvent, data: parsed });
+                } catch {
+                  observer.next({ event: currentEvent, data });
+                }
+              }
+            });
+            read();
+          }).catch(err => observer.error(err));
+        };
+        read();
+      }).catch(err => observer.error(err));
+    });
+  }
+
   getModuleNames(): Observable<UntiyChatBotExploreMenu[]> {
     return this.http.get<UntiyChatBotExploreMenu[]>(`chatbot/menu/?page_size=0`);
   }
