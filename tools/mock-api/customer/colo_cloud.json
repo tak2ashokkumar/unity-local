@@ -1,133 +1,60 @@
 [
     {
-        "id": 301,
+        "id": 535,
         "cabinets": [
             {
-                "url": "http://10.192.11.207:8000/rest/fast/cabinet/1273/",
-                "id": 1273,
-                "uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
-                "name": "CB1-SF10"
+                "url": "https://unity.unitedlayer.com/rest/fast/cabinet/1556/",
+                "id": 1556,
+                "uuid": "652ad95d-15d2-41b9-8356-a1a3862303d1",
+                "name": "Dell"
             }
         ],
-        "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
-        "created_at": "2022-05-27T00:22:51.924451-07:00",
-        "updated_at": "2023-04-24T04:04:38.975597-07:00",
-        "name": "DataCenter1 - SF10",
-        "location": "San Francisco, CA, USA",
-        "lat": "37.7749295",
-        "long": "-122.4194155",
+        "uuid": "d3420a6d-2dc4-4ba6-b55f-b995abaf47a6",
+        "created_at": "2026-03-03T22:36:20.861539-08:00",
+        "updated_at": "2026-03-17T06:27:32.000038-07:00",
+        "name": "SDX BLR DC",
+        "location": "Bengaluru, Karnataka, India",
+        "lat": "12.9628669",
+        "long": "77.577509",
         "status": [
             {
-                "status": "down",
+                "status": "up",
                 "category": "Datacenter"
             },
             {
-                "status": "down",
+                "status": "up",
                 "category": "Physical Devices"
             }
         ],
-        "customer": 365
+        "customer": 538
     },
     {
-        "id": 302,
+        "id": 536,
         "cabinets": [
             {
-                "url": "http://10.192.11.207:8000/rest/fast/cabinet/1274/",
-                "id": 1274,
-                "uuid": "a7b71f1d-fd7e-4ba1-82ed-ba9a77d04ee2",
-                "name": "CB1-Aus01"
+                "url": "https://unity.unitedlayer.com/rest/fast/cabinet/1557/",
+                "id": 1557,
+                "uuid": "ff6ee4b2-5fcd-48cc-99d6-662b0d9c5b2b",
+                "name": "dell"
             }
         ],
-        "uuid": "9cbde93f-26e9-4185-ae8e-83e016caa808",
-        "created_at": "2022-05-27T00:23:31.681964-07:00",
-        "updated_at": "2023-07-20T10:09:15.470567-07:00",
-        "name": "DataCenter2 - Aus",
-        "location": "Sydney NSW, Australia",
-        "lat": "-33.8688197",
-        "long": "151.2092955",
+        "uuid": "f9119e7a-8836-46a0-bfdc-2133ab575d00",
+        "created_at": "2026-03-17T06:23:05.531970-07:00",
+        "updated_at": "2026-03-17T06:27:48.341879-07:00",
+        "name": "SDX BLR DR",
+        "location": "Bengaluru, Karnataka, India",
+        "lat": "12.9628669",
+        "long": "77.577509",
         "status": [
             {
-                "status": "down",
+                "status": "up",
                 "category": "Datacenter"
             },
             {
-                "status": "down",
+                "status": "up",
                 "category": "Physical Devices"
             }
         ],
-        "customer": 365
-    },
-    {
-        "id": 304,
-        "cabinets": [
-            {
-                "url": "http://10.192.11.207:8000/rest/fast/cabinet/1275/",
-                "id": 1275,
-                "uuid": "921bd445-b7c6-47e4-b815-8de7b427819e",
-                "name": "CAB1-Fin"
-            }
-        ],
-        "uuid": "6340900a-d401-4895-a8d2-993ac60f953e",
-        "created_at": "2022-06-01T03:10:00.756215-07:00",
-        "updated_at": "2023-07-20T10:09:36.279401-07:00",
-        "name": "DC3-Fin",
-        "location": "Finland",
-        "lat": "61.92411",
-        "long": "25.748151",
-        "status": [
-            {
-                "status": "partially-up",
-                "category": "Datacenter"
-            },
-            {
-                "status": "partially-up",
-                "category": "Physical Devices"
-            }
-        ],
-        "customer": 365
-    },
-    {
-        "id": 464,
-        "cabinets": [],
-        "uuid": "a6d76e20-175d-4b34-9189-fbcb0972f684",
-        "created_at": "2024-01-31T12:28:11.648238-08:00",
-        "updated_at": "2024-01-31T12:28:11.648380-08:00",
-        "name": "DC4-Test",
-        "location": "San Francisco, CA 94128, USA",
-        "lat": "37.6162172",
-        "long": "-122.3859319",
-        "status": [
-            {
-                "status": "partially-up",
-                "category": "Datacenter"
-            },
-            {
-                "status": "partially-up",
-                "category": "Physical Devices"
-            }
-        ],
-        "customer": 365
-    },
-    {
-        "id": 467,
-        "cabinets": [],
-        "uuid": "abd483ee-5644-41c0-8838-ffcd5baa1641",
-        "created_at": "2024-02-29T09:28:48.111568-08:00",
-        "updated_at": "2024-02-29T09:28:48.111931-08:00",
-        "name": "DC5-Demo",
-        "location": "San Francisco, CA 94128, USA",
-        "lat": "37.6192526",
-        "long": "-122.3815739",
-        "status": [
-            {
-                "status": "partially-up",
-                "category": "Datacenter"
-            },
-            {
-                "status": "partially-up",
-                "category": "Physical Devices"
-            }
-        ],
-        "customer": 365
+        "customer": 538
     }
 ]

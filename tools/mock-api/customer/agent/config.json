@@ -1,37 +1,37 @@
 [
     {
-        "id": 59,
-        "name": "Prod Collector",
-        "ip_address": "10.192.4.150",
+        "id": 262,
+        "name": "wipro",
+        "ip_address": "10.192.58.200",
         "poller_id": null,
         "status": "Completed",
         "test_result": {
-            "date": "2025-06-16T13:35:38.558510-07:00",
+            "date": "2026-04-12T22:47:57.007614-07:00",
             "ping": {
-                "msg": null,
+                "msg": "IP is reachable",
                 "result": true
             },
             "ssh": {
-                "msg": null,
+                "msg": "SSH Connection Passed",
                 "result": true
             },
-            "host_name": ""
+            "host_name": "unityone-coll-wp-poc"
         },
         "snmp_community": null,
         "pkey": null,
-        "uuid": "ca296e51-780a-4c50-a5a9-f0331a2581df",
-        "poller_name": "UnityDemo-1",
-        "ssh_username": "uladmin",
-        "ssh_port": 22,
+        "uuid": "39cdd8ab-b648-4136-a193-537fbb0f3334",
+        "poller_name": "Wipro-CIS-COE-1",
+        "ssh_username": "unityoneadmin",
+        "ssh_port": 3131,
         "web_username": null,
         "web_password": null,
         "deployment_status": 1,
         "pyro_port": 9090,
-        "rdp_access_name": "https://rdp-ca296e51-f0331a2581df.uproxy.unitedlayer.com",
-        "created_at": "2023-01-09T22:09:34.795989-08:00",
-        "updated_at": "2025-06-16T13:35:41.599774-07:00",
+        "rdp_access_name": "https://rdp-39cdd8ab-537fbb0f3334.uproxy.unitedlayer.com",
+        "created_at": "2026-02-24T08:41:22.246979-08:00",
+        "updated_at": "2026-04-12T22:53:33.875391-07:00",
         "enable_vcenter": true,
         "is_docker": false,
-        "customer": 365
+        "customer": 538
     }
 ]

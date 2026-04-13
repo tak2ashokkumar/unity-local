@@ -1,0 +1,118 @@
+{
+  "url": "https://unity.unitedlayer.com/customer/private_cloud_integrated/f60a0acc-54f5-47ba-b70d-702a7b53bfd6/",
+  "id": 1267,
+  "proxy": {},
+  "name": "SDC-LAB -Nutanix",
+  "uuid": "f60a0acc-54f5-47ba-b70d-702a7b53bfd6",
+  "platform_type": "Nutanix",
+  "customer": {
+    "url": "https://unity.unitedlayer.com/rest/fast/org/538/",
+    "id": 538,
+    "name": "Wipro-CIS-COE",
+    "storage": null,
+    "uuid": "b84cc809-3c7d-4ab2-91f8-019779e10675"
+  },
+  "colocation_cloud": {
+    "id": 535,
+    "uuid": "d3420a6d-2dc4-4ba6-b55f-b995abaf47a6",
+    "name": "SDX BLR DC"
+  },
+  "servers": [],
+  "vms": [],
+  "vms_count": 25,
+  "device_count": 0,
+  "switch": [],
+  "load_balancer": [],
+  "customdevice": [],
+  "firewall": [],
+  "storage_device": [],
+  "mac_device": [],
+  "upstream_providers": [],
+  "hypervisors": [],
+  "bm_server": [],
+  "display_platform": "Nutanix",
+  "server_list": [],
+  "collector": {
+    "uuid": "39cdd8ab-b648-4136-a193-537fbb0f3334",
+    "name": "wipro",
+    "id": 262
+  },
+  "nutanix": {
+    "virtual_machine": {
+      "total": 25,
+      "good": 25,
+      "warning": 0,
+      "error": 0
+    },
+    "storage_container": {
+      "total": 3,
+      "good": 3,
+      "warning": 0,
+      "error": 0
+    },
+    "cluster": {
+      "total": 1,
+      "good": 0,
+      "warning": 0,
+      "error": 1
+    },
+    "host": {
+      "total": 3,
+      "good": 0,
+      "warning": 0,
+      "error": 3
+    },
+    "storage_pool": {
+      "total": 1,
+      "good": 1,
+      "warning": 0,
+      "error": 0
+    },
+    "disk": {
+      "total": 18,
+      "good": 18,
+      "warning": 0,
+      "error": 0
+    },
+    "virtual_disks": {
+      "total": 0
+    }
+  },
+  "nutanix_details": {
+    "components_to_discover": [
+      "vm",
+      "cluster",
+      "host",
+      "sc",
+      "disk",
+      "sp",
+      "vdisk"
+    ],
+    "credentials": {
+      "id": 244,
+      "uuid": "69594f00-7ad7-48e4-b9f1-b70001a24db9",
+      "name": "Nutanix Credentials",
+      "connection_type": "Default",
+      "database_type": null
+    },
+    "schedule": null,
+    "protection_domain": "",
+    "onboard": true,
+    "hostname": "https://172.17.80.190:9440"
+  },
+  "monitoring": {
+    "configured": false,
+    "observium": false,
+    "enabled": false,
+    "zabbix": true
+  },
+  "resources_list": [],
+  "discover_resources": false,
+  "discover_dependency": false,
+  "is_managed": false,
+  "ingest_event": false,
+  "total_resources": 25,
+  "clusters": [],
+  "datastores": [],
+  "networks": []
+}

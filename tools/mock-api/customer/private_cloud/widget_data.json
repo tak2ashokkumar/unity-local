@@ -1,8 +1,83 @@
 {
-  "message": "Auto-generated mock file",
-  "endpoint": "/customer/private_cloud/520ef675-cb6f-46dc-aaf7-34b7b818a887/widget_data/",
-  "method": "GET",
-  "query": {},
-  "body": {},
-  "data": []
+  "vcpu_utilization": {
+    "value": 260.0,
+    "unit": "%"
+  },
+  "allocated_ram": {
+    "value": 351.4,
+    "unit": "GB"
+  },
+  "configured_ram": {
+    "value": 152.7,
+    "unit": "GB"
+  },
+  "ram_utilization": {
+    "value": 43.5,
+    "unit": "%"
+  },
+  "allocated_vcpu": 20,
+  "alert_count": 15,
+  "disk_utilization": {
+    "value": 18.3,
+    "unit": "%"
+  },
+  "ram_runtime_usage": 13.65,
+  "available_ram": {
+    "value": 198.7,
+    "unit": "GB"
+  },
+  "allocated_storage_disk": {
+    "value": 6.9,
+    "unit": "TB"
+  },
+  "configured_storage_disk": {
+    "value": 1.3,
+    "unit": "TB"
+  },
+  "vcpu_runtime_usage": 6.83,
+  "configured_vcpu": 52,
+  "health_summary": {
+    "virtual_machine": {
+      "total": 0,
+      "good": 0,
+      "warning": 0,
+      "error": 0
+    },
+    "storage_container": {
+      "total": 0,
+      "good": 0,
+      "warning": 0,
+      "error": 0
+    },
+    "cluster": {
+      "total": 0,
+      "good": 0,
+      "warning": 0,
+      "error": 0
+    },
+    "host": {
+      "total": 0,
+      "good": 0,
+      "warning": 0,
+      "error": 0
+    },
+    "storage_pool": {
+      "total": 0,
+      "good": 0,
+      "warning": 0,
+      "error": 0
+    },
+    "disk": {
+      "total": 0,
+      "good": 0,
+      "warning": 0,
+      "error": 0
+    }
+  },
+  "month_to_date_cost": 0.0,
+  "available_vcpu": -32,
+  "available_storage_disk": {
+    "value": 5.7,
+    "unit": "TB"
+  }
 }
