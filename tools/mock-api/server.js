@@ -8,6 +8,43 @@ const PORT = 3001;
 const baseDir = path.join(__dirname);
 const celeryDir = path.join(__dirname, "celery");
 
+function buildPageUrl(req, page, pageSize) {
+  const protocol = req.protocol || "http";
+  const host = req.get("host") || `localhost:${PORT}`;
+  const url = new URL(`${protocol}://${host}${req.path}`);
+
+  url.searchParams.set("page", String(page));
+  if (pageSize !== undefined) {
+    url.searchParams.set("page_size", String(pageSize));
+  }
+  return url.toString();
+}
+
+function paginateArray(req, data) {
+  const query = req.query || {};
+  const rawPageSize = Number(query.page_size);
+  const rawPage = Number(query.page || 1);
+
+  if (query.page_size === "0" || rawPageSize === 0) {
+    return data;
+  }
+
+  const pageSize = Number.isFinite(rawPageSize) && rawPageSize > 0 ? rawPageSize : 10;
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+  const count = data.length;
+  const start = (page - 1) * pageSize;
+  const results = data.slice(start, start + pageSize);
+  const next = start + pageSize < count ? buildPageUrl(req, page + 1, pageSize) : null;
+  const previous = page > 1 ? buildPageUrl(req, page - 1, pageSize) : null;
+
+  return {
+    count,
+    next,
+    previous,
+    results
+  };
+}
+
 if (fs.existsSync(celeryDir)) {
   fs.readdirSync(celeryDir).forEach(file => {
     if (file.endsWith(".js")) {
@@ -38,7 +75,13 @@ app.use((req, res) => {
   if (fs.existsSync(filePath)) {
     const raw = fs.readFileSync(filePath, "utf8");
     const rewritten = raw.replace(/https:\/\/unity\.unitedlayer\.com/g, `http://localhost:${PORT}`);
-    res.json(JSON.parse(rewritten));
+    const parsed = JSON.parse(rewritten);
+
+    if (Array.isArray(parsed)) {
+      return res.json(paginateArray(req, parsed));
+    }
+
+    return res.json(parsed);
   } else {
     // res.status(404).json({
     //   error: "Mock API not found",
@@ -48,6 +91,11 @@ app.use((req, res) => {
     const dir = path.dirname(filePath);
 
     fs.mkdirSync(dir, { recursive: true });
+
+    if (req.query && req.query.page_size === "0") {
+      fs.writeFileSync(filePath, JSON.stringify([], null, 2));
+      return res.json([]);
+    }
 
     const template = {
       count: 0,

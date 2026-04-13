@@ -1,194 +1,189 @@
-{
-  "count": 11,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 7,
-      "url": "http://localhost:3001/rest/cpumodel/7/",
-      "asset_tag": null,
-      "name": "E5-2609v2",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 4,
-      "threads_per_core": null,
-      "perf_index": 20000,
-      "salesforce_id": "12345",
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 8,
-      "url": "http://localhost:3001/rest/cpumodel/8/",
-      "asset_tag": null,
-      "name": "E5-2695v2",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 12,
-      "threads_per_core": null,
-      "perf_index": 30000,
-      "salesforce_id": "asdaf1",
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 9,
-      "url": "http://localhost:3001/rest/cpumodel/9/",
-      "asset_tag": null,
-      "name": "E5-2620v2",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 12,
-      "threads_per_core": null,
-      "perf_index": 25000,
-      "salesforce_id": "a aa ",
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 10,
-      "url": "http://localhost:3001/rest/cpumodel/10/",
-      "asset_tag": null,
-      "name": "E5-2630V3",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 8,
-      "threads_per_core": null,
-      "perf_index": 12879,
-      "salesforce_id": "R-02359",
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 11,
-      "url": "http://localhost:3001/rest/cpumodel/11/",
-      "asset_tag": null,
-      "name": "E5620 ",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 4,
-      "threads_per_core": 8,
-      "perf_index": 20000,
-      "salesforce_id": "a046000002G31OJ",
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 1,
-      "url": "http://localhost:3001/rest/cpumodel/1/",
-      "asset_tag": null,
-      "name": "E5-2650v2 Eight Core Xeon",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 8,
-      "threads_per_core": 4,
-      "perf_index": 20000,
-      "salesforce_id": null,
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
+[
+  {
+    "id": 7,
+    "url": "http://localhost:3001/rest/cpumodel/7/",
+    "asset_tag": null,
+    "name": "E5-2609v2",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 4,
+    "threads_per_core": null,
+    "perf_index": 20000,
+    "salesforce_id": "12345",
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
       "id": 2,
-      "url": "http://localhost:3001/rest/cpumodel/2/",
-      "asset_tag": null,
-      "name": "8Core/16Thread XEON",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 4,
-      "threads_per_core": 4,
-      "perf_index": 20000,
-      "salesforce_id": null,
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 3,
-      "url": "http://localhost:3001/rest/cpumodel/3/",
-      "asset_tag": null,
-      "name": "E5410 Quad Core Xeon",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 4,
-      "threads_per_core": 4,
-      "perf_index": 20000,
-      "salesforce_id": null,
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 5,
-      "url": "http://localhost:3001/rest/cpumodel/5/",
-      "asset_tag": null,
-      "name": "Xeon E5620",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 4,
-      "threads_per_core": null,
-      "perf_index": 20000,
-      "salesforce_id": null,
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 4,
-      "url": "http://localhost:3001/rest/cpumodel/4/",
-      "asset_tag": null,
-      "name": "P4 2.60 GHz",
-      "clock_speed_mhz": null,
-      "turbo_clock_speed_mhz": null,
-      "cores": 1,
-      "threads_per_core": null,
-      "perf_index": 20000,
-      "salesforce_id": null,
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
-    },
-    {
-      "id": 6,
-      "url": "http://localhost:3001/rest/cpumodel/6/",
-      "asset_tag": null,
-      "name": "E5-2620v3",
-      "clock_speed_mhz": 2400,
-      "turbo_clock_speed_mhz": 3200,
-      "cores": 6,
-      "threads_per_core": 2,
-      "perf_index": 9965,
-      "salesforce_id": null,
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/2/",
-        "id": 2,
-        "name": "Intel"
-      }
+      "name": "Intel"
     }
-  ]
-}
+  },
+  {
+    "id": 8,
+    "url": "http://localhost:3001/rest/cpumodel/8/",
+    "asset_tag": null,
+    "name": "E5-2695v2",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 12,
+    "threads_per_core": null,
+    "perf_index": 30000,
+    "salesforce_id": "asdaf1",
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 9,
+    "url": "http://localhost:3001/rest/cpumodel/9/",
+    "asset_tag": null,
+    "name": "E5-2620v2",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 12,
+    "threads_per_core": null,
+    "perf_index": 25000,
+    "salesforce_id": "a aa ",
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 10,
+    "url": "http://localhost:3001/rest/cpumodel/10/",
+    "asset_tag": null,
+    "name": "E5-2630V3",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 8,
+    "threads_per_core": null,
+    "perf_index": 12879,
+    "salesforce_id": "R-02359",
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 11,
+    "url": "http://localhost:3001/rest/cpumodel/11/",
+    "asset_tag": null,
+    "name": "E5620 ",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 4,
+    "threads_per_core": 8,
+    "perf_index": 20000,
+    "salesforce_id": "a046000002G31OJ",
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 1,
+    "url": "http://localhost:3001/rest/cpumodel/1/",
+    "asset_tag": null,
+    "name": "E5-2650v2 Eight Core Xeon",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 8,
+    "threads_per_core": 4,
+    "perf_index": 20000,
+    "salesforce_id": null,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 2,
+    "url": "http://localhost:3001/rest/cpumodel/2/",
+    "asset_tag": null,
+    "name": "8Core/16Thread XEON",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 4,
+    "threads_per_core": 4,
+    "perf_index": 20000,
+    "salesforce_id": null,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 3,
+    "url": "http://localhost:3001/rest/cpumodel/3/",
+    "asset_tag": null,
+    "name": "E5410 Quad Core Xeon",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 4,
+    "threads_per_core": 4,
+    "perf_index": 20000,
+    "salesforce_id": null,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 5,
+    "url": "http://localhost:3001/rest/cpumodel/5/",
+    "asset_tag": null,
+    "name": "Xeon E5620",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 4,
+    "threads_per_core": null,
+    "perf_index": 20000,
+    "salesforce_id": null,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 4,
+    "url": "http://localhost:3001/rest/cpumodel/4/",
+    "asset_tag": null,
+    "name": "P4 2.60 GHz",
+    "clock_speed_mhz": null,
+    "turbo_clock_speed_mhz": null,
+    "cores": 1,
+    "threads_per_core": null,
+    "perf_index": 20000,
+    "salesforce_id": null,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  },
+  {
+    "id": 6,
+    "url": "http://localhost:3001/rest/cpumodel/6/",
+    "asset_tag": null,
+    "name": "E5-2620v3",
+    "clock_speed_mhz": 2400,
+    "turbo_clock_speed_mhz": 3200,
+    "cores": 6,
+    "threads_per_core": 2,
+    "perf_index": 9965,
+    "salesforce_id": null,
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/2/",
+      "id": 2,
+      "name": "Intel"
+    }
+  }
+]

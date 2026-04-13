@@ -1,187 +1,182 @@
-{
-  "count": 5,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 1,
-      "uuid": "da40e0c9-0920-4f84-a18b-a0540ab199f4",
-      "name": "Administrator",
-      "description": "Administrator Role",
-      "permissions": [
-        "d11dc393-a29d-473b-a702-adaa8d3dcbdb"
-      ],
-      "applicable_permissions": [
-        {
-          "id": 1,
-          "name": "Administrator Permission Set",
-          "uuid": "d11dc393-a29d-473b-a702-adaa8d3dcbdb"
-        }
-      ],
-      "active_permissions": [
-        {
-          "id": 1,
-          "name": "Administrator Permission Set",
-          "uuid": "d11dc393-a29d-473b-a702-adaa8d3dcbdb"
-        }
-      ],
-      "user_groups": [],
-      "applicable_user_groups": [],
-      "users": [
-        "Brown@unitedlayer.com",
-        "Demo@wipro.com",
-        "Grey@unitedlayer.com",
-        "japatpreet@unitedlayer.com",
-        "mayur.shah@wipro.com",
-        "msp-TenantA01@unitedlayer.com",
-        "spatric@unitedlayer.com",
-        "svijayakumar@unitedlayer.com",
-        "taaaewws2t@test.com",
-        "tenanta01@unityone.ai",
-        "white@unitedlayer.com"
-      ],
-      "is_active": true,
-      "is_default": true,
-      "created_at": "2025-08-13T01:38:14.936712-07:00",
-      "updated_at": "2026-03-17T08:46:54.634072-07:00",
-      "created_by": null,
-      "created_by_name": "Unity"
-    },
-    {
-      "id": 5,
-      "uuid": "3ff50134-0f5c-4224-99de-4ffe70c0609c",
-      "name": "AiOps Users",
-      "description": "AiOps Users",
-      "permissions": [
-        "aff91410-04cd-43e6-b056-1f5c0c4f3353"
-      ],
-      "applicable_permissions": [
-        {
-          "id": 6,
-          "name": "AiOps Users",
-          "uuid": "aff91410-04cd-43e6-b056-1f5c0c4f3353"
-        }
-      ],
-      "active_permissions": [
-        {
-          "id": 6,
-          "name": "AiOps Users",
-          "uuid": "aff91410-04cd-43e6-b056-1f5c0c4f3353"
-        }
-      ],
-      "user_groups": [],
-      "applicable_user_groups": [],
-      "users": [
-        "japatpreet@unitedlayer.com"
-      ],
-      "is_active": true,
-      "is_default": false,
-      "created_at": "2024-11-29T04:32:17.935516-08:00",
-      "updated_at": "2024-11-29T04:32:17.935189-08:00",
-      "created_by": 1928,
-      "created_by_name": "Tenant A01"
-    },
-    {
-      "id": 2,
-      "uuid": "42deb2ba-c18a-4e96-af04-405b33868393",
-      "name": "Dashboard user",
-      "description": "Dashboard User Role",
-      "permissions": [
-        "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b"
-      ],
-      "applicable_permissions": [
-        {
-          "id": 2,
-          "name": "Dashboard Permission Set",
-          "uuid": "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b"
-        }
-      ],
-      "active_permissions": [
-        {
-          "id": 2,
-          "name": "Dashboard Permission Set",
-          "uuid": "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b"
-        }
-      ],
-      "user_groups": [],
-      "applicable_user_groups": [],
-      "users": [
-        "japatpreet@unitedlayer.com"
-      ],
-      "is_active": true,
-      "is_default": true,
-      "created_at": "2025-08-13T01:38:14.936715-07:00",
-      "updated_at": "2026-03-17T08:46:54.641304-07:00",
-      "created_by": null,
-      "created_by_name": "Unity"
-    },
-    {
-      "id": 3,
-      "uuid": "a59d8dcc-f328-4e96-baaf-4d2f938ff141",
-      "name": "Global Read-Only",
-      "description": "Global Read-Only Role",
-      "permissions": [
-        "c2918f50-229c-4005-a2cd-fed17844f597"
-      ],
-      "applicable_permissions": [
-        {
-          "id": 3,
-          "name": "Global Read-Only Permission Set",
-          "uuid": "c2918f50-229c-4005-a2cd-fed17844f597"
-        }
-      ],
-      "active_permissions": [
-        {
-          "id": 3,
-          "name": "Global Read-Only Permission Set",
-          "uuid": "c2918f50-229c-4005-a2cd-fed17844f597"
-        }
-      ],
-      "user_groups": [],
-      "applicable_user_groups": [],
-      "users": [
-        "japatpreet@unitedlayer.com"
-      ],
-      "is_active": true,
-      "is_default": true,
-      "created_at": "2025-08-13T01:38:14.936718-07:00",
-      "updated_at": "2026-03-17T08:46:54.647406-07:00",
-      "created_by": null,
-      "created_by_name": "Unity"
-    },
-    {
-      "id": 6,
-      "uuid": "e9ca190f-efc6-4d08-9878-37908bc6c514",
-      "name": "Monitoring Users",
-      "description": "Monitoring Users",
-      "permissions": [
-        "605d80d2-a308-495b-a5e4-6f73fe4365d8"
-      ],
-      "applicable_permissions": [
-        {
-          "id": 7,
-          "name": "Monitoring Users",
-          "uuid": "605d80d2-a308-495b-a5e4-6f73fe4365d8"
-        }
-      ],
-      "active_permissions": [
-        {
-          "id": 7,
-          "name": "Monitoring Users",
-          "uuid": "605d80d2-a308-495b-a5e4-6f73fe4365d8"
-        }
-      ],
-      "user_groups": [],
-      "applicable_user_groups": [],
-      "users": [
-        "japatpreet@unitedlayer.com"
-      ],
-      "is_active": true,
-      "is_default": false,
-      "created_at": "2024-11-29T04:33:41.390359-08:00",
-      "updated_at": "2024-11-29T04:33:41.390067-08:00",
-      "created_by": 1928,
-      "created_by_name": "Tenant A01"
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "uuid": "da40e0c9-0920-4f84-a18b-a0540ab199f4",
+    "name": "Administrator",
+    "description": "Administrator Role",
+    "permissions": [
+      "d11dc393-a29d-473b-a702-adaa8d3dcbdb"
+    ],
+    "applicable_permissions": [
+      {
+        "id": 1,
+        "name": "Administrator Permission Set",
+        "uuid": "d11dc393-a29d-473b-a702-adaa8d3dcbdb"
+      }
+    ],
+    "active_permissions": [
+      {
+        "id": 1,
+        "name": "Administrator Permission Set",
+        "uuid": "d11dc393-a29d-473b-a702-adaa8d3dcbdb"
+      }
+    ],
+    "user_groups": [],
+    "applicable_user_groups": [],
+    "users": [
+      "Brown@unitedlayer.com",
+      "Demo@wipro.com",
+      "Grey@unitedlayer.com",
+      "japatpreet@unitedlayer.com",
+      "mayur.shah@wipro.com",
+      "msp-TenantA01@unitedlayer.com",
+      "spatric@unitedlayer.com",
+      "svijayakumar@unitedlayer.com",
+      "taaaewws2t@test.com",
+      "tenanta01@unityone.ai",
+      "white@unitedlayer.com"
+    ],
+    "is_active": true,
+    "is_default": true,
+    "created_at": "2025-08-13T01:38:14.936712-07:00",
+    "updated_at": "2026-03-17T08:46:54.634072-07:00",
+    "created_by": null,
+    "created_by_name": "Unity"
+  },
+  {
+    "id": 5,
+    "uuid": "3ff50134-0f5c-4224-99de-4ffe70c0609c",
+    "name": "AiOps Users",
+    "description": "AiOps Users",
+    "permissions": [
+      "aff91410-04cd-43e6-b056-1f5c0c4f3353"
+    ],
+    "applicable_permissions": [
+      {
+        "id": 6,
+        "name": "AiOps Users",
+        "uuid": "aff91410-04cd-43e6-b056-1f5c0c4f3353"
+      }
+    ],
+    "active_permissions": [
+      {
+        "id": 6,
+        "name": "AiOps Users",
+        "uuid": "aff91410-04cd-43e6-b056-1f5c0c4f3353"
+      }
+    ],
+    "user_groups": [],
+    "applicable_user_groups": [],
+    "users": [
+      "japatpreet@unitedlayer.com"
+    ],
+    "is_active": true,
+    "is_default": false,
+    "created_at": "2024-11-29T04:32:17.935516-08:00",
+    "updated_at": "2024-11-29T04:32:17.935189-08:00",
+    "created_by": 1928,
+    "created_by_name": "Tenant A01"
+  },
+  {
+    "id": 2,
+    "uuid": "42deb2ba-c18a-4e96-af04-405b33868393",
+    "name": "Dashboard user",
+    "description": "Dashboard User Role",
+    "permissions": [
+      "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b"
+    ],
+    "applicable_permissions": [
+      {
+        "id": 2,
+        "name": "Dashboard Permission Set",
+        "uuid": "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b"
+      }
+    ],
+    "active_permissions": [
+      {
+        "id": 2,
+        "name": "Dashboard Permission Set",
+        "uuid": "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b"
+      }
+    ],
+    "user_groups": [],
+    "applicable_user_groups": [],
+    "users": [
+      "japatpreet@unitedlayer.com"
+    ],
+    "is_active": true,
+    "is_default": true,
+    "created_at": "2025-08-13T01:38:14.936715-07:00",
+    "updated_at": "2026-03-17T08:46:54.641304-07:00",
+    "created_by": null,
+    "created_by_name": "Unity"
+  },
+  {
+    "id": 3,
+    "uuid": "a59d8dcc-f328-4e96-baaf-4d2f938ff141",
+    "name": "Global Read-Only",
+    "description": "Global Read-Only Role",
+    "permissions": [
+      "c2918f50-229c-4005-a2cd-fed17844f597"
+    ],
+    "applicable_permissions": [
+      {
+        "id": 3,
+        "name": "Global Read-Only Permission Set",
+        "uuid": "c2918f50-229c-4005-a2cd-fed17844f597"
+      }
+    ],
+    "active_permissions": [
+      {
+        "id": 3,
+        "name": "Global Read-Only Permission Set",
+        "uuid": "c2918f50-229c-4005-a2cd-fed17844f597"
+      }
+    ],
+    "user_groups": [],
+    "applicable_user_groups": [],
+    "users": [
+      "japatpreet@unitedlayer.com"
+    ],
+    "is_active": true,
+    "is_default": true,
+    "created_at": "2025-08-13T01:38:14.936718-07:00",
+    "updated_at": "2026-03-17T08:46:54.647406-07:00",
+    "created_by": null,
+    "created_by_name": "Unity"
+  },
+  {
+    "id": 6,
+    "uuid": "e9ca190f-efc6-4d08-9878-37908bc6c514",
+    "name": "Monitoring Users",
+    "description": "Monitoring Users",
+    "permissions": [
+      "605d80d2-a308-495b-a5e4-6f73fe4365d8"
+    ],
+    "applicable_permissions": [
+      {
+        "id": 7,
+        "name": "Monitoring Users",
+        "uuid": "605d80d2-a308-495b-a5e4-6f73fe4365d8"
+      }
+    ],
+    "active_permissions": [
+      {
+        "id": 7,
+        "name": "Monitoring Users",
+        "uuid": "605d80d2-a308-495b-a5e4-6f73fe4365d8"
+      }
+    ],
+    "user_groups": [],
+    "applicable_user_groups": [],
+    "users": [
+      "japatpreet@unitedlayer.com"
+    ],
+    "is_active": true,
+    "is_default": false,
+    "created_at": "2024-11-29T04:33:41.390359-08:00",
+    "updated_at": "2024-11-29T04:33:41.390067-08:00",
+    "created_by": 1928,
+    "created_by_name": "Tenant A01"
+  }
+]

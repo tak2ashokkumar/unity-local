@@ -1,1449 +1,1444 @@
-{
-  "count": 5,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 1,
-      "uuid": "d11dc393-a29d-473b-a702-adaa8d3dcbdb",
-      "name": "Administrator Permission Set",
-      "description": "All Permissions for Administrator Role",
-      "entity_groups": [],
-      "permissions": [
-        {
-          "module__name": "Monitoring",
-          "id": 1,
-          "module": 1,
-          "name": "View Monitoring"
-        },
-        {
-          "module__name": "Monitoring",
-          "id": 2,
-          "module": 1,
-          "name": "Manage Monitoring"
-        },
-        {
-          "module__name": "UnityCollector",
-          "id": 3,
-          "module": 2,
-          "name": "View UnityCollector"
-        },
-        {
-          "module__name": "UnityCollector",
-          "id": 4,
-          "module": 2,
-          "name": "Manage UnityCollector"
-        },
-        {
-          "module__name": "UnityCollector",
-          "id": 5,
-          "module": 2,
-          "name": "Register UnityCollector"
-        },
-        {
-          "module__name": "User Management",
-          "id": 6,
-          "module": 3,
-          "name": "View Users"
-        },
-        {
-          "module__name": "User Management",
-          "id": 7,
-          "module": 3,
-          "name": "Manage Users"
-        },
-        {
-          "module__name": "User Management",
-          "id": 8,
-          "module": 3,
-          "name": "Create Users"
-        },
-        {
-          "module__name": "Maintenance",
-          "id": 9,
-          "module": 4,
-          "name": "View Maintenance"
-        },
-        {
-          "module__name": "Maintenance",
-          "id": 10,
-          "module": 4,
-          "name": "Manage Maintenance"
-        },
-        {
-          "module__name": "Ticket Management",
-          "id": 11,
-          "module": 5,
-          "name": "View Tickets"
-        },
-        {
-          "module__name": "Ticket Management",
-          "id": 12,
-          "module": 5,
-          "name": "Manage Tickets"
-        },
-        {
-          "module__name": "Public Cloud",
-          "id": 13,
-          "module": 6,
-          "name": "View Public Cloud"
-        },
-        {
-          "module__name": "Public Cloud",
-          "id": 14,
-          "module": 6,
-          "name": "Manage Public Cloud"
-        },
-        {
-          "module__name": "Public Cloud",
-          "id": 15,
-          "module": 6,
-          "name": "Remote Management"
-        },
-        {
-          "module__name": "Sustainability",
-          "id": 16,
-          "module": 7,
-          "name": "View Sustainability"
-        },
-        {
-          "module__name": "Private Cloud",
-          "id": 17,
-          "module": 8,
-          "name": "View Private Cloud"
-        },
-        {
-          "module__name": "Private Cloud",
-          "id": 18,
-          "module": 8,
-          "name": "Manage Private Cloud"
-        },
-        {
-          "module__name": "Private Cloud",
-          "id": 19,
-          "module": 8,
-          "name": "Remote Management"
-        },
-        {
-          "module__name": "Notifications",
-          "id": 20,
-          "module": 9,
-          "name": "View Notifications"
-        },
-        {
-          "module__name": "Notifications",
-          "id": 21,
-          "module": 9,
-          "name": "Manage Notifications"
-        },
-        {
-          "module__name": "Service Catalog",
-          "id": 22,
-          "module": 10,
-          "name": "View Service Catalog"
-        },
-        {
-          "module__name": "Service Catalog",
-          "id": 23,
-          "module": 10,
-          "name": "Manage Service Catalog"
-        },
-        {
-          "module__name": "Service Catalog",
-          "id": 24,
-          "module": 10,
-          "name": "Order Catalog"
-        },
-        {
-          "module__name": "AIML Event Management",
-          "id": 25,
-          "module": 11,
-          "name": "View AIML Event Management"
-        },
-        {
-          "module__name": "AIML Event Management",
-          "id": 26,
-          "module": 11,
-          "name": "Manage AIML Event Management"
-        },
-        {
-          "module__name": "Services",
-          "id": 27,
-          "module": 12,
-          "name": "View Services"
-        },
-        {
-          "module__name": "Services",
-          "id": 28,
-          "module": 12,
-          "name": "Manage Services"
-        },
-        {
-          "module__name": "Credentials",
-          "id": 29,
-          "module": 13,
-          "name": "View Credentials"
-        },
-        {
-          "module__name": "Credentials",
-          "id": 30,
-          "module": 13,
-          "name": "Manage Credentials"
-        },
-        {
-          "module__name": "Datacenter",
-          "id": 31,
-          "module": 14,
-          "name": "View Datacenter"
-        },
-        {
-          "module__name": "Datacenter",
-          "id": 32,
-          "module": 14,
-          "name": "Manage Datacenter"
-        },
-        {
-          "module__name": "Datacenter",
-          "id": 33,
-          "module": 14,
-          "name": "Remote Management"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 34,
-          "module": 15,
-          "name": "View DevOps Automation"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 35,
-          "module": 15,
-          "name": "Manage DevOps Automation"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 36,
-          "module": 15,
-          "name": "View Tasks"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 37,
-          "module": 15,
-          "name": "Manage Tasks"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 38,
-          "module": 15,
-          "name": "Execute Tasks"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 39,
-          "module": 15,
-          "name": "View Workflow"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 40,
-          "module": 15,
-          "name": "Manage Workflow"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 41,
-          "module": 15,
-          "name": "Execute Workflow"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 42,
-          "module": 15,
-          "name": "View Scripts"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 43,
-          "module": 15,
-          "name": "Manage Scripts"
-        },
-        {
-          "module__name": "UnityConnect",
-          "id": 44,
-          "module": 16,
-          "name": "View UnityConnect"
-        },
-        {
-          "module__name": "UnityConnect",
-          "id": 45,
-          "module": 16,
-          "name": "Manage UnityConnect"
-        },
-        {
-          "module__name": "Dashboard",
-          "id": 46,
-          "module": 17,
-          "name": "View Dashboard"
-        },
-        {
-          "module__name": "Dashboard",
-          "id": 47,
-          "module": 17,
-          "name": "Manage Dashboard"
-        },
-        {
-          "module__name": "Cost Analysis",
-          "id": 48,
-          "module": 18,
-          "name": "View Cost Analysis"
-        },
-        {
-          "module__name": "Cost Analysis",
-          "id": 49,
-          "module": 18,
-          "name": "Manage Cost Analysis"
-        },
-        {
-          "module__name": "Cost Analysis",
-          "id": 50,
-          "module": 18,
-          "name": "Cost Calculator"
-        },
-        {
-          "module__name": "UnitySetup",
-          "id": 51,
-          "module": 19,
-          "name": "View UnitySetup"
-        },
-        {
-          "module__name": "UnitySetup",
-          "id": 52,
-          "module": 19,
-          "name": "Manage UnitySetup"
-        },
-        {
-          "module__name": "Network Topology",
-          "id": 53,
-          "module": 20,
-          "name": "View Network Topology"
-        },
-        {
-          "module__name": "Onboarding",
-          "id": 54,
-          "module": 21,
-          "name": "View Onboarding"
-        },
-        {
-          "module__name": "Onboarding",
-          "id": 55,
-          "module": 21,
-          "name": "Manage Onboarding"
-        },
-        {
-          "module__name": "Onboarding",
-          "id": 56,
-          "module": 21,
-          "name": "Discovery Admin"
-        },
-        {
-          "module__name": "Integrations",
-          "id": 57,
-          "module": 22,
-          "name": "View Integrations"
-        },
-        {
-          "module__name": "Integrations",
-          "id": 58,
-          "module": 22,
-          "name": "Manage Integrations"
-        },
-        {
-          "module__name": "Integrations",
-          "id": 59,
-          "module": 22,
-          "name": "Add Integrations"
-        },
-        {
-          "module__name": "Integrations",
-          "id": 60,
-          "module": 22,
-          "name": "Sync Integrations"
-        },
-        {
-          "module__name": "Activity Log",
-          "id": 61,
-          "module": 23,
-          "name": "View Activity Log"
-        },
-        {
-          "module__name": "Activity Log",
-          "id": 62,
-          "module": 23,
-          "name": "Download Activity Log"
-        },
-        {
-          "module__name": "Unity Report",
-          "id": 63,
-          "module": 24,
-          "name": "View Unity Report"
-        },
-        {
-          "module__name": "Unity Report",
-          "id": 64,
-          "module": 24,
-          "name": "Manage Unity Report"
-        },
-        {
-          "module__name": "Network Configuration",
-          "id": 65,
-          "module": 25,
-          "name": "View Network Configuration"
-        },
-        {
-          "module__name": "Network Configuration",
-          "id": 66,
-          "module": 25,
-          "name": "Manage Network Configuration"
-        },
-        {
-          "module__name": "Connections",
-          "id": 67,
-          "module": 26,
-          "name": "View Connections"
-        },
-        {
-          "module__name": "Connections",
-          "id": 68,
-          "module": 26,
-          "name": "Manage Connections"
-        },
-        {
-          "module__name": "Custom Attributes",
-          "id": 69,
-          "module": 27,
-          "name": "View Custom Attributes"
-        },
-        {
-          "module__name": "Custom Attributes",
-          "id": 70,
-          "module": 27,
-          "name": "Manage Custom Attributes"
-        },
-        {
-          "module__name": "Budget",
-          "id": 72,
-          "module": 28,
-          "name": "Manage Budget"
-        },
-        {
-          "module__name": "Cost Plan",
-          "id": 73,
-          "module": 29,
-          "name": "View Cost Plan"
-        },
-        {
-          "module__name": "Cost Plan",
-          "id": 74,
-          "module": 29,
-          "name": "Manage Cost Plan"
-        },
-        {
-          "module__name": "Budget",
-          "id": 71,
-          "module": 28,
-          "name": "View Budget"
-        },
-        {
-          "module__name": "Cost Analysis",
-          "id": 75,
-          "module": 18,
-          "name": "Cloud Overview"
-        },
-        {
-          "module__name": "Policy",
-          "id": 76,
-          "module": 30,
-          "name": "View Policy"
-        },
-        {
-          "module__name": "Policy",
-          "id": 77,
-          "module": 30,
-          "name": "Manage Policy"
-        },
-        {
-          "module__name": "FinOps",
-          "id": 78,
-          "module": 31,
-          "name": "View FinOps"
-        },
-        {
-          "module__name": "FinOps",
-          "id": 79,
-          "module": 31,
-          "name": "Manage FinOps"
-        },
-        {
-          "module__name": "Business Services",
-          "id": 80,
-          "module": 32,
-          "name": "View Business Services"
-        },
-        {
-          "module__name": "Business Services",
-          "id": 81,
-          "module": 32,
-          "name": "Manage Business Services"
-        }
-      ],
-      "rbac_permissions": [
-        {
-          "permission_names": [
-            "View Monitoring",
-            "Manage Monitoring"
-          ],
-          "module_name": "Monitoring"
-        },
-        {
-          "permission_names": [
-            "View UnityCollector",
-            "Manage UnityCollector",
-            "Register UnityCollector"
-          ],
-          "module_name": "UnityCollector"
-        },
-        {
-          "permission_names": [
-            "View Users",
-            "Manage Users",
-            "Create Users"
-          ],
-          "module_name": "User Management"
-        },
-        {
-          "permission_names": [
-            "View Maintenance",
-            "Manage Maintenance"
-          ],
-          "module_name": "Maintenance"
-        },
-        {
-          "permission_names": [
-            "View Tickets",
-            "Manage Tickets"
-          ],
-          "module_name": "Ticket Management"
-        },
-        {
-          "permission_names": [
-            "View Public Cloud",
-            "Manage Public Cloud",
-            "Remote Management"
-          ],
-          "module_name": "Public Cloud"
-        },
-        {
-          "permission_names": [
-            "View Sustainability"
-          ],
-          "module_name": "Sustainability"
-        },
-        {
-          "permission_names": [
-            "View Private Cloud",
-            "Manage Private Cloud",
-            "Remote Management"
-          ],
-          "module_name": "Private Cloud"
-        },
-        {
-          "permission_names": [
-            "View Notifications",
-            "Manage Notifications"
-          ],
-          "module_name": "Notifications"
-        },
-        {
-          "permission_names": [
-            "View Service Catalog",
-            "Manage Service Catalog",
-            "Order Catalog"
-          ],
-          "module_name": "Service Catalog"
-        },
-        {
-          "permission_names": [
-            "View AIML Event Management",
-            "Manage AIML Event Management"
-          ],
-          "module_name": "AIML Event Management"
-        },
-        {
-          "permission_names": [
-            "View Services",
-            "Manage Services"
-          ],
-          "module_name": "Services"
-        },
-        {
-          "permission_names": [
-            "View Credentials",
-            "Manage Credentials"
-          ],
-          "module_name": "Credentials"
-        },
-        {
-          "permission_names": [
-            "View Datacenter",
-            "Manage Datacenter",
-            "Remote Management"
-          ],
-          "module_name": "Datacenter"
-        },
-        {
-          "permission_names": [
-            "View DevOps Automation",
-            "Manage DevOps Automation",
-            "View Tasks",
-            "Manage Tasks",
-            "Execute Tasks",
-            "View Workflow",
-            "Manage Workflow",
-            "Execute Workflow",
-            "View Scripts",
-            "Manage Scripts"
-          ],
-          "module_name": "DevOps Automation"
-        },
-        {
-          "permission_names": [
-            "View UnityConnect",
-            "Manage UnityConnect"
-          ],
-          "module_name": "UnityConnect"
-        },
-        {
-          "permission_names": [
-            "View Dashboard",
-            "Manage Dashboard"
-          ],
-          "module_name": "Dashboard"
-        },
-        {
-          "permission_names": [
-            "View Cost Analysis",
-            "Manage Cost Analysis",
-            "Cost Calculator",
-            "Cloud Overview"
-          ],
-          "module_name": "Cost Analysis"
-        },
-        {
-          "permission_names": [
-            "View UnitySetup",
-            "Manage UnitySetup"
-          ],
-          "module_name": "UnitySetup"
-        },
-        {
-          "permission_names": [
-            "View Network Topology"
-          ],
-          "module_name": "Network Topology"
-        },
-        {
-          "permission_names": [
-            "View Onboarding",
-            "Manage Onboarding",
-            "Discovery Admin"
-          ],
-          "module_name": "Onboarding"
-        },
-        {
-          "permission_names": [
-            "View Integrations",
-            "Manage Integrations",
-            "Add Integrations",
-            "Sync Integrations"
-          ],
-          "module_name": "Integrations"
-        },
-        {
-          "permission_names": [
-            "View Activity Log",
-            "Download Activity Log"
-          ],
-          "module_name": "Activity Log"
-        },
-        {
-          "permission_names": [
-            "View Unity Report",
-            "Manage Unity Report"
-          ],
-          "module_name": "Unity Report"
-        },
-        {
-          "permission_names": [
-            "View Network Configuration",
-            "Manage Network Configuration"
-          ],
-          "module_name": "Network Configuration"
-        },
-        {
-          "permission_names": [
-            "View Connections",
-            "Manage Connections"
-          ],
-          "module_name": "Connections"
-        },
-        {
-          "permission_names": [
-            "View Custom Attributes",
-            "Manage Custom Attributes"
-          ],
-          "module_name": "Custom Attributes"
-        },
-        {
-          "permission_names": [
-            "Manage Budget",
-            "View Budget"
-          ],
-          "module_name": "Budget"
-        },
-        {
-          "permission_names": [
-            "View Cost Plan",
-            "Manage Cost Plan"
-          ],
-          "module_name": "Cost Plan"
-        },
-        {
-          "permission_names": [
-            "View Policy",
-            "Manage Policy"
-          ],
-          "module_name": "Policy"
-        },
-        {
-          "permission_names": [
-            "View FinOps",
-            "Manage FinOps"
-          ],
-          "module_name": "FinOps"
-        },
-        {
-          "permission_names": [
-            "View Business Services",
-            "Manage Business Services"
-          ],
-          "module_name": "Business Services"
-        }
-      ],
-      "active_entity_groups": [],
-      "applicable_entity_groups": [],
-      "applicable_roles": [
-        {
-          "id": 1,
-          "name": "Administrator",
-          "uuid": "da40e0c9-0920-4f84-a18b-a0540ab199f4"
-        }
-      ],
-      "applicable_user_groups": [],
-      "applicable_users": [
-        {
-          "email": "svijayakumar@unitedlayer.com",
-          "id": 1663,
-          "uuid": "e4f0f361-57d5-480e-9ca4-734308c46e92"
-        },
-        {
-          "email": "spatric@unitedlayer.com",
-          "id": 1806,
-          "uuid": "37873ffd-dab7-4eaa-95ae-9966f7a23287"
-        },
-        {
-          "email": "msp-TenantA01@unitedlayer.com",
-          "id": 1928,
-          "uuid": "0d2b4a48-fd60-4364-854c-85ba4d14360b"
-        },
-        {
-          "email": "Brown@unitedlayer.com",
-          "id": 1931,
-          "uuid": "da476b85-0782-4ad1-bedf-a6388fdb6d20"
-        },
-        {
-          "email": "Grey@unitedlayer.com",
-          "id": 1932,
-          "uuid": "4e14a8c2-dd04-4567-9a20-5d3899ee8cc6"
-        },
-        {
-          "email": "white@unitedlayer.com",
-          "id": 1933,
-          "uuid": "551f5851-b8b9-4b1f-a983-f5087dfbd1e8"
-        },
-        {
-          "email": "taaaewws2t@test.com",
-          "id": 1953,
-          "uuid": "880fb609-863f-409a-9920-4cde35911e3b"
-        },
-        {
-          "email": "Demo@wipro.com",
-          "id": 1983,
-          "uuid": "423b5307-a4ac-429d-8881-9e9ecbf3052d"
-        },
-        {
-          "email": "mayur.shah@wipro.com",
-          "id": 2027,
-          "uuid": "980d9860-d602-464e-8748-bc6d3eb9d5de"
-        },
-        {
-          "email": "tenanta01@unityone.ai",
-          "id": 2291,
-          "uuid": "d21bc844-3601-4a23-972d-db7f09b3ad99"
-        },
-        {
-          "email": "japatpreet@unitedlayer.com",
-          "id": 2301,
-          "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
-        }
-      ],
-      "is_active": true,
-      "is_default": true,
-      "created_at": "2025-08-13T01:38:14.936695-07:00",
-      "updated_at": "2026-03-17T08:46:54.575750-07:00",
-      "created_by": null,
-      "created_by_name": "Unity"
-    },
-    {
-      "id": 6,
-      "uuid": "aff91410-04cd-43e6-b056-1f5c0c4f3353",
-      "name": "AiOps Users",
-      "description": "AiOps Users",
-      "entity_groups": [],
-      "permissions": [
-        {
-          "module__name": "AIML Event Management",
-          "id": 25,
-          "module": 11,
-          "name": "View AIML Event Management"
-        },
-        {
-          "module__name": "AIML Event Management",
-          "id": 26,
-          "module": 11,
-          "name": "Manage AIML Event Management"
-        }
-      ],
-      "rbac_permissions": [
-        {
-          "permission_names": [
-            "View AIML Event Management",
-            "Manage AIML Event Management"
-          ],
-          "module_name": "AIML Event Management"
-        }
-      ],
-      "active_entity_groups": [],
-      "applicable_entity_groups": [],
-      "applicable_roles": [
-        {
-          "id": 5,
-          "name": "AiOps Users",
-          "uuid": "3ff50134-0f5c-4224-99de-4ffe70c0609c"
-        }
-      ],
-      "applicable_user_groups": [],
-      "applicable_users": [
-        {
-          "email": "japatpreet@unitedlayer.com",
-          "id": 2301,
-          "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
-        }
-      ],
-      "is_active": true,
-      "is_default": false,
-      "created_at": "2024-11-29T04:31:59.733553-08:00",
-      "updated_at": "2024-11-29T04:31:59.733205-08:00",
-      "created_by": 1928,
-      "created_by_name": "Tenant A01"
-    },
-    {
-      "id": 2,
-      "uuid": "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b",
-      "name": "Dashboard Permission Set",
-      "description": "Dashboard Permissions for Dashboard User Role",
-      "entity_groups": [],
-      "permissions": [
-        {
-          "module__name": "Dashboard",
-          "id": 46,
-          "module": 17,
-          "name": "View Dashboard"
-        },
-        {
-          "module__name": "Dashboard",
-          "id": 47,
-          "module": 17,
-          "name": "Manage Dashboard"
-        }
-      ],
-      "rbac_permissions": [
-        {
-          "permission_names": [
-            "View Dashboard",
-            "Manage Dashboard"
-          ],
-          "module_name": "Dashboard"
-        }
-      ],
-      "active_entity_groups": [],
-      "applicable_entity_groups": [],
-      "applicable_roles": [
-        {
-          "id": 2,
-          "name": "Dashboard user",
-          "uuid": "42deb2ba-c18a-4e96-af04-405b33868393"
-        }
-      ],
-      "applicable_user_groups": [],
-      "applicable_users": [
-        {
-          "email": "japatpreet@unitedlayer.com",
-          "id": 2301,
-          "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
-        }
-      ],
-      "is_active": true,
-      "is_default": true,
-      "created_at": "2025-08-13T01:38:14.936706-07:00",
-      "updated_at": "2026-03-17T08:46:54.599008-07:00",
-      "created_by": null,
-      "created_by_name": "Unity"
-    },
-    {
-      "id": 3,
-      "uuid": "c2918f50-229c-4005-a2cd-fed17844f597",
-      "name": "Global Read-Only Permission Set",
-      "description": "View-only Permissions for Global Read-Only Role",
-      "entity_groups": [],
-      "permissions": [
-        {
-          "module__name": "Policy",
-          "id": 76,
-          "module": 30,
-          "name": "View Policy"
-        },
-        {
-          "module__name": "Budget",
-          "id": 71,
-          "module": 28,
-          "name": "View Budget"
-        },
-        {
-          "module__name": "Maintenance",
-          "id": 9,
-          "module": 4,
-          "name": "View Maintenance"
-        },
-        {
-          "module__name": "Notifications",
-          "id": 20,
-          "module": 9,
-          "name": "View Notifications"
-        },
-        {
-          "module__name": "Network Configuration",
-          "id": 65,
-          "module": 25,
-          "name": "View Network Configuration"
-        },
-        {
-          "module__name": "Dashboard",
-          "id": 46,
-          "module": 17,
-          "name": "View Dashboard"
-        },
-        {
-          "module__name": "UnityCollector",
-          "id": 3,
-          "module": 2,
-          "name": "View UnityCollector"
-        },
-        {
-          "module__name": "UnitySetup",
-          "id": 51,
-          "module": 19,
-          "name": "View UnitySetup"
-        },
-        {
-          "module__name": "Custom Attributes",
-          "id": 69,
-          "module": 27,
-          "name": "View Custom Attributes"
-        },
-        {
-          "module__name": "Ticket Management",
-          "id": 11,
-          "module": 5,
-          "name": "View Tickets"
-        },
-        {
-          "module__name": "Network Topology",
-          "id": 53,
-          "module": 20,
-          "name": "View Network Topology"
-        },
-        {
-          "module__name": "FinOps",
-          "id": 78,
-          "module": 31,
-          "name": "View FinOps"
-        },
-        {
-          "module__name": "Public Cloud",
-          "id": 13,
-          "module": 6,
-          "name": "View Public Cloud"
-        },
-        {
-          "module__name": "Sustainability",
-          "id": 16,
-          "module": 7,
-          "name": "View Sustainability"
-        },
-        {
-          "module__name": "Activity Log",
-          "id": 61,
-          "module": 23,
-          "name": "View Activity Log"
-        },
-        {
-          "module__name": "Business Services",
-          "id": 80,
-          "module": 32,
-          "name": "View Business Services"
-        },
-        {
-          "module__name": "Datacenter",
-          "id": 31,
-          "module": 14,
-          "name": "View Datacenter"
-        },
-        {
-          "module__name": "Monitoring",
-          "id": 1,
-          "module": 1,
-          "name": "View Monitoring"
-        },
-        {
-          "module__name": "Cost Analysis",
-          "id": 48,
-          "module": 18,
-          "name": "View Cost Analysis"
-        },
-        {
-          "module__name": "Cost Analysis",
-          "id": 50,
-          "module": 18,
-          "name": "Cost Calculator"
-        },
-        {
-          "module__name": "Cost Analysis",
-          "id": 75,
-          "module": 18,
-          "name": "Cloud Overview"
-        },
-        {
-          "module__name": "User Management",
-          "id": 6,
-          "module": 3,
-          "name": "View Users"
-        },
-        {
-          "module__name": "Unity Report",
-          "id": 63,
-          "module": 24,
-          "name": "View Unity Report"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 34,
-          "module": 15,
-          "name": "View DevOps Automation"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 36,
-          "module": 15,
-          "name": "View Tasks"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 39,
-          "module": 15,
-          "name": "View Workflow"
-        },
-        {
-          "module__name": "DevOps Automation",
-          "id": 42,
-          "module": 15,
-          "name": "View Scripts"
-        },
-        {
-          "module__name": "UnityConnect",
-          "id": 44,
-          "module": 16,
-          "name": "View UnityConnect"
-        },
-        {
-          "module__name": "Cost Plan",
-          "id": 73,
-          "module": 29,
-          "name": "View Cost Plan"
-        },
-        {
-          "module__name": "Private Cloud",
-          "id": 17,
-          "module": 8,
-          "name": "View Private Cloud"
-        },
-        {
-          "module__name": "Integrations",
-          "id": 57,
-          "module": 22,
-          "name": "View Integrations"
-        },
-        {
-          "module__name": "Connections",
-          "id": 67,
-          "module": 26,
-          "name": "View Connections"
-        },
-        {
-          "module__name": "Onboarding",
-          "id": 54,
-          "module": 21,
-          "name": "View Onboarding"
-        },
-        {
-          "module__name": "Service Catalog",
-          "id": 22,
-          "module": 10,
-          "name": "View Service Catalog"
-        },
-        {
-          "module__name": "AIML Event Management",
-          "id": 25,
-          "module": 11,
-          "name": "View AIML Event Management"
-        },
-        {
-          "module__name": "Services",
-          "id": 27,
-          "module": 12,
-          "name": "View Services"
-        },
-        {
-          "module__name": "Credentials",
-          "id": 29,
-          "module": 13,
-          "name": "View Credentials"
-        }
-      ],
-      "rbac_permissions": [
-        {
-          "permission_names": [
-            "View Policy"
-          ],
-          "module_name": "Policy"
-        },
-        {
-          "permission_names": [
-            "View Budget"
-          ],
-          "module_name": "Budget"
-        },
-        {
-          "permission_names": [
-            "View Maintenance"
-          ],
-          "module_name": "Maintenance"
-        },
-        {
-          "permission_names": [
-            "View Notifications"
-          ],
-          "module_name": "Notifications"
-        },
-        {
-          "permission_names": [
-            "View Network Configuration"
-          ],
-          "module_name": "Network Configuration"
-        },
-        {
-          "permission_names": [
-            "View Dashboard"
-          ],
-          "module_name": "Dashboard"
-        },
-        {
-          "permission_names": [
-            "View UnityCollector"
-          ],
-          "module_name": "UnityCollector"
-        },
-        {
-          "permission_names": [
-            "View UnitySetup"
-          ],
-          "module_name": "UnitySetup"
-        },
-        {
-          "permission_names": [
-            "View Custom Attributes"
-          ],
-          "module_name": "Custom Attributes"
-        },
-        {
-          "permission_names": [
-            "View Tickets"
-          ],
-          "module_name": "Ticket Management"
-        },
-        {
-          "permission_names": [
-            "View Network Topology"
-          ],
-          "module_name": "Network Topology"
-        },
-        {
-          "permission_names": [
-            "View FinOps"
-          ],
-          "module_name": "FinOps"
-        },
-        {
-          "permission_names": [
-            "View Public Cloud"
-          ],
-          "module_name": "Public Cloud"
-        },
-        {
-          "permission_names": [
-            "View Sustainability"
-          ],
-          "module_name": "Sustainability"
-        },
-        {
-          "permission_names": [
-            "View Activity Log"
-          ],
-          "module_name": "Activity Log"
-        },
-        {
-          "permission_names": [
-            "View Business Services"
-          ],
-          "module_name": "Business Services"
-        },
-        {
-          "permission_names": [
-            "View Datacenter"
-          ],
-          "module_name": "Datacenter"
-        },
-        {
-          "permission_names": [
-            "View Monitoring"
-          ],
-          "module_name": "Monitoring"
-        },
-        {
-          "permission_names": [
-            "View Cost Analysis",
-            "Cost Calculator",
-            "Cloud Overview"
-          ],
-          "module_name": "Cost Analysis"
-        },
-        {
-          "permission_names": [
-            "View Users"
-          ],
-          "module_name": "User Management"
-        },
-        {
-          "permission_names": [
-            "View Unity Report"
-          ],
-          "module_name": "Unity Report"
-        },
-        {
-          "permission_names": [
-            "View DevOps Automation",
-            "View Tasks",
-            "View Workflow",
-            "View Scripts"
-          ],
-          "module_name": "DevOps Automation"
-        },
-        {
-          "permission_names": [
-            "View UnityConnect"
-          ],
-          "module_name": "UnityConnect"
-        },
-        {
-          "permission_names": [
-            "View Cost Plan"
-          ],
-          "module_name": "Cost Plan"
-        },
-        {
-          "permission_names": [
-            "View Private Cloud"
-          ],
-          "module_name": "Private Cloud"
-        },
-        {
-          "permission_names": [
-            "View Integrations"
-          ],
-          "module_name": "Integrations"
-        },
-        {
-          "permission_names": [
-            "View Connections"
-          ],
-          "module_name": "Connections"
-        },
-        {
-          "permission_names": [
-            "View Onboarding"
-          ],
-          "module_name": "Onboarding"
-        },
-        {
-          "permission_names": [
-            "View Service Catalog"
-          ],
-          "module_name": "Service Catalog"
-        },
-        {
-          "permission_names": [
-            "View AIML Event Management"
-          ],
-          "module_name": "AIML Event Management"
-        },
-        {
-          "permission_names": [
-            "View Services"
-          ],
-          "module_name": "Services"
-        },
-        {
-          "permission_names": [
-            "View Credentials"
-          ],
-          "module_name": "Credentials"
-        }
-      ],
-      "active_entity_groups": [],
-      "applicable_entity_groups": [],
-      "applicable_roles": [
-        {
-          "id": 3,
-          "name": "Global Read-Only",
-          "uuid": "a59d8dcc-f328-4e96-baaf-4d2f938ff141"
-        }
-      ],
-      "applicable_user_groups": [],
-      "applicable_users": [
-        {
-          "email": "japatpreet@unitedlayer.com",
-          "id": 2301,
-          "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
-        }
-      ],
-      "is_active": true,
-      "is_default": true,
-      "created_at": "2025-08-13T01:38:14.936708-07:00",
-      "updated_at": "2026-03-17T08:46:54.610555-07:00",
-      "created_by": null,
-      "created_by_name": "Unity"
-    },
-    {
-      "id": 7,
-      "uuid": "605d80d2-a308-495b-a5e4-6f73fe4365d8",
-      "name": "Monitoring Users",
-      "description": "Monitoring Users",
-      "entity_groups": [],
-      "permissions": [
-        {
-          "module__name": "Activity Log",
-          "id": 61,
-          "module": 23,
-          "name": "View Activity Log"
-        },
-        {
-          "module__name": "Activity Log",
-          "id": 62,
-          "module": 23,
-          "name": "Download Activity Log"
-        },
-        {
-          "module__name": "Monitoring",
-          "id": 1,
-          "module": 1,
-          "name": "View Monitoring"
-        },
-        {
-          "module__name": "Monitoring",
-          "id": 2,
-          "module": 1,
-          "name": "Manage Monitoring"
-        }
-      ],
-      "rbac_permissions": [
-        {
-          "permission_names": [
-            "View Activity Log",
-            "Download Activity Log"
-          ],
-          "module_name": "Activity Log"
-        },
-        {
-          "permission_names": [
-            "View Monitoring",
-            "Manage Monitoring"
-          ],
-          "module_name": "Monitoring"
-        }
-      ],
-      "active_entity_groups": [],
-      "applicable_entity_groups": [],
-      "applicable_roles": [
-        {
-          "id": 6,
-          "name": "Monitoring Users",
-          "uuid": "e9ca190f-efc6-4d08-9878-37908bc6c514"
-        }
-      ],
-      "applicable_user_groups": [],
-      "applicable_users": [
-        {
-          "email": "japatpreet@unitedlayer.com",
-          "id": 2301,
-          "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
-        }
-      ],
-      "is_active": true,
-      "is_default": false,
-      "created_at": "2024-11-29T04:33:22.244494-08:00",
-      "updated_at": "2024-11-29T04:33:22.244176-08:00",
-      "created_by": 1928,
-      "created_by_name": "Tenant A01"
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "uuid": "d11dc393-a29d-473b-a702-adaa8d3dcbdb",
+    "name": "Administrator Permission Set",
+    "description": "All Permissions for Administrator Role",
+    "entity_groups": [],
+    "permissions": [
+      {
+        "module__name": "Monitoring",
+        "id": 1,
+        "module": 1,
+        "name": "View Monitoring"
+      },
+      {
+        "module__name": "Monitoring",
+        "id": 2,
+        "module": 1,
+        "name": "Manage Monitoring"
+      },
+      {
+        "module__name": "UnityCollector",
+        "id": 3,
+        "module": 2,
+        "name": "View UnityCollector"
+      },
+      {
+        "module__name": "UnityCollector",
+        "id": 4,
+        "module": 2,
+        "name": "Manage UnityCollector"
+      },
+      {
+        "module__name": "UnityCollector",
+        "id": 5,
+        "module": 2,
+        "name": "Register UnityCollector"
+      },
+      {
+        "module__name": "User Management",
+        "id": 6,
+        "module": 3,
+        "name": "View Users"
+      },
+      {
+        "module__name": "User Management",
+        "id": 7,
+        "module": 3,
+        "name": "Manage Users"
+      },
+      {
+        "module__name": "User Management",
+        "id": 8,
+        "module": 3,
+        "name": "Create Users"
+      },
+      {
+        "module__name": "Maintenance",
+        "id": 9,
+        "module": 4,
+        "name": "View Maintenance"
+      },
+      {
+        "module__name": "Maintenance",
+        "id": 10,
+        "module": 4,
+        "name": "Manage Maintenance"
+      },
+      {
+        "module__name": "Ticket Management",
+        "id": 11,
+        "module": 5,
+        "name": "View Tickets"
+      },
+      {
+        "module__name": "Ticket Management",
+        "id": 12,
+        "module": 5,
+        "name": "Manage Tickets"
+      },
+      {
+        "module__name": "Public Cloud",
+        "id": 13,
+        "module": 6,
+        "name": "View Public Cloud"
+      },
+      {
+        "module__name": "Public Cloud",
+        "id": 14,
+        "module": 6,
+        "name": "Manage Public Cloud"
+      },
+      {
+        "module__name": "Public Cloud",
+        "id": 15,
+        "module": 6,
+        "name": "Remote Management"
+      },
+      {
+        "module__name": "Sustainability",
+        "id": 16,
+        "module": 7,
+        "name": "View Sustainability"
+      },
+      {
+        "module__name": "Private Cloud",
+        "id": 17,
+        "module": 8,
+        "name": "View Private Cloud"
+      },
+      {
+        "module__name": "Private Cloud",
+        "id": 18,
+        "module": 8,
+        "name": "Manage Private Cloud"
+      },
+      {
+        "module__name": "Private Cloud",
+        "id": 19,
+        "module": 8,
+        "name": "Remote Management"
+      },
+      {
+        "module__name": "Notifications",
+        "id": 20,
+        "module": 9,
+        "name": "View Notifications"
+      },
+      {
+        "module__name": "Notifications",
+        "id": 21,
+        "module": 9,
+        "name": "Manage Notifications"
+      },
+      {
+        "module__name": "Service Catalog",
+        "id": 22,
+        "module": 10,
+        "name": "View Service Catalog"
+      },
+      {
+        "module__name": "Service Catalog",
+        "id": 23,
+        "module": 10,
+        "name": "Manage Service Catalog"
+      },
+      {
+        "module__name": "Service Catalog",
+        "id": 24,
+        "module": 10,
+        "name": "Order Catalog"
+      },
+      {
+        "module__name": "AIML Event Management",
+        "id": 25,
+        "module": 11,
+        "name": "View AIML Event Management"
+      },
+      {
+        "module__name": "AIML Event Management",
+        "id": 26,
+        "module": 11,
+        "name": "Manage AIML Event Management"
+      },
+      {
+        "module__name": "Services",
+        "id": 27,
+        "module": 12,
+        "name": "View Services"
+      },
+      {
+        "module__name": "Services",
+        "id": 28,
+        "module": 12,
+        "name": "Manage Services"
+      },
+      {
+        "module__name": "Credentials",
+        "id": 29,
+        "module": 13,
+        "name": "View Credentials"
+      },
+      {
+        "module__name": "Credentials",
+        "id": 30,
+        "module": 13,
+        "name": "Manage Credentials"
+      },
+      {
+        "module__name": "Datacenter",
+        "id": 31,
+        "module": 14,
+        "name": "View Datacenter"
+      },
+      {
+        "module__name": "Datacenter",
+        "id": 32,
+        "module": 14,
+        "name": "Manage Datacenter"
+      },
+      {
+        "module__name": "Datacenter",
+        "id": 33,
+        "module": 14,
+        "name": "Remote Management"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 34,
+        "module": 15,
+        "name": "View DevOps Automation"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 35,
+        "module": 15,
+        "name": "Manage DevOps Automation"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 36,
+        "module": 15,
+        "name": "View Tasks"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 37,
+        "module": 15,
+        "name": "Manage Tasks"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 38,
+        "module": 15,
+        "name": "Execute Tasks"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 39,
+        "module": 15,
+        "name": "View Workflow"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 40,
+        "module": 15,
+        "name": "Manage Workflow"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 41,
+        "module": 15,
+        "name": "Execute Workflow"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 42,
+        "module": 15,
+        "name": "View Scripts"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 43,
+        "module": 15,
+        "name": "Manage Scripts"
+      },
+      {
+        "module__name": "UnityConnect",
+        "id": 44,
+        "module": 16,
+        "name": "View UnityConnect"
+      },
+      {
+        "module__name": "UnityConnect",
+        "id": 45,
+        "module": 16,
+        "name": "Manage UnityConnect"
+      },
+      {
+        "module__name": "Dashboard",
+        "id": 46,
+        "module": 17,
+        "name": "View Dashboard"
+      },
+      {
+        "module__name": "Dashboard",
+        "id": 47,
+        "module": 17,
+        "name": "Manage Dashboard"
+      },
+      {
+        "module__name": "Cost Analysis",
+        "id": 48,
+        "module": 18,
+        "name": "View Cost Analysis"
+      },
+      {
+        "module__name": "Cost Analysis",
+        "id": 49,
+        "module": 18,
+        "name": "Manage Cost Analysis"
+      },
+      {
+        "module__name": "Cost Analysis",
+        "id": 50,
+        "module": 18,
+        "name": "Cost Calculator"
+      },
+      {
+        "module__name": "UnitySetup",
+        "id": 51,
+        "module": 19,
+        "name": "View UnitySetup"
+      },
+      {
+        "module__name": "UnitySetup",
+        "id": 52,
+        "module": 19,
+        "name": "Manage UnitySetup"
+      },
+      {
+        "module__name": "Network Topology",
+        "id": 53,
+        "module": 20,
+        "name": "View Network Topology"
+      },
+      {
+        "module__name": "Onboarding",
+        "id": 54,
+        "module": 21,
+        "name": "View Onboarding"
+      },
+      {
+        "module__name": "Onboarding",
+        "id": 55,
+        "module": 21,
+        "name": "Manage Onboarding"
+      },
+      {
+        "module__name": "Onboarding",
+        "id": 56,
+        "module": 21,
+        "name": "Discovery Admin"
+      },
+      {
+        "module__name": "Integrations",
+        "id": 57,
+        "module": 22,
+        "name": "View Integrations"
+      },
+      {
+        "module__name": "Integrations",
+        "id": 58,
+        "module": 22,
+        "name": "Manage Integrations"
+      },
+      {
+        "module__name": "Integrations",
+        "id": 59,
+        "module": 22,
+        "name": "Add Integrations"
+      },
+      {
+        "module__name": "Integrations",
+        "id": 60,
+        "module": 22,
+        "name": "Sync Integrations"
+      },
+      {
+        "module__name": "Activity Log",
+        "id": 61,
+        "module": 23,
+        "name": "View Activity Log"
+      },
+      {
+        "module__name": "Activity Log",
+        "id": 62,
+        "module": 23,
+        "name": "Download Activity Log"
+      },
+      {
+        "module__name": "Unity Report",
+        "id": 63,
+        "module": 24,
+        "name": "View Unity Report"
+      },
+      {
+        "module__name": "Unity Report",
+        "id": 64,
+        "module": 24,
+        "name": "Manage Unity Report"
+      },
+      {
+        "module__name": "Network Configuration",
+        "id": 65,
+        "module": 25,
+        "name": "View Network Configuration"
+      },
+      {
+        "module__name": "Network Configuration",
+        "id": 66,
+        "module": 25,
+        "name": "Manage Network Configuration"
+      },
+      {
+        "module__name": "Connections",
+        "id": 67,
+        "module": 26,
+        "name": "View Connections"
+      },
+      {
+        "module__name": "Connections",
+        "id": 68,
+        "module": 26,
+        "name": "Manage Connections"
+      },
+      {
+        "module__name": "Custom Attributes",
+        "id": 69,
+        "module": 27,
+        "name": "View Custom Attributes"
+      },
+      {
+        "module__name": "Custom Attributes",
+        "id": 70,
+        "module": 27,
+        "name": "Manage Custom Attributes"
+      },
+      {
+        "module__name": "Budget",
+        "id": 72,
+        "module": 28,
+        "name": "Manage Budget"
+      },
+      {
+        "module__name": "Cost Plan",
+        "id": 73,
+        "module": 29,
+        "name": "View Cost Plan"
+      },
+      {
+        "module__name": "Cost Plan",
+        "id": 74,
+        "module": 29,
+        "name": "Manage Cost Plan"
+      },
+      {
+        "module__name": "Budget",
+        "id": 71,
+        "module": 28,
+        "name": "View Budget"
+      },
+      {
+        "module__name": "Cost Analysis",
+        "id": 75,
+        "module": 18,
+        "name": "Cloud Overview"
+      },
+      {
+        "module__name": "Policy",
+        "id": 76,
+        "module": 30,
+        "name": "View Policy"
+      },
+      {
+        "module__name": "Policy",
+        "id": 77,
+        "module": 30,
+        "name": "Manage Policy"
+      },
+      {
+        "module__name": "FinOps",
+        "id": 78,
+        "module": 31,
+        "name": "View FinOps"
+      },
+      {
+        "module__name": "FinOps",
+        "id": 79,
+        "module": 31,
+        "name": "Manage FinOps"
+      },
+      {
+        "module__name": "Business Services",
+        "id": 80,
+        "module": 32,
+        "name": "View Business Services"
+      },
+      {
+        "module__name": "Business Services",
+        "id": 81,
+        "module": 32,
+        "name": "Manage Business Services"
+      }
+    ],
+    "rbac_permissions": [
+      {
+        "permission_names": [
+          "View Monitoring",
+          "Manage Monitoring"
+        ],
+        "module_name": "Monitoring"
+      },
+      {
+        "permission_names": [
+          "View UnityCollector",
+          "Manage UnityCollector",
+          "Register UnityCollector"
+        ],
+        "module_name": "UnityCollector"
+      },
+      {
+        "permission_names": [
+          "View Users",
+          "Manage Users",
+          "Create Users"
+        ],
+        "module_name": "User Management"
+      },
+      {
+        "permission_names": [
+          "View Maintenance",
+          "Manage Maintenance"
+        ],
+        "module_name": "Maintenance"
+      },
+      {
+        "permission_names": [
+          "View Tickets",
+          "Manage Tickets"
+        ],
+        "module_name": "Ticket Management"
+      },
+      {
+        "permission_names": [
+          "View Public Cloud",
+          "Manage Public Cloud",
+          "Remote Management"
+        ],
+        "module_name": "Public Cloud"
+      },
+      {
+        "permission_names": [
+          "View Sustainability"
+        ],
+        "module_name": "Sustainability"
+      },
+      {
+        "permission_names": [
+          "View Private Cloud",
+          "Manage Private Cloud",
+          "Remote Management"
+        ],
+        "module_name": "Private Cloud"
+      },
+      {
+        "permission_names": [
+          "View Notifications",
+          "Manage Notifications"
+        ],
+        "module_name": "Notifications"
+      },
+      {
+        "permission_names": [
+          "View Service Catalog",
+          "Manage Service Catalog",
+          "Order Catalog"
+        ],
+        "module_name": "Service Catalog"
+      },
+      {
+        "permission_names": [
+          "View AIML Event Management",
+          "Manage AIML Event Management"
+        ],
+        "module_name": "AIML Event Management"
+      },
+      {
+        "permission_names": [
+          "View Services",
+          "Manage Services"
+        ],
+        "module_name": "Services"
+      },
+      {
+        "permission_names": [
+          "View Credentials",
+          "Manage Credentials"
+        ],
+        "module_name": "Credentials"
+      },
+      {
+        "permission_names": [
+          "View Datacenter",
+          "Manage Datacenter",
+          "Remote Management"
+        ],
+        "module_name": "Datacenter"
+      },
+      {
+        "permission_names": [
+          "View DevOps Automation",
+          "Manage DevOps Automation",
+          "View Tasks",
+          "Manage Tasks",
+          "Execute Tasks",
+          "View Workflow",
+          "Manage Workflow",
+          "Execute Workflow",
+          "View Scripts",
+          "Manage Scripts"
+        ],
+        "module_name": "DevOps Automation"
+      },
+      {
+        "permission_names": [
+          "View UnityConnect",
+          "Manage UnityConnect"
+        ],
+        "module_name": "UnityConnect"
+      },
+      {
+        "permission_names": [
+          "View Dashboard",
+          "Manage Dashboard"
+        ],
+        "module_name": "Dashboard"
+      },
+      {
+        "permission_names": [
+          "View Cost Analysis",
+          "Manage Cost Analysis",
+          "Cost Calculator",
+          "Cloud Overview"
+        ],
+        "module_name": "Cost Analysis"
+      },
+      {
+        "permission_names": [
+          "View UnitySetup",
+          "Manage UnitySetup"
+        ],
+        "module_name": "UnitySetup"
+      },
+      {
+        "permission_names": [
+          "View Network Topology"
+        ],
+        "module_name": "Network Topology"
+      },
+      {
+        "permission_names": [
+          "View Onboarding",
+          "Manage Onboarding",
+          "Discovery Admin"
+        ],
+        "module_name": "Onboarding"
+      },
+      {
+        "permission_names": [
+          "View Integrations",
+          "Manage Integrations",
+          "Add Integrations",
+          "Sync Integrations"
+        ],
+        "module_name": "Integrations"
+      },
+      {
+        "permission_names": [
+          "View Activity Log",
+          "Download Activity Log"
+        ],
+        "module_name": "Activity Log"
+      },
+      {
+        "permission_names": [
+          "View Unity Report",
+          "Manage Unity Report"
+        ],
+        "module_name": "Unity Report"
+      },
+      {
+        "permission_names": [
+          "View Network Configuration",
+          "Manage Network Configuration"
+        ],
+        "module_name": "Network Configuration"
+      },
+      {
+        "permission_names": [
+          "View Connections",
+          "Manage Connections"
+        ],
+        "module_name": "Connections"
+      },
+      {
+        "permission_names": [
+          "View Custom Attributes",
+          "Manage Custom Attributes"
+        ],
+        "module_name": "Custom Attributes"
+      },
+      {
+        "permission_names": [
+          "Manage Budget",
+          "View Budget"
+        ],
+        "module_name": "Budget"
+      },
+      {
+        "permission_names": [
+          "View Cost Plan",
+          "Manage Cost Plan"
+        ],
+        "module_name": "Cost Plan"
+      },
+      {
+        "permission_names": [
+          "View Policy",
+          "Manage Policy"
+        ],
+        "module_name": "Policy"
+      },
+      {
+        "permission_names": [
+          "View FinOps",
+          "Manage FinOps"
+        ],
+        "module_name": "FinOps"
+      },
+      {
+        "permission_names": [
+          "View Business Services",
+          "Manage Business Services"
+        ],
+        "module_name": "Business Services"
+      }
+    ],
+    "active_entity_groups": [],
+    "applicable_entity_groups": [],
+    "applicable_roles": [
+      {
+        "id": 1,
+        "name": "Administrator",
+        "uuid": "da40e0c9-0920-4f84-a18b-a0540ab199f4"
+      }
+    ],
+    "applicable_user_groups": [],
+    "applicable_users": [
+      {
+        "email": "svijayakumar@unitedlayer.com",
+        "id": 1663,
+        "uuid": "e4f0f361-57d5-480e-9ca4-734308c46e92"
+      },
+      {
+        "email": "spatric@unitedlayer.com",
+        "id": 1806,
+        "uuid": "37873ffd-dab7-4eaa-95ae-9966f7a23287"
+      },
+      {
+        "email": "msp-TenantA01@unitedlayer.com",
+        "id": 1928,
+        "uuid": "0d2b4a48-fd60-4364-854c-85ba4d14360b"
+      },
+      {
+        "email": "Brown@unitedlayer.com",
+        "id": 1931,
+        "uuid": "da476b85-0782-4ad1-bedf-a6388fdb6d20"
+      },
+      {
+        "email": "Grey@unitedlayer.com",
+        "id": 1932,
+        "uuid": "4e14a8c2-dd04-4567-9a20-5d3899ee8cc6"
+      },
+      {
+        "email": "white@unitedlayer.com",
+        "id": 1933,
+        "uuid": "551f5851-b8b9-4b1f-a983-f5087dfbd1e8"
+      },
+      {
+        "email": "taaaewws2t@test.com",
+        "id": 1953,
+        "uuid": "880fb609-863f-409a-9920-4cde35911e3b"
+      },
+      {
+        "email": "Demo@wipro.com",
+        "id": 1983,
+        "uuid": "423b5307-a4ac-429d-8881-9e9ecbf3052d"
+      },
+      {
+        "email": "mayur.shah@wipro.com",
+        "id": 2027,
+        "uuid": "980d9860-d602-464e-8748-bc6d3eb9d5de"
+      },
+      {
+        "email": "tenanta01@unityone.ai",
+        "id": 2291,
+        "uuid": "d21bc844-3601-4a23-972d-db7f09b3ad99"
+      },
+      {
+        "email": "japatpreet@unitedlayer.com",
+        "id": 2301,
+        "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
+      }
+    ],
+    "is_active": true,
+    "is_default": true,
+    "created_at": "2025-08-13T01:38:14.936695-07:00",
+    "updated_at": "2026-03-17T08:46:54.575750-07:00",
+    "created_by": null,
+    "created_by_name": "Unity"
+  },
+  {
+    "id": 6,
+    "uuid": "aff91410-04cd-43e6-b056-1f5c0c4f3353",
+    "name": "AiOps Users",
+    "description": "AiOps Users",
+    "entity_groups": [],
+    "permissions": [
+      {
+        "module__name": "AIML Event Management",
+        "id": 25,
+        "module": 11,
+        "name": "View AIML Event Management"
+      },
+      {
+        "module__name": "AIML Event Management",
+        "id": 26,
+        "module": 11,
+        "name": "Manage AIML Event Management"
+      }
+    ],
+    "rbac_permissions": [
+      {
+        "permission_names": [
+          "View AIML Event Management",
+          "Manage AIML Event Management"
+        ],
+        "module_name": "AIML Event Management"
+      }
+    ],
+    "active_entity_groups": [],
+    "applicable_entity_groups": [],
+    "applicable_roles": [
+      {
+        "id": 5,
+        "name": "AiOps Users",
+        "uuid": "3ff50134-0f5c-4224-99de-4ffe70c0609c"
+      }
+    ],
+    "applicable_user_groups": [],
+    "applicable_users": [
+      {
+        "email": "japatpreet@unitedlayer.com",
+        "id": 2301,
+        "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
+      }
+    ],
+    "is_active": true,
+    "is_default": false,
+    "created_at": "2024-11-29T04:31:59.733553-08:00",
+    "updated_at": "2024-11-29T04:31:59.733205-08:00",
+    "created_by": 1928,
+    "created_by_name": "Tenant A01"
+  },
+  {
+    "id": 2,
+    "uuid": "d6faf8ba-5e9e-4d26-af44-300a13ae9a5b",
+    "name": "Dashboard Permission Set",
+    "description": "Dashboard Permissions for Dashboard User Role",
+    "entity_groups": [],
+    "permissions": [
+      {
+        "module__name": "Dashboard",
+        "id": 46,
+        "module": 17,
+        "name": "View Dashboard"
+      },
+      {
+        "module__name": "Dashboard",
+        "id": 47,
+        "module": 17,
+        "name": "Manage Dashboard"
+      }
+    ],
+    "rbac_permissions": [
+      {
+        "permission_names": [
+          "View Dashboard",
+          "Manage Dashboard"
+        ],
+        "module_name": "Dashboard"
+      }
+    ],
+    "active_entity_groups": [],
+    "applicable_entity_groups": [],
+    "applicable_roles": [
+      {
+        "id": 2,
+        "name": "Dashboard user",
+        "uuid": "42deb2ba-c18a-4e96-af04-405b33868393"
+      }
+    ],
+    "applicable_user_groups": [],
+    "applicable_users": [
+      {
+        "email": "japatpreet@unitedlayer.com",
+        "id": 2301,
+        "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
+      }
+    ],
+    "is_active": true,
+    "is_default": true,
+    "created_at": "2025-08-13T01:38:14.936706-07:00",
+    "updated_at": "2026-03-17T08:46:54.599008-07:00",
+    "created_by": null,
+    "created_by_name": "Unity"
+  },
+  {
+    "id": 3,
+    "uuid": "c2918f50-229c-4005-a2cd-fed17844f597",
+    "name": "Global Read-Only Permission Set",
+    "description": "View-only Permissions for Global Read-Only Role",
+    "entity_groups": [],
+    "permissions": [
+      {
+        "module__name": "Policy",
+        "id": 76,
+        "module": 30,
+        "name": "View Policy"
+      },
+      {
+        "module__name": "Budget",
+        "id": 71,
+        "module": 28,
+        "name": "View Budget"
+      },
+      {
+        "module__name": "Maintenance",
+        "id": 9,
+        "module": 4,
+        "name": "View Maintenance"
+      },
+      {
+        "module__name": "Notifications",
+        "id": 20,
+        "module": 9,
+        "name": "View Notifications"
+      },
+      {
+        "module__name": "Network Configuration",
+        "id": 65,
+        "module": 25,
+        "name": "View Network Configuration"
+      },
+      {
+        "module__name": "Dashboard",
+        "id": 46,
+        "module": 17,
+        "name": "View Dashboard"
+      },
+      {
+        "module__name": "UnityCollector",
+        "id": 3,
+        "module": 2,
+        "name": "View UnityCollector"
+      },
+      {
+        "module__name": "UnitySetup",
+        "id": 51,
+        "module": 19,
+        "name": "View UnitySetup"
+      },
+      {
+        "module__name": "Custom Attributes",
+        "id": 69,
+        "module": 27,
+        "name": "View Custom Attributes"
+      },
+      {
+        "module__name": "Ticket Management",
+        "id": 11,
+        "module": 5,
+        "name": "View Tickets"
+      },
+      {
+        "module__name": "Network Topology",
+        "id": 53,
+        "module": 20,
+        "name": "View Network Topology"
+      },
+      {
+        "module__name": "FinOps",
+        "id": 78,
+        "module": 31,
+        "name": "View FinOps"
+      },
+      {
+        "module__name": "Public Cloud",
+        "id": 13,
+        "module": 6,
+        "name": "View Public Cloud"
+      },
+      {
+        "module__name": "Sustainability",
+        "id": 16,
+        "module": 7,
+        "name": "View Sustainability"
+      },
+      {
+        "module__name": "Activity Log",
+        "id": 61,
+        "module": 23,
+        "name": "View Activity Log"
+      },
+      {
+        "module__name": "Business Services",
+        "id": 80,
+        "module": 32,
+        "name": "View Business Services"
+      },
+      {
+        "module__name": "Datacenter",
+        "id": 31,
+        "module": 14,
+        "name": "View Datacenter"
+      },
+      {
+        "module__name": "Monitoring",
+        "id": 1,
+        "module": 1,
+        "name": "View Monitoring"
+      },
+      {
+        "module__name": "Cost Analysis",
+        "id": 48,
+        "module": 18,
+        "name": "View Cost Analysis"
+      },
+      {
+        "module__name": "Cost Analysis",
+        "id": 50,
+        "module": 18,
+        "name": "Cost Calculator"
+      },
+      {
+        "module__name": "Cost Analysis",
+        "id": 75,
+        "module": 18,
+        "name": "Cloud Overview"
+      },
+      {
+        "module__name": "User Management",
+        "id": 6,
+        "module": 3,
+        "name": "View Users"
+      },
+      {
+        "module__name": "Unity Report",
+        "id": 63,
+        "module": 24,
+        "name": "View Unity Report"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 34,
+        "module": 15,
+        "name": "View DevOps Automation"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 36,
+        "module": 15,
+        "name": "View Tasks"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 39,
+        "module": 15,
+        "name": "View Workflow"
+      },
+      {
+        "module__name": "DevOps Automation",
+        "id": 42,
+        "module": 15,
+        "name": "View Scripts"
+      },
+      {
+        "module__name": "UnityConnect",
+        "id": 44,
+        "module": 16,
+        "name": "View UnityConnect"
+      },
+      {
+        "module__name": "Cost Plan",
+        "id": 73,
+        "module": 29,
+        "name": "View Cost Plan"
+      },
+      {
+        "module__name": "Private Cloud",
+        "id": 17,
+        "module": 8,
+        "name": "View Private Cloud"
+      },
+      {
+        "module__name": "Integrations",
+        "id": 57,
+        "module": 22,
+        "name": "View Integrations"
+      },
+      {
+        "module__name": "Connections",
+        "id": 67,
+        "module": 26,
+        "name": "View Connections"
+      },
+      {
+        "module__name": "Onboarding",
+        "id": 54,
+        "module": 21,
+        "name": "View Onboarding"
+      },
+      {
+        "module__name": "Service Catalog",
+        "id": 22,
+        "module": 10,
+        "name": "View Service Catalog"
+      },
+      {
+        "module__name": "AIML Event Management",
+        "id": 25,
+        "module": 11,
+        "name": "View AIML Event Management"
+      },
+      {
+        "module__name": "Services",
+        "id": 27,
+        "module": 12,
+        "name": "View Services"
+      },
+      {
+        "module__name": "Credentials",
+        "id": 29,
+        "module": 13,
+        "name": "View Credentials"
+      }
+    ],
+    "rbac_permissions": [
+      {
+        "permission_names": [
+          "View Policy"
+        ],
+        "module_name": "Policy"
+      },
+      {
+        "permission_names": [
+          "View Budget"
+        ],
+        "module_name": "Budget"
+      },
+      {
+        "permission_names": [
+          "View Maintenance"
+        ],
+        "module_name": "Maintenance"
+      },
+      {
+        "permission_names": [
+          "View Notifications"
+        ],
+        "module_name": "Notifications"
+      },
+      {
+        "permission_names": [
+          "View Network Configuration"
+        ],
+        "module_name": "Network Configuration"
+      },
+      {
+        "permission_names": [
+          "View Dashboard"
+        ],
+        "module_name": "Dashboard"
+      },
+      {
+        "permission_names": [
+          "View UnityCollector"
+        ],
+        "module_name": "UnityCollector"
+      },
+      {
+        "permission_names": [
+          "View UnitySetup"
+        ],
+        "module_name": "UnitySetup"
+      },
+      {
+        "permission_names": [
+          "View Custom Attributes"
+        ],
+        "module_name": "Custom Attributes"
+      },
+      {
+        "permission_names": [
+          "View Tickets"
+        ],
+        "module_name": "Ticket Management"
+      },
+      {
+        "permission_names": [
+          "View Network Topology"
+        ],
+        "module_name": "Network Topology"
+      },
+      {
+        "permission_names": [
+          "View FinOps"
+        ],
+        "module_name": "FinOps"
+      },
+      {
+        "permission_names": [
+          "View Public Cloud"
+        ],
+        "module_name": "Public Cloud"
+      },
+      {
+        "permission_names": [
+          "View Sustainability"
+        ],
+        "module_name": "Sustainability"
+      },
+      {
+        "permission_names": [
+          "View Activity Log"
+        ],
+        "module_name": "Activity Log"
+      },
+      {
+        "permission_names": [
+          "View Business Services"
+        ],
+        "module_name": "Business Services"
+      },
+      {
+        "permission_names": [
+          "View Datacenter"
+        ],
+        "module_name": "Datacenter"
+      },
+      {
+        "permission_names": [
+          "View Monitoring"
+        ],
+        "module_name": "Monitoring"
+      },
+      {
+        "permission_names": [
+          "View Cost Analysis",
+          "Cost Calculator",
+          "Cloud Overview"
+        ],
+        "module_name": "Cost Analysis"
+      },
+      {
+        "permission_names": [
+          "View Users"
+        ],
+        "module_name": "User Management"
+      },
+      {
+        "permission_names": [
+          "View Unity Report"
+        ],
+        "module_name": "Unity Report"
+      },
+      {
+        "permission_names": [
+          "View DevOps Automation",
+          "View Tasks",
+          "View Workflow",
+          "View Scripts"
+        ],
+        "module_name": "DevOps Automation"
+      },
+      {
+        "permission_names": [
+          "View UnityConnect"
+        ],
+        "module_name": "UnityConnect"
+      },
+      {
+        "permission_names": [
+          "View Cost Plan"
+        ],
+        "module_name": "Cost Plan"
+      },
+      {
+        "permission_names": [
+          "View Private Cloud"
+        ],
+        "module_name": "Private Cloud"
+      },
+      {
+        "permission_names": [
+          "View Integrations"
+        ],
+        "module_name": "Integrations"
+      },
+      {
+        "permission_names": [
+          "View Connections"
+        ],
+        "module_name": "Connections"
+      },
+      {
+        "permission_names": [
+          "View Onboarding"
+        ],
+        "module_name": "Onboarding"
+      },
+      {
+        "permission_names": [
+          "View Service Catalog"
+        ],
+        "module_name": "Service Catalog"
+      },
+      {
+        "permission_names": [
+          "View AIML Event Management"
+        ],
+        "module_name": "AIML Event Management"
+      },
+      {
+        "permission_names": [
+          "View Services"
+        ],
+        "module_name": "Services"
+      },
+      {
+        "permission_names": [
+          "View Credentials"
+        ],
+        "module_name": "Credentials"
+      }
+    ],
+    "active_entity_groups": [],
+    "applicable_entity_groups": [],
+    "applicable_roles": [
+      {
+        "id": 3,
+        "name": "Global Read-Only",
+        "uuid": "a59d8dcc-f328-4e96-baaf-4d2f938ff141"
+      }
+    ],
+    "applicable_user_groups": [],
+    "applicable_users": [
+      {
+        "email": "japatpreet@unitedlayer.com",
+        "id": 2301,
+        "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
+      }
+    ],
+    "is_active": true,
+    "is_default": true,
+    "created_at": "2025-08-13T01:38:14.936708-07:00",
+    "updated_at": "2026-03-17T08:46:54.610555-07:00",
+    "created_by": null,
+    "created_by_name": "Unity"
+  },
+  {
+    "id": 7,
+    "uuid": "605d80d2-a308-495b-a5e4-6f73fe4365d8",
+    "name": "Monitoring Users",
+    "description": "Monitoring Users",
+    "entity_groups": [],
+    "permissions": [
+      {
+        "module__name": "Activity Log",
+        "id": 61,
+        "module": 23,
+        "name": "View Activity Log"
+      },
+      {
+        "module__name": "Activity Log",
+        "id": 62,
+        "module": 23,
+        "name": "Download Activity Log"
+      },
+      {
+        "module__name": "Monitoring",
+        "id": 1,
+        "module": 1,
+        "name": "View Monitoring"
+      },
+      {
+        "module__name": "Monitoring",
+        "id": 2,
+        "module": 1,
+        "name": "Manage Monitoring"
+      }
+    ],
+    "rbac_permissions": [
+      {
+        "permission_names": [
+          "View Activity Log",
+          "Download Activity Log"
+        ],
+        "module_name": "Activity Log"
+      },
+      {
+        "permission_names": [
+          "View Monitoring",
+          "Manage Monitoring"
+        ],
+        "module_name": "Monitoring"
+      }
+    ],
+    "active_entity_groups": [],
+    "applicable_entity_groups": [],
+    "applicable_roles": [
+      {
+        "id": 6,
+        "name": "Monitoring Users",
+        "uuid": "e9ca190f-efc6-4d08-9878-37908bc6c514"
+      }
+    ],
+    "applicable_user_groups": [],
+    "applicable_users": [
+      {
+        "email": "japatpreet@unitedlayer.com",
+        "id": 2301,
+        "uuid": "9af3b698-d1c2-43ac-85ca-bc2ba5b23647"
+      }
+    ],
+    "is_active": true,
+    "is_default": false,
+    "created_at": "2024-11-29T04:33:22.244494-08:00",
+    "updated_at": "2024-11-29T04:33:22.244176-08:00",
+    "created_by": 1928,
+    "created_by_name": "Tenant A01"
+  }
+]

@@ -1,55 +1,50 @@
-{
-  "count": 3,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 3700,
-      "url": "http://localhost:3001/rest/zabbix/pdu/3700/",
-      "zabbix_customer": null,
-      "host_id": 18291,
-      "pdu": {
-        "url": "http://localhost:3001/rest/pdu/6140/",
-        "id": 6140,
-        "name": "UL-SV1-UNITY-LAB-PDU1",
-        "assettag": "UL-SV1-UNITY-LAB-PDU1",
-        "uuid": "35733e67-d235-49bf-8c11-f90b8c9c2201",
-        "colo_cloud_uuid": "7838acaf-006a-4f25-9c1c-afa017b50a54",
-        "cabinet": "P26-2-R8"
-      },
-      "zabbix_templates": []
+[
+  {
+    "id": 3700,
+    "url": "http://localhost:3001/rest/zabbix/pdu/3700/",
+    "zabbix_customer": null,
+    "host_id": 18291,
+    "pdu": {
+      "url": "http://localhost:3001/rest/pdu/6140/",
+      "id": 6140,
+      "name": "UL-SV1-UNITY-LAB-PDU1",
+      "assettag": "UL-SV1-UNITY-LAB-PDU1",
+      "uuid": "35733e67-d235-49bf-8c11-f90b8c9c2201",
+      "colo_cloud_uuid": "7838acaf-006a-4f25-9c1c-afa017b50a54",
+      "cabinet": "P26-2-R8"
     },
-    {
-      "id": 3923,
-      "url": "http://localhost:3001/rest/zabbix/pdu/3923/",
-      "zabbix_customer": null,
-      "host_id": 20924,
-      "pdu": {
-        "url": "http://localhost:3001/rest/pdu/5133/",
-        "id": 5133,
-        "name": "test_PDU",
-        "assettag": "",
-        "uuid": "bf6699ca-e950-423d-9446-f02bef496816",
-        "colo_cloud_uuid": "f9d933a5-00dd-4b2b-b375-0a5e48df517f",
-        "cabinet": "dell"
-      },
-      "zabbix_templates": []
+    "zabbix_templates": []
+  },
+  {
+    "id": 3923,
+    "url": "http://localhost:3001/rest/zabbix/pdu/3923/",
+    "zabbix_customer": null,
+    "host_id": 20924,
+    "pdu": {
+      "url": "http://localhost:3001/rest/pdu/5133/",
+      "id": 5133,
+      "name": "test_PDU",
+      "assettag": "",
+      "uuid": "bf6699ca-e950-423d-9446-f02bef496816",
+      "colo_cloud_uuid": "f9d933a5-00dd-4b2b-b375-0a5e48df517f",
+      "cabinet": "dell"
     },
-    {
-      "id": 3699,
-      "url": "http://localhost:3001/rest/zabbix/pdu/3699/",
-      "zabbix_customer": null,
-      "host_id": 18290,
-      "pdu": {
-        "url": "http://localhost:3001/rest/pdu/6141/",
-        "id": 6141,
-        "name": "UL-SV1-UNITY-LAB-PDU2",
-        "assettag": "UL-SV1-UNITY-LAB-PDU2",
-        "uuid": "22374a3d-49b5-45c3-b1cd-d73c8cc245b9",
-        "colo_cloud_uuid": "7838acaf-006a-4f25-9c1c-afa017b50a54",
-        "cabinet": "P26-2-R8"
-      },
-      "zabbix_templates": []
-    }
-  ]
-}
+    "zabbix_templates": []
+  },
+  {
+    "id": 3699,
+    "url": "http://localhost:3001/rest/zabbix/pdu/3699/",
+    "zabbix_customer": null,
+    "host_id": 18290,
+    "pdu": {
+      "url": "http://localhost:3001/rest/pdu/6141/",
+      "id": 6141,
+      "name": "UL-SV1-UNITY-LAB-PDU2",
+      "assettag": "UL-SV1-UNITY-LAB-PDU2",
+      "uuid": "22374a3d-49b5-45c3-b1cd-d73c8cc245b9",
+      "colo_cloud_uuid": "7838acaf-006a-4f25-9c1c-afa017b50a54",
+      "cabinet": "P26-2-R8"
+    },
+    "zabbix_templates": []
+  }
+]

@@ -1,13 +1,33 @@
-<div class="no-access-page">
-  <div class="card no-access-card">
-    <div class="card-body text-center">
-      <div class="no-access-icon" aria-hidden="true">
-        <i class="fas fa-lock"></i>
+<div class="no-access-container">
+  <div class="no-access-card">
+    <div class="card-header-decoration"></div>
+    
+    <div class="card-content">
+      <div class="lock-icon-wrapper">
+        <div class="lock-icon">
+          <i class="fas fa-lock"></i>
+        </div>
       </div>
-      <h1 class="h4 mb-2">No Access</h1>
-      <p class="text-muted mb-0">
-        You do not have permission to access this page. Please contact your administrator if you think this is a mistake.
+      
+      <h1 class="access-denied-title">Access Denied</h1>
+      
+      <p class="access-description">
+        You do not have sufficient permissions to access this page.
       </p>
+      
+      <div class="info-box">
+        <p class="info-text">
+          <i class="fas fa-info-circle"></i>
+          <span>If you believe this is an error, please contact your administrator.</span>
+        </p>
+      </div>
+      
+      <div class="action-group">
+        <a href="/" class="btn-home">
+          <i class="fas fa-arrow-left"></i>
+          Return to Home
+        </a>
+      </div>
     </div>
   </div>
 </div>

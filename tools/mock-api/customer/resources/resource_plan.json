@@ -1,95 +1,90 @@
-{
-  "count": 2,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 36,
-      "uuid": "b675214d-0bc1-4db4-a481-6d32369ebabd",
-      "customer": 508,
-      "resource_name": "ssd",
-      "cloud_type": "VMware",
-      "cpu_size": 4,
-      "cpu_customization": true,
-      "memory_size": 2,
-      "memory_unit": "GB",
-      "memory_customization": true,
-      "storage_size": 256,
-      "storage_unit": "GB",
-      "cost_type": "All At One Price",
-      "storage_customization": true,
-      "allow_multiple_disk": true,
-      "cost_plans_list": [
-        {
-          "plan_name": "Cost Model All At One Price Ssd",
-          "cost_plan": "5b67ed88-6f0b-4406-8372-bb49c837033b"
-        }
-      ],
-      "price_unit": "Monthly",
-      "is_active": true,
-      "lock_plan": false,
-      "created_date": "2025-02-11T23:47:41.284769-08:00",
-      "modified_date": "2025-02-11T23:47:41.284793-08:00",
-      "created_user": "Tenant A01",
-      "modified_user": "Tenant A01",
-      "unit_vice_cost": 2620.0,
-      "plan_mapping_uuid": "e8bb6ae2-afb4-4932-9229-23b8b2320c76",
-      "disk_type": "SSD",
-      "regions": [
-        "Silicon Valley, CA, USA"
-      ],
-      "is_master": true,
-      "assigned_clouds_list": [
-        {
-          "private_cloud": "d9b6808d-697c-4431-875d-102dcea09712",
-          "resource_mapping_uuid": "c04b05f8-2ee7-48c0-94fc-cb62b7b839ac",
-          "account_name": "UnityLab Vcentre"
-        }
-      ],
-      "datacenters": [
-        "SV1 DC1"
-      ]
-    },
-    {
-      "id": 35,
-      "uuid": "b0676e93-3128-4577-9d81-c5d9cb446220",
-      "customer": 508,
-      "resource_name": "resource model",
-      "cloud_type": "VMware",
-      "cpu_size": 4,
-      "cpu_customization": true,
-      "memory_size": 2,
-      "memory_unit": "GB",
-      "memory_customization": true,
-      "storage_size": 256,
-      "storage_unit": "GB",
-      "cost_type": "All At One Price",
-      "storage_customization": true,
-      "allow_multiple_disk": true,
-      "cost_plans_list": [
-        {
-          "plan_name": "Cost Model - All At Once Price Hdd",
-          "cost_plan": "0561d19a-bf26-49db-bf4a-66aa829afdfa"
-        }
-      ],
-      "price_unit": "Yearly",
-      "is_active": true,
-      "lock_plan": false,
-      "created_date": "2025-02-11T21:16:31.854317-08:00",
-      "modified_date": "2025-02-11T21:16:31.854341-08:00",
-      "created_user": "Tenant A01",
-      "modified_user": "Tenant A01",
-      "unit_vice_cost": 22951200.0,
-      "plan_mapping_uuid": "7cdef181-5a26-4601-8e5e-0c259b825b49",
-      "disk_type": "HDD",
-      "regions": [
-        "Silicon Valley, CA, USA"
-      ],
-      "is_master": true,
-      "assigned_clouds_list": [],
-      "datacenters": [
-        "SV1 DC1"
-      ]
-    }
-  ]
-}
+[
+  {
+    "id": 36,
+    "uuid": "b675214d-0bc1-4db4-a481-6d32369ebabd",
+    "customer": 508,
+    "resource_name": "ssd",
+    "cloud_type": "VMware",
+    "cpu_size": 4,
+    "cpu_customization": true,
+    "memory_size": 2,
+    "memory_unit": "GB",
+    "memory_customization": true,
+    "storage_size": 256,
+    "storage_unit": "GB",
+    "cost_type": "All At One Price",
+    "storage_customization": true,
+    "allow_multiple_disk": true,
+    "cost_plans_list": [
+      {
+        "plan_name": "Cost Model All At One Price Ssd",
+        "cost_plan": "5b67ed88-6f0b-4406-8372-bb49c837033b"
+      }
+    ],
+    "price_unit": "Monthly",
+    "is_active": true,
+    "lock_plan": false,
+    "created_date": "2025-02-11T23:47:41.284769-08:00",
+    "modified_date": "2025-02-11T23:47:41.284793-08:00",
+    "created_user": "Tenant A01",
+    "modified_user": "Tenant A01",
+    "unit_vice_cost": 2620,
+    "plan_mapping_uuid": "e8bb6ae2-afb4-4932-9229-23b8b2320c76",
+    "disk_type": "SSD",
+    "regions": [
+      "Silicon Valley, CA, USA"
+    ],
+    "is_master": true,
+    "assigned_clouds_list": [
+      {
+        "private_cloud": "d9b6808d-697c-4431-875d-102dcea09712",
+        "resource_mapping_uuid": "c04b05f8-2ee7-48c0-94fc-cb62b7b839ac",
+        "account_name": "UnityLab Vcentre"
+      }
+    ],
+    "datacenters": [
+      "SV1 DC1"
+    ]
+  },
+  {
+    "id": 35,
+    "uuid": "b0676e93-3128-4577-9d81-c5d9cb446220",
+    "customer": 508,
+    "resource_name": "resource model",
+    "cloud_type": "VMware",
+    "cpu_size": 4,
+    "cpu_customization": true,
+    "memory_size": 2,
+    "memory_unit": "GB",
+    "memory_customization": true,
+    "storage_size": 256,
+    "storage_unit": "GB",
+    "cost_type": "All At One Price",
+    "storage_customization": true,
+    "allow_multiple_disk": true,
+    "cost_plans_list": [
+      {
+        "plan_name": "Cost Model - All At Once Price Hdd",
+        "cost_plan": "0561d19a-bf26-49db-bf4a-66aa829afdfa"
+      }
+    ],
+    "price_unit": "Yearly",
+    "is_active": true,
+    "lock_plan": false,
+    "created_date": "2025-02-11T21:16:31.854317-08:00",
+    "modified_date": "2025-02-11T21:16:31.854341-08:00",
+    "created_user": "Tenant A01",
+    "modified_user": "Tenant A01",
+    "unit_vice_cost": 22951200,
+    "plan_mapping_uuid": "7cdef181-5a26-4601-8e5e-0c259b825b49",
+    "disk_type": "HDD",
+    "regions": [
+      "Silicon Valley, CA, USA"
+    ],
+    "is_master": true,
+    "assigned_clouds_list": [],
+    "datacenters": [
+      "SV1 DC1"
+    ]
+  }
+]

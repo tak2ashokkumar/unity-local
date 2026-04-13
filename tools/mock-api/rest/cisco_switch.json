@@ -1,142 +1,137 @@
-{
-  "count": 5,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 2,
-      "url": "http://localhost:3001/rest/cisco_switch/2/",
+[
+  {
+    "id": 2,
+    "url": "http://localhost:3001/rest/cisco_switch/2/",
+    "name": "sw3.to1",
+    "backend_url": "http://sw3.to1.unitedlayer.com",
+    "proxy_url": "gransw3to1",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/215/",
+        "id": 215,
+        "name": "Granicus, Inc",
+        "storage": null,
+        "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
+      }
+    ],
+    "uuid": "3aee552c-d6be-4679-adfd-fdd108447e90",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1715/",
+      "id": 1715,
+      "uuid": "a3966507-8c2b-46cf-82b4-10cc4f7deef0",
       "name": "sw3.to1",
-      "backend_url": "http://sw3.to1.unitedlayer.com",
-      "proxy_url": "gransw3to1",
-      "customers": [
-        {
-          "url": "http://localhost:3001/rest/fast/org/215/",
-          "id": 215,
-          "name": "Granicus, Inc",
-          "storage": null,
-          "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
-        }
-      ],
-      "uuid": "3aee552c-d6be-4679-adfd-fdd108447e90",
-      "switch": {
-        "url": "http://localhost:3001/rest/switch/1715/",
-        "id": 1715,
-        "uuid": "a3966507-8c2b-46cf-82b4-10cc4f7deef0",
-        "name": "sw3.to1",
-        "object_class": "Switch",
-        "is_shared": false,
-        "display_name": "sw3.to1 - Granicus, Inc"
-      },
-      "proxy_fqdn": "https://gransw3to1.uproxy.unitedlayer.com"
+      "object_class": "Switch",
+      "is_shared": false,
+      "display_name": "sw3.to1 - Granicus, Inc"
     },
-    {
-      "id": 3,
-      "url": "http://localhost:3001/rest/cisco_switch/3/",
+    "proxy_fqdn": "https://gransw3to1.uproxy.unitedlayer.com"
+  },
+  {
+    "id": 3,
+    "url": "http://localhost:3001/rest/cisco_switch/3/",
+    "name": "sw1.to1",
+    "backend_url": "http://sw1.to1.unitedlayer.com",
+    "proxy_url": "gransw1to1",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/215/",
+        "id": 215,
+        "name": "Granicus, Inc",
+        "storage": null,
+        "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
+      }
+    ],
+    "uuid": "d8a6e89b-4648-437e-b7f9-2da2221ff276",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1714/",
+      "id": 1714,
+      "uuid": "2d1c7b32-0e64-4379-9087-fd1aac68d2a9",
       "name": "sw1.to1",
-      "backend_url": "http://sw1.to1.unitedlayer.com",
-      "proxy_url": "gransw1to1",
-      "customers": [
-        {
-          "url": "http://localhost:3001/rest/fast/org/215/",
-          "id": 215,
-          "name": "Granicus, Inc",
-          "storage": null,
-          "uuid": "53c1f32a-af6a-4e6f-8a55-aa76844b7b73"
-        }
-      ],
-      "uuid": "d8a6e89b-4648-437e-b7f9-2da2221ff276",
-      "switch": {
-        "url": "http://localhost:3001/rest/switch/1714/",
-        "id": 1714,
-        "uuid": "2d1c7b32-0e64-4379-9087-fd1aac68d2a9",
-        "name": "sw1.to1",
-        "object_class": "Switch",
-        "is_shared": false,
-        "display_name": "sw1.to1 - Granicus, Inc"
-      },
-      "proxy_fqdn": "https://gransw1to1.uproxy.unitedlayer.com"
+      "object_class": "Switch",
+      "is_shared": false,
+      "display_name": "sw1.to1 - Granicus, Inc"
     },
-    {
-      "id": 4,
-      "url": "http://localhost:3001/rest/cisco_switch/4/",
-      "name": "WestEd-sw1-000.sf8",
-      "backend_url": "http://sw1-000.sf8.unitedlayer.com",
-      "proxy_url": "wested-sw1-000-sf8",
-      "customers": [
-        {
-          "url": "http://localhost:3001/rest/fast/org/284/",
-          "id": 284,
-          "name": "WestEd",
-          "storage": "22.3",
-          "uuid": "46126b11-3e7f-4fab-8f90-7d35753e116a"
-        }
-      ],
-      "uuid": "9a14334c-adfc-4671-a2d5-31e53d87a94d",
-      "switch": {
-        "url": "http://localhost:3001/rest/switch/1756/",
-        "id": 1756,
-        "uuid": "b428205a-9638-40c4-912e-e8ab9376c2ee",
-        "name": "sw1-000.sf8",
-        "object_class": "Switch",
-        "is_shared": false,
-        "display_name": "sw1-000.sf8 - UnitedLayer"
-      },
-      "proxy_fqdn": "https://wested-sw1-000-sf8.uproxy.unitedlayer.com"
+    "proxy_fqdn": "https://gransw1to1.uproxy.unitedlayer.com"
+  },
+  {
+    "id": 4,
+    "url": "http://localhost:3001/rest/cisco_switch/4/",
+    "name": "WestEd-sw1-000.sf8",
+    "backend_url": "http://sw1-000.sf8.unitedlayer.com",
+    "proxy_url": "wested-sw1-000-sf8",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/284/",
+        "id": 284,
+        "name": "WestEd",
+        "storage": "22.3",
+        "uuid": "46126b11-3e7f-4fab-8f90-7d35753e116a"
+      }
+    ],
+    "uuid": "9a14334c-adfc-4671-a2d5-31e53d87a94d",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1756/",
+      "id": 1756,
+      "uuid": "b428205a-9638-40c4-912e-e8ab9376c2ee",
+      "name": "sw1-000.sf8",
+      "object_class": "Switch",
+      "is_shared": false,
+      "display_name": "sw1-000.sf8 - UnitedLayer"
     },
-    {
-      "id": 6,
-      "url": "http://localhost:3001/rest/cisco_switch/6/",
-      "name": "WestEd-sw2-000.sf8",
-      "backend_url": "http://sw2-000.sf8.unitedlayer.com",
-      "proxy_url": "wested-sw2-000.sf8",
-      "customers": [
-        {
-          "url": "http://localhost:3001/rest/fast/org/284/",
-          "id": 284,
-          "name": "WestEd",
-          "storage": "22.3",
-          "uuid": "46126b11-3e7f-4fab-8f90-7d35753e116a"
-        }
-      ],
-      "uuid": "ec2ef933-7929-49f3-b5ac-d3a9d419eb56",
-      "switch": {
-        "url": "http://localhost:3001/rest/switch/1802/",
-        "id": 1802,
-        "uuid": "56552f1d-d883-4aa9-9f69-50f94185b188",
-        "name": "sw2-000.sf8",
-        "object_class": "Switch",
-        "is_shared": false,
-        "display_name": "sw2-000.sf8 - UnitedLayer"
-      },
-      "proxy_fqdn": "https://wested-sw2-000.sf8.uproxy.unitedlayer.com"
+    "proxy_fqdn": "https://wested-sw1-000-sf8.uproxy.unitedlayer.com"
+  },
+  {
+    "id": 6,
+    "url": "http://localhost:3001/rest/cisco_switch/6/",
+    "name": "WestEd-sw2-000.sf8",
+    "backend_url": "http://sw2-000.sf8.unitedlayer.com",
+    "proxy_url": "wested-sw2-000.sf8",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/284/",
+        "id": 284,
+        "name": "WestEd",
+        "storage": "22.3",
+        "uuid": "46126b11-3e7f-4fab-8f90-7d35753e116a"
+      }
+    ],
+    "uuid": "ec2ef933-7929-49f3-b5ac-d3a9d419eb56",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1802/",
+      "id": 1802,
+      "uuid": "56552f1d-d883-4aa9-9f69-50f94185b188",
+      "name": "sw2-000.sf8",
+      "object_class": "Switch",
+      "is_shared": false,
+      "display_name": "sw2-000.sf8 - UnitedLayer"
     },
-    {
-      "id": 9,
-      "url": "http://localhost:3001/rest/cisco_switch/9/",
+    "proxy_fqdn": "https://wested-sw2-000.sf8.uproxy.unitedlayer.com"
+  },
+  {
+    "id": 9,
+    "url": "http://localhost:3001/rest/cisco_switch/9/",
+    "name": "sw1-402.sf10",
+    "backend_url": "http://10.128.109.3",
+    "proxy_url": "sw1-402-sf10",
+    "customers": [
+      {
+        "url": "http://localhost:3001/rest/fast/org/328/",
+        "id": 328,
+        "name": "My UL Demo, LLC",
+        "storage": "5",
+        "uuid": "ec9f8028-70f3-4b8d-aac9-1662730909ec"
+      }
+    ],
+    "uuid": "6e960334-0949-417d-b6ec-72eef2d14281",
+    "switch": {
+      "url": "http://localhost:3001/rest/switch/1877/",
+      "id": 1877,
+      "uuid": "998fe142-b24a-4ae8-a9d6-2e3922d2e95a",
       "name": "sw1-402.sf10",
-      "backend_url": "http://10.128.109.3",
-      "proxy_url": "sw1-402-sf10",
-      "customers": [
-        {
-          "url": "http://localhost:3001/rest/fast/org/328/",
-          "id": 328,
-          "name": "My UL Demo, LLC",
-          "storage": "5",
-          "uuid": "ec9f8028-70f3-4b8d-aac9-1662730909ec"
-        }
-      ],
-      "uuid": "6e960334-0949-417d-b6ec-72eef2d14281",
-      "switch": {
-        "url": "http://localhost:3001/rest/switch/1877/",
-        "id": 1877,
-        "uuid": "998fe142-b24a-4ae8-a9d6-2e3922d2e95a",
-        "name": "sw1-402.sf10",
-        "object_class": "Switch",
-        "is_shared": false,
-        "display_name": "sw1-402.sf10 - My UL Demo, LLC"
-      },
-      "proxy_fqdn": "https://sw1-402-sf10.uproxy.unitedlayer.com"
-    }
-  ]
-}
+      "object_class": "Switch",
+      "is_shared": false,
+      "display_name": "sw1-402.sf10 - My UL Demo, LLC"
+    },
+    "proxy_fqdn": "https://sw1-402-sf10.uproxy.unitedlayer.com"
+  }
+]

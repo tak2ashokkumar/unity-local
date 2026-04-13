@@ -1,111 +1,106 @@
-{
-  "count": 4,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 58,
-      "created_date": "2026-01-15T03:38:55.718534-08:00",
-      "modified_date": "2026-01-15T03:38:55.718562-08:00",
-      "created_user": "Tenant A01",
-      "modified_user": "Tenant A01",
-      "plan_mapping_uuid": "f45225de-6ea8-43c3-af4f-24c70d52ddd0",
-      "uuid": "0e96de5d-febd-42fa-95ff-1592a3850d1b",
-      "plan_name": "Test2",
-      "plan_description": "test",
-      "plan_type": "All At One Price",
-      "price_unit": "Yearly",
-      "price_allocation": "Always",
-      "unit_cost_price": 1022.0,
-      "disk_type": "SSD",
-      "regions": [
-        "Lebanon",
-        "Silicon Valley, CA, USA"
-      ],
-      "datacenters": [
-        "Test-DC",
-        "SV1 DC1"
-      ],
-      "is_active": true,
-      "is_master": true,
-      "customer": 508
-    },
-    {
-      "id": 56,
-      "created_date": "2026-01-15T02:34:10.872976-08:00",
-      "modified_date": "2026-01-15T02:34:10.873004-08:00",
-      "created_user": "Tenant A01",
-      "modified_user": "Tenant A01",
-      "plan_mapping_uuid": "a1678c7b-f610-4501-ad14-d9f1272d7d1c",
-      "uuid": "ad74925c-5d0d-4b3f-be43-20418e0b2a7a",
-      "plan_name": "Teste",
-      "plan_description": "cost plan",
-      "plan_type": "CPU Only",
-      "price_unit": "Yearly",
-      "price_allocation": "Running Only",
-      "unit_cost_price": 1033.0,
-      "disk_type": "",
-      "regions": [
-        "Lebanon",
-        "Silicon Valley, CA, USA"
-      ],
-      "datacenters": [
-        "Test-DC",
-        "SV1 DC1"
-      ],
-      "is_active": true,
-      "is_master": true,
-      "customer": 508
-    },
-    {
-      "id": 34,
-      "created_date": "2025-02-11T23:46:34.127580-08:00",
-      "modified_date": "2025-02-11T23:46:34.127602-08:00",
-      "created_user": "Tenant A01",
-      "modified_user": "Tenant A01",
-      "plan_mapping_uuid": "80f08dfc-6589-41a1-9faa-bf7d01b35fa7",
-      "uuid": "5b67ed88-6f0b-4406-8372-bb49c837033b",
-      "plan_name": "Cost Model All At One Price Ssd",
-      "plan_description": "Cost model all at one price SSD",
-      "plan_type": "All At One Price",
-      "price_unit": "Monthly",
-      "price_allocation": "Always",
-      "unit_cost_price": 10.0,
-      "disk_type": "SSD",
-      "regions": [
-        "Silicon Valley, CA, USA"
-      ],
-      "datacenters": [
-        "SV1 DC1"
-      ],
-      "is_active": true,
-      "is_master": true,
-      "customer": 508
-    },
-    {
-      "id": 33,
-      "created_date": "2025-02-11T21:15:32.169298-08:00",
-      "modified_date": "2025-02-11T21:15:32.169323-08:00",
-      "created_user": "Tenant A01",
-      "modified_user": "Tenant A01",
-      "plan_mapping_uuid": "401fdb0f-2374-46fc-943f-b7ce91248814",
-      "uuid": "0561d19a-bf26-49db-bf4a-66aa829afdfa",
-      "plan_name": "Cost Model - All At Once Price Hdd",
-      "plan_description": "Cost model - all at once price",
-      "plan_type": "All At One Price",
-      "price_unit": "Hourly",
-      "price_allocation": "Always",
-      "unit_cost_price": 10.0,
-      "disk_type": "HDD",
-      "regions": [
-        "Silicon Valley, CA, USA"
-      ],
-      "datacenters": [
-        "SV1 DC1"
-      ],
-      "is_active": true,
-      "is_master": true,
-      "customer": 508
-    }
-  ]
-}
+[
+  {
+    "id": 58,
+    "created_date": "2026-01-15T03:38:55.718534-08:00",
+    "modified_date": "2026-01-15T03:38:55.718562-08:00",
+    "created_user": "Tenant A01",
+    "modified_user": "Tenant A01",
+    "plan_mapping_uuid": "f45225de-6ea8-43c3-af4f-24c70d52ddd0",
+    "uuid": "0e96de5d-febd-42fa-95ff-1592a3850d1b",
+    "plan_name": "Test2",
+    "plan_description": "test",
+    "plan_type": "All At One Price",
+    "price_unit": "Yearly",
+    "price_allocation": "Always",
+    "unit_cost_price": 1022,
+    "disk_type": "SSD",
+    "regions": [
+      "Lebanon",
+      "Silicon Valley, CA, USA"
+    ],
+    "datacenters": [
+      "Test-DC",
+      "SV1 DC1"
+    ],
+    "is_active": true,
+    "is_master": true,
+    "customer": 508
+  },
+  {
+    "id": 56,
+    "created_date": "2026-01-15T02:34:10.872976-08:00",
+    "modified_date": "2026-01-15T02:34:10.873004-08:00",
+    "created_user": "Tenant A01",
+    "modified_user": "Tenant A01",
+    "plan_mapping_uuid": "a1678c7b-f610-4501-ad14-d9f1272d7d1c",
+    "uuid": "ad74925c-5d0d-4b3f-be43-20418e0b2a7a",
+    "plan_name": "Teste",
+    "plan_description": "cost plan",
+    "plan_type": "CPU Only",
+    "price_unit": "Yearly",
+    "price_allocation": "Running Only",
+    "unit_cost_price": 1033,
+    "disk_type": "",
+    "regions": [
+      "Lebanon",
+      "Silicon Valley, CA, USA"
+    ],
+    "datacenters": [
+      "Test-DC",
+      "SV1 DC1"
+    ],
+    "is_active": true,
+    "is_master": true,
+    "customer": 508
+  },
+  {
+    "id": 34,
+    "created_date": "2025-02-11T23:46:34.127580-08:00",
+    "modified_date": "2025-02-11T23:46:34.127602-08:00",
+    "created_user": "Tenant A01",
+    "modified_user": "Tenant A01",
+    "plan_mapping_uuid": "80f08dfc-6589-41a1-9faa-bf7d01b35fa7",
+    "uuid": "5b67ed88-6f0b-4406-8372-bb49c837033b",
+    "plan_name": "Cost Model All At One Price Ssd",
+    "plan_description": "Cost model all at one price SSD",
+    "plan_type": "All At One Price",
+    "price_unit": "Monthly",
+    "price_allocation": "Always",
+    "unit_cost_price": 10,
+    "disk_type": "SSD",
+    "regions": [
+      "Silicon Valley, CA, USA"
+    ],
+    "datacenters": [
+      "SV1 DC1"
+    ],
+    "is_active": true,
+    "is_master": true,
+    "customer": 508
+  },
+  {
+    "id": 33,
+    "created_date": "2025-02-11T21:15:32.169298-08:00",
+    "modified_date": "2025-02-11T21:15:32.169323-08:00",
+    "created_user": "Tenant A01",
+    "modified_user": "Tenant A01",
+    "plan_mapping_uuid": "401fdb0f-2374-46fc-943f-b7ce91248814",
+    "uuid": "0561d19a-bf26-49db-bf4a-66aa829afdfa",
+    "plan_name": "Cost Model - All At Once Price Hdd",
+    "plan_description": "Cost model - all at once price",
+    "plan_type": "All At One Price",
+    "price_unit": "Hourly",
+    "price_allocation": "Always",
+    "unit_cost_price": 10,
+    "disk_type": "HDD",
+    "regions": [
+      "Silicon Valley, CA, USA"
+    ],
+    "datacenters": [
+      "SV1 DC1"
+    ],
+    "is_active": true,
+    "is_master": true,
+    "customer": 508
+  }
+]

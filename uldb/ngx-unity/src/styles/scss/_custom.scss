@@ -26,6 +26,15 @@
   padding-bottom: 1.5rem;
 }
 
+body.no-access-page .app-body>.main {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+body.no-access-page .app-body>.main>div {
+  padding-bottom: 0;
+  min-height: calc(100vh - #{$navbar-height} - 1.5rem);
+}
+
 .equalize-card {
   height: 100%;
   margin-bottom: 0;

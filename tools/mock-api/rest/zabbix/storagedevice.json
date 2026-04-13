@@ -1,96 +1,91 @@
-{
-  "count": 5,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 1038,
-      "url": "http://localhost:3001/rest/zabbix/storagedevice/1038/",
-      "zabbix_customer": null,
-      "host_id": 13361,
-      "storagedevice": {
-        "url": "http://localhost:3001/rest/storagedevice/441/",
-        "id": 441,
-        "uuid": "ba729782-46b2-4302-819a-931aa69688d3",
-        "name": "ONTAP Demo",
-        "object_class": "StorageDevice",
-        "display_name": "ONTAP Demo - NetApp"
-      },
-      "zabbix_templates": []
+[
+  {
+    "id": 1038,
+    "url": "http://localhost:3001/rest/zabbix/storagedevice/1038/",
+    "zabbix_customer": null,
+    "host_id": 13361,
+    "storagedevice": {
+      "url": "http://localhost:3001/rest/storagedevice/441/",
+      "id": 441,
+      "uuid": "ba729782-46b2-4302-819a-931aa69688d3",
+      "name": "ONTAP Demo",
+      "object_class": "StorageDevice",
+      "display_name": "ONTAP Demo - NetApp"
     },
-    {
-      "id": 1089,
-      "url": "http://localhost:3001/rest/zabbix/storagedevice/1089/",
-      "zabbix_customer": null,
-      "host_id": 13549,
-      "storagedevice": {
-        "url": "http://localhost:3001/rest/storagedevice/455/",
-        "id": 455,
-        "uuid": "61e5b86b-4460-474c-a674-fa85cba69900",
-        "name": "LABstorage1",
-        "object_class": "StorageDevice",
-        "display_name": "LABstorage1 - NetApp"
-      },
-      "zabbix_templates": []
+    "zabbix_templates": []
+  },
+  {
+    "id": 1089,
+    "url": "http://localhost:3001/rest/zabbix/storagedevice/1089/",
+    "zabbix_customer": null,
+    "host_id": 13549,
+    "storagedevice": {
+      "url": "http://localhost:3001/rest/storagedevice/455/",
+      "id": 455,
+      "uuid": "61e5b86b-4460-474c-a674-fa85cba69900",
+      "name": "LABstorage1",
+      "object_class": "StorageDevice",
+      "display_name": "LABstorage1 - NetApp"
     },
-    {
-      "id": 963,
-      "url": "http://localhost:3001/rest/zabbix/storagedevice/963/",
-      "zabbix_customer": {
-        "id": 56,
-        "zabbix_instance": {
-          "id": 11,
-          "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-          "account_name": "zabbix-SF prod"
-        },
-        "customer": {
-          "url": "http://localhost:3001/rest/fast/org/399/",
-          "id": 399,
-          "name": "Test",
-          "storage": null,
-          "uuid": "948a8a2c-ff59-4e3d-a679-f201e63e3a28"
-        }
+    "zabbix_templates": []
+  },
+  {
+    "id": 963,
+    "url": "http://localhost:3001/rest/zabbix/storagedevice/963/",
+    "zabbix_customer": {
+      "id": 56,
+      "zabbix_instance": {
+        "id": 11,
+        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+        "account_name": "zabbix-SF prod"
       },
-      "host_id": 12969,
-      "storagedevice": {
-        "url": "http://localhost:3001/rest/storagedevice/403/",
-        "id": 403,
-        "uuid": "e6474e32-1c0d-4e4b-8f26-436650f59902",
-        "name": "melcluster2",
-        "object_class": "StorageDevice",
-        "display_name": "melcluster2 - Test"
-      },
-      "zabbix_templates": []
+      "customer": {
+        "url": "http://localhost:3001/rest/fast/org/399/",
+        "id": 399,
+        "name": "Test",
+        "storage": null,
+        "uuid": "948a8a2c-ff59-4e3d-a679-f201e63e3a28"
+      }
     },
-    {
-      "id": 4445,
-      "url": "http://localhost:3001/rest/zabbix/storagedevice/4445/",
-      "zabbix_customer": null,
-      "host_id": 23015,
-      "storagedevice": {
-        "url": "http://localhost:3001/rest/storagedevice/513/",
-        "id": 513,
-        "uuid": "5cdabec3-c839-4ac9-b4b8-2fff212cf6ba",
-        "name": "SV1-P26-2-R14-NIMBLE-STORAGE-01",
-        "object_class": "StorageDevice",
-        "display_name": "SV1-P26-2-R14-NIMBLE-STORAGE-01 - Unity infra"
-      },
-      "zabbix_templates": []
+    "host_id": 12969,
+    "storagedevice": {
+      "url": "http://localhost:3001/rest/storagedevice/403/",
+      "id": 403,
+      "uuid": "e6474e32-1c0d-4e4b-8f26-436650f59902",
+      "name": "melcluster2",
+      "object_class": "StorageDevice",
+      "display_name": "melcluster2 - Test"
     },
-    {
-      "id": 4588,
-      "url": "http://localhost:3001/rest/zabbix/storagedevice/4588/",
-      "zabbix_customer": null,
-      "host_id": 23370,
-      "storagedevice": {
-        "url": "http://localhost:3001/rest/storagedevice/516/",
-        "id": 516,
-        "uuid": "0384914b-57f5-49c0-bdc3-53f62c9cc2bf",
-        "name": "WiproSDXX20 - Pure Flash",
-        "object_class": "StorageDevice",
-        "display_name": "WiproSDXX20 - Pure Flash - Wipro-CIS-old"
-      },
-      "zabbix_templates": []
-    }
-  ]
-}
+    "zabbix_templates": []
+  },
+  {
+    "id": 4445,
+    "url": "http://localhost:3001/rest/zabbix/storagedevice/4445/",
+    "zabbix_customer": null,
+    "host_id": 23015,
+    "storagedevice": {
+      "url": "http://localhost:3001/rest/storagedevice/513/",
+      "id": 513,
+      "uuid": "5cdabec3-c839-4ac9-b4b8-2fff212cf6ba",
+      "name": "SV1-P26-2-R14-NIMBLE-STORAGE-01",
+      "object_class": "StorageDevice",
+      "display_name": "SV1-P26-2-R14-NIMBLE-STORAGE-01 - Unity infra"
+    },
+    "zabbix_templates": []
+  },
+  {
+    "id": 4588,
+    "url": "http://localhost:3001/rest/zabbix/storagedevice/4588/",
+    "zabbix_customer": null,
+    "host_id": 23370,
+    "storagedevice": {
+      "url": "http://localhost:3001/rest/storagedevice/516/",
+      "id": 516,
+      "uuid": "0384914b-57f5-49c0-bdc3-53f62c9cc2bf",
+      "name": "WiproSDXX20 - Pure Flash",
+      "object_class": "StorageDevice",
+      "display_name": "WiproSDXX20 - Pure Flash - Wipro-CIS-old"
+    },
+    "zabbix_templates": []
+  }
+]

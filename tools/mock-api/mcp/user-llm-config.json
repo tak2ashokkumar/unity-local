@@ -1,38 +1,33 @@
-{
-    "count": 2,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "id": 4,
-            "organization": 365,
-            "user": 1392,
-            "model_name": "gpt-4o",
-            "provider": "openai",
-            "description": "OpenAI's reliable model",
-            "endpoint_url": "",
-            "context_window": null,
-            "is_default": false,
-            "created_at": "2026-03-14T08:16:41.426886-07:00",
-            "updated_at": "2026-03-14T08:16:41.426934-07:00",
-            "active_for_applications": []
-        },
-        {
-            "id": 2,
-            "organization": 365,
-            "user": 1392,
-            "model_name": "gpt-5.2",
-            "provider": "openai",
-            "description": "OpenAI's recent model",
-            "endpoint_url": "",
-            "context_window": null,
-            "is_default": false,
-            "created_at": "2026-03-13T08:07:06.423939-07:00",
-            "updated_at": "2026-03-13T08:07:06.423984-07:00",
-            "active_for_applications": [
-                "assistant",
-                "network_agent"
-            ]
-        }
+[
+  {
+    "id": 4,
+    "organization": 365,
+    "user": 1392,
+    "model_name": "gpt-4o",
+    "provider": "openai",
+    "description": "OpenAI's reliable model",
+    "endpoint_url": "",
+    "context_window": null,
+    "is_default": false,
+    "created_at": "2026-03-14T08:16:41.426886-07:00",
+    "updated_at": "2026-03-14T08:16:41.426934-07:00",
+    "active_for_applications": []
+  },
+  {
+    "id": 2,
+    "organization": 365,
+    "user": 1392,
+    "model_name": "gpt-5.2",
+    "provider": "openai",
+    "description": "OpenAI's recent model",
+    "endpoint_url": "",
+    "context_window": null,
+    "is_default": false,
+    "created_at": "2026-03-13T08:07:06.423939-07:00",
+    "updated_at": "2026-03-13T08:07:06.423984-07:00",
+    "active_for_applications": [
+      "assistant",
+      "network_agent"
     ]
-}
+  }
+]

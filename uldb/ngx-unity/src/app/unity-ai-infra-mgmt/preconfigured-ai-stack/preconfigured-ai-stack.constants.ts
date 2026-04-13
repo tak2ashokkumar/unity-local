@@ -7,6 +7,7 @@ export interface AiStack {
     version: string;
     category: string;
     icon: string;
+    showTitle?: boolean;
 }
 
 export const FILTER_CATEGORIES: string[] = [
@@ -31,7 +32,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Open-source deep learning framework with dynamic computation graphs.',
         version: 'v2.3.0',
         category: 'Frameworks',
-        icon: `${BASE}/pytorch.svg`,
+        icon: `${BASE}/Pytorch.svg`,
+        showTitle: false,
     },
     {
         id: 'tensorflow',
@@ -39,7 +41,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'End-to-end ML platform by Google for production workloads.',
         version: 'v2.16.1',
         category: 'Frameworks',
-        icon: `${BASE}/tensorflow.svg`,
+        icon: `${BASE}/TensorFlow.svg`,
+        showTitle: false,
     },
     {
         id: 'jax',
@@ -47,7 +50,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'High-performance numerical computing with auto-differentiation.',
         version: 'v0.4.30',
         category: 'Frameworks',
-        icon: `${BASE}/jax.svg`,
+        icon: `${BASE}/JAX.svg`,
+        showTitle: false,
     },
     {
         id: 'keras',
@@ -55,7 +59,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'High-level neural network API, runs on top of TensorFlow.',
         version: 'v3.4.1',
         category: 'Frameworks',
-        icon: `${BASE}/keras.svg`,
+        icon: `${BASE}/Keras.svg`,
+        showTitle: false,
     },
     {
         id: 'mxnet',
@@ -63,7 +68,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Scalable deep learning framework with multi-GPU support.',
         version: 'v1.9.1',
         category: 'Frameworks',
-        icon: `${BASE}/Apache_MXNet.svg`,
+        icon: `${BASE}/MXNet.svg`,
+        showTitle: false,
     },
     {
         id: 'paddlepaddle',
@@ -71,7 +77,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Industrial deep learning platform by Baidu.',
         version: 'v2.6.1',
         category: 'Frameworks',
-        icon: `${BASE}/paddlepaddle.svg`,
+        icon: `${BASE}/PaddlePaddle.svg`,
+        showTitle: false,
     },
 
     // ── IDEs & Notebooks ───────────────────────────────────────
@@ -81,7 +88,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Professional Python IDE with ML & data science tooling.',
         version: 'v2024.1',
         category: 'IDEs & Notebooks',
-        icon: `${BASE}/PyCharm_Pro.svg`,
+        icon: `${BASE}/PyCharm.svg`,
+        showTitle: false,
     },
     {
         id: 'jupyterlab',
@@ -90,6 +98,7 @@ export const AI_STACKS: AiStack[] = [
         version: 'v4.2.0',
         category: 'IDEs & Notebooks',
         icon: `${BASE}/JupyterLab.svg`,
+        showTitle: false,
     },
     {
         id: 'vscode',
@@ -97,7 +106,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Remote VS Code with GPU-aware extensions pre-installed.',
         version: 'v1.90.0',
         category: 'IDEs & Notebooks',
-        icon: `${BASE}/VS_Code_Server.svg`,
+        icon: `${BASE}/VSCode.svg`,
+        showTitle: false,
     },
     {
         id: 'zeppelin',
@@ -105,7 +115,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Web-based notebook for data analytics and visualization.',
         version: 'v0.11.1',
         category: 'IDEs & Notebooks',
-        icon: `${BASE}/Apache_Zeppelin.svg`,
+        icon: `${BASE}/Zeppelin.svg`,
+        showTitle: false,
     },
     {
         id: 'rstudio',
@@ -113,7 +124,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'IDE for R with statistical computing & ML packages.',
         version: 'v2024.04',
         category: 'IDEs & Notebooks',
-        icon: `${BASE}/RStudio_Server.svg`,
+        icon: `${BASE}/RStudio.svg`,
+        showTitle: false,
     },
     {
         id: 'comfyui',
@@ -131,7 +143,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Platform for ML lifecycle: tracking, packaging, deployment.',
         version: 'v2.14.0',
         category: 'MLOps & Serving',
-        icon: `${BASE}/mlflow.svg`,
+        icon: `${BASE}/MLFlow.svg`,
+        showTitle: false,
     },
     {
         id: 'kubeflow',
@@ -139,7 +152,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'ML toolkit for Kubernetes with pipeline orchestration.',
         version: 'v1.9.0',
         category: 'MLOps & Serving',
-        icon: `${BASE}/kubeflow.svg`,
+        icon: `${BASE}/KubeFlow.svg`,
+        showTitle: false,
     },
     {
         id: 'triton',
@@ -155,7 +169,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Scalable model serving with Ray distributed framework.',
         version: 'v2.31.0',
         category: 'MLOps & Serving',
-        icon: `${BASE}/Ray_Serve.svg`,
+        icon: `${BASE}/Ray.svg`,
+        showTitle: false,
     },
     {
         id: 'bentoml',
@@ -163,7 +178,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Framework for building production-ready ML services.',
         version: 'v1.2.19',
         category: 'MLOps & Serving',
-        icon: `${BASE}/bentoml.svg`,
+        icon: `${BASE}/BentoML.svg`,
+        showTitle: false,
     },
     {
         id: 'seldon',
@@ -171,7 +187,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Deploy, scale & monitor ML models on Kubernetes.',
         version: 'v1.18.0',
         category: 'MLOps & Serving',
-        icon: `${BASE}/Seldon_Core.svg`,
+        icon: `${BASE}/Seldon.svg`,
+        showTitle: false,
     },
 
     // ── Libraries ──────────────────────────────────────────────
@@ -181,7 +198,8 @@ export const AI_STACKS: AiStack[] = [
         description: 'Classical ML algorithms: classification, regression, clustering.',
         version: 'v1.5.0',
         category: 'Libraries',
-        icon: `${BASE}/Scikit-learn.svg`,
+        icon: `${BASE}/SlickitLearn.svg`,
+        showTitle: false,
     },
     {
         id: 'pandas',

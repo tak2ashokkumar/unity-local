@@ -47,7 +47,7 @@
                                 <img [src]="stack.icon" alt="{{stack.title}}" class="stack-icon"
                                     onerror="this.onerror=null; this.src='/static/assets/images/external-brand/ai-stacks/default-ai.svg';">
                             </div>
-                            <h6 class="font-weight-bold mb-1 stack-title">{{ stack.title }}</h6>
+                            <h6 *ngIf="stack.showTitle !== false" class="font-weight-bold mb-1 stack-title">{{ stack.title }}</h6>
                             <p class="stack-desc flex-grow-1 mb-2" [title]="stack.description">{{ stack.description }}
                             </p>
                             <div class="stack-version mb-2">{{ stack.version }}</div>

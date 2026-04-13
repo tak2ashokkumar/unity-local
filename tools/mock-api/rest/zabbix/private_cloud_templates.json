@@ -1,39 +1,34 @@
-{
-  "count": 2,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 10,
-      "url": "http://localhost:3001/rest/zabbix/private_cloud_templates/10/",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 347,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/347/",
-        "template_id": 10649,
-        "template_name": "Unity_Vmware_HTTPS"
-      },
-      "type": "VMware"
-    },
-    {
+[
+  {
+    "id": 10,
+    "url": "http://localhost:3001/rest/zabbix/private_cloud_templates/10/",
+    "zabbix_instance": {
       "id": 11,
-      "url": "http://localhost:3001/rest/zabbix/private_cloud_templates/11/",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 347,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/347/",
-        "template_id": 10649,
-        "template_name": "Unity_Vmware_HTTPS"
-      },
-      "type": "United Private Cloud vCenter"
-    }
-  ]
-}
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 347,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/347/",
+      "template_id": 10649,
+      "template_name": "Unity_Vmware_HTTPS"
+    },
+    "type": "VMware"
+  },
+  {
+    "id": 11,
+    "url": "http://localhost:3001/rest/zabbix/private_cloud_templates/11/",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 347,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/347/",
+      "template_id": 10649,
+      "template_name": "Unity_Vmware_HTTPS"
+    },
+    "type": "United Private Cloud vCenter"
+  }
+]

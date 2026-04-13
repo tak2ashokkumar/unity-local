@@ -1,56 +1,51 @@
-{
-  "count": 7,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "url": "http://localhost:3001/rest/diskcontroller/5/",
-      "id": 5,
-      "controller": "82801ER",
-      "ports": "2",
-      "raid_support": "None"
-    },
-    {
-      "url": "http://localhost:3001/rest/diskcontroller/4/",
-      "id": 4,
-      "controller": "ICH4",
-      "ports": "2",
-      "raid_support": "None"
-    },
-    {
-      "url": "http://localhost:3001/rest/diskcontroller/7/",
-      "id": 7,
-      "controller": "LSI 2208",
-      "ports": "8",
-      "raid_support": "RAID 0 1 5 10"
-    },
-    {
-      "url": "http://localhost:3001/rest/diskcontroller/6/",
-      "id": 6,
-      "controller": "LSI 3108 SAS3",
-      "ports": "8",
-      "raid_support": "RAID 0, 1, 5, 6, 10, 50, 60"
-    },
-    {
-      "url": "http://localhost:3001/rest/diskcontroller/1/",
-      "id": 1,
-      "controller": "SATA2",
-      "ports": "8",
-      "raid_support": "RAID 0, 1, 10"
-    },
-    {
-      "url": "http://localhost:3001/rest/diskcontroller/2/",
-      "id": 2,
-      "controller": "SATA3",
-      "ports": "10",
-      "raid_support": "RAID 0, 1, 5,10"
-    },
-    {
-      "url": "http://localhost:3001/rest/diskcontroller/3/",
-      "id": 3,
-      "controller": "SATAII",
-      "ports": "6",
-      "raid_support": "RAID 0 1 5 10"
-    }
-  ]
-}
+[
+  {
+    "url": "http://localhost:3001/rest/diskcontroller/5/",
+    "id": 5,
+    "controller": "82801ER",
+    "ports": "2",
+    "raid_support": "None"
+  },
+  {
+    "url": "http://localhost:3001/rest/diskcontroller/4/",
+    "id": 4,
+    "controller": "ICH4",
+    "ports": "2",
+    "raid_support": "None"
+  },
+  {
+    "url": "http://localhost:3001/rest/diskcontroller/7/",
+    "id": 7,
+    "controller": "LSI 2208",
+    "ports": "8",
+    "raid_support": "RAID 0 1 5 10"
+  },
+  {
+    "url": "http://localhost:3001/rest/diskcontroller/6/",
+    "id": 6,
+    "controller": "LSI 3108 SAS3",
+    "ports": "8",
+    "raid_support": "RAID 0, 1, 5, 6, 10, 50, 60"
+  },
+  {
+    "url": "http://localhost:3001/rest/diskcontroller/1/",
+    "id": 1,
+    "controller": "SATA2",
+    "ports": "8",
+    "raid_support": "RAID 0, 1, 10"
+  },
+  {
+    "url": "http://localhost:3001/rest/diskcontroller/2/",
+    "id": 2,
+    "controller": "SATA3",
+    "ports": "10",
+    "raid_support": "RAID 0, 1, 5,10"
+  },
+  {
+    "url": "http://localhost:3001/rest/diskcontroller/3/",
+    "id": 3,
+    "controller": "SATAII",
+    "ports": "6",
+    "raid_support": "RAID 0 1 5 10"
+  }
+]

@@ -1,217 +1,212 @@
-{
-  "count": 10,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 28,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/28/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 386,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/386/",
-        "template_id": 10765,
-        "template_name": "Unity_Arista by SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/58/",
-        "id": 58,
-        "name": "Arista"
-      }
+[
+  {
+    "id": 28,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/28/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
     },
-    {
-      "id": 29,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/29/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 396,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/396/",
-        "template_id": 10778,
-        "template_name": "Unity_APC_UPS by SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/18/",
-        "id": 18,
-        "name": "APC"
-      }
+    "zabbix_template": {
+      "id": 386,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/386/",
+      "template_id": 10765,
+      "template_name": "Unity_Arista by SNMP"
     },
-    {
-      "id": 30,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/30/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 387,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/387/",
-        "template_id": 10766,
-        "template_name": "Unity_FortiGate_by_SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/32/",
-        "id": 32,
-        "name": "FortiGate"
-      }
-    },
-    {
-      "id": 31,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/31/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 355,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/355/",
-        "template_id": 10231,
-        "template_name": "Unity_Juniper_SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/15/",
-        "id": 15,
-        "name": "Juniper"
-      }
-    },
-    {
-      "id": 32,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/32/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 371,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/371/",
-        "template_id": 10747,
-        "template_name": "Unity_Lantronix_SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/63/",
-        "id": 63,
-        "name": "Lantronix"
-      }
-    },
-    {
-      "id": 33,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/33/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 372,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/372/",
-        "template_id": 10748,
-        "template_name": "Unity_LANTRONIX_UDS1100_SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/63/",
-        "id": 63,
-        "name": "Lantronix"
-      }
-    },
-    {
-      "id": 34,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/34/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 388,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/388/",
-        "template_id": 10767,
-        "template_name": "Unity_Ubiquiti_AirOS_by_SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/48/",
-        "id": 48,
-        "name": "Ubiquiti"
-      }
-    },
-    {
-      "id": 35,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/35/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 373,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/373/",
-        "template_id": 10749,
-        "template_name": "Unity_Palo_Alto_SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/72/",
-        "id": 72,
-        "name": "Palo Alto Networks"
-      }
-    },
-    {
-      "id": 36,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/36/",
-      "interface_type": "SNMP",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 376,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/376/",
-        "template_id": 10754,
-        "template_name": "Unity_Cisco_IOS_by_SNMP"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/13/",
-        "id": 13,
-        "name": "cisco"
-      }
-    },
-    {
-      "id": 37,
-      "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/37/",
-      "interface_type": "Agent",
-      "zabbix_instance": {
-        "id": 11,
-        "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
-        "account_name": "zabbix-SF prod"
-      },
-      "zabbix_template": {
-        "id": 405,
-        "url": "http://localhost:3001/rest/zabbix/zabbix_templates/405/",
-        "template_id": 10800,
-        "template_name": "Unity_ICMP_Ping"
-      },
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/6/",
-        "id": 6,
-        "name": "Adaptec"
-      }
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/58/",
+      "id": 58,
+      "name": "Arista"
     }
-  ]
-}
+  },
+  {
+    "id": 29,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/29/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 396,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/396/",
+      "template_id": 10778,
+      "template_name": "Unity_APC_UPS by SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/18/",
+      "id": 18,
+      "name": "APC"
+    }
+  },
+  {
+    "id": 30,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/30/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 387,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/387/",
+      "template_id": 10766,
+      "template_name": "Unity_FortiGate_by_SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/32/",
+      "id": 32,
+      "name": "FortiGate"
+    }
+  },
+  {
+    "id": 31,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/31/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 355,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/355/",
+      "template_id": 10231,
+      "template_name": "Unity_Juniper_SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/15/",
+      "id": 15,
+      "name": "Juniper"
+    }
+  },
+  {
+    "id": 32,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/32/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 371,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/371/",
+      "template_id": 10747,
+      "template_name": "Unity_Lantronix_SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/63/",
+      "id": 63,
+      "name": "Lantronix"
+    }
+  },
+  {
+    "id": 33,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/33/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 372,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/372/",
+      "template_id": 10748,
+      "template_name": "Unity_LANTRONIX_UDS1100_SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/63/",
+      "id": 63,
+      "name": "Lantronix"
+    }
+  },
+  {
+    "id": 34,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/34/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 388,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/388/",
+      "template_id": 10767,
+      "template_name": "Unity_Ubiquiti_AirOS_by_SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/48/",
+      "id": 48,
+      "name": "Ubiquiti"
+    }
+  },
+  {
+    "id": 35,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/35/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 373,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/373/",
+      "template_id": 10749,
+      "template_name": "Unity_Palo_Alto_SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/72/",
+      "id": 72,
+      "name": "Palo Alto Networks"
+    }
+  },
+  {
+    "id": 36,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/36/",
+    "interface_type": "SNMP",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 376,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/376/",
+      "template_id": 10754,
+      "template_name": "Unity_Cisco_IOS_by_SNMP"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/13/",
+      "id": 13,
+      "name": "cisco"
+    }
+  },
+  {
+    "id": 37,
+    "url": "http://localhost:3001/rest/zabbix/manufacturer_templates/37/",
+    "interface_type": "Agent",
+    "zabbix_instance": {
+      "id": 11,
+      "uuid": "1e1212be-8867-4e24-8cd2-5435879ca514",
+      "account_name": "zabbix-SF prod"
+    },
+    "zabbix_template": {
+      "id": 405,
+      "url": "http://localhost:3001/rest/zabbix/zabbix_templates/405/",
+      "template_id": 10800,
+      "template_name": "Unity_ICMP_Ping"
+    },
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/6/",
+      "id": 6,
+      "name": "Adaptec"
+    }
+  }
+]

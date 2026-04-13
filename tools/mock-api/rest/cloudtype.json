@@ -1,51 +1,46 @@
-{
-  "count": 4,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "url": "http://localhost:3001/rest/cloudtype/1/",
-      "id": 1,
-      "cloud_type": "Basic",
-      "vcpu": 1,
-      "memorysize": 2,
-      "memory_measuretype": "GB",
-      "disksize": 80,
-      "disk_measuretype": "GB",
-      "ethports": 2
-    },
-    {
-      "url": "http://localhost:3001/rest/cloudtype/2/",
-      "id": 2,
-      "cloud_type": "Essential",
-      "vcpu": 1,
-      "memorysize": 4,
-      "memory_measuretype": "GB",
-      "disksize": 160,
-      "disk_measuretype": "GB",
-      "ethports": 2
-    },
-    {
-      "url": "http://localhost:3001/rest/cloudtype/3/",
-      "id": 3,
-      "cloud_type": "Premier",
-      "vcpu": 2,
-      "memorysize": 8,
-      "memory_measuretype": "GB",
-      "disksize": 320,
-      "disk_measuretype": "GB",
-      "ethports": 2
-    },
-    {
-      "url": "http://localhost:3001/rest/cloudtype/4/",
-      "id": 4,
-      "cloud_type": "Elite",
-      "vcpu": 4,
-      "memorysize": 16,
-      "memory_measuretype": "GB",
-      "disksize": 640,
-      "disk_measuretype": "GB",
-      "ethports": 2
-    }
-  ]
-}
+[
+  {
+    "url": "http://localhost:3001/rest/cloudtype/1/",
+    "id": 1,
+    "cloud_type": "Basic",
+    "vcpu": 1,
+    "memorysize": 2,
+    "memory_measuretype": "GB",
+    "disksize": 80,
+    "disk_measuretype": "GB",
+    "ethports": 2
+  },
+  {
+    "url": "http://localhost:3001/rest/cloudtype/2/",
+    "id": 2,
+    "cloud_type": "Essential",
+    "vcpu": 1,
+    "memorysize": 4,
+    "memory_measuretype": "GB",
+    "disksize": 160,
+    "disk_measuretype": "GB",
+    "ethports": 2
+  },
+  {
+    "url": "http://localhost:3001/rest/cloudtype/3/",
+    "id": 3,
+    "cloud_type": "Premier",
+    "vcpu": 2,
+    "memorysize": 8,
+    "memory_measuretype": "GB",
+    "disksize": 320,
+    "disk_measuretype": "GB",
+    "ethports": 2
+  },
+  {
+    "url": "http://localhost:3001/rest/cloudtype/4/",
+    "id": 4,
+    "cloud_type": "Elite",
+    "vcpu": 4,
+    "memorysize": 16,
+    "memory_measuretype": "GB",
+    "disksize": 640,
+    "disk_measuretype": "GB",
+    "ethports": 2
+  }
+]

@@ -1,87 +1,82 @@
-{
-  "count": 17,
-  "next": null,
-  "previous": "http://10.192.11.207:8000/customer/dash_device/?group_uuid=3de1c5ca-28ff-41d4-930f-eed82448d186&page=2&page_size=6",
-  "results": [
-    {
-      "status": "0",
-      "uptime": null,
-      "monitoring": {
-        "configured": false,
-        "observium": false,
-        "enabled": false,
-        "zabbix": true
-      },
-      "uuid": "17fcb7ab-34fb-43f1-b0bb-f9598df6d76a",
-      "last_rebooted": null,
-      "device_uuid": "ce77fe2d-0817-4d3e-b659-75c6a9eb6b0d",
-      "failed_alerts": "0",
-      "device_category": "switch",
-      "device_name": "ul-ansible-c1"
+[
+  {
+    "status": "0",
+    "uptime": null,
+    "monitoring": {
+      "configured": false,
+      "observium": false,
+      "enabled": false,
+      "zabbix": true
     },
-    {
-      "status": "0",
-      "uptime": null,
-      "monitoring": {
-        "configured": false,
-        "observium": false,
-        "enabled": false,
-        "zabbix": true
-      },
-      "uuid": "f6405af4-7208-441a-9580-4ffb6a36b292",
-      "last_rebooted": null,
-      "device_uuid": "86e70919-9221-4b01-a9e1-2181da3a27e2",
-      "failed_alerts": "0",
-      "device_category": "switch",
-      "device_name": "UnityDemo-oobsw1-301.sf10"
+    "uuid": "17fcb7ab-34fb-43f1-b0bb-f9598df6d76a",
+    "last_rebooted": null,
+    "device_uuid": "ce77fe2d-0817-4d3e-b659-75c6a9eb6b0d",
+    "failed_alerts": "0",
+    "device_category": "switch",
+    "device_name": "ul-ansible-c1"
+  },
+  {
+    "status": "0",
+    "uptime": null,
+    "monitoring": {
+      "configured": false,
+      "observium": false,
+      "enabled": false,
+      "zabbix": true
     },
-    {
-      "status": "1",
-      "uptime": null,
-      "monitoring": {
-        "configured": false,
-        "observium": false,
-        "enabled": false,
-        "zabbix": true
-      },
-      "uuid": "5ab58196-0284-4d80-a0c7-526313b400a7",
-      "last_rebooted": null,
-      "device_uuid": "48bc09d2-a250-4176-97b0-12e372ad01da",
-      "failed_alerts": "0",
-      "device_category": "firewall",
-      "device_name": "Fw1-test_unity"
+    "uuid": "f6405af4-7208-441a-9580-4ffb6a36b292",
+    "last_rebooted": null,
+    "device_uuid": "86e70919-9221-4b01-a9e1-2181da3a27e2",
+    "failed_alerts": "0",
+    "device_category": "switch",
+    "device_name": "UnityDemo-oobsw1-301.sf10"
+  },
+  {
+    "status": "1",
+    "uptime": null,
+    "monitoring": {
+      "configured": false,
+      "observium": false,
+      "enabled": false,
+      "zabbix": true
     },
-    {
-      "status": "1",
-      "uptime": null,
-      "monitoring": {
-        "configured": false,
-        "observium": false,
-        "enabled": false,
-        "zabbix": true
-      },
-      "uuid": "39d62981-29f8-4252-932a-116e184f814a",
-      "last_rebooted": null,
-      "device_uuid": "1eb33c0f-1cd8-46ad-8c0a-984a8ac61ba5",
-      "failed_alerts": "0",
-      "device_category": "firewall",
-      "device_name": "fw-unitydemo"
+    "uuid": "5ab58196-0284-4d80-a0c7-526313b400a7",
+    "last_rebooted": null,
+    "device_uuid": "48bc09d2-a250-4176-97b0-12e372ad01da",
+    "failed_alerts": "0",
+    "device_category": "firewall",
+    "device_name": "Fw1-test_unity"
+  },
+  {
+    "status": "1",
+    "uptime": null,
+    "monitoring": {
+      "configured": false,
+      "observium": false,
+      "enabled": false,
+      "zabbix": true
     },
-    {
-      "status": "1",
-      "uptime": null,
-      "monitoring": {
-        "configured": false,
-        "observium": false,
-        "enabled": false,
-        "zabbix": true
-      },
-      "uuid": "4766efb2-746e-4ece-84c4-0d9886aea577",
-      "last_rebooted": null,
-      "device_uuid": "70b84949-f12e-456b-abac-8f85b6d72344",
-      "failed_alerts": "0",
-      "device_category": "firewall",
-      "device_name": "UnityDemo-fw1-313.sf10.unitedlayer.com"
-    }
-  ]
-}
+    "uuid": "39d62981-29f8-4252-932a-116e184f814a",
+    "last_rebooted": null,
+    "device_uuid": "1eb33c0f-1cd8-46ad-8c0a-984a8ac61ba5",
+    "failed_alerts": "0",
+    "device_category": "firewall",
+    "device_name": "fw-unitydemo"
+  },
+  {
+    "status": "1",
+    "uptime": null,
+    "monitoring": {
+      "configured": false,
+      "observium": false,
+      "enabled": false,
+      "zabbix": true
+    },
+    "uuid": "4766efb2-746e-4ece-84c4-0d9886aea577",
+    "last_rebooted": null,
+    "device_uuid": "70b84949-f12e-456b-abac-8f85b6d72344",
+    "failed_alerts": "0",
+    "device_category": "firewall",
+    "device_name": "UnityDemo-fw1-313.sf10.unitedlayer.com"
+  }
+]

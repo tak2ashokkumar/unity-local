@@ -58,7 +58,7 @@ export class UnityChatbotService {
   }
 
   getModuleNames(): Observable<UntiyChatBotExploreMenu[]> {
-    return this.http.get<UntiyChatBotExploreMenu[]>(`chatbot/menu/`);
+    return this.http.get<UntiyChatBotExploreMenu[]>(`chatbot/menu/?page_size=0`);
   }
 
   getInsights(apiUrl: string, params?: any): Observable<AssistedInsights> {

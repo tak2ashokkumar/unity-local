@@ -1378,7 +1378,7 @@ export const SEND_COST_COMPARATOR_DATA_BY_EMAIL = () => `customer/cost_calculato
 
 export const GET_SELF_HELP_DATA = (selfHelpEndpointMapping: SelfHelpEndpointMapping) => `${environment.staticData}self-help-data/${selfHelpEndpointMapping}`;
 
-export const GET_SERVICE_CATEGORY = () => `customer/service_catalogues/types/`;
+export const GET_SERVICE_CATEGORY = () => `customer/service_catalogues/types/?page_size=0`;
 
 export const SERVICE_CATALOG_BY_DEVICE_TYPE = (deviceType: DeviceMapping) => {
     //In future use switch to get endpoint param by  devicetype

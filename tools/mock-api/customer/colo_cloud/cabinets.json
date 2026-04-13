@@ -1,49 +1,44 @@
-{
-    "count": 1,
-    "next": null,
-    "previous": null,
-    "results": [
-        {
-            "url": "http://10.192.11.207:8000/customer/cabinets/0472482e-3f03-4383-9690-2678a6aa82ae/",
-            "id": 1273,
-            "uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
-            "name": "CB1-SF10",
-            "type": "COLO DEDICATED",
-            "available_size": "31",
-            "customers": [
-                {
-                    "url": "http://10.192.11.207:8000/rest/fast/org/365/",
-                    "id": 365,
-                    "name": "UnityDemo",
-                    "storage": null,
-                    "uuid": "ec92b121-b726-40bb-b90b-cddda5825f4a"
-                }
-            ],
-            "cabinet_type": {
-                "url": "http://10.192.11.207:8000/rest/cabinettype/3/",
-                "id": 3,
-                "cabinet_type": "COLO DEDICATED"
-            },
-            "cage": null,
-            "model": "Standard",
-            "colocloud_set": [
-                {
-                    "id": 301,
-                    "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
-                    "name": "DataCenter1 - SF10"
-                }
-            ],
-            "size": 45,
-            "contract_start_date": "2022-04-30T11:30:00-07:00",
-            "contract_end_date": "2025-05-30T11:30:00-07:00",
-            "cost": 600.0,
-            "renewal": "Auto",
-            "annual_escalation": 10.0,
-            "capacity": 45,
-            "co2_emission_value": 0.0,
-            "tags": [
-                "UnitedLayer"
-            ]
-        }
+[
+  {
+    "url": "http://10.192.11.207:8000/customer/cabinets/0472482e-3f03-4383-9690-2678a6aa82ae/",
+    "id": 1273,
+    "uuid": "0472482e-3f03-4383-9690-2678a6aa82ae",
+    "name": "CB1-SF10",
+    "type": "COLO DEDICATED",
+    "available_size": "31",
+    "customers": [
+      {
+        "url": "http://10.192.11.207:8000/rest/fast/org/365/",
+        "id": 365,
+        "name": "UnityDemo",
+        "storage": null,
+        "uuid": "ec92b121-b726-40bb-b90b-cddda5825f4a"
+      }
+    ],
+    "cabinet_type": {
+      "url": "http://10.192.11.207:8000/rest/cabinettype/3/",
+      "id": 3,
+      "cabinet_type": "COLO DEDICATED"
+    },
+    "cage": null,
+    "model": "Standard",
+    "colocloud_set": [
+      {
+        "id": 301,
+        "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+        "name": "DataCenter1 - SF10"
+      }
+    ],
+    "size": 45,
+    "contract_start_date": "2022-04-30T11:30:00-07:00",
+    "contract_end_date": "2025-05-30T11:30:00-07:00",
+    "cost": 600,
+    "renewal": "Auto",
+    "annual_escalation": 10,
+    "capacity": 45,
+    "co2_emission_value": 0,
+    "tags": [
+      "UnitedLayer"
     ]
-}
+  }
+]

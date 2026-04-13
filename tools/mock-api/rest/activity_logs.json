@@ -1,225 +1,220 @@
-{
-  "count": 8,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 24929391,
-      "actor": null,
-      "hijacker": null,
-      "action": "Login",
-      "content_type": {
-        "app_label": "user2",
-        "model": "user",
-        "readable_model_name": "user",
-        "id": 283
-      },
-      "object_pk": "1392",
-      "object_id": 1392,
-      "object_repr": "unitydemo@unitedlayer.com",
-      "changes": "{\"last_login\": [\"2026-03-23 11:29:50\", 0]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-23 11:29:50",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
+[
+  {
+    "id": 24929391,
+    "actor": null,
+    "hijacker": null,
+    "action": "Login",
+    "content_type": {
+      "app_label": "user2",
+      "model": "user",
+      "readable_model_name": "user",
+      "id": 283
     },
-    {
-      "id": 24929390,
-      "actor": null,
-      "hijacker": null,
-      "action": "Login",
-      "content_type": {
-        "app_label": "user2",
-        "model": "user",
-        "readable_model_name": "user",
-        "id": 283
-      },
-      "object_pk": "1392",
-      "object_id": 1392,
-      "object_repr": "unitydemo@unitedlayer.com",
-      "changes": "{\"last_login\": [\"2026-03-19 06:07:12\", 0]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-19 06:07:12",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
+    "object_pk": "1392",
+    "object_id": 1392,
+    "object_repr": "unitydemo@unitedlayer.com",
+    "changes": "{\"last_login\": [\"2026-03-23 11:29:50\", 0]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-23 11:29:50",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  },
+  {
+    "id": 24929390,
+    "actor": null,
+    "hijacker": null,
+    "action": "Login",
+    "content_type": {
+      "app_label": "user2",
+      "model": "user",
+      "readable_model_name": "user",
+      "id": 283
     },
-    {
-      "id": 24929389,
-      "actor": {
-        "url": "http://10.192.11.207:8000/rest/fast/user/1392/",
-        "id": 1392,
-        "uuid": "09bf7d51-7e49-4f73-960b-7b1751fd30d5",
-        "email": "unitydemo@unitedlayer.com",
-        "first_name": "Unity",
-        "last_name": "Demo",
-        "access_types": [
-          "http://10.192.11.207:8000/rest/access_type/1/"
-        ],
-        "user_roles": [
-          "http://10.192.11.207:8000/rest/role/13/"
-        ],
-        "last_login": "2026-03-23T04:29:50.793222-07:00"
-      },
-      "hijacker": null,
-      "action": "Updated",
-      "content_type": {
-        "app_label": "organization",
-        "model": "organizationsettings",
-        "readable_model_name": "organization settings",
-        "id": 544
-      },
-      "object_pk": "165",
-      "object_id": 165,
-      "object_repr": "UnityDemo",
-      "changes": "{\"auto_ticketing_enabled\": [\"False\", \"True\"]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-14 15:22:23",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
+    "object_pk": "1392",
+    "object_id": 1392,
+    "object_repr": "unitydemo@unitedlayer.com",
+    "changes": "{\"last_login\": [\"2026-03-19 06:07:12\", 0]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-19 06:07:12",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  },
+  {
+    "id": 24929389,
+    "actor": {
+      "url": "http://10.192.11.207:8000/rest/fast/user/1392/",
+      "id": 1392,
+      "uuid": "09bf7d51-7e49-4f73-960b-7b1751fd30d5",
+      "email": "unitydemo@unitedlayer.com",
+      "first_name": "Unity",
+      "last_name": "Demo",
+      "access_types": [
+        "http://10.192.11.207:8000/rest/access_type/1/"
+      ],
+      "user_roles": [
+        "http://10.192.11.207:8000/rest/role/13/"
+      ],
+      "last_login": "2026-03-23T04:29:50.793222-07:00"
     },
-    {
-      "id": 24929388,
-      "actor": {
-        "url": "http://10.192.11.207:8000/rest/fast/user/1392/",
-        "id": 1392,
-        "uuid": "09bf7d51-7e49-4f73-960b-7b1751fd30d5",
-        "email": "unitydemo@unitedlayer.com",
-        "first_name": "Unity",
-        "last_name": "Demo",
-        "access_types": [
-          "http://10.192.11.207:8000/rest/access_type/1/"
-        ],
-        "user_roles": [
-          "http://10.192.11.207:8000/rest/role/13/"
-        ],
-        "last_login": "2026-03-23T04:29:50.793222-07:00"
-      },
-      "hijacker": null,
-      "action": "Updated",
-      "content_type": {
-        "app_label": "organization",
-        "model": "organizationsettings",
-        "readable_model_name": "organization settings",
-        "id": 544
-      },
-      "object_pk": "165",
-      "object_id": 165,
-      "object_repr": "UnityDemo",
-      "changes": "{\"attach_rca_to_ticket\": [\"True\", \"False\"]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-14 15:22:21",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
+    "hijacker": null,
+    "action": "Updated",
+    "content_type": {
+      "app_label": "organization",
+      "model": "organizationsettings",
+      "readable_model_name": "organization settings",
+      "id": 544
     },
-    {
-      "id": 24929387,
-      "actor": {
-        "url": "http://10.192.11.207:8000/rest/fast/user/1392/",
-        "id": 1392,
-        "uuid": "09bf7d51-7e49-4f73-960b-7b1751fd30d5",
-        "email": "unitydemo@unitedlayer.com",
-        "first_name": "Unity",
-        "last_name": "Demo",
-        "access_types": [
-          "http://10.192.11.207:8000/rest/access_type/1/"
-        ],
-        "user_roles": [
-          "http://10.192.11.207:8000/rest/role/13/"
-        ],
-        "last_login": "2026-03-23T04:29:50.793222-07:00"
-      },
-      "hijacker": null,
-      "action": "Updated",
-      "content_type": {
-        "app_label": "organization",
-        "model": "organizationsettings",
-        "readable_model_name": "organization settings",
-        "id": 544
-      },
-      "object_pk": "165",
-      "object_id": 165,
-      "object_repr": "UnityDemo",
-      "changes": "{\"attach_rca_to_ticket\": [\"False\", \"True\"]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-14 15:22:18",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
+    "object_pk": "165",
+    "object_id": 165,
+    "object_repr": "UnityDemo",
+    "changes": "{\"auto_ticketing_enabled\": [\"False\", \"True\"]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-14 15:22:23",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  },
+  {
+    "id": 24929388,
+    "actor": {
+      "url": "http://10.192.11.207:8000/rest/fast/user/1392/",
+      "id": 1392,
+      "uuid": "09bf7d51-7e49-4f73-960b-7b1751fd30d5",
+      "email": "unitydemo@unitedlayer.com",
+      "first_name": "Unity",
+      "last_name": "Demo",
+      "access_types": [
+        "http://10.192.11.207:8000/rest/access_type/1/"
+      ],
+      "user_roles": [
+        "http://10.192.11.207:8000/rest/role/13/"
+      ],
+      "last_login": "2026-03-23T04:29:50.793222-07:00"
     },
-    {
-      "id": 24929386,
-      "actor": null,
-      "hijacker": null,
-      "action": "Login",
-      "content_type": {
-        "app_label": "user2",
-        "model": "user",
-        "readable_model_name": "user",
-        "id": 283
-      },
-      "object_pk": "1392",
-      "object_id": 1392,
-      "object_repr": "unitydemo@unitedlayer.com",
-      "changes": "{\"last_login\": [\"2026-03-14 14:07:29\", 0]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-14 14:07:29",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
+    "hijacker": null,
+    "action": "Updated",
+    "content_type": {
+      "app_label": "organization",
+      "model": "organizationsettings",
+      "readable_model_name": "organization settings",
+      "id": 544
     },
-    {
-      "id": 24929385,
-      "actor": null,
-      "hijacker": null,
-      "action": "Login",
-      "content_type": {
-        "app_label": "user2",
-        "model": "user",
-        "readable_model_name": "user",
-        "id": 283
-      },
-      "object_pk": "1392",
-      "object_id": 1392,
-      "object_repr": "unitydemo@unitedlayer.com",
-      "changes": "{\"last_login\": [\"2026-03-14 06:36:31\", 0]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-14 06:36:31",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
+    "object_pk": "165",
+    "object_id": 165,
+    "object_repr": "UnityDemo",
+    "changes": "{\"attach_rca_to_ticket\": [\"True\", \"False\"]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-14 15:22:21",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  },
+  {
+    "id": 24929387,
+    "actor": {
+      "url": "http://10.192.11.207:8000/rest/fast/user/1392/",
+      "id": 1392,
+      "uuid": "09bf7d51-7e49-4f73-960b-7b1751fd30d5",
+      "email": "unitydemo@unitedlayer.com",
+      "first_name": "Unity",
+      "last_name": "Demo",
+      "access_types": [
+        "http://10.192.11.207:8000/rest/access_type/1/"
+      ],
+      "user_roles": [
+        "http://10.192.11.207:8000/rest/role/13/"
+      ],
+      "last_login": "2026-03-23T04:29:50.793222-07:00"
     },
-    {
-      "id": 24929384,
-      "actor": null,
-      "hijacker": null,
-      "action": "Login",
-      "content_type": {
-        "app_label": "user2",
-        "model": "user",
-        "readable_model_name": "user",
-        "id": 283
-      },
-      "object_pk": "1392",
-      "object_id": 1392,
-      "object_repr": "unitydemo@unitedlayer.com",
-      "changes": "{\"last_login\": [\"2026-03-13 11:17:30\", 0]}",
-      "remote_addr": "10.192.11.251",
-      "timestamp": "2026-03-13 11:17:30",
-      "additional_data": null,
-      "organizations": [
-        365
-      ]
-    }
-  ]
-}
+    "hijacker": null,
+    "action": "Updated",
+    "content_type": {
+      "app_label": "organization",
+      "model": "organizationsettings",
+      "readable_model_name": "organization settings",
+      "id": 544
+    },
+    "object_pk": "165",
+    "object_id": 165,
+    "object_repr": "UnityDemo",
+    "changes": "{\"attach_rca_to_ticket\": [\"False\", \"True\"]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-14 15:22:18",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  },
+  {
+    "id": 24929386,
+    "actor": null,
+    "hijacker": null,
+    "action": "Login",
+    "content_type": {
+      "app_label": "user2",
+      "model": "user",
+      "readable_model_name": "user",
+      "id": 283
+    },
+    "object_pk": "1392",
+    "object_id": 1392,
+    "object_repr": "unitydemo@unitedlayer.com",
+    "changes": "{\"last_login\": [\"2026-03-14 14:07:29\", 0]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-14 14:07:29",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  },
+  {
+    "id": 24929385,
+    "actor": null,
+    "hijacker": null,
+    "action": "Login",
+    "content_type": {
+      "app_label": "user2",
+      "model": "user",
+      "readable_model_name": "user",
+      "id": 283
+    },
+    "object_pk": "1392",
+    "object_id": 1392,
+    "object_repr": "unitydemo@unitedlayer.com",
+    "changes": "{\"last_login\": [\"2026-03-14 06:36:31\", 0]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-14 06:36:31",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  },
+  {
+    "id": 24929384,
+    "actor": null,
+    "hijacker": null,
+    "action": "Login",
+    "content_type": {
+      "app_label": "user2",
+      "model": "user",
+      "readable_model_name": "user",
+      "id": 283
+    },
+    "object_pk": "1392",
+    "object_id": 1392,
+    "object_repr": "unitydemo@unitedlayer.com",
+    "changes": "{\"last_login\": [\"2026-03-13 11:17:30\", 0]}",
+    "remote_addr": "10.192.11.251",
+    "timestamp": "2026-03-13 11:17:30",
+    "additional_data": null,
+    "organizations": [
+      365
+    ]
+  }
+]

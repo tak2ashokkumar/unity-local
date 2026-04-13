@@ -1,24 +1,19 @@
-{
-  "count": 1,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "url": "http://localhost:3001/rest/chassis/1/",
+[
+  {
+    "url": "http://localhost:3001/rest/chassis/1/",
+    "id": 1,
+    "model_name": "CSE-512F-520",
+    "manufacturer": {
+      "url": "http://localhost:3001/rest/manufacturer/1/",
       "id": 1,
-      "model_name": "CSE-512F-520",
-      "manufacturer": {
-        "url": "http://localhost:3001/rest/manufacturer/1/",
-        "id": 1,
-        "name": "Supermicro"
-      },
-      "u_height": 1.0,
-      "num_integrated_psu": 1,
-      "num_psu_slots": 0,
-      "num_drive_bays": 1,
-      "drive_bay_width": "3.5",
-      "num_fan_slots": 3,
-      "dimensions": "1.7x17.2x14.5 inches"
-    }
-  ]
-}
+      "name": "Supermicro"
+    },
+    "u_height": 1,
+    "num_integrated_psu": 1,
+    "num_psu_slots": 0,
+    "num_drive_bays": 1,
+    "drive_bay_width": "3.5",
+    "num_fan_slots": 3,
+    "dimensions": "1.7x17.2x14.5 inches"
+  }
+]
