@@ -1,6 +1,7 @@
 #!/bin/bash
 
 UNITY_HOME="/c/Users/AshokKumar/Desktop/unity-local"
+export PATH="$UNITY_HOME/tools/python/Scripts:$UNITY_HOME/tools/python:$PATH"
 
 cdd(){
     cd "$UNITY_HOME"
@@ -46,21 +47,6 @@ serveunity() {
     npm run static-server
 }
 
-serveunitylocal(){
-    echo "Starting Mock API..."
-    startmock &
-
-    sleep 2
-
-    echo "Starting Proxy..."
-    startproxy &
-
-    sleep 2
-
-    echo "Starting Unity Static Server..."
-    serveunity &
-}
-
 buildmtp() {
     mtp || return
     node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng build --watch
@@ -69,21 +55,6 @@ buildmtp() {
 servemtp() {
     mtp || return
     npm run static-server
-}
-
-servemtplocal(){
-    echo "Starting Mock API..."
-    startmock &
-
-    sleep 2
-
-    echo "Starting Proxy..."
-    startproxy &
-
-    sleep 2
-
-    echo "Starting Unity Static Server..."
-    servemtp &
 }
 
 buildprod() {
