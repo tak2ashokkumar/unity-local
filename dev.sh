@@ -102,3 +102,8 @@ serveadmin() {
     admin || return
     node server.js
 }
+
+# --- Python (3.13.12) ---
+pythonlocal(){
+    "$UNITY_HOME/tools/python/python.exe" "$@"
+}
