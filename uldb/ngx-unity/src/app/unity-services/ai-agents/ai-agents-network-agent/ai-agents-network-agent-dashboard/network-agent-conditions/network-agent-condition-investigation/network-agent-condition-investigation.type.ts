@@ -83,3 +83,54 @@ export interface PromptResult {
   customer: number;
   prompt_name: string;
 }
+
+
+export interface NetworkAgentChatReponseType {
+    type: string;
+    answer: string;
+    meta: MetaType;
+}
+export interface MetaType {
+    used_tools: any[];
+    filters_used: filtersUsedType;
+    recommended_actions: string[];
+    device_data: deviceDataType;
+}
+export interface filtersUsedType {
+    org_id: number;
+    user_id: string;
+    application: string;
+    count: number;
+    conversation_id: string;
+    role: string;
+    streaming: boolean;
+    title: string;
+    query: string;
+    history: HistoryType[];
+}
+export interface HistoryType {
+    id: number;
+    chat_message_id: string;
+    streaming: boolean;
+    sequence_number: number;
+    role: string;
+    content: string;
+    token_count: number;
+    is_deleted: boolean;
+    metadata: null;
+    created_at: string;
+    feedback: null;
+    reaction: string;
+    parent_message: null;
+    customer: number;
+}
+export interface deviceDataType {
+    monitoring_type: string;
+    device: DeviceType;
+}
+export interface DeviceType {
+    device_id: string;
+    device_uuid: string;
+    device_ct: string;
+    customer_id: string;
+}

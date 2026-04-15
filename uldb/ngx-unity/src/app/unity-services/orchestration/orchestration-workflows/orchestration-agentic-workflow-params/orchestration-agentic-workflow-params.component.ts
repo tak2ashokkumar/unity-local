@@ -45,12 +45,13 @@ import {
 import { cloneDeep as _clone } from 'lodash-es';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
-import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
+import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { QueryBuilderClassNames, QueryBuilderConfig, RuleSet } from 'src/app/shared/query-builder/query-builder.interfaces';
 import { queryBuilderClassNames } from 'src/app/unity-services/aiml-event-mgmt/aiml-rules/aiml-correlation-rule-crud/aiml-correlation-rule-crud.service';
 import { QueryBuilderComponent } from 'src/app/shared/query-builder/query-builder.component';
 import { AimlRulesService } from 'src/app/unity-services/aiml-event-mgmt/aiml-rules/aiml-rules.service';
 import { AppLevelService } from 'src/app/app-level.service';
+import { UserGroupType } from 'src/app/shared/SharedEntityTypes/user-mgmt.type';
 
 
 @Component({
@@ -203,6 +204,22 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
     { name: 'Open', value: 0 },
     { name: 'Resolved', value: 1 }
   ];
+  channelsTypeSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: 'name',
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block',
+    dynamicTitleMaxItems: 1,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    selectAsObject: false,
+    keyToSelect: 'value'
+  };
+  channelsTypes = [
+    { name: 'Email', value: 'EMAIL' }
+  ];
   queryBuilderConfig: QueryBuilderConfig;
   queryBuilderClassNames: QueryBuilderClassNames = queryBuilderClassNames;
   @ViewChild('queryBuilder') queryBuilder: QueryBuilderComponent;
@@ -212,6 +229,67 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
   allowCollapse: boolean = false;
   persistValueOnFieldChange: boolean = false;
   aimlData;
+  triggerTypes = [
+    'Manual Trigger',
+    'Schedule Trigger',
+    'Chat Trigger',
+    'ITSM Event Trigger',
+    'Webhook Trigger',
+    'AIML Event Trigger'
+  ];
+
+  userGroups: UserGroupType[] = [];
+  userList: string[] = [];
+
+  userGroupsSettings: IMultiSelectSettings = {
+    isSimpleArray: false,
+    lableToDisplay: 'name',
+    keyToSelect: 'uuid',
+    selectAsObject: false,
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block btn-sm',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    appendToBody: true
+  };
+
+  userGroupTexts: IMultiSelectTexts = {
+    checkAll: 'Select all',
+    uncheckAll: 'Uncheck all',
+    checked: 'Group',
+    checkedPlural: 'Groups',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select User Groups',
+    allSelected: 'All Groups',
+  };
+
+  userListSettings: IMultiSelectSettings = {
+    isSimpleArray: true,
+    enableSearch: true,
+    checkedStyle: 'fontawesome',
+    buttonClasses: 'btn btn-default btn-block btn-sm',
+    dynamicTitleMaxItems: 2,
+    displayAllSelectedText: true,
+    showCheckAll: true,
+    showUncheckAll: true,
+    appendToBody: true
+  };
+
+  userTexts: IMultiSelectTexts = {
+    checkAll: 'Select all',
+    uncheckAll: 'Uncheck all',
+    checked: 'User',
+    checkedPlural: 'Users',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select Users',
+    allSelected: 'All Users',
+  };
+
+  human_approval = false;
+
 
   constructor(
     public bsModalRef: BsModalRef,
@@ -235,7 +313,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.nodeId = this.nodeData.node_id;
+    this.nodeId = this.nodeData?.isTool ? this.nodeData?.node_id.split('-')[1] : this.nodeData?.node_id;
     this.toolsList = [
       ...this.containerSvc.toolsList.map((t) => ({
         name: t.name,
@@ -313,6 +391,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
     })
   }
   getConnectedNodes() {
+    console.log('connected nodes>>>', this.connectedNodes)
     if (this.connectedNodes.length) {
       this.connectedNodes = this.connectedNodes.map((node) => {
         if (
@@ -652,7 +731,10 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         this.getTags();
         break;
       case nodeTypes.CreateITSMTicket:
-        this.createTicketForm = this.svc.createTicketForm(this.nodeData, this.nodeId);
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
+        this.createTicketForm = this.svc.createTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.createTicketForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.createTicketFormErrors = this.svc.createTicketFormErrors(this.nodeData, this.nodeId);
         this.createTicketFormValidationMessage = this.svc.createTicketValidationMessage;
@@ -670,7 +752,10 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
           });
         break;
       case nodeTypes.UpdateITSMTicket:
-        this.updateTicketForm = this.svc.updateTicketForm(this.nodeData, this.nodeId);
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
+        this.updateTicketForm = this.svc.updateTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.updateTicketForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.updateTicketFormErrors = this.svc.updateTicketFormErrors(this.nodeData, this.nodeId);
         this.updateTicketFormValidationMessage = this.svc.updateTicketValidationMessage;
@@ -682,7 +767,10 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
           });
         break;
       case nodeTypes.CommentInITSMTicket:
-        this.commentInTicketForm = this.svc.commentInTicketForm(this.nodeData, this.nodeId);
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
+        this.commentInTicketForm = this.svc.commentInTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.commentInTicketFormErrors = this.svc.commentInTicketFormErrors(this.nodeData, this.nodeId);
         this.commentInTicketFormValidationMessage = this.svc.commentInTicketFormValidationMessage;
 
@@ -696,7 +784,10 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
           });
         break;
       case nodeTypes.GetITSMTicket:
-        this.getTicketForm = this.svc.getTicketForm(this.nodeData, this.nodeId);
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
+        this.getTicketForm = this.svc.getTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.getTicketForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.getTicketFormErrors = this.svc.resetgetTicketForm(this.nodeData, this.nodeId);
         this.getTicketFormValidationMessage = this.svc.getTicketFormValidationMessage;
@@ -711,6 +802,9 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         // this.processRealTimeData(this.getTicketForm);
         break;
       case nodeTypes.Email:
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildEmailForm(
           this.nodeData,
@@ -730,6 +824,9 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         }
         break;
       case nodeTypes.Chart:
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildChartForm(
           this.nodeData,
@@ -806,11 +903,21 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         }
         break;
       case nodeTypes.Source:
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildSourceTaskForm(
           this.nodeData,
-          this.nodeId
+          this.nodeId, this.nodeData.isTool
         );
+
+        // if (this.nodeData?.isTool) {
+        //   this.propertiesForm.addControl(
+        //     'humanApproval',
+        //     this.svc.buildHumanApprovalForm(this.nodeData, this.nodeId)
+        //   );
+        // }
         this.propertiesForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.propertiesFormErrors = this.svc.resetSourceTaskForm();
         this.propertiesFormValidationMessages =
@@ -825,10 +932,13 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         }
         break;
       case nodeTypes.Action:
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildActionTaskForm(
           this.nodeData,
-          this.nodeId
+          this.nodeId, this.nodeData.isTool
         );
         this.propertiesForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.propertiesFormErrors = this.svc.resetActionTaskForm();
@@ -883,11 +993,14 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         break;
       default:
         // handle dynamic group like playbookTypes
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+        }
         if (this.isOrcPlayBook(this.nodeData.node_type)) {
           this.oldNames['propertiesForm'] = this.nodeData?.name || '';
           this.propertiesForm = this.svc.buildTaskForm(
             this.nodeData,
-            this.nodeId
+            this.nodeId, this.nodeData.isTool
           );
           this.propertiesForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
           this.propertiesFormErrors = this.svc.resetTaskForm();
@@ -1591,7 +1704,9 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
   }
 
   onDragLeave(event: DragEvent, key?: string) {
-    if (key === 'name') return;
+    if (key === 'name') {
+      return;
+    }
     const input = event.target as HTMLInputElement;
     input.classList.remove('drag-highlight');
   }
@@ -1650,6 +1765,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
       updateTicketFormValidationMessages: this.updateTicketFormValidationMessage,
       getTicketFormValidationMessages: this.getTicketFormValidationMessage,
       commentInTicketFormValidationmessages: this.commentInTicketFormValidationMessage,
+      human_approval: this.nodeData?.human_approval,
       // outputValidationMessage: this.outputValidationMessage,
     };
   }
@@ -1749,6 +1865,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         this.onClose(this.updatedFormDatas, { action }); // send back to parent
         this.bsModalRef.hide();
       }
+      console.log(this.updatedFormDatas, "save properties")
     } else {
       this.bsModalRef.hide();
     }
@@ -2145,9 +2262,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
                 ];
 
               if (control?.invalid && validationMessage) {
-                groupErrors[controlName] = {
-                  required: validationMessage.required,
-                };
+                groupErrors[controlName] = validationMessage.required;
               }
             });
             return Object.keys(groupErrors).length ? groupErrors : null;
@@ -2553,6 +2668,29 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
       default_value: '',
     });
   }
+
+  getDropdownData() {
+    this.spinner.start('main');
+    this.userGroups = [];
+    this.userList = [];
+    this.svc.getDropdownData().pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ userGroups, userList }) => {
+      if (userGroups) {
+        this.userGroups = _clone(userGroups);
+      } else {
+        this.userGroups = [];
+        this.notification.error(new Notification("Error while fetching User Groups"));
+      }
+
+      if (userList) {
+        this.userList = _clone(userList);
+      } else {
+        this.userList = [];
+        this.notification.error(new Notification("Error while fetching User List"));
+      }
+      this.spinner.stop('main');
+    });
+  }
+
 
   removeScheduleParam(index: number): void {
     this.scheduleInputs.removeAt(index);

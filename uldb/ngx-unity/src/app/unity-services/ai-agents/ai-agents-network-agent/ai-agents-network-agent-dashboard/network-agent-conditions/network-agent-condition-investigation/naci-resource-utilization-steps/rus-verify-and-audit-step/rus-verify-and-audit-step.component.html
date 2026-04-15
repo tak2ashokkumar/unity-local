@@ -13,7 +13,7 @@
     </div>
 
     <div class="card-body" [collapse]="!isVerifyAndAuditOpen">
-        <div class="card round-edge equalize-card mb-2">
+        <div class="card round-edge equalize-card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
                 <span class="font-lg font-500">Resource Utilization</span>
             </div>
@@ -57,18 +57,6 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12 px-2 mb-2"
-                *ngFor="let interfaceChartData of interfaceWidgetViewData?.chartData; let last = last;">
-                <div class="card equalize-card">
-                    <div class="card-body pb-0">
-                        <ng-container *ngIf="interfaceChartData">
-                            <div echarts [options]="interfaceChartData?.options"
-                                [extentions]="interfaceChartData?.extensions" [defaultHeight]="300"></div>
-                        </ng-container>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- <naci-zabbix-graphs [deviceData]="deviceData" [monitoringType]="'resource_utilization'"></naci-zabbix-graphs> -->
     </div>
 </div>

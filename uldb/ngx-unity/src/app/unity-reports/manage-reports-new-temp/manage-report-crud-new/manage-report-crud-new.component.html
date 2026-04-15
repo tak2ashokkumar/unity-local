@@ -16,8 +16,6 @@
                 <div class="col-12">
                     <div class="row form-group">
                         <div class="col-2 text-right mt-2">Report Name<em>* </em>:</div>
-                        <!-- <label class="col-2 form-col-form-label align-items-center m-0 text-center">Report
-                            Name<em>*</em></label> -->
                         <div class="col-6">
                             <input id="name" type="text" class="col form-control" formControlName="name"
                                 placeholder="Enter Name" [class.is-invalid]="formErrors.name">
@@ -28,13 +26,11 @@
                 <div class="col-12">
                     <div class="row form-group">
                         <div class="col-2 text-right mt-2">Report Type<em>* </em>:</div>
-                        <!-- <label class="col-2 form-col-form-label align-items-center m-0 text-center">Report
-                            Type<em>*</em></label> -->
                         <div class="col-4">
                             <select class="col form-control" formControlName="feature"
                                 [class.is-invalid]="formErrors.feature"
                                 (change)="onReportTypeChange($event.target.value)">
-                                <option [value]="''" disabled>Select Module</option>
+                                <option [value]="''" disabled>Select Report</option>
                                 <option [value]="'Cloud Inventory'">Cloud Inventory</option>
                                 <option [value]="'DC Inventory'">DC Inventory</option>
                                 <option [value]="'Cost Analysis'">Cost Analysis</option>
@@ -42,12 +38,43 @@
                                 <option [value]="'Performance'">Performance</option>
                                 <option [value]="'DevOps Automation'">DevOps Automation</option>
                                 <option [value]="'UnityOne ITSM'">UnityOne ITSM</option>
+                                <option *ngIf="isDynamic" [value]="'Dynamic'">Dynamic</option>
                             </select>
                             <div class="invalid-feedback col" *ngIf="formErrors.feature">
                                 {{formErrors.feature}}</div>
                         </div>
                     </div>
                 </div>
+                <ng-container *ngIf="form.get('feature')?.value == 'Dynamic'" formGroupName="report_meta">
+                    <div class="col-12">
+                        <div class="row form-group">
+                            <div class="col-2 text-right mt-2">Module<em>* </em>:</div>
+                            <div class="col-4">
+                                <select class="col form-control" formControlName="module_name" [class.is-invalid]="formErrors.report_meta?.module_name">
+                                    <option [value]="''">Select Module</option>                                
+                                    <option *ngFor="let module of dynamicReportModulesArr" [value]="module.name">
+                                        {{module.display_name}}</option>
+                                </select>
+                                <div class="invalid-feedback col" *ngIf="formErrors.report_meta?.module_name">
+                                    {{formErrors.report_meta?.module_name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="row form-group">
+                            <div class="col-2 text-right mt-2">Model<em>* </em>:</div>
+                            <div class="col-4">
+                                <select class="col form-control" formControlName="model_name" [class.is-invalid]="formErrors.report_meta?.model_name">
+                                    <option [value]="''">Select Model</option>
+                                    <option *ngFor="let model of dynamicReportModelsArr" [value]="model.model_name">
+                                        {{model.model_display_name}}</option>
+                                </select>
+                                <div class="invalid-feedback col" *ngIf="formErrors.report_meta?.model_name">
+                                    {{formErrors.report_meta?.model_name}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
                 <div *ngIf="form.get('feature')?.value == 'Cloud Inventory'" formGroupName="report_meta"
                     class="col-12 form-group d-flex align-items-center my-2">
                     <label class="col-2 form-col-form-label align-items-center m-0 text-center">Cloud
@@ -68,55 +95,55 @@
                         <div class="invalid-feedback col" *ngIf="formErrors.cloud_type">{{formErrors.cloud_type}}</div>
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="row form-group" *ngIf="form.get('feature')?.value == 'DevOps Automation'"
-                        formGroupName="report_meta">
-                        <div class="col-2 text-right mt-2">Execution Type<em>* </em>:</div>
-                        <div class="col-4">
-                            <select class="col form-control" formControlName="execution_type"
-                                [class.is-invalid]="formErrors.feature">
-                                <option [value]="''" disabled>Select Execution Type</option>
-                                <option [value]="'Task'">Task</option>
-                                <option [value]="'Workflow'">Workflow</option>
-                                <option [value]="'Task and Workflow'">Task and Workflow</option>
-                                <option [value]="'Workflow Integration'">Workflow Integration</option>
-                            </select>
-                            <div class="invalid-feedback col" *ngIf="formErrors.execution_type">
-                                {{formErrors.execution_type}}</div>
+                <ng-container *ngIf="form.get('feature')?.value == 'DevOps Automation'" formGroupName="report_meta">
+                    <div class="col-12">
+                        <div class="row form-group">
+                            <div class="col-2 text-right mt-2">Execution Type<em>* </em>:</div>
+                            <div class="col-4">
+                                <select class="col form-control" formControlName="execution_type"
+                                    [class.is-invalid]="formErrors.feature">
+                                    <option [value]="''" disabled>Select Execution Type</option>
+                                    <option [value]="'Task'">Task</option>
+                                    <option [value]="'Workflow'">Workflow</option>
+                                    <option [value]="'Task and Workflow'">Task and Workflow</option>
+                                    <option [value]="'Workflow Integration'">Workflow Integration</option>
+                                </select>
+                                <div class="invalid-feedback col" *ngIf="formErrors.execution_type">
+                                    {{formErrors.execution_type}}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12">
-                    <div class="row form-group"
-                        *ngIf="reportMeta.get('execution_type')?.value === 'Workflow Integration' && form.get('feature')?.value === 'DevOps Automation'"
-                        formGroupName="report_meta">
-                        <div class="col-2 text-right mt-2">Workflow Integration<em>* </em>:</div>
-                        <div class="col-4">
-                            <select class="col form-control" formControlName="workflow_integration"
-                                [class.is-invalid]="formErrors.feature">
-                                <option [value]="''" disabled>Select Workflow Integration</option>
-                                <option *ngFor="let wi of workflowIntegration" [value]="wi.name">{{wi.name}}</option>
-                            </select>
-                            <div class="invalid-feedback col" *ngIf="formErrors.workflow_integration">
-                                {{formErrors.workflow_integration}}</div>
+                    <div class="col-12" *ngIf="reportMeta.get('execution_type')?.value === 'Workflow Integration'">
+                        <div class="row form-group" formGroupName="report_meta">
+                            <div class="col-2 text-right mt-2">Workflow Integration<em>* </em>:</div>
+                            <div class="col-4">
+                                <select class="col form-control" formControlName="workflow_integration"
+                                    [class.is-invalid]="formErrors.feature">
+                                    <option [value]="''" disabled>Select Workflow Integration</option>
+                                    <option *ngFor="let wi of workflowIntegration" [value]="wi.name">{{wi.name}}</option>
+                                </select>
+                                <div class="invalid-feedback col" *ngIf="formErrors.workflow_integration">
+                                    {{formErrors.workflow_integration}}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12">
-                    <div class="row form-group" *ngIf="form.get('feature')?.value == 'UnityOne ITSM'"
-                        formGroupName="report_meta">
-                        <div class="col-2 text-right mt-2">Table<em>* </em>:</div>
-                        <div class="col-4">
-                            <select class="col form-control" formControlName="table"
-                                [class.is-invalid]="formErrors.feature">
-                                <option [value]="''" disabled>Select Table</option>
-                                <option *ngFor="let wi of unityOneITSMTable" [value]="wi.uuid">{{wi.name}}</option>
-                            </select>
-                            <div class="invalid-feedback col" *ngIf="formErrors.table">
-                                {{formErrors.table}}</div>
+                </ng-container>
+                <ng-container *ngIf="form.get('feature')?.value == 'UnityOne ITSM'" formGroupName="report_meta">
+                    <div class="col-12">
+                        <div class="row form-group">
+                            <div class="col-2 text-right mt-2">Table<em>* </em>:</div>
+                            <div class="col-4">
+                                <select class="col form-control" formControlName="table"
+                                    [class.is-invalid]="formErrors.feature">
+                                    <option [value]="''" disabled>Select Table</option>
+                                    <option *ngFor="let wi of unityOneITSMTable" [value]="wi.uuid">{{wi.name}}</option>
+                                </select>
+                                <div class="invalid-feedback col" *ngIf="formErrors.table">
+                                    {{formErrors.table}}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </ng-container>
                 <ng-container *ngIf="form.get('feature')?.value == 'Performance'" formGroupName="report_meta">
                     <div class="col-12">
                         <div class="form-group row">
@@ -249,6 +276,12 @@
                     <cloud-inventory-report-crud [reporttype]="'UnityOne ITSM'" [reportdata]="selectedReport"
                         [tableUuid]="tableUuid" (formdata)="childFormData($event)"></cloud-inventory-report-crud>
                 </ng-container>
+
+                <ng-container *ngSwitchCase="'Dynamic'">
+                    <report-crud-common [reporttype]="'Dynamic'" [reportdata]="selectedReport" [module]="dynamicModule"
+                        [model]="dynamicModel" (formdata)="childFormData($event)"></report-crud-common>
+                </ng-container>
+                
             </ng-container>
 
             <div *ngIf="form.get('feature')?.value" class="border position-relative rounded mt-4 pt-3 px-2 pb-1">

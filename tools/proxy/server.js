@@ -32,11 +32,12 @@ const adminProxy = createProxyMiddleware({
 app.use((req, res, next) => {
   let isMockRequest = req.url.startsWith("/customer") ||
     req.url.startsWith("/rest") ||
-    req.url.startsWith("/func") ||
     req.url.startsWith("/orchestration") ||
     req.url.startsWith("/chatbot") ||
-    req.url.startsWith("/mcp") ||
     req.url.startsWith("/task") ||
+    req.url.startsWith("/apm") ||
+    req.url.startsWith("/func") ||
+    req.url.startsWith("/mcp") ||
     req.url.startsWith("/ssr")
 
   if (isMockRequest) {

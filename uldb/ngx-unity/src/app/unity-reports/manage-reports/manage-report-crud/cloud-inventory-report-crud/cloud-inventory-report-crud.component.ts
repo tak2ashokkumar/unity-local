@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { AttributeDataType, CloudInventoryReportCrudService, FieldsDataType, FieldsViewData, OsDataType, ReportTypesMapping } from './cloud-inventory-report-crud.service';
@@ -27,7 +27,7 @@ export const MY_NATIVE_FORMATS = {
   styleUrls: ['./cloud-inventory-report-crud.component.scss'],
   providers: [CloudInventoryReportCrudService, { provide: DateTimeAdapter, useClass: MomentDateTimeAdapter, deps: [OWL_DATE_TIME_LOCALE] }, { provide: OWL_DATE_TIME_FORMATS, useValue: MY_NATIVE_FORMATS }]
 })
-export class CloudInventoryReportCrudComponent implements OnInit {
+export class CloudInventoryReportCrudComponent implements OnInit, OnDestroy {
 
   private ngUnsubscribe = new Subject();
   @Input('reportdata') reportdata: ReportFormData;

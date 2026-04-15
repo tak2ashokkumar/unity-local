@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { FieldsType, InputParamsType, OutputParamsType } from '../orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.type';
-import { Observable, of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
-import { GET_ADVANCED_DISCOVERY_CREDENTIALS } from 'src/app/shared/api-endpoint.const';
+import { GET_ADVANCED_DISCOVERY_CREDENTIALS, GET_USER_GROUPS_LIST, LIST_ACTIVE_USER } from 'src/app/shared/api-endpoint.const';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { UnityServicesModule } from 'src/app/unity-services/unity-services.module';
 import { CorrelationRuleFields } from 'src/app/unity-services/aiml-event-mgmt/aiml-rules/aiml-rules.type';
 import { QueryBuilderConfig, Rule, RuleSet } from 'src/app/shared/query-builder/query-builder.interfaces';
+import { UserGroupType } from 'src/app/shared/SharedEntityTypes/user-mgmt.type';
+import { catchError } from 'rxjs/operators';
 
 @Injectable()
 export class OrchestrationAgenticWorkflowParamsService {
@@ -46,13 +48,30 @@ export class OrchestrationAgenticWorkflowParamsService {
     return this.http.get<CorrelationRuleFields[]>(`rest/orchestration/aiml/field_meta/`, { params: params });
   }
 
-  buildTaskForm(nodeData, nodeId) {
+  getUserGroups(): Observable<UserGroupType[]> {
+    let params: HttpParams = new HttpParams().set('status', true).set('page_size', 0);
+    return this.http.get<UserGroupType[]>(GET_USER_GROUPS_LIST(), { params: params });
+  }
+
+  getUserList(): Observable<string[]> {
+    return this.http.get<string[]>(LIST_ACTIVE_USER());
+  }
+
+  getDropdownData(): Observable<{ userGroups: UserGroupType[], userList: string[] }> {
+    return forkJoin({
+      userGroups: this.getUserGroups().pipe(catchError(error => of(undefined))),
+      userList: this.getUserList().pipe(catchError(error => of(undefined))),
+    })
+  }
+
+  buildTaskForm(nodeData, nodeId, toolData) {
     // if (nodeData?.formErrors) {
     //   this.resetTaskForm = nodeData.formErrors;
     // }
     const valid = nodeData?.config?.target_type === 'Host' ? [Validators.required, NoWhitespaceValidator] : [];
-    return this.fb.group({
+    const form = this.fb.group({
       name: [nodeData.name, [Validators.required, NoWhitespaceValidator]],
+      description: [nodeData?.description || nodeData?.description, [Validators.required]],
       target: [nodeData?.config?.target, valid],
       credential: [nodeData?.config?.credential, valid],
       inputs: this.fb.array(nodeData.inputs.map(input => this.createInputParamGroup(input))),
@@ -60,9 +79,23 @@ export class OrchestrationAgenticWorkflowParamsService {
       timeouts: [nodeData?.config?.settings?.timeout ? nodeData?.config?.settings?.timeout : 3600],
       retries: [nodeData?.config?.settings?.retries ? nodeData?.config?.settings?.retries : 0],
       continue_on_failure: [nodeData?.config?.settings?.continue_on_failure ? nodeData?.config?.settings?.continue_on_failure : false],
-      node_id: [nodeId]
+      node_id: [nodeId],
+      // mode: [nodeData?.mode || '', [Validators.required]],
+      // channels: [nodeData?.channels || [], [Validators.required]],
+      // approver_groups: [nodeData?.approver_groups || [], [Validators.required]],
+      // approver_users: [nodeData?.approver_users || [], [Validators.required]],
+      // timeout: [nodeData?.timeout || 3600, [Validators.required]],
+      // on_timeout: [nodeData?.on_timeout || '', [Validators.required]],
     });
 
+    if (toolData) {
+      form.addControl('mode', this.fb.control(nodeData?.mode || '', Validators.required));
+      form.addControl('channels', this.fb.control(nodeData?.channels || [], Validators.required));
+      form.addControl('approver_groups', this.fb.control(nodeData?.approver_groups || [], Validators.required));
+      form.addControl('approver_users', this.fb.control(nodeData?.approver_users || [], Validators.required));
+      form.addControl('timeout', this.fb.control(nodeData?.timeout || 3600, Validators.required));
+    }
+    return form;
   }
 
   resetTaskForm() {
@@ -71,7 +104,13 @@ export class OrchestrationAgenticWorkflowParamsService {
       'target': '',
       'credential': '',
       'inputs': [],
-      'outputs': []
+      'outputs': [],
+      'mode': '',
+      'channels': '',
+      'approver_groups': '',
+      'approver_users': '',
+      'timeout': '',
+      'on_timeout': '',
     }
   }
 
@@ -100,7 +139,25 @@ export class OrchestrationAgenticWorkflowParamsService {
       'expression': {
         'required': 'Expression is required in added output.'
       },
-    }
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
   createInputParamGroup(input: InputParamsType) {
@@ -244,6 +301,7 @@ export class OrchestrationAgenticWorkflowParamsService {
   buildEmailForm(selectedOutput, nodeId) {
     return this.fb.group({
       name: [selectedOutput?.name ? selectedOutput?.name : 'Email', [Validators.required, NoWhitespaceValidator]],
+      description: [selectedOutput?.description || selectedOutput?.description, [Validators.required]],
       node_id: [nodeId],
       to: [selectedOutput?.config ? selectedOutput?.config?.to : '', [Validators.required, NoWhitespaceValidator]],
       subject: [selectedOutput?.config ? selectedOutput?.config?.subject : '', [Validators.required, NoWhitespaceValidator]],
@@ -251,6 +309,12 @@ export class OrchestrationAgenticWorkflowParamsService {
       timeouts: [selectedOutput?.config?.settings?.timeout ? selectedOutput?.config?.settings?.timeout : 3600],
       retries: [selectedOutput?.config?.settings?.retries ? selectedOutput?.config?.settings?.retries : 0],
       continue_on_failure: [selectedOutput?.config?.settings?.continue_on_failure ? selectedOutput?.config?.settings?.continue_on_failure : false],
+      // mode: [selectedOutput?.mode || '', [Validators.required]],
+      // channels: [selectedOutput?.channels || [], [Validators.required]],
+      // approver_groups: [selectedOutput?.approver_groups || [], [Validators.required]],
+      // approver_users: [selectedOutput?.approver_users || [], [Validators.required]],
+      // timeout: [selectedOutput?.timeout || '', [Validators.required]],
+      // on_timeout: [selectedOutput?.on_timeout || '', [Validators.required]],
     })
   }
 
@@ -260,7 +324,13 @@ export class OrchestrationAgenticWorkflowParamsService {
       'to': '',
       'subject': '',
       'body': '',
-      'outputs': []
+      'outputs': [],
+      'mode': '',
+      'channels': '',
+      'approver_groups': '',
+      'approver_users': '',
+      'timeout': '',
+      'on_timeout': '',
     }
   }
 
@@ -288,6 +358,24 @@ export class OrchestrationAgenticWorkflowParamsService {
         'required': 'Expression is required in added output.'
       },
     },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
   buildChartForm(selectedOutput, nodeId) {
@@ -302,6 +390,12 @@ export class OrchestrationAgenticWorkflowParamsService {
       timeouts: [selectedOutput?.config?.settings?.timeout ? selectedOutput?.config?.settings?.timeout : 3600],
       retries: [selectedOutput?.config?.settings?.retries ? selectedOutput?.config?.settings?.retries : 0],
       continue_on_failure: [selectedOutput?.config?.settings?.continue_on_failure ? selectedOutput?.config?.settings?.continue_on_failure : false],
+      // mode: [selectedOutput?.config?.mode || '', [Validators.required, NoWhitespaceValidator]],
+      // channels: [selectedOutput?.config ? selectedOutput?.config?.channels : '', [Validators.required]],
+      // approver_groups: [selectedOutput?.config ? selectedOutput?.config?.approver_groups : '', [Validators.required]],
+      // approver_users: [selectedOutput?.config ? selectedOutput?.config?.approver_users : '', [Validators.required]],
+      // timeout: [selectedOutput?.config ? selectedOutput?.config?.timeout : '', [Validators.required]],
+      on_timeout: [selectedOutput?.config ? selectedOutput?.config?.on_timeout : '', [Validators.required]],
     })
   }
 
@@ -313,7 +407,13 @@ export class OrchestrationAgenticWorkflowParamsService {
       'y_label': '',
       'x_values': '',
       'y_values': '',
-      'outputs': []
+      'outputs': [],
+      'mode': '',
+      'channels': '',
+      'approver_groups': '',
+      'approver_users': '',
+      'timeout': '',
+      'on_timeout': '',
     }
   }
 
@@ -346,25 +446,66 @@ export class OrchestrationAgenticWorkflowParamsService {
       'expression': {
         'required': 'Expression is required in added output.'
       },
-    }
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
-  buildSourceTaskForm(selectedSourceTask, nodeId) {
-    return this.fb.group({
+  buildSourceTaskForm(selectedSourceTask, nodeId, toolData) {
+    const form = this.fb.group({
       name: [selectedSourceTask.name, [Validators.required, NoWhitespaceValidator]],
+      description: [selectedSourceTask?.description || selectedSourceTask?.description, [Validators.required]],
       inputs: this.fb.array(selectedSourceTask.inputs.map(input => this.createInputParamGroup(input))),
       timeouts: [selectedSourceTask?.config?.settings?.timeout ? selectedSourceTask?.config?.settings?.timeout : 3600],
       retries: [selectedSourceTask?.config?.settings?.retries ? selectedSourceTask?.config?.settings?.retries : 0],
       continue_on_failure: [selectedSourceTask?.config?.settings?.continue_on_failure ? selectedSourceTask?.config?.settings?.continue_on_failure : false],
-      node_id: [nodeId]
+      node_id: [nodeId],
+      // mode: [selectedSourceTask?.mode || '', [Validators.required]],
+      // channels: [selectedSourceTask?.channels || [], [Validators.required]],
+      // approver_groups: [selectedSourceTask?.approver_groups || [], [Validators.required]],
+      // approver_users: [selectedSourceTask?.approver_users || [], [Validators.required]],
+      // timeout: [selectedSourceTask?.timeout || 3600, [Validators.required]],
+      // on_timeout: [selectedSourceTask?.on_timeout || '', [Validators.required]],
     });
+
+    if (toolData) {
+      form.addControl('mode', this.fb.control(selectedSourceTask?.mode || '', Validators.required));
+      form.addControl('channels', this.fb.control(selectedSourceTask?.channels || [], Validators.required));
+      form.addControl('approver_groups', this.fb.control(selectedSourceTask?.approver_groups || [], Validators.required));
+      form.addControl('approver_users', this.fb.control(selectedSourceTask?.approver_users || [], Validators.required));
+      form.addControl('timeout', this.fb.control(selectedSourceTask?.timeout || 3600, Validators.required));
+    }
+
+    return form;
   }
 
   resetSourceTaskForm(selectedSourceTask?: any) {
     return {
       'name': '',
       'inputs': [],
-      'outputs': []
+      'outputs': [],
+      'mode': '',
+      'channels': '',
+      'approver_groups': '',
+      'approver_users': '',
+      'timeout': '',
+      'on_timeout': '',
     };
   }
 
@@ -386,18 +527,51 @@ export class OrchestrationAgenticWorkflowParamsService {
       'expression': {
         'required': 'Expression is required in added output.'
       },
-    }
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
-  buildActionTaskForm(selectedActionTask, nodeId) {
-    return this.fb.group({
+  buildActionTaskForm(selectedActionTask, nodeId, toolData) {
+    const form = this.fb.group({
       name: [selectedActionTask.name, [Validators.required, NoWhitespaceValidator]],
       inputs: this.fb.array(selectedActionTask.inputs.map(input => this.createInputParamGroup(input))),
       timeouts: [selectedActionTask?.config?.settings?.timeout ? selectedActionTask?.config?.settings?.timeout : 3600],
       retries: [selectedActionTask?.config?.settings?.retries ? selectedActionTask?.config?.settings?.retries : 0],
       continue_on_failure: [selectedActionTask?.config?.settings?.continue_on_failure ? selectedActionTask?.config?.settings?.continue_on_failure : false],
-      node_id: [nodeId]
+      node_id: [nodeId],
+      // mode: [selectedActionTask?.mode || '', [Validators.required]],
+      // channels: [selectedActionTask?.channels || [], [Validators.required]],
+      // approver_groups: [selectedActionTask?.approver_groups || [], [Validators.required]],
+      // approver_users: [selectedActionTask?.approver_users || [], [Validators.required]],
+      // timeout: [selectedActionTask?.timeout || 3600, [Validators.required]]
     });
+
+    if (toolData) {
+      form.addControl('mode', this.fb.control(selectedActionTask?.mode || '', Validators.required));
+      form.addControl('channels', this.fb.control(selectedActionTask?.channels || [], Validators.required));
+      form.addControl('approver_groups', this.fb.control(selectedActionTask?.approver_groups || [], Validators.required));
+      form.addControl('approver_users', this.fb.control(selectedActionTask?.approver_users || [], Validators.required));
+      form.addControl('timeout', this.fb.control(selectedActionTask?.timeout || 3600, Validators.required));
+    }
+
+    return form;
   }
 
   resetActionTaskForm(selectedActionTask?: any) {
@@ -426,6 +600,21 @@ export class OrchestrationAgenticWorkflowParamsService {
       'expression': {
         'required': 'Expression is required in added output.'
       },
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
     }
   }
 
@@ -553,6 +742,49 @@ export class OrchestrationAgenticWorkflowParamsService {
     });
   }
 
+
+  // buildHumanApprovalForm(selectedLLM, nodeId) {
+  //   return this.fb.group({
+  //     mode: [ || '', [Validators.req||ired, NoWhitespaceValidat, NoWhitespaceValidatoror]],
+  //     channels: [selectedLLM?.config ? selectedLLM?.config?.channels : '', [Validators.required]],
+  //     approver_groups: [selectedLLM?.config ? selectedLLM?.config?.approver_groups : '', [Validators.required]],
+  //     approver_users: [selectedLLM?.config ? selectedLLM?.config?.approver_users : '', [Validators.required]],
+  //     timeout: [selectedLLM?.config ? selectedLLM?.config?.timeout : '', [Validators.required]],
+  // on_timeout: [selectedLLM?.config ? selectedLLM?.config?.on_timeout : '', [Validators.required]],
+  //   })
+  // }
+
+  resetHumanApprovalForm() {
+    return {
+      'mode': '',
+      'channels': '',
+      'approver_groups': '',
+      'approver_users': '',
+      'timeout': '',
+      'on_timeout': '',
+    }
+  }
+
+  humanApprovalFormValidationMessage = {
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
+  }
 
 
   /////////////////////////////////////////// OUTPUT FORM /////////////////////////////////////////// 
@@ -775,16 +1007,33 @@ export class OrchestrationAgenticWorkflowParamsService {
     }
   }
 
-  createTicketForm(nodeData, nodeId): FormGroup {
-    return this.fb.group({
+  createTicketForm(nodeData, nodeId, toolData): FormGroup {
+    const form = this.fb.group({
       name: [nodeData.name ? nodeData.name : '', [Validators.required]],
+      description: [nodeData?.description || nodeData?.description, [Validators.required]],
       itsm_table: [nodeData?.config?.itsm_table ? nodeData?.config?.itsm_table : '', [Validators.required]],
       inputs: this.fb.array(nodeData?.inputs.map(input => this.itsmFieldsGroup(input))),
       timeouts: [nodeData?.config?.settings?.timeout ? nodeData?.config?.settings?.timeout : 3600],
       retries: [nodeData?.config?.settings?.retries ? nodeData?.config?.settings?.retries : 0],
       continue_on_failure: [nodeData?.config?.settings?.continue_on_failure ? nodeData?.config?.settings?.continue_on_failure : false],
       // inputs: this.fb.array([]),
+      // mode: [nodeData?.mode || '', [Validators.required]],
+      // channels: [nodeData?.channels || [], [Validators.required]],
+      // approver_groups: [nodeData?.approver_groups || [], [Validators.required]],
+      // approver_users: [nodeData?.approver_users || [], [Validators.required]],
+      // timeout: [nodeData?.timeout || 3600, [Validators.required]],
+      // on_timeout: [nodeData?.on_timeout || '', [Validators.required]],
     });
+
+    if (toolData) {
+      form.addControl('mode', this.fb.control(nodeData?.mode || '', Validators.required));
+      form.addControl('channels', this.fb.control(nodeData?.channels || [], Validators.required));
+      form.addControl('approver_groups', this.fb.control(nodeData?.approver_groups || [], Validators.required));
+      form.addControl('approver_users', this.fb.control(nodeData?.approver_users || [], Validators.required));
+      form.addControl('timeout', this.fb.control(nodeData?.timeout || 3600, Validators.required));
+    }
+    return form;
+
   }
 
   createTicketFormErrors(nodeData, nodeId) {
@@ -796,7 +1045,13 @@ export class OrchestrationAgenticWorkflowParamsService {
       name: '',
       itsm_table: '',
       inputs: [],
-      outputs: []
+      outputs: [],
+      mode: '',
+      channels: '',
+      approver_groups: '',
+      approver_users: '',
+      timeout: '',
+      on_timeout: '',
     };
   }
 
@@ -822,19 +1077,52 @@ export class OrchestrationAgenticWorkflowParamsService {
       'expression': {
         'required': 'Expression is required in added output.'
       },
-    }
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
-  updateTicketForm(nodeData, nodeId): FormGroup {
-    return this.fb.group({
+  updateTicketForm(nodeData, nodeId, toolData): FormGroup {
+    const form = this.fb.group({
       name: [nodeData.name ? nodeData.name : '', [Validators.required]],
+      description: [nodeData?.description || nodeData?.description, [Validators.required]],
       itsm_table: [nodeData?.config?.itsm_table ? nodeData?.config?.itsm_table : '', [Validators.required]],
       ticket_id: [nodeData?.config?.ticket_id ? nodeData?.config?.ticket_id : '', [Validators.required]],
       inputs: this.fb.array(nodeData?.inputs.map(input => this.itsmFieldsGroup(input))),
       timeouts: [nodeData?.config?.settings?.timeout ? nodeData?.config?.settings?.timeout : 3600],
       retries: [nodeData?.config?.settings?.retries ? nodeData?.config?.settings?.retries : 0],
       continue_on_failure: [nodeData?.config?.settings?.continue_on_failure ? nodeData?.config?.settings?.continue_on_failure : false],
+      // mode: [nodeData?.mode || '', [Validators.required]],
+      // channels: [nodeData?.channels || [], [Validators.required]],
+      // approver_groups: [nodeData?.approver_groups || [], [Validators.required]],
+      // approver_users: [nodeData?.approver_users || [], [Validators.required]],
+      // timeout: [nodeData?.timeout || 3600, [Validators.required]],
+      // on_timeout: [nodeData?.on_timeout || '', [Validators.required]],
     });
+    if (toolData) {
+      form.addControl('mode', this.fb.control(nodeData?.mode || '', Validators.required));
+      form.addControl('channels', this.fb.control(nodeData?.channels || [], Validators.required));
+      form.addControl('approver_groups', this.fb.control(nodeData?.approver_groups || [], Validators.required));
+      form.addControl('approver_users', this.fb.control(nodeData?.approver_users || [], Validators.required));
+      form.addControl('timeout', this.fb.control(nodeData?.timeout || 3600, Validators.required));
+    }
+    return form
   }
 
   updateTicketFormErrors(nodeData, nodeId) {
@@ -847,7 +1135,13 @@ export class OrchestrationAgenticWorkflowParamsService {
       itsm_table: '',
       ticket_id: '',
       inputs: [],
-      outputs: []
+      outputs: [],
+      mode: '',
+      channels: '',
+      approver_groups: '',
+      approver_users: '',
+      timeout: '',
+      on_timeout: '',
     };
   }
 
@@ -880,12 +1174,31 @@ export class OrchestrationAgenticWorkflowParamsService {
       'expression': {
         'required': 'Expression is required in added output.'
       },
-    }
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
-  commentInTicketForm(nodeData, nodeId): FormGroup {
-    return this.fb.group({
+  commentInTicketForm(nodeData, nodeId, toolData): FormGroup {
+    const form = this.fb.group({
       name: [nodeData.name ? nodeData.name : '', [Validators.required]],
+      description: [nodeData?.description || nodeData?.description, [Validators.required]],
       itsm_table: [nodeData?.config?.itsm_table ? nodeData?.config?.itsm_table : '', [Validators.required]],
       ticket_id: [nodeData?.config?.ticket_id ? nodeData?.config?.ticket_id : '', [Validators.required]],
       field_name: [nodeData?.config?.field_name ? nodeData?.config?.field_name : '', [Validators.required]],
@@ -893,7 +1206,22 @@ export class OrchestrationAgenticWorkflowParamsService {
       timeouts: [nodeData?.config?.settings?.timeout ? nodeData?.config?.settings?.timeout : 3600],
       retries: [nodeData?.config?.settings?.retries ? nodeData?.config?.settings?.retries : 0],
       continue_on_failure: [nodeData?.config?.settings?.continue_on_failure ? nodeData?.config?.settings?.continue_on_failure : false],
+      // mode: [nodeData?.mode || '', [Validators.required]],
+      // channels: [nodeData?.channels || [], [Validators.required]],
+      // approver_groups: [nodeData?.approver_groups || [], [Validators.required]],
+      // approver_users: [nodeData?.approver_users || [], [Validators.required]],
+      // timeout: [nodeData?.timeout || 3600, [Validators.required]],
+      // on_timeout: [nodeData?.on_timeout || '', [Validators.required]],
     });
+
+    if (toolData) {
+      form.addControl('mode', this.fb.control(nodeData?.mode || '', Validators.required));
+      form.addControl('channels', this.fb.control(nodeData?.channels || [], Validators.required));
+      form.addControl('approver_groups', this.fb.control(nodeData?.approver_groups || [], Validators.required));
+      form.addControl('approver_users', this.fb.control(nodeData?.approver_users || [], Validators.required));
+      form.addControl('timeout', this.fb.control(nodeData?.timeout || 3600, Validators.required));
+    }
+    return form;
   }
 
 
@@ -907,7 +1235,13 @@ export class OrchestrationAgenticWorkflowParamsService {
       itsm_table: '',
       ticket_id: '',
       comment: '',
-      inputs: []
+      inputs: [],
+      mode: '',
+      channels: '',
+      approver_groups: '',
+      approver_users: '',
+      timeout: '',
+      on_timeout: '',
     };
   }
 
@@ -928,13 +1262,31 @@ export class OrchestrationAgenticWorkflowParamsService {
       'default_value': {
         'required': 'Value is required.'
       }
-    }
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
-
-  getTicketForm(nodeData, nodeId): FormGroup {
-    return this.fb.group({
+  getTicketForm(nodeData, nodeId, toolData): FormGroup {
+    const form = this.fb.group({
       name: [nodeData.name ? nodeData.name : '', [Validators.required]],
+      description: [nodeData?.description || nodeData?.description, [Validators.required]],
       itsm_table: [nodeData?.config?.itsm_table ? nodeData?.config?.itsm_table : '', [Validators.required]],
       filters: this.fb.array(
         nodeData?.config?.filters?.length
@@ -944,7 +1296,21 @@ export class OrchestrationAgenticWorkflowParamsService {
       timeouts: [nodeData?.config?.settings?.timeout ? nodeData?.config?.settings?.timeout : 3600],
       retries: [nodeData?.config?.settings?.retries ? nodeData?.config?.settings?.retries : 0],
       continue_on_failure: [nodeData?.config?.settings?.continue_on_failure ? nodeData?.config?.settings?.continue_on_failure : false],
+      // mode: [nodeData?.mode || '', [Validators.required]],
+      // channels: [nodeData?.channels || [], [Validators.required]],
+      // approver_groups: [nodeData?.approver_groups || [], [Validators.required]],
+      // approver_users: [nodeData?.approver_users || [], [Validators.required]],
+      // timeout: [nodeData?.timeout || 3600, [Validators.required]],
+      // on_timeout: [nodeData?.on_timeout || '', [Validators.required]],
     });
+    if (toolData) {
+      form.addControl('mode', this.fb.control(nodeData?.mode || '', Validators.required));
+      form.addControl('channels', this.fb.control(nodeData?.channels || [], Validators.required));
+      form.addControl('approver_groups', this.fb.control(nodeData?.approver_groups || [], Validators.required));
+      form.addControl('approver_users', this.fb.control(nodeData?.approver_users || [], Validators.required));
+      form.addControl('timeout', this.fb.control(nodeData?.timeout || 3600, Validators.required));
+    }
+    return form;
   }
 
   resetgetTicketForm(nodeData, nodeId) {
@@ -956,7 +1322,13 @@ export class OrchestrationAgenticWorkflowParamsService {
       'name': '',
       'itsm_table': '',
       'filters': [],
-      'outputs': []
+      'outputs': [],
+      'mode': '',
+      'channels': '',
+      'approver_groups': '',
+      'approver_users': '',
+      'timeout': '',
+      'on_timeout': '',
     };
   }
 
@@ -988,7 +1360,25 @@ export class OrchestrationAgenticWorkflowParamsService {
       'expression': {
         'required': 'Expression is required in added output.'
       },
-    }
+    },
+    'mode': {
+      'required': 'Mode is required.'
+    },
+    'channels': {
+      'required': 'channels is required.'
+    },
+    'approver_groups': {
+      'required': 'approver_groups is required.'
+    },
+    'approver_users': {
+      'required': 'approver_users is required.'
+    },
+    'timeout': {
+      'required': 'timeout is required.'
+    },
+    'on_timeout': {
+      'required': 'on_timeout is required.'
+    },
   }
 
   createAimlEventTriggerForm(nodeData): Observable<FormGroup> {

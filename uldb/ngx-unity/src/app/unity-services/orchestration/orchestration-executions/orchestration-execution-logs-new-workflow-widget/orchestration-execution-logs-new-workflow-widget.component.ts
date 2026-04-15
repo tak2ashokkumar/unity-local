@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, Input, OnInit, Renderer2, ViewEncapsulation } from '@angular/core';
 import { OrchestrationWorkflowPocService } from '../../orchestration-workflows/orchestration-workflow-poc/orchestration-workflow-poc.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -13,6 +13,7 @@ import { DrawflowNode, NodeDetailsArrayModel, nodeTypes } from '../../orchestrat
 import { OrchestrationAgenticWorkflowContainerService } from '../../orchestration-workflows/orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.service';
 import { environment } from 'src/environments/environment';
 import { cloneDeep as _clone } from 'lodash-es';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
   selector: 'orchestration-execution-logs-new-workflow-widget',
@@ -130,6 +131,7 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
   };
 
   constructor(
+    @Inject(DOCUMENT) private document,
     private svc: OrchestrationWorkflowPocService,
     private router: Router,
     private route: ActivatedRoute,
@@ -173,12 +175,44 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
       // });
       // this.connectionList = this.mapConnectionsForEditApi(_clone(this.workFlowData?.connections));
       // this.workflowDetails = _clone(this.dummyJson)
+      const getId = (val: any) =>
+        val?.includes?.('-') ? Number(val.split('-')[1]) : Number(val);
+      this.workflowDetails?.nodes_execution?.forEach((n: any) => {
+        if (n?.node_type === nodeTypes.AIAgent) {
+          setTimeout(() => {
+            this.syncNodeUI(getId(n?.node_id));
+
+          }, 0);
+        }
+        if (n?.node_type === nodeTypes.LLM) {
+          setTimeout(() => {
+            this.workflowDetails?.nodes_execution?.forEach((n: any) => {
+              this.syncNodeUI(n?.node_id);
+            });
+          }, 0);
+        }
+      });
       const drawflowData = this.generateDrawflowStructureEdit(this.workflowDetails);
       console.log('<<<<<<<<<<<<<', this.editor)
       console.log('<<<<<<<<<<<<<&&&&&&&&&&&&&', drawflowData)
 
       if (this.editor) {
         this.waitForEditorAndImport(drawflowData);
+        this.editor.on('import', () => {
+          const getId = (val: any) =>
+            val?.includes?.('-') ? Number(val.split('-')[1]) : Number(val);
+
+          this.workflowDetails?.nodes_execution?.forEach((n: any) => {
+            this.syncNodeUI(getId(n?.node_id));
+          });
+
+          // Important: fix connection positions AFTER UI is applied
+          requestAnimationFrame(() => {
+            this.workflowDetails?.nodes_execution?.forEach((n: any) => {
+              this.editor.updateConnectionNodes(`node-${n.node_id}`);
+            });
+          });
+        });
       }
     } else {
       this.editor.import(this.workflowDetails.design_data);
@@ -419,81 +453,102 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     const statusName = node.status;
     // --- AI / LLM nodes logic (as in my previous message) ---
     if (node.type === nodeTypes.AIAgent || node.type === nodeTypes.LLM) {
-      if (!node.plusSlots) {
+
+      // --- AI / LLM nodes logic (as in my previous message) ---
+      if (node.type === nodeTypes.AIAgent || node.type === nodeTypes.LLM) {
+        const modelValue = node?.config?.model?.llm_integ || '';
+        const memoryEnabled = node?.config?.enable_memory === true;
         if (node.type === nodeTypes.AIAgent) {
-          node.plusSlots = [
-            { name: 'Model', filled: false, iconUrl: '' },
-            { name: 'Memory', filled: false, iconUrl: '' },
-            { name: 'Tools', filled: false, iconUrl: '' }
-          ];
-        } else {
-          node.plusSlots = [{ name: 'Model', filled: false, iconUrl: '' }];
-        }
-      }
-
-      const plusButtonsHtml = node.plusSlots.map((slot, index) => {
-        const slotId = `slot-${nodeId}-${index}`;
-        // if (!slot.filled) {
-        //   return `
-        //   <div class="slot-row" id="${slotId}" onclick="event.stopPropagation(); onPlusClick('${nodeId}', ${index}, event)">
-        //     <span class="slot-name">${slot.name}</span>
-        //     <div class="plus-btn">+</div>
-        //   </div>
-        // `;
-        // } else {
-        //   let content = '';
-        //   if (slot.iconUrl) {
-        //     content = `<img class="slot-icon" src="${slot.iconUrl}" />`;
-        //   } else if (slot.count !== undefined) {
-        //     content = `<span class="slot-count">${slot.count}</span>`;
-        //   }
-        //   return `
-        //   <div class="slot-row" id="${slotId}" onclick="event.stopPropagation(); onPlusClick('${nodeId}', ${index}, event)">
-        //     <span class="slot-name">${slot.name}</span>
-        //     ${content}
-        //   </div>
-        // `;
-        // }
-        if (!slot.filled) {
           return `
-            <div class="slot-row" id="${slotId}">
-              <span class="slot-name">${slot.name}</span>
-              <div class="plus-btn">+</div>
-            </div>
-          `;
-        } else {
-          let content = '';
-          if (slot.iconUrl) {
-            content = `<img class="slot-icon" src="${slot.iconUrl}" />`;
-          } else if (slot.count !== undefined) {
-            content = `<span class="slot-count">${slot.count}</span>`;
-          }
-          return `
-            <div class="slot-row" id="${slotId}">
-              <span class="slot-name">${slot.name}</span>
-              ${content}
-            </div>
-          `;
-        }
-      }).join('');
-
-      return `
         <div class="agentic-custom-node" id="node-${nodeId}">
-          <div class="${boxClass}">
+          <div class="node-box ainode">
+            <!-- Header -->
+            <div class="node-header">
+                <div class="node-center-icon-ai">
+                    <img src="static/assets/images/external-brand/workflow/AIAgent.svg">
+                </div>
+                <span class="node-title">AI Agent</span>
+                <span><i class="${statusFa}" title="${statusName}"></i></span>
+            </div>
+
+            <!-- Config Row -->
+            <div class="row">
+
+                <div class="col-8">
+                    <span class="config-label">Model</span>
+                    <select class="form-control text-dark model-select"
+                        style="border-radius: 20px"
+                        onchange="window.onModelChange(${nodeId}, this)">
+                        <option value="">Select Model</option>
+                        <option value="UnityOne AI" ${modelValue === 'UnityOne AI' ? 'selected' : ''}>
+                          UnityOne AI
+                        </option>
+                      </select>
+                </div>
+
+                <div class="col-4 memory-col">
+                    <span class="config-label">Memory</span>
+                    <img class="memory-icon"
+                        data-enabled="${memoryEnabled}"
+                        onclick="window.toggleMemoryIcon(${nodeId}, this)"
+                        src="${memoryEnabled ? environment.assetsUrl + 'external-brand/workflow/memory_enabled.svg'
+              : environment.assetsUrl + 'external-brand/workflow/memory_disabled.svg'}"/>
+                </div>
+
+            </div>
+
+            <!-- Tools Section -->
+            <div class="tools-container"></div>
+          </div>
+        </div>`;
+        }
+
+        if (node.type === nodeTypes.LLM) {
+          return `
+        <div class="agentic-custom-node" id="node-${nodeId}">
+          <div class="node-actions-llm"
+              onclick="event.stopPropagation();"
+              onmousedown="event.stopPropagation();"
+              onmouseup="event.stopPropagation();">
+            <i class="fas fa-play action test"
+              title="Test"></i>
+            <i class="fas fa-pen action edit"
+              title="Edit"></i>
+            <i class="fas fa-trash action delete"
+              title="Delete"></i>
+          </div>
+          <div class="node-box llm">
             <div class="icon-and-title">
               <div class="${iconClass}">
-                <img src="${this.containerSvc.getCenterImageUrl(node.type)}" />
+                <img src="${this.containerSvc.getCenterImageUrl(node.type)}" loading="eager"/>
               </div>
-              <span>${node.type === nodeTypes.AIAgent ? 'AI Agent' : 'LLM'}</span>
+              <span> LLM </span>
               <span><i class="${statusFa}" title="${statusName}"></i></span>
-            </div>
-            <div class="plus-buttons">
-              ${plusButtonsHtml}
+              <div class="node-status-right">
+                <span class="node-status" title="${node.hasErrors ? 'Validation errors' : 'All required fields are filled up!'}">
+                  <i class="${node.hasErrors ? 'fas fa-exclamation-triangle text-warning' : ''}"></i>
+                </span>
+              </div>
+            </div>  
+            <div class="row m-0 p-0 mt-2">              
+              <div class="col-12">
+                      <span class="config-label">Model</span>
+                      <select class="form-control text-dark model-select"
+                          style="border-radius: 20px"
+                          onchange="window.onModelChange(${nodeId}, this)">
+                          <option value="">Select Model</option>
+                          <option value="UnityOne AI" ${modelValue === 'UnityOne AI' ? 'selected' : ''}>
+                            UnityOne AI
+                          </option>
+                        </select>
+              </div>
             </div>
           </div>
           <div class="node-label">${node.name}</div>
         </div>
       `;
+        }
+      }
     }
 
     // --- Other nodes (Triggers, Switch, Normal) ---
@@ -515,6 +570,111 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
         <div class="node-label">${node.name}</div>
       </div>
     `;
+  }
+
+
+  updateAgentTools(nodeId: number, tools: any[]) {
+
+    const getId = (val: any) =>
+      val?.includes?.('-') ? val.split('-')[1] : val;
+
+    const safeTools = (tools || []).filter(t => t && (t?.node_id || t?.tool_id));
+
+    const toolsHTML = safeTools.map(tool => {
+      const id = Number(getId(tool?.node_id || tool?.tool_id));
+
+      return `<div class="tool-chip" data-node-id="${id}">
+          <div class="tool-delete-icon">×</div>
+
+          <div class="tool-icon">
+            <img src="${this.containerSvc.getCenterImageUrl(tool.node_type || tool.type)}" loading="eager" />
+          </div>
+
+          <span class="tool-name">${tool.name}</span>
+        </div>`;
+    }).join('');
+
+    const nodeEl = document.getElementById(`node-${nodeId}`);
+    if (nodeEl) {
+      const toolsContainer = nodeEl.querySelector('.drawflow_content_node .tools-container') as HTMLElement | null;
+      if (toolsContainer) {
+        toolsContainer.innerHTML = toolsHTML;
+      } else {
+        console.warn('Tools container not found for node', nodeId);
+      }
+    }
+
+    /* ---------- Update Stored HTML ---------- */
+
+    const dfNode = this.editor.drawflow.drawflow.Home.data[nodeId];
+    const htmlString = String(dfNode?.html || '');
+
+    if (htmlString) {
+      const temp = document.createElement('div');
+      temp.innerHTML = htmlString.trim();
+
+      const toolsContainer = temp.querySelector('.drawflow_content_node .tools-container') as HTMLElement | null;
+
+      if (toolsContainer) {
+        toolsContainer.innerHTML = toolsHTML;
+        dfNode.html = temp.innerHTML;
+      }
+    }
+
+
+  }
+
+
+  syncNodeUI(nodeId: number) {
+    const root = this.document.getElementById(`node-${nodeId}`);
+    if (!root) {
+      setTimeout(() => this.syncNodeUI(nodeId), 0);
+      return;
+    }
+
+    const node: any = this.workflowDetails?.nodes_execution?.find((n: any) => n.node_id === Number(nodeId));
+    const config = node?.config || {};
+
+
+    if (node?.node_type === nodeTypes.AIAgent) {
+      //  MEMORY
+      const memoryEl = root.querySelector('.memory-icon') as HTMLImageElement;
+      if (memoryEl) {
+        const isEnabled = !!config?.enable_memory;
+
+        if (node) {
+          node.config = {
+            ...node.config,
+            enable_memory: isEnabled
+          };
+        }
+
+        memoryEl.src = isEnabled
+          ? `${environment.assetsUrl}external-brand/workflow/memory_enabled.svg`
+          : `${environment.assetsUrl}external-brand/workflow/memory_disabled.svg`;
+
+        memoryEl.setAttribute('data-enabled', isEnabled.toString());
+      }
+
+      this.updateAgentTools(nodeId, _clone(config?.tools)) //pass this.toolsArr m aybe
+
+    }
+
+    //  MODEL
+    const selectEl = root.querySelector('.model-select') as HTMLSelectElement;
+    if (selectEl) {
+      selectEl.value = config?.model?.llm_integ || '';
+
+      if (node) {
+        node.config = {
+          ...node.config,
+          model: {
+            ...node.config?.model,
+            llm_integ: config?.model?.llm_integ
+          }
+        };
+      }
+    }
   }
 
 

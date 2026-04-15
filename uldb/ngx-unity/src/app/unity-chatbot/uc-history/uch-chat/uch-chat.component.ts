@@ -314,4 +314,17 @@ export class UchChatComponent implements OnInit, OnDestroy {
   onNewChat() {
     this.newChat.emit();
   }
+
+  stopResponse() {
+    // this.chatHistoryData.getLast().botResponseId = this.chatId;
+    // clearInterval(this.typingInterval);
+    // this.typingInterval = null;
+    this.showStopButton = false;
+    this.isTyping = false;
+    this.cleanup();
+    this.typingQueue = [];
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+    // this.shouldScroll = false;
+  }
 }

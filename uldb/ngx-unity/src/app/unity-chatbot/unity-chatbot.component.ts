@@ -13,7 +13,7 @@ import { UserInfoService } from '../shared/user-info.service';
 import { UcChartsService } from './uc-charts/uc-charts.service';
 import { UcTableService } from './uc-table/uc-table.service';
 import { DashboardApiMapping, InsightsMapping, ModuleIcons, moduleMapping, TabNames, UnityChatbotService } from './unity-chatbot.service';
-import { ChatHistoryData, Insight, UnityChatBot, UntiyChatBotExploreMenu } from './unity-chatbot.type';
+import { ChatHistoryData, Document, Insight, UnityChatBot, UntiyChatBotExploreMenu } from './unity-chatbot.type';
 
 @Component({
   selector: 'unity-chatbot',
@@ -68,6 +68,10 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   activeModel: SupportedLLMConfigData;
 
   chatId: string;
+
+  @ViewChild('fileInput') fileInput: ElementRef;
+  fileUploadLoader: boolean = false;
+  attachedFiles: Document[] = [];
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -175,10 +179,13 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   typingQueue: string[] = [];
   hasReachedTop: boolean = false;
   showStopButton: boolean = false;
+  doneData: any;
   getStreamingResponse(chat: string) {
+    this.attachedFiles = [];
     this.isTyping = true;
     this.isStreaming = true;
     this.showStopButton = true;
+    this.doneData = null;
     let postData = { conversation_id: this.conversationId, query: chat, org_id: this.userInfoService.userOrgId };
     this.startWaitMessages();
 
@@ -198,9 +205,10 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
           }
 
         } else if (event === 'done') {
+          this.doneData = data;
           this.chatId = data.chat_message_id ?? '';
           this.conversationId = data.conversation_id;
-          this.chatHistoryData[lastIndex]['suggestedPrompt'] = data.suggested_questions?.length ? data.suggested_questions[0] : '';
+          // this.chatHistoryData[lastIndex]['suggestedPrompt'] = data.suggested_questions?.length ? data.suggested_questions[0] : '';
           this.chatHistoryData[lastIndex]['liked'] = false;
           this.chatHistoryData[lastIndex]['disliked'] = false;
           this.chatHistoryData[lastIndex]['comment'] = false;
@@ -239,8 +247,10 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
           this.shouldScroll = true;
         }
       } else {
-        console.log('else');
-        this.showStopButton && (this.chatHistoryData.getLast().botResponseId = this.chatId);
+        if(this.showStopButton){
+          this.showStopButton && (this.chatHistoryData.getLast().botResponseId = this.chatId);
+          this.chatHistoryData.getLast()['suggestedPrompt'] = this.doneData.suggested_questions?.length ? this.doneData.suggested_questions[0] : '';
+        }
         this.showStopButton = false;
         this.cleanup();
         clearInterval(this.typingInterval);
@@ -759,5 +769,38 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.typingQueue = [];
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+    this.shouldScroll = false;
+  }
+
+  getDocuments() {
+    this.service.getDocuments(this.conversationId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.attachedFiles = res.documents;
+    })
+  }
+
+  onFilesSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || !input.files.length) return;
+    const file = input.files[0];
+    input.value = '';
+    this.uploadDocument(file);
+  }
+
+  uploadDocument(file: File) {
+    this.fileUploadLoader = true;
+    this.service.uploadDocument(file, this.conversationId, this.userInfoService.userOrgId, this.userInfoService.userDetails.id)
+      .pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+        this.fileUploadLoader = false;
+        this.getDocuments();
+      }, (error: HttpErrorResponse) => {
+        this.fileUploadLoader = false;
+      });
+  }
+
+  removeFile(file: any) {
+    // this.attachedFiles = this.attachedFiles.filter(f => f !== file);
+    this.service.deleteDocument(file.document_id, this.conversationId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.getDocuments();
+    })
   }
 }

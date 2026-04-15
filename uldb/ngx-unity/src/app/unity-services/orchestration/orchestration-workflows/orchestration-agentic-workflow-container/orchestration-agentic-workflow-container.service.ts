@@ -207,6 +207,44 @@ export class OrchestrationAgenticWorkflowContainerService {
     }
   }
 
+  isAINode(val: string) {
+    if (val === nodeTypes.AIAgent || val === nodeTypes.LLM) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isFlowControlNode(val: string) {
+    if (val === nodeTypes.IfElse || val === nodeTypes.Switch || val === nodeTypes.Wait) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isOrcPlayBook(type: string) {
+    return this.isPlaybookType(type);
+  }
+
+  isSourceTaskOrAction(type: string) {
+    if (type === nodeTypes.Source || nodeTypes.Action) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isITSM(type: string) {
+    if (type === nodeTypes.CreateITSMTicket || nodeTypes.UpdateITSMTicket ||
+      type === nodeTypes.CommentInITSMTicket || nodeTypes.GetITSMTicket
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // formatDuration(dur: string) {
   //   let modifiedDuration;
   //   let initialDuration = dur?.split('.')[0];

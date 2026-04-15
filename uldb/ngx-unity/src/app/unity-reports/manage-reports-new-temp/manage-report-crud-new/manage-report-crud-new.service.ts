@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { AppLevelService } from 'src/app/app-level.service';
 import { GET_REPORT_BY_ID, MANAGE_CREATE_REPORT, UPDATE_REPORT_BY_ID } from 'src/app/shared/api-endpoint.const';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { RuleSet } from 'src/app/shared/query-builder/query-builder.interfaces';
 
 @Injectable()
 export class ManageReportCrudNewService {
@@ -19,6 +20,9 @@ export class ManageReportCrudNewService {
 
   private reportTypeSource = new Subject<string>();
   reportType$ = this.reportTypeSource.asObservable();
+
+  private dynamicModelSource = new Subject<boolean>();
+  dynamicModel$ = this.dynamicModelSource.asObservable();
 
   constructor(private http: HttpClient,
     private builder: FormBuilder,
@@ -41,12 +45,20 @@ export class ManageReportCrudNewService {
     this.reportTypeSource.next(type);
   }
 
+  resetDynamicFiltersAndFields(reset: boolean) {
+    this.dynamicModelSource.next(reset);
+  }
+
   getReportById(uuid: string) {
     return this.http.get<ReportFormData>(GET_REPORT_BY_ID(uuid));
   }
 
   getWorkflowIntegration() {
     return this.http.get<any>(`/customer/workflow/integration/`)
+  }
+
+  getDynamicReportModules(): Observable<ReportModuleType[]> {
+    return this.http.get<ReportModuleType[]>(`/customer/reporting/master/models/`)
   }
 
   buildForm(report: ReportFormData): FormGroup {
@@ -85,7 +97,9 @@ export class ManageReportCrudNewService {
       'min': '',
       'execution_type': '',
       'workflow_integration': '',
-      'table': ''
+      'table': '',
+      'module_name':'',
+      'model_name':'',
     }
   }
 
@@ -93,6 +107,8 @@ export class ManageReportCrudNewService {
     let formErrors = {
       name: '',
       feature: '',
+      // module: '',
+      // model: '',
       // cloud_type: '',
       visibility: '',
       enable: '',
@@ -106,8 +122,14 @@ export class ManageReportCrudNewService {
       required: 'Report name is required',
     },
     feature: {
-      required: 'Module is required',
+      required: 'Report type is required',
     },
+    // module: {
+    //   required: 'Module is required',
+    // },
+    // model: {
+    //   required: 'Model is required',
+    // },
     // cloud_type: {
     //   required: 'Cloud Type is required',
     // },
@@ -146,6 +168,12 @@ export class ManageReportCrudNewService {
       table: {
         required: 'Table is required'
       },
+      module_name: {
+        required: 'Module is required',
+      },
+      model_name: {
+        required: 'Model is required',
+      },
     },
   };
 
@@ -166,10 +194,14 @@ export interface ReportFormData {
   uuid?: string;
   name: string;
   feature: string;
+  // module_name: string;
+  // model_name: string;
   // cloud_type: string;
   report_meta: CloudInventoryMetaData;
   visibility: string;
   enable: boolean;
+  // select_fields: any;
+  // query_meta: any;
 }
 
 export interface CloudInventoryMetaData {
@@ -187,12 +219,27 @@ export interface CloudInventoryMetaData {
   execution_type: string;
   workflow_integration: string;
   table: string;
+
+  selected_fields: FieldsArrayItem[];
+  filter_rule_meta: RuleSet;
+
+  module_name: string;
+  model_name: string;
+  select_fields: any;
+  query_meta: any;
 }
 
 export interface FiltersItem {
   attribute: string;
   operator: string;
   value: string | string[];
+}
+
+export interface FieldsArrayItem {
+  name: string;
+  show_as: string;
+  summary_fn: string[];
+  data_processing_fn: string[];
 }
 
 export interface Period {
@@ -210,3 +257,23 @@ export interface ReportMetaDuration {
   to_duration?: string;
 }
 
+
+// export interface DynamicReportDataType {
+//     [key: string]: ReportModuleType;
+// }
+
+export interface ReportModuleType {
+    models: ReportModelType[];
+    module_name: string;
+    module_display_name: string;
+}
+
+export interface ReportModelType {
+    model_display_name: string;
+    model_name: string;
+}
+
+export interface ModuleArrType{
+    name: string;
+    display_name: string;
+}

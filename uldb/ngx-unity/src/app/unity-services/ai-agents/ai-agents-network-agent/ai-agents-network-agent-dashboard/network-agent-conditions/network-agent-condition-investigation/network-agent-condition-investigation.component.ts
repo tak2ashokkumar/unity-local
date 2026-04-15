@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { NetworkAgentConditionDetailsViewData, NetworkAgentConditionInvestigationService, PromptResultViewData } from './network-agent-condition-investigation.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -22,7 +22,7 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
   styleUrls: ['./network-agent-condition-investigation.component.scss'],
   providers: [NetworkAgentConditionInvestigationService]
 })
-export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDestroy {
+export class NetworkAgentConditionInvestigationComponent implements OnInit, AfterViewInit, OnDestroy {
   private ngUnsubscribe = new Subject();
 
   conditionId: string;
@@ -41,6 +41,10 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
   activityVerticalWizardViewData: any;
 
   chatResponse: any;
+  chatResponseHistoryData: any[] = [];
+
+  @ViewChild('leftSideContainer') leftSideContainer: ElementRef;
+  @ViewChildren('chatResponseHistory') chatResponseHistory: QueryList<ElementRef>;
 
   initialChatResponseData: any[] = [];
   isAnyStepDataPresent: boolean = false;
@@ -86,7 +90,25 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
       this.spinner.start('conditionSummarySpinner');
     }, 5);
     this.getConditionDetails();
-    this.getActivities();
+    // this.getActivities();
+  }
+
+  ngAfterViewInit() {
+    this.chatResponseHistory.changes.pipe(takeUntil(this.ngUnsubscribe)).subscribe((change) => {
+      if (this.chatResponseHistory?.length > 1) {
+        this.scrollToLastChatResponseHistory();
+      }
+    });
+  }
+
+  scrollToLastChatResponseHistory() {
+    setTimeout(() => {
+      const parent = this.leftSideContainer.nativeElement;
+      const last = this.chatResponseHistory.last?.nativeElement;
+      // added gap=150, When scrolling to the last chat history response,it will leave 150px space above it in the viewport, so some part of previous chat response history also show
+      const gap = 150;
+      parent.scrollTop += (last.getBoundingClientRect().top - parent.getBoundingClientRect().top) - gap;
+    }, 2);
   }
 
   ngOnDestroy(): void {
@@ -264,48 +286,56 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, OnDe
     }
   }
 
-  private resolveStep(res: NetworkAgentsChatResponseType) {
-    const phase = res?.answer?.phase;
-    const stageTitle = res?.answer?.stage_title;
+  // private resolveStep(res: NetworkAgentsChatResponseType) {
+  //   const phase = res?.answer?.phase;
+  //   const stageTitle = res?.answer?.stage_title;
 
-    if (phase !== 'Verify and Audit') {
-      return {
-        stageKey: phase,
-        componentType: 'Basic CLI Check'
-      }
-    }
+  //   if (phase !== 'Verify and Audit') {
+  //     return {
+  //       stageKey: phase,
+  //       componentType: 'Basic CLI Check'
+  //     }
+  //   }
 
-    return {
-      stageKey: stageTitle,
-      componentType: stageTitle
-    }
-  }
+  //   return {
+  //     stageKey: stageTitle,
+  //     componentType: stageTitle
+  //   }
+  // }
 
-  handleChatResponse(res: NetworkAgentsChatResponseType | null) {
+  handleChatResponse(res: any | null) {
     if (this.initialChatResponseData?.length == 0) {
       this.initialChatResponseData.push(res);
       this.spinner.stop('conditionSummarySpinner');
     }
-    if (res == null || res?.answer?.phase == 'General') { return; }
-    this.isAnyStepDataPresent = res?.answer?.stage ? true : this.isAnyStepDataPresent;
-    const { stageKey, componentType } = this.resolveStep(res);
-    const existingStep = this.dynamicSteps.find(
-      step => step.stageKey === stageKey
-    );
-    if (existingStep) {
-      existingStep.chatResponse = res;
-    } else {
-      this.dynamicSteps.push({
-        stageKey,
-        componentType,
-        chatResponse: res
-      });
+    // if (res == null || res?.answer?.phase == 'General') { return; }
+    if (res == null) { return; }
+    this.isAnyStepDataPresent = res?.answer ? true : this.isAnyStepDataPresent;
+    const workSpaceData = res?.answer?.split('sectionBreak')[1];
+    if (!workSpaceData && !res?.meta?.device_data?.monitoring_type) {
+      return;
     }
-    this.dynamicSteps = [...this.dynamicSteps];
-    this.chatResponse = res;
-    if (res?.answer?.stage == "Stage 0") {
-      this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);
-    }
+    const modifiedRes = { ...res, workSpaceData: workSpaceData };
+    this.chatResponseHistoryData.push(modifiedRes);
+
+    // const { stageKey, componentType } = this.resolveStep(res);
+    // const existingStep = this.dynamicSteps.find(
+    //   step => step.stageKey === stageKey
+    // );
+    // if (existingStep) {
+    //   existingStep.chatResponse = res;
+    // } else {
+    //   this.dynamicSteps.push({
+    //     stageKey,
+    //     componentType,
+    //     chatResponse: res
+    //   });
+    // }
+    // this.dynamicSteps = [...this.dynamicSteps];
+    // this.chatResponse = res;
+    // if (res?.answer?.stage == "Stage 0") {
+    //   this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);
+    // }
     this.spinner.stop('main');
   }
 

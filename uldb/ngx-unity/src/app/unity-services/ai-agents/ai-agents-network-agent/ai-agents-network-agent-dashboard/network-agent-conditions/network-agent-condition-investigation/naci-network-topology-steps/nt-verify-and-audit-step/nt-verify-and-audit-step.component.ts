@@ -13,6 +13,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { clone as _clone } from 'lodash-es';
 import { NaciCliCheckStepsService } from '../../naci-cli-check-steps/naci-cli-check-steps.service';
 import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'nt-verify-and-audit-step',
@@ -22,9 +23,13 @@ import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '..
 })
 export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
-  @Input() chatResponse!: any;
+  // @Input() chatResponse!: any;
+  @Input('deviceData') deviceData: any;
+  @Input('index') index: number;
   isVerifyAndAuditOpen: boolean = false;
   verifyAuditViewData: any;
+
+  spinnerName: string;
 
   networkViewData: UnityNetworkTopologyViewData = new UnityNetworkTopologyViewData();
   networkTopologyData: UnityNetworkTopologyViewData;
@@ -60,13 +65,14 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.spinnerName = `unity-topology-${this.index}`;
     this.options = this.getInitialOptions();
     setTimeout(() => {
-      this.spinner.start('unity-topology');
-      this.nodeDetailsRef = document.getElementById('dc-node-details-wrapper');
+      this.spinner.start(this.spinnerName);
+      this.nodeDetailsRef = document.getElementById(`dc-node-details-wrapper-${this.index}`);
     }, 0);
     this.remInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    this.getDeviceNetwork();
+    this.getNetworkTopologyData();
   }
 
   getInitialOptions() {
@@ -109,7 +115,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.spinner.stop('unity-topology');
+    this.spinner.stop(this.spinnerName);
     this.destroyNetwork();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
@@ -123,11 +129,13 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   }
 
   ngOnChanges(): void {
-    if (this.chatResponse?.answer?.stage_title != StageTitleMapping.NETWORK_TOPOLOGY) {
-      return;
-    }
-    this.toggleVerifyAndAuditAccordion();
-    this.verifyAudit();
+    // if (this.chatResponse?.answer?.stage_title != StageTitleMapping.NETWORK_TOPOLOGY) {
+    //   return;
+    // }
+    // this.toggleVerifyAndAuditAccordion();
+    // this.verifyAudit();
+    // console.log('index', this.index);
+    // this.getNetworkTopologyData();
   }
 
   destroyNetwork() {
@@ -139,7 +147,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   }
 
   verifyAudit() {
-    this.verifyAuditViewData = this.chatResponse.answer;
+    // this.verifyAuditViewData = this.chatResponse.answer;
     // this.verifyAuditViewData = jsonOutput;
     // this.verifyAuditViewData = this.svc.convertToVerifyAndAuditViewData(this.chatResponse?.answer);
     // console.log(this.verifyAuditViewData, 'vf & avd')
@@ -148,15 +156,24 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   }
 
   refreshData() {
-    this.spinner.start('unity-topology');
+    this.spinner.start(this.spinnerName);
     this.getDeviceNetwork();
+  }
+
+  getNetworkTopologyData() {
+    this.svc.getNetworkTopologyData(this.deviceData.device).pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
+      this.verifyAuditViewData = data;
+      this.getDeviceNetwork();
+    }, (err: HttpErrorResponse) => {
+      this.spinner.stop(this.spinnerName);
+    })
   }
 
   getDeviceNetwork() {
     this.destroyNetwork();
-    let networkData: UnityNetworkTopologyViewData = this.svc.convertToViewData(this.verifyAuditViewData.data);
+    let networkData: UnityNetworkTopologyViewData = this.svc.convertToViewData(this.verifyAuditViewData);
     if (networkData.nodes && networkData.nodes.length) {
-      this.spinner.stop('unity-topology');
+      // this.spinner.stop(this.spinnerName);
       this.networkViewData = networkData;
       this.selectedNode = networkData.nodes[0];
       this.selectedNodes.push(networkData.nodes[0]);
@@ -164,7 +181,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
       this.drawNetwork();
     } else {
       setTimeout(() => {
-        this.spinner.stop('unity-topology');
+        this.spinner.stop(this.spinnerName);
       }, 0)
     }
   }
@@ -172,7 +189,12 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
   @HostListener('window:resize')
   setHeight() {
     const height = Math.floor(window.innerHeight) - Math.floor(this.visGraph.nativeElement.getBoundingClientRect().top) - Math.floor(this.remInPx);
-    this.renderer.setStyle(this.visGraph.nativeElement, 'height', height + 'px');
+
+    if (height < 300 || height > 350) {
+      this.renderer.setStyle(this.visGraph.nativeElement, 'height', '350px');
+    } else {
+      this.renderer.setStyle(this.visGraph.nativeElement, 'height', height + 'px');
+    }
   }
 
   updateNetworkPhysics() {
@@ -288,7 +310,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
     this.network.on('stabilized', (nwk: any) => {
       this.isNetworkStable = true;
       setTimeout(() => {
-        this.spinner.stop('unity-topology');
+        this.spinner.stop(this.spinnerName);
       }, 200)
     });
   }
@@ -310,7 +332,7 @@ export class NtVerifyAndAuditStepComponent implements OnInit, OnDestroy {
         physics: false
       });
       this.network.fit({ animation: true });
-      this.spinner.stop('unity-topology');
+      this.spinner.stop(this.spinnerName);
     });
   }
 

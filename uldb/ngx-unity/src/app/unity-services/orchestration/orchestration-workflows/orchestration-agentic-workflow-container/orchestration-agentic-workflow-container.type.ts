@@ -71,6 +71,7 @@ export interface TaskDetailsModel {
   config?: any;
   uuid: string;
   name?: string;
+  description?: string;
 }
 
 
@@ -116,7 +117,8 @@ export interface OutputParamsType {
 
 export interface NodeDetailsArrayModel {
   name: string;
-  node_id: number;
+  node_id?: any;
+  tool_id?: any;
   node_type: string;
   type_version: number;
   pos_x: number;
@@ -127,6 +129,8 @@ export interface NodeDetailsArrayModel {
   form?: any;
   formErrors?: any;
   formValidationMessages?: any;
+  isTool?: boolean;
+  human_approval?: boolean;
 }
 
 export interface DrawflowNode {

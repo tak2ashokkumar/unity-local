@@ -1,9 +1,9 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { CdhVerifyAndAuditStepService, DeviceHealthMetricWidgetViewData, DeviceHealthSummaryViewData } from './cdh-verify-and-audit-step.service';
+import { CdhVerifyAndAuditStepService, DeviceHealthSummaryViewData } from './cdh-verify-and-audit-step.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { CheckDeviceHealthDataType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
 import { NetworkAgentConditionInvestigationService, StageTitleMapping } from '../../network-agent-condition-investigation.service';
+import { CheckDeviceHealthDataType, DeviceType, NetworkAgentsChatResponseType } from '../../naci-chatbot/naci-chatbot.type';
 
 @Component({
   selector: 'cdh-verify-and-audit-step',
@@ -16,8 +16,8 @@ export class CdhVerifyAndAuditStepComponent implements OnInit, OnChanges {
 
   isVerifyAndAuditOpen: boolean = false;
   @Input() chatResponse: NetworkAgentsChatResponseType;
+  deviceData: DeviceType;
   deviceHealthSummaryViewData: DeviceHealthSummaryViewData;
-  deviceHealthMetricWidgetViewData: DeviceHealthMetricWidgetViewData;
 
   constructor(private svc: CdhVerifyAndAuditStepService,
     private investigationSvc: NetworkAgentConditionInvestigationService) {
@@ -45,8 +45,8 @@ export class CdhVerifyAndAuditStepComponent implements OnInit, OnChanges {
 
   verifyAudit() {
     const chatResponseData = this.chatResponse?.answer?.data as CheckDeviceHealthDataType;
+    this.deviceData = chatResponseData?.device;
     this.deviceHealthSummaryViewData = this.svc.convertToDeviceHealthSummaryViewData(chatResponseData?.resource_utilization);
-    this.deviceHealthMetricWidgetViewData = this.svc.convertToDeviceHealthMetricWidgetViewData(chatResponseData?.metrics);
   }
 
 

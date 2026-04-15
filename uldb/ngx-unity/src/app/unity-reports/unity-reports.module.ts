@@ -40,6 +40,7 @@ import { ManageReportsNewTempComponent } from './manage-reports-new-temp/manage-
 import { ManageReportCrudNewComponent } from './manage-reports-new-temp/manage-report-crud-new/manage-report-crud-new.component';
 import { PerformanceReportCrudComponent } from './manage-reports/manage-report-crud/performance-report-crud/performance-report-crud.component';
 import { PerformanceReportPreviewComponent } from './manage-reports/manage-report-preview/performance-report-preview/performance-report-preview.component';
+import { ReportCrudCommonComponent } from './manage-reports-new-temp/manage-report-crud-new/report-crud-common/report-crud-common.component';
 @NgModule({
   declarations: [
     CloudInventoryReportComponent,
@@ -73,7 +74,8 @@ import { PerformanceReportPreviewComponent } from './manage-reports/manage-repor
     ManageReportsNewTempComponent,
     ManageReportCrudNewComponent,
     PerformanceReportCrudComponent,
-    PerformanceReportPreviewComponent
+    PerformanceReportPreviewComponent,
+    ReportCrudCommonComponent
   ],
   imports: [
     AppCoreModule,

@@ -1,7 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { AppDashboardComponent } from "./app-dashboard.component";
-import { AppGlobalDashboardComponent } from "./app-global-dashboard/app-global-dashboard.component";
 import { AppPersonaDashboardComponent } from "./app-persona-dashboard/app-persona-dashboard.component";
 import { AppDashboardCrudComponent } from "./app-dashboard-crud/app-dashboard-crud.component";
 import { AppDashboardListComponent } from "./app-dashboard-list/app-dashboard-list.component";
@@ -28,15 +27,6 @@ const routes: Routes = [
                 component: AppDefaultDashboardsComponent,
             },
             ...DEFAULT_DASHBOARD_ROUTES,
-            {
-                path: 'global',
-                data: {
-                    breadcrumb: {
-                        title: 'Global Dashboard'
-                    }
-                },
-                component: AppGlobalDashboardComponent
-            },
             {
                 path: 'my-dashboard',
                 data: {

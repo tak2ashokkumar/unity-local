@@ -37,6 +37,9 @@ export class NetworkAgentConditionsComponent implements OnInit, OnDestroy {
   conditionUuid: string;
   selectedCondition: NetworkAgentConditionDetails;
 
+  completedApis: number = 0;
+  isInitialLoad: boolean = true;
+
   acknowledgeForm: FormGroup;
   acknowledgeFormErrors: any;
   acknowledgeFormValidationMessages: any;
@@ -159,15 +162,29 @@ export class NetworkAgentConditionsComponent implements OnInit, OnDestroy {
   getConditionsSummary() {
     this.conditionSvc.getConditionsSummary().pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
       this.conditionsSummaryViewdata = this.conditionSvc.convertToConditionsSummaryViewData(res);
+      this.handleSpinnerStopForConditionSummaryAndList();
     }, (err) => {
       this.conditionsSummaryViewdata = null;
       this.notification.error(new Notification('Error whlie getting Condition summary'));
+      this.handleSpinnerStopForConditionSummaryAndList();
     });
+  }
+
+  handleSpinnerStopForConditionSummaryAndList() {
+    if (!this.isInitialLoad) {
+      this.spinner.stop('main');
+      return;
+    }
+    this.completedApis++;
+    if (this.completedApis == 2) {
+      this.isInitialLoad = false;
+      this.spinner.stop('main');
+    }
   }
 
   getConditions() {
     this.conditionSvc.getConditions(this.currentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
-      this.spinner.stop('main');
+      this.handleSpinnerStopForConditionSummaryAndList();
       this.conditionCount = res.count;
       this.viewData = this.conditionSvc.convertToConditionsViewdata(res.results);
       if (this.selectedConditionId) {
@@ -179,7 +196,7 @@ export class NetworkAgentConditionsComponent implements OnInit, OnDestroy {
       }
     }, (err) => {
       this.notification.error(new Notification('Error whlie getting conditions'));
-      this.spinner.stop('main');
+      this.handleSpinnerStopForConditionSummaryAndList();
     });
   }
 

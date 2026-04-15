@@ -15,10 +15,7 @@
         <!-- <h5 class="text-dark">INPUT</h5> -->
         <h6 class="fw-bold mb-3">I N P U T</h6>
 
-        <div class="accordion text-muted" *ngIf="nodeData.node_type !== 'Manual Trigger' && 
-                              nodeData.node_type !== 'Schedule Trigger' &&
-                              nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger' &&
-                              nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger'">
+        <div class="accordion text-muted" *ngIf="nodeData && !triggerTypes.includes(nodeData.node_type)">
           <div class="accordion-headers" (click)="toggleContextVariables()">
             <i class="text-muted mb-2 "
               [ngClass]="contextVarHeader? 'fas fa-chevron-down' : 'fas fa-chevron-right'"></i>
@@ -45,10 +42,10 @@
         </div>
 
         <ng-container
-          *ngIf="nodeData.node_type !== 'Manual Trigger' && 
-                              nodeData.node_type !== 'Schedule Trigger' &&
-                              nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'Webhook Trigger' 
-                              && nodeData.node_type !== 'ITSM Event Trigger' && nodeData.node_type !== 'AIML Event Trigger'">
+          *ngIf="nodeData?.node_type !== 'Manual Trigger' && 
+                              nodeData?.node_type !== 'Schedule Trigger' &&
+                              nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'Webhook Trigger' 
+                              && nodeData?.node_type !== 'ITSM Event Trigger' && nodeData?.node_type !== 'AIML Event Trigger'">
           <div class="accordion text-muted">
             <div class="accordion-headers" (click)="toggleWorkflowVariables()">
               <i class="text-muted mb-2 "
@@ -84,12 +81,12 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="nodeData.node_type !== 'Manual Trigger' && 
-                              nodeData.node_type !== 'Schedule Trigger' &&
-                              nodeData.node_type !== 'Chat Trigger'&& nodeData.node_type !== 'ITSM Event Trigger' &&
-                              nodeData.node_type !== 'Webhook Trigger'">
+        <ng-container *ngIf="nodeData?.node_type !== 'Manual Trigger' && 
+                              nodeData?.node_type !== 'Schedule Trigger' &&
+                              nodeData?.node_type !== 'Chat Trigger'&& nodeData?.node_type !== 'ITSM Event Trigger' &&
+                              nodeData?.node_type !== 'Webhook Trigger'">
           <div class="accordion text-muted" *ngFor="let con of connectedNodes">
-            <div class="accordion-headers" *ngIf="nodeData.node_id !== con.node_id"
+            <div class="accordion-headers" *ngIf="nodeData?.node_id !== con.node_id"
               (click)="toggleAccordion(con.node_id)">
               <i class="text-muted mb-2"
                 [ngClass]="isAccordionOpen(con.node_id) ? 'fas fa-chevron-down' : 'fas fa-chevron-right'">
@@ -163,10 +160,11 @@
             </div>
           </div>
         </ng-container>
-        <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
-                              nodeData.node_type === 'Schedule Trigger' ||
-                              nodeData.node_type === 'Chat Trigger' || nodeData.node_type === 'ITSM Event Trigger' ||
-                              nodeData.node_type === 'Webhook Trigger' || nodeData.node_type === 'AIML Event Trigger'">
+        <div
+          *ngIf="nodeData?.node_type === 'Manual Trigger' || 
+                              nodeData?.node_type === 'Schedule Trigger' ||
+                              nodeData?.node_type === 'Chat Trigger' || nodeData?.node_type === 'ITSM Event Trigger' ||
+                              nodeData?.node_type === 'Webhook Trigger' || nodeData?.node_type === 'AIML Event Trigger'">
           Inputs are not applicable to Trigger nodes.
         </div>
       </div>
@@ -178,10 +176,10 @@
         <div class="d-flex bg-header justify-content-between align-items-center p-2">
           <div class="d-flex align-items-center">
             <img loading="eager" height="25" width="25" class="mx-2" [src]="middlePanelLogo" alt="Logo" />
-            <h5 class="text-dark mb-0">{{ nodeData.node_type }}</h5>
+            <h5 class="text-dark mb-0">{{ nodeData?.node_type }}</h5>
           </div>
 
-          <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center" *ngIf="!nodeData?.isTool">
             <i [ngClass]="getStatusFaClass(realTimeData?.status) + ' pr-2'"></i>
             <button class="btn btn-primary btn-sm" (click)="closeModal('test')"><i class="fas fa-play mr-1"></i>Run
               Node</button>
@@ -193,25 +191,32 @@
             <a class="nav-link" [class.active]="activeTab === 'properties'"
               (click)="changeTab('properties')">Properties</a>
           </li>
-          <li class="nav-item" *ngIf="nodeData.node_type === 'LLM Chain' || nodeData.node_type === 'AI Agent'">
-            <a class="nav-link" [class.active]="activeTab === 'model'" (click)="changeTab('model')">Model</a>
+          <li class="nav-item" *ngIf="nodeData?.isTool">
+            <a class="nav-link" [class.active]="activeTab === 'humanApproval'"
+              (click)="changeTab('humanApproval')">Human Approval</a>
           </li>
-          <li class="nav-item" *ngIf="nodeData.node_type === 'AI Agent'">
+          <!-- <li class="nav-item" *ngIf="nodeData?.node_type === 'LLM Chain' || nodeData?.node_type === 'AI Agent'">
+            <a class="nav-link" [class.active]="activeTab === 'model'" (click)="changeTab('model')">Model</a>
+          </li> -->
+          <!-- <li class="nav-item" *ngIf="nodeData?.node_type === 'AI Agent'">
             <a class="nav-link" [class.active]="activeTab === 'memory'" (click)="changeTab('memory')">Memory</a>
           </li>
-          <li class="nav-item" *ngIf="nodeData.node_type === 'AI Agent'">
+          <li class="nav-item" *ngIf="nodeData?.node_type === 'AI Agent'">
             <a class="nav-link" [class.active]="activeTab === 'tools'" (click)="changeTab('tools')">Tools</a>
-          </li>
-          <li class="nav-item" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
-             && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
-             && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'
-             && nodeData.node_type !== 'AIML Event Trigger'">
+          </li> -->
+          <li class="nav-item"
+            *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
+             && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
+             && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'Add Comment'
+             && nodeData?.node_type !== 'AIML Event Trigger' && !nodeData?.isTool && nodeData?.node_type !== 'If Else' && nodeData?.node_type !== 'Switch Case' && nodeData?.node_type !== 'Wait'">
             <a class="nav-link" [class.active]="activeTab === 'output'" (click)="changeTab('output')">Output
               Configuration</a>
           </li>
-          <li class="nav-item" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
-             && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
-             && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger'">
+          <li class="nav-item"
+            *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
+             && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
+             && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'AIML Event Trigger'
+            && !nodeData?.isTool && nodeData?.node_type !== 'Switch Case' && nodeData?.node_type !== 'If Else' && nodeData?.node_type !== 'Wait'">
             <a class="nav-link" [class.active]="activeTab === 'settings'" (click)="changeTab('settings')">Settings</a>
           </li>
         </ul>
@@ -229,31 +234,37 @@
                     [adaptivePosition]="false" placement="top"></span>
                   <ng-container
                     *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('name')}"></ng-container>
-
+                </div>
+                <div class="mb-3" *ngIf="nodeData?.isTool && propertiesForm.get('description')">
+                  <label class="form-label text-muted mb-1">Description<em>*</em></label>
+                  <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [adaptivePosition]="false"
+                    placement="top"></span>
+                  <textarea formControlName="description" class="form-control text-dark" placeholder="Enter Description"
+                    rows="3" [class.is-invalid]="propertiesFormErrors?.description"></textarea>
                 </div>
                 <div class="mb-3" *ngIf="nodeData?.config?.target_type === 'Host' && propertiesForm.get('target')">
                   <label class="form-label text-muted mb-1">Target<em>*</em></label>
                   <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                     [tooltip]="tooltip.target"></span>
                   <ng-container
-                    *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('target'), key: 'target' , error: propertiesFormErrors.target }"></ng-container>
+                    *ngTemplateOutlet="nodeData?.isTool ? fxInputIcon : fxInput; context: { control: propertiesForm.get('target'), key: 'target' , error: propertiesFormErrors.target }"></ng-container>
                 </div>
                 <div class="mb-3" *ngIf="nodeData?.config?.target_type === 'Host' && propertiesForm.get('credential')">
                   <label class="form-label text-muted mb-1">Credential<em>*</em></label>
                   <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                     [tooltip]="tooltip.credential"></span>
                   <ng-container
-                    *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('credential'),key: 'credential', error: propertiesFormErrors.credential }"></ng-container>
+                    *ngTemplateOutlet="nodeData?.isTool ? fxInputIcon : fxInput; context: { control: propertiesForm.get('credential'),key: 'credential', error: propertiesFormErrors.credential }"></ng-container>
                 </div>
-                <ng-container *ngIf="nodeData.node_type === 'If Else'">
-                  <div class="mb-3" *ngIf="(nodeData.node_type === 'If Else') && propertiesForm.get('condition_key')">
+                <ng-container *ngIf="nodeData?.node_type === 'If Else'">
+                  <div class="mb-3" *ngIf="(nodeData?.node_type === 'If Else') && propertiesForm.get('condition_key')">
                     <label class="form-label text-muted mb-1">Key<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                       [tooltip]="tooltip.key"></span>
                     <ng-container
                       *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('condition_key'),key: 'condition_key', error: propertiesFormErrors.condition_key}"></ng-container>
                   </div>
-                  <div class="mb-3" *ngIf="(nodeData.node_type === 'If Else') && propertiesForm.get('operator')">
+                  <div class="mb-3" *ngIf="(nodeData?.node_type === 'If Else') && propertiesForm.get('operator')">
                     <label class="form-label text-muted mb-1">Operator<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                       [tooltip]="tooltip.operator"></span>
@@ -267,7 +278,8 @@
                     <div class="invalid-feedback" *ngIf="propertiesFormErrors.operator">
                       {{propertiesFormErrors.operator}}</div>
                   </div>
-                  <div class="mb-3" *ngIf="(nodeData.node_type === 'If Else') && propertiesForm.get('condition_value')">
+                  <div class="mb-3"
+                    *ngIf="(nodeData?.node_type === 'If Else') && propertiesForm.get('condition_value')">
                     <label class="form-label text-muted mb-1">Value<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                       [tooltip]="tooltip.value"></span>
@@ -288,12 +300,12 @@
                     </ng-container>
                   </div>
                 </ng-container>
-                <ng-container *ngIf="nodeData.node_type === 'Switch Case'">
+                <ng-container *ngIf="nodeData?.node_type === 'Switch Case'">
                   <div formArrayName="switchConditions" class="p-0">
                     <div *ngFor="let filterGroup of propertiesForm.get('switchConditions').controls; let i = index;"
                       [formGroupName]="i" class="mb-4">
                       <div class="mb-2"
-                        *ngIf="(nodeData.node_type === 'Switch Case') && filterGroup.get('condition_key')">
+                        *ngIf="(nodeData?.node_type === 'Switch Case') && filterGroup.get('condition_key')">
                         <div class="d-flex justify-content-between mb-1">
                           <label class="form-label text-muted align-self-end mb-0">Key<em>*</em></label>
                           <span class="fas fa-info-circle text-primary pointer-link text-info align-self-end mb-1 pl-1"
@@ -304,7 +316,7 @@
                         <ng-container
                           *ngTemplateOutlet="fxInput; context: { control: filterGroup.get('condition_key'), key: 'condition_key', index: i, error: propertiesFormErrors.switchConditions[i]?.condition_key }"></ng-container>
                       </div>
-                      <div class="mb-2" *ngIf="(nodeData.node_type === 'Switch Case') && filterGroup.get('operator')">
+                      <div class="mb-2" *ngIf="(nodeData?.node_type === 'Switch Case') && filterGroup.get('operator')">
                         <label class="form-label text-muted mb-1">Operator<em>*</em></label>
                         <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                           [tooltip]="tooltip.operator"></span>
@@ -320,7 +332,7 @@
                         </div>
                       </div>
                       <div class="mb-2"
-                        *ngIf="(nodeData.node_type === 'Switch Case') && filterGroup.get('condition_value')">
+                        *ngIf="(nodeData?.node_type === 'Switch Case') && filterGroup.get('condition_value')">
                         <label class="form-label text-muted mb-1">Value<em>*</em></label>
                         <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                           [tooltip]="tooltip.value"></span>
@@ -346,14 +358,14 @@
                       </div>
                     </div>
                   </div>
-                  <div class="d-flex justify-content-end" *ngIf="nodeData.node_type === 'Switch Case'">
+                  <div class="d-flex justify-content-end" *ngIf="nodeData?.node_type === 'Switch Case'">
                     <button type="button" class="btn text-primary border-primary w-20" (click)="addSwitchForm()">
                       <i class="fas fa-plus mr-1"></i> Condition
                     </button>
                   </div>
                 </ng-container>
-                <ng-container *ngIf="nodeData.node_type === 'Wait'">
-                  <div class="mb-3" *ngIf="(nodeData.node_type === 'Wait') && propertiesForm.get('duration_value')">
+                <ng-container *ngIf="nodeData?.node_type === 'Wait'">
+                  <div class="mb-3" *ngIf="(nodeData?.node_type === 'Wait') && propertiesForm.get('duration_value')">
                     <label class="form-label text-muted mb-1">Duration<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
                     <div class="pr-1 input-group">
@@ -363,7 +375,7 @@
                         {{propertiesFormErrors.duration_value}}</div>
                     </div>
                   </div>
-                  <div class="mb-3" *ngIf="(nodeData.node_type === 'Wait') && propertiesForm.get('duration_unit')">
+                  <div class="mb-3" *ngIf="(nodeData?.node_type === 'Wait') && propertiesForm.get('duration_unit')">
                     <label class="form-label text-muted mb-1">Unit<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
                     <select id="duration_unit" class="form-control text-dark" formControlName="duration_unit"
@@ -378,7 +390,7 @@
                       {{propertiesFormErrors.duration_unit}}</div>
                   </div>
                 </ng-container>
-                <ng-container *ngIf="nodeData.node_type === 'Email'">
+                <ng-container *ngIf="nodeData?.node_type === 'Email'">
                   <div class="mb-3" *ngIf="propertiesForm.get('to')">
                     <label class="form-label text-muted mb-1">To<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
@@ -437,7 +449,7 @@
                     </div>
                   </div>
                 </ng-container>
-                <ng-container *ngIf="nodeData.node_type === 'Chart'">
+                <ng-container *ngIf="nodeData?.node_type === 'Chart'">
                   <div class="mb-3" *ngIf="propertiesForm.get('chart_type')">
                     <label class="form-label text-muted mb-1">Chart Type<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
@@ -563,7 +575,7 @@
                     </div>
                   </ng-container>
                 </ng-container>
-                <ng-container *ngIf="nodeData.node_type === 'LLM Chain'">
+                <ng-container *ngIf="nodeData?.node_type === 'LLM Chain'">
                   <div class="mb-3" *ngIf="propertiesForm.get('prompt')">
                     <label class="form-label text-muted mb-1">Prompt<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
@@ -590,7 +602,7 @@
                     </div>
                   </div>
                 </ng-container>
-                <ng-container *ngIf="nodeData.node_type === 'AI Agent' && !isPromptExpanded">
+                <ng-container *ngIf="nodeData?.node_type === 'AI Agent' && !isPromptExpanded">
                   <div class="mb-3" *ngIf="propertiesForm.get('user_prompt')">
                     <label class="form-label text-muted mb-1">User Prompt<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
@@ -657,7 +669,7 @@
                         <!-- <input type="text" formControlName="default_value" id="input-{{ i }}"
                         class="form-control form-control-sm pr-1" placeholder="Enter value"> -->
                         <ng-container
-                          *ngTemplateOutlet="fxInput; context: { control: inputGroup.get('default_value'),key: 'default_value', index: i, error: propertiesFormErrors?.inputs?.[i]?.default_value  }"></ng-container>
+                          *ngTemplateOutlet="nodeData?.isTool ? fxInputIcon : fxInput; context: { control: inputGroup.get('default_value'),key: 'default_value', index: i, error: propertiesFormErrors?.inputs?.[i]?.default_value  }"></ng-container>
                         <ng-container *ngIf="hasRealTimeData()">
                           <div class="text-muted mt-1"
                             *ngIf="getResolvedValue(propertiesForm, 'inputs', i, 'default_value')">
@@ -700,10 +712,10 @@
                         placeholder="Enter value">
                     </div>
                   </div>
-                  <div class="form-check ml-1 mb-3">
-                    <input class="form-check-input" type="checkbox" id="continue_on_failure"
-                      formControlName="continue_on_failure">
+                  <div class="form-check mb-3 p-0">
                     <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                    <input class="form-check-input ml-2" type="checkbox" id="continue_on_failure"
+                      formControlName="continue_on_failure">
                   </div>
                 </div>
               </div>
@@ -716,9 +728,10 @@
                 <div class="col-12 m-0 p-0">
                   <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
                   <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
-                  <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
-                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
-                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                  <div formArrayName="outputs" id="outputContainer"
+                    *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
+                          && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'  
+                          && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'Add Comment' && nodeData?.node_type !== 'If Else' && nodeData?.node_type !== 'Switch Case' && nodeData?.node_type !== 'Wait'">
                     <div *ngIf="!outputs.length" class="text-muted fst-italic mb-3">
                       Outputs will appear here once you add.
                     </div>
@@ -729,8 +742,8 @@
                           <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
                             [tooltip]="tooltip.paramName"></span>
                         </div>
-                        <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
-                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                        <button *ngIf="nodeData?.node_type !== 'Add Comment' && nodeData?.node_type !== 'Update Ticket' 
+                                    && nodeData?.node_type !== 'Create Ticket' && nodeData?.node_type !== 'Get Ticket'"
                           type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
                         </button>
                       </div>
@@ -763,27 +776,128 @@
                       </div>
                     </div>
 
-                    <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
-                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
-                                  && nodeData.node_type !== 'Get Ticket') &&
-                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
-                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
-                                  && nodeData.node_type !== 'Webhook Trigger')">
+                    <div class="d-flex justify-content-end" *ngIf="(nodeData?.node_type !== 'Add Comment' &&
+                                  nodeData?.node_type !== 'Update Ticket' && nodeData?.node_type !== 'Create Ticket'
+                                  && nodeData?.node_type !== 'Get Ticket') &&
+                                  (nodeData?.node_type !== 'Manual Trigger' &&  nodeData?.node_type !== 'Schedule Trigger' 
+                                  && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
+                                  && nodeData?.node_type !== 'Webhook Trigger')">
                       <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
                         <i class="fas fa-plus mr-1"></i> Output
                       </button>
                     </div>
 
                   </div>
-                  <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
-                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
-                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
-                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                  <div *ngIf="nodeData?.node_type === 'Manual Trigger' || 
+                            nodeData?.node_type === 'Schedule Trigger' || nodeData?.node_type === 'Chat Trigger' 
+                          || nodeData?.node_type === 'ITSM Event Trigger' || nodeData?.node_type === 'Webhook Trigger' ||
+                          nodeData?.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
                     Outputs are not applicable to this node.
                   </div>
                   <!-- </form> -->
                 </div>
                 <!---------------------------------------------- OUTPUT END ------------------------------------------------->
+              </div>
+
+              <div class="tab-pane fade" [ngClass]="activeTab === 'humanApproval' ? 'show active' : ''"
+                id="humanApproval" *ngIf="activeTab === 'humanApproval'">
+                <div class="d-flex align-items-center justify-content-start mb-1 pl-0 ml-0">
+                  <label class="form-label text-muted mb-0 mr-2">
+                    Human Approval
+                  </label>
+                  <button class="toggle-button mb-0 fa font-lg"
+                    (click)="nodeData.human_approval = !nodeData.human_approval; human_approval = !human_approval"
+                    [ngClass]="nodeData.human_approval ? 'fa-toggle-on' : 'fa-toggle-off'">
+                  </button>
+                </div>
+
+                <div *ngIf="nodeData.human_approval">
+                  <div class="mb-3">
+                    <div class="d-flex align-items-center mb-1">
+                      <label class="form-label text-muted mb-0" for="mode">
+                        Mode<em>*</em>
+                      </label>
+                    </div>
+                    <select class="form-control text-dark" id="mode" formControlName="mode"
+                      [class.is-invalid]="propertiesFormErrors?.mode">
+                      <option value="" disabled>Select Mode</option>
+                      <option value="APPROVE_REJECT">Approve or Reject</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors?.mode">
+                      {{ propertiesFormErrors?.mode }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <div class="d-flex align-items-center mb-1">
+                      <label class="form-label text-muted mb-0" for="mode">
+                        Channels<em>*</em>
+                      </label>
+                    </div>
+                    <multiselect-dropdown [settings]="channelsTypeSettings" [options]="channelsTypes"
+                      class="form-control p-0" style="height:auto;" formControlName="channels"
+                      [class.is-invalid]="propertiesFormErrors?.channels"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors?.channels">
+                      {{ propertiesFormErrors?.channels }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <div class="d-flex align-items-center mb-1">
+                      <label class="form-label text-muted mb-0" for="approver_groups">
+                        Approver Groups
+                      </label>
+                    </div>
+                    <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                      class="form-control form-control-sm p-0" [texts]="userGroupTexts" style="height:auto;"
+                      formControlName="approver_groups"
+                      [class.is-invalid]="formErrors.approver_groups"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors?.approver_groups">
+                      {{ propertiesFormErrors?.approver_groups }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <div class="d-flex align-items-center mb-1">
+                      <label class="form-label text-muted mb-0" for="approver_users">
+                        Approver Users<em>*</em>
+                      </label>
+                    </div>
+                    <multiselect-dropdown [options]="userList" [settings]="userListSettings" [texts]="userTexts"
+                      class="form-control form-control-sm p-0" style="height:auto;" formControlName="approver_users"
+                      [class.is-invalid]="formErrors.approver_users"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors?.approver_users">
+                      {{ propertiesFormErrors?.approver_users }}
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label text-muted mb-1">Timeout</label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                    <div class="pr-1 input-group">
+                      <input type="number" formControlName="timeout" class="form-control text-dark"
+                        placeholder="Enter value">
+                    </div>
+                  </div>
+
+                  <!-- <div class="mb-3">
+                    <div class="d-flex align-items-center mb-1">
+                      <label class="form-label text-muted mb-0" for="on_timeout">
+                        On Timeout<em>*</em>
+                      </label>
+                    </div>
+                    <select class="form-control text-dark" id="on_timeout" formControlName="on_timeout"
+                      [class.is-invalid]="propertiesFormErrors?.on_timeout">
+                      <option value="''" disabled>Select On Timeout</option>
+                      <option value="AUTO_APPROVE">Auto Approve</option>
+                      <option value="AUTO_REJECT">Auto Reject</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors?.on_timeout">
+                      {{ propertiesFormErrors?.on_timeout }}
+                    </div>
+                  </div> -->
+                </div>
               </div>
 
               <!-- Model Tab -->
@@ -939,7 +1053,7 @@
 
           <!----------------------------------------------- TRIGGER FORM START ------------------------------------------------------>
 
-          <form *ngIf="nodeData.node_type === 'Manual Trigger'" [formGroup]="triggerForm">
+          <form *ngIf="nodeData?.node_type === 'Manual Trigger'" [formGroup]="triggerForm">
             <div class="mb-4">
               <label class="form-label text-muted mb-1">Name<em>*</em></label>
               <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2" [tooltip]="tooltip.name"
@@ -1037,7 +1151,7 @@
 
           <!-------------------------------------------- SCHEDULE TRIGGER FORM START --------------------------------------------->
 
-          <form *ngIf="nodeData.node_type === 'Schedule Trigger'" [formGroup]="scheduleTriggerForm">
+          <form *ngIf="nodeData?.node_type === 'Schedule Trigger'" [formGroup]="scheduleTriggerForm">
             <div class="mb-4">
               <label class="form-label text-muted mb-1">Name<em>*</em></label>
               <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2" [tooltip]="tooltip.name"
@@ -1142,7 +1256,7 @@
 
           <!-------------------------------------------- ON CHAT MESSAGE FORM START--------------------------------------------->
 
-          <form *ngIf="nodeData.node_type === 'Chat Trigger'" [formGroup]="onChatMessageForm">
+          <form *ngIf="nodeData?.node_type === 'Chat Trigger'" [formGroup]="onChatMessageForm">
             <div class="mb-4">
               <label class="form-label text-muted mb-1">Name<em>*</em></label>
               <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2" [tooltip]="tooltip.name"
@@ -1265,7 +1379,7 @@
           <!-------------------------------------------- ON CHAT MESSAGE FORM END--------------------------------------------->
 
 
-          <form *ngIf="nodeData.node_type === 'ITSM Event Trigger'" [formGroup]="itsmForm">
+          <form *ngIf="nodeData?.node_type === 'ITSM Event Trigger'" [formGroup]="itsmForm">
             <div class="mb-3">
               <label class="form-label text-muted mb-1">Name<em>*</em></label>
               <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
@@ -1303,7 +1417,7 @@
           </form>
 
 
-          <form *ngIf="nodeData.node_type === 'Webhook Trigger'" [formGroup]="webhookForm">
+          <form *ngIf="nodeData?.node_type === 'Webhook Trigger'" [formGroup]="webhookForm">
             <div class="mb-3">
               <label class="form-label text-muted mb-1">Name<em>*</em></label>
               <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
@@ -1323,7 +1437,7 @@
             </div>
           </form>
 
-          <form *ngIf="nodeData.node_type === 'AIML Event Trigger' && aimlForm" [formGroup]="aimlForm">
+          <form *ngIf="nodeData?.node_type === 'AIML Event Trigger' && aimlForm" [formGroup]="aimlForm">
             <div class="mb-3">
               <label class="form-label text-muted mb-1">Name<em>*</em></label>
               <span class="fas fa-info-circle pointer-link text-info pt-1 pl-1" [tooltip]="tooltip.name"
@@ -1386,7 +1500,7 @@
           </form>
 
 
-          <form *ngIf="nodeData.node_type === 'Create Ticket'" [formGroup]="createTicketForm">
+          <form *ngIf="nodeData?.node_type === 'Create Ticket'" [formGroup]="createTicketForm">
             <ng-container *ngIf="activeTab === 'properties'">
               <div class="mb-3">
                 <label class="form-label text-muted mb-1">Name<em>*</em></label>
@@ -1449,6 +1563,92 @@
               </div>
             </ng-container>
 
+            <div class="tab-pane fade" [ngClass]="activeTab === 'humanApproval' ? 'show active' : ''" id="humanApproval"
+              *ngIf="activeTab === 'humanApproval'">
+              <div class="d-flex align-items-center mb-1">
+                <button class="toggle-button mb-0 fa font-lg ml-1"
+                  (click)="nodeData.human_approval = !nodeData.human_approval;human_approval = !human_approval"
+                  [ngClass]="nodeData.human_approval ? 'fa-toggle-on' : 'fa-toggle-off'">
+                </button>
+                <label class="form-label text-muted mb-0 ml-2" for="mode">
+                  Human in the Loop
+                </label>
+              </div>
+
+              <div *ngIf="nodeData.human_approval">
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Mode<em>*</em>
+                    </label>
+                  </div>
+                  <select class="form-control text-dark" id="mode" formControlName="mode"
+                    [class.is-invalid]="createTicketFormErrors?.mode">
+                    <option value="" disabled>Select Mode</option>
+                    <option value="APPROVE_REJECT">Approve or Reject</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="createTicketFormErrors?.mode">
+                    {{ createTicketFormErrors?.mode }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Channels<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [settings]="channelsTypeSettings" [options]="channelsTypes"
+                    class="form-control p-0" style="height:auto;" formControlName="channels"
+                    [class.is-invalid]="createTicketFormErrors?.channels"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="createTicketFormErrors?.channels">
+                    {{ createTicketFormErrors?.channels }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_groups">
+                      Approver Groups
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                    class="form-control form-control-sm p-0" [texts]="userGroupTexts" style="height:auto;"
+                    formControlName="approver_groups"
+                    [class.is-invalid]="formErrors.approver_groups"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="createTicketFormErrors?.approver_groups">
+                    {{ createTicketFormErrors?.approver_groups }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_users">
+                      Approver Users<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userList" [settings]="userListSettings" [texts]="userTexts"
+                    class="form-control form-control-sm p-0" style="height:auto;" formControlName="approver_users"
+                    [class.is-invalid]="formErrors.approver_users"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="createTicketFormErrors?.approver_users">
+                    {{ createTicketFormErrors?.approver_users }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeout</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeout" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+
             <!-- Output Configuration Tab -->
             <div class="tab-pane fade" [ngClass]="activeTab === 'output' ? 'show active' : ''" id="output"
               *ngIf="activeTab === 'output'">
@@ -1457,9 +1657,9 @@
               <div class="col-12 m-0 p-0">
                 <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
                 <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
-                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
-                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
-                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
+                          && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'  
+                          && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'Add Comment'">
                   <div *ngIf="!createOutputs.length" class="text-muted fst-italic mb-3">
                     Outputs will appear here once you add.
                   </div>
@@ -1470,8 +1670,8 @@
                         <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
                           [tooltip]="tooltip.paramName"></span>
                       </div>
-                      <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
-                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                      <button *ngIf="nodeData?.node_type !== 'Add Comment' && nodeData?.node_type !== 'Update Ticket' 
+                                    && nodeData?.node_type !== 'Create Ticket' && nodeData?.node_type !== 'Get Ticket'"
                         type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
                       </button>
                     </div>
@@ -1504,22 +1704,22 @@
                     </div>
                   </div>
 
-                  <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
-                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
-                                  && nodeData.node_type !== 'Get Ticket') &&
-                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
-                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
-                                  && nodeData.node_type !== 'Webhook Trigger')">
+                  <div class="d-flex justify-content-end" *ngIf="(nodeData?.node_type !== 'Add Comment' &&
+                                  nodeData?.node_type !== 'Update Ticket' && nodeData?.node_type !== 'Create Ticket'
+                                  && nodeData?.node_type !== 'Get Ticket') &&
+                                  (nodeData?.node_type !== 'Manual Trigger' &&  nodeData?.node_type !== 'Schedule Trigger' 
+                                  && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
+                                  && nodeData?.node_type !== 'Webhook Trigger')">
                     <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
                       <i class="fas fa-plus mr-1"></i> Output
                     </button>
                   </div>
 
                 </div>
-                <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
-                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
-                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
-                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                <div *ngIf="nodeData?.node_type === 'Manual Trigger' || 
+                            nodeData?.node_type === 'Schedule Trigger' || nodeData?.node_type === 'Chat Trigger' 
+                          || nodeData?.node_type === 'ITSM Event Trigger' || nodeData?.node_type === 'Webhook Trigger' ||
+                          nodeData?.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
                   Outputs are not applicable to this node.
                 </div>
                 <!-- </form> -->
@@ -1550,16 +1750,16 @@
                       placeholder="Enter value">
                   </div>
                 </div>
-                <div class="form-check ml-1 mb-3">
-                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
-                    formControlName="continue_on_failure">
+                <div class="form-check mb-3 p-0">
                   <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                  <input class="form-check-input ml-2" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
                 </div>
               </div>
             </div>
           </form>
 
-          <form *ngIf="nodeData.node_type === 'Update Ticket'" [formGroup]="updateTicketForm">
+          <form *ngIf="nodeData?.node_type === 'Update Ticket'" [formGroup]="updateTicketForm">
             <ng-container *ngIf="activeTab === 'properties'">
               <div class="mb-3">
                 <label class="form-label text-muted mb-1">Name<em>*</em></label>
@@ -1612,7 +1812,7 @@
                       </div>
                     </div>
                     <div class="mb-2"
-                      *ngIf="(nodeData.node_type === 'Update Ticket') && filterGroup.get('default_value')">
+                      *ngIf="(nodeData?.node_type === 'Update Ticket') && filterGroup.get('default_value')">
                       <label class="form-label text-muted mb-1">Value<em>*</em></label>
                       <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                         [tooltip]="tooltip.value"></span>
@@ -1638,12 +1838,99 @@
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end" *ngIf="nodeData.node_type === 'Update Ticket'">
+              <div class="d-flex justify-content-end" *ngIf="nodeData?.node_type === 'Update Ticket'">
                 <button type="button" class="btn text-primary border-primary w-20" (click)="addUpdateTicketForm()">
                   <i class="fas fa-plus mr-1"></i> Field
                 </button>
               </div>
             </ng-container>
+
+
+            <div class="tab-pane fade" [ngClass]="activeTab === 'humanApproval' ? 'show active' : ''" id="humanApproval"
+              *ngIf="activeTab === 'humanApproval'">
+              <div class="d-flex align-items-center mb-1">
+                <button class="toggle-button mb-0 fa font-lg ml-1"
+                  (click)="nodeData.human_approval = !nodeData.human_approval;human_approval = !human_approval"
+                  [ngClass]="nodeData.human_approval ? 'fa-toggle-on' : 'fa-toggle-off'">
+                </button>
+                <label class="form-label text-muted mb-0 ml-2" for="mode">
+                  Human in the Loop
+                </label>
+              </div>
+
+              <div *ngIf="nodeData.human_approval">
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Mode<em>*</em>
+                    </label>
+                  </div>
+                  <select class="form-control text-dark" id="mode" formControlName="mode"
+                    [class.is-invalid]="updateTicketFormErrors?.mode">
+                    <option value="" disabled>Select Mode</option>
+                    <option value="APPROVE_REJECT">Approve or Reject</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="updateTicketFormErrors?.mode">
+                    {{ updateTicketFormErrors?.mode }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Channels<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [settings]="channelsTypeSettings" [options]="channelsTypes"
+                    class="form-control p-0" style="height:auto;" formControlName="channels"
+                    [class.is-invalid]="updateTicketFormErrors?.channels"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="updateTicketFormErrors?.channels">
+                    {{ updateTicketFormErrors?.channels }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_groups">
+                      Approver Groups
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                    class="form-control form-control-sm p-0" [texts]="userGroupTexts" style="height:auto;"
+                    formControlName="approver_groups"
+                    [class.is-invalid]="formErrors.approver_groups"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="updateTicketFormErrors?.approver_groups">
+                    {{ updateTicketFormErrors?.approver_groups }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_users">
+                      Approver Users<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userList" [settings]="userListSettings" [texts]="userTexts"
+                    class="form-control form-control-sm p-0" style="height:auto;" formControlName="approver_users"
+                    [class.is-invalid]="formErrors.approver_users"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="updateTicketFormErrors?.approver_users">
+                    {{ updateTicketFormErrors?.approver_users }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeout</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeout" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
 
             <!-- Output Configuration Tab -->
             <div class="tab-pane fade" [ngClass]="activeTab === 'output' ? 'show active' : ''" id="output"
@@ -1653,9 +1940,9 @@
               <div class="col-12 m-0 p-0">
                 <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
                 <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
-                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
-                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
-                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
+                          && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'  
+                          && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'Add Comment'">
                   <div *ngIf="!updateOutputs.length" class="text-muted fst-italic mb-3">
                     Outputs will appear here once you add.
                   </div>
@@ -1666,8 +1953,8 @@
                         <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
                           [tooltip]="tooltip.paramName"></span>
                       </div>
-                      <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
-                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                      <button *ngIf="nodeData?.node_type !== 'Add Comment' && nodeData?.node_type !== 'Update Ticket' 
+                                    && nodeData?.node_type !== 'Create Ticket' && nodeData?.node_type !== 'Get Ticket'"
                         type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
                       </button>
                     </div>
@@ -1700,22 +1987,22 @@
                     </div>
                   </div>
 
-                  <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
-                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
-                                  && nodeData.node_type !== 'Get Ticket') &&
-                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
-                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
-                                  && nodeData.node_type !== 'Webhook Trigger')">
+                  <div class="d-flex justify-content-end" *ngIf="(nodeData?.node_type !== 'Add Comment' &&
+                                  nodeData?.node_type !== 'Update Ticket' && nodeData?.node_type !== 'Create Ticket'
+                                  && nodeData?.node_type !== 'Get Ticket') &&
+                                  (nodeData?.node_type !== 'Manual Trigger' &&  nodeData?.node_type !== 'Schedule Trigger' 
+                                  && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
+                                  && nodeData?.node_type !== 'Webhook Trigger')">
                     <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
                       <i class="fas fa-plus mr-1"></i> Output
                     </button>
                   </div>
 
                 </div>
-                <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
-                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
-                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
-                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                <div *ngIf="nodeData?.node_type === 'Manual Trigger' || 
+                            nodeData?.node_type === 'Schedule Trigger' || nodeData?.node_type === 'Chat Trigger' 
+                          || nodeData?.node_type === 'ITSM Event Trigger' || nodeData?.node_type === 'Webhook Trigger' ||
+                          nodeData?.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
                   Outputs are not applicable to this node.
                 </div>
                 <!-- </form> -->
@@ -1745,16 +2032,16 @@
                       placeholder="Enter value">
                   </div>
                 </div>
-                <div class="form-check ml-1 mb-3">
-                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
-                    formControlName="continue_on_failure">
+                <div class="form-check mb-3 p-0">
                   <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                  <input class="form-check-input ml-2" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
                 </div>
               </div>
             </div>
           </form>
 
-          <form *ngIf="nodeData.node_type === 'Add Comment'" [formGroup]="commentInTicketForm">
+          <form *ngIf="nodeData?.node_type === 'Add Comment'" [formGroup]="commentInTicketForm">
             <ng-container *ngIf="activeTab === 'properties'">
               <div class="mb-3">
                 <label class="form-label text-muted mb-1">Name<em>*</em></label>
@@ -1808,6 +2095,93 @@
               </div>
             </ng-container>
 
+
+            <div class="tab-pane fade" [ngClass]="activeTab === 'humanApproval' ? 'show active' : ''" id="humanApproval"
+              *ngIf="activeTab === 'humanApproval'">
+              <div class="d-flex align-items-center mb-1">
+                <button class="toggle-button mb-0 fa font-lg ml-1"
+                  (click)="nodeData.human_approval = !nodeData.human_approval;human_approval = !human_approval"
+                  [ngClass]="nodeData.human_approval ? 'fa-toggle-on' : 'fa-toggle-off'">
+                </button>
+                <label class="form-label text-muted mb-0 ml-2" for="mode">
+                  Human in the Loop
+                </label>
+              </div>
+
+              <div *ngIf="nodeData.human_approval">
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Mode<em>*</em>
+                    </label>
+                  </div>
+                  <select class="form-control text-dark" id="mode" formControlName="mode"
+                    [class.is-invalid]="commentInTicketFormErrors?.mode">
+                    <option value="" disabled>Select Mode</option>
+                    <option value="APPROVE_REJECT">Approve or Reject</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="commentInTicketFormErrors?.mode">
+                    {{ commentInTicketFormErrors?.mode }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Channels<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [settings]="channelsTypeSettings" [options]="channelsTypes"
+                    class="form-control p-0" style="height:auto;" formControlName="channels"
+                    [class.is-invalid]="commentInTicketFormErrors?.channels"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="commentInTicketFormErrors?.channels">
+                    {{ commentInTicketFormErrors?.channels }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_groups">
+                      Approver Groups
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                    class="form-control form-control-sm p-0" [texts]="userGroupTexts" style="height:auto;"
+                    formControlName="approver_groups"
+                    [class.is-invalid]="formErrors.approver_groups"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="commentInTicketFormErrors?.approver_groups">
+                    {{ commentInTicketFormErrors?.approver_groups }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_users">
+                      Approver Users<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userList" [settings]="userListSettings" [texts]="userTexts"
+                    class="form-control form-control-sm p-0" style="height:auto;" formControlName="approver_users"
+                    [class.is-invalid]="formErrors.approver_users"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="commentInTicketFormErrors?.approver_users">
+                    {{ commentInTicketFormErrors?.approver_users }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeout</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeout" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+
             <!-- Settings Tab -->
             <div class="tab-pane fade" [ngClass]="activeTab === 'settings' ? 'show active' : ''" id="settings"
               *ngIf="activeTab === 'settings'">
@@ -1830,15 +2204,16 @@
                       placeholder="Enter value">
                   </div>
                 </div>
-                <div class="form-check ml-1 mb-3">
-                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
-                    formControlName="continue_on_failure">
+                <div class="form-check mb-3 p-0">
                   <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                  <input class="form-check-input ml-2" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
                 </div>
               </div>
             </div>
           </form>
-          <form *ngIf="nodeData.node_type === 'Get Ticket'" [formGroup]="getTicketForm">
+
+          <form *ngIf="nodeData?.node_type === 'Get Ticket'" [formGroup]="getTicketForm">
             <ng-container *ngIf="activeTab === 'properties'">
               <div class="mb-3">
                 <label class="form-label text-muted mb-1">Name<em>*</em></label>
@@ -1865,7 +2240,7 @@
               <div formArrayName="filters" class="p-0">
                 <div *ngFor="let filterGroup of getTicketForm.get('filters').controls; let i = index;"
                   [formGroupName]="i" class="mb-4">
-                  <div class="mb-2" *ngIf="(nodeData.node_type === 'Get Ticket') && filterGroup.get('condition_key')">
+                  <div class="mb-2" *ngIf="(nodeData?.node_type === 'Get Ticket') && filterGroup.get('condition_key')">
                     <div class="d-flex justify-content-between mb-1">
                       <label class="form-label text-muted align-self-end mb-0">Key<em>*</em></label>
                       <!-- <span class="fas fa-info-circle text-primary pointer-link text-info align-self-end mb-1 pl-1"
@@ -1883,7 +2258,7 @@
                       {{ getTicketFormErrors.filters[i]?.condition_key }}
                     </div>
                   </div>
-                  <div class="mb-2" *ngIf="(nodeData.node_type === 'Get Ticket') && filterGroup.get('operator')">
+                  <div class="mb-2" *ngIf="(nodeData?.node_type === 'Get Ticket') && filterGroup.get('operator')">
                     <label class="form-label text-muted mb-1">Operator<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                       [tooltip]="tooltip.operator"></span>
@@ -1898,7 +2273,8 @@
                       {{ getTicketFormErrors.filters[i]?.operator }}
                     </div>
                   </div>
-                  <div class="mb-2" *ngIf="(nodeData.node_type === 'Get Ticket') && filterGroup.get('condition_value')">
+                  <div class="mb-2"
+                    *ngIf="(nodeData?.node_type === 'Get Ticket') && filterGroup.get('condition_value')">
                     <label class="form-label text-muted mb-1">Value<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
                       [tooltip]="tooltip.value"></span>
@@ -1922,12 +2298,99 @@
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-end" *ngIf="nodeData.node_type === 'Get Ticket'">
+              <div class="d-flex justify-content-end" *ngIf="nodeData?.node_type === 'Get Ticket'">
                 <button type="button" class="btn text-primary border-primary w-20" (click)="addGetTicketForm()">
                   <i class="fas fa-plus mr-1"></i> Field
                 </button>
               </div>
             </ng-container>
+
+
+            <div class="tab-pane fade" [ngClass]="activeTab === 'humanApproval' ? 'show active' : ''" id="humanApproval"
+              *ngIf="activeTab === 'humanApproval'">
+              <div class="d-flex align-items-center mb-1">
+                <button class="toggle-button mb-0 fa font-lg ml-1"
+                  (click)="nodeData.human_approval = !nodeData.human_approval;human_approval = !human_approval"
+                  [ngClass]="nodeData.human_approval ? 'fa-toggle-on' : 'fa-toggle-off'">
+                </button>
+                <label class="form-label text-muted mb-0 ml-2" for="mode">
+                  Human in the Loop
+                </label>
+              </div>
+
+              <div *ngIf="nodeData.human_approval">
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Mode<em>*</em>
+                    </label>
+                  </div>
+                  <select class="form-control text-dark" id="mode" formControlName="mode"
+                    [class.is-invalid]="getTicketFormErrors?.mode">
+                    <option value="" disabled>Select Mode</option>
+                    <option value="APPROVE_REJECT">Approve or Reject</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="getTicketFormErrors?.mode">
+                    {{ getTicketFormErrors?.mode }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="mode">
+                      Channels<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [settings]="channelsTypeSettings" [options]="channelsTypes"
+                    class="form-control p-0" style="height:auto;" formControlName="channels"
+                    [class.is-invalid]="getTicketFormErrors?.channels"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="getTicketFormErrors?.channels">
+                    {{ getTicketFormErrors?.channels }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_groups">
+                      Approver Groups
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
+                    class="form-control form-control-sm p-0" [texts]="userGroupTexts" style="height:auto;"
+                    formControlName="approver_groups"
+                    [class.is-invalid]="formErrors.approver_groups"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="getTicketFormErrors?.approver_groups">
+                    {{ getTicketFormErrors?.approver_groups }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center mb-1">
+                    <label class="form-label text-muted mb-0" for="approver_users">
+                      Approver Users<em>*</em>
+                    </label>
+                  </div>
+                  <multiselect-dropdown [options]="userList" [settings]="userListSettings" [texts]="userTexts"
+                    class="form-control form-control-sm p-0" style="height:auto;" formControlName="approver_users"
+                    [class.is-invalid]="formErrors.approver_users"></multiselect-dropdown>
+                  <div class="invalid-feedback" *ngIf="getTicketFormErrors?.approver_users">
+                    {{ getTicketFormErrors?.approver_users }}
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label text-muted mb-1">Timeout</label>
+                  <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                    [tooltip]="tooltip.timeouts" [adaptivePosition]="false" placement="top"></span>
+                  <div class="pr-1 input-group">
+                    <input type="number" formControlName="timeout" class="form-control text-dark"
+                      placeholder="Enter value">
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
 
             <!-- Output Configuration Tab -->
             <div class="tab-pane fade" [ngClass]="activeTab === 'output' ? 'show active' : ''" id="output"
@@ -1937,9 +2400,9 @@
               <div class="col-12 m-0 p-0">
                 <!-- <form class="sidebarParam p-3 rounded shadow-sm" [formGroup]="outputForm"> -->
                 <!-- <h6 class="fw-bold mb-4">O U T P U T</h6> -->
-                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger'
-                          && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'  
-                          && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'Add Comment'">
+                <div formArrayName="outputs" id="outputContainer" *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
+                          && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'  
+                          && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'Add Comment'">
                   <div *ngIf="!getTicketOutputs.length" class="text-muted fst-italic mb-3">
                     Outputs will appear here once you add.
                   </div>
@@ -1950,8 +2413,8 @@
                         <span class="fas fa-info-circle text-primary pointer-link text-info mb-1 pl-2"
                           [tooltip]="tooltip.paramName"></span>
                       </div>
-                      <button *ngIf="nodeData.node_type !== 'Add Comment' && nodeData.node_type !== 'Update Ticket' 
-                                    && nodeData.node_type !== 'Create Ticket' && nodeData.node_type !== 'Get Ticket'"
+                      <button *ngIf="nodeData?.node_type !== 'Add Comment' && nodeData?.node_type !== 'Update Ticket' 
+                                    && nodeData?.node_type !== 'Create Ticket' && nodeData?.node_type !== 'Get Ticket'"
                         type="button" class="action-icons fas fa-minus font-sm" (click)="removeOutput(i)">
                       </button>
                     </div>
@@ -1984,22 +2447,22 @@
                     </div>
                   </div>
 
-                  <div class="d-flex justify-content-end" *ngIf="(nodeData.node_type !== 'Add Comment' &&
-                                  nodeData.node_type !== 'Update Ticket' && nodeData.node_type !== 'Create Ticket'
-                                  && nodeData.node_type !== 'Get Ticket') &&
-                                  (nodeData.node_type !== 'Manual Trigger' &&  nodeData.node_type !== 'Schedule Trigger' 
-                                  && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger'
-                                  && nodeData.node_type !== 'Webhook Trigger')">
+                  <div class="d-flex justify-content-end" *ngIf="(nodeData?.node_type !== 'Add Comment' &&
+                                  nodeData?.node_type !== 'Update Ticket' && nodeData?.node_type !== 'Create Ticket'
+                                  && nodeData?.node_type !== 'Get Ticket') &&
+                                  (nodeData?.node_type !== 'Manual Trigger' &&  nodeData?.node_type !== 'Schedule Trigger' 
+                                  && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
+                                  && nodeData?.node_type !== 'Webhook Trigger')">
                     <button type="button" class="btn text-primary border-primary" (click)="addOutputData()">
                       <i class="fas fa-plus mr-1"></i> Output
                     </button>
                   </div>
 
                 </div>
-                <div *ngIf="nodeData.node_type === 'Manual Trigger' || 
-                            nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' 
-                          || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||
-                          nodeData.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
+                <div *ngIf="nodeData?.node_type === 'Manual Trigger' || 
+                            nodeData?.node_type === 'Schedule Trigger' || nodeData?.node_type === 'Chat Trigger' 
+                          || nodeData?.node_type === 'ITSM Event Trigger' || nodeData?.node_type === 'Webhook Trigger' ||
+                          nodeData?.node_type === 'Add Comment'" class="text-muted fst-italic mb-3">
                   Outputs are not applicable to this node.
                 </div>
                 <!-- </form> -->
@@ -2029,10 +2492,10 @@
                       placeholder="Enter value">
                   </div>
                 </div>
-                <div class="form-check ml-1 mb-3">
-                  <input class="form-check-input" type="checkbox" id="continue_on_failure"
-                    formControlName="continue_on_failure">
+                <div class="form-check mb-3 p-0">
                   <label class="form-check-label" for="continue_on_failure">Continue on failure</label>
+                  <input class="form-check-input ml-2" type="checkbox" id="continue_on_failure"
+                    formControlName="continue_on_failure">
                 </div>
               </div>
             </div>
@@ -2057,8 +2520,8 @@
       <ng-template #fxInputIcon let-control="control" let-key="key" let-index="index" let-error="error">
         <div class="input-group">
           <input type="text" class="form-control text-dark" [formControl]="control" (dragenter)="onDragEnter($event)"
-            (dragover)="onDragOver($event)" (dragleave)="onDragLeave($even)" (drop)="onDrop($event, control)"
-            [class.is-invalid]="error" />
+            (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event, control)"
+            [class.is-invalid]="error" [attr.disabled]="control.value === 'AI INPUT' ? true : null" />
           <!-- <div class="invalid-feedback" *ngIf="propertiesFormErrors[key]">
             {{ propertiesFormErrors[key] }}</div> -->
           <!-- Icon on right -->
@@ -2087,19 +2550,19 @@
         </div>
       </div>
       <div
-        *ngIf="nodeData.node_type === 'Manual Trigger' || nodeData.node_type === 'Schedule Trigger' || nodeData.node_type === 'Chat Trigger' || nodeData.node_type === 'ITSM Event Trigger' || nodeData.node_type === 'Webhook Trigger' ||  nodeData.node_type === 'AIML Event Trigger'"
+        *ngIf="nodeData?.node_type === 'Manual Trigger' || nodeData?.node_type === 'Schedule Trigger' || nodeData?.node_type === 'Chat Trigger' || nodeData?.node_type === 'ITSM Event Trigger' || nodeData?.node_type === 'Webhook Trigger' ||  nodeData?.node_type === 'AIML Event Trigger'"
         class="text-dark">
         Outputs are not applicable for Trigger Node.
       </div>
 
       <!-- Non-trigger + no output -->
       <div
-        *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger' && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger' && nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger' && !nodeOutput"
+        *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger' && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger' && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'AIML Event Trigger' && !nodeOutput"
         class="text-dark">
         Outputs will appear after execution.
       </div>
       <pre
-        *ngIf="nodeData.node_type !== 'Manual Trigger' && nodeData.node_type !== 'Schedule Trigger' && nodeData.node_type !== 'Chat Trigger' && nodeData.node_type !== 'ITSM Event Trigger' &&nodeData.node_type !== 'Webhook Trigger' && nodeData.node_type !== 'AIML Event Trigger' && nodeOutput"
-        style="max-height: 400px; overflow-y: auto;">{{nodeOutput | json}}</pre>
+        *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger' && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger' && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'AIML Event Trigger' && nodeOutput"
+        style="max-height:470px">{{nodeOutput | json}}</pre>
     </div>
   </div>

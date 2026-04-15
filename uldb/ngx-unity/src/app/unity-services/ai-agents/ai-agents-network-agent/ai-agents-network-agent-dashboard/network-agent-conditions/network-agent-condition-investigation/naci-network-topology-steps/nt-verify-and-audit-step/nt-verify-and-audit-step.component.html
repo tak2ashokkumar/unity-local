@@ -1,7 +1,7 @@
-<div class="card mb-0">
+<!-- <div class="card mb-0"> -->
 
-    <!-- Card Header -->
-    <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1 px-2">
+<!-- Card Header -->
+<!-- <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-1 px-2">
 
         <div class="d-flex align-items-center">
             <i class="fas fa-shield-alt text-primary step-icon rounded-circle pt-2 pl-2 mr-2"></i>
@@ -13,34 +13,38 @@
             <i class="fas fa-lg" [ngClass]="isVerifyAndAuditOpen ? 'fa-chevron-up' : 'fa-chevron-down'">
             </i>
         </button>
-    </div>
+    </div> -->
 
-    <!-- Collapsible Body -->
-    <div [collapse]="!isVerifyAndAuditOpen">
-        <div class="card-body">
-            <div class="topology-card">
-                <app-spinner [name]="'unity-topology'"></app-spinner>
-                <div class="py-0">
-                    <div class="text-center text-muted m-5 p-5 font-lg"
-                        *ngIf="!networkViewData || !networkViewData.nodes.length">No
-                        devices discovered.</div>
-                    <ng-container>
-                        <div id="dc-node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo">
-                        </div>
-                    </ng-container>
+<!-- Collapsible Body -->
+<!-- <div [collapse]="!isVerifyAndAuditOpen">
+        <div class="card-body"> -->
+<div class="topology-card position-relative">
+    <app-spinner [name]="spinnerName"></app-spinner>
+    <div class="py-0">
+        <ng-container>
+            <div class="dc-node-details-wrapper" [id]="'dc-node-details-wrapper-'+ index" [popover]="nodeDetails"
+                triggers="" [isOpen]="showNodeInfo">
+            </div>
+            <!-- <div id="dc-node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo">
+            </div> -->
+        </ng-container>
 
-                    <div class="row">
-                        <div class="pr-0" [ngClass]="selectedNodes.length ? 'col-11': 'col-12'">
-                            <div class="discovery-network-container" id="discovery-network-container" #visGraph>
-                            </div>
-                        </div>
-                    </div>
+        <div class="row">
+            <div class="pr-0" [ngClass]="selectedNodes.length ? 'col-11': 'col-12'">
+                <div class="discovery-network-container" id="discovery-network-container" #visGraph>
                 </div>
             </div>
         </div>
+        <div class="d-flex justify-content-center align-items-center text-muted m-5 p-5 font-lg"
+            *ngIf="!networkViewData || !networkViewData.nodes.length">
+            <div>No devices discovered.</div>
+        </div>
+    </div>
+</div>
+<!-- </div>
     </div>
 
-</div>
+</div> -->
 
 <ng-template #nodeDetails>
     <div class="card border-0 mb-0" *ngIf="hoveredNode">

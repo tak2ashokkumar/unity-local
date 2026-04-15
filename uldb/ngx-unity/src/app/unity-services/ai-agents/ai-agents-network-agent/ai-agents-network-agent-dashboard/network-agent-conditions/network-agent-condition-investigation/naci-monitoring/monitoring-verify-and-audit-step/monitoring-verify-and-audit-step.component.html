@@ -11,22 +11,7 @@
             </i>
         </button>
     </div>
-    <div [collapse]="!isVerifyAndAuditOpen">
-        <div class="card-body">
-            <div [collapse]="!isVerifyAndAuditOpen">
-                <div *ngFor="let chartData of verifyAuditViewData?.chartData">
-                    <div class="card round-edge equalize-card mb-2">
-                        <div class="card-body">
-                            <div echarts [options]="chartData.options" [extensions]="chartData.extensions"
-                                [defaultHeight]="280">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <ng-container *ngIf="!verifyAuditViewData?.chartData?.length">
-                    <div class="text-center text-muted py-5">No Verify and Audit data found.</div>
-                </ng-container>
-            </div>
-        </div>
+    <div class="card-body" [collapse]="!isVerifyAndAuditOpen">
+        <!-- <naci-zabbix-graphs [deviceData]="deviceData" [monitoringType]="'monitoring'"></naci-zabbix-graphs> -->
     </div>
 </div>

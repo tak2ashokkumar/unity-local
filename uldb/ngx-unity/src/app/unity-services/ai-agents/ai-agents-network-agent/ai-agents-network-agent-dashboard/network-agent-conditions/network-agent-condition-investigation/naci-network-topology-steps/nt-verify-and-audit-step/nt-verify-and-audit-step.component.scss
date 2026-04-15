@@ -1,7 +1,7 @@
 .step-icon {
-    width: 30px;
-    height: 30px;
-    background-color: #cfe2ff;
+  width: 30px;
+  height: 30px;
+  background-color: #cfe2ff;
 }
 
 // .card-body{
@@ -11,7 +11,7 @@
 // }
 
 .topology-card {
-  min-height: calc(100vh - 150px);
+  min-height: 300px;
 }
 
 .popover {
@@ -26,10 +26,11 @@
 .popover p {
   margin-bottom: 4px;
 }
-#dc-node-details-wrapper{
+
+.dc-node-details-wrapper {
   position: absolute !important;
 }
 
-#pc-node-details-wrapper{
+#pc-node-details-wrapper {
   position: absolute !important;
 }

@@ -250,7 +250,7 @@ ul li strong:first-child {
     max-width: 400px;
     margin: 0;
     position: absolute;
-    bottom: 25px;
+    bottom: 10px;
     /* adjust as needed */
     //   left: 330px;
     flex-direction: column;
@@ -258,15 +258,26 @@ ul li strong:first-child {
 }
 
 /* input box shared styles */
+// .chat-input-box {
+//     display: flex;
+//     align-items: center;
+//     border: 1px solid #dcdcdc;
+//     border-radius: 10px;
+//     background: #fff;
+//     padding: 8px 12px;
+//     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+// }
+
 .chat-input-box {
-    display: flex;
-    align-items: center;
-    border: 1px solid #dcdcdc;
-    border-radius: 10px;
-    background: #fff;
-    padding: 8px 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  border: 1px solid #c8ced3;
+  border-radius: 10px;
+  background: #fff;
+  /* less vertical padding */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
+
 
 /* inputs */
 .chat-input {
@@ -365,4 +376,21 @@ ul li strong:first-child {
     padding: 10px;
     font-size: 12px;
     color: #777;
+}
+
+.query-button {
+  border-radius: 0.75rem;
+}
+
+.query-button-success:hover {
+  color: white;
+  background-color: #0cbb70cc;
+  border-color: #0cbb70cc;
+}
+
+.query-button:focus,
+.query-button:active,
+.query-button:focus:active {
+  outline: none !important;
+  box-shadow: none !important;
 }

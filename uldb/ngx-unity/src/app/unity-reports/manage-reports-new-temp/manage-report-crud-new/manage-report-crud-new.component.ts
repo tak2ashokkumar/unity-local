@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { CloudInventoryMetaData, ManageReportCrudNewService, ReportFormData } from './manage-report-crud-new.service';
+import { CloudInventoryMetaData, ManageReportCrudNewService, ModuleArrType, ReportFormData, ReportModelType, ReportModuleType } from './manage-report-crud-new.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { Subject } from 'rxjs';
@@ -37,6 +37,10 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
 
   unityOneITSMTable: any;
   // unityOneTableLoaded = false;
+
+  dynamicReportModulesSrc: ReportModuleType[] = [];
+  dynamicReportModulesArr: ModuleArrType[] = [];
+  dynamicReportModelsArr: ReportModelType[] = [];
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -80,6 +84,20 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
     });
   }
 
+  getDynamicReportModules() {
+    this.crudSvc.getDynamicReportModules().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.dynamicReportModulesSrc = res;
+      this.dynamicReportModulesArr = [];
+      res.forEach((val:ReportModuleType) => {
+        this.dynamicReportModulesArr.push({ name: val.module_name, display_name: val.module_display_name })
+      });
+      const moduleName = this.reportMeta.get('module_name')?.value;
+      this.dynamicReportModelsArr = module ? this.findModelsByModuleName(moduleName) : [];
+    }, err => {
+      this.notification.error(new Notification('Error while fetching dynamic report modules!! Please try again.'));
+    });
+  }
+
   get cloudType(): string {
     return this.reportMeta ? this.reportMeta.get('cloud_type').value : '';
   }
@@ -100,33 +118,29 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
     return this.form.get("report_meta") as FormGroup;
   }
 
+  get isDynamic(): boolean{
+    return this.form.get('feature')?.value == 'Dynamic';
+  }
+
+  get dynamicModule(): string{
+    return this.reportMeta?.get('module_name') ? this.reportMeta.get('module_name')?.value : '';
+  }
+
+  get dynamicModel(): string{
+    return this.reportMeta?.get('model_name') ? this.reportMeta.get('model_name')?.value : '';
+  }
+
   onReportTypeChange(selectedType: string) {
     this.crudSvc.setReportType(selectedType);
   }
 
   // childFormData($event: ManageReportDatacenterFormData | ManageReportPrivateCloudFormData | ManageReportPublicCloudFormData | ManageReportEventFormData) {
   childFormData($event: CloudInventoryMetaData) {
-    // console.log('inside childFormData');
     let childFormData = $event;
     if (this.form.valid) {
       this.invalidForms = false;
-      if (this.form.get('feature').value !== 'Cloud Inventory') {
-        this.reportMeta.removeControl('cloud_type');
-      }
-      let fd = <any>this.form.getRawValue();
-      fd.report_meta = Object.assign({}, fd.report_meta, childFormData);
-      fd.report_meta['duration_values'] = {}
-      if (fd.report_meta.duration_type == 'Last') {
-        fd.report_meta.duration_values['hour'] = fd.report_meta.hour;
-        fd.report_meta.duration_values['min'] = fd.report_meta.min;
-        delete fd.report_meta.hour;
-        delete fd.report_meta.min;
-      } else {
-        fd.report_meta.duration_values['from_duration'] = moment(fd.report_meta.from_duration).format('YYYY-MM-DD HH:mm:ss');
-        fd.report_meta.duration_values['to_duration'] = moment(fd.report_meta.to_duration).format('YYYY-MM-DD HH:mm:ss');
-        delete fd.report_meta.from_duration;
-        delete fd.report_meta.to_duration;
-      }
+      let fd = <ReportFormData>this.form.getRawValue();
+      fd.report_meta = Object.assign({},fd.report_meta, childFormData);
       this.submitFinalFormData(fd);
     }
   }
@@ -142,7 +156,7 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
       }, (err: HttpErrorResponse) => {
         this.spinner.stop('main');
         this.notificationService.error(new Notification('Error while updating Report. Please try again'));
-        this.handleError(err);
+        this.handleError(err.error);
       });
     } else {
       this.crudSvc.createReport(fd).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
@@ -153,7 +167,7 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
       }, (err: HttpErrorResponse) => {
         this.spinner.stop('main');
         this.notificationService.error(new Notification('Error while creating Report. Please try again'));
-        this.handleError(err);
+        this.handleError(err.error);
       });
     }
   };
@@ -162,9 +176,23 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
     this.spinner.start('main');
     this.form = this.crudSvc.buildForm(this.selectedReport);
     this.validationMessages = this.crudSvc.validationMessages;
-    this.formErrors = this.crudSvc.resetFormErrors();
+    this.formErrors = this.crudSvc.resetFormErrors();   
     this.manageFormSubscription();
     this.form.patchValue({ 'feature': this.storageService.getByKey('feature', StorageType.SESSIONSTORAGE) });
+    if (this.isDynamic) {
+      this.form.get('feature').disable({ emitEvent: false });
+      // if (this.reportId) {
+      //   setTimeout(() => {
+      //     this.reportMeta.get('module_name').setValue(this.selectedReport.report_meta.module_name)
+      //     this.reportMeta.get('model_name').setValue(this.selectedReport.report_meta.model_name)
+      //   }, 50);
+      // }
+    }
+    else {
+      this.form.get('feature').enable({ emitEvent: false });
+      this.form.get('feature').setValidators([Validators.required, NoWhitespaceValidator]);
+    }
+    
     this.spinner.stop('main');
   }
 
@@ -191,24 +219,36 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
       } else {
         this.reportMeta.removeControl('execution_type');
       }
+
       if (this.selectedReport.report_meta.execution_type === 'Workflow Integration') {
         this.getWorkflowIntegration();
         this.reportMeta.addControl('workflow_integration', new FormControl(this.selectedReport.report_meta.workflow_integration, [Validators.required]));
       } else {
         this.reportMeta.removeControl('workflow_integration');
       }
+
       if (this.selectedReport.feature == 'UnityOne ITSM') {
         // this.getUnityOneITSMTable();
         this.reportMeta.addControl('table', new FormControl(this.selectedReport.report_meta.table, [Validators.required]));
       } else {
         this.reportMeta.removeControl('table');
       }
+
+      // if (this.selectedReport.feature == 'Dynamic') {
+      //   // this.getDynamicReportModules();
+      //   this.reportMeta.addControl('module_name', new FormControl(this.selectedReport.report_meta.module_name, [Validators.required, NoWhitespaceValidator]));
+      //   this.reportMeta.addControl('model_name', new FormControl(this.selectedReport.report_meta.model_name, [Validators.required, NoWhitespaceValidator]));
+      //   // this.manageModuleAndModelSubscription();
+      // }
     }
+
     //check this
     // if(this.form.get('feature').value == 'Performance'){
     //   this.reportMeta.addControl('sub_type', new FormControl('', [Validators.required]));
     //   this.manageReportSubType();
     // }
+    
+    // reset everything once report type changed
     this.form.get('feature').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value: string) => {
       if (value === 'Cloud Inventory') {
         let cloudSelected = this.selectedReport?.report_meta?.cloud_type ? this.selectedReport.report_meta.cloud_type : 'Public';
@@ -248,7 +288,55 @@ export class ManageReportCrudNewComponent implements OnInit, OnDestroy {
       } else {
         this.reportMeta.removeControl('table');
       }
+
+      if (value === 'Dynamic') {
+        this.getDynamicReportModules();
+        const moduleName = this.selectedReport?.report_meta?.module_name ? this.selectedReport.report_meta.module_name : '';
+        const modelName = this.selectedReport?.report_meta?.model_name ? this.selectedReport.report_meta.model_name : '';
+        if (!this.reportMeta.get('module_name')) {
+          this.reportMeta.addControl('module_name', new FormControl(moduleName, [Validators.required, NoWhitespaceValidator]));
+        }
+        else {
+          this.reportMeta.get('module_name').setValue(moduleName);
+        }
+        if (!this.reportMeta.get('model_name')) {
+          this.reportMeta.addControl('model_name', new FormControl(modelName, [Validators.required, NoWhitespaceValidator]));
+        }
+        else {
+          this.reportMeta.get('model_name').setValue(modelName);
+        }
+
+        this.manageModuleAndModelSubscription();
+      }
+      else {
+        this.reportMeta.removeControl('module_name');
+        this.reportMeta.removeControl('model_name');
+        this.dynamicReportModulesArr = [];
+        this.dynamicReportModelsArr = [];
+      }
     });
+  }
+
+  // Function to find models by module name
+  findModelsByModuleName(type: string): ReportModelType[] {
+    for (const module of this.dynamicReportModulesSrc) {
+      if (module.module_name === type) {
+        return module.models;
+      }
+    }
+    return [];  // Return [] if no match is found
+  }
+
+  manageModuleAndModelSubscription() {
+    this.reportMeta.get('module_name').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(module => {
+        this.reportMeta.get('model_name').setValue('');
+        this.dynamicReportModelsArr = module ? this.findModelsByModuleName(module) : [];
+        // this.crudSvc.resetDynamicFiltersAndFields(true);
+    });
+    
+    // this.reportMeta.get('model_name').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(model => {
+    //     // this.crudSvc.resetDynamicFiltersAndFields(true);
+    // });
   }
 
   getWorkflowIntegration() {

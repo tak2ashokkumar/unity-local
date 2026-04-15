@@ -90,19 +90,28 @@ export interface SuggestedCommand {
 
 
 export interface MonitoringDataType {
-    metrics: MetricsType[];
+    // metrics: MetricsType[];
     resource_summary: ResourceSummaryType;
+    device: DeviceType;
+}
+
+export interface DeviceType {
+    device_id: number;
+    device_ct: number;
+    customer_id: number;
 }
 
 export interface CheckDeviceHealthDataType {
     resource_utilization: ResourceUtilizationSummaryType;
     resource_summary: ResourceSummaryType;
-    metrics: MetricsType[];
+    // metrics: MetricsType[];
+    device: DeviceType;
 }
 
 export interface ResourceUtilizationDataType {
     resource_summary: ResourceSummaryType;
-    metrics: MetricsType[];
+    // metrics: MetricsType[];
+    device: DeviceType;
 }
 
 // Check Device Health & ResourceUtlization & Monitoring related common types 

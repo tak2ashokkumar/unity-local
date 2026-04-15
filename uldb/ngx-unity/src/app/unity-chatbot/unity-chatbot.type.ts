@@ -83,3 +83,12 @@ export interface InsightUrl {
     params?: any;
     toBeskipped?: boolean;
 }
+
+export interface ChatDocuments {
+    documents: Document[];
+}
+
+export interface Document {
+    file_name: string;
+    conversation_id: string;
+}

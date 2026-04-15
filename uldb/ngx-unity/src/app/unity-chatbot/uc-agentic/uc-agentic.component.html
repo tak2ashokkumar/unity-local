@@ -66,19 +66,24 @@
                     </div>
                   </div>
                 </div>
-                <div class="chat-input-bottom" aria-hidden="false">
-                  <div class="chat-input-container mt-3 mb-3">
-                    <div class="chat-input-box pb-0">
-                      <textarea aria-label="type your message" class="chat-input" placeholder="Type your message..."
-                        [(ngModel)]="newMessage" (keydown.enter)="onEnter($event)"></textarea>
-                      <button class="send-btn mr-2" (click)="send(newMessage)" aria-label="send"
+
+              </ng-container>
+            </div>
+            <div class="chat-input-bottom" aria-hidden="false">
+              <div class="chat-input-container mt-3 mb-3">
+                <div class="chat-input-box pb-0">
+                  <textarea aria-label="type your message" class="chat-input" placeholder="Type your message..."
+                    [(ngModel)]="newMessage" (keydown.enter)="onEnter($event)" rows="3"></textarea>
+                  <!-- <button class="send-btn mr-2 mt-5" (click)="send(newMessage)" aria-label="send"
                         [ngClass]="{ 'active-send': newMessage?.trim().length > 0 }">
                         <i class="fas fa-paper-plane"></i>
-                      </button>
-                    </div>
-                  </div>
+                      </button> -->
+                  <button type="button" class="btn btn-sm mx-2 mt-4 query-button btn-success query-button-success"
+                    (click)="send(newMessage)">
+                    <i class="fas fa-arrow-up font-md text-white"></i>
+                  </button>
                 </div>
-              </ng-container>
+              </div>
             </div>
           </div>
         </div>

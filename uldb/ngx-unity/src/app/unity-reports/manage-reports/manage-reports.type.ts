@@ -22,6 +22,7 @@ export interface ManageReportSummaryCountDataType {
     events: number;
     DevOpsAutomation: number;
     UnityOneITSM: number;
+    dynamic: number;
 }
 
 export interface ManageReportDataType {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Subject, Subscription, timer } from 'rxjs';
 import { ChatHistoryData } from 'src/app/unity-chatbot/unity-chatbot.type';
@@ -35,6 +35,13 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
   conversationId: string = null;
   title: string;
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.active-ai-modal-model-selector')) {
+      this.showModelDropdown = false;
+    }
+  }
   constructor(private service: NaciChatbotService,
     private userInfoService: UserInfoService,
     private router: Router,
@@ -48,7 +55,7 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getAIModels();
-    const firstQuery = `Create a investigation plan and remediation steps along with RCA to resolve the condition ${this.conditionId}`
+    const firstQuery = `Create an investigation plan to resolve the condition ${this.conditionId}`;
     this.getResponse(firstQuery);
     this.buildForm();
   }
@@ -58,9 +65,72 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  getResponse(chat: string) {
-    setTimeout(() => { this.scrollToBottom(); });
+  ngAfterViewChecked(): void {
+    if (this.shouldScroll) {
+      this.scrollToBottom();
+    }
+  }
+
+  // getResponse(chat: string) {
+  //   setTimeout(() => { this.scrollToBottom(); });
+  //   this.isTyping = true;
+  //   let postData = {
+  //     query: chat,
+  //     org_id: this.userInfoService.userOrgId,
+  //     user_id: `${this.userInfoService.userDetails.id}`,
+  //     application: 'Network Agent',
+  //     count: 0,
+  //     conversation_id: this.conversationId,
+  //     role: 'User',
+  //     streaming: false,
+  //     title: this.title
+  //   }
+  //   this.startWaitMessages();
+  //   if (chat.includes('Exit')) {
+  //     this.goBack();
+  //     return;
+  //   }
+  //   this.service.getResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: any) => {
+  //     this.isTyping = false;
+  //     this.manageResponse(res);
+  //     this.conversationId = res.conversation_id;
+  //     if (res.answer.recommended_actions && this.chatHistoryData.length > 1) {
+  //       setTimeout(() => {
+  //         this.scrollToBottom();
+  //         this.shouldScroll = false;
+  //       }
+  //       );
+  //     } else {
+  //       this.shouldScroll = false;
+  //     }
+  //     this.cleanup();
+  //     this.chatResponse.emit(res);
+  //   }, (err: HttpErrorResponse) => {
+  //     this.chatResponse.emit(null);
+  //     this.isTyping = false;
+  //     this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
+  //     this.shouldScroll = false;
+  //     this.cleanup();
+  //   });
+  // }
+
+  hasReachedTop: boolean = false;
+  showModelDropdown = false;
+  activeModel: SupportedLLMConfigData;
+  llmModels: SupportedLLMConfigData[] = [];
+  typingQueue: string[] = [];
+  showStopButton: boolean = false;
+  typingInterval: any = null;
+  isStreaming = false;
+  doneData: any = null;
+  sectionBreakReached = false;
+
+  getResponse(chat: string, isDefault?: boolean) {
     this.isTyping = true;
+    this.isStreaming = true;
+    this.showStopButton = true;
+    this.sectionBreakReached = false;
+    this.typingQueue = [];
     let postData = {
       query: chat,
       org_id: this.userInfoService.userOrgId,
@@ -72,48 +142,119 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
       streaming: false,
       title: this.title
     }
+    this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
+    const lastIndex = this.chatHistoryData.length - 1;
     this.startWaitMessages();
-    if (chat.includes('Exit')) {
-      this.goBack();
-      return;
-    }
-    this.service.getResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res: any) => {
-      this.isTyping = false;
-      this.manageResponse(res);
-      this.conversationId = res.conversation_id;
-      if (res.answer.recommended_actions && this.chatHistoryData.length > 1) {
-        setTimeout(() => {
-          this.scrollToBottom();
-          this.shouldScroll = false;
+    this.service.getStreamingResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+      next: ({ event, data }) => {
+        if (event === 'start') {
+          this.conversationId = data.conversation_id;
+        } else if (event === 'chunk') {
+          if (!this.typingQueue.includes('sectionBreak')) {
+            this.typingQueue.push(data.delta);
+            if (!this.typingInterval) {
+              this.startTypingEffect();
+            }
+          }
+        } else if (event === 'complete') {
+          this.chatResponse.emit(data);
+          this.doneData = data;
+          if (this.sectionBreakReached) {
+            if (this.doneData?.meta?.recommended_actions?.length) {
+              this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => {
+                return {
+                  name: ra,
+                  isDisabled: false
+                }
+              });
+              setTimeout(() => {
+                this.scrollToBottom();
+              });
+            }
+          }
         }
-        );
-      } else {
+      },
+      error: (err) => {
+        this.typingQueue = [];
+        this.chatResponse.emit(null);
+        this.isTyping = false;
+        this.isStreaming = false;
+        this.showStopButton = false;
+        this.chatHistoryData[lastIndex].message = 'Sorry, I am having trouble right now.';
         this.shouldScroll = false;
+        clearInterval(this.typingInterval);
+        this.typingInterval = null;
+        this.typingQueue = [];
+        this.cleanup();
+      },
+      complete: () => {
+        this.sectionBreakReached && (this.typingQueue = []);
+        // this.sectionBreakReached = false;
+        this.isTyping = false;
+        this.isStreaming = false;
       }
-      this.cleanup();
-      this.chatResponse.emit(res);
-    }, (err: HttpErrorResponse) => {
-      this.chatResponse.emit(null);
-      this.isTyping = false;
-      this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
-      this.shouldScroll = false;
-      this.cleanup();
     });
   }
 
-  manageResponse(res: any) {
-    if (res.answer.answer) {
-      this.chatHistoryData.push({ user: 'bot', message: (res.answer.answer as string), type: 'text' });
-      this.chatHistoryData.getLast()['actions'] = res.answer.recommended_actions.map(ra => {
-        return {
-          name: ra,
-          isDisabled: false
+  startTypingEffect() {
+    this.isTyping = false;
+    this.cleanup();
+    this.typingInterval = setInterval(() => {
+      if (this.typingQueue.length > 0) {
+        const char = this.typingQueue.shift();
+        if (char === 'sectionBreak') {
+          const last = this.chatHistoryData[this.chatHistoryData.length - 1];
+          last.message = (last.message as string).trimEnd();
+          this.sectionBreakReached = true;
+          this.showStopButton = false;
+          this.shouldScroll = false;
+          return;
         }
-      });
-    } else {
-      this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
-    }
+        if (!this.sectionBreakReached) {
+          this.chatHistoryData[this.chatHistoryData.length - 1].message += char;
+          if (!this.hasReachedTop) {
+            this.shouldScroll = true;
+          }
+        }
+      } else {
+        if (this.sectionBreakReached || !this.isStreaming) {
+          if (this.doneData) {
+            const last = this.chatHistoryData[this.chatHistoryData.length - 1];
+            if (this.doneData?.meta?.recommended_actions?.length) {
+              last['actions'] = this.doneData.meta.recommended_actions.map(ra => {
+                return {
+                  name: ra,
+                  isDisabled: false
+                }
+              });
+              setTimeout(() => {
+                this.scrollToBottom();
+              });
+            }
+            this.doneData = null;
+          }
+          this.showStopButton = false;
+          clearInterval(this.typingInterval);
+          this.typingInterval = null;
+          this.shouldScroll = false;
+        }
+      }
+    }, 100);
   }
+
+  // manageResponse(res: any) {
+  //   if (res.answer.answer) {
+  //     this.chatHistoryData.push({ user: 'bot', message: (res.answer.answer as string), type: 'text' });
+  //     this.chatHistoryData.getLast()['actions'] = res.answer.recommended_actions.map(ra => {
+  //       return {
+  //         name: ra,
+  //         isDisabled: false
+  //       }
+  //     });
+  //   } else {
+  //     this.chatHistoryData.push({ user: 'bot', message: 'Sorry, I am having trouble right now.', type: 'text' });
+  //   }
+  // }
 
   buildForm() {
     this.form = this.service.buildForm();
@@ -172,64 +313,76 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
     this.router.navigate(['../../../../', 'dashboard', 'conditions'], { relativeTo: this.route })
   }
 
-    showModelDropdown = false;
-    activeModel: SupportedLLMConfigData;
-    llmModels: SupportedLLMConfigData[] = [];
-    typingQueue: string[] = [];
-    showStopButton: boolean = false;
-    getAIModels() {
-      this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-        this.llmModels = res;
-        this.llmModels.forEach(m => {
-          if (m.active_for_applications?.includes('assistant')) {
-            this.activeModel = m;
-          }
-        })
-      }, err => {
-        this.llmModels = [];
-        this.activeModel = null;
+  getAIModels() {
+    this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.llmModels = res;
+      this.llmModels.forEach(m => {
+        if (m.active_for_applications?.includes('assistant')) {
+          this.activeModel = m;
+        }
       })
-    }
-  
-    toggleDropdown() {
-      this.showModelDropdown = !this.showModelDropdown;
-      console.log(this.showModelDropdown);
-    }
-  
-    changeActiveModel(model: SupportedLLMConfigData) {
-      if (this.activeModel?.id === model.id) {
-        this.showModelDropdown = false;
-        return;
-      }
-  
-      if (model.is_user_owned) {
-        this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
-        model.active_for_applications.push('assistant');
-        this.changeActiveModelToSelected(model);
-      } else {
-        // this.goToConfig(model);
-      }
-  
-    }
-  
-    changeActiveModelToSelected(model: SupportedLLMConfigData) {
+    }, err => {
+      this.llmModels = [];
+      this.activeModel = null;
+    })
+  }
+
+  toggleDropdown() {
+    this.showModelDropdown = !this.showModelDropdown;
+    console.log(this.showModelDropdown);
+  }
+
+  changeActiveModel(model: SupportedLLMConfigData) {
+    if (this.activeModel?.id === model.id) {
       this.showModelDropdown = false;
-      this.service.changeActiveModel('Assistant', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-        this.activeModel = model;
-      }, err => {
-  
-      })
+      return;
     }
-  
-    goToConfig(model: SupportedLLMConfigData) {
-      // this.togglePopUp();
-      this.router.navigate(['/settings/profile/add-model']);
+
+    if (model.is_user_owned) {
+      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+      model.active_for_applications.push('assistant');
+      this.changeActiveModelToSelected(model);
+    } else {
+      // this.goToConfig(model);
     }
-  
-    getModelItemClass(model: SupportedLLMConfigData) {
-      return {
-        'active-model-item': model.active_for_applications?.includes('assistant'),
-        'bg-light text-muted': !model.is_user_owned
-      }
+
+  }
+
+  changeActiveModelToSelected(model: SupportedLLMConfigData) {
+    this.showModelDropdown = false;
+    this.service.changeActiveModel('Assistant', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.activeModel = model;
+    }, err => {
+
+    })
+  }
+
+  goToConfig(model: SupportedLLMConfigData) {
+    // this.togglePopUp();
+    this.router.navigate(['/settings/profile/add-model']);
+  }
+
+  getModelItemClass(model: SupportedLLMConfigData) {
+    return {
+      'active-model-item': model.active_for_applications?.includes('assistant'),
+      'bg-light text-muted': !model.is_user_owned
     }
+  }
+
+  stopResponse() {
+    // this.chatResponse.emit(this.doneData ? this.doneData : null)
+    // this.sectionBreakReached = false;
+    clearInterval(this.typingInterval);
+    this.typingInterval = null;
+    this.showStopButton = false;
+    this.isTyping = false;
+    this.isStreaming = false;
+    this.typingQueue = [];
+    this.doneData = null;
+    this.cleanup();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+    this.ngUnsubscribe = new Subject();
+    this.shouldScroll = false;
+  }
 }

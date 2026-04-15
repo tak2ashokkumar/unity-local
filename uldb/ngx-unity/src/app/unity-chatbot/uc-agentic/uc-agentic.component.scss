@@ -16,6 +16,7 @@
   flex-direction: column;
   // overflow: hidden; /* only inner area scrolls */
   background: transparent;
+  max-height: 620px;
 }
 
 .message-box {
@@ -124,18 +125,27 @@
   /* green when input has content */
 }
 
+// .chat-input-bottom {
+//   flex-shrink: 0;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   padding-top: 8px;
+// }
+
 .chat-input-bottom {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 8px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 8px 16px;
 }
 
 /* shared input container */
 .chat-input-container {
   width: 100%;
-  max-width: 750px;
+  // max-width: 750px;
   margin: 0;
 }
 
@@ -143,11 +153,11 @@
 .chat-input-box {
   display: flex;
   align-items: center;
-  border: 1px solid #dcdcdc;
+  border: 1px solid #c8ced3;
   border-radius: 10px;
   background: #fff;
   /* less vertical padding */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 @keyframes pulse {
@@ -247,15 +257,28 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-bottom: 16px; /* just small gap, not pushing input up */
+  padding-bottom: 16px;
+  /* just small gap, not pushing input up */
 }
 
+// .chat-body {
+//   display: flex;
+//   justify-content: center;
+//   overflow-y: auto;
+//   scrollbar-width: thin;
+//   height: 440px;
+// }
+
 .chat-body {
-  display: flex;
-  justify-content: center;
+  flex-grow: 1;
   overflow-y: auto;
-  scrollbar-width: thin;
-  height: 440px;
+  min-height: 0;
+  // display: flex;
+  // justify-content: center;
+
+  // padding-bottom: 120px;
+  overflow-x: hidden;
+  padding: 0.5rem;
 }
 
 .custom-gradient-bg {
@@ -282,4 +305,21 @@
 .angle-icon.disable {
   background-color: #e4e7ea;
   color: #73818f;
+}
+
+.query-button {
+  border-radius: 0.75rem;
+}
+
+.query-button-success:hover {
+  color: white;
+  background-color: #0cbb70cc;
+  border-color: #0cbb70cc;
+}
+
+.query-button:focus,
+.query-button:active,
+.query-button:focus:active {
+  outline: none !important;
+  box-shadow: none !important;
 }

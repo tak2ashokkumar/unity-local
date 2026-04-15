@@ -251,8 +251,7 @@
                                     <div *ngIf="msg.sender === 'user'" class="user-text">{{ msg.message }}</div>
 
                                     <!-- dots inside message box, only for Running bot messages -->
-                                    <span class="dots"
-                                        *ngIf="msg.sender === 'bot' && (!msg.message || msg.status === 'Running')"></span>
+                                    <span class="dots" *ngIf="msg.status === 'Running'"></span>
                                 </div>
                             </div>
                         </ng-container>
@@ -265,16 +264,17 @@
                         </div>
                     </div>
                 </div>
-                <!-- docked input INSIDE the card (not viewport-fixed) -->
+
                 <div class="chat-input-bottom" aria-hidden="false">
-                    <div class="chat-input-container mt-3">
+                    <div class="chat-input-container mt-3 mb-3">
                         <div class="chat-input-box pb-0">
                             <textarea aria-label="type your message" class="chat-input"
-                                placeholder="Ask me something..." [(ngModel)]="newMessage"
-                                (keydown.enter)="onEnter($event)"></textarea>
-                            <button class="send-btn mb-2" (click)="send(newMessage)" aria-label="send"
-                                [ngClass]="{ 'active-send': newMessage?.trim().length > 0 }">
-                                <i class="fas fa-paper-plane"></i>
+                                placeholder="Type your message..." [(ngModel)]="newMessage"
+                                (keydown.enter)="onEnter($event)" rows="3"></textarea>
+                            <button type="button"
+                                class="btn btn-sm mx-2 mt-4 query-button btn-success query-button-success"
+                                (click)="send(newMessage)">
+                                <i class="fas fa-arrow-up font-md text-white"></i>
                             </button>
                         </div>
                     </div>

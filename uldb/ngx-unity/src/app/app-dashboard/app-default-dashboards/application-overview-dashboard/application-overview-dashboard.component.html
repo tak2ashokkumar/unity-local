@@ -26,44 +26,9 @@
 <ng-container *ngIf="applicationId">
     <div [ngSwitch]="selectedApplication">
         <!-- load child components here -->
-        <div *ngSwitchCase="'AstronomyShop'" class="card-body row">
-            <div class="col-12 mb-2">
-                <customer-behavior-insights-kpis-widget [filters]="dateDropdownOptions?.formData"
-                    [appId]="applicationId"></customer-behavior-insights-kpis-widget>
-            </div>
-
-            <div class="col-12 mb-2">
-                <conversion-sales-funnel-kpis-widget [filters]="dateDropdownOptions?.formData"
-                    [appId]="applicationId"></conversion-sales-funnel-kpis-widget>
-            </div>
-
-            <div class="col-12 mb-2">
-                <traffic-engagement-kpis-widget [filters]="dateDropdownOptions?.formData"
-                    [appId]="applicationId"></traffic-engagement-kpis-widget>
-            </div>
-
-            <div class="col-12 mb-2">
-                <performance-reliability-kpis-widget [filters]="dateDropdownOptions?.formData"
-                    [appId]="applicationId"></performance-reliability-kpis-widget>
-            </div>
-
-            <div class="col-12 mb-2">
-                <revenue-customer-value-kpis-widget [filters]="dateDropdownOptions?.formData"
-                    [appId]="applicationId"></revenue-customer-value-kpis-widget>
-            </div>
-
-            <div class="col-12 mb-2">
-                <services-overview-widget [appId]="applicationId"></services-overview-widget>
-            </div>
-
-            <div class="col-12 mb-2">
-                <components-overview-widget [filters]="dateDropdownOptions?.formData"
-                    [appId]="applicationId"></components-overview-widget>
-            </div>
-
-            <div class="col-12 mb-2">
-                <critical-alerts-widget [appId]="applicationId"></critical-alerts-widget>
-            </div>
+        <div *ngSwitchCase="'AstronomyShop'">
+            <astronomy-shop-application-dashboard [appId]="applicationId"
+                [filters]="dateDropdownOptions?.formData"></astronomy-shop-application-dashboard>
         </div>
         <ng-container *ngSwitchCase="'EasyTrade'">
             <easy-trade-application-dashboard [appId]="applicationId"

@@ -38,6 +38,8 @@
   flex: 1 1 auto;
   max-width: 100%;
   width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 /* EXTREME RIGHT PANEL (slide-in overlay) */
@@ -100,6 +102,7 @@
 #agentic-drawflow {
   flex: 1;
   min-height: 80vh !important;
+  // height: 100%;
   height: calc(100vh - 130px);
   border: 1px solid #ccc;
   background-color: white;
@@ -129,7 +132,7 @@
   background: transparent !important;
   min-width: 60px;
   /* same as box width */
-  max-width: 60px;
+  // max-width: 60px;
   cursor: grab;
   /* fix width so text won't expand node */
 }
@@ -214,7 +217,7 @@
 
 .node-box.llm {
   height: 100px !important;
-  width: 90px !important;
+  width: 110px !important;
 }
 
 /* Node wrapper only contains the visual box */
@@ -230,7 +233,7 @@
   /* wider rectangle */
   height: 14px !important;
   /* taller rectangle */
-  left: -3px !important;
+  left: 52px !important;
   /* stick out from left */
   top: -10px !important;
   border-radius: 0px !important;
@@ -253,7 +256,7 @@
 /* Force output alignment relative to wrapper */
 .drawflow .drawflow-node.agentic-default-node .output {
   position: absolute !important;
-  right: -6px;
+  right: 50px !important;
   top: 35%;
   transform: translateY(-50%);
   width: 12px !important;
@@ -270,7 +273,7 @@
 }
 
 .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .input {
-  left: -18px !important;
+  left: 27px !important;
   /* always outside */
   // top: 40% !important;             /* force vertical center */
 }
@@ -283,7 +286,7 @@
 }
 
 .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .output {
-  right: -20px !important;
+  right: 25px !important;
   /* always outside */
   top: 40% !important;
   /* force vertical center */
@@ -337,7 +340,7 @@
   align-items: center;
   gap: 6px;
   /* spacing between icon and text */
-  justify-content: center;
+  // justify-content: center;
   /* horizontally center in the node box */
   padding-top: 5%;
 }
@@ -554,10 +557,10 @@
 }
 
 .bottom-panel {
-  position: fixed;
-  bottom: 32px;
-  left: 59px;
-  right: 9px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 
   box-sizing: border-box;
   background: #fff;
@@ -568,17 +571,17 @@
 }
 
 .bottom-panel.left-open {
-  left: 421px;
+  left: 361px;
 }
 
 .bottom-panel.right-open {
-  right: 317px;
-  left: 60px;
+  right: 300px;;
+  left: 0;
 }
 
 
 .bottom-panel.left-open.right-open {
-  left: 421px;
+  left: 362px;
   right: 309px;
 }
 
@@ -597,7 +600,7 @@
   position: absolute;
   top: -28px;
   left: 0;
-  right: 0;
+  right: 55px;
   height: 28px;
   display: flex;
   justify-content: flex-end;
@@ -622,7 +625,7 @@
   position: absolute;
   top: -28px;
   left: 0;
-  right: -40px;
+  right: 0px;
   height: 28px;
   display: flex;
   justify-content: flex-end;
@@ -639,6 +642,31 @@
 
 /* Show when hovering node OR hovering actions */
 .agentic-custom-node:hover .node-actions-agentic,
+.agentic-custom-node .node-actions:hover {
+  visibility: visible;
+}
+
+.agentic-custom-node .node-actions-llm {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  right: 41px;
+  height: 28px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+  visibility: hidden;
+  background: transparent;
+  color: #73818f;
+  cursor: pointer !important;
+}
+
+/* Show when hovering node OR hovering actions */
+.agentic-custom-node:hover .node-actions-llm,
 .agentic-custom-node .node-actions:hover {
   visibility: visible;
 }
@@ -719,50 +747,214 @@
   justify-content: center;
 }
 
-
-/* Bottom panel as overlay */
-// .body-container .bottom-panel {
-//   position: absolute;
-//   // left: 361px;
-//   right: 0;
-//   bottom: 0;
-//   height: 70%;
-//   // width: 722px;
-//   background: #fff;
-//   z-index: 50;
-//   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
-//   transition:
-//     transform 0.3s ease,
-//     opacity 0.2s ease;
-//   transform: translateY(0);
-//   overflow: auto;
-// }
-
-// .body-container .bottom-panel {
-//   position: absolute;
-//   bottom: 0;
-//   height: 50%;
-//   background: #fff;
-//   z-index: 50;
-//   box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
-//   overflow: auto;
-
-//   transition:
-//     left 0.3s ease,
-//     width 0.3s ease;
-// }
-
-
-
-// /* Collapsed (hidden) state */
-// .body-container.bottom-collapsed .bottom-panel {
-//   transform: translateY(100%);
-//   opacity: 0;
-//   display: none;
-// }
-
 .fx-icon {
   font-weight: 600;
   margin-right: 6px;
+  color: #5c6873 !important;
+}
+
+
+
+
+/* AI Agent Node */
+
+.node-box.ainode {
+  width: fit-content !important;
+  /* grows with content */
+  min-width: 180px !important;
+  /* base size */
+  max-width: calc(5 * 34px + 5 * 10px + 16px);
+  /* don't overflow parent */
+  height: auto !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+
+/* Header */
+
+.node-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.node-center-icon-ai img {
+  width: 18px;
+}
+
+.node-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-icon {
+  margin-left: auto;
+  /* pushes it to extreme right */
+  display: flex;
+  align-items: center;
+}
+
+
+/* Config Row */
+
+.config-row {
+  display: flex;
+  gap: 10px;
+}
+
+.config-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.config-label {
+  font-size: 11px;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.model-select {
+  height: 26px;
+  font-size: 12px;
+}
+
+.memory-col {
+  align-items: center;
+}
+
+.memory-icon {
+  width: 35px;
+  cursor: pointer !important;
+}
+
+
+/* Tools Container */
+
+.tools-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 34px);
+  gap: 10px;
+  justify-content: start;
+  padding: 4px 2px;
+
+  max-width: calc(5 * 34px + 5 * 10px);
+  width: fit-content;
+}
+
+.tools-container:empty {
+  display: none;
+}
+
+/* Tool Chip */
+
+.tool-chip {
+  position: relative;
+  width: 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-icon {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #5c6873;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  cursor: pointer;
+}
+
+.tool-icon img {
+  width: 18px;
+}
+
+.tool-name {
+  font-size: 9px;
+  text-align: center;
+  max-width: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* Drop Zone */
+
+.drop-zone {
+  border: 1.5px dashed #bdbdbd;
+  border-radius: 6px;
+  min-height: 50px;
+  /* keeps minimum size */
+  flex: 1;
+  /* expands to available space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+  margin-top: auto;
+}
+
+/* Drawflow port alignment */
+
+.drawflow .drawflow-node.agentic-default-node:has(.node-box.ainode) .input {
+  top: 50% !important;
+  left: -3px !important;
+}
+
+.drawflow .drawflow-node.agentic-default-node:has(.node-box.ainode) .output {
+  right: -5px !important;
+  top: 50% !important;
+}
+
+/* delete icon */
+.tool-delete-icon {
+  position: absolute;
+
+  top: -5px;
+  /* slightly outside top */
+  right: -5px;
+  /* slightly outside right */
+
+  width: 16px;
+  height: 16px;
+
+  background: #ff4d4f;
+  color: #fff;
+  font-size: 10px;
+
+  border-radius: 50%;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+  cursor: pointer;
+}
+
+/* visible state */
+.tool-chip.show-delete .tool-delete-icon {
+  display: flex;
+}
+
+.human-in-loop-icon {
+  position: absolute;
+  top: -15px;
+  /* slightly outside top */
+  left: -5px;
+  /* slightly outside right */
   color: #5c6873 !important;
 }

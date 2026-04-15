@@ -1,7 +1,7 @@
 <div class="container-fluid pt-2">
     <div class="animated-fadeIn">
         <div class="row" style="height:calc(100vh - 75px)">
-            <div class="col-8 condition-detail h-100" [perfectScrollbar]="{suppressScrollX: true}">
+            <div  #leftSideContainer class="col-8 condition-detail h-100" [perfectScrollbar]="{suppressScrollX: true}">
                 <div class="card mb-2"
                     [ngClass]="{'h-100':(!initialChatResponseData?.length && !isAnyStepDataPresent)|| (initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent)}">
                     <div class="card-header border-bottom bg-white p-2 d-flex flex-column position-relative"
@@ -147,7 +147,8 @@
 
                     <div class="card-body"
                         [ngClass]="{'p-0 position-relative h-100':chatResponse?.answer?.stage!='Stage 0'}">
-                        <ng-container *ngIf="chatResponse?.answer?.stage == 'Stage 0'">
+
+                        <!-- <ng-container *ngIf="chatResponse?.answer?.stage == 'Stage 0'">
                             <div class="col mt-2 row pr-0 mb-2 align-items-center">
                                 <img [src]="analysisLogos.UnityOne.imageURL" alt="UnityOne.ai"
                                     style="height: 20px; max-width: 20px;" />
@@ -241,7 +242,7 @@
                                 <h6 class="font-500 border-bottom pb-2">Activity</h6>
                                 <ng-container *ngTemplateOutlet="activityList"></ng-container>
                             </div>
-                        </ng-container>
+                        </ng-container> -->
 
                         <div class="h-100"
                             *ngIf="((!initialChatResponseData?.length && !isAnyStepDataPresent)|| (initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent))">
@@ -257,8 +258,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-3"
-                    *ngIf="chatResponse?.answer?.stage?.startsWith('Stage ') && chatResponse?.answer?.stage != 'Stage 0'">
+                <div class="my-3" *ngIf="chatResponseHistoryData.length">
                     <div class="d-flex align-items-center justify-content-between">
                         <div class="font-500 font-lg">
                             Workspace
@@ -322,7 +322,8 @@
                         [title]="selectedPrompt?.isDefault ? 'Default version cannot be edited' : ''"
                         (click)="onSave()">Save</button>
                 </div> -->
-                <ng-container *ngFor="let step of dynamicSteps">
+
+                <!-- <ng-container *ngFor="let step of dynamicSteps">
 
                     <naci-monitoring *ngIf="step.componentType === 'Monitoring'" [chatResponse]="step.chatResponse">
                     </naci-monitoring>
@@ -347,7 +348,21 @@
                         [chatResponse]="step.chatResponse">
                     </naci-cli-check-steps>
 
-                </ng-container>
+                </ng-container> -->
+
+                <div class="card" *ngIf="chatResponseHistoryData.length">
+                    <div class="card-body">
+                        <div #chatResponseHistory *ngFor="let chat of chatResponseHistoryData;let i = index;let last = last" class="w-100"
+                            style="max-width: 100%;">
+                            <markdown [data]="chat.workSpaceData"></markdown>
+                            <naci-zabbix-graphs [deviceData]="chat.meta?.device_data" [index]="i"
+                                *ngIf="chat.meta?.device_data?.monitoring_type && chat.meta?.device_data?.monitoring_type!= 'Network Topology'"></naci-zabbix-graphs>
+                            <naci-network-topology-steps [deviceData]="chat.meta?.device_data" [index]="i"
+                                *ngIf="chat.meta?.device_data?.monitoring_type == 'Network Topology'">></naci-network-topology-steps>
+                            <hr class="border" *ngIf="!last">
+                        </div>
+                    </div>
+                </div>
             </div>
 
 

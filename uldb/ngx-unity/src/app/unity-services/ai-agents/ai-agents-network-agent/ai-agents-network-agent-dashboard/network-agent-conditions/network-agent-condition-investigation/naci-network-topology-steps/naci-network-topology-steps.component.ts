@@ -6,7 +6,9 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./naci-network-topology-steps.component.scss'],
 })
 export class NaciNetworkTopologyStepsComponent implements OnInit {
-  @Input() chatResponse: any;
+  // @Input() chatResponse: any;
+  @Input('deviceData') deviceData: any;
+  @Input('index') index: number;
   currentStep: number;
 
   constructor() { }
@@ -18,16 +20,16 @@ export class NaciNetworkTopologyStepsComponent implements OnInit {
     // this.updateStep();
   }
 
-  private updateStep(): void {
-    if (!this.chatResponse?.answer?.stage) {
-      // this.currentStep = 1;
-      return;
-    }
+  // private updateStep(): void {
+  //   if (!this.chatResponse?.answer?.stage) {
+  //     // this.currentStep = 1;
+  //     return;
+  //   }
 
-    // Extract number from "Stage 3"
-    const match = this.chatResponse.answer?.stage?.match(/\d+/);
-    this.currentStep = match ? +match[0] : 1;
-  }
+  //   // Extract number from "Stage 3"
+  //   const match = this.chatResponse.answer?.stage?.match(/\d+/);
+  //   this.currentStep = match ? +match[0] : 1;
+  // }
 
   getIcon(step: number): string {
     const icons: Record<number, string> = {

@@ -13,7 +13,7 @@
     </div>
 
     <div class="card-body" [collapse]="!isVerifyAndAuditOpen">
-        <div class="row">
+        <div class="row mb-3">
             <div class="col pr-0">
                 <div class="card round-edge equalize-card mb-0">
                     <div class="card-body p-2">
@@ -81,16 +81,6 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-12 mt-2" *ngFor="let chartData of deviceHealthMetricWidgetViewData?.chartData;">
-                <div class="card round-edge equalize-card mb-2">
-                    <div class="card-body px-2">
-                        <div echarts [options]="chartData.options" [extentions]="chartData.extensions"
-                            [defaultHeight]="300">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- <naci-zabbix-graphs [deviceData]="deviceData" [monitoringType]="'device_health'"></naci-zabbix-graphs> -->
     </div>
 </div>

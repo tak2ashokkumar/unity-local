@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { SupportedLLMConfig, SupportedLLMConfigData } from '../shared/SharedEntityTypes/ai-chatbot/llm-model.type';
-import { AssistedInsights, UntiyChatBotExploreMenu, UrlData } from './unity-chatbot.type';
+import { AssistedInsights, ChatDocuments, UntiyChatBotExploreMenu, UrlData } from './unity-chatbot.type';
 
 @Injectable({
   providedIn: 'root'
@@ -127,6 +127,25 @@ export class UnityChatbotService {
 
   submitFeedback(data: any, queryId: string) {
     return this.http.patch(`customer/network_agent/chat-messages/${queryId}/feedback/`, data);
+  }
+
+  getDocuments(conversationId: string): Observable<ChatDocuments> {
+    const data = { conversation_id: conversationId};
+    return this.http.post<ChatDocuments>('mcp/get_conversation_document_ids/', data)
+  }
+
+  uploadDocument(file: File, conversationId: string, orgId: any, userId: any) {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('conversation_id', conversationId);
+    formData.append('org_id', orgId);
+    formData.append('user_id', userId);
+    return this.http.post(`${environment.ChatbotDocumentUploadUrl}documents/upload`, formData);
+  }
+
+  deleteDocument(docId: string, conversationId: string) {
+    const postData = { conversation_id: conversationId, document_id: docId }
+    return this.http.post(`${environment.ChatbotDocumentUploadUrl}documents/delete`, postData);
   }
 }
 

@@ -175,6 +175,7 @@ import { NaciMonitoringService } from './ai-agents/ai-agents-network-agent/ai-ag
 import { NaciNetworkTopologyStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-network-topology-steps/naci-network-topology-steps.service';
 import { NaciCheckDeviceHealthStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-check-device-health-steps/naci-check-device-health-steps.service';
 import { NaciCliCheckStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-cli-check-steps/naci-cli-check-steps.service';
+import { NaciZabbixGraphsComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-zabbix-graphs/naci-zabbix-graphs.component';
 /**
  * Change format according to need
  */
@@ -349,7 +350,8 @@ export const MY_NATIVE_FORMATS = {
     NtDocumentAndCloseStepComponent,
     NtRemediationScriptStepComponent,
     NtRootCauseAnalysisStepComponent,
-    NtValidateFixStepComponent
+    NtValidateFixStepComponent,
+    NaciZabbixGraphsComponent
   ],
   imports: [
     AppCoreModule,
