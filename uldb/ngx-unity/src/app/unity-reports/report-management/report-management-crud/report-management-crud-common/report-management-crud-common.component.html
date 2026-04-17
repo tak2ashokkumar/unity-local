@@ -1,0 +1,173 @@
+<form *ngIf="form" [formGroup]="form">
+  <ng-container>
+    <div
+      *ngIf="queryBuilderConfig"
+      class="mt-4 px-3 pt-3 border rounded position-relative"
+    >
+      <div class="bg-white position-absolute section-name-one font-md font-500">
+        Query Filters
+      </div>
+      <!-- Query builder config is generated from the selected Dynamic module/model metadata. -->
+      <div class="col-12 pb-3">
+        <div class="col">
+          <query-builder
+            #queryBuilder
+            formControlName="query_meta"
+            [classNames]="queryBuilderClassNames"
+            [config]="queryBuilderConfig"
+            [allowRuleset]="allowRuleset"
+            [allowCollapse]="allowCollapse"
+            [persistValueOnFieldChange]="persistValueOnFieldChange"
+          >
+          </query-builder>
+        </div>
+        <div class="invalid-feedback d-block" *ngIf="formErrors.query_meta">
+          {{ formErrors.query_meta }}
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 px-3 pt-3 border rounded position-relative">
+      <div class="bg-white position-absolute section-name-one font-md font-500">
+        Query Field
+      </div>
+      <!-- select_fields controls define the columns returned by the Dynamic report. -->
+      <div class="col-12">
+        <div class="row form-group my-0">
+          <div class="w-22 px-2">
+            <label class="form-col-form-label">Field Name<em>*</em></label>
+          </div>
+          <div class="w-22 px-2">
+            <label class="form-col-form-label">Show As<em>*</em></label>
+          </div>
+          <div class="w-22 px-2">
+            <label class="form-col-form-label">Processing Funtion</label>
+          </div>
+          <div class="w-22 px-2">
+            <label class="form-col-form-label">Summary Funtion</label>
+          </div>
+          <div class="w-12 px-2"></div>
+        </div>
+      </div>
+      <div class="col-12 pb-3" formArrayName="select_fields">
+        <div
+          *ngFor="
+            let field of selectFields.controls;
+            let i = index;
+            let first = first;
+            let last = last;
+            trackBy: trackByControl
+          "
+        >
+          <div class="row form-group" [formGroupName]="i">
+            <div class="w-22 px-2">
+              <!-- <label for="name" class="form-col-form-label">Field Name<em>*</em></label> -->
+              <select
+                [id]="'dynamicFieldName' + i"
+                [attr.name]="'dynamicFieldName' + i"
+                aria-label="Field name"
+                class="form-control"
+                formControlName="name"
+                [class.is-invalid]="formErrors.select_fields[i].name"
+                (change)="updateShowAsField($event.target.value, i)"
+              >
+                <option [value]="''" disabled>Select Field</option>
+                <option
+                  *ngFor="
+                    let field of fieldsMetaData;
+                    trackBy: trackByDynamicField
+                  "
+                  [value]="field.name"
+                >
+                  {{ field.display_name }}
+                </option>
+              </select>
+              <div
+                class="invalid-feedback"
+                *ngIf="formErrors.select_fields[i].name"
+              >
+                {{ formErrors.select_fields[i].name }}
+              </div>
+            </div>
+            <div class="w-22 px-2">
+              <!-- <label for="show_as" class="form-col-form-label">Show As<em>*</em></label> -->
+              <input
+                [id]="'dynamicFieldShowAs' + i"
+                [attr.name]="'dynamicFieldShowAs' + i"
+                aria-label="Show as"
+                class="form-control"
+                type="text"
+                formControlName="show_as"
+                [class.is-invalid]="formErrors.select_fields[i].show_as"
+                placeholder="Enter display name"
+                autocomplete="off"
+              />
+              <div
+                class="invalid-feedback"
+                *ngIf="formErrors.select_fields[i].show_as"
+              >
+                {{ formErrors.select_fields[i].show_as }}
+              </div>
+            </div>
+            <div class="w-22 px-2">
+              <!-- <label class="form-col-form-label">Processing Funtion</label> -->
+              <multiselect-dropdown
+                [attr.id]="'dynamicFieldProcessingFunction' + i"
+                [attr.name]="'dynamicFieldProcessingFunction' + i"
+                aria-label="Processing function"
+                class="form-control p-0"
+                formControlName="data_processing_fn"
+                [options]="processingFuncList"
+                [settings]="procFuncOptionsSettings"
+                [class.is-invalid]="
+                  formErrors.select_fields[i].data_processing_fn
+                "
+              ></multiselect-dropdown>
+              <div
+                class="invalid-feedback"
+                *ngIf="formErrors.select_fields[i].data_processing_fn"
+              >
+                {{ formErrors.select_fields[i].data_processing_fn }}
+              </div>
+            </div>
+            <div class="w-22 px-2">
+              <!-- <label for="name" class="form-col-form-label">Summary Funtion</label> -->
+              <multiselect-dropdown
+                [attr.id]="'dynamicFieldSummaryFunction' + i"
+                [attr.name]="'dynamicFieldSummaryFunction' + i"
+                aria-label="Summary function"
+                class="form-control p-0"
+                formControlName="summary_fn"
+                [options]="summaryFuncList"
+                [settings]="summaryFuncOptionsSettings"
+                [class.is-invalid]="formErrors.select_fields[i].summary_fn"
+              ></multiselect-dropdown>
+              <div
+                class="invalid-feedback"
+                *ngIf="formErrors.select_fields[i].summary_fn"
+              >
+                {{ formErrors.select_fields[i].summary_fn }}
+              </div>
+            </div>
+            <div class="w-10 px-2">
+              <span class="form-control border-0 p-0">
+                <button
+                  tooltip="Remove Field"
+                  class="action-icons fas fa-minus font-sm ml-1"
+                  (click)="removeSelectFields(i)"
+                  *ngIf="form.get('select_fields').controls.length > 1"
+                ></button>
+                <button
+                  tooltip="Add Field"
+                  class="action-icons fas fa-plus font-sm ml-1"
+                  *ngIf="last"
+                  (click)="addSelectFields(i)"
+                ></button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</form>

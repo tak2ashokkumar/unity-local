@@ -453,7 +453,7 @@ const UNITY_REPORT_NAV_DATA = (svc: PermissionService, orgName: string) => {
     let menuName = orgName ? `Reports` : 'UnityReports';
     const navItems = {
         name: `${menuName}`,
-        url: '/reports/manage/new-reports',
+         url: '/reports/manage-reports',
         icon: 'far fa-newspaper',
         attributes: {
             module: UnityModules.UNITY_REPORT,

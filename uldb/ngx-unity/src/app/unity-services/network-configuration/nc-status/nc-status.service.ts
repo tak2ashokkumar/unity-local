@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { DATA_CENTERS, DEVICE_MODELS, FIREWALL_MANUFACTURERS, GET_AGENT_CONFIGURATIONS } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
@@ -9,10 +10,9 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { FirewallCRUDManufacturer } from 'src/app/united-cloud/shared/entities/firewall-crud.type';
 import { SwitchCRUDModel } from 'src/app/united-cloud/shared/entities/switch-crud.type';
-import { ManageReportDatacenterType } from 'src/app/unity-reports/manage-reports/manage-report-crud/datacenter-report-crud/datacenter-report-crud.type';
+import { ManageReportDatacenterType } from 'src/app/unity-reports/report-management/report-management.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { NCMDeviceType, NCMRunningConfigurationType, NCMStartupConfigurationType, NCMSummaryType, NCMValidateCredentialsFormDataType } from './nc-status.type';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Injectable()
 export class NcStatusService {

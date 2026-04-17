@@ -1,20 +1,17 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { Observable, forkJoin, of } from 'rxjs';
-import { DATA_CENTERS, GET_AGENT_CONFIGURATIONS, GET_CREDENTIALS, HYPERVISOR_MANUFACTURERS, HYPERVISOR_OS, PDU_MANUFACTURERS, STORAGE_MANUFACTURERS, SWITCH_MANUFACTURERS, UPDATE_ADVANCED_DISCOVERY } from 'src/app/shared/api-endpoint.const';
-import { ManageReportDatacenterType } from 'src/app/unity-reports/manage-reports/manage-report-crud/datacenter-report-crud/datacenter-report-crud.type';
-import { DeviceDiscoveryAgentConfigurationType } from '../../../advanced-discovery-connectivity/agent-config.type';
-import { catchError } from 'rxjs/operators';
-import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { IpVersion, RxwebValidators } from '@rxweb/reactive-form-validators';
+import { Observable, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { DATA_CENTERS, GET_AGENT_CONFIGURATIONS, GET_CREDENTIALS, HYPERVISOR_MANUFACTURERS, HYPERVISOR_OS, PDU_MANUFACTURERS, STORAGE_MANUFACTURERS, SWITCH_MANUFACTURERS, UPDATE_ADVANCED_DISCOVERY } from 'src/app/shared/api-endpoint.const';
+import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { QueryBuilderClassNames, QueryBuilderConfig, Rule, RuleSet } from 'src/app/shared/query-builder/query-builder.interfaces';
-import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
-import { error } from 'console';
-import { SwitchCRUDManufacturer } from 'src/app/united-cloud/shared/entities/switch-crud.type';
 import { HypervisorCRUDOperatingSystem } from 'src/app/united-cloud/shared/entities/hypervisor-crud.type';
-import { Validator } from 'vis-util/esnext';
-import { templateType } from './advanced-discovery-policy-crud.type';
+import { SwitchCRUDManufacturer } from 'src/app/united-cloud/shared/entities/switch-crud.type';
+import { ManageReportDatacenterType } from 'src/app/unity-reports/report-management/report-management.type';
+import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
+import { DeviceDiscoveryAgentConfigurationType } from '../../../advanced-discovery-connectivity/agent-config.type';
 
 @Injectable()
 export class AdvancedDiscoveryPolicyCrudService {

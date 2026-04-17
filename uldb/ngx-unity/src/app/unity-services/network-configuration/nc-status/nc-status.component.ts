@@ -16,7 +16,7 @@ import { LabelValueType } from 'src/app/shared/SharedEntityTypes/unity-utils.typ
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { FirewallCRUDManufacturer } from 'src/app/united-cloud/shared/entities/firewall-crud.type';
 import { SwitchCRUDModel } from 'src/app/united-cloud/shared/entities/switch-crud.type';
-import { ManageReportDatacenterType } from 'src/app/unity-reports/manage-reports/manage-report-crud/datacenter-report-crud/datacenter-report-crud.type';
+import { ManageReportDatacenterType } from 'src/app/unity-reports/report-management/report-management.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { NCMConfigDetailsViewData, NCMDeviceViewData, NcStatusService, statusOptions } from './nc-status.service';
 import { NCMDeviceType, NetworkConfigurationDeviceType } from './nc-status.type';

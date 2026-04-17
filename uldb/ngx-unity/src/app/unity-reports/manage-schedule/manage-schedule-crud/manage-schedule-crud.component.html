@@ -1,255 +1,301 @@
-<div class="card round-edge mt--2">
-    <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
-        <span>{{action}} Schedule</span>
-        <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" (click)="goToSchedule()">
-            <i class="fa fa-arrow-left"></i>
-        </button>
-    </div>
+<div class="card round-edge manage-schedule-crud">
+  <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
+    <span>{{ action }} Schedule</span>
+    <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" tooltip="Back" aria-label="Back to schedules"
+      type="button" (click)="goToSchedule()">
+      <i class="fa fa-arrow-left" aria-hidden="true"></i>
+    </button>
+  </div>
 
-    <div class="card-body">
-        <form *ngIf="scheduleForm" [formGroup]="scheduleForm">
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group">
-                        <label class="form-col-form-label">Schedule Name<em>*</em></label>
-                        <input id="name" class="form-control" type="text" formControlName="name"
-                            placeholder="Enter Schedule Name" [class.is-invalid]="scheduleFormErrors.name">
-                        <div class="invalid-feedback" *ngIf="scheduleFormErrors.name">
-                            {{scheduleFormErrors.name}}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <div class="form-group">
-                        <label class="form-col-form-label">Export Type<em>*</em></label>
-                        <select class="form-control" formControlName="export_type" id="status"
-                            [ngClass]="{'is-invalid' : scheduleFormErrors.export_type}">
-                            <option [value]="'CSV'">CSV</option>
-                            <option [value]="'PDF'" disabled>PDF</option>
-                        </select>
-                        <div class="invalid-feedback" *ngIf="scheduleFormErrors.export_type">
-                            {{scheduleFormErrors.export_type}}</div>
-                    </div>
-                </div>
-                <div class="col-3 mt-4">
-                    <div class="form-group mt-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" formControlName="execute_immediately">
-                            <label class="form-check-label" for="exec_immediately">
-                                Execute Immediately
-                            </label>
-                        </div>
-                    </div>
-                </div>
+  <div class="card-body">
+    <form *ngIf="scheduleForm" [formGroup]="scheduleForm" novalidate>
+      <div class="row">
+        <div class="col-6">
+          <div class="form-group">
+            <label class="form-col-form-label" for="scheduleName">
+              Schedule Name<em>*</em>
+            </label>
+            <input id="scheduleName" name="name" class="form-control" type="text" formControlName="name"
+              placeholder="Enter Schedule Name" autocomplete="off" [class.is-invalid]="scheduleFormErrors.name" />
+            <div class="invalid-feedback" *ngIf="scheduleFormErrors.name">
+              {{ scheduleFormErrors.name }}
             </div>
-            <div class="row mt-2">
-                <div class="ml-2 mr-3 col border rounded p-4 position-relative">
-                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Schedule Time</div>
-                    <div class="row">
-                        <div class="col-3">
-                            <div class="form-group">
-                                <label for="schedule_time" class="form-col-form-label">Schedule
-                                    Time<em>*</em></label>
-                                <div class="input-group">
-                                    <owl-date-time #schedule_time [pickerType]="'timer'"></owl-date-time>
-                                    <input class="form-control rounded-left" formControlName="schedule_time"
-                                        name="schedule_time" [owlDateTimeTrigger]="schedule_time"
-                                        [owlDateTime]="schedule_time" type="text"
-                                        [ngClass]="{'is-invalid' : scheduleFormErrors.schedule_time}">
-                                    <div class="input-group-append " [owlDateTimeTrigger]="schedule_time">
-                                        <span class="input-group-text bg-white">
-                                            <i class="fas fa-calendar-alt"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="invalid-feedback d-block" *ngIf="scheduleFormErrors.schedule_time">
-                                    {{scheduleFormErrors.schedule_time}}</div>
-                            </div>
-                        </div>
-                        <div class="col-2 mt-4">
-                            <div class="form-group mt-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" formControlName="is_repeats"
-                                        (change)="toggleRepeats()">
-                                    <label class="form-check-label" for="is_repeats">Repetition
-                                        Every</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-3 pl-0">
-                            <div class="form-group">
-                                <label for="repeats">Repeats</label>
-                                <div class="input-group d-flex">
-                                    <input class="form-control" id="repeats_hr" type="number"
-                                        formControlName="repeats_hr" min="0" max="23" placeholder="hrs">
-                                    <input class="form-control ml-2" formControlName="repeats_mn" id="repeats_mn"
-                                        type="number" min="0" max="59" placeholder="mins">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-3 pl-0">
-                            <label for="repeats">Until</label>
-                            <div class="input-group">
-                                <input class="form-control" formControlName="repeats_until" id="input1" type="number"
-                                    min="1">
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-3">
-                            <label class="form-col-form-label">Recurrence Pattern<em>*</em></label>
-                            <select class="form-control" formControlName="recurrence_pattern"
-                                [ngClass]="{'is-invalid' : scheduleFormErrors.recurrence_pattern}" id="status">
-                                <option [value]="'ONCE'">Once</option>
-                                <option [value]="'DAILY'">Daily</option>
-                                <option [value]="'WEEKLY'">Weekly</option>
-                                <option [value]="'MONTHLY'">Monthly</option>
-                                <option [value]="'YEARLY'">Yearly</option>
-                            </select>
-                            <div class="invalid-feedback" *ngIf="scheduleFormErrors.recurrence_pattern">
-                                {{scheduleFormErrors.recurrence_pattern}}</div>
-                        </div>
-
-                        <div class="col-3">
-                            <label for="scheduled_time" class="form-col-form-label">Schedule
-                                On<em>*</em></label>
-                            <div class="input-group">
-                                <input class="form-control rounded-left" [value]="getFormattedDate()" disabled
-                                    name="scheduled_time" formControlName="schedule_on" type=" text">
-                                <div class="input-group-append " disabled>
-                                    <span class="input-group-text bg-white">
-                                        <i class="fas fa-calendar-alt"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            <!-- <div class="invalid-feedback d-block" *ngIf="scheduleFormErrors.scheduled_time">
-                                {{scheduleFormErrors.scheduled_time}}</div> 
-                            [ngClass]="{'is-invalid' : scheduleFormErrors.scheduled_time}"-->
-                        </div>
-                    </div>
-                </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="form-group">
+            <label class="form-col-form-label" for="exportType">
+              Export Type<em>*</em>
+            </label>
+            <select id="exportType" name="export_type" class="form-control" formControlName="export_type"
+              [ngClass]="{ 'is-invalid': scheduleFormErrors.export_type }">
+              <option [value]="'CSV'">CSV</option>
+              <option [value]="'PDF'" disabled>PDF</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="scheduleFormErrors.export_type">
+              {{ scheduleFormErrors.export_type }}
             </div>
-            <div class="row mt-4">
-                <div class="ml-2 mr-3 col border rounded p-4 position-relative">
-                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Range Of Recurrence</div>
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="d-inline"><span>Start on<em>*</em></span></div>
-                            <div class="col-9 float-right d-inline mr-2">
-                                <div class="input-group">
-                                    <owl-date-time #range_of_recurrence [pickerType]="'calendar'"></owl-date-time>
-                                    <input class="form-control rounded-left" name="range_of_recurrence"
-                                        formControlName="range_of_recurrence" [owlDateTimeTrigger]="range_of_recurrence"
-                                        [owlDateTime]="range_of_recurrence" type="text"
-                                        [ngClass]="{'is-invalid' : scheduleFormErrors.range_of_recurrence}">
-                                    <div class="input-group-append " [owlDateTimeTrigger]="range_of_recurrence">
-                                        <span class="input-group-text bg-white">
-                                            <i class="fas fa-calendar-alt"></i>
-                                        </span>
-                                    </div>
-                                    <div class="invalid-feedback" *ngIf="scheduleFormErrors.range_of_recurrence">
-                                        {{scheduleFormErrors.range_of_recurrence}}</div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-6">
-                            <div class="d-inline"><span>Ends</span></div>
-                            <div class="col-9 float-right d-inline pl-2 pr-4">
-                                <div class="form-check d-flex align-items-center">
-                                    <input class="form-check-input" type="radio" (change)="toggleFields('never')"
-                                        id="never" formControlName="radioOptions" value="never"
-                                        [ngClass]="{'is-invalid' : scheduleFormErrors.radioOptions}">
-                                    <span class="ml-2">Never</span>
-
-                                </div>
-                                <div class="form-check d-flex align-items-center mt-2">
-                                    <input class="form-check-input" type="radio" (change)="toggleFields('after')"
-                                        id="after" formControlName="radioOptions" value="occur"
-                                        [ngClass]="{'is-invalid' : scheduleFormErrors.radioOptions}">
-                                    <div class="input-group align-items-center">
-                                        <span class="mx-2">After</span>
-                                        <input class="form-control rounded h-25" id="input1" formControlName="occurs"
-                                            type="number" min="-1">
-                                        <span class="mx-2">occurrences</span>
-                                    </div>
-                                </div>
-                                <div class="form-check d-flex align-items-center mt-2">
-                                    <input class="form-check-input" (change)="toggleFields('ends')" type="radio"
-                                        id="endsby" formControlName="radioOptions" value="endsby"
-                                        [ngClass]="{'is-invalid' : scheduleFormErrors.radioOptions}">
-                                    <div class="input-group ">
-                                        <span class="mx-2 mt-1">End by</span>
-                                        <owl-date-time #ends [hour12Timer]="true"></owl-date-time>
-                                        <input class="form-control h-25 rounded-left" formControlName="ends" name="ends"
-                                            [owlDateTimeTrigger]="ends" [owlDateTime]="ends" type="text">
-                                        <div class="input-group-append " [owlDateTimeTrigger]="ends">
-                                            <span class="input-group-text bg-white">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.radioOptions">
-                                    {{scheduleFormErrors.radioOptions}}</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
+          </div>
+        </div>
+        <div class="col-3 mt-4">
+          <div class="form-group mt-2">
+            <div class="form-check">
+              <input id="executeImmediately" name="execute_immediately" class="form-check-input" type="checkbox"
+                formControlName="execute_immediately" />
+              <label class="form-check-label" for="executeImmediately">
+                Execute Immediately
+              </label>
             </div>
-            <div class="row mt-4">
-                <div class="ml-2 mr-3 col border rounded px-3 pt-3 pb-0 position-relative">
-                    <div class="pb-2 mb-3 bg-white position-absolute section-name">Recipients</div>
-                    <div class="row mt-2">
-                        <div class="col-4">
-                            <label class="form-col-form-label">Report Name<em>*</em></label>
-                            <select class="form-control" formControlName="report_name" id="status"
-                                [ngClass]="{'is-invalid' : scheduleFormErrors.report_name}">
-                                <option value="''" disabled>Select</option>
-                                <option *ngFor="let report of reports" [ngValue]="report.uuid">
-                                    {{report.name}}
-                                </option>
-                            </select>
-                            <div class="invalid-feedback" *ngIf="scheduleFormErrors.report_name">
-                                {{scheduleFormErrors.report_name}}</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="form-group">
-                                <label for="status" class="form-col-form-label">Select Recipients<em>*</em></label>
-                                <multiselect-dropdown *ngIf="!orgUsers.length" [options]="orgUsers"
-                                    [settings]="emailSettings" class="form-control p-0" style="height:auto;"
-                                    formControlName="recipient_emails" [disabled]="!orgUsers.length"
-                                    [ngClass]="{'is-invalid' : scheduleFormErrors.recipient_emails}"></multiselect-dropdown>
-                                <multiselect-dropdown *ngIf="orgUsers.length" [options]="orgUsers"
-                                    [settings]="emailSettings" class="form-control p-0" style="height:auto;"
-                                    formControlName="recipient_emails"
-                                    [ngClass]="{'is-invalid' : scheduleFormErrors.recipient_emails}"></multiselect-dropdown>
-                                <div class="invalid-feedback" *ngIf="scheduleFormErrors.recipient_emails">
-                                    {{scheduleFormErrors.recipient_emails}}</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <label class="form-col-form-label">Additional Email</label>
-                            <input id="name" class="form-control" type="text" formControlName="schedule_name"
-                                placeholder="Comma Seperated Emails" formControlName="additional_emails"
-                                [ngClass]="{'is-invalid' : scheduleFormErrors.additional_emails}">
-                            <div class="invalid-feedback" *ngIf="scheduleFormErrors.additional_emails">
-                                {{scheduleFormErrors.additional_emails}}</div>
-                        </div>
-                    </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-2">
+        <div class="ml-2 mr-3 col border rounded p-4 position-relative">
+          <div class="pb-2 mb-3 bg-white position-absolute section-name">
+            Schedule Time
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label for="scheduleTime" class="form-col-form-label">
+                  Schedule Time<em>*</em>
+                </label>
+                <div class="input-group">
+                  <owl-date-time #schedule_time [pickerType]="'timer'"></owl-date-time>
+                  <input id="scheduleTime" name="schedule_time" class="form-control rounded-left"
+                    formControlName="schedule_time" [owlDateTimeTrigger]="schedule_time" [owlDateTime]="schedule_time"
+                    type="text" autocomplete="off" [ngClass]="{
+                      'is-invalid': scheduleFormErrors.schedule_time
+                    }" />
+                  <div class="input-group-append" [owlDateTimeTrigger]="schedule_time">
+                    <span class="input-group-text bg-white">
+                      <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                    </span>
+                  </div>
                 </div>
+                <div class="invalid-feedback d-block" *ngIf="scheduleFormErrors.schedule_time">
+                  {{ scheduleFormErrors.schedule_time }}
+                </div>
+              </div>
             </div>
-        </form>
-    </div>
-    <div class="card-footer border-top-0 bg-white d-flex justify-content-center mb-2">
-        <button class="btn btn-outline-danger  mr-2" type="button" (click)="goToSchedule()">Cancel</button>
-        <button class="btn btn-success" type="button" (click)="onSubmit()">{{action}} Schedule</button>
-    </div>
+            <div class="col-2 mt-4">
+              <div class="form-group mt-2">
+                <div class="form-check">
+                  <input id="isRepeats" name="is_repeats" class="form-check-input" type="checkbox"
+                    formControlName="is_repeats" (change)="toggleRepeats()" />
+                  <label class="form-check-label" for="isRepeats">
+                    Repetition Every
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-3 pl-0">
+              <div class="form-group">
+                <label for="repeatHours">Repeats</label>
+                <div class="input-group d-flex">
+                  <input id="repeatHours" name="repeats_hr" class="form-control" type="number"
+                    formControlName="repeats_hr" min="0" max="23" placeholder="hrs" autocomplete="off"
+                    aria-label="Repeat hours" />
+                  <input id="repeatMinutes" name="repeats_mn" class="form-control ml-2" formControlName="repeats_mn"
+                    type="number" min="0" max="59" placeholder="mins" autocomplete="off" aria-label="Repeat minutes" />
+                </div>
+              </div>
+            </div>
+
+            <div class="col-3 pl-0">
+              <label for="repeatUntil">Until</label>
+              <div class="input-group">
+                <input id="repeatUntil" name="repeats_until" class="form-control" formControlName="repeats_until"
+                  type="number" min="1" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col-3">
+              <label class="form-col-form-label" for="recurrencePattern">
+                Recurrence Pattern<em>*</em>
+              </label>
+              <select id="recurrencePattern" name="recurrence_pattern" class="form-control"
+                formControlName="recurrence_pattern" [ngClass]="{
+                  'is-invalid': scheduleFormErrors.recurrence_pattern
+                }">
+                <option [value]="'ONCE'">Once</option>
+                <option [value]="'DAILY'">Daily</option>
+                <option [value]="'WEEKLY'">Weekly</option>
+                <option [value]="'MONTHLY'">Monthly</option>
+                <option [value]="'YEARLY'">Yearly</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="scheduleFormErrors.recurrence_pattern">
+                {{ scheduleFormErrors.recurrence_pattern }}
+              </div>
+            </div>
+
+            <div class="col-3">
+              <label for="scheduleOn" class="form-col-form-label">
+                Schedule On<em>*</em>
+              </label>
+              <div class="input-group">
+                <input id="scheduleOn" name="schedule_on" class="form-control rounded-left" [value]="formattedToday"
+                  formControlName="schedule_on" type="text" autocomplete="off" />
+                <div class="input-group-append">
+                  <span class="input-group-text bg-white">
+                    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="ml-2 mr-3 col border rounded p-4 position-relative">
+          <div class="pb-2 mb-3 bg-white position-absolute section-name">
+            Range Of Recurrence
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <label class="d-inline" for="rangeOfRecurrence">
+                Start on<em>*</em>
+              </label>
+              <div class="col-9 float-right d-inline mr-2">
+                <div class="input-group">
+                  <owl-date-time #range_of_recurrence [pickerType]="'calendar'"></owl-date-time>
+                  <input id="rangeOfRecurrence" name="range_of_recurrence" class="form-control rounded-left"
+                    formControlName="range_of_recurrence" [owlDateTimeTrigger]="range_of_recurrence"
+                    [owlDateTime]="range_of_recurrence" type="text" autocomplete="off" [ngClass]="{
+                      'is-invalid': scheduleFormErrors.range_of_recurrence
+                    }" />
+                  <div class="input-group-append" [owlDateTimeTrigger]="range_of_recurrence">
+                    <span class="input-group-text bg-white">
+                      <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <div class="invalid-feedback" *ngIf="scheduleFormErrors.range_of_recurrence">
+                    {{ scheduleFormErrors.range_of_recurrence }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-2">
+            <div class="col-6">
+              <div class="d-inline"><span>Ends</span></div>
+              <div class="col-9 float-right d-inline pl-2 pr-4">
+                <div class="form-check d-flex align-items-center">
+                  <input id="scheduleEndsNever" name="radioOptions" class="form-check-input" type="radio"
+                    (change)="toggleFields('never')" formControlName="radioOptions" value="never" [ngClass]="{
+                      'is-invalid': scheduleFormErrors.radioOptions
+                    }" />
+                  <label class="ml-2 mb-0" for="scheduleEndsNever">
+                    Never
+                  </label>
+                </div>
+                <div class="form-check d-flex align-items-center mt-2">
+                  <input id="scheduleEndsAfter" name="radioOptions" class="form-check-input" type="radio"
+                    (change)="toggleFields('after')" formControlName="radioOptions" value="occur" [ngClass]="{
+                      'is-invalid': scheduleFormErrors.radioOptions
+                    }" />
+                  <div class="input-group align-items-center">
+                    <label class="mx-2 mb-0" for="occurrences">After</label>
+                    <input id="occurrences" name="occurs" class="form-control rounded h-25" formControlName="occurs"
+                      type="number" min="-1" autocomplete="off" />
+                    <span class="mx-2">occurrences</span>
+                  </div>
+                </div>
+                <div class="form-check d-flex align-items-center mt-2">
+                  <input id="scheduleEndsBy" name="radioOptions" class="form-check-input"
+                    (change)="toggleFields('ends')" type="radio" formControlName="radioOptions" value="endsby"
+                    [ngClass]="{
+                      'is-invalid': scheduleFormErrors.radioOptions
+                    }" />
+                  <div class="input-group">
+                    <label class="mx-2 mt-1 mb-0" for="endsByDate">
+                      End by
+                    </label>
+                    <owl-date-time #ends [hour12Timer]="true"></owl-date-time>
+                    <input id="endsByDate" name="ends" class="form-control h-25 rounded-left" formControlName="ends"
+                      [owlDateTimeTrigger]="ends" [owlDateTime]="ends" type="text" autocomplete="off" />
+                    <div class="input-group-append" [owlDateTimeTrigger]="ends">
+                      <span class="input-group-text bg-white">
+                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="scheduleFormErrors.radioOptions">
+                  {{ scheduleFormErrors.radioOptions }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="ml-2 mr-3 col border rounded px-3 pt-3 pb-0 position-relative">
+          <div class="pb-2 mb-3 bg-white position-absolute section-name">
+            Recipients
+          </div>
+          <div class="row mt-2">
+            <div class="col-4">
+              <label class="form-col-form-label" for="reportName">
+                Report Name<em>*</em>
+              </label>
+              <select id="reportName" name="report_name" class="form-control" formControlName="report_name"
+                [ngClass]="{ 'is-invalid': scheduleFormErrors.report_name }">
+                <option value="''" disabled>Select</option>
+                <option *ngFor="let report of reports; trackBy: trackByReport" [ngValue]="report.uuid">
+                  {{ report.name }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="scheduleFormErrors.report_name">
+                {{ scheduleFormErrors.report_name }}
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="recipientEmails" class="form-col-form-label">
+                  Select Recipients<em>*</em>
+                </label>
+                <multiselect-dropdown id="recipientEmails" name="recipient_emails" aria-label="Select recipients"
+                  [options]="orgUsers" [settings]="emailSettings" class="form-control p-0" style="height: auto"
+                  formControlName="recipient_emails" [isDisabled]="!hasOrganizationUsers" [ngClass]="{
+                    'is-invalid': scheduleFormErrors.recipient_emails
+                  }"></multiselect-dropdown>
+                <div class="invalid-feedback" *ngIf="scheduleFormErrors.recipient_emails">
+                  {{ scheduleFormErrors.recipient_emails }}
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <label class="form-col-form-label" for="additionalEmails">
+                Additional Email
+              </label>
+              <input id="additionalEmails" name="additional_emails" class="form-control" type="text"
+                placeholder="Comma Seperated Emails" formControlName="additional_emails" autocomplete="off" [ngClass]="{
+                  'is-invalid': scheduleFormErrors.additional_emails
+                }" />
+              <div class="invalid-feedback" *ngIf="scheduleFormErrors.additional_emails">
+                {{ scheduleFormErrors.additional_emails }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-footer border-top-0 bg-white d-flex justify-content-center mb-2">
+    <button class="btn btn-outline-danger mr-2" type="button" (click)="goToSchedule()">
+      Cancel
+    </button>
+    <button class="btn btn-success" type="button" (click)="onSubmit()">
+      {{ action }} Schedule
+    </button>
+  </div>
 </div>

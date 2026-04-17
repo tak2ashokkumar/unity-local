@@ -1,194 +1,137 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { InventoryReportsComponent } from './inventory-reports/inventory-reports.component';
-import { CloudInventoryReportComponent } from './inventory-reports/cloud-inventory-report/cloud-inventory-report.component';
-import { DatacenterInventoryReportComponent } from './inventory-reports/datacenter-inventory-report/datacenter-inventory-report.component';
-import { ReportSchedulesComponent } from './report-schedules/report-schedules.component';
-import { UnityReportsComponent } from './unity-reports.component';
-import { ManageReportsComponent } from './manage-reports/manage-reports.component';
-import { ManageScheduleComponent } from './manage-schedule/manage-schedule.component';
-import { ManageReportCrudComponent } from './manage-reports/manage-report-crud/manage-report-crud.component';
+import { RouterModule, Routes } from '@angular/router';
 import { ManageScheduleCrudComponent } from './manage-schedule/manage-schedule-crud/manage-schedule-crud.component';
-import { ManageReportPreviewComponent } from './manage-reports/manage-report-preview/manage-report-preview.component';
-import { ManageReportsNewTempComponent } from './manage-reports-new-temp/manage-reports-new-temp.component';
-import { ManageReportCrudNewComponent } from './manage-reports-new-temp/manage-report-crud-new/manage-report-crud-new.component';
+import { ManageScheduleComponent } from './manage-schedule/manage-schedule.component';
+import { ReportManagementCrudComponent } from './report-management/report-management-crud/report-management-crud.component';
+import { ReportManagementPreviewComponent } from './report-management/report-management-preview/report-management-preview.component';
+import { ReportManagementComponent } from './report-management/report-management.component';
+import { UnityReportsComponent } from './unity-reports.component';
 
 const routes: Routes = [
   {
-    path: 'inventory',
-    component: InventoryReportsComponent,
-    data: {
-      breadcrumb: {
-        title: 'Inventory'
-      }
-    },
-    children: [
-      {
-        path: 'cloud',
-        component: CloudInventoryReportComponent,
-        data: {
-          breadcrumb: {
-            title: 'Cloud',
-            stepbackCount: 0
-          }
-        }
-      },
-      {
-        path: 'cloud/:scheduleId',
-        component: CloudInventoryReportComponent,
-        data: {
-          breadcrumb: {
-            title: 'Cloud',
-            stepbackCount: 0
-          }
-        }
-      },
-      {
-        path: 'datacenter',
-        component: DatacenterInventoryReportComponent,
-        data: {
-          breadcrumb: {
-            title: 'Datacenter',
-            stepbackCount: 0
-          }
-        }
-      },
-      {
-        path: 'datacenter/:scheduleId',
-        component: DatacenterInventoryReportComponent,
-        data: {
-          breadcrumb: {
-            title: 'Datacenter',
-            stepbackCount: 0
-          }
-        }
-      }
-    ]
-  },
-  {
-    path: 'schedules',
-    component: ReportSchedulesComponent,
-    data: {
-      breadcrumb: {
-        title: 'Reports'
-      }
-    }
-  },
-  {
-    path: 'manage',
+    path: '',
     component: UnityReportsComponent,
-    data: {
-      breadcrumb: {
-        title: 'Manage'
-      }
-    },
     children: [
+      // Keep /reports as the module entry and send users to the active reports list.
       {
-        path: 'reports',
-        component: ManageReportsComponent,
-        data: {
-          breadcrumb: {
-            title: 'Reports'
-          }
-        }
+        path: '',
+        redirectTo: 'manage-reports',
+        pathMatch: 'full',
+      },
+      // Legacy report URLs are redirected to the flattened route structure for bookmark/RBAC compatibility.
+      {
+        path: 'manage',
+        redirectTo: 'manage-reports',
+        pathMatch: 'full',
       },
       {
-        path: 'reports/create',
-        component: ManageReportCrudComponent,
-        data: {
-          breadcrumb: {
-            title: 'Create'
-          }
-        }
+        path: 'manage/reports',
+        redirectTo: 'manage-reports',
+        pathMatch: 'full',
       },
       {
-        path: 'reports/:reportId/update',
-        component: ManageReportCrudComponent,
-        data: {
-          breadcrumb: {
-            title: 'Update'
-          }
-        }
+        path: 'manage/reports/create',
+        redirectTo: 'manage-reports/create',
+        pathMatch: 'full',
       },
       {
-        path: 'reports/:feature/:reportId/preview',
-        component: ManageReportPreviewComponent,
-        data: {
-          breadcrumb: {
-            title: 'Preview'
-          }
-        }
+        path: 'manage/reports/:reportId/update',
+        redirectTo: 'manage-reports/:reportId/update',
+        pathMatch: 'full',
       },
       {
-        path: 'new-reports',
-        component: ManageReportsNewTempComponent,
-        data: {
-          breadcrumb: {
-            title: 'New Reports'
-          }
-        }
+        path: 'manage/reports/:feature/:reportId/preview',
+        redirectTo: 'manage-reports/:feature/:reportId/preview',
+        pathMatch: 'full',
+      },
+      // Legacy schedule URLs are redirected for the same compatibility reason as report URLs.
+      {
+        path: 'manage/schedules',
+        redirectTo: 'manage-schedules',
+        pathMatch: 'full',
       },
       {
-        path: 'new-reports/create',
-        component: ManageReportCrudNewComponent,
-        data: {
-          breadcrumb: {
-            title: 'Create'
-          }
-        }
+        path: 'manage/schedules/:feature/create',
+        redirectTo: 'manage-schedules/:feature/create',
+        pathMatch: 'full',
       },
       {
-        path: 'new-reports/:reportId/update',
-        component: ManageReportCrudNewComponent,
-        data: {
-          breadcrumb: {
-            title: 'Update'
-          }
-        }
-      },
-      
-      {
-        path: 'new-reports/:feature/:reportId/preview',
-        component: ManageReportPreviewComponent,
-        data: {
-          breadcrumb: {
-            title: 'Preview'
-          }
-        }
+        path: 'manage/schedules/:feature/:scheduleId/update',
+        redirectTo: 'manage-schedules/:feature/:scheduleId/update',
+        pathMatch: 'full',
       },
       {
-        path: 'schedules',
+        path: 'manage-reports',
+        component: ReportManagementComponent,
+        data: {
+          breadcrumb: {
+            title: 'Manage',
+          },
+        },
+      },
+      {
+        path: 'manage-reports/create',
+        component: ReportManagementCrudComponent,
+        data: {
+          breadcrumb: {
+            title: 'Create',
+          },
+        },
+      },
+      {
+        path: 'manage-reports/:reportId/update',
+        component: ReportManagementCrudComponent,
+        data: {
+          breadcrumb: {
+            title: 'Update',
+          },
+        },
+      },
+      {
+        path: 'manage-reports/:feature/:reportId/preview',
+        component: ReportManagementPreviewComponent,
+        data: {
+          breadcrumb: {
+            title: 'Preview',
+          },
+        },
+      },
+      {
+        path: 'manage-schedules',
         component: ManageScheduleComponent,
         data: {
           breadcrumb: {
-            title: 'Schedules'
-          }
-        }
+            title: 'Schedules',
+          },
+        },
       },
       {
-        path: 'schedules/:feature/create',
+        path: 'manage-schedules/:feature/create',
         component: ManageScheduleCrudComponent,
         data: {
           breadcrumb: {
-            title: 'Create'
-          }
-        }
+            title: 'Create',
+          },
+        },
       },
       {
-        path: 'schedules/:feature/:scheduleId/update',
+        path: 'manage-schedules/:feature/:scheduleId/update',
         component: ManageScheduleCrudComponent,
         data: {
           breadcrumb: {
-            title: 'Update'
-          }
-        }
+            title: 'Update',
+          },
+        },
       },
-    ]
-  }
+    ],
+  },
 ];
 
+/**
+ * Defines the child route configuration for the Unity Reports feature module.
+ */
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class UnityReportsRoutingModule { }
+export class UnityReportsRoutingModule {}

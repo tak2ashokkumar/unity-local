@@ -2,9 +2,13 @@
   display: block;
 }
 
-.manage-schedule {
+.report-management {
   font-size: 0.875rem;
   line-height: 1.4;
+
+  &__filter {
+    line-height: 1.4;
+  }
 
   &__feature-list {
     .list-group-item {

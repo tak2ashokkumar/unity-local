@@ -16,7 +16,7 @@ export class AppWelcomePageComponent implements OnInit, OnDestroy {
   public tabItems: TabData[] = tabItems;
   public ngUnsubscribe = new Subject();
   welcomePage: boolean;
-  brandName: string = 'Unity';
+  brandName: string = 'UnityOne AI';
   constructor(private welcomeService: AppWelcomeServiceService,
     public userSvc: UserInfoService,) {
     if (this.userSvc.selfBrandedOrgName) {
@@ -54,7 +54,7 @@ export class AppWelcomePageComponent implements OnInit, OnDestroy {
 }
 export const tabItems: TabData[] = [
   {
-    name: 'Welcome to Unity',
+    name: 'Welcome to UnityOne AI',
     url: '/welcomepage'
   }
 ];

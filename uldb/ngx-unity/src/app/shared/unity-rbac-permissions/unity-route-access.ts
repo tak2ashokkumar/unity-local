@@ -10,7 +10,7 @@ export const UNITY_ROUTE_ACCESS = {
         aliases: ['/support/documentation']
     },
     REPORTS_MANAGE_NEW_REPORTS: {
-        aliases: ['/reports/manage']
+        aliases: ['/reports/manage-reports', '/reports/manage-schedules', '/reports/manage']
     },
     SERVICES_AIML: {
         aliases: ['/services/aiml-summary', '/services/aiml-event-mgmt']

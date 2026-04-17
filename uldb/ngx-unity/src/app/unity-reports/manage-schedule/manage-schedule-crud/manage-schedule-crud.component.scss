@@ -1,13 +1,37 @@
-.section-name {
-    position: absolute;
-    top: -0.75rem;
-    left: 1rem;
-    z-index: 1;
-    padding: 0 0.5rem;
-    font-size: 1.02rem;
+:host {
+  display: block;
 }
 
+.manage-schedule-crud {
+  font-size: 0.875rem;
+  line-height: 1.4;
 
-body {
-    overflow: auto;
+  .form-col-form-label,
+  label {
+    line-height: 1.35;
+  }
+
+  .form-control,
+  .form-check-label,
+  .input-group-text {
+    font-size: 0.875rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .input-group {
+    align-items: stretch;
+  }
+}
+
+.section-name {
+  position: absolute;
+  top: -0.75rem;
+  left: 1rem;
+  z-index: 1;
+  padding: 0 0.5rem;
+  font-size: 1.02rem;
+  line-height: 1.35;
 }

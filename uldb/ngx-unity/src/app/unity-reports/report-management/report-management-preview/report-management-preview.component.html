@@ -1,0 +1,48 @@
+<div class="card round-edge">
+    <div class="card-header bg-white p-1">
+        <div class="row p-0">
+            <div class="col-3">
+                <div class="py-1 ml-3">
+                    <span>Preview Report</span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="pull-right">
+                    <button class="action-icons fas fa-download font-sm d-inline" tooltip="Download"
+                        (click)="downloadFile()" accessControl moduleName="Unity Report"
+                        accessType="Manage Unity Report" elementType="actionbtn"></button>
+                    <a class="nav-link py-1 text-right text-warning d-inline" (click)="goBack()">
+                        <i class="fa fa-arrow-left">&nbsp;</i>
+                        <span>Back to Manage Reports</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Feature route param decides which preview renderer owns the report body. -->
+        <ng-container [ngSwitch]="feature">
+            <ng-container *ngSwitchCase="'sustainability'">
+                <report-management-sustainability-reports-preview [reportId]="reportId"></report-management-sustainability-reports-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Cloud Inventory'">
+                <report-management-cloud-inventory-preview [reportId]="reportId"></report-management-cloud-inventory-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'DC Inventory'">
+                <report-management-dc-inventory-preview [reportId]="reportId"></report-management-dc-inventory-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Cost Analysis'">
+                <report-management-cost-analysis-preview [reportId]="reportId"></report-management-cost-analysis-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'Performance'">
+                <report-management-performance-report-preview [reportId]="reportId"></report-management-performance-report-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'DevOps Automation'">
+                <report-management-cloud-inventory-preview [reportId]="reportId"></report-management-cloud-inventory-preview>
+            </ng-container>
+            <ng-container *ngSwitchCase="'UnityOne ITSM'">
+                <report-management-cloud-inventory-preview [reportId]="reportId"></report-management-cloud-inventory-preview>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>
