@@ -22,6 +22,29 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end w-35">
+                                <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
+                                    tooltip="Manage in same tab"
+                                    (click)="consoleSameTab(view)"></button>
+                                <span dropdown placement="bottom right" container="body">
+                                    <!-- <button
+                                        class="action-icons action-icons-disabled mb-0 fas fa-external-link-alt font-sm ml-1"
+                                        (click)="false" container="body"></button> -->
+
+                                    <button id="button-container"
+                                        class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
+                                        data-toggle="dropdown" aria-controls="dropdown-container" dropdownToggle
+                                        (click)="false" container="body" tooltip="Manage in New Tab"></button>
+                                    <div id="dropdown-container" class="dropdown-menu dropdown-menu-right" *dropdownMenu
+                                        aria-labelledby="button-container">
+                                        <!-- <a class="dropdown-item text-primary" (click)="webAccessNewTab(view)">Web
+                                            Access</a> -->
+                                        <!-- <a class="dropdown-item text-primary" (click)="requestWebAccess(view)">Request
+                                            Web Access </a> -->
+                                        <a class="dropdown-item" (click)="consoleNewTab(view)">
+                                            Console Access
+                                        </a>
+                                    </div>
+                                </span>
                                 <button
                                     *ngIf="!conditionDetailsViewData.ticketId && !conditionDetailsViewData.ticketUuid && conditionDetailsViewData.conditionStatus != 'Resolved'"
                                     class="btn btn-sm btn-pill btn-warning ml-2" type="button"
@@ -447,3 +470,6 @@
         </div>
     </div>
 </ng-template>
+
+<naci-auth-modal></naci-auth-modal>
+<naci-floating-terminal></naci-floating-terminal>

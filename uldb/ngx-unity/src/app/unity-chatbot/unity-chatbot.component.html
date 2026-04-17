@@ -44,8 +44,7 @@
                             [ngClass]="{'active': tab.isSelected}">{{tab.name}}</button>
                     </div>
                 </div>
-                <div *ngIf="selectedTab == 'Agentic Workflows'"
-                    class="agentic-container custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top">
+                <div *ngIf="selectedTab == 'Agentic Workflows'" style="height: 100%; overflow: hidden;">
                     <uc-agentic [chatbotData]="moduleLevelData"></uc-agentic>
                 </div>
                 <ng-container *ngIf="selectedTab == 'AI Agents'">

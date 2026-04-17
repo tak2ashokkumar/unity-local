@@ -1623,7 +1623,7 @@ export const cloudAttributes = [
   },
   {
     cloudType: "vCloud Director",
-    attributes: ["name", "account_id", "cloud_type", "username", "password"]
+    attributes: ["name", "account_id", "cloud_type", "endpoint", "username", "password"]
   },
   {
     cloudType: "ESXi",

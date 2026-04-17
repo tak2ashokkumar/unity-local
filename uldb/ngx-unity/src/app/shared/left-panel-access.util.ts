@@ -5,7 +5,8 @@ export const canAccessAiInfraManagement = (userService: UserInfoService): boolea
 };
 
 export const canAccessAiAgents = (userService: UserInfoService): boolean => {
-    return !!userService.isTenantOrg;
+    // return !!userService.isTenantOrg;
+    return true;
 };
 
 export const canAccessCostAnalysis = (userService: UserInfoService): boolean => {

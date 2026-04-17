@@ -44,8 +44,13 @@ import { UnityLogMgmtServicesComponent } from './unity-log-mgmt-services/unity-l
 import { UnityNtaServicesComponent } from './unity-nta-services/unity-nta-services.component';
 import { VmBackupComponent } from './vm-backup/vm-backup.component';
 import { VmMigrationComponent } from './vm-migration/vm-migration.component';
+import { NaciTerminalNewTabComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-terminal-new-tab/naci-terminal-new-tab.component';
 
 const routes: Routes = [
+  {
+    path: 'terminal-new-tab',
+    component: NaciTerminalNewTabComponent
+  },
   {
     path: 'devopscontroller',
     component: DevopsAsServicesComponent,

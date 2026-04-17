@@ -317,7 +317,7 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
     this.service.getSupportedLLMModelList().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.llmModels = res;
       this.llmModels.forEach(m => {
-        if (m.active_for_applications?.includes('assistant')) {
+        if (m.active_for_applications?.includes('network_agent')) {
           this.activeModel = m;
         }
       })
@@ -339,8 +339,8 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
     }
 
     if (model.is_user_owned) {
-      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
-      model.active_for_applications.push('assistant');
+      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'network_agent');
+      model.active_for_applications.push('network_agent');
       this.changeActiveModelToSelected(model);
     } else {
       // this.goToConfig(model);
@@ -350,7 +350,7 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
 
   changeActiveModelToSelected(model: SupportedLLMConfigData) {
     this.showModelDropdown = false;
-    this.service.changeActiveModel('Assistant', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.service.changeActiveModel('Network Agent', model).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.activeModel = model;
     }, err => {
 

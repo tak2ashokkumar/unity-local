@@ -176,6 +176,11 @@ import { NaciNetworkTopologyStepsService } from './ai-agents/ai-agents-network-a
 import { NaciCheckDeviceHealthStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-check-device-health-steps/naci-check-device-health-steps.service';
 import { NaciCliCheckStepsService } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-cli-check-steps/naci-cli-check-steps.service';
 import { NaciZabbixGraphsComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-zabbix-graphs/naci-zabbix-graphs.component';
+import { NaciFloatingTerminalComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-floating-terminal/naci-floating-terminal.component';
+import { NaciAuthModalComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-auth-modal/naci-auth-modal.component';
+import { NaciNewTerminalComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-new-terminal/naci-new-terminal.component';
+import { NaciFloatingTerminalItemComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-floating-terminal/naci-floating-terminal-item/naci-floating-terminal-item.component';
+import { NaciTerminalNewTabComponent } from './ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-terminal-new-tab/naci-terminal-new-tab.component';
 /**
  * Change format according to need
  */
@@ -350,8 +355,13 @@ export const MY_NATIVE_FORMATS = {
     NtDocumentAndCloseStepComponent,
     NtRemediationScriptStepComponent,
     NtRootCauseAnalysisStepComponent,
+    NaciFloatingTerminalComponent,
+    NaciAuthModalComponent,
+    NaciNewTerminalComponent,
     NtValidateFixStepComponent,
-    NaciZabbixGraphsComponent
+    NaciZabbixGraphsComponent,
+    NaciFloatingTerminalItemComponent,
+    NaciTerminalNewTabComponent
   ],
   imports: [
     AppCoreModule,

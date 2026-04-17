@@ -14,6 +14,7 @@ import { LeftPanelRouteAccessGuard } from './shared/app-guards/left-panel-route-
 import { AiInfraMgmtGuard } from './unity-ai-infra-mgmt/unity-ai-infra-mgmt.guard';
 import { CostAnalysisGuard } from './unity-cost-analysis/unity-cost-analysis.guard';
 import { WelcomePageGuardService } from './welcome-page-guard.service';
+import { NaciTerminalNewTabComponent } from './unity-services/ai-agents/ai-agents-network-agent/ai-agents-network-agent-dashboard/network-agent-conditions/network-agent-condition-investigation/naci-terminal-new-tab/naci-terminal-new-tab.component';
 
 export const routes: Routes = [
   {
@@ -218,6 +219,10 @@ export const routes: Routes = [
   {
     path: 'unityterminal',
     component: AppTermialViewComponent
+  },
+  {
+    path: 'terminal-new-tab',
+    component: NaciTerminalNewTabComponent
   },
 ];
 

@@ -40,7 +40,7 @@ export const cloudAttributes = [
   },
   {
     cloudType: "VMware vCloud Director",
-    attributes: ["name", "account_id", "cloud_type", "username", "password"]
+    attributes: ["name", "account_id", "cloud_type", "endpoint", "username", "password"]
   },
   {
     cloudType: "ESXi",

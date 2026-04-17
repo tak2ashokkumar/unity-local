@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GET_AIOPS_CONDITION_BY_ID } from 'src/app/shared/api-endpoint.const';
 import { FormBuilder, Validators } from '@angular/forms';
-import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { AppLevelService } from 'src/app/app-level.service';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
@@ -14,6 +14,7 @@ import { NetworkAgentConditionActivityDetail } from '../network-agent-conditions
 import { NetworkAgentConditionActivityDetailViewData } from '../network-agent-conditions.service';
 import { ConditionResponse, PromptResult } from './network-agent-condition-investigation.type';
 import { AnswerType, ConditionData } from './naci-chatbot/naci-chatbot.type';
+import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 
 @Injectable()
 export class NetworkAgentConditionInvestigationService {
@@ -34,16 +35,16 @@ export class NetworkAgentConditionInvestigationService {
     return this.http.get<PaginatedResult<any>>(`/internal/mcp/prompts/?app_name=condition_agent`);
   }
 
-  promptSaveAs(selectedPrompt: PromptResultViewData){
-    return this.http.post<any>(`/internal/mcp/prompts/${selectedPrompt.uuid}/save_as/`,{prompt: selectedPrompt.prompt,prompt_name: selectedPrompt.promptName});
+  promptSaveAs(selectedPrompt: PromptResultViewData) {
+    return this.http.post<any>(`/internal/mcp/prompts/${selectedPrompt.uuid}/save_as/`, { prompt: selectedPrompt.prompt, prompt_name: selectedPrompt.promptName });
   }
 
-  promptSave(selectedPrompt: PromptResultViewData){
-    return this.http.patch<any>(`/internal/mcp/prompts/${selectedPrompt.uuid}/`,selectedPrompt);
+  promptSave(selectedPrompt: PromptResultViewData) {
+    return this.http.patch<any>(`/internal/mcp/prompts/${selectedPrompt.uuid}/`, selectedPrompt);
   }
 
-  activateVersion(activateVersion: PromptResultViewData){
-    return this.http.post(`/internal/mcp/prompts/${activateVersion.uuid}/activate/`,{});
+  activateVersion(activateVersion: PromptResultViewData) {
+    return this.http.post(`/internal/mcp/prompts/${activateVersion.uuid}/activate/`, {});
   }
 
   getConditionDetails(conditionUuid: string) {
@@ -238,14 +239,21 @@ export class NetworkAgentConditionInvestigationService {
       view.prompt = ad.prompt;
       view.isActive = ad.is_active;
       view.isDefault = ad.is_default;
-      view.createdAt = ad.created_at? this.utilSvc.toUnityOneDateFormat(ad.created_at): 'NA';
-      view.updatedAt = ad.updated_at? this.utilSvc.toUnityOneDateFormat(ad.updated_at): 'NA';
+      view.createdAt = ad.created_at ? this.utilSvc.toUnityOneDateFormat(ad.created_at) : 'NA';
+      view.updatedAt = ad.updated_at ? this.utilSvc.toUnityOneDateFormat(ad.updated_at) : 'NA';
       view.customer = ad.customer;
       view.promptName = ad.prompt_name;
       viewdata.push(view);
     });
 
     return viewdata;
+  }
+
+  getConsoleAccessInput(device: any): ConsoleAccessInput {
+    return {
+      label: DeviceMapping.SWITCHES, deviceType: DeviceMapping.SWITCHES, deviceId: 'asfsdf',
+      newTab: false, deviceName: 'asg', managementIp: '10.192.34.22'
+    };
   }
 
 }

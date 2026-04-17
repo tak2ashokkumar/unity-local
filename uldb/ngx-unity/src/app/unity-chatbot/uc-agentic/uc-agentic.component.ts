@@ -24,7 +24,8 @@ export class UcAgenticComponent implements OnInit {
   firstMessage = '';
   newMessage = '';
   chatHistoryData: ChatHistoryData[] = [];
-  @ViewChild('chatBody') chatBody?: ElementRef<HTMLDivElement>;
+  // @ViewChild('chatBody') chatBody?: ElementRef<HTMLDivElement>;
+  @ViewChild('messagesContainer') chatBody?: ElementRef<HTMLDivElement>;
   workflowNames: WorkflowType[];
   showHotKeys = true;
   botData = {
@@ -128,6 +129,7 @@ export class UcAgenticComponent implements OnInit {
 
     if (message === this.firstMessage) this.firstMessage = '';
     if (message === this.newMessage) this.newMessage = '';
+    this.scrollToBottom('auto', true);
 
     setTimeout(() => this.scrollToBottom('smooth'), 60);
 
@@ -182,28 +184,50 @@ export class UcAgenticComponent implements OnInit {
   }
 
 
-  private scrollToBottom(behavior: 'smooth' | 'auto' = 'auto') {
+  // private scrollToBottom(behavior: 'smooth' | 'auto' = 'auto') {
+  //   try {
+  //     const el = this.chatBody?.nativeElement;
+  //     if (el) {
+  //       setTimeout(() => {
+  //         try {
+  //           el.scrollTo({ top: el.scrollHeight, behavior });
+  //         } catch (e) {
+  //           el.scrollTop = el.scrollHeight;
+  //         }
+  //       }, 10);
+  //     } else {
+  //       try {
+  //         window.scrollTo({ top: document.body.scrollHeight, behavior });
+  //       } catch (e) {
+  //       }
+  //     }
+  //   } catch (e) {
+  //   }
+  // }
+
+  private scrollToBottom(behavior: 'smooth' | 'auto' = 'auto', force: boolean = false): void {
     try {
+      // Get the chat container
       const el = this.chatBody?.nativeElement;
-      if (el) {
-        // small delay to allow DOM updates
+      if (!el) return;
+
+      // Check if user is near the bottom (tolerance of 5px)
+      const isNearBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 15;
+
+      // Only scroll if the user is already at the bottom
+      if (force || isNearBottom) {
+        // Delay slightly to ensure new messages are rendered
         setTimeout(() => {
           try {
             el.scrollTo({ top: el.scrollHeight, behavior });
           } catch (e) {
+            // fallback for older browsers
             el.scrollTop = el.scrollHeight;
           }
         }, 10);
-      } else {
-        // fallback
-        try {
-          window.scrollTo({ top: document.body.scrollHeight, behavior });
-        } catch (e) {
-          /* ignore */
-        }
       }
-    } catch (e) {
-      // ignore
+    } catch (err) {
+      console.error('Failed to scroll chat container:', err);
     }
   }
 

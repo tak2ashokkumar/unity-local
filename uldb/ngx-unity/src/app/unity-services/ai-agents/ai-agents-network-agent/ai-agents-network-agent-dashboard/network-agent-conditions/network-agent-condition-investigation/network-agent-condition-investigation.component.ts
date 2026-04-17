@@ -3,7 +3,7 @@ import { NetworkAgentConditionDetailsViewData, NetworkAgentConditionInvestigatio
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { AppUtilityService, SERVICE_NOW_TICKET_TYPE, TICKET_MGMT_TYPE } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, DeviceMapping, SERVICE_NOW_TICKET_TYPE, TICKET_MGMT_TYPE, TICKET_TYPE } from 'src/app/shared/app-utility/app-utility.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { takeUntil } from 'rxjs/operators';
@@ -15,6 +15,12 @@ import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/s
 import { DOCUMENT } from '@angular/common';
 import { NetworkAgentsChatResponseType } from './naci-chatbot/naci-chatbot.type';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
+import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
+import { DEVICE_WEB_ACCESS_SUBJECT, SWITCH_TICKET_METADATA } from 'src/app/shared/create-ticket.const';
+import { AppLevelService } from 'src/app/app-level.service';
+import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
+import { NaciNewTerminalService } from './naci-new-terminal/naci-new-terminal.service';
 
 @Component({
   selector: 'network-agent-condition-investigation',
@@ -65,6 +71,8 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
   confirmSaveAsModalRef: BsModalRef;
   promptName: string = '';
 
+  conversationId: string = '';
+
   constructor(private svc: NetworkAgentConditionInvestigationService,
     @Inject(DOCUMENT) private document,
     private renderer: Renderer2,
@@ -74,7 +82,11 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
     private router: Router,
     private utilService: AppUtilityService,
     private modalService: BsModalService,
-    public storage: StorageService) {
+    public storage: StorageService,
+    private ticketService: SharedCreateTicketService,
+    private termService: FloatingTerminalService,
+    private appService: AppLevelService,
+    private newTerminalService: NaciNewTerminalService) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.conditionId = params.get('conditionId');
       this.conditionUuid = params.get('conditionUuid');
@@ -336,6 +348,10 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
     // if (res?.answer?.stage == "Stage 0") {
     //   this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);
     // }
+    if (res?.conversation_id) {
+      this.conversationId = res.conversation_id;
+      this.newTerminalService.setConversationId(res.conversation_id);
+    }
     this.spinner.stop('main');
   }
 
@@ -419,6 +435,28 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
       this.confirmSaveAsModalRef.hide();
       this.notification.error(new Notification('Failed to Save As Version. Please try again later.'));
     })
+  }
+
+  requestWebAccess(view: any) {
+    this.ticketService.createTicket({
+      subject: DEVICE_WEB_ACCESS_SUBJECT(DeviceMapping.SWITCHES, view.name),
+      metadata: SWITCH_TICKET_METADATA(DeviceMapping.SWITCHES, view.name, view.deviceStatus, view.model, view.type, view.managementIp),
+      type: TICKET_TYPE.PROBLEM,
+      webaccess: true
+    }, DeviceMapping.SWITCHES);
+  }
+
+  webAccessNewTab(view: any) {
+    // this.appService.updateActivityLog('switches', 'sdrgg');
+    window.open('/main#/unityterminal/');
+  }
+
+  consoleNewTab(view: any) {
+    window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+  }
+
+  consoleSameTab(view: any) {
+    this.newTerminalService.openTerminal();
   }
 
 }
