@@ -90,7 +90,8 @@
                                         <button class="action-icons mb-0 fas fa-history font-sm ml-1" container="body"
                                             tooltip="Schedule History" (click)="getScheduleHistory(view)"></button>
                                         <button class="action-icons fas fa-pencil-alt font-sm ml-1"
-                                            (click)="editAccount(view)" tooltip="Edit Account">
+                                            (click)="editAccount(view)" tooltip="Edit Account" accessControl moduleName="Public Cloud" accessType="Manage Public Cloud"
+                                            elementType="actionbtn">
                                         </button>
                                         <span dropdown placement="bottom right" container="body">
                                             <button id="button-container"

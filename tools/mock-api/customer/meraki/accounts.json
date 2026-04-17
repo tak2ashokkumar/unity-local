@@ -1,0 +1,70 @@
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "uuid": "15203af0-9f8b-4c21-a54b-edf191cd53ad",
+      "name": "CiscoMeraki",
+      "account_url": "https://api.meraki.com",
+      "port": 443,
+      "dashboard_url": "https://n149.meraki.com",
+      "proxy": {
+        "proxy_fqdn": "https://0a9abe98-6ed2-4c85-92a4-0c45b8adeb04.cnr-uproxy.unitedlayer.com",
+        "backend_url": "https://n149.meraki.com",
+        "same_tab": false
+      },
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "tags": [],
+      "backend_url": "https://n149.meraki.com",
+      "status": "1",
+      "collector": null,
+      "created_at": "2025-05-30T13:45:32.516320+05:30",
+      "updated_at": "2026-02-02T16:59:09.055826+05:30",
+      "schedule_meta": {
+        "run_now": false,
+        "schedule_type": "none"
+      }
+    },
+    {
+      "uuid": "0e3acb05-a945-43df-9674-fcd5f4e99c61",
+      "name": "Meraki",
+      "account_url": "https://api.meraki.com",
+      "port": 443,
+      "dashboard_url": "https://n149.meraki.com",
+      "proxy": {
+        "proxy_fqdn": "https://a532c305-7f8d-4c91-a1d3-e8c62a31acbb.cnr-uproxy.unitedlayer.com",
+        "backend_url": "https://n149.meraki.com",
+        "same_tab": false
+      },
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "tags": [],
+      "backend_url": "https://n149.meraki.com",
+      "status": "1",
+      "collector": null,
+      "created_at": "2025-05-29T21:56:34.035577+05:30",
+      "updated_at": "2026-02-02T16:59:09.056976+05:30",
+      "schedule_meta": {
+        "end_date": "",
+        "run_now": true,
+        "daily": {
+          "days_interval": "1",
+          "at": "21:56:32 +0530"
+        },
+        "schedule_type": "daily",
+        "end_date_status": "never",
+        "start_date": "2025-05-29T16:26:28.451Z"
+      }
+    }
+  ]
+}

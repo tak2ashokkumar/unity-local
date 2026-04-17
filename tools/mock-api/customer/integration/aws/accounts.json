@@ -1,0 +1,42 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 217,
+      "region": [],
+      "aws_user": null,
+      "access_key": "XXXXXXXXXXXXXXXXXXXX",
+      "secret_key": "XXXXXXXXXXXXXXXXXXXX",
+      "account_name": null,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "discover_services": "All",
+      "services": [],
+      "onboard_device": false,
+      "dependency_map": false,
+      "collector": null,
+      "uuid": "f1968350-48f4-4ef4-a219-18fe770b12d9",
+      "name": "AWS Demo",
+      "customer": 417,
+      "cloud_provider": 600,
+      "is_managed": true,
+      "discover_dependency": true,
+      "ingest_event": false,
+      "discover_resources": true,
+      "cost_analysis": true,
+      "schedule_meta": {
+        "run_now": true,
+        "schedule_type": "none"
+      },
+      "event_inbound_webhook": null,
+      "event_inbound_api": null,
+      "ticket_subject_format": null
+    }
+  ]
+}

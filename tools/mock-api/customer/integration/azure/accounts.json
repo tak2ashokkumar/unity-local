@@ -1,0 +1,134 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "user_name": null,
+      "subscription_id": "1234abcd-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "client_secret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "services_to_discover": [],
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "client_id": "1234abcd-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "tenant_id": "1234abcd-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "azure_ad_integ": false,
+      "resource_type": null,
+      "attributes_map": [],
+      "collector": null,
+      "uuid": "2d5d48db-9da3-4085-b172-4cf2fa31e592",
+      "name": "Azure Demo",
+      "customer": 417,
+      "cloud_provider": 400,
+      "is_managed": true,
+      "discover_dependency": true,
+      "ingest_event": false,
+      "discover_resources": true,
+      "cost_analysis": true,
+      "schedule_meta": {
+        "run_now": true,
+        "schedule_type": "none"
+      },
+      "event_inbound_webhook": {
+        "uuid": "2c0838fc-f544-4c1b-8259-c816c1880e0a",
+        "token": "9b2638d3ed931e83b3c950e30cd04a9c30fb1aac",
+        "token_expiry_date": "2026-07-22",
+        "webhook_url": "http://play.unityone.ai/customer/inbound/webhook/2c0838fc-f544-4c1b-8259-c816c1880e0a/events/",
+        "attribute_map": [
+          {
+            "unity_attribute": "device_name",
+            "custom_field": null,
+            "mapped_attribute_expression": "{{data.essentials.configurationItems.0}}",
+            "expression_type": "simple",
+            "regular_expression": null,
+            "choice_map": []
+          },
+          {
+            "unity_attribute": "event_id",
+            "custom_field": null,
+            "mapped_attribute_expression": "{{data.essentials.originAlertId}}",
+            "expression_type": "simple",
+            "regular_expression": "[-_](\\d+)$",
+            "choice_map": []
+          },
+          {
+            "unity_attribute": "severity",
+            "custom_field": null,
+            "mapped_attribute_expression": "{{data.essentials.severity}}",
+            "expression_type": "simple",
+            "regular_expression": null,
+            "choice_map": [
+              {
+                "unity_value": "1",
+                "mapped_value": "Informational"
+              },
+              {
+                "unity_value": "2",
+                "mapped_value": "Sev2,Sev3,Warning"
+              },
+              {
+                "unity_value": "3",
+                "mapped_value": "Sev0,Sev1"
+              }
+            ]
+          },
+          {
+            "unity_attribute": "status",
+            "custom_field": null,
+            "mapped_attribute_expression": "{{data.essentials.monitorCondition}}",
+            "expression_type": "simple",
+            "regular_expression": null,
+            "choice_map": [
+              {
+                "unity_value": "0",
+                "mapped_value": "Fired"
+              },
+              {
+                "unity_value": "1",
+                "mapped_value": "Resolved"
+              }
+            ]
+          },
+          {
+            "unity_attribute": "description",
+            "custom_field": null,
+            "mapped_attribute_expression": "{{data.alertContext.condition.allOf.0.metricName}} {{data.essentials.description}}",
+            "expression_type": "simple",
+            "regular_expression": null,
+            "choice_map": []
+          },
+          {
+            "unity_attribute": "event_datetime",
+            "custom_field": null,
+            "mapped_attribute_expression": "{{data.essentials.firedDateTime}}",
+            "expression_type": "simple",
+            "regular_expression": null,
+            "choice_map": []
+          },
+          {
+            "unity_attribute": "recovered_datetime",
+            "custom_field": null,
+            "mapped_attribute_expression": "{{data.essentials.resolvedDateTime}}",
+            "expression_type": "simple",
+            "regular_expression": null,
+            "choice_map": []
+          },
+          {
+            "unity_attribute": "custom_data",
+            "custom_field": "Data1",
+            "mapped_attribute_expression": "{{data.essentials.severity}}",
+            "expression_type": "simple",
+            "regular_expression": null,
+            "choice_map": []
+          }
+        ]
+      },
+      "event_inbound_api": null,
+      "ticket_subject_format": null
+    }
+  ]
+}

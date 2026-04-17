@@ -1,0 +1,37 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "uuid": "f5170be1-6cd1-4c11-b234-03342c6aefcf",
+      "name": "sdwan",
+      "account_url": "https://sandbox-sdwan-2.cisco.com",
+      "port": 443,
+      "username": "devnetuser",
+      "proxy": {
+        "proxy_fqdn": "https://d6231671-ede0-4282-a02e-11ad63994269.cnr-uproxy.unitedlayer.com",
+        "backend_url": "https://sandbox-sdwan-2.cisco.com",
+        "same_tab": false
+      },
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "tags": [
+        "UnityDemo"
+      ],
+      "backend_url": "https://sandbox-sdwan-2.cisco.com",
+      "status": "1",
+      "collector": null,
+      "created_at": "2025-04-30T22:20:45.771551+05:30",
+      "updated_at": "2026-02-02T17:02:49.549413+05:30",
+      "schedule_meta": {
+        "run_now": true,
+        "schedule_type": "none"
+      }
+    }
+  ]
+}

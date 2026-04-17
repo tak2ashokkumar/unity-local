@@ -1,0 +1,59 @@
+{
+  "count": 1,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 211,
+      "email": "user@unityone.ai",
+      "project_id": "unity-123456",
+      "service_account_info": "xxxxx",
+      "service_mesh": false,
+      "discover_services": "Custom",
+      "services": [
+        "Capacity Planner",
+        "Backup and DR",
+        "VM instances",
+        "VMware Engine networks",
+        "Clusters"
+      ],
+      "onboard_device": false,
+      "dependency_map": false,
+      "billing_enabled": true,
+      "dataset": "BQDataset",
+      "billing_account": "010DAB-0227DE-9C0391",
+      "co2emission_enabled": false,
+      "monitoring": {
+        "configured": false,
+        "observium": false,
+        "enabled": false,
+        "zabbix": true
+      },
+      "sustainability": false,
+      "collector": null,
+      "uuid": "6c5cdcc3-bb87-41a3-96e3-4585fd67ca85",
+      "name": "GCP Demo",
+      "customer": 417,
+      "cloud_provider": 700,
+      "is_managed": true,
+      "discover_dependency": true,
+      "ingest_event": false,
+      "discover_resources": true,
+      "cost_analysis": true,
+      "schedule_meta": {
+        "end_date": "",
+        "run_now": true,
+        "daily": {
+          "days_interval": "1",
+          "at": "13:58:21 +0530"
+        },
+        "schedule_type": "daily",
+        "end_date_status": "never",
+        "start_date": "2025-07-02T08:26:17.734Z"
+      },
+      "event_inbound_webhook": null,
+      "event_inbound_api": null,
+      "ticket_subject_format": null
+    }
+  ]
+}

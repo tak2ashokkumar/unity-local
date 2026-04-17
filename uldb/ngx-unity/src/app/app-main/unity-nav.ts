@@ -302,10 +302,10 @@ const UNITY_SETUP_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
             name: 'FinOps Building Blocks',
             url: '/setup/finops',
             icon: 'fa fa-users',
-            // attributes: {
-            //     module: UnityModules.FINOPS,
-            //     access: 'Manage'
-            // }
+            attributes: {
+                module: UnityModules.FINOPS,
+                access: 'View'
+            }
         },
         {
             name: 'Monitoring',
@@ -493,9 +493,9 @@ const UNITY_COST_ANALYSIS_NAV_ITEMS = (svc: PermissionService) => {
             name: 'Cloud Intelligence',
             url: '/cost-analysis/cost-intelligence',
             icon: 'fas fa-magic',
-            // attributes: {
-            //     module: UnityModules.FINOPS
-            // }
+            attributes: {
+                module: UnityModules.FINOPS
+            }
         }
     ]
     navItems = navItems.map(nav => nav.attributes ? filterRequiredUnityCostAnalysisNavItems(nav, svc) : nav);

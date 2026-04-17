@@ -1,1 +1,141 @@
-[]
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 15,
+            "ops_components": null,
+            "fixed_components": null,
+            "func_components": {
+                "compute": {
+                    "id": 23,
+                    "uuid": "b61563a0-6faf-404c-ae29-59263afd4fb9",
+                    "cpu_count": 2,
+                    "cpu_type": "Intel Xeon",
+                    "cpu_metric_type": "Vcpu Hours",
+                    "cpu_metric_unit": "Vcpu",
+                    "cpu_rate_value": 0.1,
+                    "cpu_rate_frequency": "Hourly",
+                    "ram_size": 100,
+                    "ram_metric_type": "Actual RAM Usage",
+                    "ram_metric_unit": "GB",
+                    "ram_rate_value": 0.5,
+                    "ram_rate_frequency": "Daily",
+                    "storage_type": "SSD",
+                    "storage_count": 1,
+                    "storage_allocated_capacity": 0,
+                    "storage_rate_value": 0.001,
+                    "storage_rate_frequency": "Daily"
+                },
+                "os_config": null,
+                "network": null,
+                "backup": null
+            },
+            "management_components": null,
+            "business_unit": {
+                "id": 13,
+                "uuid": "7ea5e4d4-01fc-4483-b867-6cb7594b240b",
+                "name": "HR",
+                "description": null,
+                "tags": "Test",
+                "customer": 417
+            },
+            "service": {
+                "id": 14,
+                "name": "ABC",
+                "uuid": "5ba34a71-c656-4e50-a386-1ae9aac80a46",
+                "hostname": null,
+                "latency": null,
+                "throughput": null,
+                "device_id": null,
+                "content_type": null,
+                "parent_app": null,
+                "customer": null,
+                "type_of_app": "WEB",
+                "parent_app_availability": null,
+                "parent_app_status_code": null
+            },
+            "finops_cost": {
+                "id": 15,
+                "uuid": "9ed29805-8ab4-4ba4-92ab-36a53e5b48c8",
+                "billing_currency": "USD",
+                "budget_amount": 1000,
+                "budget_period": "Monthly",
+                "customer": 417
+            },
+            "device_types": [],
+            "devices": [],
+            "basic": {
+                "building_block_code": "Test",
+                "host_deployment_type": null,
+                "budget_period": "Monthly",
+                "allocation_type": "Dedicated",
+                "service": "ABC",
+                "maintenance_cost_per_host": null,
+                "description": null,
+                "tags": "Test",
+                "billing_currency": "USD",
+                "purchase_cost_per_server": null,
+                "environment": "Test",
+                "allocation_strategy": "Fixed %",
+                "business_unit": "HR",
+                "workload_type": null,
+                "license_cost_per_core_vm": null,
+                "license_model": "BYOL",
+                "virtualization_type": "Vmware",
+                "license_cost_center": "Network Ops",
+                "budget_amount": 1000
+            },
+            "component": {
+                "ram": {
+                    "ram_rate_frequency": "Daily",
+                    "ram_metric_type": "Actual RAM Usage",
+                    "ram_metric_unit": "GB",
+                    "ram_size": 100,
+                    "ram_rate_value": 0.5
+                },
+                "storage": {
+                    "storage_type": "SSD",
+                    "storage_rate_value": 0.001,
+                    "storage_allocated_capacity": 0,
+                    "storage_count": 1,
+                    "storage_rate_frequency": "Daily"
+                },
+                "cpu": {
+                    "cpu_metric_unit": "Vcpu",
+                    "cpu_rate_value": 0.1,
+                    "cpu_metric_type": "Vcpu Hours",
+                    "cpu_count": 2,
+                    "cpu_rate_frequency": "Hourly",
+                    "cpu_type": "Intel Xeon"
+                },
+                "sub_categories": [
+                    "CPU",
+                    "RAM",
+                    "Storage"
+                ]
+            },
+            "uuid": "c5f4dd0c-6ded-42f6-8567-6de9270882a8",
+            "description": null,
+            "building_block_code": "Test",
+            "subcategories": [
+                "CPU",
+                "RAM",
+                "Storage"
+            ],
+            "license_cost_per_core_vm": null,
+            "purchase_cost_per_server": null,
+            "maintenance_cost_per_host": null,
+            "license_model": "BYOL",
+            "license_cost_center": "Network Ops",
+            "environment": "Test",
+            "workload_type": null,
+            "host_deployment_type": null,
+            "virtualization_type": "Vmware",
+            "allocation_type": "Dedicated",
+            "allocation_strategy": "Fixed %",
+            "customer": 417
+        }
+    ]
+}

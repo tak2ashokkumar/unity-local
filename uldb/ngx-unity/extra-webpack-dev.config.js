@@ -19,7 +19,7 @@ module.exports = {
         "path": path.join(process.cwd(), "dist"),
         "filename": "[name]-[fullhash].js",
         "crossOriginLoading": false,
-        "publicPath":"http://10.192.11.207:8090/"
+        "publicPath":"http://localhost:8091/"
     },
     "devServer": {
         "historyApiFallback": true,

@@ -61,11 +61,14 @@
                                     </td>
                                     <td class="action-icons-column">
                                         <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
-                                            (click)="edit(view)"></button>
+                                            (click)="edit(view)" accessControl moduleName="FinOps"
+                                            accessType="Manage FinOps" elementType="actionbtn"></button>
                                         <button class="action-icons mb-0 fas fa-user-plus font-sm ml-1"
-                                            tooltip="Map Device" (click)="gotoDeviceMapping(view.uuid)"></button>
+                                            tooltip="Map Device" (click)="gotoDeviceMapping(view.uuid)" accessControl moduleName="FinOps"
+                                            accessType="Manage FinOps" elementType="actionbtn"></button>
                                         <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" tooltip="Delete"
-                                            (click)="delete(view)"></button>
+                                            (click)="delete(view)" accessControl moduleName="FinOps"
+                                            accessType="Manage FinOps" elementType="actionbtn"></button>
                                     </td>
                                 </tr>
                             </tbody>

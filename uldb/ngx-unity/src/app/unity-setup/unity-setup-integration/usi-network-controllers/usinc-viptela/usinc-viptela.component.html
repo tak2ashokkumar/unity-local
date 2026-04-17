@@ -7,8 +7,9 @@
           <span class="ml-1 font-lg">Accounts</span>
         </div>
         <div class="d-flex justify-content-end align-items-center">
-          <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="goToViptelaAdd()">
-            <span class="font-xs-sm mx-1">Create Account</span>
+          <button class="btn btn-pill btn-sm btn-warning font-500" type="button" (click)="goToViptelaAdd()"
+            accessControl moduleName="Datacenter" accessType="Manage Datacenter" elementType="btn">
+            <span class=" font-xs-sm mx-1">Create Account</span>
           </button>
           <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
           <button class="btn btn-pill btn-warning pull-right ml-2 btn-sm" type="button" container="body"
@@ -68,7 +69,8 @@
               <td class="action-icons-column text-center">
                 <button class="action-icons mb-0 fas fa-sync font-sm mr-1" (click)="syncNow(view)"
                   [tooltip]="view.syncInProgress ? 'In Progress': 'Sync Now'"
-                  [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}">
+                  [ngClass]="{'action-icons-disabled fa-spin': view.syncInProgress}" accessControl
+                  moduleName="Datacenter" accessType="Manage Datacenter" elementType="actionbtn">
                 </button>
                 <button class="action-icons mb-0 fas fa-eye font-sm" tooltip="View Details"
                   (click)="goToViewDetails(view)"></button>
@@ -80,9 +82,11 @@
                     class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
                     aria-labelledby="button-container">
                     <button class="action-icons mt-2 mb-1 fas fa-pencil-alt font-sm" (click)="goToViptelaEdit(view)"
-                      tooltip="Edit" container="body"></button>
+                      tooltip="Edit" container="body" accessControl moduleName="Datacenter"
+                      accessType="Manage Datacenter" elementType="actionbtn"></button>
                     <button class="action-icons mt-1 mb-1 fas fa-trash-alt font-sm" tooltip="Delete"
-                      (click)="delete(view)" container="body"></button>
+                      (click)="delete(view)" container="body" accessControl moduleName="Datacenter"
+                      accessType="Manage Datacenter" elementType="actionbtn"></button>
                     <button class="action-icons mt-1 mb-2 fas fa-ticket-alt font-sm" tooltip="Create Ticket"
                       (click)="createTicket(view)" container="body"></button>
                   </div>
