@@ -4,10 +4,10 @@
   "previous": null,
   "results": [
     {
-      "url": "http://play.unityone.ai/customer/organizationusers/b6e66df8-1845-4a43-a6c7-2cddbeda81b0/",
-      "id": 2229,
-      "uuid": "b6e66df8-1845-4a43-a6c7-2cddbeda81b0",
-      "first_name": "Player2",
+      "url": "http://play.unityone.ai/customer/organizationusers/4e578f76-d6ff-46a2-a850-0e229b648abd/",
+      "id": 1637,
+      "uuid": "4e578f76-d6ff-46a2-a850-0e229b648abd",
+      "first_name": "Admin",
       "last_name": "User",
       "org": {
         "url": "http://play.unityone.ai/customer/organization/49e91ec8-a5fd-4571-89ea-9a8e46a9a316/",
@@ -37,50 +37,71 @@
         "msp_tenant": true,
         "monitor_by": "zabbix"
       },
-      "email": "player2@unityone.ai",
-      "is_customer_admin": false,
+      "email": "player-admin@unityone.ai",
+      "is_customer_admin": true,
       "has_two_factor": false,
-      "user_roles": [],
+      "user_roles": [
+        {
+          "url": "http://play.unityone.ai/rest/role/3/",
+          "id": 3,
+          "name": "Dashboard user"
+        },
+        {
+          "url": "http://play.unityone.ai/rest/role/13/",
+          "id": 13,
+          "name": "Administrator"
+        },
+        {
+          "url": "http://play.unityone.ai/rest/role/14/",
+          "id": 14,
+          "name": "Global Read-Only"
+        }
+      ],
       "rbac_roles": [
-        "Global Read-Only"
+        "Administrator"
       ],
       "active_rbac_roles": [
-        "Global Read-Only"
+        "Administrator"
       ],
       "applicable_permission_sets": [
         {
-          "id": 3,
-          "name": "Global Read-Only Permission Set",
-          "uuid": "c2918f50-229c-4005-a2cd-fed17844f597"
+          "id": 1,
+          "name": "Administrator Permission Set",
+          "uuid": "d11dc393-a29d-473b-a702-adaa8d3dcbdb"
         }
       ],
       "applicable_module_permissions": [
         {
           "permission_names": [
+            "Manage AIML Event Management",
             "View AIML Event Management"
           ],
           "module_name": "AIML Event Management"
         },
         {
           "permission_names": [
+            "Download Activity Log",
             "View Activity Log"
           ],
           "module_name": "Activity Log"
         },
         {
           "permission_names": [
+            "Manage Budget",
             "View Budget"
           ],
           "module_name": "Budget"
         },
         {
           "permission_names": [
+            "Manage Business Services",
             "View Business Services"
           ],
           "module_name": "Business Services"
         },
         {
           "permission_names": [
+            "Manage Connections",
             "View Connections"
           ],
           "module_name": "Connections"
@@ -89,42 +110,55 @@
           "permission_names": [
             "Cloud Overview",
             "Cost Calculator",
+            "Manage Cost Analysis",
             "View Cost Analysis"
           ],
           "module_name": "Cost Analysis"
         },
         {
           "permission_names": [
+            "Manage Cost Plan",
             "View Cost Plan"
           ],
           "module_name": "Cost Plan"
         },
         {
           "permission_names": [
+            "Manage Credentials",
             "View Credentials"
           ],
           "module_name": "Credentials"
         },
         {
           "permission_names": [
+            "Manage Custom Attributes",
             "View Custom Attributes"
           ],
           "module_name": "Custom Attributes"
         },
         {
           "permission_names": [
+            "Manage Dashboard",
             "View Dashboard"
           ],
           "module_name": "Dashboard"
         },
         {
           "permission_names": [
+            "Manage Datacenter",
+            "Remote Management",
             "View Datacenter"
           ],
           "module_name": "Datacenter"
         },
         {
           "permission_names": [
+            "Execute Tasks",
+            "Execute Workflow",
+            "Manage DevOps Automation",
+            "Manage Scripts",
+            "Manage Tasks",
+            "Manage Workflow",
             "View DevOps Automation",
             "View Scripts",
             "View Tasks",
@@ -134,30 +168,37 @@
         },
         {
           "permission_names": [
+            "Manage FinOps",
             "View FinOps"
           ],
           "module_name": "FinOps"
         },
         {
           "permission_names": [
+            "Add Integrations",
+            "Manage Integrations",
+            "Sync Integrations",
             "View Integrations"
           ],
           "module_name": "Integrations"
         },
         {
           "permission_names": [
+            "Manage Maintenance",
             "View Maintenance"
           ],
           "module_name": "Maintenance"
         },
         {
           "permission_names": [
+            "Manage Monitoring",
             "View Monitoring"
           ],
           "module_name": "Monitoring"
         },
         {
           "permission_names": [
+            "Manage Network Configuration",
             "View Network Configuration"
           ],
           "module_name": "Network Configuration"
@@ -170,42 +211,53 @@
         },
         {
           "permission_names": [
+            "Manage Notifications",
             "View Notifications"
           ],
           "module_name": "Notifications"
         },
         {
           "permission_names": [
+            "Discovery Admin",
+            "Manage Onboarding",
             "View Onboarding"
           ],
           "module_name": "Onboarding"
         },
         {
           "permission_names": [
+            "Manage Policy",
             "View Policy"
           ],
           "module_name": "Policy"
         },
         {
           "permission_names": [
+            "Manage Private Cloud",
+            "Remote Management",
             "View Private Cloud"
           ],
           "module_name": "Private Cloud"
         },
         {
           "permission_names": [
+            "Manage Public Cloud",
+            "Remote Management",
             "View Public Cloud"
           ],
           "module_name": "Public Cloud"
         },
         {
           "permission_names": [
+            "Manage Service Catalog",
+            "Order Catalog",
             "View Service Catalog"
           ],
           "module_name": "Service Catalog"
         },
         {
           "permission_names": [
+            "Manage Services",
             "View Services"
           ],
           "module_name": "Services"
@@ -218,36 +270,44 @@
         },
         {
           "permission_names": [
+            "Manage Tickets",
             "View Tickets"
           ],
           "module_name": "Ticket Management"
         },
         {
           "permission_names": [
+            "Manage Unity Report",
             "View Unity Report"
           ],
           "module_name": "Unity Report"
         },
         {
           "permission_names": [
+            "Manage UnityCollector",
+            "Register UnityCollector",
             "View UnityCollector"
           ],
           "module_name": "UnityCollector"
         },
         {
           "permission_names": [
+            "Manage UnityConnect",
             "View UnityConnect"
           ],
           "module_name": "UnityConnect"
         },
         {
           "permission_names": [
+            "Manage UnitySetup",
             "View UnitySetup"
           ],
           "module_name": "UnitySetup"
         },
         {
           "permission_names": [
+            "Create Users",
+            "Manage Users",
             "View Users"
           ],
           "module_name": "User Management"
@@ -255,11 +315,11 @@
       ],
       "applicable_rbac_user_groups": [],
       "groups": [],
-      "date_joined": "2026-02-26T22:30:02.319361+05:30",
-      "last_login": "2026-04-17T19:08:42.707250+05:30",
+      "date_joined": "2023-11-24T21:18:02.435582+05:30",
+      "last_login": "2026-04-18T15:21:26.628315+05:30",
       "access_types": [],
       "timezone": "US/Pacific",
-      "welcome_page": true,
+      "welcome_page": false,
       "eula_version": 1.0,
       "subscribed_modules": [
         "Dashboard",
@@ -305,7 +365,7 @@
       "is_rca_enabled": false,
       "is_ai_enabled": true,
       "is_insights_enabled": false,
-      "default_dashboard": null
+      "default_dashboard": "7e0b35b4-1fd6-49c2-94cc-a422e3223215"
     }
   ]
 }
