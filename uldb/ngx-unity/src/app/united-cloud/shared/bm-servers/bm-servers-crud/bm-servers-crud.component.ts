@@ -17,7 +17,7 @@ import { BMServerCRUDManufacturer, BMServerCRUDModel, BMServerCRUDOperatingSyste
 import { BMServer } from '../../entities/bm-server.type';
 import { BareMetalServerCRUDFormData, BmServersCrudService } from './bm-servers-crud.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/shared/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 import { LifeCycleStageOptions, LifeCycleStageStatusOptions } from '../../hypervisors/hypervisors-crud/hypervisors-crud.service';
 
 @Component({

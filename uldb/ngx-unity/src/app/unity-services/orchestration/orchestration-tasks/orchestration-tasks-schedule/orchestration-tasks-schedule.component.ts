@@ -15,7 +15,7 @@ import { CloudNameType } from '../orchestration-task-execute/orchestration-task-
 import { Hosts, deviceTypes } from '../orchestration-task-execute/orchestration-task-execute.service';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { environment } from 'src/environments/environment';
 
 @Component({

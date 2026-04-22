@@ -6,7 +6,7 @@ import { SearchCriteria, PAGE_SIZES } from 'src/app/shared/table-functionality/s
 import { Subject } from 'rxjs';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { takeUntil, tap } from 'rxjs/operators';
-import { CabinetCrudService } from 'src/app/shared/cabinet-crud/cabinet-crud.service';
+import { CabinetCrudService } from 'src/app/app-shared-crud/cabinet-crud/cabinet-crud.service';
 import { DataCenterCabinet } from 'src/app/united-cloud/shared/entities/datacenter-cabinet.type';
 
 @Component({

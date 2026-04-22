@@ -13,7 +13,7 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { CabinetFast } from 'src/app/shared/SharedEntityTypes/cabinet.type';
 import { DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/shared/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { FirewallCRUDManufacturer, FirewallCRUDModel } from '../../entities/firewall-crud.type';
 import { FirewallCRUDFormData, FirewallCrudService } from './firewalls-crud.service';

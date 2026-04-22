@@ -9,7 +9,7 @@ import { DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility
 import { PDU } from 'src/app/united-cloud/datacenter/entities/pdus.type';
 import { AdvancedDeviceDiscoveryService } from '../advanced-device-discovery.service';
 import { AdvanceAdvancedDiscoveryScanOpRes, AdvancedDiscoveryScanOp } from '../advanced-discovery-scan-op.type';
-import { PDUCRUDModel, PDUCRUDPowerCircuit, PDUCRUDCabinet, PDUCRUDManufacturer } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDModel, PDUCRUDPowerCircuit, PDUCRUDCabinet, PDUCRUDManufacturer } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 
 @Injectable()
 export class AdvancedDiscoveryPdusService {

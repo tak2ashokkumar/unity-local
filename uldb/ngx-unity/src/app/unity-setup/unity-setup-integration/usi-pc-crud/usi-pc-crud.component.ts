@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CRUDActionTypes, ServerSidePlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { PcCrudService } from 'src/app/shared/pc-crud/pc-crud.service';
+import { PcCrudService } from 'src/app/app-shared-crud/pc-crud/pc-crud.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { PrivateCloudsWidgetMetadataType } from './usi-pc-crud.const';

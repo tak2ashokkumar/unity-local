@@ -6,7 +6,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService, PDUTypes } from 'src/app/shared/app-utility/app-utility.service';
-import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDCabinet, PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { AdvancedDiscoveryPdusService, DevDisPDUViewdata, DeviceDiscoveryPDUFormData } from './advanced-discovery-pdus.service';
 
 @Component({

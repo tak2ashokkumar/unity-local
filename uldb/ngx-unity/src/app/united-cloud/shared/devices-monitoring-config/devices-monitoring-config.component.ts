@@ -14,7 +14,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, AuthLevelMapping, DeviceMapping, SNMPVersionMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DeviceTabData } from '../device-tab/device-tab.component';
 import { SNMPCrudType } from '../entities/snmp-crud.type';

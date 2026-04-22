@@ -5,7 +5,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { takeUntil } from 'rxjs/operators';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
-import { DcCrudService } from 'src/app/shared/dc-crud/dc-crud.service';
+import { DcCrudService } from 'src/app/app-shared-crud/dc-crud/dc-crud.service';
 
 @Component({
   selector: 'device-discovery-data-center',

@@ -3,7 +3,7 @@ import { AdvancedDiscoveryDatacenterService, DatacenterViewData } from './advanc
 import { Subject } from 'rxjs';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { DcCrudService } from 'src/app/shared/dc-crud/dc-crud.service';
+import { DcCrudService } from 'src/app/app-shared-crud/dc-crud/dc-crud.service';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { takeUntil } from 'rxjs/operators';
 

@@ -17,7 +17,7 @@ import { Switch } from '../entities/switch.type';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PDUCRUDCabinet } from '../../datacenter/entities/pdus-crud.type';
 import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
-import { PDUCRUDModel } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDModel } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
 
 @Injectable()

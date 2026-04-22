@@ -13,7 +13,7 @@ import { CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-u
 import { PDU_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { DeviceZabbixEmailNotificationService } from 'src/app/shared/device-zabbix-email-notification/device-zabbix-email-notification.service';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
-import { PduCrudService } from 'src/app/shared/pdu-crud/pdu-crud.service';
+import { PduCrudService } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DevicePopoverData } from 'src/app/united-cloud/shared/devices-popover/device-popover-data';

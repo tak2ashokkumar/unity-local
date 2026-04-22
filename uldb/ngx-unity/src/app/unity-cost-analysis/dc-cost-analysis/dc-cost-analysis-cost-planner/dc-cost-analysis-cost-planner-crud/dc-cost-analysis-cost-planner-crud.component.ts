@@ -11,7 +11,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
-import { PDUCRUDPowerCircuit } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDPowerCircuit } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { DatacenterCostPlannerDataType } from '../dc-cost-analysis-cost-planner.type';
 import { DcCostAnalysisCostPlannerCrudService } from './dc-cost-analysis-cost-planner-crud.service';
 

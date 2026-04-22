@@ -9,7 +9,7 @@ import { ISTIO_SERVICES_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/c
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { environment } from 'src/environments/environment';
 import { IstioServiceViewdata, IstioServicesService } from './istio-services.service';

@@ -6,7 +6,7 @@ import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service'
 import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
-import { UsiOntapCrudService } from '../../../shared/usi-ontap-crud/usi-ontap-crud.service';
+import { UsiOntapCrudService } from '../../../app-shared-crud/usi-ontap-crud/usi-ontap-crud.service';
 import { UnitySetupIntegrationService, UsiOntapCluster } from '../unity-setup-integration.service';
 
 @Component({

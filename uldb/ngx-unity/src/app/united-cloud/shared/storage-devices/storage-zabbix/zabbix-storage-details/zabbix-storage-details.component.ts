@@ -23,7 +23,7 @@ import { StorageDevice } from '../../../entities/storage-device.type';
 import { ZabbixStorageDetailsService } from './zabbix-storage-details.service';
 import { ScrollStrategy, ScrollStrategyOptions } from '@angular/cdk/overlay';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
-import { DeviceInterfaceCrudService } from 'src/app/shared/device-interface-crud/device-interface-crud.service';
+import { DeviceInterfaceCrudService } from 'src/app/app-shared-crud/device-interface-crud/device-interface-crud.service';
 import { InterfaceDetailsType, RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
 import { DeviceTabData } from '../../../device-tab/device-tab.component';
 import { UnityCredentialsFast } from 'src/app/shared/SharedEntityTypes/unity-credentials.type';

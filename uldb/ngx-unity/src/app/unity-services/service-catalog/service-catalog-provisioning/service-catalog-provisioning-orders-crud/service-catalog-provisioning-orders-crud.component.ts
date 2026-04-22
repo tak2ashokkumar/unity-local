@@ -18,7 +18,7 @@ import {
   NewOrders,
 } from './service-catalog-provisionining-orders-crud.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { Hosts } from 'src/app/unity-services/orchestration/orchestration-tasks/orchestration-tasks-schedule/orchestration-tasks-schedule.service';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';

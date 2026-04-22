@@ -15,7 +15,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 
 @Component({
   selector: 'unityconnect-vxc',

@@ -3,7 +3,7 @@ import { DecimalPipe } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { DndModule } from 'ngx-drag-drop';
 import { AppCoreModule } from 'src/app/app-core/app-core.module';
-import { CallbackPipe } from 'src/app/shared/pipes';
+import { AppSharedCrudModule } from 'src/app/app-shared-crud/app-shared-crud.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { UnitedCloudSharedModule } from '../shared/united-cloud-shared.module';
 import { DatacenterCabinetViewCabinetInfoComponent } from './datacenter-cabinet-view/datacenter-cabinet-view-cabinet-info/datacenter-cabinet-view-cabinet-info.component';
@@ -63,12 +63,12 @@ import { DatacenterService } from './datacenter.service';
     ZabbixDcPduGraphCrudComponent,
     ZabbixDcPduGraphsComponent,
     DatacenterPdusZabbixComponent,
-    CallbackPipe,
     ZabbixDcPduDetailsComponent
   ],
   imports: [
     AppCoreModule,
     SharedModule,
+    AppSharedCrudModule,
     DatacenterRoutingModule,
     UnitedCloudSharedModule,
     DragDropModule,

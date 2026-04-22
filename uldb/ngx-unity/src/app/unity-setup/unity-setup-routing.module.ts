@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UnitySetupLdapCrudComponent } from '../shared/unity-setup-ldap-crud/unity-setup-ldap-crud.component';
+import { UnitySetupLdapCrudComponent } from '../app-shared-crud/unity-setup-ldap-crud/unity-setup-ldap-crud.component';
 import { DiscoveryCredentialsComponent } from './discovery-credentials/discovery-credentials.component';
 import { UnitySetupBudgetCrudComponent } from './unity-setup-budget/unity-setup-budget-crud/unity-setup-budget-crud.component';
 import { UnitySetupBudgetDetailsComponent } from './unity-setup-budget/unity-setup-budget-details/unity-setup-budget-details.component';

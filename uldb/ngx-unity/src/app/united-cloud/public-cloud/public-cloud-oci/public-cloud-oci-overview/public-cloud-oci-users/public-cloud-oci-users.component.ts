@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { OCIUserType } from './oci-user.type';
 import { SearchCriteria, PAGE_SIZES } from 'src/app/shared/table-functionality/search-criteria';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 
 @Component({
   selector: 'public-cloud-oci-users',

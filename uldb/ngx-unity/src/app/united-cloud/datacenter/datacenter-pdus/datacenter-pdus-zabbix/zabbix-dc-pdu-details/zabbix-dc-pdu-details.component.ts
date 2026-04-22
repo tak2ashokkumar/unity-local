@@ -11,7 +11,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService, deviceDiscoveryMethodOptions, deviceEnvironmentOptions, deviceStatusOptions } from 'src/app/shared/app-utility/app-utility.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
-import { PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDManufacturer, PDUCRUDModel, PDUCRUDPowerCircuit } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { CabinetFast } from 'src/app/shared/SharedEntityTypes/cabinet.type';
 import { PDU } from '../../../entities/pdus.type';
 import { DataCenter } from '../../../tabs';

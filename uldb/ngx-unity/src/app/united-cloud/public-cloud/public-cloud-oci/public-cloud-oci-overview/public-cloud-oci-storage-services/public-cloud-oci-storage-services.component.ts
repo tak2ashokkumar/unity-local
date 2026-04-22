@@ -3,7 +3,7 @@ import { PublicCloudOciStorageServicesService, PublicCloudOciBucketsView } from 
 import { Subject } from 'rxjs';
 import { SearchCriteria, PAGE_SIZES } from 'src/app/shared/table-functionality/search-criteria';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { takeUntil } from 'rxjs/operators';

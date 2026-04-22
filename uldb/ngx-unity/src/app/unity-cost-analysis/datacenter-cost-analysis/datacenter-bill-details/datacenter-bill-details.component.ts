@@ -7,9 +7,9 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { CabinetCrudService } from 'src/app/shared/cabinet-crud/cabinet-crud.service';
+import { CabinetCrudService } from 'src/app/app-shared-crud/cabinet-crud/cabinet-crud.service';
 import { CABINET_TICKET_METADATA, PDU_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
-import { PduCrudService } from 'src/app/shared/pdu-crud/pdu-crud.service';
+import { PduCrudService } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { PDU } from 'src/app/united-cloud/datacenter/entities/pdus.type';

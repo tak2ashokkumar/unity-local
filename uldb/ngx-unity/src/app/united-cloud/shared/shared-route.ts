@@ -55,7 +55,7 @@ import { ZABBIX_VMS_ROUTES } from './vms/vms-zabbix/vms-zabbix-routing.const';
 import { VmsZabbixComponent } from './vms/vms-zabbix/vms-zabbix.component';
 import { VmsComponent } from './vms/vms.component';
 import { WebAccessComponent } from './web-access/web-access.component';
-import { PcCrudComponent } from 'src/app/shared/pc-crud/pc-crud.component';
+import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
 
 export const SharedVMsRoutes: Routes = OBSERVIUM_VMS_ROUTES;
 

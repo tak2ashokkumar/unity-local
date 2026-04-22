@@ -8,7 +8,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
-import { DeviceInterfaceCrudService } from 'src/app/shared/device-interface-crud/device-interface-crud.service';
+import { DeviceInterfaceCrudService } from 'src/app/app-shared-crud/device-interface-crud/device-interface-crud.service';
 import { DeviceBGPPeersType } from 'src/app/shared/SharedEntityTypes/device-bgp-peers.type';
 import { InterfaceDetailsType, RemoteDevicesType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
 import { DeviceInterface } from 'src/app/shared/SharedEntityTypes/inventory-attributes.type';

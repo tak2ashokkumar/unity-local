@@ -7,7 +7,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppUtilityService, DeviceMapping, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
-import { PcCrudService } from 'src/app/shared/pc-crud/pc-crud.service';
+import { PcCrudService } from 'src/app/app-shared-crud/pc-crud/pc-crud.service';
 import { UnitedCloudSharedService } from '../united-cloud-shared.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { SUMMARY_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';

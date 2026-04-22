@@ -5,7 +5,7 @@ import { ChartData, ChartTooltipItem } from 'chart.js';
 import { Observable } from 'rxjs';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { ChartConfigService, DEFAULT_BAR_THICKNESS, UnityChartData } from 'src/app/shared/chart-config.service';
-import { BandWidthPipe } from 'src/app/shared/pipes';
+import { BandWidthPipe } from 'src/app/app-filters/pipes';
 import { UnitedConnectNetworkBill, UnitedConnectNetworkBillMappedPorts } from './unityconnect-network-billing.type';
 
 @Injectable()

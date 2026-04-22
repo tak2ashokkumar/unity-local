@@ -10,7 +10,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { TabData } from 'src/app/shared/tabdata';
-import { PcCrudService } from '../../shared/pc-crud/pc-crud.service';
+import { PcCrudService } from '../../app-shared-crud/pc-crud/pc-crud.service';
 import { PrivateCloudService } from './private-cloud.service';
 import { PCTabs } from './tabs';
 import { UserInfoService } from 'src/app/shared/user-info.service';

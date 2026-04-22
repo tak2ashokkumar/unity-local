@@ -11,7 +11,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
-import { UnityDevicesMonitoringCrudService } from 'src/app/shared/unity-devices-monitoring-crud/unity-devices-monitoring-crud.service';
+import { UnityDevicesMonitoringCrudService } from 'src/app/app-shared-crud/unity-devices-monitoring-crud/unity-devices-monitoring-crud.service';
 import { UnityScheduleService } from 'src/app/shared/unity-schedule/unity-schedule.service';
 import { DataCenter } from 'src/app/united-cloud/datacenter/tabs';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';

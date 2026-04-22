@@ -8,7 +8,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { UsiPureStorageCrudService } from 'src/app/shared/usi-pure-storage-crud/usi-pure-storage-crud.service';
+import { UsiPureStorageCrudService } from 'src/app/app-shared-crud/usi-pure-storage-crud/usi-pure-storage-crud.service';
 import { PureStorageViewData, UsisPureService } from './usis-pure.service';
 
 @Component({

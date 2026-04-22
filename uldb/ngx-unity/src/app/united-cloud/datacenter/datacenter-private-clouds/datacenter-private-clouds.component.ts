@@ -4,7 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { AppUtilityService, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { TabData } from 'src/app/shared/tabdata';
-import { PcCrudService } from '../../../shared/pc-crud/pc-crud.service';
+import { PcCrudService } from '../../../app-shared-crud/pc-crud/pc-crud.service';
 import { DatacenterPrivateCloudService } from './datacenter-private-cloud.service';
 import { PCTabs } from './tabs';
 import { cloneDeep as _clone } from 'lodash-es';

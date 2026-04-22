@@ -11,7 +11,7 @@ import { AppUtilityService, CRUDActionTypes } from 'src/app/shared/app-utility/a
 import { LDAP_CONFIG_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { TabData } from 'src/app/shared/tabdata';
-import { UnitySetupLdapCrudService } from '../../shared/unity-setup-ldap-crud/unity-setup-ldap-crud.service';
+import { UnitySetupLdapCrudService } from '../../app-shared-crud/unity-setup-ldap-crud/unity-setup-ldap-crud.service';
 import { LDAPConfigViewData, UnitySetupImportUserService } from './unity-setup-import-user.service';
 
 @Component({

@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { DEVICE_MONITORING_GROUP, DEVICE_MONITORING_STATUS, GET_ALERTS_BY_DEVICE_TYPE_AND_DEVICEID, UPDATE_DEVICE_DATA_ON_DRAG, UPDATE_GROUP_DATA_ON_DRAG, ZABBIX_DEVICE_ALERTS_BY_DEVICE_TYPE_AND_DEVICE_ID } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { AppSecToDaysPipe } from 'src/app/shared/pipes';
+import { AppSecToDaysPipe } from 'src/app/app-filters/pipes';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { environment } from 'src/environments/environment';
 import { DeviceMonitoringAlerts, DeviceMonitoringStatus, DeviceMonitoringStatusViewData } from './entities/device-monitoring-status.type';

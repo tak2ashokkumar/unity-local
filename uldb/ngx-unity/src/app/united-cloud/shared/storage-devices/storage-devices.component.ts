@@ -13,13 +13,13 @@ import { DeviceZabbixEmailNotificationService } from 'src/app/shared/device-zabb
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { UsiOntapCrudService } from 'src/app/shared/usi-ontap-crud/usi-ontap-crud.service';
+import { UsiOntapCrudService } from 'src/app/app-shared-crud/usi-ontap-crud/usi-ontap-crud.service';
 import { environment } from 'src/environments/environment';
 import { DevicePopoverData } from '../devices-popover/device-popover-data';
 import { StorageDevice } from '../entities/storage-device.type';
 import { StorageCrudService } from './storage-crud/storage-crud.service';
 import { StorageDeviceViewData, StorageDevicesService } from './storage-devices.service';
-import { UsiPureStorageCrudService } from 'src/app/shared/usi-pure-storage-crud/usi-pure-storage-crud.service';
+import { UsiPureStorageCrudService } from 'src/app/app-shared-crud/usi-pure-storage-crud/usi-pure-storage-crud.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';

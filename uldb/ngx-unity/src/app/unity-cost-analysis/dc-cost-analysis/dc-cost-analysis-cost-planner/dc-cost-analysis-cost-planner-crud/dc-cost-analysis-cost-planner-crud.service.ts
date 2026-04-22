@@ -6,7 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { DATACENTER_ADD_COST_PLANNER, DEVICES_FAST_BY_DEVICE_TYPE, EDIT_COST_PLANNER, GET_COST_PLANNER, PDU_POWER_CIRCUITS } from 'src/app/shared/api-endpoint.const';
 import { AppUtilityService, DeviceMapping, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
-import { PDUCRUDPowerCircuit } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDPowerCircuit } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { CostPlannerEntityDataType, CostPlannerPowerEntityDataType, DatacenterCostPlannerDataType, DatacenterListDatatype } from '../dc-cost-analysis-cost-planner.type';
 
 @Injectable()

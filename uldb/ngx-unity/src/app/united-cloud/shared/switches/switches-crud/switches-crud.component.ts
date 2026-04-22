@@ -16,7 +16,7 @@ import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/pri
 import { SwitchCRUDManufacturer, SwitchCRUDModel } from '../../entities/switch-crud.type';
 import { SwitchCRUDFormData, SwitchesCrudService } from './switches-crud.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/shared/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 
 @Component({
   selector: 'switches-crud',

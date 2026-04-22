@@ -20,7 +20,7 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { AWS_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
 import { AWSVm } from 'src/app/united-cloud/shared/entities/aws.type';
 

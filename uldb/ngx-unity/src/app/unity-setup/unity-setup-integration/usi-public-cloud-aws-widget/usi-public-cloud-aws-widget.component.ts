@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CRUDActionTypes, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { PublicCloudAwsCrudService } from 'src/app/shared/public-cloud-aws-crud/public-cloud-aws-crud.service';
+import { PublicCloudAwsCrudService } from 'src/app/app-shared-crud/public-cloud-aws-crud/public-cloud-aws-crud.service';
 import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';

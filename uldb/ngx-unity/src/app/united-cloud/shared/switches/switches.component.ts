@@ -22,7 +22,7 @@ import { SwitchViewData, SwitchesService } from './switches.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { PDUCRUDCabinet, PDUCRUDModel } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDCabinet, PDUCRUDModel } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
 

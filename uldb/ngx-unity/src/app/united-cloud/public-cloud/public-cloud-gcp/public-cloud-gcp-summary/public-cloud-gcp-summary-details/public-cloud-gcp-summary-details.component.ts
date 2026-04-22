@@ -18,7 +18,7 @@ import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floati
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { environment } from 'src/environments/environment';
 import { GcpAccountType } from '../public-cloud-gcp-summary.type';

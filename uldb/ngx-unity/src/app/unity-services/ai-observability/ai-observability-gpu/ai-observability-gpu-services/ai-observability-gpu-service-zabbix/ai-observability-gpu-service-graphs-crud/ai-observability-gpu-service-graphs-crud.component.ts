@@ -14,7 +14,7 @@ import { ZabbixMonitoringGraphCRUDViewdata } from 'src/app/united-cloud/shared/z
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AiObservabilityGpuServiceGraphsCrudService, GpuGraphCRUDViewdata } from './ai-observability-gpu-service-graphs-crud.service';

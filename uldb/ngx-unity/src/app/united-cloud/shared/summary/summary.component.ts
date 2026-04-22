@@ -15,7 +15,7 @@ import { StorageType } from 'src/app/shared/app-storage/storage-type';
 import { StorageService } from 'src/app/shared/app-storage/storage.service';
 import { AppUtilityService, DeviceMapping, FaIconMapping, PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { SUMMARY_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
-import { PcCrudService } from 'src/app/shared/pc-crud/pc-crud.service';
+import { PcCrudService } from 'src/app/app-shared-crud/pc-crud/pc-crud.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { UsageData, UsageStatsPercent } from '../entities/usage-data.type';
 import { CustomVirtualMachine, VCenterDataStore, VirtualMachine } from '../entities/vm.type';

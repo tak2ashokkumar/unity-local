@@ -4,7 +4,7 @@ import { DeviceDiscCabinetViewData, AdvancedDiscoveryCabinetsService } from './a
 import { Subject } from 'rxjs';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { CabinetCrudService } from 'src/app/shared/cabinet-crud/cabinet-crud.service';
+import { CabinetCrudService } from 'src/app/app-shared-crud/cabinet-crud/cabinet-crud.service';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { takeUntil } from 'rxjs/operators';
 

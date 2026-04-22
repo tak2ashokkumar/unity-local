@@ -11,7 +11,7 @@ import { AppUtilityService, CRUDActionTypes, DeviceMapping } from 'src/app/share
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 import { CustomCloudVMCRUDOS } from '../../../entities/custom-cloud-vm-crud.type';
 import { VmsListCustomCrudService } from './vms-list-custom-crud.service';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/shared/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 
 @Component({
   selector: 'vms-list-custom-crud',

@@ -6,7 +6,7 @@ import { DeviceMonitoringSNMPCrudTypeClass } from 'src/app/shared/SharedEntityTy
 import { NutanixAccount, PrivateCloudType } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { DATA_CENTERS, DEVICES_FAST_BY_DEVICE_TYPE, GET_AGENT_CONFIGURATIONS, GET_CREDENTIALS } from 'src/app/shared/api-endpoint.const';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { UnityDevicesMonitoringCrudService } from 'src/app/shared/unity-devices-monitoring-crud/unity-devices-monitoring-crud.service';
+import { UnityDevicesMonitoringCrudService } from 'src/app/app-shared-crud/unity-devices-monitoring-crud/unity-devices-monitoring-crud.service';
 import { DataCenter } from 'src/app/united-cloud/datacenter/tabs';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';

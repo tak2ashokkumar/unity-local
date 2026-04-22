@@ -6,7 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { PrivateClouds } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { PcCrudService } from 'src/app/shared/pc-crud/pc-crud.service';
+import { PcCrudService } from 'src/app/app-shared-crud/pc-crud/pc-crud.service';
 import { UsiNutanixService } from './usi-nutanix.service';
 
 @Component({

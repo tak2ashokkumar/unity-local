@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AppCoreModule } from 'src/app/app-core/app-core.module';
+import { AppSharedCrudModule } from 'src/app/app-shared-crud/app-shared-crud.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AdvancedDeviceDiscoveryComponent } from './advanced-device-discovery/advanced-device-discovery.component';
 import { AdvancedDiscoveryCabinetsComponent } from './advanced-device-discovery/advanced-discovery-cabinets/advanced-discovery-cabinets.component';
@@ -147,6 +148,7 @@ import { AdvancedDiscoveryPolicyCrudComponent } from './advanced-device-discover
   imports: [
     AppCoreModule,
     SharedModule,
+    AppSharedCrudModule,
     PerfectScrollbarModule,
     UnitySetupOnBoardingRoutingModule,
     // ChartsModule

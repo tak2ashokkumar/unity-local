@@ -6,7 +6,7 @@ import { switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { environment } from 'src/environments/environment';
 import { AlertsTabData, tabItems } from '../../tabs';

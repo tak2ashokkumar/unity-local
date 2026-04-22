@@ -7,13 +7,13 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
 import { isString } from 'lodash-es';
 import { DeviceTypesOptionsType } from 'src/app/shared/SharedEntityTypes/device-interface.type';
-import { deviceTypesOptions } from 'src/app/shared/device-interface-crud/device-interface-crud.service';
+import { deviceTypesOptions } from 'src/app/app-shared-crud/device-interface-crud/device-interface-crud.service';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
 import { devicesType, ZabbixAnomalyDetectionTriggerGraphItemsType } from '../../usm-anomaly-detection/usm-anomaly-detection-crud/usm-anomaly-detection-crud.type';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';

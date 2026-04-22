@@ -5,7 +5,7 @@ import { PrivateCloudComponent } from './private-cloud.component';
 import { PrivateCloudResolverService } from './private-cloud-resolver.service';
 
 import { DevicesRoutes } from 'src/app/united-cloud/shared/shared-route';
-import { PcCrudComponent } from 'src/app/shared/pc-crud/pc-crud.component';
+import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
 
 
 

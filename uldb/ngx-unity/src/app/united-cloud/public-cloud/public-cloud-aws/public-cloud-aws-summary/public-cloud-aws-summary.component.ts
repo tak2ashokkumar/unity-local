@@ -14,7 +14,7 @@ import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.
 import { AppUtilityService, CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { AWS_ACCOUNT_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import { PublicCloudAwsCrudService } from 'src/app/shared/public-cloud-aws-crud/public-cloud-aws-crud.service';
+import { PublicCloudAwsCrudService } from 'src/app/app-shared-crud/public-cloud-aws-crud/public-cloud-aws-crud.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { environment } from 'src/environments/environment';

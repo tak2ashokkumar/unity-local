@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppLevelService } from 'src/app/app-level.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { FileSizeConversionPipe } from 'src/app/shared/pipes';
+import { FileSizeConversionPipe } from 'src/app/app-filters/pipes';
 import { PureStorageArray, PureStorageGraphData, PureStorageGraphDataAttr } from 'src/app/shared/SharedEntityTypes/storage-pure.type';
 import { ECHARTCOLORS, UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 

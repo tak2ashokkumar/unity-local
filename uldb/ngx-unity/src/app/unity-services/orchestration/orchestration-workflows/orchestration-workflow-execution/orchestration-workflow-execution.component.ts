@@ -10,7 +10,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings } from 'src/app/shared/multiselect-dropdown/types';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { DeviceDiscoveryCredentials } from 'src/app/unity-setup/discovery-credentials/discovery-credentials.type';
 import { Account, DropdownWithImage, Tag, TemplateOption, WorkflowDetails, WorkflowTask } from '../orchestration-workflow-execution/orchestration-workflow-execution.type';
 import { HostType, Hosts, OrchestrationWorkflowExecutionService, TerraFormParams, deviceTypes } from './orchestration-workflow-execution.service';

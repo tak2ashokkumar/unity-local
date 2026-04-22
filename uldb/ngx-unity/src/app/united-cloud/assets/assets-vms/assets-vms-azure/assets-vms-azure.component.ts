@@ -9,7 +9,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { PowerToggleInput, ServerPowerToggleService } from 'src/app/united-cloud/shared/server-power-toggle/server-power-toggle.service';
 import { AppLevelService } from 'src/app/app-level.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 
 @Component({
   selector: 'assets-vms-azure',

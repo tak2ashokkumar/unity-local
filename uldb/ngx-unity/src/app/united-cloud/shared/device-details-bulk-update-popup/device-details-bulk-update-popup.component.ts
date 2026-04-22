@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { PDUCRUDCabinet, PDUCRUDModel } from 'src/app/shared/pdu-crud/pdu-crud.type';
+import { PDUCRUDCabinet, PDUCRUDModel } from 'src/app/app-shared-crud/pdu-crud/pdu-crud.type';
 import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/private-cloud.type';
 import { BulkUpdateFieldType } from '../entities/bulk-update-field.type';
 import { DeviceDetailsBulkUpdatePopupService, fieldDependencies } from './device-details-bulk-update-popup.service';

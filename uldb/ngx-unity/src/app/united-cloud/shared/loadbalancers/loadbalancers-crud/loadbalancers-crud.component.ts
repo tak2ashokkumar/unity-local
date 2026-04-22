@@ -16,7 +16,7 @@ import { DeviceCRUDPrivateCloudFast } from 'src/app/shared/SharedEntityTypes/pri
 import { LoadBalancerCRUDManufacturer, LoadBalancerCRUDModel } from '../../entities/loadbalancer-crud.type';
 import { LoadBalancerCRUDFormData, LoadbalancersCrudService } from './loadbalancers-crud.service';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/shared/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 
 @Component({
   selector: 'loadbalancers-crud',

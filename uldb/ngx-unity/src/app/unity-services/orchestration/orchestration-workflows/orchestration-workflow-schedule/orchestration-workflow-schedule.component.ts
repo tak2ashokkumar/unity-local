@@ -11,7 +11,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { catchError, debounceTime, takeUntil } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Notification } from 'src/app/shared/app-notification/notification.type';

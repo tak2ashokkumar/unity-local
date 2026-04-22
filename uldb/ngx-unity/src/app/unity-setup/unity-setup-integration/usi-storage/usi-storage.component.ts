@@ -5,8 +5,8 @@ import { takeUntil } from 'rxjs/operators';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { UnityModules } from 'src/app/shared/unity-rbac-permissions/unity-modules';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { UsiOntapCrudService } from 'src/app/shared/usi-ontap-crud/usi-ontap-crud.service';
-import { UsiPureStorageCrudService } from 'src/app/shared/usi-pure-storage-crud/usi-pure-storage-crud.service';
+import { UsiOntapCrudService } from 'src/app/app-shared-crud/usi-ontap-crud/usi-ontap-crud.service';
+import { UsiPureStorageCrudService } from 'src/app/app-shared-crud/usi-pure-storage-crud/usi-pure-storage-crud.service';
 import { environment } from 'src/environments/environment';
 import { UnitySetupIntegrationService } from '../unity-setup-integration.service';
 

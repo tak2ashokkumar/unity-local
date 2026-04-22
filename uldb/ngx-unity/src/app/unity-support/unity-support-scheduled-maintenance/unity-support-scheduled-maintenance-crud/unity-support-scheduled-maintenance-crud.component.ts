@@ -9,7 +9,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { UnitySupportScheduledMaintenanceCrudService, UserAndGroupViewData, deviceTypes, queryBuilderClassNames, queryBuilderConfig } from './unity-support-scheduled-maintenance-crud.service';
 import { DatacenterFast, DeviceDataType, MaintenanceType, PrivateCloudFast, TenantUserGroupType, TiggerDataType, UserType } from './unity-support-scheduled-maintenance-crud.type';
 import { ScrollStrategy, ScrollStrategyOptions } from '@angular/cdk/overlay';

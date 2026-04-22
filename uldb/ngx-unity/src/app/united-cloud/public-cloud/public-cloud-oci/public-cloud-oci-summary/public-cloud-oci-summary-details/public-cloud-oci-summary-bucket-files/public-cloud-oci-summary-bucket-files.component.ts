@@ -8,7 +8,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { PublicCloudOCIBucketFileView, PublicCloudOciSummaryBucketFileService } from './public-cloud-oci-summary-bucket-file.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';

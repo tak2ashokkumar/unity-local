@@ -19,7 +19,7 @@ import { BmServersMonitoringConfigService } from './bm-servers-monitoring-config
 import { DOWNLOAD_AGENT_BY_DEVICE_TYPE } from 'src/app/shared/api-endpoint.const';
 import { MonitoringTemplate } from 'src/app/shared/SharedEntityTypes/monitoring-templates.type';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { AUTH_ALGOS, CRYPTO_ALGOS } from 'src/app/app-constants';
 
 

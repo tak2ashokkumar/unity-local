@@ -14,7 +14,7 @@ import { DATABASE_GRAPH_TICKET_METADATA, DATABASE_GRAPH_TICKET_SUBJECT } from 's
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DcPDUZabbixMonitoringGraphItems } from '../datacenter-pdus-zabbix-monitoring.type';
 import { DcPDUMonitoringGraphsViewdata, ZabbixDcPduGraphCrudService } from './zabbix-dc-pdu-graph-crud.service';

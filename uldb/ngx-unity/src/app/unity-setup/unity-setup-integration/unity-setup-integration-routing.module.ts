@@ -56,7 +56,7 @@ import { UsiWorkflowIntegrationCrudComponent } from './usi-workflow-integration/
 import { UsiPublicCloudsComponent } from './usi-public-clouds/usi-public-clouds.component';
 import { UsiPrivateCloudsResourcesComponent } from './usi-private-clouds/usi-private-clouds-resources/usi-private-clouds-resources.component';
 import { UnitySetupLdapConfigComponent } from '../unity-setup-ldap-config/unity-setup-ldap-config.component';
-import { UnitySetupLdapCrudComponent } from 'src/app/shared/unity-setup-ldap-crud/unity-setup-ldap-crud.component';
+import { UnitySetupLdapCrudComponent } from 'src/app/app-shared-crud/unity-setup-ldap-crud/unity-setup-ldap-crud.component';
 import { UnitySetupLdapUserImportComponent } from '../unity-setup-ldap-config/unity-setup-ldap-user-import/unity-setup-ldap-user-import.component';
 import { UsiWorkflowIntegrationHistoryComponent } from './usi-workflow-integration/usi-workflow-integration-history/usi-workflow-integration-history.component';
 import { UsisPureComponent } from './usi-storage/usis-pure/usis-pure.component';
@@ -77,10 +77,10 @@ import { UsiEventIngestionEmailHistoryComponent } from './usi-event-ingestion-em
 import { UsiEventIngestionEmailCrudComponent } from './usi-event-ingestion-email/usi-event-ingestion-email-crud/usi-event-ingestion-email-crud.component';
 import { UsiJiraCrudComponent } from './usi-jira/usi-jira-crud/usi-jira-crud.component';
 import { UsiMsDynamicsCrmCrudComponent } from './usi-ms-dynamics-crm/usi-ms-dynamics-crm-crud/usi-ms-dynamics-crm-crud.component';
-import { PcCrudComponent } from 'src/app/shared/pc-crud/pc-crud.component';
+import { PcCrudComponent } from 'src/app/app-shared-crud/pc-crud/pc-crud.component';
 import { UsiImportDataCrudComponent } from './usi-import-data/usi-import-data-crud/usi-import-data-crud.component';
-import { UsiOntapCrudComponent } from 'src/app/shared/usi-ontap-crud/usi-ontap-crud.component';
-import { UsiOntapCrudNewComponent } from 'src/app/shared/usi-ontap-crud-new/usi-ontap-crud-new.component';
+import { UsiOntapCrudComponent } from 'src/app/app-shared-crud/usi-ontap-crud/usi-ontap-crud.component';
+import { UsiOntapCrudNewComponent } from 'src/app/app-shared-crud/usi-ontap-crud-new/usi-ontap-crud-new.component';
 import { UsisPureCrudComponent } from './usi-storage/usis-pure/usis-pure-crud/usis-pure-crud.component';
 import { UsiEventIngestionCommonComponent } from './usi-event-ingestion-common/usi-event-ingestion-common.component';
 import { UsiVaultsCrudComponent } from './usi-vaults/usi-vaults-crud/usi-vaults-crud.component';

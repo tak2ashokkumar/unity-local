@@ -5,7 +5,7 @@ import { SearchCriteria, PAGE_SIZES } from 'src/app/shared/table-functionality/s
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';

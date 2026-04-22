@@ -12,7 +12,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { StorageOntapCluster } from '../storage-ontap.type';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/shared/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 
 @Component({
   selector: 'storage-ontap-summary',

@@ -3,7 +3,7 @@ import { SubscribedCatalogueServicesService } from './subscribed-catalogue-servi
 import { Subject, interval } from 'rxjs';
 import { SearchCriteria, PAGE_SIZES } from 'src/app/shared/table-functionality/search-criteria';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
 import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
 import { takeUntil, tap, switchMap, takeWhile } from 'rxjs/operators';

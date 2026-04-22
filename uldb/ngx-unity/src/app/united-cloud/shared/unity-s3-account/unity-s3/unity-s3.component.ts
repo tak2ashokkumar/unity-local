@@ -13,9 +13,9 @@ import { tap, switchMap, takeWhile, takeUntil } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.prod';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FileSizePipe } from 'src/app/shared/pipes';
+import { FileSizePipe } from 'src/app/app-filters/pipes';
 import { TaskError } from 'src/app/shared/SharedEntityTypes/task-status.type';
 
 @Component({

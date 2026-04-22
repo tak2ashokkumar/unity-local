@@ -10,7 +10,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { cloneDeep as _clone } from 'lodash-es';
 import { CloudTypesItem, CostPlansListType, UscpResourceModelDataType } from '../uscp-resource-model.type';
 import { UscpCostModelService } from '../../uscp-cost-model/uscp-cost-model.service';

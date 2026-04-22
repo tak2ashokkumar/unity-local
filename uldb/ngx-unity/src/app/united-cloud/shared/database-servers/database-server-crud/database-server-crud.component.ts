@@ -11,7 +11,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { HttpErrorResponse } from '@angular/common/http';
 import { DatabaseCRUDBMServerFast, DatabaseCRUDPrivateCloudFast, DatabaseCRUDPrivateCloudVms, DatabaseCRUDDBType } from '../../entities/database-servers-crud.type';
 import { AppLevelService } from 'src/app/app-level.service';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/shared/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 import { LifeCycleStageOptions, LifeCycleStageStatusOptions } from '../../hypervisors/hypervisors-crud/hypervisors-crud.service';
 
 @Component({

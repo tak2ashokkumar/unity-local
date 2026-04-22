@@ -7,7 +7,7 @@ import { TabData } from 'src/app/shared/tabdata';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { takeUntil } from 'rxjs/operators';
-import { DcCrudService } from 'src/app/shared/dc-crud/dc-crud.service';
+import { DcCrudService } from 'src/app/app-shared-crud/dc-crud/dc-crud.service';
 
 @Component({
   selector: 'datacenter',

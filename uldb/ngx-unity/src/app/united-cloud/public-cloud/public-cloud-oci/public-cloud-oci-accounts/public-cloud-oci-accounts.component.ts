@@ -6,7 +6,7 @@ import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { CRUDActionTypes } from 'src/app/shared/app-utility/app-utility.service';
 import { OCI_ACCOUNT_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
-import { PublicCloudOciCrudService } from 'src/app/shared/public-cloud-oci-crud/public-cloud-oci-crud.service';
+import { PublicCloudOciCrudService } from 'src/app/app-shared-crud/public-cloud-oci-crud/public-cloud-oci-crud.service';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { OCIAccountType } from '../../entities/oci-account.type';

@@ -11,7 +11,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { ClientSideSearchPipe } from 'src/app/shared/table-functionality/client-side-search.pipe';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { CloudNameType } from './orchestration-task-execute.type';
 import { isString } from 'lodash-es';
 import { InputTemplateModel } from '../../orchestration-input-template/orchestration-input-template.service';
