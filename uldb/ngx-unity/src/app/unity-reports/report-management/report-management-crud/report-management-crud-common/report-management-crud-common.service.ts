@@ -19,7 +19,7 @@ import {
  */
 @Injectable()
 export class ReportManagementCrudCommonService {
-  constructor(private http: HttpClient, private builder: FormBuilder) {}
+  constructor(private http: HttpClient, private builder: FormBuilder) { }
 
   // For query builder
   private valueToSQL(value) {
@@ -170,7 +170,7 @@ export class ReportManagementCrudCommonService {
       if (field.type === 'ForeignKey') {
         return this.fetchChoices(field.url).pipe(
           map((res) => {
-            let choices = res.map((r) => [r.uuid, r.name]);
+            let choices = res.map((r) => [r.id, r.name]);
             field.choices = choices?.length ? choices : [];
             return field;
           })
@@ -210,9 +210,9 @@ export class ReportManagementCrudCommonService {
         defaultOperator: field.operators?.length ? field.operators[0] : 'is',
         options: field.choices.length
           ? field.choices.map((choice) => {
-              return { name: choice[1], value: choice[0] };
-              // return { name: choice.name, value: choice.uuid }
-            })
+            return { name: choice[1], value: choice[0] };
+            // return { name: choice.name, value: choice.uuid }
+          })
           : [],
         defaultValue: field.choices.length ? field.choices[0][0] : '',
         // defaultValue: field.choices.length ? field.choices[0].uuid : '',

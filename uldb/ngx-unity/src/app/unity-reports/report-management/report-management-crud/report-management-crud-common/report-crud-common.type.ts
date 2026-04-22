@@ -41,7 +41,7 @@ export interface ChoicesDataType {
   /**
    * Describes the id value in the Choices Data Type contract.
    */
-  id: number;
+  id: string;
   /**
    * Describes the uuid value in the Choices Data Type contract.
    */

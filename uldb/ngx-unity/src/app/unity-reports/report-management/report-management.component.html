@@ -100,7 +100,7 @@
                           ">
                           <button *ngIf="feature != 'Dynamic'" type="button" class="action-icons mt-2 mb-1 fas fa-eye font-sm" container="body"
                             tooltip="Preview" aria-label="Preview report" (click)="goToPreview(view)"></button>
-                          <button *ngIf="feature != 'Dynamic'" type="button" class="action-icons mt-1 mb-1 fas fa-calendar-alt font-sm"
+                          <button type="button" class="action-icons mt-1 mb-1 fas fa-calendar-alt font-sm"
                             container="body" tooltip="Schedule" aria-label="Schedule report" (click)="goToSchedule()"
                             accessControl moduleName="Unity Report" accessType="Manage Unity Report"
                             elementType="actionbtn"></button>
@@ -108,7 +108,7 @@
                             [tooltip]="view.toggleTootipMsg" [ngClass]="view.toggleIcon"
                             [attr.aria-label]="view.toggleTootipMsg + ' report'" (click)="toggle(view)" accessControl
                             moduleName="Unity Report" accessType="Manage Unity Report" elementType="actionbtn"></button>
-                          <button *ngIf="feature != 'Dynamic'" type="button" class="action-icons mt-1 mb-1 fas fa-pencil-alt font-sm"
+                          <button type="button" class="action-icons mt-1 mb-1 fas fa-pencil-alt font-sm"
                             container="body" tooltip="Edit" aria-label="Edit report" (click)="goToEdit(view)"
                             accessControl moduleName="Unity Report" accessType="Manage Unity Report"
                             elementType="actionbtn"></button>

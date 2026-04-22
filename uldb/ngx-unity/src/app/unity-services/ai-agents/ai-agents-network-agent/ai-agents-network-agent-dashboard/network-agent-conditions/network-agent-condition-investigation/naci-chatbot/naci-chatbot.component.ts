@@ -143,6 +143,7 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
       title: this.title
     }
     this.chatHistoryData.push({ user: 'bot', message: '', type: 'text' });
+    this.chatHistoryData.getLast()['showAction'] = false;
     const lastIndex = this.chatHistoryData.length - 1;
     this.startWaitMessages();
     this.service.getStreamingResponse(postData).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
@@ -157,8 +158,13 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
             }
           }
         } else if (event === 'complete') {
-          this.chatResponse.emit(data);
-          this.doneData = data;
+          if (typeof data == 'string') {
+            this.doneData = JSON.parse(data);
+          } else {
+            this.doneData = data;
+          }
+          this.chatResponse.emit(this.doneData);
+          console.log('this.doneData', this.doneData);
           if (this.sectionBreakReached) {
             if (this.doneData?.meta?.recommended_actions?.length) {
               this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => {
@@ -192,6 +198,17 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
         // this.sectionBreakReached = false;
         this.isTyping = false;
         this.isStreaming = false;
+        console.log('this.doneData typeof', typeof this.doneData)
+        console.log('this.doneData?.meta', this.doneData?.meta);
+        if (this.doneData?.meta?.recommended_actions?.length) {
+          console.log('inside complete if condition')
+          this.chatHistoryData.getLast()['actions'] = this.doneData.meta.recommended_actions.map(ra => {
+            return {
+              name: ra,
+              isDisabled: false
+            }
+          });
+        }
       }
     });
   }
@@ -204,6 +221,8 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
         const char = this.typingQueue.shift();
         if (char === 'sectionBreak') {
           const last = this.chatHistoryData[this.chatHistoryData.length - 1];
+          last.showAction = true;
+          console.log('last', last);
           last.message = (last.message as string).trimEnd();
           this.sectionBreakReached = true;
           this.showStopButton = false;

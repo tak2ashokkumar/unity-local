@@ -5,6 +5,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -14,7 +15,6 @@ import { DATABASE_GRAPH_TICKET_METADATA, DATABASE_GRAPH_TICKET_SUBJECT } from 's
 import { DataRefreshBtnService } from 'src/app/shared/data-refresh-btn/data-refresh-btn.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
-import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { DcPDUZabbixMonitoringGraphItems } from '../datacenter-pdus-zabbix-monitoring.type';
 import { DcPDUMonitoringGraphsViewdata, ZabbixDcPduGraphCrudService } from './zabbix-dc-pdu-graph-crud.service';

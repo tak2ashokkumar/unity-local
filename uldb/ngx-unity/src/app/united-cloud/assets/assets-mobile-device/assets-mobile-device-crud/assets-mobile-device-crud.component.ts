@@ -5,15 +5,15 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/public_api';
 import { Observable, of, Subject } from 'rxjs';
 import { mergeMap, takeUntil } from 'rxjs/operators';
+import { AppLevelService } from 'src/app/app-level.service';
+import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService, CRUDActionTypes, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { AssetsMobileDeviceCrudService, TagDevice } from './assets-mobile-device-crud.service';
-import { AppLevelService } from 'src/app/app-level.service';
 import { DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
-import { UnityDevicesCustomAttributesCrudService } from 'src/app/app-shared-crud/unity-devices-custom-attributes-crud/unity-devices-custom-attributes-crud.service';
+import { AssetsMobileDeviceCrudService, TagDevice } from './assets-mobile-device-crud.service';
 
 @Component({
   selector: 'assets-mobile-device-crud',

@@ -1,8 +1,8 @@
 <div class="container custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top"
-  *ngIf="showHotKeys">
+  *ngIf="showHotKeys" style="overflow-y : auto !important">
   <div class="row m-0 p-0">
     <div class="col-12 m-0 p-0">
-      <div id="defaultQueries" class="d-flex flex-column mt-2">
+      <div id="defaultQueries" class="d-flex flex-column mt-2 p-2">
         <div *ngIf="workflowNames && workflowNames.length; else noWorkflows">
           <div *ngFor="let wfn of workflowNames" class="card round-edge mb-2">
             <div class="card-body p-2 default-query" style="cursor: pointer" (click)="selectHotKey(wfn)">
@@ -93,7 +93,7 @@
       </div>
     </div> -->
 
-<div class="custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top"
+<div class="custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top p-2"
   *ngIf="chatbotData?.entityId && !showHotKeys">
   <div class="d-flex justify-content-between align-items-center" style="color: #73818f;">
     <div class="font-weight-bold">{{chatbotData?.entity}}</div>

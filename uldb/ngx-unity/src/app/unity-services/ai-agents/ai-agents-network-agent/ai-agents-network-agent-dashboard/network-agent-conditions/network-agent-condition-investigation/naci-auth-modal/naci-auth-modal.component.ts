@@ -68,7 +68,7 @@ export class NaciAuthModalComponent implements OnInit {
 
   onSubmit() {
     const payload = this.authForm.getRawValue();
-
+    const conversationId = this.terminalService.getConversationId();
     const input = {
       deviceId: this.generateTabId(),
       deviceName: payload.host,
@@ -82,7 +82,7 @@ export class NaciAuthModalComponent implements OnInit {
       port: payload.port,
       username: payload.username,
       password: payload.password,
-      conversation_id: this.conversationId
+      conversation_id: conversationId
     };
 
     this.modalRef.hide();

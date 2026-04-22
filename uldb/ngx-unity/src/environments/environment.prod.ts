@@ -15,5 +15,6 @@ export const environment = {
     availableThemes: ['light', 'dark'] as string[],
   },
   networkAgentHostUrl: 'https://unity.unitedlayer.com/networkai/',
-  ChatbotDocumentUploadUrl: 'https://unity.unitedlayer.com/ai-chat/'
+  ChatbotDocumentUploadUrl: 'https://unity.unitedlayer.com/ai-chat/',
+  cliNetworkAgentUrl: '10.192.36.36:8006/ws/terminal'
 };

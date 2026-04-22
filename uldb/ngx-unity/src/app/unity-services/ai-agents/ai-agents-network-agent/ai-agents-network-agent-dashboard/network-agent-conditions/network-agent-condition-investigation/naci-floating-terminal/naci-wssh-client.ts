@@ -53,14 +53,8 @@ export class WSSHClient {
     }
 
     getEndpoint(): string {
-        // if (window.location.protocol == 'https:') {
-        //     var protocol = 'wss://';
-        // } else {
-        //     var protocol = 'ws://';
-        // }
-        // environment
-        // return protocol + this.getHostUrl() + "/vmterminal/" + this.wsOptions.uuid + '/';
-        return `ws://10.192.36.36:8006/ws/terminal/${this.wsOptions.uuid}`;
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        return `${protocol}${environment.cliNetworkAgentUrl}/${this.wsOptions.uuid}`;
     }
 
     connect() {
@@ -129,7 +123,8 @@ export class WSSHClient {
     sendClientData(data: any) {
         this.connection.send(JSON.stringify({
             type: 'input',
-            data: data
+            data: data,
+            conversation_id: this.wsOptions.conversation_id
         }));
     }
 

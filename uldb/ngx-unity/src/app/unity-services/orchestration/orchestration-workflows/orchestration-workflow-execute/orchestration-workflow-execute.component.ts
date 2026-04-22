@@ -668,6 +668,4 @@ export class OrchestrationWorkflowExecuteComponent implements OnInit {
     this.isResizing = false;
     this.removeMouseMove?.();
     this.removeMouseUp?.();
-  }
-
-}
+  }}

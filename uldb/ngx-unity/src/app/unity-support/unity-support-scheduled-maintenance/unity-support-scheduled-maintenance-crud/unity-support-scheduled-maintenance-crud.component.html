@@ -266,26 +266,26 @@
                             <div class="row border rounded p-4 position-relative mt-4 mx-0">
                                 <div class="pb-2 mb-3 bg-white position-absolute section-name">Actions</div>
                                 <div class="col">
-                                    <div class="form-group row ml-5 pl-3">
+                                    <div class="form-group row ml-3 pl-3">
                                         <div class="col-4 align-items-center row px-0">
-                                            <div class="col-5 pr-0">Event Email Notification :</div>
-                                            <div class="col-7 pl-0">
+                                            <div class="col-6 pr-0">AIML Notification:</div>
+                                            <div class="col-6 pl-0">
                                                 <div class="d-inline-block">
                                                     <ul class="d-flex px-0 mb-0">
                                                         <li>
                                                             <label class="pointer-link"
-                                                                [class.active]="form.get('disable_event_notification').value">
+                                                                [class.active]="form.get('aiml_notification').value">
                                                                 <input type="radio" [value]="true"
-                                                                    formControlName="disable_event_notification">
-                                                                <span class="font-sm">Enable</span>
+                                                                    formControlName="aiml_notification">
+                                                                <span class="font-sm">Continue</span>
                                                             </label>
                                                         </li>
                                                         <li>
                                                             <label class="pointer-link"
-                                                                [class.active]="!form.get('disable_event_notification').value">
+                                                                [class.active]="!form.get('aiml_notification').value">
                                                                 <input type="radio" [value]="false"
-                                                                    formControlName="disable_event_notification">
-                                                                <span class="font-sm">Disable</span>
+                                                                    formControlName="aiml_notification">
+                                                                <span class="font-sm">Block</span>
                                                             </label>
                                                         </li>
                                                     </ul>
@@ -293,56 +293,25 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-4 align-items-center row px-0">
-                                            <div class="col-4 pr-0">Event Suppresion :</div>
-                                            <div class="col-8 pl-0">
-                                                <div class="d-inline-block">
-                                                    <ul class="d-flex px-0 mb-0">
-                                                        <li>
-                                                            <label class="pointer-link"
-                                                                [class.active]="form.get('suppress_event').value">
-                                                                <input type="radio" [value]="true"
-                                                                    formControlName="suppress_event">
-                                                                <span class="font-sm">Enable</span>
-                                                            </label>
-                                                        </li>
-                                                        <li>
-                                                            <label class="pointer-link"
-                                                                [class.active]="!form.get('suppress_event').value">
-                                                                <input type="radio" [value]="false"
-                                                                    formControlName="suppress_event">
-                                                                <span class="font-sm">Disable</span>
-                                                            </label>
-                                                        </li>
-                                                    </ul>
+                                        <div class="col-4 align-items-center row px-0 ml-3">
+                                            <div class="col-7 pr-0">Suppress All Events :</div>
+                                            <div class="col-2 pl-0 mb-3 pb-1">
+                                                <div class="form-check">
+                                                    <input class="form-check-input form-check-xl" type="checkbox"
+                                                        formControlName="suppress_event">
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div class="col-4 align-items-center row px-0"
                                             *ngIf="!form.get('suppress_event').value">
-                                            <div class="col-4 pr-0">Correlate :</div>
-                                            <div class="col-8 pl-0">
-                                                <div class="d-inline-block">
-                                                    <ul class="d-flex px-0 mb-0">
-                                                        <li>
-                                                            <label class="pointer-link"
-                                                                [class.active]="form.get('single_correlation').value">
-                                                                <input type="radio" [value]="true"
-                                                                    formControlName="single_correlation">
-                                                                <span class="font-sm">Enable</span>
-                                                            </label>
-                                                        </li>
-                                                        <li>
-                                                            <label class="pointer-link"
-                                                                [class.active]="!form.get('single_correlation').value">
-                                                                <input type="radio" [value]="false"
-                                                                    formControlName="single_correlation">
-                                                                <span class="font-sm">Disable</span>
-                                                            </label>
-                                                        </li>
-                                                    </ul>
+                                            <div class="col-9 pr-0">Correlate into Single Condition :</div>
+                                            <div class="col-2 pl-0 mb-3 pb-1 ml-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input form-check-xl" type="checkbox"
+                                                        formControlName="single_correlation">
                                                 </div>
+
                                             </div>
                                         </div>
 
@@ -378,27 +347,32 @@
                                                 </ul>
                                             </div>
                                         </div>
-                                        <ng-container *ngIf="form.get('send_notification').value">
-                                            <div class="col-2 mt-1">
+                                    </div>
+
+                                    <ng-container *ngIf="form.get('send_notification').value">
+                                        <div class="form-group row">
+                                            <div class="col-2 text-right align-self-center">Before Maintenance :
+                                            </div>
+                                            <div class="col-2 ">
                                                 <div class="form-check">
                                                     <input class="form-check-input form-check-xl" type="checkbox"
                                                         formControlName="notify_before_window">
-                                                    <label class="form-check-label">
-                                                        Before And
-                                                    </label>
                                                 </div>
                                             </div>
-                                            <div class="col-3 mt-1">
+
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-2 text-right align-self-center">After Maintenance :
+                                            </div>
+                                            <div class="col-2 ">
                                                 <div class="form-check">
                                                     <input class="form-check-input form-check-xl" type="checkbox"
                                                         formControlName="notify_after_window">
-                                                    <label class="form-check-label">
-                                                        After Maintenance Window
-                                                    </label>
                                                 </div>
                                             </div>
-                                        </ng-container>
-                                    </div>
+
+                                        </div>
+                                    </ng-container>
                                     <ng-container *ngIf="form.get('users_and_user_groups')">
                                         <div class="form-group row">
                                             <div class=" col-2 text-right mt-1">User or User Group<em>*</em> :</div>
@@ -805,8 +779,8 @@
                                             End Next<em>*</em> :
                                         </div>
                                         <div class="col-1 mt-3">
-                                            <input class="form-control" type="number" formControlName="end_next"
-                                                [class.is-invalid]="formErrors.end_next">
+                                            <input class="form-control" type="number" [min]="0"
+                                                formControlName="end_next" [class.is-invalid]="formErrors.end_next">
 
                                             <small class="invalid-feedback" *ngIf="formErrors.schedule_meta.end_next">
                                                 {{ formErrors.schedule_meta.end_next }}

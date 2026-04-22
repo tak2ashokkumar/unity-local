@@ -322,6 +322,10 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
     }
     // if (res == null || res?.answer?.phase == 'General') { return; }
     if (res == null) { return; }
+    if (res?.meta?.filters_used?.conversation_id) {
+      this.conversationId = res?.meta?.filters_used?.conversation_id;
+      this.newTerminalService.setConversationId(res?.meta?.filters_used?.conversation_id);
+    }
     this.isAnyStepDataPresent = res?.answer ? true : this.isAnyStepDataPresent;
     const workSpaceData = res?.answer?.split('sectionBreak')[1];
     if (!workSpaceData && !res?.meta?.device_data?.monitoring_type) {
@@ -348,10 +352,6 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
     // if (res?.answer?.stage == "Stage 0") {
     //   this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);
     // }
-    if (res?.conversation_id) {
-      this.conversationId = res.conversation_id;
-      this.newTerminalService.setConversationId(res.conversation_id);
-    }
     this.spinner.stop('main');
   }
 

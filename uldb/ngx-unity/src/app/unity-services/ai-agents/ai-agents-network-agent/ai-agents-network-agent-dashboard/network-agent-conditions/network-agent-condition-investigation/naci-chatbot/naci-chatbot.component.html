@@ -19,7 +19,7 @@
                             <ng-container *ngIf="chat.type == 'text'">
                                 <div class="message-box bot-message">
                                     <markdown [data]="chat.message"></markdown>
-                                    <ng-container *ngIf="chat.actions?.length">
+                                    <ng-container *ngIf="chat.actions?.length && chat.showAction">
                                         <div class="mt-2 font-500">Recommended Actions:</div>
                                         <div class="d-flex flex-wrap mt-2">
                                             <div class="suggested-action py-1 px-2 mr-2 mb-2"

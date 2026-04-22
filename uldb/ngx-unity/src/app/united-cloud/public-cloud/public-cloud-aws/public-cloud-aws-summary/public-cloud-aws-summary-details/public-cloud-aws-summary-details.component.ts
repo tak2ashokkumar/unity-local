@@ -1,28 +1,28 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AWSInstanceCreateDropdownData, AWSPowerToggleInput, AWSS3FileUploadsViewData, AWSS3ViewData, AccountsDetailListViewData, AutoScaleGroupDropDown, AwsLocationData, AwsResourcesViewData, LoadBalancerDropDown, NetworkInterfaceDropDown, PublicCloudAwsSummaryDetailsService, ResourceDetailsViewData } from './public-cloud-aws-summary-details.service';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { Subject, from, interval } from 'rxjs';
+import { mergeMap, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
+import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
+import { AppLevelService } from 'src/app/app-level.service';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
-import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppUtilityService, DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
-import { Subject, from, interval } from 'rxjs';
-import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { Notification } from 'src/app/shared/app-notification/notification.type';
-import { HttpErrorResponse } from '@angular/common/http';
-import { mergeMap, switchMap, take, takeUntil, takeWhile, tap } from 'rxjs/operators';
-import { AwsAccountsType } from './public-cloud-aws-summary-details.type';
-import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { environment } from 'src/environments/environment';
-import { AppLevelService } from 'src/app/app-level.service';
-import { UserInfoService } from 'src/app/shared/user-info.service';
-import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { AWS_TICKET_METADATA, TICKET_SUBJECT } from 'src/app/shared/create-ticket.const';
-import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
+import { FloatingTerminalService } from 'src/app/shared/floating-terminal/floating-terminal.service';
+import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
+import { SharedCreateTicketService } from 'src/app/shared/shared-create-ticket/shared-create-ticket.service';
 import { ClientSidePage } from 'src/app/shared/table-functionality/client-side-page.service';
+import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { UserInfoService } from 'src/app/shared/user-info.service';
 import { AWSVm } from 'src/app/united-cloud/shared/entities/aws.type';
+import { environment } from 'src/environments/environment';
+import { AWSInstanceCreateDropdownData, AWSPowerToggleInput, AWSS3FileUploadsViewData, AWSS3ViewData, AccountsDetailListViewData, AutoScaleGroupDropDown, AwsLocationData, AwsResourcesViewData, LoadBalancerDropDown, NetworkInterfaceDropDown, PublicCloudAwsSummaryDetailsService, ResourceDetailsViewData } from './public-cloud-aws-summary-details.service';
+import { AwsAccountsType } from './public-cloud-aws-summary-details.type';
 
 @Component({
   selector: 'public-cloud-aws-summary-details',

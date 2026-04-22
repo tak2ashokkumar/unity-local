@@ -41,11 +41,11 @@ export class NetworkAgentEventsService {
         }
       }
     });
-    const deviceTypes = ['switch', 'firewall', 'load_balancer'];
-
-    deviceTypes.forEach((type: string) => {
-      params = params.append('device_type', type);
-    });
+    if (!filterData.device_type || filterData.device_type.length === 0) {
+      ['switch', 'firewall', 'load_balancer'].forEach(type => {
+        params = params.append('device_type', type);
+      });
+    }
     return this.http.get<PaginatedResult<AIMLEvents>>(GET_AIOPS_EVENTS(), { params: params });
   }
 

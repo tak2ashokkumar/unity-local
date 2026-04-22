@@ -904,7 +904,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
             this.toolsArr = this.toolsArr.map(group => ({
               ...group,
               data: group.data.map(node =>
-                node?.node_id === nodeId
+                getId(node?.node_id) === getId(nodeId)
                   ? {
                     ...node,
                     ...formDatas?.propertyForm,
@@ -929,26 +929,25 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
 
             console.log('after toolsArr>>>>>', this.toolsArr)
 
-            this.nodeDetailsArr = this.nodeDetailsArr.map(node => {
-              if (node?.node_type === nodeTypes.AIAgent && this.toolsArr?.length) {
+            // this.nodeDetailsArr = this.nodeDetailsArr.map(node => {
+            //   if (node?.node_type === nodeTypes.AIAgent) {
 
-                // Flatten toolsArr if it's grouped
-                // const allTools = this.toolsArr.flatMap(group => group.data || []);
+            //     const group = this.toolsArr.find(t => t.aiNodeId === node.node_id);
 
-                return {
-                  ...node,
-                  config: {
-                    ...node.config,
-                    tools: (this.toolsArr
-                      .find(t => t.aiNodeId === node.node_id)?.data || []
-                    ).map(tool => this.getToolsConfig(tool)),
-                  }
-                };
-              }
+            //     return {
+            //       ...node,
+            //       config: {
+            //         ...node.config,
+            //         tools: (group?.data || []).map(tool =>
+            //           this.getToolsConfig({ ...tool }) // clone here
+            //         ),
+            //       }
+            //     };
+            //   }
 
-              return node;
-            });
-
+            //   return node;
+            // });
+            this.syncAgentToolsToNodes();
           } else {
 
             this.nodeDetailsArr = this.nodeDetailsArr.map(node =>
@@ -1033,6 +1032,28 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
     //   this.handleTestFromModal(payload);
     // };
   }
+
+  syncAgentToolsToNodes() {
+    this.nodeDetailsArr = this.nodeDetailsArr.map(node => {
+
+      if (node?.node_type !== nodeTypes.AIAgent) return node;
+
+      const group = this.toolsArr.find(
+        t => t.aiNodeId === node.node_id
+      );
+
+      return {
+        ...node,
+        config: {
+          ...node.config,
+          tools: (group?.data || []).map(tool =>
+            this.getToolsConfig({ ...tool }) // clone to avoid ref issues
+          )
+        }
+      };
+    });
+  }
+
 
 
   updateToolInNodeDetails(aiNodeId, toolData) {
@@ -1440,8 +1461,8 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
 
       task: tool?.config?.task || '',
       target_type: tool?.config?.target_type || '',
-      target: tool?.config?.target || '',
-      credential: tool?.config?.credential || '',
+      target: tool?.config?.target || tool?.target,
+      credential: tool?.config?.credential || tool?.credential,
       cloud_type: tool?.config?.cloud_type || '',
 
       description: tool?.description || tool?.desc || '',
@@ -1591,8 +1612,8 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
           currentNode.config.cloud_type = this.taskDetails?.config?.cloud_type;
         }
         if (this.taskDetails.target_type === 'Host') {
-          currentNode.config.target = this.taskDetails?.config?.targets.join(',');
-          currentNode.config.credential = this.taskDetails?.config?.credentials;
+          // currentNode.config.target = '';
+          // currentNode.config.credential = '';
         }
         currentNode.description = this.taskDetails?.description;
       }
@@ -2093,40 +2114,42 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
 
   removeTool(toolId: number, agentNodeId: number) {
 
-
     const getId = (val: any) =>
       val?.includes?.('-') ? val : `tool-${val}`;
 
+    const toolKey = `tool-${toolId}`;
+
+    // Remove tool ONLY from the matching agent group
     this.toolsArr.forEach(group => {
-      const index = group.data.findIndex(n => (getId(n.node_id) === `tool-${toolId}`) ||
-        (getId(n.tool_id) === `tool-${toolId}`));
-      if (index !== -1) {
-        group.data.splice(index, 1); // remove the tool from the group
-      }
+
+      if (group.aiNodeId !== agentNodeId) return;
+
+      group.data = (group.data || []).filter(n =>
+        getId(n.node_id) !== toolKey &&
+        getId(n.tool_id) !== toolKey
+      );
     });
 
-    const toolsToPass = this.toolsArr.flatMap(group => group.data || []);
+    // Update tools for this agent only
+    const currentGroup = this.toolsArr.find(g => g.aiNodeId === agentNodeId);
+    const toolsToPass = currentGroup?.data || [];
+
     this.updateAgentTools(agentNodeId, toolsToPass);
 
+    console.log('after removal >>>', this.toolsArr);
 
-    console.log('afetr splice>>>', this.toolsArr)
-
-
+    // Remove from nodeDetailsArr ONLY for this agent node
     this.nodeDetailsArr.forEach(node => {
+
+      if (node.node_id !== agentNodeId) return;
+
       if (node?.config?.tools) {
-        const tools = node.config.tools;
-
-        const index = tools.findIndex(t =>
-          t.node_id === `tool-${toolId}` || t.tool_id === `tool-${toolId}`
+        node.config.tools = node.config.tools.filter(t =>
+          t.node_id !== toolKey &&
+          t.tool_id !== toolKey
         );
-
-        if (index !== -1) {
-          tools.splice(index, 1); // remove from nodeDetailsArr
-        }
       }
     });
-
-
   }
 
   syncNodeUI(nodeId: number) {
@@ -2305,27 +2328,27 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
       this.spinner.stop('main');
       this.workFlowData = res;
       this.emptyCanvas = false;
+      this.toolsArr = [];
 
       this.workFlowData?.nodes?.forEach(n => {
         this.nodeDetailsArr.push(_clone(n));
         if (n?.node_type === nodeTypes.AIAgent) {
-          setTimeout(() => {
-            this.nodeDetailsArr.forEach(n => {
-              this.syncNodeUI(getId(n?.node_id));
-              const tools = _clone(n?.config?.tools);
 
-              // Only push if tools exist and not empty
-              if (Array.isArray(tools) && tools.length > 0) {
-                const updatedTools = tools.map(tool => this.mapToolToNode(tool));
+          this.syncNodeUI(getId(n?.node_id));
 
-                this.toolsArr.push({
-                  aiNodeId: n?.node_id,
-                  data: _clone(updatedTools)
-                });
+          const tools = _clone(n?.config?.tools);
 
-              }
+          if (Array.isArray(tools) && tools.length > 0) {
+
+            const updatedTools = tools.map(tool =>
+              this.mapToolToNode(tool)
+            );
+
+            this.toolsArr.push({
+              aiNodeId: n?.node_id,
+              data: _clone(updatedTools)
             });
-          }, 0);
+          }
         }
         if (n?.node_type === nodeTypes.LLM) {
           setTimeout(() => {

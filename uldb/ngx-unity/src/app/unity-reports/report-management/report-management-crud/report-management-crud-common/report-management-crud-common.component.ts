@@ -421,6 +421,8 @@ export class ReportManagementCrudCommonComponent implements OnInit, OnDestroy {
     let formGroup = <FormGroup>this.selectFields.at(i);
     let field = this.fieldsMetaData.find((f) => f.name == name);
     formGroup.get('show_as').setValue(field.display_name);
+    formGroup.get('data_processing_fn').setValue([]);
+    formGroup.get('summary_fn').setValue([]);
   }
 
   /**

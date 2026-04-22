@@ -1,15 +1,16 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { AssetsVmsAzureService, AzureVMViewData, AzurePowerToggleInput } from './assets-vms-azure.service';
-import { Subject } from 'rxjs';
-import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
-import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { takeUntil, take } from 'rxjs/operators';
-import { Notification } from 'src/app/shared/app-notification/notification.type';
-import { PowerToggleInput, ServerPowerToggleService } from 'src/app/united-cloud/shared/server-power-toggle/server-power-toggle.service';
-import { AppLevelService } from 'src/app/app-level.service';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ClientSideSearchPipe } from 'src/app/app-filters/client-side-search.pipe';
+import { AppLevelService } from 'src/app/app-level.service';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
+import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
+import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { ServerPowerToggleService } from 'src/app/united-cloud/shared/server-power-toggle/server-power-toggle.service';
+import { AssetsVmsAzureService, AzurePowerToggleInput, AzureVMViewData } from './assets-vms-azure.service';
+
 
 @Component({
   selector: 'assets-vms-azure',

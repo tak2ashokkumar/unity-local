@@ -93,19 +93,26 @@
                                                 <button class="action-icons mt-2 mb-1 fas fa-key font-sm"
                                                     tooltip="Copy Key"
                                                     [ngClass]="{'action-icons-disabled': !view.ingestEvent}"
-                                                    (click)="copyKey(view.token,view)" container="body">
+                                                    (click)="copyKey(view.token,view)" container="body" accessControl
+                                                    moduleName="Private Cloud" accessType="Manage Private Cloud"
+                                                    elementType="actionbtn">
                                                 </button>
                                                 <button class="action-icons mt-2 mb-1 fas fa-link font-sm"
                                                     tooltip="Copy URL"
                                                     [ngClass]="{'action-icons-disabled': !view.ingestEvent}"
-                                                    (click)="copyKey(view.url,view)" container="body">
+                                                    (click)="copyKey(view.url,view)" container="body" accessControl
+                                                    moduleName="Private Cloud" accessType="Manage Private Cloud"
+                                                    elementType="actionbtn">
                                                 </button>
                                                 <button class="action-icons mt-2 mb-1 fas fa-pencil-alt font-sm"
-                                                    (click)="editAccount(view)" tooltip="Edit Account" container="body">
+                                                    (click)="editAccount(view)" tooltip="Edit Account" container="body"
+                                                    accessControl moduleName="Private Cloud"
+                                                    accessType="Manage Private Cloud" elementType="actionbtn">
                                                 </button>
                                                 <button class="action-icons mt-2 mb-1 fas fa-trash-alt font-sm"
                                                     tooltip="Delete Account" (click)="deleteAccount(view)"
-                                                    container="body">
+                                                    container="body" accessControl moduleName="Private Cloud"
+                                                    accessType="Manage Private Cloud" elementType="actionbtn">
                                                 </button>
                                             </div>
                                         </span>

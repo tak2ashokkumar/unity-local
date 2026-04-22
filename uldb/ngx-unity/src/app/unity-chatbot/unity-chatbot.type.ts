@@ -57,7 +57,8 @@ export interface ChatHistoryData {
     feedbackSubmitted?: boolean;
     feedbackIconTooltip?: string;
     suggestedPrompt?: string;
-    actions?: { name: string, isDisabled: boolean }
+    actions?: { name: string, isDisabled: boolean };
+    showAction?: boolean;
 }
 
 export interface AssistedInsights {

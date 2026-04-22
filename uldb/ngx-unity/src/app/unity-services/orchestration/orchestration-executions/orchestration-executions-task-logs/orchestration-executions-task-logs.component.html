@@ -75,11 +75,11 @@
               <div class="row m-0 mt-2" *ngIf="outputData?.output">
                 <div class="col-12 p-0">
                   <div class="row m-0 mt-2 output-bgr">
-                    <div class="col-12 p-0 p-3 position-relative" #copyContent>
+                    <div class="col-12 p-0 p-3 position-relative">
                       <button class="action-icons fas fa-copy font-sm position-absolute" tooltip="Copy"
                         style="top: 8px; right: 4px; z-index: 1;" (click)="copyOutput()">
                       </button>
-                      <pre class="mb-0 pr-4">{{ outputData?.output }}</pre>
+                      <pre class="mb-0 pr-4" #copyContent>{{ outputData?.output }}</pre>
                     </div>
                   </div>
                 </div>

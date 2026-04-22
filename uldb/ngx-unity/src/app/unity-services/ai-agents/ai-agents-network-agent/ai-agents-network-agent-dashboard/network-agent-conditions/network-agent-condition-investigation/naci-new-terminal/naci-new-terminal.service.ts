@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class NaciNewTerminalService {
+  private conversationId: string;
 
   private openModalSource = new Subject<void>();
   openModal$ = this.openModalSource.asObservable();
@@ -26,6 +27,11 @@ export class NaciNewTerminalService {
   }
 
   setConversationId(id: string) {
+    this.conversationId = id;
     this.conversationIdSource.next(id);
+  }
+
+  getConversationId(): string {
+    return this.conversationId;
   }
 }

@@ -72,8 +72,8 @@ export class OrchestrationAgenticWorkflowParamsService {
     const form = this.fb.group({
       name: [nodeData.name, [Validators.required, NoWhitespaceValidator]],
       description: [nodeData?.description || nodeData?.description, [Validators.required]],
-      target: [nodeData?.config?.target, valid],
-      credential: [nodeData?.config?.credential, valid],
+      target: [nodeData?.target ?? nodeData?.config?.target ?? '', valid],
+      credential: [nodeData?.credential ?? nodeData?.config?.credential ?? '', valid],
       inputs: this.fb.array(nodeData.inputs.map(input => this.createInputParamGroup(input))),
       // outputs: nodeData.outputs ? this.fb.array(nodeData.outputs?.map(input => this.createOutputParamGroup(input))) : [],
       timeouts: [nodeData?.config?.settings?.timeout ? nodeData?.config?.settings?.timeout : 3600],

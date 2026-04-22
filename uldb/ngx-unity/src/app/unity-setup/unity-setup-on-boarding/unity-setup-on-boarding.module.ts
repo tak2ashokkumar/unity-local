@@ -11,6 +11,7 @@ import { AdvancedDiscoveryHypervisorsComponent } from './advanced-device-discove
 import { AdvancedDiscoveryLoadbalancersComponent } from './advanced-device-discovery/advanced-discovery-loadbalancers/advanced-discovery-loadbalancers.component';
 import { AdvancedDiscoveryMacdevicesComponent } from './advanced-device-discovery/advanced-discovery-macdevices/advanced-discovery-macdevices.component';
 import { AdvancedDiscoveryNetworkScanComponent } from './advanced-device-discovery/advanced-discovery-network-scan/advanced-discovery-network-scan.component';
+import { AdvancedDiscoveryPolicyCrudComponent } from './advanced-device-discovery/advanced-discovery-network-scan/advanced-discovery-policy-crud/advanced-discovery-policy-crud.component';
 import { AdvancedDiscoveryNetworkTopologyComponent } from './advanced-device-discovery/advanced-discovery-network-topology/advanced-discovery-network-topology.component';
 import { AdvancedDiscoveryNextPrevComponent } from './advanced-device-discovery/advanced-discovery-next-prev/advanced-discovery-next-prev.component';
 import { AdvancedDiscoveryPdusComponent } from './advanced-device-discovery/advanced-discovery-pdus/advanced-discovery-pdus.component';
@@ -72,7 +73,6 @@ import { UnitySetupOnBoardingResolverService } from './unity-setup-on-boarding-r
 import { UnitySetupOnBoardingRoutingModule } from './unity-setup-on-boarding-routing.module';
 import { UnitySetupOnBoardingSummaryComponent } from './unity-setup-on-boarding-summary/unity-setup-on-boarding-summary.component';
 import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.component';
-import { AdvancedDiscoveryPolicyCrudComponent } from './advanced-device-discovery/advanced-discovery-network-scan/advanced-discovery-policy-crud/advanced-discovery-policy-crud.component';
 
 
 @NgModule({
