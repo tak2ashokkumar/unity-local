@@ -7,12 +7,12 @@ import { merge as _merge } from 'lodash-es';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { WIDGET_DATA_ERROR } from 'src/app/app-home/app-home.constants';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { WIDGET_DATA_ERROR } from '../../infra-as-a-service.constants';
 import { PCFastData } from '../pc-fast.type';
 import { CloudWidgetViewData, PrivateCloudService } from '../private-cloud.service';
 

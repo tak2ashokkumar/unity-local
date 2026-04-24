@@ -40,8 +40,14 @@ export class WSSHClient {
     private messageEvent = new Subject<any>();
     onMessage: Observable<any> = this.messageEvent.asObservable();
 
+    private _commandSent = false;
+
     constructor(options: WSOption) {
         this.wsOptions = options;
+    }
+
+    isShellReady(data: string): boolean {
+        return data.includes('$') || data.includes('#');
     }
 
     getHostUrl(): string {
@@ -73,7 +79,17 @@ export class WSSHClient {
         };
 
         this.connection.onmessage = (evt: MessageEvent) => {
-            this.messageEvent.next(evt.data);
+            const data = evt.data;
+            this.messageEvent.next(data);
+            if (!this._commandSent && this.isShellReady(data)) {
+                this._commandSent = true;
+                const raw = localStorage.getItem('terminal_command');
+                if (raw) {
+
+                    this.sendClientData(raw + '\n');
+                    localStorage.removeItem('terminal_command');
+                }
+            }
         };
 
         this.connection.onclose = (evt: CloseEvent) => {

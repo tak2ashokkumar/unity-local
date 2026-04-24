@@ -6,11 +6,11 @@ import * as pluginDataLabels from 'chartjs-plugin-datalabels';
 import { Color, Label, SingleDataSet } from 'ng2-charts';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { WIDGET_DATA_ERROR } from 'src/app/app-home/app-home.constants';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { WIDGET_DATA_ERROR } from '../../infra-as-a-service.constants';
 import { OCIViewData, OCIWidgetViewData, PublicCloudService } from '../public-cloud.service';
 
 @Component({

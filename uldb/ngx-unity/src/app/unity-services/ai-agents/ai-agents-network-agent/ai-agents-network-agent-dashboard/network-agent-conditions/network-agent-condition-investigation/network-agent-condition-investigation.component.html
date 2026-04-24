@@ -283,9 +283,9 @@
                 </div>
                 <div class="my-3" *ngIf="chatResponseHistoryData.length">
                     <div class="d-flex align-items-center justify-content-between">
-                        <div class="font-500 font-lg">
+                        <h1 class="font-500 font-xl mt-1">
                             Workspace
-                        </div>
+                        </h1>
                         <button class="btn btn-pill btn-warning" (click)="togglePromptTuning()">
                             Prompt Tuning
                         </button>
@@ -302,7 +302,7 @@
                                 <input type="checkbox" [checked]="selectedPrompt?.isActive"
                                     [disabled]="!selectedPrompt || selectedPrompt.isActive"
                                     (change)="onToggleActive($event)" />
-                                <span class="fw-bold ml-1">
+                                <span class="font-500 ml-1">
                                     {{ selectedPrompt?.isActive ? 'Active' : 'Inactive' }}
                                 </span>
                             </div>
@@ -377,7 +377,7 @@
                     <div class="card-body">
                         <div #chatResponseHistory *ngFor="let chat of chatResponseHistoryData;let i = index;let last = last" class="w-100"
                             style="max-width: 100%;">
-                            <markdown [data]="chat.workSpaceData"></markdown>
+                            <markdown (click)="onMarkdownClick($event)" [data]="chat.workSpaceData"></markdown>
                             <naci-zabbix-graphs [deviceData]="chat.meta?.device_data" [index]="i"
                                 *ngIf="chat.meta?.device_data?.monitoring_type && chat.meta?.device_data?.monitoring_type!= 'Network Topology'"></naci-zabbix-graphs>
                             <naci-network-topology-steps [deviceData]="chat.meta?.device_data" [index]="i"
@@ -467,6 +467,28 @@
                 As</button>
             <button class="btn btn-sm btn-danger pull-right" (click)="confirmSaveAsModalRef.hide()"
                 type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #executeCommand>
+    <div class="card mb-0">
+        <div class="card-header font-500">
+            Confirm Command Execution
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmExecutionModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div>Do you want to Execute this Command ?</div>
+            <div class="font-500 mt-2">{{command}}</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmExecuteModal()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
+                type="button">No</button>
         </div>
     </div>
 </ng-template>

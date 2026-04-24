@@ -10,7 +10,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { WIDGET_DATA_ERROR } from '../../infra-as-a-service.constants';
+import { WIDGET_DATA_ERROR } from 'src/app/app-home/app-home.constants';
 import { DashboardDockerControllersView } from '../dashboard-dockers-controller.service';
 import { DashboardNativeDockerWidgetService, DashboardNativeDockerWidgetViewData } from './dashboard-native-docker-widget.service';
 

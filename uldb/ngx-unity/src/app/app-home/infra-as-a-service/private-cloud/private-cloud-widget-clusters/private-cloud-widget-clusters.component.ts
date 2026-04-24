@@ -1,19 +1,19 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { CloudWidgetViewData, PrivateCloudService } from '../private-cloud.service';
-import { PCFastData } from '../pc-fast.type';
-import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { WIDGET_DATA_ERROR } from 'src/app/app-home/app-home.constants';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
-import { UserInfoService } from 'src/app/shared/user-info.service';
-import { takeUntil } from 'rxjs/operators';
-import { WIDGET_DATA_ERROR } from '../../infra-as-a-service.constants';
-import { HttpErrorResponse } from '@angular/common/http';
-import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
-import { ClusterDataType, ClusterViewData, PrivateCloudWidgetClustersService, TopUsageItem } from './private-cloud-widget-clusters.service';
+import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { DeviceMapping } from 'src/app/shared/app-utility/app-utility.service';
+import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
+import { UserInfoService } from 'src/app/shared/user-info.service';
+import { PCFastData } from '../pc-fast.type';
+import { PrivateCloudService } from '../private-cloud.service';
+import { ClusterViewData, PrivateCloudWidgetClustersService, TopUsageItem } from './private-cloud-widget-clusters.service';
 
 @Component({
   selector: 'private-cloud-widget-clusters',
@@ -84,12 +84,12 @@ export class PrivateCloudWidgetClustersComponent implements OnInit, OnDestroy {
     this.popOverList = view.extraHighestHosts;
   }
 
-  goToClusterDetails(cluster: TopUsageItem){
+  goToClusterDetails(cluster: TopUsageItem) {
     if (this.user.isDashboardOnlyUser) {
       return;
     }
-    this.storageService.put('cluster', { name: this.pcData.name, deviceType: DeviceMapping.CLUSTER, configured: true }, StorageType.SESSIONSTORAGE);    
-    this.router.navigate(['/unitycloud/pccloud',this.pcData.uuid,'vcclusters',cluster.uuid,'hypervisors']);
+    this.storageService.put('cluster', { name: this.pcData.name, deviceType: DeviceMapping.CLUSTER, configured: true }, StorageType.SESSIONSTORAGE);
+    this.router.navigate(['/unitycloud/pccloud', this.pcData.uuid, 'vcclusters', cluster.uuid, 'hypervisors']);
   }
 
 }

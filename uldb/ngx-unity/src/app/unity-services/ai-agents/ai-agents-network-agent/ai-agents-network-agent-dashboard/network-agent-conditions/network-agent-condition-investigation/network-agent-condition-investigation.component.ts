@@ -73,6 +73,10 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
 
   conversationId: string = '';
 
+  @ViewChild('executeCommand') executeCommand: ElementRef;
+  confirmExecutionModalRef: BsModalRef;
+  command: string = '';
+
   constructor(private svc: NetworkAgentConditionInvestigationService,
     @Inject(DOCUMENT) private document,
     private renderer: Renderer2,
@@ -457,6 +461,24 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
 
   consoleSameTab(view: any) {
     this.newTerminalService.openTerminal();
+  }
+
+  onMarkdownClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const codeEl = target.closest('code');
+    if (codeEl) {
+      this.command = codeEl.textContent?.trim();
+      if (this.command) {
+        this.confirmExecutionModalRef = this.modalService.show(this.executeCommand, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+      }
+    }
+
+  }
+
+  confirmExecuteModal() {
+    this.confirmExecutionModalRef.hide();
+    localStorage.setItem('terminal_command', this.command);
+    window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
   }
 
 }

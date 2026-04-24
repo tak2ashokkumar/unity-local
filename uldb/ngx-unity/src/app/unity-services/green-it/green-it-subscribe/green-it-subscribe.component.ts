@@ -12,7 +12,7 @@ export class GreenItSubscribeComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  goToDashboard() {
+  goToHome() {
     this.router.navigate(['home']);
   }
 
