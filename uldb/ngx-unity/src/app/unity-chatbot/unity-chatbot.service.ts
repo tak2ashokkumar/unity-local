@@ -185,14 +185,6 @@ export const InsightsMapping: { [key: string]: UrlData } = {
       { name: 'Recent Failures', url: 'api/dashboard/devops_recentfail/', params: {} }
     ]
   },
-  'unityview/root/dashboard': {
-    apiUrls: [
-      { name: 'Public Cloud', url: 'api/dashboard/public_summary/', params: {} },
-      { name: 'Data Center', url: 'api/dashboard/datacenter_summary/', params: {} },
-      { name: 'Devices under Management', url: 'api/dashboard/devices_under_management/', params: {} },
-      { name: 'Private Cloud', url: 'api/dashboard/private_summary/', params: {} }
-    ]
-  },
   'unitycloud/infrastructure': {
     apiUrls: [
       { name: 'Alerts', url: 'api/dashboard/infra_alerts/', params: {} },

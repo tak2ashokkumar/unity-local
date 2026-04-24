@@ -10,7 +10,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { WIDGET_DATA_ERROR } from '../../../../united-view/dashboard/dashboard.component';
+import { WIDGET_DATA_ERROR } from '../../infra-as-a-service.constants';
 import { OCIViewData, OCIWidgetViewData, PublicCloudService } from '../public-cloud.service';
 
 @Component({

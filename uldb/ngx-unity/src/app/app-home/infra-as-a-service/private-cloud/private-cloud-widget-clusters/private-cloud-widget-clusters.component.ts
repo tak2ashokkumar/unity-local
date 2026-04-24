@@ -8,7 +8,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { takeUntil } from 'rxjs/operators';
-import { WIDGET_DATA_ERROR } from '../../../../united-view/dashboard/dashboard.component';
+import { WIDGET_DATA_ERROR } from '../../infra-as-a-service.constants';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { ClusterDataType, ClusterViewData, PrivateCloudWidgetClustersService, TopUsageItem } from './private-cloud-widget-clusters.service';

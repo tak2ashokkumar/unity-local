@@ -10,16 +10,6 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AppCoreModule } from '../app-core/app-core.module';
 import { ActivityLogsComponent } from './activity-logs/activity-logs.component';
-import { CustomDashboardWidgetCrudComponent } from './custom-dashboard-wrapper/custom-dashboard-widget-crud/custom-dashboard-widget-crud.component';
-import { CustomDashboardWidgetCrudService } from './custom-dashboard-wrapper/custom-dashboard-widget-crud/custom-dashboard-widget.service';
-import { CustomDashboardWidgetDatasetComponent } from './custom-dashboard-wrapper/custom-dashboard-widget/custom-dashboard-widget-dataset/custom-dashboard-widget-dataset.component';
-import { CustomDashboardWidgetComponent } from './custom-dashboard-wrapper/custom-dashboard-widget/custom-dashboard-widget.component';
-import { CustomDashboardWrapperComponent } from './custom-dashboard-wrapper/custom-dashboard-wrapper.component';
-import { CustomDashboardCrudComponent } from './custom-dashboard/custom-dashboard-crud/custom-dashboard-crud.component';
-import { CustomDashboardWidgetsComponent } from './custom-dashboard/custom-dashboard-widgets/custom-dashboard-widgets.component';
-import { CustomDashboardComponent } from './custom-dashboard/custom-dashboard.component';
-import { DashboardWrapperComponent } from './dashboard-wrapper/dashboard-wrapper.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { DatabaseComponent } from './monitoring/database/database.component';
 import { DeviceGroupComponent } from './monitoring/devices/device-group/device-group.component';
 import { DeviceService } from './monitoring/devices/device.service';
@@ -55,12 +45,12 @@ import { UnityGcpTopologyViewComponent } from './unity-topology/unity-gcp-topolo
 import { CurrencyPipe } from '@angular/common';
 import { UnityServiceTopologyComponent } from './unity-service-topology/unity-service-topology.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
+import { AppSecToDaysPipe } from 'src/app/app-filters/pipes';
 // import { UnityZabbixVmsAlertsComponent } from './unity-alerts/vms-alerts/unity-zabbix-vms-alerts/unity-zabbix-vms-alerts.component';
 // import { UnityObserviumVmsAlertsComponent } from './unity-alerts/vms-alerts/unity-observium-vms-alerts/unity-observium-vms-alerts.component';
 
 @NgModule({
   declarations: [
-    DashboardComponent,
     MonitoringComponent,
     DevicesComponent,
     SystemComponent,
@@ -85,17 +75,9 @@ import { NgxGraphModule } from '@swimlane/ngx-graph';
     UnityAlertGraphsComponent,
     MonitoringConfigurationComponent,
     UnityNetworkTopologyComponent,
-    DashboardWrapperComponent,
-    CustomDashboardWrapperComponent,
-    CustomDashboardWidgetComponent,
-    CustomDashboardWidgetCrudComponent,
-    CustomDashboardWidgetDatasetComponent,
     UnityTopologyComponent,
     UnityTopologyViewComponent,
     UnityAzureTopologyViewComponent,
-    CustomDashboardComponent,
-    CustomDashboardWidgetsComponent,
-    CustomDashboardCrudComponent,
     UnityOciTopologyViewComponent,
     UnityGcpTopologyViewComponent,
     UnityServiceTopologyComponent
@@ -122,8 +104,8 @@ import { NgxGraphModule } from '@swimlane/ngx-graph';
   providers: [DeviceService,
     ZabbixAlertsService,
     ObserviumAlertsService,
-    CustomDashboardWidgetCrudService,
-    CurrencyPipe
+    CurrencyPipe,
+    AppSecToDaysPipe
   ]
 })
 export class UnitedViewModule { }

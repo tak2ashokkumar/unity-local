@@ -66,7 +66,6 @@ import { SharedScheduleFormComponent } from './shared-schedule-form/shared-sched
 import { UnityScheduleComponent } from './unity-schedule/unity-schedule.component';
 import { AimlAlertDetailsComponent } from './aiml-alert-details/aiml-alert-details.component';
 import { AimlEventDetailsComponent } from './aiml-event-details/aiml-event-details.component';
-import { SharedGraphComponent } from './shared-graph/shared-graph.component';
 import { UnityLeaderLineComponent } from './unity-leader-line/unity-leader-line.component';
 import { SharedInterfaceDetailsComponent } from './shared-interface-details/shared-interface-details.component';
 import { ImageDropdownComponent } from './image-dropdown/image-dropdown.component';
@@ -146,7 +145,6 @@ import { AppSharedCrudModule } from '../app-shared-crud/app-shared-crud.module';
     UnityScheduleComponent,
     AimlAlertDetailsComponent,
     AimlEventDetailsComponent,
-    SharedGraphComponent,
     SharedInterfaceDetailsComponent,
     UnitySelectDropdownComponent,
     JsonComparisonComponent,
@@ -226,7 +224,6 @@ import { AppSharedCrudModule } from '../app-shared-crud/app-shared-crud.module';
     UnityScheduleComponent,
     AimlAlertDetailsComponent,
     AimlEventDetailsComponent,
-    SharedGraphComponent,
     UnityLeaderLineComponent,
     SharedInterfaceDetailsComponent,
     ImageDropdownComponent,

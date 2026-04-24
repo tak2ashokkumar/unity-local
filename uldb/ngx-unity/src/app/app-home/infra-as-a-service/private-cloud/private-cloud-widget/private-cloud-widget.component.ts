@@ -12,7 +12,7 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { WIDGET_DATA_ERROR } from '../../../../united-view/dashboard/dashboard.component';
+import { WIDGET_DATA_ERROR } from '../../infra-as-a-service.constants';
 import { PCFastData } from '../pc-fast.type';
 import { CloudWidgetViewData, PrivateCloudService } from '../private-cloud.service';
 
