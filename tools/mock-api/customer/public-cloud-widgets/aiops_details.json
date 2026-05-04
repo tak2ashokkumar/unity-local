@@ -1,0 +1,38 @@
+{
+  "alerts_pie": {
+    "raw_events": 878,
+    "alerts": 109,
+    "conditions": 32
+  },
+  "aiops_graph": {
+    "raw_events": {
+      "critical": 156,
+      "warning": 305,
+      "informative": 417
+    },
+    "noise_reduction": {
+      "dedupe": 156,
+      "suppressed": 305,
+      "correlated": 417
+    },
+    "first_response": {
+      "auto_cloned": 156,
+      "ticket_created": 305,
+      "auto_closed": 417
+    }
+  },
+  "raw_events_details": {
+    "raw_events": 878,
+    "critical": 156,
+    "warning": 305,
+    "informative": 417,
+    "noise_reduction": "77",
+    "dedupe_events": 589,
+    "suppressed_events": 289,
+    "correlated": 32,
+    "first_response": "92",
+    "auto_cloned": 126,
+    "ticket_created": 456,
+    "auto_closed": 378
+  }
+}

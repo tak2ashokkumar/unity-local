@@ -1,0 +1,101 @@
+{
+  "summary": {
+    "critical_alerts": 24,
+    "high_alerts": 67,
+    "open_itsm_tickets": 14,
+    "automation_success": "91",
+    "avg_mttr": "3.2h"
+  },
+  "top_alerts": [
+    {
+      "id": "1744",
+      "device_name": "UL_Switch_Disk",
+      "severity": "critical",
+      "description": "Ethernet has changed...",
+      "source": "Unity",
+      "acknowledged": "Yes",
+      "duration": "34s"
+    },
+    {
+      "id": "1746",
+      "device_name": "UL_Switch_Test",
+      "severity": "critical",
+      "description": "Ethernet has changed...",
+      "source": "Unity",
+      "acknowledged": "No",
+      "duration": "36s"
+    },
+    {
+      "id": "2319",
+      "device_name": "UL_Firewall_Test",
+      "severity": "critical",
+      "description": "High bandwidth usag...",
+      "source": "Unity",
+      "acknowledged": "No",
+      "duration": "39s"
+    },
+    {
+      "id": "6644",
+      "device_name": "UL_Switch_AT",
+      "severity": "high",
+      "description": "Device has been repla...",
+      "source": "Zabbix",
+      "acknowledged": "Yes",
+      "duration": "01m"
+    },
+    {
+      "id": "9956",
+      "device_name": "UL_LoadBalancer_09",
+      "severity": "high",
+      "description": "System name has bee...",
+      "source": "Nagios",
+      "acknowledged": "No",
+      "duration": "02m 44s"
+    },
+    {
+      "id": "1470",
+      "device_name": "UL_Router_AT",
+      "severity": "high",
+      "description": "Device has been repla...",
+      "source": "Unity",
+      "acknowledged": "Yes",
+      "duration": "08m 56s"
+    },
+    {
+      "id": "7452",
+      "device_name": "UL_LoadBalancer_04",
+      "severity": "critical",
+      "description": "Interface Link down...",
+      "source": "Nagios",
+      "acknowledged": "Yes",
+      "duration": "10m 15s"
+    },
+    {
+      "id": "2354",
+      "device_name": "UL_Switch_BT",
+      "severity": "high",
+      "description": "Interface : High error...",
+      "source": "Unity",
+      "acknowledged": "No",
+      "duration": "20m 13s"
+    },
+    {
+      "id": "0996",
+      "device_name": "UL_Firewall_007",
+      "severity": "critical",
+      "description": "Unavailable by ICMP...",
+      "source": "Nagios",
+      "acknowledged": "No",
+      "duration": "01h 09m"
+    },
+    {
+      "id": "0994",
+      "device_name": "UL_Firewall_007",
+      "severity": "critical",
+      "description": "Unavailable by ICMP...",
+      "source": "Zabbix",
+      "acknowledged": "Yes",
+      "duration": "01h 09m"
+    }
+  ]
+}
