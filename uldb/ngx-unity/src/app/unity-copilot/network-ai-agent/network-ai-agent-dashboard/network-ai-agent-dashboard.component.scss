@@ -1,0 +1,32 @@
+@import "variables";
+
+.move-dropdowns-up-end-of-top-tabs {
+    position: relative;
+    z-index: 100;
+    margin-top: -70px;
+    // margin-bottom: 2rem;
+    padding-top: 0.7rem;
+    pointer-events: none;
+}
+
+.move-dropdowns-up-end-of-top-tabs * {
+    pointer-events: auto;
+}
+
+.card .entity-card.active {
+    height: 100%;
+    width: 20% !important;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: $primary;
+    border-radius: 0.3rem !important;
+    color: $white;
+
+    .sub-entity {
+        color: $white;
+    }
+
+    .value {
+        color: $white;
+    }
+}

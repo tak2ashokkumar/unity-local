@@ -143,6 +143,7 @@ export class QueryBuilderComponent implements OnInit, OnChanges, ControlValueAcc
   private entityContextCache = new Map<Rule, EntityContext>();
   private removeButtonContextCache = new Map<Rule, RemoveButtonContext>();
   private buttonGroupContext: ButtonGroupContext;
+  @Input() dropdownContainer: 'body' | null = 'body';
 
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 

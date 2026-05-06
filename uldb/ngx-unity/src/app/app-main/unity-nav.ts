@@ -518,30 +518,31 @@ const UNITY_COST_ANALYSIS_NAV_DATA = (svc: PermissionService, userSvc: UserInfoS
 }
 
 const UNITY_AI_AGENTS_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
-    let finopsMenuName = orgName ? `Security Agent` : 'Finops Agent';
-    let ITSMMenuName = orgName ? `NOC Agent` : 'ITSM Agent';
+    let networkMenuName = orgName ? `Network Agent` : 'Network AI Agent';
+    let finopsMenuName = orgName ? `Security Agent` : 'Finops AI Agent';
+    let ITSMMenuName = orgName ? `NOC Agent` : 'ITSM AI Agent';
     const navItems = [
         {
-            name: 'Network Agent',
-            url: '/services/ai-agents/network-agent',
+            name: `${networkMenuName}`,
+            url: '/unity-copilot/network-ai-agent',
         },
         {
             name: `${finopsMenuName}`,
-            url: '/services/ai-agents/finops-agent',
+            url: '/unity-copilot/finops-ai-agent',
         },
         {
             name: `${ITSMMenuName}`,
-            url: '/services/ai-agents/itsm-agent',
+            url: '/unity-copilot/itsm-ai-agent',
         },
     ]
     return navItems;
 }
 
 const UNITY_AI_AGENTS_NAV_DATA = (svc: PermissionService, orgName: string) => {
-    let menuName = orgName ? `AI Agents Team` : 'AI Agents';
+    let menuName = orgName ? `AI Agents Team` : 'UnityCopilot';
     const navItems = {
         name: `${menuName}`,
-        url: '/services/ai-agents',
+        url: '/unity-copilot',
         icon: 'fas fa-exchange-alt',
         children: UNITY_AI_AGENTS_NAV_ITEMS(svc, orgName),
     }
@@ -842,6 +843,14 @@ const UNITED_VIEW_NAV_DATA = (svc: PermissionService, orgName: string) => {
 
 const DASBOARD_NAV_ITEMS = (svc: PermissionService) => {
     let navItems: UnityNavData[] = [
+        {
+            name: 'Curated Collection',
+            url: '/app-dashboard/collections',
+            icon: 'fas fa-layer-group',
+            attributes: {
+                module: UnityModules.DASHBOARD,
+            }
+        },
         {
             name: 'Default',
             url: '/app-dashboard/default',

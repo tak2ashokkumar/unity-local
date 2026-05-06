@@ -91,6 +91,7 @@ export interface WorkflowOutputResponse {
   output: string;
   task_name: string;
   type: string;
+  id: number;
 }
 
 

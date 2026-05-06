@@ -1,0 +1,63 @@
+<ng-template #authModal>
+
+  <div class="modal-header">
+    <h5 class="modal-title">Connect to Device</h5>
+    <button type="button" class="close" (click)="close()">
+      <span>&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+
+    <form [formGroup]="authForm">
+
+      <div class="form-group">
+        <label>Host</label>
+        <input class="form-control" formControlName="host">
+        <div class="text-danger">{{formErrors.host}}</div>
+      </div>
+
+      <div class="form-group">
+        <label>Port</label>
+        <input type="number" class="form-control" formControlName="port">
+        <div class="text-danger">{{formErrors.port}}</div>
+      </div>
+
+      <div class="form-group">
+        <label>Username</label>
+        <input class="form-control" formControlName="username">
+        <div class="text-danger">{{formErrors.username}}</div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" class="form-control" formControlName="password">
+        <div class="text-danger">{{formErrors.password}}</div>
+      </div>
+
+      <div class="form-group" formGroupName="collector">
+        <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
+        <select id="collectoruuid" class="form-control" formControlName="uuid"
+          [class.is-invalid]="formErrors.collector.uuid">
+          <option value="''" disabled>Select Collector</option>
+          <option *ngFor="let collector of collectors" [value]="collector.uuid">
+            {{collector.name}}
+          </option>
+        </select>
+        <div class="invalid-feedback" *ngIf="formErrors.collector.uuid">
+          {{formErrors.collector.uuid}}
+        </div>
+      </div>
+
+      <div class="text-danger">{{formErrors.invalidCred}}</div>
+
+    </form>
+
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="close()">Close</button>
+    <button class="btn btn-success" (click)="onSubmit()">Connect</button>
+  </div>
+
+</ng-template>

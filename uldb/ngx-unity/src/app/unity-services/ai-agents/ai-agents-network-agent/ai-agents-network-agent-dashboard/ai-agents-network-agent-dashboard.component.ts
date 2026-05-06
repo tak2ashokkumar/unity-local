@@ -62,8 +62,8 @@ export class AiAgentsNetworkAgentDashboardComponent implements OnInit, OnDestroy
     private notification: AppNotificationService) {
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        if (event.url === '/services/ai-agents/network-agent/dashboard') {
-          this.router.navigate(['events'], { relativeTo: this.route });
+        if (event.url === '/services/ops-co-pilot/network-ai-agent/dashboard') {
+          this.router.navigate(['conditions'], { relativeTo: this.route });
         }
         this.currentPath = event.url.split('/').pop();
       }

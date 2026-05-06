@@ -86,10 +86,20 @@ import { SharedApplicationTopologyComponent } from './shared-application-topolog
 import { AppDirectivesModule } from '../app-directives/app-directives.module';
 import { AppFiltersModule } from '../app-filters/app-filters.module';
 import { AppSharedCrudModule } from '../app-shared-crud/app-shared-crud.module';
+import { ConditionInvestigationComponent } from './condition-investigation/condition-investigation.component';
+import { ConditionInvestigationChatbotComponent } from './condition-investigation/condition-investigation-chatbot/condition-investigation-chatbot.component';
+import { ConditionInvestigationZabbixGraphsComponent } from './condition-investigation/condition-investigation-zabbix-graphs/condition-investigation-zabbix-graphs.component';
+import { ConditionInvestigationNetworkTopologyComponent } from './condition-investigation/condition-investigation-network-topology/condition-investigation-network-topology.component';
+import { MarkdownModule } from 'ngx-markdown';
+import { ConditionInvestigationAuthModalComponent } from './condition-investigation/condition-investigation-auth-modal/condition-investigation-auth-modal.component';
+import { ConditionInvestigationNewTerminalComponent } from './condition-investigation/condition-investigation-new-terminal/condition-investigation-new-terminal.component';
+import { ConditionInvestigationTerminalNewTabComponent } from './condition-investigation/condition-investigation-terminal-new-tab/condition-investigation-terminal-new-tab.component';
+import { ConditionInvestigationFloatingTerminalComponent } from './condition-investigation/condition-investigation-floating-terminal/condition-investigation-floating-terminal.component';
+import { ConditionInvestigationFloatingTerminalItemComponent } from './condition-investigation/condition-investigation-floating-terminal/condition-investigation-floating-terminal-item/condition-investigation-floating-terminal-item.component';
 
 @NgModule({
   imports: [AppCoreModule, ChartsModule, ResizableModule, PerfectScrollbarModule,
-    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule],
+    TypeaheadModule.forRoot(), AppDirectivesModule, AppFiltersModule, AppSharedCrudModule, MarkdownModule],
   exports: [
     AppMainTabComponent,
     ComingSoonComponent,
@@ -239,7 +249,16 @@ import { AppSharedCrudModule } from '../app-shared-crud/app-shared-crud.module';
     SharedApplicationTopologyComponent,
     CustomPasswordFieldComponent,
     CustomDateDropdownComponent,
-    VmBackupHistoryComponent
+    VmBackupHistoryComponent,
+    ConditionInvestigationComponent,
+    ConditionInvestigationChatbotComponent,
+    ConditionInvestigationZabbixGraphsComponent,
+    ConditionInvestigationNetworkTopologyComponent,
+    ConditionInvestigationAuthModalComponent,
+    ConditionInvestigationNewTerminalComponent,
+    ConditionInvestigationTerminalNewTabComponent,
+    ConditionInvestigationFloatingTerminalComponent,
+    ConditionInvestigationFloatingTerminalItemComponent,
   ],
   providers: [
     CookieService,

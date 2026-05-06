@@ -1,0 +1,45 @@
+<div class="topology-card position-relative">
+    <app-spinner [name]="spinnerName"></app-spinner>
+    <div class="py-0">
+        <ng-container>
+            <div class="dc-node-details-wrapper" [id]="'dc-node-details-wrapper-'+ index" [popover]="nodeDetails"
+                triggers="" [isOpen]="showNodeInfo">
+            </div>
+            <!-- <div id="dc-node-details-wrapper" [popover]="nodeDetails" triggers="" [isOpen]="showNodeInfo">
+            </div> -->
+        </ng-container>
+
+        <div class="row">
+            <div class="pr-0" [ngClass]="selectedNodes.length ? 'col-11': 'col-12'">
+                <div class="discovery-network-container" id="discovery-network-container" #visGraph>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center text-muted m-5 p-5 font-lg"
+            *ngIf="!networkViewData || !networkViewData.nodes.length">
+            <div>No devices discovered.</div>
+        </div>
+    </div>
+</div>
+
+<ng-template #nodeDetails>
+    <div class="card border-0 mb-0" *ngIf="hoveredNode">
+        <div class="card-body p-0 pt-1" *ngIf="hoveredNode.is_device">
+            <p class="card-text mb-1">Name: <span>{{hoveredNode.name}}</span>
+            </p>
+            <p class="card-text mb-1">Management IP: <span class="text-muted">{{hoveredNode.ip_address}}</span></p>
+            <p class="card-text mb-1">Device Type: <span class="text-muted">{{hoveredNode.displayType}}</span></p>
+            <p class="card-text mb-1">Onboarding Status: <span class="text-muted">{{hoveredNode.onboarded ?
+                    'Onboarded' : 'Not Onboarded'}}</span></p>
+            <p class="card-text mb-1">Alerts: <span class="text-muted">{{hoveredNode.alert_count}}</span></p>
+        </div>
+        <div class="card-body p-0 pt-1" *ngIf="!hoveredNode.is_device">
+            <p class="card-text mb-1">Name: <span class="text-muted">{{hoveredNode.name}}</span></p>
+            <p class="card-text mb-1">Type: <span class="text-muted">{{hoveredNode.displayType}}</span></p>
+            <p class="card-text mb-1" *ngIf="hoveredNode.platform_type">Platform Type: <span
+                    class="text-muted">{{hoveredNode.platform_type}}</span></p>
+            <p class="card-text mb-1" *ngIf="hoveredNode.datacenter"> Datacenter: <span
+                    class="text-muted">{{hoveredNode.datacenter}}</span></p>
+        </div>
+    </div>
+</ng-template>

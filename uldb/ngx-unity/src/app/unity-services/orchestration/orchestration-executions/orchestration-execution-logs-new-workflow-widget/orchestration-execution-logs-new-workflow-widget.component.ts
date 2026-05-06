@@ -164,6 +164,76 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
     this.editor = new Drawflow(container);
     this.editor.start();
     this.editor.curvature = 0.5;
+
+    this.editor.createCurvature = function (
+      start_pos_x,
+      start_pos_y,
+      end_pos_x,
+      end_pos_y
+    ) {
+      const offsetX = 120;
+      const clearanceY = 80;
+
+      // adaptive radius (prevents sharp breaks on short segments)
+      const getRadius = (len: number) => Math.min(12, Math.abs(len) / 2);
+
+      const isForward = end_pos_x >= start_pos_x;
+
+      if (isForward) {
+        const mid_x = start_pos_x + (end_pos_x - start_pos_x) / 2;
+
+        const dx = mid_x - start_pos_x;
+        const dyTotal = end_pos_y - start_pos_y;
+
+        const rX = getRadius(dx);
+        const rY = getRadius(dyTotal);
+
+        const dy = dyTotal > 0 ? rY : -rY;
+
+        return `
+      M ${start_pos_x} ${start_pos_y}
+      L ${mid_x - rX} ${start_pos_y}
+      Q ${mid_x} ${start_pos_y} ${mid_x} ${start_pos_y + dy}
+      L ${mid_x} ${end_pos_y - dy}
+      Q ${mid_x} ${end_pos_y} ${mid_x + rX} ${end_pos_y}
+      L ${end_pos_x} ${end_pos_y}
+    `;
+      } else {
+        const mid_x1 = start_pos_x + offsetX;
+        const mid_x2 = end_pos_x - offsetX;
+        const drop_y = Math.max(start_pos_y, end_pos_y) + clearanceY;
+
+        const dx1 = mid_x1 - start_pos_x;
+        const dx2 = mid_x2 - end_pos_x;
+        const dy1 = drop_y - start_pos_y;
+        const dy2 = drop_y - end_pos_y;
+
+        const r1 = getRadius(dx1);
+        const r2 = getRadius(dx2);
+        const rY1 = getRadius(dy1);
+        const rY2 = getRadius(dy2);
+
+        const dirY1 = dy1 > 0 ? rY1 : -rY1;
+        const dirY2 = dy2 > 0 ? -rY2 : rY2;
+
+        return `
+      M ${start_pos_x} ${start_pos_y}
+      L ${mid_x1 - r1} ${start_pos_y}
+      Q ${mid_x1} ${start_pos_y} ${mid_x1} ${start_pos_y + dirY1}
+
+      L ${mid_x1} ${drop_y - dirY1}
+      Q ${mid_x1} ${drop_y} ${mid_x1 - r1} ${drop_y}
+
+      L ${mid_x2 + r2} ${drop_y}
+      Q ${mid_x2} ${drop_y} ${mid_x2} ${drop_y + dirY2}
+
+      L ${mid_x2} ${end_pos_y - dirY2}
+      Q ${mid_x2} ${end_pos_y} ${mid_x2 + r2} ${end_pos_y}
+
+      L ${end_pos_x} ${end_pos_y}
+    `;
+      }
+    };
     this.editor.editor_mode = 'view';
     this.getWorkflowDetails();
   }
@@ -445,10 +515,9 @@ export class OrchestrationExecutionLogsNewWorkflowWidgetComponent implements OnI
         ? 'node-box llm'
         : node.type === nodeTypes.AIAgent
           ? 'node-box aiagent'
-          : 'node-box';
+          : node.type === nodeTypes.Loop ? 'node-box loop' : 'node-box';
 
     const iconClass = node.type === nodeTypes.LLM ? 'node-center-icon-llm' : 'node-center-icon-ai';
-
     const statusFa = this.getStatusFaClass(node.status);
     const statusName = node.status;
     // --- AI / LLM nodes logic (as in my previous message) ---

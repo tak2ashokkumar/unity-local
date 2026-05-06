@@ -239,6 +239,9 @@
                                             style="cursor: pointer;"></i>
                                     </div>
                                 </div>
+                                <div *ngIf="fileUploadErrorMessage" class="mt-2 mx-1 text-danger font-xs-sm pl-1">
+                                    {{fileUploadErrorMessage}}
+                                </div>
                                 <div class="row">
                                     <div class="col">
                                         <input class="form-control round-edge" type="text" formControlName="chat"
@@ -249,7 +252,7 @@
                                 <div class="d-flex align-items-center mb-2 pt-1">
                                     <div class="mx-2">
                                         <input #fileInput type="file" style="display: none;"
-                                            accept=".pdf,.docx,.xlsx,.txt,.csv" (change)="onFilesSelected($event)">
+                                            accept=".pdf,.docx,.xlsx,.txt,.csv" (change)="onFilesSelected($event)" multiple>
                                         <i class="fas fa-paperclip font-md text-muted" style="cursor: pointer;"
                                             (click)="fileInput.click()"></i>
                                     </div>

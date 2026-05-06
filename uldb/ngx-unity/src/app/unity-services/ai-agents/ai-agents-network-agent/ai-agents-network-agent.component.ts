@@ -15,7 +15,7 @@ export class AiAgentsNetworkAgentComponent implements OnInit, OnDestroy {
   constructor(private router: Router) {
     this.subscr = this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        if (event.url === '/services/ai-agents/network-agent') {
+        if (event.url === '/services/ops-co-pilot/network-ai-agent') {
           this.router.navigate([this.tabItems[0]?.url]);
         }
       }
@@ -33,10 +33,10 @@ export class AiAgentsNetworkAgentComponent implements OnInit, OnDestroy {
 const tabData: TabData[] = [
   {
     name: 'Dashboard',
-    url: '/services/ai-agents/network-agent/dashboard',
+    url: '/services/ops-co-pilot/network-ai-agent/dashboard',
   },
-  {
-    name: 'Network Agent Hub',
-    url: '/services/ai-agents/network-agent/network-agent-hub',
-  }
+  // {
+  //   name: 'Network Agent Hub',
+  //   url: '/services/ops-co-pilot/network-ai-agent/network-agent-hub',
+  // }
 ];

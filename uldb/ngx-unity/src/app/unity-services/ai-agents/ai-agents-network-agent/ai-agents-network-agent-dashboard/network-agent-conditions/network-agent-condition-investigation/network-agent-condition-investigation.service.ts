@@ -56,6 +56,7 @@ export class NetworkAgentConditionInvestigationService {
     viewdata.id = data.id;
     viewdata.uuid = data.uuid;
     viewdata.ruleName = data.rule_name;
+    viewdata.description = data.description;
     viewdata.alertCount = data.alert_count;
     viewdata.eventCount = data.event_count;
     viewdata.conditionSeverity = data.condition_severity;
@@ -263,6 +264,7 @@ export class NetworkAgentConditionDetailsViewData {
   id: number;
   uuid: string;
   ruleName: string;
+  description: string;
   alertCount: number;
   eventCount: number;
   conditionDatetime: string;
@@ -299,6 +301,7 @@ export interface NetworkAgentConditionDetails {
   id: number;
   uuid: string;
   rule_name: string;
+  description: string;
   alert_count: number;
   event_count: number;
   condition_datetime: string;

@@ -1,0 +1,268 @@
+<ng-container>
+    <ng-template #acknowledgeFormRef>
+        <form *ngIf="acknowledgeForm" [formGroup]="acknowledgeForm" [style.width.px]="250">
+            <div class="form-group">
+                <label for="comments" class="form-col-form-label">Comments</label>
+                <textarea id="comments" class="form-control static" rows='3' formControlName="ack_comment"
+                    [class.is-invalid]="acknowledgeFormErrors.ack_comment" placeholder="Enter Comments"></textarea>
+                <div class="invalid-feedback d-flex mb-3" *ngIf="acknowledgeFormErrors.ack_comment">
+                    {{acknowledgeFormErrors.ack_comment}}
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-sm btn-primary pull-right ml-2" type="button"
+                    (click)="onAcknowledge()">Acknowledge</button>
+                <button class="btn btn-sm btn-danger pull-right mb-2" type="button"
+                    (click)="onCloseAcknowledge()">Cancel</button>
+            </div>
+        </form>
+    </ng-template>
+</ng-container>
+
+<div class="container-fluid pl-1 pr-0 mb-1">
+    <div class="row">
+
+        <!-- Total Alerts -->
+        <div class="col pl-1">
+            <div class="card p-1 border rounded mb-2">
+                <div class="font-lg font-500 py-1 pl-1">Total Alerts</div>
+                <div class="d-flex align-items-center pl-1">
+                    <div class="font-lg font-500 text-primary">{{summaryViewData?.total?.alert_count}}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dedupe Events -->
+        <div class="col">
+            <div class="card p-1 border rounded mb-2">
+                <div class="font-lg font-500 py-1 pl-1">Suppressed Events</div>
+                <div class="d-flex align-items-center pl-1">
+                    <div class="font-lg font-500 text-primary">{{summaryViewData?.total?.supressed_count}}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Noise Reduction -->
+        <div class="col">
+            <div class="card p-1 border rounded mb-2">
+                <div class="font-lg font-500 py-1 pl-1">Noise Reduction</div>
+                <div class="font-lg font-500 text-primary pl-1">{{summaryViewData?.total?.noise_reduction}}%</div>
+            </div>
+        </div>
+
+        <!-- Critical -->
+        <div class="col">
+            <div class="card p-1 border rounded mb-2">
+                <div class="font-lg font-500 py-1 pl-1">Switches</div>
+                <div class="d-flex align-items-center pl-1">
+                    <div class="font-lg font-500 text-primary">{{summaryViewData?.switch}}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning -->
+        <div class="col">
+            <div class="card p-1 border rounded mb-2">
+                <div class="font-lg font-500 py-1 pl-1">Firewalls</div>
+                <div class="d-flex align-items-center pl-1">
+                    <div class="font-lg font-500 text-primary">{{summaryViewData?.firewall}}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information -->
+        <div class="col">
+            <div class="card p-1 border rounded mb-2">
+                <div class="font-lg font-500 py-1 pl-1">Load Balancers</div>
+                <div class="d-flex align-items-center pl-1">
+                    <div class="font-lg text-primary">{{summaryViewData?.load_balancer}}</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="card" style="overflow: visible !important;">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom-0 py-2">
+        <div id="count" class="d-flex justify-content-start text-muted">
+            <span class="badge badge-pill badge-secondary">{{count}}</span>
+            <span class="ml-1">Alerts</span>
+        </div>
+        <div class="col-7 d-flex justify-content-center align-items-center">
+            <form *ngIf="filterForm" [formGroup]="filterForm" class="row w-100">
+                <div class="col-4 pr-0">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                        <input type="text" class="form-control form-control-sm" formControlName="search_key"
+                            id="search_key" placeholder="Enter Keyword">
+                    </div>
+                </div>
+                <div class="col-3 form-group mb-0 pr-0">
+                    <select class="form-control form-control-sm" id="severity" formControlName="severity">
+                        <option value="" disabled>Severity</option>
+                        <option value="Critical">Critical</option>
+                        <option value="Information">Information</option>
+                        <option value="Warning">Warning</option>
+                    </select>
+                </div>
+                <div class="col-3 form-group mb-0 pr-0">
+                    <select class="form-control form-control-sm" id="status" formControlName="status">
+                        <option value="" disabled>Status</option>
+                        <option value="Open">Open</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="col-1 pr-0">
+                    <button class="btn btn-sm btn-pill btn-warning" [tooltip]="'Filter'" container="body"
+                        (click)="filterEvents()">
+                        <i class="fas fa-filter font-xs"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="d-flex justify-content-end">
+            <!-- <a *ngIf="!isSuppressed" class="btn btn-pill btn-sm btn-warning text-white pull-right mr-2"
+                (click)="manageAlerts()">Show Suppressed</a>
+            <a *ngIf="isSuppressed" class="btn btn-pill btn-sm btn-warning text-white pull-right mr-2"
+                (click)="manageAlerts()">Show Alerts</a> -->
+            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count" [isLargeSize]="true"
+                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+        </div>
+    </div>
+    <div class="card-body pt-0" style="overflow: visible !important;">
+        <div class="table-responsive" style="overflow: visible !important;">
+            <ng-container *ngIf="!isSuppressed">
+                <ng-container *ngTemplateOutlet="alerts"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="isSuppressed">
+                <ng-container *ngTemplateOutlet="suppressed"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="isSuppressed">
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No associated events found.</div>
+            </ng-container>
+            <ng-container *ngIf="!isSuppressed">
+                <div class="text-center text-muted py-5" *ngIf="!viewData.length">No associated alerts found.</div>
+            </ng-container>
+            <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize" [totalCount]="count">
+            </table-entries>
+            <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                [totalCount]="count" (pageChange)="pageChange($event)"></table-pager>
+        </div>
+    </div>
+</div>
+
+<ng-template #alerts style="overflow: visible !important;">
+    <table class="table table-sm font-xs-sm font-500">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Device Name</th>
+                <th class="text-center">Count</th>
+                <th>Event Metric</th>
+                <th>Alert Time</th>
+                <th class="text-center">Severity</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Source</th>
+                <th>Source Account</th>
+                <th>Acknowledged</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let view of viewData;let i = index;" truncateText>
+                <td class="tdw-5">
+                    <div [tooltip]="view.id">{{view.id}}</div>
+                </td>
+                <td class="tdw-10">
+                    <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
+                </td>
+                <td class="tdw-5">
+                    <div class="text-center">{{view.eventCount}}</div>
+                </td>
+                <td class="tdw-8">
+                    <div [tooltip]="view.eventMetric">{{view.eventMetric}}</div>
+                </td>
+                <td class="tdw-12">
+                    <div [tooltip]="view.alertTime">{{view.alertTime}}</div>
+                </td>
+                <td class="tdw-5">
+                    <div class="text-center">
+                        <i class="fa status-icon" [ngClass]="view.severityIcon" [tooltip]="view.severity"
+                            container="body"></i>
+                    </div>
+                </td>
+                <td class="tdw-20">
+                    <div [tooltip]="view.description">{{view.description}}</div>
+                </td>
+                <td class="tdw-5">
+                    <div [ngClass]="[view.statusTextColor, 'text-capitalize']" [tooltip]="view.status">{{view.status}}
+                    </div>
+                </td>
+                <td class="tdw-10">
+                    <div class="text-capitalize">{{view.source}}</div>
+                </td>
+                <td class="tdw-10">
+                    <div class="text-capitalize">{{view.sourceAccount}}</div>
+                </td>
+                <td class="tdw-10 no-truncate">
+                    <div class="pl-3 tooltip-wrapper" *ngIf="view.isAcknowledged">
+                        <span *ngIf="view.acknowledgedTime" class="fas fa-check-circle fa-lg text-success"
+                            container="body" (mouseenter)="onMouseEnterTooltip(i, $event.target)"
+                            (mouseleave)="hoveredIndex = -1">
+                            <div #tooltipRef class="tooltip-box" *ngIf="hoveredIndex === i"
+                                [ngClass]="tooltipDirection === 'bottom' ? 'tooltip-bottom' : 'tooltip-top'"
+                                [innerHTML]="view.acknowledgedTooltipMsg"></div>
+                        </span>
+                        <span *ngIf="!view.acknowledgedTime">
+                            <i class="fa fa-spinner fa-spin">&nbsp;</i>
+                        </span>
+                    </div>
+                    <div class="pl-2" *ngIf="!view.isAcknowledged">
+                        <button class="action-icons mb-0 fas fa-comment-dots font-sm"
+                            (click)="onCloseAcknowledge(); acknowledge(i); $event.stopPropagation(); $event.preventDefault();"
+                            [popover]="acknowledgeFormRef" [tooltip]="'Acknowledge'" container="body"
+                            [outsideClick]="true" accessControl moduleName="AIML Event Management"
+                            accessType="Manage AIML Event Management" elementType="actionbtn"></button>
+                    </div>
+                </td>
+                <td class="action-icons-column">
+                    <span dropdown placement="bottom right" container="body">
+                        <button id="button-container" class="action-icons mb-0 fa fa-ellipsis-h font-sm ml-1"
+                            data-toggle="dropdown" aria-controls="icons-dropdown-container" dropdownToggle
+                            (click)="false" [tooltip]="'More Actions'" container="body" accessControl
+                            moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                            elementType="actionbtn"></button>
+                        <div container="body" id="icons-dropdown-container"
+                            class="dropdown-menu dropdown-menu-right text-center mt-2" *dropdownMenu
+                            aria-labelledby="button-container">
+                            <button class="action-icons mb-0 fa fas font-sm mt-1 mb-1"
+                                [tooltip]="view.resolveInProgress ? 'In Progress': view.resolveBtnTooltipMsg"
+                                [ngClass]="{'fa-times':!view.resolveInProgress,'fa-spinner fa-spin': view.resolveInProgress,'action-icons-disabled':view.resolveInProgress || view.isStatusResolved}"
+                                container="body" (click)="resolveAlert(view)"></button>
+                            <button class="action-icons mb-0 fas fa-comment-dots font-sm mt-2 mb-1"
+                                [tooltip]="'Coming Soon'" container="body"
+                                [ngClass]="{'action-icons-disabled':true}"></button>
+                            <button class="action-icons mb-0 fas fa-edit font-sm mt-1 mb-1" [tooltip]="'Coming Soon'"
+                                container="body" [ngClass]="{'action-icons-disabled':true}"></button>
+                            <button class="action-icons mb-0 fas fa-external-link-alt font-sm mt-1 mb-1"
+                                [tooltip]="'Coming Soon'" container="body"
+                                [ngClass]="{'action-icons-disabled':true}"></button>
+                            <button class="action-icons mb-0 fas fa-ticket-alt font-sm mt-1 mb-2"
+                                tooltip="Manage by creating support ticket" container="body"
+                                [ngClass]="{'action-icons-disabled':true}"></button>
+                        </div>
+                    </span>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</ng-template>

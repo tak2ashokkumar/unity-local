@@ -1079,7 +1079,6 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.form?.get('script')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value: string) => {
-        console.log(value, "value")
         // if (this.form.contains('inputs')) {
         //   this.form.removeControl('inputs');
         // }
@@ -1257,6 +1256,7 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
       if (val == 'Input Template') {
         fg.removeControl('default_value');
         fg.addControl('template', new FormControl('', [Validators.required]));
+        fg.addControl('attribute', new FormControl(''));
       } else {
         fg.addControl('default_value', new FormControl('', [validateDefaultValue]));
         fg.removeControl('template');
@@ -1518,8 +1518,6 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
   }
 
   confirmTaskCreate() {
-    console.log(this.form, "form")
-    console.log(this.formErrors, "form errors")
     let obj = <any>Object.assign({}, this.form.getRawValue());
     if (this.taskType == playbookTypes.AnsibleBook || this.taskType == playbookTypes.TerraformScript) {
       this.form.removeControl('auth');
@@ -1723,6 +1721,18 @@ export class OrchestrationTasksCrudComponent implements OnInit, OnDestroy {
         if (this.showRestApiHeaders) {
           obj.config.headers = obj.headers;
         }
+
+        if (this.showRestApiInputParameters) {
+          obj.inputs.forEach(ele => {
+            if (ele.param_type == 'Number') {
+              ele.default_value = Number(ele.default_value);
+            }
+            if (ele.param_type == 'Boolean') {
+              ele.default_value = Boolean(ele.default_value);
+            }
+          });
+        }
+
         delete obj.url_type;
         delete obj.collector;
         delete obj.method;

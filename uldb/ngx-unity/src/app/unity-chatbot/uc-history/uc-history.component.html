@@ -21,32 +21,40 @@
                     <span class="ml-2 ">Loading</span>
                 </div>
             </ng-container>
-            <virtual-scroller #scroll [items]="infiniteHistoryList" (vsEnd)="fetchMoreHistory($event)"
-                class="w-100 p-2 mb-3 scroll-container" style="overflow-x: hidden; flex: 1; min-height: 0;"
-                [enableUnequalChildrenSizes]="true">
-                <div *ngFor="let history of scroll.viewPortItems; let i = index">
-                    <ng-container *ngIf="history.displayLabel">
-                        <div class="px-3 pb-1" [ngClass]="{'pt-3': i != 0}">
-                            <span class="text-muted font-weight-bold">
-                                {{ history.displayLabel }}
-                            </span>
-                        </div>
-                    </ng-container>
-                    <div class="card round-edge mb-2 mx-3">
-                        <div class="card-body px-2 py-1 default-query" style="cursor: pointer"
-                            (click)="toSelectedHistoryChat(history)">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div>
-                                    <div class="text-muted font-sm ml-2 hover-text">{{history.title}}</div>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-center rounded-circle angle-icon">
-                                    <i class="fas fa-angle-right font-sm"></i>
+            <ng-container *ngIf="selectedTab == 'Assistant'">
+                <virtual-scroller #scroll [items]="infiniteHistoryList" (vsEnd)="fetchMoreHistory($event)"
+                    class="w-100 p-2 mb-3 scroll-container" style="overflow-x: hidden; flex: 1; min-height: 0;"
+                    [enableUnequalChildrenSizes]="true">
+                    <div *ngFor="let history of scroll.viewPortItems; let i = index">
+                        <ng-container *ngIf="history.displayLabel">
+                            <div class="px-3 pb-1" [ngClass]="{'pt-3': i != 0}">
+                                <span class="text-muted font-weight-bold">
+                                    {{ history.displayLabel }}
+                                </span>
+                            </div>
+                        </ng-container>
+                        <div class="card round-edge mb-2 mx-3">
+                            <div class="card-body px-2 py-1 default-query" style="cursor: pointer"
+                                (click)="toSelectedHistoryChat(history)">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <div class="text-muted font-sm ml-2 hover-text">{{history.title}}</div>
+                                    </div>
+                                    <div
+                                        class="d-flex align-items-center justify-content-center rounded-circle angle-icon">
+                                        <i class="fas fa-angle-right font-sm"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </virtual-scroller>
+            </ng-container>
+            <ng-container *ngIf="selectedTab == 'Agentic Workflows'">
+                <div class="d-flex align-items-center justify-content-center p-5">
+                    <span class="ml-2 ">Coming Soon...</span>
                 </div>
-            </virtual-scroller>
+            </ng-container>
             <!-- </div> -->
         </div>
     </ng-container>

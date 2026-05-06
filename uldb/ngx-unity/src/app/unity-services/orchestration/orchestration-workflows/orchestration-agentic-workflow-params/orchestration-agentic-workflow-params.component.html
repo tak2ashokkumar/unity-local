@@ -41,11 +41,11 @@
 
         </div>
 
-        <ng-container
-          *ngIf="nodeData?.node_type !== 'Manual Trigger' && 
+        <ng-container *ngIf="nodeData?.node_type !== 'Manual Trigger' && 
                               nodeData?.node_type !== 'Schedule Trigger' &&
                               nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'Webhook Trigger' 
-                              && nodeData?.node_type !== 'ITSM Event Trigger' && nodeData?.node_type !== 'AIML Event Trigger'">
+                              && nodeData?.node_type !== 'ITSM Event Trigger' && nodeData?.node_type !== 'AIML Event Trigger'
+                              && nodeData?.node_type !== 'Loop'">
           <div class="accordion text-muted">
             <div class="accordion-headers" (click)="toggleWorkflowVariables()">
               <i class="text-muted mb-2 "
@@ -132,6 +132,13 @@
                   <span class="key-text">query</span>
                 </div>
               </div>
+              <div *ngIf="con.node_type === 'Loop'" class="pl-4 draggable-item">
+                <div class="key-pill align-items-center me-2" draggable="true"
+                  (dragstart)="onDragStart($event, con, { param_name: 'item' })">
+                  <span class="drag-handle mr-1">⋮⋮</span>
+                  <span class="key-text">item</span>
+                </div>
+              </div>
               <div
                 *ngIf="(con.node_type === 'Manual Trigger' || con.node_type === 'Schedule Trigger' || con.node_type === 'Chat Trigger')"
                 class="pl-4 mt-2">
@@ -208,7 +215,7 @@
             *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
              && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
              && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'Add Comment'
-             && nodeData?.node_type !== 'AIML Event Trigger' && !nodeData?.isTool && nodeData?.node_type !== 'If Else' && nodeData?.node_type !== 'Switch Case' && nodeData?.node_type !== 'Wait'">
+             && nodeData?.node_type !== 'AIML Event Trigger' && !nodeData?.isTool && nodeData?.node_type !== 'If Else' && nodeData?.node_type !== 'Switch Case' && nodeData?.node_type !== 'Wait' && nodeData?.node_type !== 'Loop' && nodeData?.node_type !== 'Transform Node'">
             <a class="nav-link" [class.active]="activeTab === 'output'" (click)="changeTab('output')">Output
               Configuration</a>
           </li>
@@ -216,7 +223,7 @@
             *ngIf="nodeData?.node_type !== 'Manual Trigger' && nodeData?.node_type !== 'Schedule Trigger'
              && nodeData?.node_type !== 'Chat Trigger' && nodeData?.node_type !== 'ITSM Event Trigger'
              && nodeData?.node_type !== 'Webhook Trigger' && nodeData?.node_type !== 'AIML Event Trigger'
-            && !nodeData?.isTool && nodeData?.node_type !== 'Switch Case' && nodeData?.node_type !== 'If Else' && nodeData?.node_type !== 'Wait'">
+            && !nodeData?.isTool && nodeData?.node_type !== 'Switch Case' && nodeData?.node_type !== 'If Else' && nodeData?.node_type !== 'Wait' && nodeData?.node_type !== 'Loop' && nodeData?.node_type !== 'Transform Node'">
             <a class="nav-link" [class.active]="activeTab === 'settings'" (click)="changeTab('settings')">Settings</a>
           </li>
         </ul>
@@ -256,6 +263,249 @@
                   <ng-container
                     *ngTemplateOutlet="nodeData?.isTool ? fxInputIcon : fxInput; context: { control: propertiesForm.get('credential'),key: 'credential', error: propertiesFormErrors.credential }"></ng-container>
                 </div>
+
+                <ng-container *ngIf="nodeData?.node_type === 'Transform Node'">
+                  <div class="mb-3" *ngIf="propertiesForm.get('input')">
+                    <label class="form-label text-muted mb-1">Input<em>*</em></label>
+                    <ng-container
+                      *ngTemplateOutlet="nodeData?.isTool ? fxInputIcon : fxInput; context: { control: propertiesForm.get('input'),key: 'input', error: propertiesFormErrors.input }"></ng-container>
+                  </div>
+                  <div class="mb-3" *ngIf="propertiesForm.get('operation')">
+                    <label class="form-label text-muted mb-1">Operation<em>*</em></label>
+                    <select formControlName="operation" class="form-control text-dark"
+                      (change)="onOperationChange($event.target.value)"
+                      [class.is-invalid]="propertiesFormErrors?.operation">
+                      <option value="" disabled>Select Operation</option>
+                      <option *ngFor="let op of operationsList" [value]="op.value">
+                        {{op.label}}
+                      </option>
+                    </select>
+                    <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.operation">
+                      {{ propertiesFormErrors?.operation }}
+                    </div>
+                  </div>
+                  <div class="mb-3" *ngIf="propertiesForm.get('operation').value === 'RENAME_FIELDS' ||
+                  ['SELECT_FIELDS','DROP_FIELDS'].includes(propertiesForm.get('operation').value) ||
+                  propertiesForm.get('operation').value === 'ADD_FIELDS'">
+
+                    <label class="form-label text-muted mb-1">Fields</label>
+
+                    <div formArrayName="fields"
+                      *ngIf="['SELECT_FIELDS','DROP_FIELDS'].includes(propertiesForm.get('operation').value)">
+
+                      <div *ngFor="let fg of fieldsArray.controls; let i = index;" [formGroupName]="i" class="mb-4">
+
+                        <div class="mb-2">
+                          <div class="d-flex justify-content-between mb-1">
+                            <label class="form-label text-muted align-self-end mb-0">
+                              Field<em>*</em>
+                            </label>
+
+                            <button type="button" class="action-icons fas fa-minus ml-auto font-sm"
+                              (click)="removeField(i)">
+                            </button>
+                          </div>
+
+                          <input type="text" formControlName="field" class="form-control text-dark"
+                            placeholder="Enter field name" [class.is-invalid]="propertiesFormErrors.fields[i]?.field">
+
+                          <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors.fields[i]?.field">
+                            {{ propertiesFormErrors.fields[i].field }}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end"
+                      *ngIf="['SELECT_FIELDS','DROP_FIELDS'].includes(propertiesForm.get('operation').value)">
+                      <button type="button" class="btn text-primary border-primary w-20" (click)="addField()">
+                        <i class="fas fa-plus mr-1"></i> Field
+                      </button>
+                    </div>
+
+                    <div formArrayName="fields" *ngIf="propertiesForm.get('operation').value === 'RENAME_FIELDS'">
+
+                      <div *ngFor="let fg of fieldsArray.controls; let i = index;" [formGroupName]="i" class="mb-4">
+
+                        <!-- SOURCE -->
+                        <div class="mb-2">
+                          <div class="d-flex justify-content-between mb-1">
+                            <label class="form-label text-muted mb-0">
+                              Source Field<em>*</em>
+                            </label>
+
+                            <button type="button" class="action-icons fas fa-minus ml-auto font-sm"
+                              (click)="removeField(i)">
+                            </button>
+                          </div>
+
+                          <input type="text" formControlName="source" class="form-control text-dark"
+                            placeholder="Enter source field"
+                            [class.is-invalid]="propertiesFormErrors.fields[i]?.source">
+
+                          <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors.fields[i]?.source">
+                            {{ propertiesFormErrors.fields[i].source }}
+                          </div>
+                        </div>
+
+                        <!-- TARGET -->
+                        <div class="mb-2">
+                          <label class="form-label text-muted mb-1">
+                            Target Field<em>*</em>
+                          </label>
+
+                          <input type="text" formControlName="target" class="form-control text-dark"
+                            placeholder="Enter target field"
+                            [class.is-invalid]="propertiesFormErrors.fields[i]?.target">
+
+                          <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors.fields[i]?.target">
+                            {{ propertiesFormErrors.fields[i].target }}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end"
+                      *ngIf="propertiesForm.get('operation').value === 'RENAME_FIELDS'">
+                      <button type="button" class="btn text-primary border-primary w-20" (click)="addField()">
+                        <i class="fas fa-plus mr-1"></i> Field
+                      </button>
+                    </div>
+
+                    <div formArrayName="fields" *ngIf="propertiesForm.get('operation').value === 'ADD_FIELDS'">
+
+                      <div *ngFor="let fg of fieldsArray.controls; let i = index;" [formGroupName]="i" class="mb-4">
+
+                        <!-- FIELD -->
+                        <div class="mb-2">
+                          <div class="d-flex justify-content-between mb-1">
+                            <label class="form-label text-muted mb-0">
+                              Field Name<em>*</em>
+                            </label>
+
+                            <button type="button" class="action-icons fas fa-minus ml-auto font-sm"
+                              (click)="removeField(i)">
+                            </button>
+                          </div>
+
+                          <input type="text" formControlName="field" class="form-control text-dark"
+                            placeholder="Enter field name" [class.is-invalid]="propertiesFormErrors.fields[i]?.field">
+
+                          <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors.fields[i]?.field">
+                            {{ propertiesFormErrors.fields[i].field }}
+                          </div>
+                        </div>
+
+                        <!-- VALUE -->
+                        <div class="mb-2">
+                          <label class="form-label text-muted mb-1">
+                            Field Value<em>*</em>
+                          </label>
+
+                          <input type="text" formControlName="value" class="form-control text-dark"
+                            placeholder="Enter value" [class.is-invalid]="propertiesFormErrors.fields[i]?.value">
+
+                          <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors.fields[i]?.value">
+                            {{ propertiesFormErrors.fields[i].value }}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end"
+                      *ngIf="propertiesForm.get('operation').value === 'ADD_FIELDS'">
+                      <button type="button" class="btn text-primary border-primary w-20" (click)="addField()">
+                        <i class="fas fa-plus mr-1"></i> Field
+                      </button>
+                    </div>
+                  </div>
+
+
+                  <div *ngIf="propertiesForm.get('operation').value === 'FILTER_ITEMS'">
+
+                    <div class="mb-2">
+                      <label class="form-label text-muted mb-1">Field<em>*</em></label>
+                      <input type="text" formControlName="field" class="form-control text-dark"
+                        placeholder="Enter field" [class.is-invalid]="propertiesFormErrors?.field">
+                      <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.field">
+                        {{ propertiesFormErrors?.field }}
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="form-label text-muted mb-1">Operator<em>*</em></label>
+                      <select class="form-control text-dark" formControlName="operator"
+                        [class.is-invalid]="propertiesFormErrors?.operator">
+                        <option value="">Select Operator</option>
+                        <option *ngFor="let c of conditionOperators" [value]="c.value">
+                          {{c.label}}
+                        </option>
+                      </select>
+                      <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.operator">
+                        {{ propertiesFormErrors?.operator }}
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="form-label text-muted mb-1">Value<em>*</em></label>
+                      <input type="text" formControlName="value" class="form-control text-dark"
+                        placeholder="Enter value" [class.is-invalid]="propertiesFormErrors?.value">
+                      <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.value">
+                        {{ propertiesFormErrors?.value }}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div *ngIf="propertiesForm.get('operation').value === 'SORT_ITEMS'">
+
+                    <div class="mb-2">
+                      <label class="form-label text-muted mb-1">Field<em>*</em></label>
+                      <input type="text" formControlName="field" class="form-control text-dark"
+                        [class.is-invalid]="propertiesFormErrors?.field">
+                      <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.field">
+                        {{ propertiesFormErrors?.field }}
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="form-label text-muted mb-1">Order<em>*</em></label>
+                      <select formControlName="order" class="form-control text-dark"
+                        [class.is-invalid]="propertiesFormErrors?.order">
+                        <option value="">Select Order</option>
+                        <option *ngFor="let o of sortOrders" [value]="o.value">
+                          {{o.label}}
+                        </option>
+                      </select>
+                      <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.order">
+                        {{ propertiesFormErrors?.order }}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div *ngIf="propertiesForm.get('operation').value === 'SLICE_ITEMS'">
+
+                    <div class="mb-2">
+                      <label class="form-label text-muted mb-1">Limit<em>*</em></label>
+                      <input type="number" formControlName="limit" class="form-control text-dark"
+                        placeholder="Enter limit" [class.is-invalid]="propertiesFormErrors?.limit">
+                      <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.limit">
+                        {{ propertiesFormErrors?.limit }}
+                      </div>
+                    </div>
+
+                    <div class="mb-2">
+                      <label class="form-label text-muted mb-1">Offset</label>
+                      <input type="number" formControlName="offset" class="form-control text-dark"
+                        placeholder="Enter offset" [class.is-invalid]="propertiesFormErrors?.offset">
+                      <div class="invalid-feedback d-block" *ngIf="propertiesFormErrors?.offset">
+                        {{ propertiesFormErrors?.offset }}
+                      </div>
+                    </div>
+
+                  </div>
+                </ng-container>
                 <ng-container *ngIf="nodeData?.node_type === 'If Else'">
                   <div class="mb-3" *ngIf="(nodeData?.node_type === 'If Else') && propertiesForm.get('condition_key')">
                     <label class="form-label text-muted mb-1">Key<em>*</em></label>
@@ -364,8 +614,113 @@
                     </button>
                   </div>
                 </ng-container>
-                <ng-container *ngIf="nodeData?.node_type === 'Wait'">
-                  <div class="mb-3" *ngIf="(nodeData?.node_type === 'Wait') && propertiesForm.get('duration_value')">
+                <ng-container *ngIf="nodeData.node_type === 'Loop'">
+                  <div class="mb-3" *ngIf="(nodeData.node_type === 'Loop') && propertiesForm.get('mode')">
+                    <label class="form-label text-muted mb-1">Mode<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
+                    <select id="mode" class="form-control text-dark" formControlName="mode"
+                      [class.is-invalid]="propertiesFormErrors.mode">
+                      <option value="" disabled> Select Mode</option>
+                      <option value="FOR_EACH">ForEach</option>
+                      <option value="WHILE">While</option>
+                    </select>
+                    <div class="invalid-feedback" *ngIf="propertiesFormErrors.mode">
+                      {{propertiesFormErrors.mode}}</div>
+                  </div>
+                  <div class="mb-3"
+                    *ngIf="propertiesForm.get('items') && propertiesForm.get('mode')?.value === 'FOR_EACH'">
+                    <label class="form-label text-muted mb-1">Items<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
+                    <ng-container
+                      *ngTemplateOutlet="fxInput; context: { control: propertiesForm.get('items'), key: 'items', error: propertiesFormErrors.items }"></ng-container>
+                    <ng-container *ngIf="hasRealTimeData()">
+                      <div class="text-muted mt-1" *ngIf="getResolvedControlValue(propertiesForm, 'items')">
+                        <small>
+                          <strong>
+                            {{ getResolvedControlValue(propertiesForm, 'items') }}
+                          </strong>
+                        </small>
+                      </div>
+                    </ng-container>
+                  </div>
+                  <div class="mb-3"
+                    *ngIf="propertiesForm.get('conditions') && propertiesForm.get('mode')?.value === 'WHILE'">
+                    <label class="form-label text-muted mb-1">Conditions<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
+                    <div formArrayName="conditions" *ngIf="conditionsControls?.length" class="p-0">
+                      <div *ngFor="let filterGroup of conditionsControls let i = index;" [formGroupName]="i"
+                        class="mb-4">
+                        <div class="mb-2" *ngIf="(nodeData.node_type === 'Loop') && filterGroup.get('condition_key')">
+                          <div class="d-flex justify-content-start mb-1">
+                            <label class="form-label text-muted align-self-end mb-0">Key<em>*</em></label>
+                            <!-- <span
+                              class="fas fa-info-circle text-primary pointer-link text-info align-self-end mb-1 pl-1"
+                              [tooltip]="tooltip.key"></span> -->
+                            <!-- <button type="button" class="action-icons fas fa-minus ml-auto  font-sm"
+                              (click)="removeSwitchForm(i)"></button> -->
+                          </div>
+                          <ng-container
+                            *ngTemplateOutlet="fxInput; context: { control: filterGroup.get('condition_key'), key: 'condition_key', index: i, error: propertiesFormErrors.conditions[i]?.condition_key }"></ng-container>
+                        </div>
+                        <div class="mb-2" *ngIf="(nodeData.node_type === 'Loop') && filterGroup.get('operator')">
+                          <label class="form-label text-muted mb-1">Operator<em>*</em></label>
+                          <!-- <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                            [tooltip]="tooltip.operator"></span> -->
+                          <select id="operator" class="form-control text-dark" formControlName="operator"
+                            [class.is-invalid]="propertiesFormErrors.conditions[i]?.operator">
+                            <option value="" disabled> Select Operator </option>
+                            <option *ngFor="let c of conditionOperators" [value]="c.value">
+                              {{c.label}}
+                            </option>
+                          </select>
+                          <div class="invalid-feedback" *ngIf="propertiesFormErrors.conditions[i]?.operator">
+                            {{ propertiesFormErrors.conditions[i].operator }}
+                          </div>
+                        </div>
+                        <div class="mb-2" *ngIf="(nodeData.node_type === 'Loop') && filterGroup.get('condition_value')">
+                          <label class="form-label text-muted mb-1">Value<em>*</em></label>
+                          <!-- <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                            [tooltip]="tooltip.value"></span> -->
+                          <div class="pr-1 input-group">
+                            <input type="text" formControlName="condition_value" class="form-control text-dark"
+                              placeholder="Enter value"
+                              [class.is-invalid]="propertiesFormErrors.conditions[i]?.condition_value">
+                          </div>
+                          <div class="invalid-feedback d-block"
+                            *ngIf="propertiesFormErrors.conditions[i]?.condition_value">
+                            {{ propertiesFormErrors.conditions[i].condition_value }}
+                          </div>
+                          <ng-container *ngIf="hasRealTimeData()">
+                            <div class="text-muted mt-1"
+                              *ngIf="getResolvedValue(propertiesForm, 'conditions', i, 'value')">
+                              <small>
+                                <strong>
+                                  {{ getResolvedValue(propertiesForm, 'conditions', i, 'value') }}
+                                </strong>
+                              </small>
+                            </div>
+                          </ng-container>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div class="d-flex justify-content-end" *ngIf="nodeData.node_type === 'Loop'">
+                    <button type="button" class="btn text-primary border-primary w-20" (click)="addSwitchForm()">
+                      <i class="fas fa-plus mr-1"></i> Condition
+                    </button>
+                  </div> -->
+                  <div class="mb-3" *ngIf="propertiesForm.get('mode')?.value === 'WHILE'">
+                    <label class="form-label text-muted mb-1">Max iterations<em>*</em></label>
+                    <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"
+                      [adaptivePosition]="false" placement="top"></span>
+                    <div class="pr-1 input-group">
+                      <input type="number" formControlName="max_iterations" class="form-control text-dark"
+                        placeholder="Enter value">
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="nodeData.node_type === 'Wait'">
+                  <div class="mb-3" *ngIf="(nodeData.node_type === 'Wait') && propertiesForm.get('duration_value')">
                     <label class="form-label text-muted mb-1">Duration<em>*</em></label>
                     <span class="fas fa-info-circle text-primary pointer-link text-info pt-1 pl-2"></span>
                     <div class="pr-1 input-group">
@@ -806,12 +1161,12 @@
                     Human Approval
                   </label>
                   <button class="toggle-button mb-0 fa font-lg"
-                    (click)="nodeData.human_approval = !nodeData.human_approval; human_approval = !human_approval"
-                    [ngClass]="nodeData.human_approval ? 'fa-toggle-on' : 'fa-toggle-off'">
+                    (click)="propertiesForm.get('human_approval')?.setValue(!propertiesForm.get('human_approval')?.value)"
+                    [ngClass]="propertiesForm.get('human_approval')?.value ? 'fa-toggle-on' : 'fa-toggle-off'">
                   </button>
                 </div>
 
-                <div *ngIf="nodeData.human_approval">
+                <div *ngIf="propertiesForm.get('human_approval')?.value">
                   <div class="mb-3">
                     <div class="d-flex align-items-center mb-1">
                       <label class="form-label text-muted mb-0" for="mode">
@@ -845,15 +1200,15 @@
                   <div class="mb-3">
                     <div class="d-flex align-items-center mb-1">
                       <label class="form-label text-muted mb-0" for="approver_groups">
-                        Approver Groups
+                        Approver Groups<em>*</em>
                       </label>
                     </div>
                     <multiselect-dropdown [options]="userGroups" [settings]="userGroupsSettings"
-                      class="form-control form-control-sm p-0" [texts]="userGroupTexts" style="height:auto;"
+                      class="form-control p-0" [texts]="userGroupTexts" style="height:auto;"
                       formControlName="approver_groups"
-                      [class.is-invalid]="formErrors.approver_groups"></multiselect-dropdown>
-                    <div class="invalid-feedback" *ngIf="propertiesFormErrors?.approver_groups">
-                      {{ propertiesFormErrors?.approver_groups }}
+                      [class.is-invalid]="propertiesForm?.errors?.approverRequired"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="propertiesForm?.errors?.approverRequired">
+                      {{ taskFormValidationMessage?.approverRequired?.required }}
                     </div>
                   </div>
 
@@ -864,10 +1219,10 @@
                       </label>
                     </div>
                     <multiselect-dropdown [options]="userList" [settings]="userListSettings" [texts]="userTexts"
-                      class="form-control form-control-sm p-0" style="height:auto;" formControlName="approver_users"
-                      [class.is-invalid]="formErrors.approver_users"></multiselect-dropdown>
-                    <div class="invalid-feedback" *ngIf="propertiesFormErrors?.approver_users">
-                      {{ propertiesFormErrors?.approver_users }}
+                      class="form-control p-0" style="height:auto;" formControlName="approver_users"
+                      [class.is-invalid]="propertiesForm?.errors?.approverRequired"></multiselect-dropdown>
+                    <div class="invalid-feedback" *ngIf="propertiesForm?.errors?.approverRequired">
+                      {{ taskFormValidationMessage?.approverRequired?.required }}
                     </div>
                   </div>
 
@@ -1471,7 +1826,8 @@
               <div class="col" *ngIf="queryBuilderConfig">
                 <query-builder #queryBuilder formControlName='filter' [classNames]='queryBuilderClassNames'
                   [config]='queryBuilderConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse'
-                  [persistValueOnFieldChange]='persistValueOnFieldChange' [moduleName]="'workflow'">
+                  [persistValueOnFieldChange]='persistValueOnFieldChange' [moduleName]="'workflow'"
+                  [dropdownContainer]="null">
                   <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
                     <textarea class="text-input text-area" [(ngModel)]="rule.value"
                       [ngModelOptions]="{standalone: true}" [disabled]=getDisabledState()

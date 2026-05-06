@@ -17,7 +17,7 @@
         <div class="mb-4" *ngFor="let workflowVar of variables.controls; let i = index" [formGroupName]="i">
           <div class="d-flex justify-content-between mb-1">
             <div class="d-flex align-items-end">
-              <label class="text-muted text-sm align-self-end mb-0">Variabe Name<em>*</em> :</label>
+              <label class="text-muted text-sm align-self-end mb-0">Variable Name<em>*</em> :</label>
             </div>
             <button type="button" class="action-icons fas fa-minus btn-sm" (click)="removeVariable(i)"></button>
           </div>
@@ -26,10 +26,10 @@
           <div class="invalid-feedback" *ngIf="workflowVarsFormErrors?.variables[i]?.param_name">
             {{ workflowVarsFormErrors?.variables[i].param_name }}
           </div>
-          <label class="text-muted text-sm mb-1">Variabe Type<em>*</em> :</label>
+          <label class="text-muted text-sm mb-1">Variable Type<em>*</em> :</label>
           <select class="form-control mb-2 text-dark" formControlName="param_type"
             [class.is-invalid]="workflowVarsFormErrors?.variables[i]?.param_type">
-            <option value="">Select Variabe Type</option>
+            <option value="">Select Variable Type</option>
             <option value="Text">Text</option>
             <option value="Password">Password</option>
             <option value="Number">Number</option>

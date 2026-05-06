@@ -29,7 +29,7 @@ import {
   paramNameValidator,
   TOOLTIP_MESSAGES,
 } from './orchestration-agentic-workflow-params.service';
-import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
+import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { catchError, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { Observable, of, Subject } from 'rxjs';
 import { OrchestrationAgenticWorkflowContainerService } from '../orchestration-agentic-workflow-container/orchestration-agentic-workflow-container.service';
@@ -289,7 +289,26 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
   };
 
   human_approval = false;
+  operationsList = [
+    { label: 'Select Fields', value: 'SELECT_FIELDS' },
+    { label: 'Rename Fields', value: 'RENAME_FIELDS' },
+    { label: 'Drop Fields', value: 'DROP_FIELDS' },
+    { label: 'Add Fields', value: 'ADD_FIELDS' },
+    { label: 'Filter Items', value: 'FILTER_ITEMS' },
+    { label: 'Sort Items', value: 'SORT_ITEMS' },
+    { label: 'Slice Items', value: 'SLICE_ITEMS' }
+  ];
 
+  filterOperators = [
+    { label: 'Greater Than', value: 'greater_than' },
+    { label: 'Less Than', value: 'less_than' },
+    { label: 'Equals', value: 'equals' }
+  ];
+
+  sortOrders = [
+    { label: 'ASC', value: 'asc' },
+    { label: 'DESC', value: 'desc' }
+  ];
 
   constructor(
     public bsModalRef: BsModalRef,
@@ -503,6 +522,18 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
               ...node,
               outputs: [rawOutputNode, outputNodeGet, statusNode]
             }
+          }
+
+          if (node.node_type === nodeTypes.Loop) {
+            const itemOutput = {
+              param_name: 'item',
+              expression_type: 'String',
+              expression: '',
+            };
+            return {
+              ...node,
+              outputs: [itemOutput],
+            };
           }
 
           return {
@@ -731,10 +762,15 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         this.getTags();
         break;
       case nodeTypes.CreateITSMTicket:
+        this.createTicketForm = this.svc.createTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         if (this.nodeData.isTool) {
           this.getDropdownData();
+          const isEnabled = this.propertiesForm.get('human_approval')?.value;
+          this.updateHumanApprovalControls(isEnabled);
+          this.propertiesForm.get('human_approval')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((isEnabled) => {
+            this.updateHumanApprovalControls(isEnabled);
+          });
         }
-        this.createTicketForm = this.svc.createTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.createTicketForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.createTicketFormErrors = this.svc.createTicketFormErrors(this.nodeData, this.nodeId);
         this.createTicketFormValidationMessage = this.svc.createTicketValidationMessage;
@@ -752,9 +788,6 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
           });
         break;
       case nodeTypes.UpdateITSMTicket:
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         this.updateTicketForm = this.svc.updateTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.updateTicketForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.updateTicketFormErrors = this.svc.updateTicketFormErrors(this.nodeData, this.nodeId);
@@ -767,9 +800,6 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
           });
         break;
       case nodeTypes.CommentInITSMTicket:
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         this.commentInTicketForm = this.svc.commentInTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.commentInTicketFormErrors = this.svc.commentInTicketFormErrors(this.nodeData, this.nodeId);
         this.commentInTicketFormValidationMessage = this.svc.commentInTicketFormValidationMessage;
@@ -784,9 +814,6 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
           });
         break;
       case nodeTypes.GetITSMTicket:
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         this.getTicketForm = this.svc.getTicketForm(this.nodeData, this.nodeId, this.nodeData.isTool);
         this.getTicketForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.getTicketFormErrors = this.svc.resetgetTicketForm(this.nodeData, this.nodeId);
@@ -802,9 +829,6 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         // this.processRealTimeData(this.getTicketForm);
         break;
       case nodeTypes.Email:
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildEmailForm(
           this.nodeData,
@@ -824,9 +848,6 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         }
         break;
       case nodeTypes.Chart:
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildChartForm(
           this.nodeData,
@@ -836,6 +857,33 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         this.propertiesFormErrors = this.svc.resetChartForm();
         this.propertiesFormValidationMessages =
           this.svc.chartFormValidationMessage;
+        if (this.nodeData?.formErrors) {
+          this.propertiesFormErrors = this.nodeData?.formErrors;
+          this.propertiesForm.valueChanges
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(() => {
+              this.clearPropertiesFormErrors();
+            });
+        }
+        break;
+      case nodeTypes.Transform:
+        this.oldNames['propertiesForm'] = this.nodeData?.name || '';
+        this.propertiesForm = this.svc.buildTransformForm(
+          this.nodeData,
+          this.nodeId
+        );
+        this.propertiesForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
+        this.propertiesFormErrors = this.svc.resetTransformForm();
+        this.propertiesFormValidationMessages =
+          this.svc.transformValidationMessages;
+        if (this.nodeData?.config?.operation) {
+          this.propertiesForm.patchValue({ operation: this.nodeData?.config?.operation });
+          this.svc.buildOperationForm(
+            this.propertiesForm,
+            this.nodeData?.config?.operation,
+            this.nodeData   // PASS THIS
+          );
+        }
         if (this.nodeData?.formErrors) {
           this.propertiesFormErrors = this.nodeData?.formErrors;
           this.propertiesForm.valueChanges
@@ -903,21 +951,19 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         }
         break;
       case nodeTypes.Source:
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildSourceTaskForm(
           this.nodeData,
           this.nodeId, this.nodeData.isTool
         );
-
-        // if (this.nodeData?.isTool) {
-        //   this.propertiesForm.addControl(
-        //     'humanApproval',
-        //     this.svc.buildHumanApprovalForm(this.nodeData, this.nodeId)
-        //   );
-        // }
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+          const isEnabled = this.propertiesForm.get('human_approval')?.value;
+          this.updateHumanApprovalControls(isEnabled);
+          this.propertiesForm.get('human_approval')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((isEnabled) => {
+            this.updateHumanApprovalControls(isEnabled);
+          });
+        }
         this.propertiesForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.propertiesFormErrors = this.svc.resetSourceTaskForm();
         this.propertiesFormValidationMessages =
@@ -932,14 +978,19 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         }
         break;
       case nodeTypes.Action:
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         this.oldNames['propertiesForm'] = this.nodeData?.name || '';
         this.propertiesForm = this.svc.buildActionTaskForm(
           this.nodeData,
           this.nodeId, this.nodeData.isTool
         );
+        if (this.nodeData.isTool) {
+          this.getDropdownData();
+          const isEnabled = this.propertiesForm.get('human_approval')?.value;
+          this.updateHumanApprovalControls(isEnabled);
+          this.propertiesForm.get('human_approval')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((isEnabled) => {
+            this.updateHumanApprovalControls(isEnabled);
+          });
+        }
         this.propertiesForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
         this.propertiesFormErrors = this.svc.resetActionTaskForm();
         this.propertiesFormValidationMessages =
@@ -991,17 +1042,59 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
             });
         }
         break;
+      case nodeTypes.Loop:
+        this.oldNames['propertiesForm'] = this.nodeData?.name || '';
+        this.propertiesForm = this.svc.buildLoopForm(
+          this.nodeData,
+          this.nodeId
+        );
+        this.propertiesFormErrors = this.svc.resetLoopForm();
+        this.propertiesFormValidationMessages = this.svc.loopFormValidationMessage;
+        if (this.nodeData?.formErrors) {
+          this.propertiesFormErrors = this.nodeData?.formErrors;
+          this.propertiesForm.valueChanges
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(() => {
+              this.clearPropertiesFormErrors();
+            });
+        }
+
+        this.propertiesForm.get('mode')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(val => {
+
+          if (val === 'FOR_EACH') {
+            this.propertiesForm.get('items')?.setValidators([Validators.required, NoWhitespaceValidator]);
+            this.propertiesForm.get('items')?.updateValueAndValidity();
+
+            this.propertiesForm.get('conditions')?.clearValidators();
+            this.propertiesForm.get('conditions')?.updateValueAndValidity();
+          }
+
+          if (val === 'WHILE') {
+            this.propertiesForm.get('conditions')?.setValidators([Validators.required]);
+            this.propertiesForm.get('conditions')?.updateValueAndValidity();
+
+            this.propertiesForm.get('items')?.clearValidators();
+            this.propertiesForm.get('items')?.updateValueAndValidity();
+          }
+
+        });
+
       default:
         // handle dynamic group like playbookTypes
-        if (this.nodeData.isTool) {
-          this.getDropdownData();
-        }
         if (this.isOrcPlayBook(this.nodeData.node_type)) {
           this.oldNames['propertiesForm'] = this.nodeData?.name || '';
           this.propertiesForm = this.svc.buildTaskForm(
             this.nodeData,
             this.nodeId, this.nodeData.isTool
           );
+          if (this.nodeData.isTool) {
+            this.getDropdownData();
+            const isEnabled = this.propertiesForm.get('human_approval')?.value;
+            this.updateHumanApprovalControls(isEnabled);
+            this.propertiesForm.get('human_approval')?.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((isEnabled) => {
+              this.updateHumanApprovalControls(isEnabled);
+            });
+          }
           this.propertiesForm.addControl('outputs', this.svc.creteOutputArray(this.nodeData));
           this.propertiesFormErrors = this.svc.resetTaskForm();
           this.propertiesFormValidationMessages =
@@ -1018,6 +1111,26 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         }
         return '';
     }
+  }
+
+  updateHumanApprovalControls(isEnabled: boolean) {
+    if (isEnabled) {
+      this.propertiesForm.addControl('mode', this.fb.control(this.nodeData?.config?.settings?.mode || '', Validators.required));
+      this.propertiesForm.addControl('channels', this.fb.control(this.nodeData?.config?.settings?.channels || [], Validators.required));
+      this.propertiesForm.addControl('approver_groups', this.fb.control(this.nodeData?.config?.settings?.approver_groups || []));
+      this.propertiesForm.addControl('approver_users', this.fb.control(this.nodeData?.config?.settings?.approver_users || [], Validators.required));
+      this.propertiesForm.addControl('timeout', this.fb.control(this.nodeData?.config?.settings?.timeout || 3600, Validators.required));
+    } else {
+      ['mode', 'channels', 'approver_groups', 'approver_users', 'timeout'].forEach(ctrl => {
+        if (this.propertiesForm.get(ctrl)) {
+          this.propertiesForm.removeControl(ctrl);
+        }
+      });
+    }
+  }
+
+  get conditionsControls() {
+    return (this.propertiesForm.get('conditions') as FormArray).controls;
   }
 
   getTableDetailsCreate(uuid: string, type: string, form: FormGroup) {
@@ -1606,15 +1719,6 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
       raw_output: "RAW OUTPUT",
       outputs: []
     };
-    // const parsed = this.parseJinjaPath(this.getDragText(event, nodeData, variable, child));
-
-    // const json = this.buildJsonFromJinja(
-    //   parsed,
-    //   WEBHOOK_TEMPLATE,
-    //   0 // inject template at "Webhook"
-    // );
-
-    // console.log(JSON.stringify(json, null, 2));
   }
 
   getDragText(event: DragEvent, nodeData: any, variable: any, childData?: any): string {
@@ -1765,7 +1869,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
       updateTicketFormValidationMessages: this.updateTicketFormValidationMessage,
       getTicketFormValidationMessages: this.getTicketFormValidationMessage,
       commentInTicketFormValidationmessages: this.commentInTicketFormValidationMessage,
-      human_approval: this.nodeData?.human_approval,
+      human_approval: this.propertiesForm?.get('human_approval')?.value,
       // outputValidationMessage: this.outputValidationMessage,
     };
   }
@@ -1865,7 +1969,7 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
         this.onClose(this.updatedFormDatas, { action }); // send back to parent
         this.bsModalRef.hide();
       }
-      console.log(this.updatedFormDatas, "save properties")
+      console.log(this.updatedFormDatas, "updated form data")
     } else {
       this.bsModalRef.hide();
     }
@@ -2154,6 +2258,8 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
     this.inputFormErrors();
     this.SwitchFormErrors();
     this.toolInputFormErrors();
+    this.loopFormErrors();
+    this.transformFormErrors();
   }
 
   // For INPUTS Array Validation
@@ -2267,6 +2373,66 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
             });
             return Object.keys(groupErrors).length ? groupErrors : null;
           });
+      }
+    }
+  }
+
+  transformFormErrors() {
+    if (this.nodeData.node_type === 'Transform Node') {
+      const fieldsArray = this.propertiesForm.get('fields') as FormArray;
+
+      if (fieldsArray && fieldsArray.length) {
+        this.propertiesFormErrors.fields = fieldsArray.controls.map(
+          (ctrl: FormGroup) => {
+            const groupErrors: any = {};
+
+            Object.keys(ctrl.controls).forEach((controlName) => {
+              const control = ctrl.get(controlName);
+
+              const validationMessage =
+                this.propertiesFormValidationMessages.fields?.[controlName];
+
+              if (control?.invalid && validationMessage) {
+                groupErrors[controlName] = validationMessage.required;
+              }
+            });
+
+            return Object.keys(groupErrors).length ? groupErrors : null;
+          }
+        );
+      }
+    }
+  }
+
+  loopFormErrors() {
+    if (this.nodeData.node_type === 'Loop') {
+      const conditionsArray = this.propertiesForm.get('conditions') as FormArray;
+
+      // reset first (important to avoid stale errors)
+      this.propertiesFormErrors.conditions = [];
+
+      if (conditionsArray && conditionsArray.length) {
+        this.propertiesFormErrors.conditions = conditionsArray.controls.map(
+          (ctrl: FormGroup) => {
+            const groupErrors: any = {};
+
+            Object.keys(ctrl.controls).forEach((controlName) => {
+              const control = ctrl.get(controlName);
+
+              const validationMessage =
+                this.propertiesFormValidationMessages.conditions?.[controlName];
+
+              if (control && control.invalid && validationMessage) {
+                if (control.errors?.required) {
+                  groupErrors[controlName] = validationMessage.required;
+                }
+                // if you add more validators later, handle here
+              }
+            });
+
+            return Object.keys(groupErrors).length ? groupErrors : null;
+          }
+        );
       }
     }
   }
@@ -2896,7 +3062,6 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
     });
   }
 
-
   getTags() {
     this.tagsAutocompleteItems = [];
     this.appService.getTags().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
@@ -2907,5 +3072,38 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
   onTagInputChange() {
     this.aimlForm.get('description').setValue(this.svc.basicRulesetToSQL(this.aimlForm.get('filters').value));
   }
+
+  get fieldsArray() {
+    return this.propertiesForm.get('fields') as FormArray;
+  }
+
+  addField() {
+    const operation = this.propertiesForm.get('operation').value;
+
+    if (operation === 'RENAME_FIELDS') {
+      this.fieldsArray.push(this.fb.group({
+        source: ['', Validators.required],
+        target: ['', Validators.required]
+      }));
+    } else if (operation === 'ADD_FIELDS') {
+      this.fieldsArray.push(this.fb.group({
+        field: ['', Validators.required],
+        value: ['', Validators.required]
+      }));
+    } else {
+      this.fieldsArray.push(this.fb.group({
+        field: ['', Validators.required]
+      }));
+    }
+  }
+
+  removeField(i: number) {
+    this.fieldsArray.removeAt(i);
+  }
+
+  onOperationChange(operation: string) {
+    this.svc.buildOperationForm(this.propertiesForm, operation);
+  }
+
 }
 

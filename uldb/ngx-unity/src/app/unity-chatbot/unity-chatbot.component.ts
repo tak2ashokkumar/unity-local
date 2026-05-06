@@ -13,7 +13,7 @@ import { UserInfoService } from '../shared/user-info.service';
 import { UcChartsService } from './uc-charts/uc-charts.service';
 import { UcTableService } from './uc-table/uc-table.service';
 import { DashboardApiMapping, InsightsMapping, ModuleIcons, moduleMapping, TabNames, UnityChatbotService } from './unity-chatbot.service';
-import { ChatHistoryData, Document, Insight, UnityChatBot, UntiyChatBotExploreMenu } from './unity-chatbot.type';
+import { ChatHistoryData, ChatDocument, Insight, UnityChatBot, UntiyChatBotExploreMenu } from './unity-chatbot.type';
 
 @Component({
   selector: 'unity-chatbot',
@@ -71,7 +71,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
 
   @ViewChild('fileInput') fileInput: ElementRef;
   fileUploadLoader: boolean = false;
-  attachedFiles: Document[] = [];
+  attachedFiles: ChatDocument[] = [];
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -79,6 +79,9 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
       this.showModelDropdown = false;
     }
   }
+
+  fileUploadErrorMessage: string = '';
+
   constructor(private service: UnityChatbotService,
     private router: Router,
     private modalService: BsModalService,
@@ -181,7 +184,8 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   showStopButton: boolean = false;
   doneData: any;
   getStreamingResponse(chat: string) {
-    this.attachedFiles = [];
+    this.fileUploadErrorMessage = '';
+    // this.attachedFiles = [];
     this.isTyping = true;
     this.isStreaming = true;
     this.showStopButton = true;
@@ -215,6 +219,15 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
           this.chatHistoryData[lastIndex]['feedbackSubmitted'] = false;
           // this.chatHistoryData[lastIndex]['botResponseId'] = data.chat_message_id ?? '';
           this.chatHistoryData[lastIndex]['feedbackIconTooltip'] = 'Feedback';
+          // if (!(this.chatHistoryData[lastIndex].message as string).length) {
+          //   this.chatHistoryData[lastIndex].message = 'Sorry, I am having trouble right now.';
+          //   this.showStopButton = false;
+          // }
+        } else if (event === 'error') {
+          if (!(this.chatHistoryData[lastIndex].message as string).length) {
+            this.chatHistoryData[lastIndex].message = 'Sorry, I am having trouble right now.';
+            this.showStopButton = false;
+          }
         }
       },
       error: (err) => {
@@ -247,7 +260,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
           this.shouldScroll = true;
         }
       } else {
-        if(this.showStopButton){
+        if (this.showStopButton) {
           this.showStopButton && (this.chatHistoryData.getLast().botResponseId = this.chatId);
           this.chatHistoryData.getLast()['suggestedPrompt'] = this.doneData.suggested_questions?.length ? this.doneData.suggested_questions[0] : '';
         }
@@ -690,6 +703,8 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   onNewChat() {
+    this.fileUploadErrorMessage = '';
+    this.attachedFiles = [];
     this.onHistory = false;
     this.showStopButton = false;
     this.isTyping = false;
@@ -729,7 +744,9 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     }
 
     if (model.is_user_owned) {
-      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+      if (this.activeModel) {
+        this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'assistant');
+      }
       model.active_for_applications.push('assistant');
       this.changeActiveModelToSelected(model);
     } else {
@@ -760,6 +777,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   stopResponse() {
+    this.fileUploadErrorMessage = '';
     this.chatHistoryData.getLast().botResponseId = this.chatId;
     clearInterval(this.typingInterval);
     this.typingInterval = null;
@@ -779,21 +797,36 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   onFilesSelected(event: Event) {
+    this.fileUploadErrorMessage = '';
     const input = event.target as HTMLInputElement;
     if (!input.files || !input.files.length) return;
-    const file = input.files[0];
+    const files = Array.from(input.files);
     input.value = '';
-    this.uploadDocument(file);
+    const validFiles = files.filter(file => file.size <= 2 * 1024 * 1024);
+    const oversized = files.filter(file => file.size > 2 * 1024 * 1024);
+
+    if (oversized.length) {
+      this.fileUploadErrorMessage = `${oversized.length} file(s) exceed 2MB and were skipped.`;
+    }
+
+    if (validFiles.length) {
+      this.uploadDocuments(validFiles);
+    }
   }
 
-  uploadDocument(file: File) {
+  uploadDocuments(files: File[]) {
     this.fileUploadLoader = true;
-    this.service.uploadDocument(file, this.conversationId, this.userInfoService.userOrgId, this.userInfoService.userDetails.id)
-      .pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-        this.fileUploadLoader = false;
-        this.getDocuments();
-      }, (error: HttpErrorResponse) => {
-        this.fileUploadLoader = false;
+    this.service.uploadDocument(files, this.conversationId, this.userInfoService.userOrgId, this.userInfoService.userDetails.id)
+      .pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+        next: (res) => {
+          this.conversationId = res.conversation_id;
+          this.fileUploadLoader = false;
+          this.conversationId && this.getDocuments();
+        },
+        error: (error: HttpErrorResponse) => {
+          // this.fileUploadErrorMessage = 'Failed to upload file, please try agin.';
+          this.fileUploadLoader = false;
+        }
       });
   }
 

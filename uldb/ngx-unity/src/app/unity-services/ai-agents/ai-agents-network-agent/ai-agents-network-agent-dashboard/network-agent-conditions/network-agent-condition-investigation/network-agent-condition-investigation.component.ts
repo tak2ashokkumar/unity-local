@@ -49,7 +49,7 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
   chatResponse: any;
   chatResponseHistoryData: any[] = [];
 
-  @ViewChild('leftSideContainer') leftSideContainer: ElementRef;
+  @ViewChild('chatResponsHistoryScrollContainer') chatResponsHistoryScrollContainer: ElementRef;
   @ViewChildren('chatResponseHistory') chatResponseHistory: QueryList<ElementRef>;
 
   initialChatResponseData: any[] = [];
@@ -119,10 +119,10 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
 
   scrollToLastChatResponseHistory() {
     setTimeout(() => {
-      const parent = this.leftSideContainer.nativeElement;
+      const parent = this.chatResponsHistoryScrollContainer.nativeElement;
       const last = this.chatResponseHistory.last?.nativeElement;
-      // added gap=150, When scrolling to the last chat history response,it will leave 150px space above it in the viewport, so some part of previous chat response history also show
-      const gap = 150;
+      // added gap=100, When scrolling to the last chat history response,it will leave 100px space above it in the viewport, so some part of previous chat response history also show
+      const gap = 100;
       parent.scrollTop += (last.getBoundingClientRect().top - parent.getBoundingClientRect().top) - gap;
     }, 2);
   }

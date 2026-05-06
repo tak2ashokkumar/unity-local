@@ -164,6 +164,8 @@
 
 .query-button {
   border-radius: 0.75rem;
+  height: 2rem;
+  width: 2rem;
 }
 
 .query-button-success:hover {
@@ -194,7 +196,13 @@
   border-color: #cbd5e1;
 }
 
-.stop-button {
-  height: 2rem;
-  width: 2rem;
+.suggested-action {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.file-name {
+  color: #378ad8;
+  background-color: #d8ecff;
+  border-radius: 0.25rem !important;
 }

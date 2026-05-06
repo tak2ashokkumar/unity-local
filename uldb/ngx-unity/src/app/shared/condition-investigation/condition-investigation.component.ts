@@ -1,0 +1,488 @@
+import { Component, ElementRef, Inject, OnDestroy, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
+import { Subject } from 'rxjs';
+import { ConditionDetailsViewData, ConditionInvestigationService, PromptResultViewData } from './condition-investigation.service';
+import { FormGroup } from '@angular/forms';
+import { PAGE_SIZES, SearchCriteria } from '../table-functionality/search-criteria';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { DOCUMENT } from '@angular/common';
+import { AppSpinnerService } from '../app-spinner/app-spinner.service';
+import { AppNotificationService } from '../app-notification/app-notification.service';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { AppUtilityService, DeviceMapping, SERVICE_NOW_TICKET_TYPE, TICKET_MGMT_TYPE, TICKET_TYPE } from '../app-utility/app-utility.service';
+import { StorageService, StorageType } from '../app-storage/storage.service';
+import { SharedCreateTicketService } from '../shared-create-ticket/shared-create-ticket.service';
+import { FloatingTerminalService } from '../floating-terminal/floating-terminal.service';
+import { AppLevelService } from 'src/app/app-level.service';
+import { environment } from 'src/environments/environment';
+import { DEVICE_WEB_ACCESS_SUBJECT, SWITCH_TICKET_METADATA } from '../create-ticket.const';
+import { Notification } from '../app-notification/notification.type';
+import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntil } from 'rxjs/operators';
+import { NetworkAgentsChatResponseType } from './condition-investigation-chatbot/condition-investigation-chatbot.type';
+import { ConditionInvestigationNewTerminalService } from './condition-investigation-new-terminal/condition-investigation-new-terminal.service';
+
+@Component({
+  selector: 'condition-investigation',
+  templateUrl: './condition-investigation.component.html',
+  styleUrls: ['./condition-investigation.component.scss']
+})
+export class ConditionInvestigationComponent implements OnInit, OnDestroy {
+  private ngUnsubscribe = new Subject();
+
+  conditionId: string;
+  conditionUuid: string;
+  conditionDetailsViewData: ConditionDetailsViewData;
+  conditionOverviewViewData: any;
+
+  acknowledgeForm: FormGroup;
+  acknowledgeFormErrors: any;
+  acknowledgeFormValidationMessages: any;
+
+  analysisLogos = AnalysisLogos;
+
+  activitiesCount: number;
+  activityCurrentCriteria: SearchCriteria;
+  activityVerticalWizardViewData: any;
+
+  chatResponse: any;
+  chatResponseHistoryData: any[] = [];
+
+  @ViewChild('chatResponsHistoryScrollContainer') chatResponsHistoryScrollContainer: ElementRef;
+  @ViewChildren('chatResponseHistory') chatResponseHistory: QueryList<ElementRef>;
+
+  initialChatResponseData: any[] = [];
+  isAnyStepDataPresent: boolean = false;
+
+  dynamicSteps: {
+    stageKey: string;
+    componentType: string;
+    chatResponse: NetworkAgentsChatResponseType;
+  }[] = [];
+
+  showPromptTuning = false;
+  promptText: string = '';
+  promptCurrentCriteria: SearchCriteria;
+  promptViewData: PromptResultViewData[] = [];
+  selectedPrompt: PromptResultViewData;
+
+  @ViewChild('confirmSaveAs') confirmSaveAs: ElementRef;
+  confirmSaveAsModalRef: BsModalRef;
+  promptName: string = '';
+
+  conversationId: string = '';
+
+  @ViewChild('executeCommand') executeCommand: ElementRef;
+  confirmExecutionModalRef: BsModalRef;
+  command: string = '';
+  constructor(private svc: ConditionInvestigationService,
+    @Inject(DOCUMENT) private document,
+    private renderer: Renderer2,
+    private spinner: AppSpinnerService,
+    private notification: AppNotificationService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private utilService: AppUtilityService,
+    private modalService: BsModalService,
+    public storage: StorageService,
+    private ticketService: SharedCreateTicketService,
+    private termService: FloatingTerminalService,
+    private appService: AppLevelService,
+    private newTerminalService: ConditionInvestigationNewTerminalService) {
+    this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
+      this.conditionId = params.get('conditionId');
+      this.conditionUuid = params.get('conditionUuid');
+    });
+    this.activityCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
+    this.promptCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
+  }
+
+  ngOnInit(): void {
+    this.minimizeLeftPanel();
+    setTimeout(() => {
+      // this.spinner.start('conditionDetailsSpinner');
+      this.spinner.start('conditionSummarySpinner');
+    }, 5);
+    this.getConditionDetails();
+    // this.getActivities();
+  }
+
+  ngAfterViewInit() {
+    this.chatResponseHistory.changes.pipe(takeUntil(this.ngUnsubscribe)).subscribe((change) => {
+      if (this.chatResponseHistory?.length > 1) {
+        this.scrollToLastChatResponseHistory();
+      }
+    });
+  }
+
+  scrollToLastChatResponseHistory() {
+    setTimeout(() => {
+      const parent = this.chatResponsHistoryScrollContainer.nativeElement;
+      const last = this.chatResponseHistory.last?.nativeElement;
+      // added gap=100, When scrolling to the last chat history response,it will leave 100px space above it in the viewport, so some part of previous chat response history also show
+      const gap = 100;
+      parent.scrollTop += (last.getBoundingClientRect().top - parent.getBoundingClientRect().top) - gap;
+    }, 2);
+  }
+
+  ngOnDestroy(): void {
+    this.spinner.stop('main');
+    this.maximizeLeftPanel();
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
+  minimizeLeftPanel() {
+    let isSideBarMinimised = this.document.body.className.includes('sidebar-minimized');
+    if (!isSideBarMinimised) {
+      let sidebar_minimizer = this.document.getElementsByClassName('sidebar-minimizer').item(0);
+      this.renderer.setStyle(sidebar_minimizer, 'display', 'none');
+      sidebar_minimizer.click();
+    }
+  }
+
+  maximizeLeftPanel() {
+    let isSideBarMinimised = this.document.body.className.includes('sidebar-minimized');
+    if (isSideBarMinimised) {
+      let sidebar_minimizer = this.document.getElementsByClassName('sidebar-minimizer').item(0);
+      this.renderer.setStyle(sidebar_minimizer, 'display', 'unset');
+      sidebar_minimizer.click();
+    }
+  }
+
+  getConditionDetails() {
+    this.svc.getConditionDetails(this.conditionUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.conditionDetailsViewData = this.svc.convertToConditionDetailsViewdata(res);
+      // this.spinner.stop('conditionDetailsSpinner');
+    }, (err: HttpErrorResponse) => {
+      this.spinner.stop('conditionDetailsSpinner');
+      this.notification.error(new Notification('Error whlie getting condition details'));
+    });
+  }
+
+  goToTicketDetails(view: ConditionDetailsViewData) {
+    switch (view.ticketingSystem) {
+      case TICKET_MGMT_TYPE.CRM:
+        if (view.accountId && view.ticketUuid) {
+          this.router.navigate(['/support/ticketmgmt', view.accountId, 'dynamics-crm-tickets', view.ticketUuid, 'details']);
+        } else {
+          if (!view.accountId) {
+            this.notification.error(new Notification('CRM account is not linked to UnityOne'));
+          } else if (!view.ticketUuid) {
+            this.notification.error(new Notification('Ticket not found in linked CRM account'));
+          }
+        }
+        break;
+      case TICKET_MGMT_TYPE.SERVICENOW:
+        if (view.accountId && view.ticketUuid) {
+          if (view.ticketId && (view.ticketType == SERVICE_NOW_TICKET_TYPE.INCIDENT || view.ticketType == SERVICE_NOW_TICKET_TYPE.PROBLEM)) {
+            this.storage.put('selectedTicketSysId', view.ticketUuid, StorageType.SESSIONSTORAGE);
+            this.router.navigate(['/support/ticketmgmt', view.accountId, 'nowtickets', view.ticketId, 'enhanced-details']);
+          } else if (view.ticketType == SERVICE_NOW_TICKET_TYPE.CHANGE_REQUEST) {
+            this.router.navigate(['/support/ticketmgmt', view.accountId, 'nowtickets', view.ticketUuid, 'details']);
+          }
+        } else {
+          if (!view.accountId) {
+            this.notification.error(new Notification('ServiceNow account is not linked to UnityOne'));
+          } else if (!view.ticketUuid) {
+            this.notification.error(new Notification('Ticket not found in linked ServiceNow account'));
+          }
+        }
+        break;
+      case TICKET_MGMT_TYPE.JIRA:
+        if (view.accountId && view.projectId && view.ticketId) {
+          this.router.navigate(['/support/ticketmgmt', view.accountId, 'jira', 'projects', view.projectId, view.ticketId, 'details']);
+        } else {
+          if (!view.accountId) {
+            this.notification.error(new Notification('JIRA account is not linked to UnityOne'));
+          } else if (!view.projectId) {
+            this.notification.error(new Notification('Project not found in linked JIRA account'));
+          } else if (!view.ticketId) {
+            this.notification.error(new Notification('Ticket not found in linked JIRA account'));
+          }
+        }
+        break;
+      default: return;
+    }
+  }
+
+  createTicket(conditionUuid: string) {
+    this.spinner.start('main');
+    this.svc.createTicket(conditionUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.notification.success(new Notification('Ticket Created Successfully.'));
+      this.spinner.stop('main');
+      this.getConditionDetails();
+    }, (err: HttpErrorResponse) => {
+      this.spinner.stop('main');
+      this.notification.error(new Notification('Failed to create a ticket. Please try again later.'));
+    });
+  }
+
+  conditionAcknowledge() {
+    this.acknowledgeForm = this.svc.buildAcknowledgeForm();
+    this.acknowledgeFormErrors = this.svc.resetAcknowledgeFormErrors();
+    this.acknowledgeFormValidationMessages = this.svc.acknowledgeFormValidationMessages;
+    this.handleAcknowledgementFormSubscriptions();
+  }
+
+  handleAcknowledgementFormSubscriptions() {
+    this.acknowledgeForm.get('ack_comment').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((value: string) => {
+      if (value && value.length > 512) {
+        this.acknowledgeForm.get('ack_comment').setValue(value.slice(0, 512), { emitEvent: false });
+      }
+    });
+  }
+
+  onConditionAcknowledge() {
+    if (this.acknowledgeForm.invalid) {
+      this.acknowledgeFormErrors = this.utilService.validateForm(this.acknowledgeForm, this.acknowledgeFormValidationMessages, this.acknowledgeFormErrors);
+      this.acknowledgeForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((data: any) => {
+        this.acknowledgeFormErrors = this.utilService.validateForm(this.acknowledgeForm, this.acknowledgeFormValidationMessages, this.acknowledgeFormErrors);
+      });
+    } else {
+      let obj = Object.assign({}, this.acknowledgeForm.getRawValue());
+      this.onCloseConditionAcknowledge();
+      this.conditionDetailsViewData.isAcknowledged = true;
+      this.svc.onConditionAcknowledge(this.conditionUuid, obj).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+        this.conditionDetailsViewData.isAcknowledged = res.is_acknowledged;
+        this.conditionDetailsViewData.acknowledgedTime = res.acknowledged_time;
+        this.conditionDetailsViewData.acknowledgedComment = res.acknowledged_comment;
+        this.conditionDetailsViewData.acknowledgedBy = res.acknowledged_by;
+        this.conditionDetailsViewData.acknowledgedTooltipMsg = `Ack by: ${res.acknowledged_by}<br>` + `Ack Msg: ${res.acknowledged_comment}<br>` + `Ack at: ${res.acknowledged_time}`;
+        this.spinner.stop('main');
+      }, (err: HttpErrorResponse) => {
+        this.conditionDetailsViewData.isAcknowledged = false;
+        this.spinner.stop('main');
+        this.notification.error(new Notification('Error while acknowledging an events'));
+      });
+    }
+  }
+
+  onCloseConditionAcknowledge() {
+    let element: HTMLElement = document.getElementById('event-severity') as HTMLElement;
+    element.click();
+    this.acknowledgeForm = null;
+    this.acknowledgeFormErrors = this.svc.resetAcknowledgeFormErrors();
+    this.acknowledgeFormValidationMessages = this.svc.acknowledgeFormValidationMessages;
+  }
+
+  resolveCondtion() {
+    if (this.conditionDetailsViewData.isStatusResolved || this.conditionDetailsViewData.resolveInProgress) {
+      return;
+    }
+    this.conditionDetailsViewData.resolveInProgress = true;
+    this.svc.resolveCondition(this.conditionUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.conditionDetailsViewData.resolveInProgress = false;
+      this.getConditionDetails();
+      this.notification.success(new Notification(`Request to resolve Condition ID: ${this.conditionDetailsViewData.id} processed successfully`));
+    }, (err: HttpErrorResponse) => {
+      this.conditionDetailsViewData.resolveInProgress = false;
+      this.notification.error(new Notification(`Request to resolve Condition ID: ${this.conditionDetailsViewData.id} failed. Please try again.`));
+      this.spinner.stop('main');
+    });
+  }
+
+  // getActivities() {
+  //   this.activityVerticalWizardViewData = [];
+  //   this.svc.getActivityDetails(this.conditionUuid, this.activityCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+  //     this.activitiesCount = res.count;
+  //     this.activityVerticalWizardViewData = this.svc.convertToActivityWizardViewData(res.results);
+  //   }, (err: HttpErrorResponse) => {
+  //     this.notification.error(new Notification('Failed to get Activity details. Please try again later.'));
+  //   })
+  // }
+
+  // activityPageChange(pageNo: number) {
+  //   if (this.activityCurrentCriteria.pageNo !== pageNo) {
+  //     // this.spinner.start('main');
+  //     this.activityCurrentCriteria.pageNo = pageNo;
+  //     this.getActivities();
+  //   }
+  // }
+
+  // private resolveStep(res: NetworkAgentsChatResponseType) {
+  //   const phase = res?.answer?.phase;
+  //   const stageTitle = res?.answer?.stage_title;
+
+  //   if (phase !== 'Verify and Audit') {
+  //     return {
+  //       stageKey: phase,
+  //       componentType: 'Basic CLI Check'
+  //     }
+  //   }
+
+  //   return {
+  //     stageKey: stageTitle,
+  //     componentType: stageTitle
+  //   }
+  // }
+
+  handleChatResponse(res: any | null) {
+    if (this.initialChatResponseData?.length == 0) {
+      this.initialChatResponseData.push(res);
+      this.spinner.stop('conditionSummarySpinner');
+    }
+    // if (res == null || res?.answer?.phase == 'General') { return; }
+    if (res == null) { return; }
+    if (res?.meta?.filters_used?.conversation_id) {
+      this.conversationId = res?.meta?.filters_used?.conversation_id;
+      this.newTerminalService.setConversationId(res?.meta?.filters_used?.conversation_id);
+    }
+    this.isAnyStepDataPresent = res?.answer ? true : this.isAnyStepDataPresent;
+    const workSpaceData = res?.answer?.split('sectionBreak')[1];
+    if (!workSpaceData && !res?.meta?.device_data?.monitoring_type) {
+      return;
+    }
+    const modifiedRes = { ...res, workSpaceData: workSpaceData };
+    this.chatResponseHistoryData.push(modifiedRes);
+
+    // const { stageKey, componentType } = this.resolveStep(res);
+    // const existingStep = this.dynamicSteps.find(
+    //   step => step.stageKey === stageKey
+    // );
+    // if (existingStep) {
+    //   existingStep.chatResponse = res;
+    // } else {
+    //   this.dynamicSteps.push({
+    //     stageKey,
+    //     componentType,
+    //     chatResponse: res
+    //   });
+    // }
+    // this.dynamicSteps = [...this.dynamicSteps];
+    // this.chatResponse = res;
+    // if (res?.answer?.stage == "Stage 0") {
+    //   this.conditionOverviewViewData = this.svc.convertToConditionOverviewData(res.answer);
+    // }
+    this.spinner.stop('main');
+  }
+
+  togglePromptTuning() {
+    this.showPromptTuning = !this.showPromptTuning;
+    if (this.showPromptTuning) {
+      this.getAllPrompts();
+    }
+  }
+
+  getAllPrompts() {
+    this.svc.getAllPrompts(this.promptCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.promptViewData = this.svc.convertToPromptViewData(res.results);
+      this.initializePromptSelection();
+    }, (err: HttpErrorResponse) => {
+      this.notification.error(new Notification('Failed to get Prompt details. Please try again later.'));
+    })
+  }
+
+  initializePromptSelection() {
+    if (!this.promptViewData || this.promptViewData.length === 0) return;
+    const active = this.promptViewData.find(p => p.isActive);
+    this.selectedPrompt = active || this.promptViewData[0];
+    this.promptText = this.selectedPrompt.prompt;
+  }
+
+  onCancel() {
+    this.showPromptTuning = false;
+  }
+
+  onSave() {
+    const savePrompt = this.selectedPrompt;
+    savePrompt.prompt = this.promptText;
+    this.svc.promptSave(savePrompt).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.getAllPrompts();
+      this.notification.success(new Notification('Version is Saved.'));
+    }, (err: HttpErrorResponse) => {
+      this.notification.error(new Notification('Failed to Save Prompt. Please try again later.'));
+    })
+
+  }
+
+  onPromptChange() {
+    if (this.selectedPrompt) {
+      this.promptText = this.selectedPrompt.prompt;
+    }
+  }
+
+  onToggleActive(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    if (!this.selectedPrompt) return;
+    if (checked && !this.selectedPrompt.isActive) {
+      this.svc.activateVersion(this.selectedPrompt).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+        this.getAllPrompts();
+        this.notification.success(new Notification('Version Activated Successfully.'));
+      }, (err: HttpErrorResponse) => {
+        this.notification.error(new Notification('Failed to Activate Version. Please try again later.'));
+      })
+    }
+  }
+
+  onSaveAs() {
+    this.confirmSaveAsModalRef = this.modalService.show(this.confirmSaveAs, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+  }
+
+  confirmSaveAsModal() {
+    if (!this.promptName || !this.promptName.trim()) {
+      this.notification.error(new Notification('Please enter a valid prompt name.'));
+      return;
+    }
+    const saveAsPrompt = {
+      ...this.selectedPrompt,
+      prompt: this.promptText,
+      promptName: this.promptName
+    }
+    this.svc.promptSaveAs(saveAsPrompt).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
+      this.confirmSaveAsModalRef.hide();
+      this.getAllPrompts();
+      this.notification.success(new Notification('New Prompt Version is created.'));
+    }, (err: HttpErrorResponse) => {
+      this.confirmSaveAsModalRef.hide();
+      this.notification.error(new Notification('Failed to Save As Version. Please try again later.'));
+    })
+  }
+
+  requestWebAccess(view: any) {
+    this.ticketService.createTicket({
+      subject: DEVICE_WEB_ACCESS_SUBJECT(DeviceMapping.SWITCHES, view.name),
+      metadata: SWITCH_TICKET_METADATA(DeviceMapping.SWITCHES, view.name, view.deviceStatus, view.model, view.type, view.managementIp),
+      type: TICKET_TYPE.PROBLEM,
+      webaccess: true
+    }, DeviceMapping.SWITCHES);
+  }
+
+  webAccessNewTab(view: any) {
+    // this.appService.updateActivityLog('switches', 'sdrgg');
+    window.open('/main#/unityterminal/');
+  }
+
+  consoleNewTab(view: any) {
+    window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+  }
+
+  consoleSameTab(view: any) {
+    this.newTerminalService.openTerminal();
+  }
+
+  onMarkdownClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const codeEl = target.closest('code');
+    if (codeEl) {
+      this.command = codeEl.textContent?.trim();
+      if (this.command) {
+        this.confirmExecutionModalRef = this.modalService.show(this.executeCommand, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+      }
+    }
+
+  }
+
+  confirmExecuteModal() {
+    this.confirmExecutionModalRef.hide();
+    localStorage.setItem('terminal_command', this.command);
+    window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+  }
+
+}
+
+
+const AnalysisLogos = {
+  'UnityOne': {
+    'imageURL': `${environment.assetsUrl}brand/unity-logo-old.png`,
+  },
+}

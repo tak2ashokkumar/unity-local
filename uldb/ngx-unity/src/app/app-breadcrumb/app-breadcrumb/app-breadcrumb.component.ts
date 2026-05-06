@@ -43,8 +43,8 @@ export class AppBreadcrumbComponent implements OnInit, OnDestroy {
         : p.label,
     }));
 
-    // Remove the parent breadcrumb entry that precedes 'UPC for AI' / 'AI Agents'
-    const aiIndex = crumbs.findIndex(p => p.label === 'UPC for AI' || p.label === 'AI Agents');
+    // Remove the parent breadcrumb entry that precedes 'UPC for AI'
+    const aiIndex = crumbs.findIndex(p => p.label === 'UPC for AI');
     if (aiIndex > 0) {
       crumbs = crumbs.filter((_, i) => i !== aiIndex - 1);
     }

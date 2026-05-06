@@ -1790,7 +1790,7 @@ export const GET_SERVICE_NOW_TICKET_BY_TYPE = (uuid: string) => `customer/servic
 
 export const CREATE_SERVICE_NOW_TICKET = (uuid: string, type: string) => `customer/service_now/${uuid}/create_ticket/?ticket_type=${type}`;
 
-export const DB_PRIVATE_CLOUD_FAST = () => `customer/private_cloud_fast/?page_size=0`;
+export const DB_PRIVATE_CLOUD_FAST = () => `customer/cloud_fast/?page_size=0`;
 
 export const DB_BMS = () => `${BMS_FAST()}?page_size=0`;
 

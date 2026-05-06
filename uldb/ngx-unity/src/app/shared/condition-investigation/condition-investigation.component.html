@@ -1,0 +1,499 @@
+<div class="container-fluid pt-2">
+    <div class="animated-fadeIn">
+        <div class="row" style="height:calc(100vh - 75px)">
+            <div class="col-8 condition-detail h-100 d-flex flex-column">
+                <div class="card mb-0"
+                    [ngClass]="{'h-100':(!initialChatResponseData?.length && !isAnyStepDataPresent)|| (initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent)}">
+                    <div class="card-header border-bottom bg-white p-2 d-flex flex-column position-relative"
+                        *ngIf="conditionDetailsViewData">
+                        <!-- <app-spinner [name]="'conditionDetailsSpinner'"></app-spinner> -->
+                        <div class="d-flex align-items-center">
+                            <div id="event-severity"
+                                class="d-flex align-items-center rounded event-severity small p-1 mr-2"
+                                [ngClass]="[conditionDetailsViewData.severityBg, 'text-white']">
+                                {{conditionDetailsViewData.conditionSeverity}}
+                            </div>
+                            <div class="d-flex align-items-center w-60 mr-auto">
+                                <div class="font-lg font-500 event-name text-truncate">
+                                    {{conditionDetailsViewData.description}}
+                                </div>
+                                <div class="w-20 ml-2 mt-1 font-xs text-muted">
+                                    {{conditionDetailsViewData.conditionDatetime}}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end w-35">
+                                <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
+                                    tooltip="Manage in same tab" (click)="consoleSameTab(view)"></button>
+                                <span dropdown placement="bottom right" container="body">
+                                    <!-- <button
+                                        class="action-icons action-icons-disabled mb-0 fas fa-external-link-alt font-sm ml-1"
+                                        (click)="false" container="body"></button> -->
+
+                                    <button id="button-container"
+                                        class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
+                                        data-toggle="dropdown" aria-controls="dropdown-container" dropdownToggle
+                                        (click)="false" container="body" tooltip="Manage in New Tab"></button>
+                                    <div id="dropdown-container" class="dropdown-menu dropdown-menu-right" *dropdownMenu
+                                        aria-labelledby="button-container">
+                                        <!-- <a class="dropdown-item text-primary" (click)="webAccessNewTab(view)">Web
+                                            Access</a> -->
+                                        <!-- <a class="dropdown-item text-primary" (click)="requestWebAccess(view)">Request
+                                            Web Access </a> -->
+                                        <a class="dropdown-item" (click)="consoleNewTab(view)">
+                                            Console Access
+                                        </a>
+                                    </div>
+                                </span>
+                                <button
+                                    *ngIf="!conditionDetailsViewData.ticketId && !conditionDetailsViewData.ticketUuid && conditionDetailsViewData.conditionStatus != 'Resolved'"
+                                    class="btn btn-sm btn-pill btn-warning ml-2" type="button"
+                                    (click)="createTicket(conditionDetailsViewData.uuid)" accessControl
+                                    moduleName="Ticket Management" accessType="Manage Tickets" elementType="btn">Create
+                                    Ticket</button>
+                                <button *ngIf="!conditionDetailsViewData.isAcknowledged"
+                                    class="action-icons mb-0 fas fa-comment-dots font-sm ml-1"
+                                    (click)="onCloseConditionAcknowledge(); conditionAcknowledge(); $event.stopPropagation();$event.preventDefault();"
+                                    [popover]="conditionAcknowledgeFormRef" [tooltip]="'Acknowledge'" container="body"
+                                    [outsideClick]="true" placement="left" accessControl
+                                    moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                    elementType="actionbtn"></button>
+                                <span *ngIf="conditionDetailsViewData.isAcknowledged">
+                                    <span *ngIf="conditionDetailsViewData.acknowledgedTime"
+                                        [tooltip]="conditionDetailsViewData.acknowledgedTooltipMsg" container="body"
+                                        [style.marginTop.px]="2"
+                                        class="fas fa-check-circle fa-2x text-success ml-1"></span>
+                                    <span *ngIf="!conditionDetailsViewData.acknowledgedTime"><i
+                                            class="fa fa-spinner fa-2x ml-1 fa-spin">&nbsp;</i></span>
+                                </span>
+                                <button class="action-icons mb-0 fa fa-times font-sm ml-1"
+                                    [tooltip]="conditionDetailsViewData.resolveInProgress ? 'In Progress': conditionDetailsViewData.resolveBtnTooltipMsg"
+                                    [ngClass]="{'fa-times':!conditionDetailsViewData.resolveInProgress,'fa-spinner fa-spin': conditionDetailsViewData.resolveInProgress,'action-icons-disabled':conditionDetailsViewData.resolveInProgress || conditionDetailsViewData.isStatusResolved}"
+                                    container="body" (click)="resolveCondtion()" accessControl
+                                    moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                    elementType="actionbtn"></button>
+                                <button class="action-icons mb-0 fas fa-project-diagram font-sm ml-1"
+                                    [tooltip]="'Coming Soon'" container="body" accessControl
+                                    moduleName="AIML Event Management" accessType="Manage AIML Event Management"
+                                    elementType="actionbtn"></button>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <span class="font-sm-xs text-muted">Ticket ID: </span>
+                                <a class="font-sm-xs text-muted text-primary font-500 "
+                                    (click)="goToTicketDetails(conditionDetailsViewData)" accessControl
+                                    moduleName="Ticket Management" accessType="View Tickets"
+                                    elementType="div">{{conditionDetailsViewData.ticketId}}</a>
+                            </div>
+                            <div class="border-left ml-1 pl-1">
+                                <span class="font-sm-xs text-muted">Status: </span>
+                                <span class="font-sm-xs font-500"
+                                    [ngClass]="[conditionDetailsViewData.statusTextColor, 'text-capitalize']">{{conditionDetailsViewData.conditionStatus}}</span>
+                            </div>
+                            <div class="border-left ml-1 pl-1">
+                                <span class="font-sm-xs text-muted">Source: </span>
+                                <div class="font-sm d-inline">
+                                    <span
+                                        class="font-500 text-capitalize">{{conditionDetailsViewData.conditionSource}}</span>
+                                </div>
+                            </div>
+                            <div class="border-left ml-1 pl-1">
+                                <span class="font-sm-xs text-muted">Hosts: </span>
+                                <div class="font-sm d-inline" *ngIf="conditionDetailsViewData.hosts?.length">
+                                    <span class="font-500">{{conditionDetailsViewData.hosts[0]}}</span>
+                                    <div class="d-inline source-count font-xss pl-0 py-1 pr-1 ml-1"
+                                        *ngIf="conditionDetailsViewData.hosts.length-1">
+                                        +{{conditionDetailsViewData.hosts.length-1}}
+                                    </div>
+                                </div>
+                                <div class="font-sm d-inline" *ngIf="!conditionDetailsViewData.hosts?.length">NA
+                                </div>
+                            </div>
+                            <div class="border-left ml-1 pl-1">
+                                <span class="font-sm-xs text-muted">Correlator: </span>
+                                <span *ngIf="conditionDetailsViewData.correlator?.length"
+                                    class="font-sm font-500">{{conditionDetailsViewData.correlator}}</span>
+                                <span *ngIf="!conditionDetailsViewData.correlator?.length"
+                                    class="font-sm font-500">NA</span>
+                            </div>
+                            <div class="border-left ml-1 pl-1">
+                                <span class="font-sm-xs text-muted">Time Window: </span>
+                                <span class="font-sm font-500">{{conditionDetailsViewData.correlationWindow
+                                    || 'NA'}}</span>
+                            </div>
+                            <div class="border-left ml-1 pl-1">
+                                <span class="font-sm-xs text-muted">Acknowledged: </span>
+                                <span *ngIf="conditionDetailsViewData.isAcknowledged">
+                                    <i class="font-sm fas fa-check-circle text-success"></i>
+                                    <span class="font-xs-sm ml-1">with comment</span>
+                                    <span
+                                        class="font-xs-sm font-500 ml-1">{{conditionDetailsViewData.acknowledgedComment}}</span>
+                                </span>
+                                <span class="font-sm font-500"
+                                    *ngIf="!conditionDetailsViewData.isAcknowledged">No</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <span class="font-sm-xs text-muted">Events: </span>
+                                    <span
+                                        class="badge badge-pill badge-secondary font-xs-sm">{{conditionDetailsViewData.eventCount}}</span>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Alert Start Time: </span>
+                                    <div class="font-sm d-inline">
+                                        <span
+                                            class="font-500 text-capitalize">{{conditionDetailsViewData.firstAlertDateTime}}</span>
+                                    </div>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Latest Alert Time: </span>
+                                    <div class="font-sm d-inline">
+                                        <span class="font-500">{{conditionDetailsViewData.lastAlertDateTime}}</span>
+                                    </div>
+                                </div>
+                                <div class="border-left ml-1 pl-1">
+                                    <span class="font-sm-xs text-muted">Duration: </span>
+                                    <span class="font-sm font-500">{{conditionDetailsViewData.conditionDuration
+                                        || 'NA'}}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center pr-2">
+                                <span
+                                    class="badge badge-pill badge-secondary font-xs-sm">{{conditionDetailsViewData.alertCount}}</span>
+                                <span class="ml-1 font-sm float-right align-middle">Alerts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body"
+                        [ngClass]="{'p-0 position-relative h-100':chatResponse?.answer?.stage!='Stage 0'}">
+
+                        <!-- <ng-container *ngIf="chatResponse?.answer?.stage == 'Stage 0'">
+                            <div class="col mt-2 row pr-0 mb-2 align-items-center">
+                                <img [src]="analysisLogos.UnityOne.imageURL" alt="UnityOne.ai"
+                                    style="height: 20px; max-width: 20px;" />
+                                <div class="text-success ml-2">
+                                    Summary by UnityOne.AI
+                                </div>
+                            </div>
+                            <div>
+                                {{ conditionOverviewViewData?.data?.conditionSummary?.conditionAnalysis }}
+                            </div>
+                            <div class="font-500 font-lg border-bottom mt-3 pb-1">
+                                Details
+                            </div>
+                            <div>
+                                <div class="d-flex border-bottom p-2">
+                                    <div class="text-muted mr-2">Subject :</div>
+                                    <div>
+                                        {{ conditionOverviewViewData?.data?.conditionSummary?.conditionName }}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex border-bottom p-2">
+                                    <div class="text-muted mr-2">Source :</div>
+                                    <div>
+                                        {{ conditionOverviewViewData?.data?.conditionSummary?.conditionSource }}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex border-bottom p-2">
+                                    <div class="text-muted mr-2">Host :</div>
+                                    <div>
+                                        {{
+                                        conditionOverviewViewData?.data?.conditionSummary?.affectedDevices?.length
+                                        ? conditionOverviewViewData.data.conditionSummary.affectedDevices.join(', ')
+                                        : 'No Available Hosts'
+                                        }}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex py-2 border-bottom">
+
+                                    <span class="d-flex pr-2 border-right ml-2">
+                                        <span class="text-muted mr-1">Correlator :</span>
+                                        <span>
+                                            {{ conditionOverviewViewData?.data?.conditionSummary?.correlators }}
+                                        </span>
+                                    </span>
+
+                                    <span class="d-flex px-2 border-right">
+                                        <span class="text-muted mr-1">Alerts :</span>
+                                        <span>
+                                            {{ conditionOverviewViewData?.data?.conditionSummary?.alertCount }}
+                                        </span>
+                                    </span>
+
+                                    <span class="d-flex px-2">
+                                        <span class="text-muted mr-1">Events :</span>
+                                        <span>
+                                            {{ conditionOverviewViewData?.data?.conditionSummary?.eventCount }}
+                                        </span>
+                                    </span>
+
+                                </div>
+
+                                <div class="d-flex border-bottom p-2">
+
+                                    <span class="border-right pr-2">
+                                        <span class="text-muted mr-1">Alert Start Time :</span>
+                                        <span>
+                                            {{ conditionOverviewViewData?.data?.conditionSummary?.firstAlertDatetime }}
+                                        </span>
+                                    </span>
+
+                                    <span class="border-right px-2">
+                                        <span class="text-muted mr-1">Latest Alert Time :</span>
+                                        <span>
+                                            {{ conditionOverviewViewData?.data?.conditionSummary?.lastAlertDatetime }}
+                                        </span>
+                                    </span>
+
+                                    <span class="px-2">
+                                        <span class="text-muted mr-1">Duration :</span>
+                                        <span>
+                                            {{ conditionOverviewViewData?.data?.conditionSummary?.conditionDuration }}
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <h6 class="font-500 border-bottom pb-2">Activity</h6>
+                                <ng-container *ngTemplateOutlet="activityList"></ng-container>
+                            </div>
+                        </ng-container> -->
+
+                        <div class="h-100"
+                            *ngIf="((!initialChatResponseData?.length && !isAnyStepDataPresent)|| (initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent))">
+                            <app-spinner [name]="'conditionSummarySpinner'"></app-spinner>
+                            <div class="d-flex justify-content-center pt-5 h-100">
+                                <span class="font-500 pt-5"
+                                    *ngIf="!initialChatResponseData?.length && !isAnyStepDataPresent">Investigating
+                                    the problem.</span>
+                                <span class="text-muted pt-5"
+                                    *ngIf="initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent">No
+                                    data available.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="my-3" *ngIf="chatResponseHistoryData.length">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h1 class="font-500 font-xl mt-1">
+                            Workspace
+                        </h1>
+                        <button class="btn btn-pill btn-warning" (click)="togglePromptTuning()">
+                            Prompt Tuning
+                        </button>
+                    </div>
+                    <div class="prompt-panel mt-3" *ngIf="showPromptTuning">
+                        <div class="mb-2 d-flex justify-content-end">
+                            <select class="form-control mr-2" style="max-width: 100px;" [(ngModel)]="selectedPrompt"
+                                (change)="onPromptChange()">
+                                <option *ngFor="let p of promptViewData" [ngValue]="p">
+                                    {{ p.promptName }}
+                                </option>
+                            </select>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="checkbox" [checked]="selectedPrompt?.isActive"
+                                    [disabled]="!selectedPrompt || selectedPrompt.isActive"
+                                    (change)="onToggleActive($event)" />
+                                <span class="font-500 ml-1">
+                                    {{ selectedPrompt?.isActive ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+                        </div>
+                        <textarea class="form-control" rows="5" [(ngModel)]="promptText"
+                            placeholder="Enter your prompt here..."></textarea>
+
+                        <div class="d-flex justify-content-end gap-2 mt-2">
+                            <button class="btn btn-danger mr-1" (click)="onCancel()">Cancel</button>
+                            <button class="btn btn-success mr-1" (click)="onSaveAs()">Save As</button>
+                            <button class="btn btn-primary" [disabled]="!selectedPrompt || selectedPrompt.isDefault"
+                                [title]="selectedPrompt?.isDefault ? 'Default version cannot be edited' : ''"
+                                (click)="onSave()">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="mb-2 d-flex justify-content-end">
+                    <select class="form-control mr-2" style="max-width: 100px;" [(ngModel)]="selectedPrompt"
+                        (change)="onPromptChange()">
+                        <option *ngFor="let p of promptViewData" [ngValue]="p">
+                            {{ p.promptName }}
+                        </option>
+                    </select>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="checkbox" [checked]="selectedPrompt?.isActive"
+                            [disabled]="!selectedPrompt || selectedPrompt.isActive" (change)="onToggleActive($event)" />
+                        <span class="fw-bold ml-1">
+                            {{ selectedPrompt?.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                    </div>
+                </div>
+                <textarea class="form-control" rows="5" [(ngModel)]="promptText"
+                    placeholder="Enter your prompt here..."></textarea>
+
+                <div class="d-flex justify-content-end gap-2 mt-2">
+                    <button class="btn btn-danger mr-1" (click)="onCancel()">Cancel</button>
+                    <button class="btn btn-success mr-1" (click)="onSaveAs()">Save As</button>
+                    <button class="btn btn-primary" [disabled]="!selectedPrompt || selectedPrompt.isDefault"
+                        [title]="selectedPrompt?.isDefault ? 'Default version cannot be edited' : ''"
+                        (click)="onSave()">Save</button>
+                </div> -->
+
+                <!-- <ng-container *ngFor="let step of dynamicSteps">
+
+                    <naci-monitoring *ngIf="step.componentType === 'Monitoring'" [chatResponse]="step.chatResponse">
+                    </naci-monitoring>
+
+                    <naci-resource-utilization-steps *ngIf="step.componentType === 'Resource Utilization'"
+                        [chatResponse]="step.chatResponse">
+                    </naci-resource-utilization-steps>
+
+                    <naci-check-device-health-steps *ngIf="step.componentType === 'Check Device Health'"
+                        [chatResponse]="step.chatResponse">
+                    </naci-check-device-health-steps>
+
+                    <naci-centralized-logs-steps *ngIf="step.componentType === 'Centralized Logs'"
+                        [chatResponse]="step.chatResponse">
+                    </naci-centralized-logs-steps>
+
+                    <naci-network-topology-steps *ngIf="step.componentType === 'Network Topology'"
+                        [chatResponse]="step.chatResponse">
+                    </naci-network-topology-steps>
+
+                    <naci-cli-check-steps *ngIf="step.componentType === 'Basic CLI Check'"
+                        [chatResponse]="step.chatResponse">
+                    </naci-cli-check-steps>
+
+                </ng-container> -->
+
+                <div #chatResponsHistoryScrollContainer class="card flex-grow-1 mb-0"
+                    *ngIf="chatResponseHistoryData.length" [perfectScrollbar]="{suppressScrollX: true}">
+                    <div class="card-body">
+                        <div #chatResponseHistory
+                            *ngFor="let chat of chatResponseHistoryData;let i = index;let last = last" class="w-100"
+                            style="max-width: 100%;">
+                            <markdown (click)="onMarkdownClick($event)" [data]="chat.workSpaceData"></markdown>
+                            <condition-investigation-zabbix-graphs [deviceData]="chat.meta?.device_data" [index]="i"
+                                *ngIf="chat.meta?.device_data?.monitoring_type && chat.meta?.device_data?.monitoring_type!= 'Network Topology'"></condition-investigation-zabbix-graphs>
+                            <condition-investigation-network-topology [deviceData]="chat.meta?.device_data" [index]="i"
+                                *ngIf="chat.meta?.device_data?.monitoring_type == 'Network Topology'">></condition-investigation-network-topology>
+                            <hr class="border" *ngIf="!last">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-4 h-100">
+                <condition-investigation-chatbot class="h-100" [conditionId]="conditionId"
+                    (chatResponse)="handleChatResponse($event)"></condition-investigation-chatbot>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #conditionAcknowledgeFormRef>
+    <form *ngIf="acknowledgeForm" [formGroup]="acknowledgeForm" [style.width.px]="250">
+        <div class="form-group">
+            <label for="comments" class="form-col-form-label">Comments</label>
+            <textarea id="comments" class="form-control static" rows='3' formControlName="ack_comment"
+                [class.is-invalid]="acknowledgeFormErrors.ack_comment" placeholder="Enter Comments"></textarea>
+            <div class="invalid-feedback d-flex mb-3" *ngIf="acknowledgeFormErrors.ack_comment">
+                {{acknowledgeFormErrors.ack_comment}}
+            </div>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-sm btn-primary pull-right ml-2" type="button"
+                (click)="onConditionAcknowledge()">Acknowledge</button>
+            <button class="btn btn-sm btn-danger pull-right mb-2" type="button"
+                (click)="onCloseConditionAcknowledge()">Cancel</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #activityList>
+    <div class="wizard" *ngIf="activityVerticalWizardViewData.length">
+        <div class="activity-list ml-3">
+            <div class="step" *ngFor="let view of activityVerticalWizardViewData;let last = last">
+                <div *ngIf="!last" class="line"></div>
+                <div class="d-flex">
+                    <div class="check-icon-container mr-2">
+                        <i class="action-icons text-success mb-0 font-sm nopointerevents fas fa-check"></i>
+                    </div>
+                    <div>
+                        <div>{{view.description}}</div>
+                        <div class="text-muted text-sm"><i class="far fa-clock mr-2"></i>{{view.createdDatetime}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mx-1">
+            <table-entries [pageNo]="activityCurrentCriteria.pageNo" [pageSize]="activityCurrentCriteria.pageSize"
+                [totalCount]="activitiesCount"></table-entries>
+            <table-pager *ngIf="activityVerticalWizardViewData.length" [pageNo]="activityCurrentCriteria.pageNo"
+                [pageSize]="activityCurrentCriteria.pageSize" [totalCount]="activitiesCount"
+                (pageChange)="activityPageChange($event)"></table-pager>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center" *ngIf="!activityVerticalWizardViewData.length">
+        <p class="py-4 text-muted">No Activity data found.</p>
+    </div>
+</ng-template>
+
+<ng-template #confirmSaveAs>
+    <div class="card mb-0">
+        <div class="card-header">
+            Save As
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmSaveAsModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="mb-1 font-500">Prompt Name</label>
+                <input type="text" class="form-control" [(ngModel)]="promptName"
+                    placeholder="Enter unique prompt name" />
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmSaveAsModal()">Save
+                As</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmSaveAsModalRef.hide()"
+                type="button">Cancel</button>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #executeCommand>
+    <div class="card mb-0">
+        <div class="card-header font-500">
+            Confirm Command Execution
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmExecutionModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div>Do you want to Execute this Command ?</div>
+            <div class="font-500 mt-2">{{command}}</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success pull-right ml-1" type="button"
+                (click)="confirmExecuteModal()">Yes</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>
+
+<condition-investigation-auth-modal></condition-investigation-auth-modal>
+<condition-investigation-floating-terminal></condition-investigation-floating-terminal>

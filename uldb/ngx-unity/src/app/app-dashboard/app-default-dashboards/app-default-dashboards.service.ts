@@ -2,13 +2,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 
 @Injectable()
 export class AppDefaultDashboardsService {
 
-  constructor(private http: HttpClient,
-    private tableSvc: TableApiServiceService) { }
+  constructor(private http: HttpClient) { }
 
   getDefaults(criteria: SearchCriteria): Observable<DefaultType[]> {
     let params = new HttpParams();
@@ -19,11 +17,9 @@ export class AppDefaultDashboardsService {
   }
 
   convertToViewData(data: DefaultType[]) {
-    if(!data || !data.length) return [];
+    if (!data || !data.length) return [];
     let viewData: DefaultViewData[] = [];
-    const defaultDashboard = ['Infrastructure Overview', 'Network Overview', 'Cloud Cost Overview', 'Task and Workflow Overview', 'IoT Device Overview', 'Application Dashboard']
-    const filterdData = data?.filter(d => defaultDashboard.includes(d.name));
-    filterdData.forEach(d => {
+    data.forEach(d => {
       let view: DefaultViewData = new DefaultViewData();
       view.defaultId = d.uuid;
       view.name = d.name;
@@ -38,19 +34,30 @@ export class AppDefaultDashboardsService {
   }
 
   getDefaultDashboardRouteSegment(name: string) {
-    switch (name) {
-      case 'Infrastructure Overview':
+    switch ((name || '').trim().toLowerCase()) {
+      case 'infrastructure overview':
         return 'infrastructure';
-      case 'Network Overview':
+      case 'network overview':
         return 'network-devices';
-      case 'IoT Device Overview':
+      case 'iot device overview':
         return 'iot-devices';
-      case 'Cloud Cost Overview':
+      case 'cloud cost overview':
         return 'cloud-cost';
-      case 'Task and Workflow Overview':
+      case 'task and workflow overview':
         return 'orchestration';
-      case 'Application Dashboard':
+      case 'application dashboard':
         return 'application';
+      case 'private cloud compute dashboard':
+        return 'private-cloud-compute';
+      case 'public cloud compute dashboard':
+        return 'public-cloud-compute';
+      case 'database dashboard':
+        return 'database';
+      case 'unified aiops command center':
+      case 'unified aiops command center dashboard':
+      case 'unified aiops command centre':
+      case 'unified aiops command centre dashboard':
+        return 'unified-aiops-command-centre';
     }
   }
 }

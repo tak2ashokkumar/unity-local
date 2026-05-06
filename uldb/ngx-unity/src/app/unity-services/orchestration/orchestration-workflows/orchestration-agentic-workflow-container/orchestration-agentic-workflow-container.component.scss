@@ -216,8 +216,8 @@
 }
 
 .node-box.llm {
-  height: 100px !important;
-  width: 110px !important;
+  height: 110px !important;
+  width: 150px !important;
 }
 
 /* Node wrapper only contains the visual box */
@@ -273,7 +273,7 @@
 }
 
 .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .input {
-  left: 27px !important;
+  left: 7px !important;
   /* always outside */
   // top: 40% !important;             /* force vertical center */
 }
@@ -286,7 +286,7 @@
 }
 
 .drawflow .drawflow-node.agentic-default-node:has(.node-box.llm) .output {
-  right: 25px !important;
+  right: 5px !important;
   /* always outside */
   top: 40% !important;
   /* force vertical center */
@@ -294,16 +294,16 @@
 
 .drawflow .connection path {
   stroke: #5c6873 !important;
-  /* Color of the arrow */
   stroke-width: 1px !important;
-  /* Thickness */
   fill: none;
   stroke-linecap: round;
-  /* Makes the line edges round */
   marker-end: url(#arrow);
-  /* Attach an arrow marker */
   cursor: pointer;
-  // stroke-opacity: 0.5 !important;
+}
+
+.middle-arrow {
+  pointer-events: none;
+  /* So it doesn't block mouse events */
 }
 
 .node-left-icon {
@@ -575,7 +575,8 @@
 }
 
 .bottom-panel.right-open {
-  right: 300px;;
+  right: 300px;
+  ;
   left: 0;
 }
 
@@ -957,4 +958,8 @@
   left: -5px;
   /* slightly outside right */
   color: #5c6873 !important;
+}
+
+.node-box.loop {
+   height: 90px !important;
 }

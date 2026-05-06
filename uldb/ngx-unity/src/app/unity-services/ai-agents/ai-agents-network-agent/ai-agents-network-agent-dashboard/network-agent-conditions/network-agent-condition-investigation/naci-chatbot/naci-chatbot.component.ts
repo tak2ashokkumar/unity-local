@@ -126,6 +126,10 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
   sectionBreakReached = false;
 
   getResponse(chat: string, isDefault?: boolean) {
+    if (chat.includes('Exit')) {
+      this.goBack();
+      return;
+    }
     this.isTyping = true;
     this.isStreaming = true;
     this.showStopButton = true;
@@ -358,7 +362,9 @@ export class NaciChatbotComponent implements OnInit, OnDestroy {
     }
 
     if (model.is_user_owned) {
-      this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'network_agent');
+      if (this.activeModel) {
+        this.activeModel.active_for_applications = this.activeModel.active_for_applications.filter(app => app != 'network_agent');
+      }
       model.active_for_applications.push('network_agent');
       this.changeActiveModelToSelected(model);
     } else {

@@ -13,23 +13,23 @@ import { AiAgentsGuard } from "./ai-agents.guard";
 
 export const AI_AGENTS_ROUTES: Routes = [
     {
-        path: 'ai-agents',
+        path: 'ops-co-pilot',
         component: AiAgentsComponent,
         canActivate: [AiAgentsGuard],
         canActivateChild: [AiAgentsGuard],
         data: {
             breadcrumb: {
-                title: 'AI Agents',
+                title: 'Ops Co-Pilot',
                 stepbackCount: 0
             },
         },
         children: [
             {
-                path: 'network-agent',
+                path: 'network-ai-agent',
                 component: AiAgentsNetworkAgentComponent,
                 data: {
                     breadcrumb: {
-                        title: 'Network Agent',
+                        title: 'Network AI Agent',
                         stepbackCount: 0
                     }
                 },
@@ -89,7 +89,7 @@ export const AI_AGENTS_ROUTES: Routes = [
                 ]
             },
             {
-                path: 'network-agent/conditions/:conditionId/:conditionUuid/investigate',
+                path: 'network-ai-agent/conditions/:conditionId/:conditionUuid/investigate',
                 component: NetworkAgentConditionInvestigationComponent,
                 data: {
                     breadcrumb: {
@@ -99,21 +99,21 @@ export const AI_AGENTS_ROUTES: Routes = [
                 },
             },
             {
-                path: 'finops-agent',
+                path: 'finops-ai-agent',
                 component: AiAgentsFinopsAgentComponent,
                 data: {
                     breadcrumb: {
-                        title: 'Finops Agent',
+                        title: 'Finops AI Agent',
                         stepbackCount: 0
                     }
                 },
             },
             {
-                path: 'itsm-agent',
+                path: 'itsm-ai-agent',
                 component: AiAgentsItsmAgentComponent,
                 data: {
                     breadcrumb: {
-                        title: 'ITSM Agent',
+                        title: 'ITSM AI Agent',
                         stepbackCount: 0
                     }
                 },

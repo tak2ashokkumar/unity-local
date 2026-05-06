@@ -279,25 +279,15 @@
                                             {{ model.activeFor.join(', ') }}
                                         </td>
                                         <td class="text-center w-17">
-                                            <!-- <button class="action-icons mb-0 fas fa-toggle-on font-sm mt-1 mb-1"
-                                                [tooltip]="view.triggerDisableBtnTooltipMsg" container="body"
-                                                [ngClass]="{'action-icons-disabled':view.isStatusResolved || !view.isSourceUnity}"
-                                                (click)="disable(view)"></button> -->
-                                            <!-- <button class="action-icons fas mb-0 font-sm mr-2" container="body"
-                                                [ngClass]="{
-'fa-toggle-on': model.isActiveForSession,'fa-toggle-off': !model.isActiveForSession,'action-icons-disabled': model.isActiveForSession}"
-                                                [disabled]="model.isActiveForSession"
-                                                (click)="!model.isActiveForSession && enableModel(model)">
-                                            </button> -->
                                             <button class="action-icons btn btn-sm fas fa-pen mr-2"
-                                                [ngClass]="{'action-icons-disabled': model.isActiveForSession}"
-                                                [disabled]="model.isActiveForSession" tooltip="Edit"
-                                                (click)="!model.isActiveForSession && editModel(model)">
+                                                tooltip="Edit"                                                
+                                                (click)="editModel(model)">
                                             </button>
-                                            <button class="action-icons btn btn-sm fas fa-trash" tooltip="Delete"
-                                                [ngClass]="{'action-icons-disabled': model.isActiveForSession}"
-                                                [disabled]="model.isActiveForSession"
-                                                (click)="!model.isActiveForSession && deleteModel(model)">
+                                            <button class="action-icons btn btn-sm fas fa-trash"
+                                                [tooltip]="model.activeFor.length ? 'Active model cannot be deleted' : 'Delete'"
+                                                [ngClass]="{'action-icons-disabled': model.activeFor.length}"
+                                                (click)="!model.activeFor.length && deleteModel(model)"
+                                                container="body">
                                             </button>
                                         </td>
                                     </tr>

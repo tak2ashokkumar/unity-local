@@ -1,0 +1,520 @@
+<div class="unified-aiops-dashboard">
+    <div class="dashboard-topbar">
+        <div>
+            <div class="dashboard-title">Unified AIOps Command Center</div>
+            <div class="dashboard-subtitle">Refreshed: Today 10:00 IST | Scope: {{scopeText}}</div>
+        </div>
+        <div class="dashboard-filters filter-loading-surface" *ngIf="!filterForm">
+            <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
+        </div>
+        <form class="dashboard-filters" *ngIf="filterForm" [formGroup]="filterForm">
+            <div class="filter-control multi-filter-control">
+                <label>Datacenter</label>
+                <multiselect-dropdown [options]="datacenterOptions" [settings]="multiselectSettings"
+                    [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
+                    formControlName="datacenters">
+                </multiselect-dropdown>
+            </div>
+            <div class="filter-control multi-filter-control">
+                <label>Cloud</label>
+                <multiselect-dropdown [options]="cloudOptions" [settings]="multiselectSettings"
+                    [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect" formControlName="clouds">
+                </multiselect-dropdown>
+            </div>
+            <button class="round-action-btn" type="button" (click)="applyFilters()" [tooltip]="'Apply Filters'"
+                container="body">
+                <i class="fa fa-filter"></i>
+            </button>
+            <span class="dashboard-action-separator"></span>
+            <div class="dashboard-filter-actions">
+                <button class="round-action-btn" type="button" (click)="refreshFilters()" [tooltip]="'Reset Filters'"
+                    container="body">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="round-action-btn" type="button" (click)="goBack()" [tooltip]="'Go Back'"
+                    container="body">
+                    <i class="fa fa-arrow-left"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="dashboard-content" *ngIf="filterForm">
+        <div class="section-title">Executive Monitoring Summary</div>
+        <div class="dashboard-card summary-card">
+            <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
+            <div class="summary-metric" *ngFor="let metric of summaryMetrics; trackBy: trackByIndex">
+                <div class="metric-label">{{metric.label}}</div>
+                <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+            </div>
+        </div>
+
+        <div class="two-column-grid mt-3">
+            <div>
+                <div class="section-title">Device Discovery vs Monitoring Enablement</div>
+                <div class="dashboard-card chart-card">
+                    <app-spinner [name]="loaderNames.discovery" [width]="0"></app-spinner>
+                    <div echarts [options]="discoveryOptions" class="top-chart"></div>
+                </div>
+            </div>
+            <div>
+                <div class="section-title title-with-icons">
+                    <span>Alert Segregation by Type</span>
+                    <span class="alert-legend-inline">
+                        <span class="legend-alert" *ngFor="let item of alertSegregationLegend; trackBy: trackByIndex"
+                            [ngClass]="getToneClass(item.tone)">
+                            <i class="fa" [ngClass]="item.icon"></i> {{item.value}}
+                        </span>
+                    </span>
+                </div>
+                <div class="dashboard-card chart-card">
+                    <app-spinner [name]="loaderNames.alertSegregation" [width]="0"></app-spinner>
+                    <div echarts [options]="alertSegregationOptions" class="top-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sprint backlog: Business Services widget. Uncomment with getBusinessServices() when this widget resumes.
+            <div class="section-title mt-3">Business Services</div>
+            <div class="dashboard-card table-card">
+                <app-spinner [name]="loaderNames.businessServices" [width]="0"></app-spinner>
+                <table class="dashboard-table business-table">
+                    <thead>
+                        <tr>
+                            <th>Service Name</th>
+                            <th>Status</th>
+                            <th>Uptime</th>
+                            <th>Degraded</th>
+                            <th>Alerts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let row of businessServices; trackBy: trackByIndex">
+                            <td>{{row.serviceName}}</td>
+                            <td><i class="fa status-icon" [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
+                            <td>{{row.uptime}}</td>
+                            <td>{{row.degraded}}</td>
+                            <td><span class="count-chip" [ngClass]="getToneClass(row.alertTone)">{{row.alerts}}</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        -->
+
+        <div class="two-column-grid mt-3">
+            <div>
+                <div class="section-title">Employee / Digital Experience</div>
+                <div class="dashboard-card employee-card">
+                    <app-spinner [name]="loaderNames.employeeExperience" [width]="0"></app-spinner>
+                    <div class="employee-metric" *ngFor="let metric of employeeMetrics; trackBy: trackByIndex">
+                        <div class="metric-label">{{metric.label}}</div>
+                        <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="section-title">Geo Distribution / Global Operations</div>
+                <div class="dashboard-card geo-card">
+                    <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
+                    <div echarts [options]="geoHeatmapOptions" class="geo-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title mt-3">Private Cloud Infrastructure Coverage - {{privateCloudCoverageTotal}} Resources
+        </div>
+        <div class="coverage-grid private-grid">
+            <app-spinner [name]="loaderNames.privateCloudCoverage" [width]="0"></app-spinner>
+            <div class="coverage-card" *ngFor="let provider of privateCloudCoverage; trackBy: trackByIndex">
+                <div class="coverage-title">{{provider.title}}</div>
+                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
+                    <span>{{row.label}}</span>
+                    <strong>{{row.value}}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title mt-3">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources
+        </div>
+        <div class="coverage-grid public-grid">
+            <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
+            <div class="coverage-card" *ngFor="let provider of publicCloudCoverage; trackBy: trackByIndex">
+                <div class="coverage-title">{{provider.title}}</div>
+                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
+                    <span>{{row.label}}</span>
+                    <strong>{{row.value}}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title mt-3">Data Center Infrastructure</div>
+        <div class="dashboard-card metric-strip">
+            <app-spinner [name]="loaderNames.datacenterInfrastructure" [width]="0"></app-spinner>
+            <div class="strip-metric" *ngFor="let metric of datacenterInfrastructureMetrics; trackBy: trackByIndex">
+                <div class="metric-label">{{metric.label}}</div>
+                <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                <div class="trend-line" *ngIf="metric.up || metric.down || metric.unknown">
+                    <span class="up">&uarr; {{metric.up}}</span>
+                    <span class="down">&darr; {{metric.down}}</span>
+                    <span class="unknown"><i class="fa fa-info-circle"></i> {{metric.unknown}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-column-grid mt-3">
+            <div>
+                <div class="section-title">Kubernetes / Container</div>
+                <div class="dashboard-card compact-metric-grid">
+                    <app-spinner [name]="loaderNames.kubernetes" [width]="0"></app-spinner>
+                    <div class="compact-metric" *ngFor="let metric of kubernetesMetrics; trackBy: trackByIndex">
+                        <div class="metric-label">{{metric.label}}</div>
+                        <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                        <div class="trend-line" *ngIf="metric.up || metric.down || metric.unknown">
+                            <span class="up">&uarr; {{metric.up}}</span>
+                            <span class="down">&darr; {{metric.down}}</span>
+                            <span class="unknown"><i class="fa fa-info-circle"></i> {{metric.unknown}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="section-title">AI / GPU / LLM</div>
+                <div class="dashboard-card compact-metric-grid ai-grid">
+                    <app-spinner [name]="loaderNames.aiGpu" [width]="0"></app-spinner>
+                    <div class="compact-metric" *ngFor="let metric of aiGpuMetrics; trackBy: trackByIndex">
+                        <div class="metric-label">{{metric.label}}</div>
+                        <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                        <div class="trend-line" *ngIf="metric.up || metric.down || metric.unknown">
+                            <span class="up">&uarr; {{metric.up}}</span>
+                            <span class="down">&darr; {{metric.down}}</span>
+                            <span class="unknown"><i class="fa fa-info-circle"></i> {{metric.unknown}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sprint backlog: Application Overview and Services Overview widgets.
+            Uncomment with getApplicationRows() and getServiceRows() when these widgets resume.
+            <div class="two-column-grid mt-3">
+                <div class="dashboard-card table-card">
+                    <app-spinner [name]="loaderNames.applications" [width]="0"></app-spinner>
+                    <div class="card-title-row">Application Overview</div>
+                    <table class="dashboard-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Avg Throughput (rps)</th>
+                                <th>Avg Availability(%)</th>
+                                <th>Avg Response Time (ms)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of applicationRows; trackBy: trackByIndex">
+                                <td>{{row.name}}</td>
+                                <td>{{row.throughput}}</td>
+                                <td>{{row.availability}}</td>
+                                <td>{{row.responseTime}}</td>
+                                <td><i class="fa status-icon" [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="dashboard-card table-card">
+                    <app-spinner [name]="loaderNames.services" [width]="0"></app-spinner>
+                    <div class="card-title-row service-title-row">
+                        <span>Services Overview</span>
+                        <div class="mini-filter">
+                            <label>Application</label>
+                            <select class="form-control form-control-sm">
+                                <option>Astronomy Shop</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="dashboard-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Service Name</th>
+                                <th>Throughput (rps)</th>
+                                <th>Availability (%)</th>
+                                <th>Response Time (ms)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of serviceRows; trackBy: trackByIndex">
+                                <td>{{row.name}}</td>
+                                <td>{{row.throughput}}</td>
+                                <td>{{row.availability}}</td>
+                                <td>{{row.responseTime}}</td>
+                                <td><i class="fa status-icon" [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        -->
+
+        <div class="two-column-grid mt-2">
+            <div class="dashboard-card table-card monitoring-table-card">
+                <app-spinner [name]="loaderNames.databases" [width]="0"></app-spinner>
+                <div class="card-title-row">Database Monitoring</div>
+                <div class="monitoring-table-scroll">
+                    <table class="dashboard-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Database Type</th>
+                                <th>Count</th>
+                                <th>Status</th>
+                                <th>Queries/a</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of databaseRows; trackBy: trackByIndex">
+                                <td>{{row.name}}</td>
+                                <td>{{row.count}}</td>
+                                <td><i class="fa status-icon"
+                                        [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
+                                <td>{{row.queries}}</td>
+                            </tr>
+                            <tr *ngIf="!databaseRows.length">
+                                <td colspan="4" class="empty-table-cell">No databases found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="dashboard-card table-card monitoring-table-card">
+                <app-spinner [name]="loaderNames.os" [width]="0"></app-spinner>
+                <div class="card-title-row">OS Monitoring</div>
+                <div class="monitoring-table-scroll">
+                    <table class="dashboard-table compact-table">
+                        <thead>
+                            <tr>
+                                <th>Database Type</th>
+                                <th>Count</th>
+                                <th>EOL Date <i class="fa fa-sort"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of osRows; trackBy: trackByIndex">
+                                <td>{{row.name}}</td>
+                                <td>{{row.count}}</td>
+                                <td>{{row.eolDate}}</td>
+                            </tr>
+                            <tr *ngIf="!osRows.length">
+                                <td colspan="3" class="empty-table-cell">No operating systems found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sprint backlog: Infrastructure / Platform Performance widget.
+            Uncomment with getBandwidthBar(), getBandwidthLine(), getPlatformPerformance(), and getPerformanceMetrics().
+            <div class="dashboard-card performance-card mt-3">
+                <app-spinner [name]="loaderNames.bandwidthBar" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.bandwidthLine" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.platformPerformance" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.performanceMetrics" [width]="0"></app-spinner>
+                <div class="card-title-row">Infrastructure / Platform Performance</div>
+                <div class="performance-chart-grid">
+                    <div class="inner-chart-card">
+                        <div class="chart-title">Avg Network Bandwidth Usage (%)</div>
+                        <div echarts [options]="bandwidthBarOptions" class="small-chart"></div>
+                    </div>
+                    <div class="inner-chart-card">
+                        <div class="chart-title">Avg Network Bandwidth Usage (%)</div>
+                        <div echarts [options]="bandwidthLineOptions" class="small-chart"></div>
+                    </div>
+                    <div class="inner-chart-card">
+                        <div class="chart-title">Infrastructure / Platform Performance</div>
+                        <div echarts [options]="platformPerformanceOptions" class="small-chart"></div>
+                    </div>
+                </div>
+                <div class="performance-metrics">
+                    <div class="summary-metric" *ngFor="let metric of performanceMetrics; trackBy: trackByIndex">
+                        <div class="metric-label">{{metric.label}}</div>
+                        <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                    </div>
+                </div>
+            </div>
+        -->
+
+        <div class="section-title mt-3">Analytics &amp; Health Charts</div>
+        <div class="analytics-grid">
+            <div class="dashboard-card analytics-card">
+                <app-spinner [name]="loaderNames.deviceAvailability" [width]="0"></app-spinner>
+                <div class="chart-title">Device Availability</div>
+                <div echarts [options]="deviceAvailabilityOptions" class="analytics-chart"></div>
+            </div>
+            <div class="dashboard-card analytics-card">
+                <app-spinner [name]="loaderNames.availabilityCategory" [width]="0"></app-spinner>
+                <div class="chart-title">Availability By Category %</div>
+                <div echarts [options]="availabilityCategoryOptions" class="analytics-chart"></div>
+            </div>
+            <div class="dashboard-card analytics-card">
+                <app-spinner [name]="loaderNames.alertTrend" [width]="0"></app-spinner>
+                <div class="chart-title">Alert Trend -- 7 Days</div>
+                <div echarts [options]="alertTrendOptions" class="analytics-chart"></div>
+            </div>
+        </div>
+
+        <!-- Sprint backlog: Alerts widget. Uncomment with getAlertReductionMetrics(), getAlertResponseMetrics(),
+            getAlertSourceSankey(), and getAlertLifecycleSankey() when this widget resumes.
+            <div class="section-title mt-3">Alerts</div>
+            <div class="dashboard-card alerts-card">
+                <app-spinner [name]="loaderNames.alertReduction" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.alertResponse" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.alertSourceSankey" [width]="0"></app-spinner>
+                <app-spinner [name]="loaderNames.alertLifecycleSankey" [width]="0"></app-spinner>
+                <div class="alerts-filter-row">
+                    <div class="mini-filter">
+                        <label>Datacenter</label>
+                        <select class="form-control form-control-sm"><option>All Datacenter</option></select>
+                    </div>
+                    <div class="mini-filter">
+                        <label>Cloud</label>
+                        <select class="form-control form-control-sm"><option>All Cloud</option></select>
+                    </div>
+                    <div class="mini-filter">
+                        <label>Devices</label>
+                        <select class="form-control form-control-sm"><option>All Devices</option></select>
+                    </div>
+                    <div class="mini-filter">
+                        <label>View By</label>
+                        <select class="form-control form-control-sm"><option>Source</option></select>
+                    </div>
+                    <div class="mini-filter">
+                        <label>Source Type</label>
+                        <select class="form-control form-control-sm"><option>All Source</option></select>
+                    </div>
+                    <div class="mini-filter">
+                        <label>Duration</label>
+                        <select class="form-control form-control-sm"><option>Last 7 days</option></select>
+                    </div>
+                </div>
+                <div class="alert-metric-row">
+                    <div class="summary-metric" *ngFor="let metric of alertReductionMetrics; trackBy: trackByIndex">
+                        <div class="metric-label">{{metric.label}}</div>
+                        <div class="metric-value tone-primary">{{metric.value}}</div>
+                    </div>
+                    <span class="metric-spacer"></span>
+                    <div class="summary-metric" *ngFor="let metric of alertResponseMetrics; trackBy: trackByIndex">
+                        <div class="metric-label">{{metric.label}}</div>
+                        <div class="metric-value tone-primary">{{metric.value}}</div>
+                    </div>
+                </div>
+                <div class="sankey-grid">
+                    <div echarts [options]="alertSourceSankeyOptions" class="sankey-chart"></div>
+                    <div echarts [options]="alertLifecycleSankeyOptions" class="sankey-chart"></div>
+                </div>
+            </div>
+        -->
+
+        <!-- <div class="dashboard-card alerts-table-card mt-3">
+            <app-spinner [name]="loaderNames.criticalAlerts" [width]="0"></app-spinner>
+            <app-spinner [name]="loaderNames.ticketPriority" [width]="0"></app-spinner>
+            <app-spinner [name]="loaderNames.ticketStatus" [width]="0"></app-spinner>
+            <app-spinner [name]="loaderNames.tickets" [width]="0"></app-spinner>
+            <div class="card-title-row">Top 10 Critical Alerts</div>
+            <table class="dashboard-table alert-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Device Name</th>
+                        <th>Severity</th>
+                        <th>Description</th>
+                        <th>Source</th>
+                        <th>Acknowledged</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let alert of criticalAlerts; trackBy: trackByIndex">
+                        <td><a>{{alert.id}}</a></td>
+                        <td>{{alert.deviceName}}</td>
+                        <td><i class="fa status-icon" [ngClass]="[alert.severity === 'critical' ? 'fa-exclamation-circle' : 'fa-exclamation-circle', alert.severity === 'critical' ? 'tone-danger' : 'tone-warning']"></i></td>
+                        <td>{{alert.description}}</td>
+                        <td>{{alert.source}}</td>
+                        <td>{{alert.acknowledged}}</td>
+                        <td>{{alert.duration}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="card-title-row tickets-title">ITSM Tickets</div>
+            <div class="ticket-chart-row">
+                <div>
+                    <div class="chart-title">Tickets by Priority</div>
+                    <div echarts [options]="ticketPriorityOptions" class="ticket-chart"></div>
+                </div>
+                <div>
+                    <div class="chart-title">Tickets by Status</div>
+                    <div echarts [options]="ticketStatusOptions" class="ticket-chart"></div>
+                </div>
+                <div class="no-ticket-box">No Tickets Found.</div>
+            </div>
+            <div class="ticket-filter-row">
+                <label>Search : <input class="form-control form-control-sm" placeholder="Enter Keyword"></label>
+                <label>State : <select class="form-control form-control-sm"><option>All</option></select></label>
+                <label>Date Created : <input class="form-control form-control-sm date-input" value="March 30, 2026 - April 13, 2026"></label>
+                <button type="button" class="filter-ticket-btn">Filter Tickets</button>
+                <span class="ticket-total">2123 Tickets</span>
+            </div>
+            <table class="dashboard-table tickets-table">
+                <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Short Description</th>
+                        <th>State <i class="fa fa-sort"></i></th>
+                        <th>Priority <i class="fa fa-sort"></i></th>
+                        <th>Created On <i class="fa fa-sort"></i></th>
+                        <th>Updated On <i class="fa fa-sort"></i></th>
+                        <th>Resolution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let ticket of tickets; trackBy: trackByIndex">
+                        <td><a>{{ticket.ticketId}}</a></td>
+                        <td>{{ticket.shortDescription}}</td>
+                        <td>{{ticket.state}}</td>
+                        <td>{{ticket.priority}}</td>
+                        <td>{{ticket.createdOn}}</td>
+                        <td>{{ticket.updatedOn}}</td>
+                        <td>{{ticket.resolution}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-title mt-3">Auto-Remediation Summary</div>
+        <div class="dashboard-card remediation-card">
+            <app-spinner [name]="loaderNames.remediationDonut" [width]="0"></app-spinner>
+            <app-spinner [name]="loaderNames.remediationActions" [width]="0"></app-spinner>
+            <app-spinner [name]="loaderNames.remediationSummary" [width]="0"></app-spinner>
+            <app-spinner [name]="loaderNames.remediationMetrics" [width]="0"></app-spinner>
+            <div class="remediation-left">
+                <div echarts [options]="remediationDonutOptions" class="remediation-donut"></div>
+                <div class="remediation-summary">
+                    <span *ngFor="let metric of remediationSummary; trackBy: trackByIndex"
+                        [ngClass]="getToneClass(metric.tone)">
+                        {{metric.label}} {{metric.value}}
+                    </span>
+                </div>
+            </div>
+            <div class="remediation-actions">
+                <div class="chart-title">Top Auto-Remediation Actions</div>
+                <div echarts [options]="remediationActionsOptions" class="remediation-chart"></div>
+            </div>
+            <div class="remediation-metric-card">
+                <div class="remediation-metric" *ngFor="let metric of remediationMetrics; trackBy: trackByIndex">
+                    <div class="metric-label">{{metric.label}}</div>
+                    <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+</div> 

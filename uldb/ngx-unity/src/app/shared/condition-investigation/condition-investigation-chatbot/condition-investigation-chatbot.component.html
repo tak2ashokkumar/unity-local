@@ -1,0 +1,161 @@
+<div class="card round-edge h-100">
+    <div class="card-header d-flex align-items-center justify-content-between bg-white pr-2 pl-0 py-0">
+        <div class="d-flex justify-content-start align-items-center">
+            <img [src]="imageURL" [alt]="'Logo'">
+            <h6 class="m-0">UnityOne AI Copilot</h6>
+        </div>
+        <div>
+            <button class="action-icons fa fa-arrow-left" tooltip="Back" (click)="goBack()" placement="bottom"></button>
+        </div>
+    </div>
+    <div class="card-body card-body-custom d-flex flex-column p-0">
+        <div class="custom-gradient-bg d-flex flex-column h-100 overflow-hidden pb-0 pt-1 px-1 border-top">
+            <div #messagesContainer class="messages-container d-flex flex-column">
+                <div class="d-flex flex-column w-100" style="max-width: 100%;">
+                    <div *ngFor="let chat of chatHistoryData;let i = index" class="d-flex flex-column w-100"
+                        style="max-width: 100%;">
+                        <div *ngIf="chat.user == 'bot'" class="d-flex flex-column justify-content-start mb-1 w-100"
+                            style="max-width: 100%;">
+                            <ng-container *ngIf="chat.type == 'text'">
+                                <div class="message-box bot-message">
+                                    <markdown [data]="chat.message"></markdown>
+                                    <ng-container *ngIf="chat.actions?.length && chat.showAction">
+                                        <div class="mt-2 font-500">Recommended Actions:</div>
+                                        <div class="d-flex flex-wrap mt-2">
+                                            <div class="suggested-action py-1 px-2 mr-2 mb-2"
+                                                *ngFor="let action of chat.actions" (click)="submitQuery(action.name)">
+                                                {{action.name}}
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                            <!-- <ng-container *ngIf="chat.botResponseId">
+                                <div class="d-flex align-items-center ml-1 mb-2">
+                                    <span class="fas fa-thumbs-up cursor-pointer"
+                                        [ngClass]="chat.liked ? 'text-success' : 'text-muted'" (click)="onLike(i)"
+                                        tooltip="Like"></span>
+                                    <span class="fas fa-thumbs-down mx-3 cursor-pointer"
+                                        [ngClass]="chat.disliked ? 'text-danger' : 'text-muted'" (click)="onDislike(i)"
+                                        tooltip="Dislike"></span>
+                                    <span class="fas fa-comment cursor-pointer"
+                                        [ngClass]="{'text-success': chat.feedbackSubmitted,'text-primary': !chat.feedbackSubmitted && chat.comment,'text-muted': !chat.feedbackSubmitted && !chat.comment}"
+                                        (click)="onComment(i)" [tooltip]="chat.feedbackIconTooltip"></span>
+                                </div>
+                                <ng-container *ngIf="chat.comment && !chat.feedbackSubmitted">
+                                    <form *ngIf="feedbackForm" [formGroup]="feedbackForm" class="mb-3">
+                                        <div class="card round-edge mt-2 mb-0">
+                                            <div class="card-body p-1">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <textarea name="feedback" id="feedback"
+                                                            formControlName="feedback" rows="2"
+                                                            class="form-control no-resize no-border"
+                                                            placeholder="Add your comment..."></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex justify-content-end mt-1">
+                                                    <button class="btn btn-pill btn-primary btn-sm mr-2" type="button"
+                                                        (click)="submitFeedBackForm(chat.botResponseId, i)"
+                                                        [disabled]="!feedbackForm.get('feedback')?.value?.trim()"
+                                                        [tooltip]="'Submit'" container="body">
+                                                        <i class="fa fa-arrow-up"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </ng-container>
+                            </ng-container> -->
+                        </div>
+                        <div *ngIf="chat.user == 'user'" class="d-flex justify-content-end mb-1"
+                            style="max-width: 100%;">
+                            <div class="message-box user-message">
+                                {{ chat.message }}
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="isTyping" class="d-flex justify-content-start mb-2">
+                        <div class="message-box bot-message d-flex">
+                            <span>{{waitMessage}}</span>
+                            <div class="pulse-loader ml-1 align-self-end mb-1">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- <ng-container *ngIf="resetThread && isOpen">
+                                <div class="d-flex align-items-center justify-content-center mt-2 position-relative">
+                                    <div class="dashed-line flex-grow-1 mx-0 position-relative"></div>
+                                    <i class="fas fa-info-circle text-muted info-icon"
+                                        tooltip="The conversation has been reset. You can start a fresh one."
+                                        container="body"></i>
+                                </div>
+                            </ng-container> -->
+                </div>
+            </div>
+            <form *ngIf="form" [formGroup]="form" class="w-100 mt-auto p-2">
+                <div class="round-edge bg-white w-100 form-wrapper">
+                    <div class="row">
+                        <div class="col">
+                            <input class="form-control round-edge" type="text" formControlName="chat"
+                                placeholder="Ask me anything..." (keyup.enter)="onSubmit()"
+                                style="height:2.7rem; border: 0 !important;">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mb-2 pt-1">
+                        <div class="active-ai-modal-model-selector">
+                            <button type="button"
+                                class="btn btn-pill active-ai-modal-model-btn d-flex align-items-center"
+                                (click)="toggleDropdown()">
+                                <img *ngIf="activeModel?.image" [src]="activeModel?.image"
+                                    class="active-ai-modal-model-icon mr-1">
+                                {{activeModel?.text || 'Select Model'}}
+                                <i class="fas fa-chevron-down ml-1"></i>
+                            </button>
+                            <div *ngIf="showModelDropdown" class="active-ai-modal-model-dropdown">
+                                <div *ngFor="let model of llmModels" class="active-ai-modal-model-option"
+                                    (click)="changeActiveModel(model)" [ngClass]="getModelItemClass(model)">
+                                    <img [src]="model?.image" class="active-ai-modal-model-icon mr-2">
+                                    <div style="min-width: 0; flex: 1;">
+                                        <div class="d-flex align-items-center justify-content-between font-sm">
+                                            <div class="font-500 text-truncate" style="min-width: 0; flex: 1;">
+                                                {{model?.text}}
+                                            </div>
+                                            <div *ngIf="!model.is_user_owned"
+                                                class="ml-1 flex-shrink-0 text-primary font-sm-xs"
+                                                style="cursor: pointer; text-decoration: underline;"
+                                                (click)="goToConfig(model); $event.stopPropagation()">
+                                                Configure
+                                            </div>
+                                        </div>
+                                        <div class="text-muted font-sm-xs">
+                                            {{model?.description}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <ng-container *ngIf="chatHistoryData.length > 1">
+                            <button type="button" class="btn btn-sm ml-2 new-chat-button no-hover query-button"
+                                (click)="onNewChat()">
+                                <i class="fas fa-comment-medical font-md text-muted"></i>
+                            </button>
+                        </ng-container> -->
+                        <button *ngIf="!showStopButton" type="button" class="btn btn-sm mx-2 query-button"
+                            [ngClass]="!typingQueue.length ? 'btn-success query-button-success' : 'btn-secondary'"
+                            (click)="onSubmit()">
+                            <i class="fas fa-arrow-up font-md text-white"></i>
+                        </button>
+                        <button *ngIf="showStopButton" type="button"
+                            class="btn btn-danger stop-button btn-sm mx-2 query-button d-flex align-items-center justify-content-center"
+                            (click)="stopResponse()">
+                            <i class="fas fa-square text-white"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -15,6 +15,9 @@ import { MarkdownModule } from 'ngx-markdown';
 import { AppCoreModule } from '../app-core/app-core.module';
 import { AppHomeModule } from '../app-home/app-home.module';
 import { SharedModule } from '../shared/shared.module';
+import { AppDashboardCollectionsCrudComponent } from './app-dashboard-collections/app-dashboard-collections-crud/app-dashboard-collections-crud.component';
+import { AppDashboardCollectionsViewComponent } from './app-dashboard-collections/app-dashboard-collections-view/app-dashboard-collections-view.component';
+import { AppDashboardCollectionsComponent } from './app-dashboard-collections/app-dashboard-collections.component';
 import { AdcPreviewComponent } from './app-dashboard-crud/adc-preview/adc-preview.component';
 import { AppDashboardCrudComponent } from './app-dashboard-crud/app-dashboard-crud.component';
 import { AppDashboardListComponent } from './app-dashboard-list/app-dashboard-list.component';
@@ -28,11 +31,15 @@ import { EasyTradeApplicationDashboardComponent } from './app-default-dashboards
 import { ExecutiveAiBusinessSummaryComponent } from './app-default-dashboards/application-overview-dashboard/executive-ai-business-summary/executive-ai-business-summary.component';
 import { CloudCostOverviewDashboardComponent } from './app-default-dashboards/cloud-cost-overview-dashboard/cloud-cost-overview-dashboard.component';
 import { ResourceLevelDashboardComponent } from './app-default-dashboards/cloud-cost-overview-dashboard/resource-level-dashboard/resource-level-dashboard.component';
+import { DatabaseDashboardComponent } from './app-default-dashboards/database-dashboard/database-dashboard.component';
 import { InfrastructureOverviewDashboardComponent } from './app-default-dashboards/infrastructure-overview-dashboard/infrastructure-overview-dashboard.component';
 import { InterfaceDetailsDashboardComponent } from './app-default-dashboards/interface-details-dashboard/interface-details-dashboard.component';
 import { IotDevicesSummaryDashboardComponent } from './app-default-dashboards/iot-devices-summary-dashboard/iot-devices-summary-dashboard.component';
 import { NetworkDevicesOverviewDashboardComponent } from './app-default-dashboards/network-devices-overview-dashboard/network-devices-overview-dashboard.component';
 import { OrchestrationOverviewDashboardComponent } from './app-default-dashboards/orchestration-overview-dashboard/orchestration-overview-dashboard.component';
+import { PrivateCloudComputeDashboardComponent } from './app-default-dashboards/private-cloud-compute-dashboard/private-cloud-compute-dashboard.component';
+import { PublicCloudComputeDashboardComponent } from './app-default-dashboards/public-cloud-compute-dashboard/public-cloud-compute-dashboard.component';
+import { UnifiedAiopsCommandCentreComponent } from './app-default-dashboards/unified-aiops-command-centre/unified-aiops-command-centre.component';
 import { AppPersonaDashboardComponent } from './app-persona-dashboard/app-persona-dashboard.component';
 // import { DashboardMapWidgetComponent } from '../app-home/dashboard-map-widget/dashboard-map-widget.component';
 
@@ -66,6 +73,13 @@ export const MY_NATIVE_FORMATS = {
     AstronomyShopApplicationDashboardComponent,
     EasyTradeApplicationDashboardComponent,
     ExecutiveAiBusinessSummaryComponent,
+    PrivateCloudComputeDashboardComponent,
+    PublicCloudComputeDashboardComponent,
+    DatabaseDashboardComponent,
+    UnifiedAiopsCommandCentreComponent,
+    AppDashboardCollectionsComponent,
+    AppDashboardCollectionsCrudComponent,
+    AppDashboardCollectionsViewComponent
   ],
   imports: [
     AppCoreModule,

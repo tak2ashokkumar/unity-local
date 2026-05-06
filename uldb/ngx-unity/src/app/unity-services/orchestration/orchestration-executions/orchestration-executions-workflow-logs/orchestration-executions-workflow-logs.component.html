@@ -139,7 +139,7 @@
                                         {{ task.name }}
                                     </div>
                                 </div>
-                                <i *ngIf="selectedTask?.name === task.name" class="fa fa-solid fa-angle-right"></i>
+                                <i *ngIf="selectedTask?.nodeId === task.nodeId" class="fa fa-solid fa-angle-right"></i>
                             </div>
                             <div *ngIf="i < workflowTaskListViewData.length - 1"
                                 class="position-absolute start-0 top-100" [ngClass]="getStatusClass(task.status)"
@@ -206,7 +206,7 @@
 
                 <ng-container *ngIf="workflowOutputViewData.length > 0; else noDetails">
                     <ng-container *ngFor="let output of workflowOutputViewData">
-                        <ng-container *ngIf="selectedTask?.name === output.taskName">
+                        <ng-container *ngIf="selectedTask?.nodeId === output.id">
                             <ng-container *ngIf="output.type !== 'Chart Task'">
                                 <div class="row mb-3" style="max-height: 300px; overflow-y: auto;"
                                     *ngIf="output?.output">

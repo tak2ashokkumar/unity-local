@@ -151,10 +151,13 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
 
       // this.selectedTask = this.workflowTaskListViewData[0];
       if (this.workflowTaskListViewData?.length && this.workflowOutputViewData?.length) {
+        console.log(this.workflowTaskListViewData, "wf task list")
+        console.log(this.workflowOutputViewData, "wf output list")
         const taskWithOutput = this.workflowTaskListViewData.find(task =>
-          this.workflowOutputViewData.some(output => output.taskName === task.name)
+          this.workflowOutputViewData.some(output => output.id === task.nodeId)
         );
         this.selectedTask = taskWithOutput || this.workflowTaskListViewData[0];
+        console.log(this.selectedTask, "selected Task")
       }
       this.workflowOutputViewData.forEach(val => {
         if (val.type === 'Chart Task') {
@@ -208,6 +211,7 @@ export class OrchestrationExecutionsWorkflowLogsComponent implements OnInit, OnD
       case 'cancelled': return 'bg-light-red';
       case 'skipped': return 'bg-skipped';
       case 'queued': return 'bg-queued';
+      case 'running': return 'bg-info';
       default: return 'bg-secondary';
     }
   }

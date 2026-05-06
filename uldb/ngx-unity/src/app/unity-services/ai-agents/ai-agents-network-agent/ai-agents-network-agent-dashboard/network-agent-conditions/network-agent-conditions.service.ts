@@ -62,6 +62,7 @@ export class NetworkAgentConditionsService {
       view.id = cd.id;
       view.uuid = cd.uuid;
       view.ruleName = cd.rule_name;
+      view.description = cd.description;
       view.alertCount = cd.alert_count;
       view.conditionSeverity = cd.condition_severity;
       view.severityBg = cd.condition_severity == 'Critical' ? 'bg-danger' : cd.condition_severity == 'Warning' ? 'bg-warning' : 'bg-primary';
@@ -480,6 +481,7 @@ export class NetworkAgentConditionsViewData {
   id: number;
   uuid: string;
   ruleName: string;
+  description: string;
   alertCount: number;
   eventCount: number;
   conditionDatetime: string;

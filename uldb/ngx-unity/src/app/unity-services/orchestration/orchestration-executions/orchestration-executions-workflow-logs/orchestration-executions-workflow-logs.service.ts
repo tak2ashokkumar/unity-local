@@ -114,12 +114,17 @@ export class OrchestrationExecutionsWorkflowLogsService {
       viewItem.endDate = node.end_time ? node.end_time.split('T')[0] : '';
       viewItem.duration = node.duration ? this.formatDuration(node.duration) : 'NA';
       viewItem.inputs = node.inputs;
+      viewItem.nodeId = node.node_id;
 
       // Status colors like non-agentic
       if (node.status === 'Success') {
         viewItem.statusColor = 'text-success';
       } else if (node.status === 'Queued') {
         viewItem.statusColor = 'text-muted';
+      } else if (node.status === 'Running') {
+        viewItem.statusColor = 'text-primary';
+      } else if (node.status === 'Skipped') {
+        viewItem.statusColor = 'text-warning';
       } else {
         viewItem.statusColor = 'text-danger';
       }
@@ -182,6 +187,7 @@ export class OrchestrationExecutionsWorkflowLogsService {
       // }
       view.taskName = d.task_name;
       view.type = d.type;
+      view.id = d.id;
       viewData.push(view);
     });
     return viewData;
@@ -489,6 +495,7 @@ export class WorkflowOutputViewData {
   output: any;
   taskName: string;
   type: string;
+  id: number;
 }
 
 export class WorkflowTaskViewData {
@@ -502,4 +509,5 @@ export class WorkflowTaskViewData {
   inputs?: any;
   startDate: string;
   endDate: string;
+  nodeId: number;
 }

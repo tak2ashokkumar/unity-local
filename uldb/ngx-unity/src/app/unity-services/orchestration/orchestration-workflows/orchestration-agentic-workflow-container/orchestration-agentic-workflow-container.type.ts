@@ -25,8 +25,10 @@ export enum nodeTypes {
   CommentInITSMTicket = 'Add Comment',
   GetITSMTicket = 'Get Ticket',
   Wait = 'Wait',
+  Transform = 'Transform Node',
   AimlEventTrigger = 'AIML Event Trigger',
-  Action = 'Action Task'
+  Action = 'Action Task',
+  Loop = 'Loop'
 }
 
 const OPERATOR_MAPPING = {

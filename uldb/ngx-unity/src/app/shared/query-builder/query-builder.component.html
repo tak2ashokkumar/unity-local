@@ -37,7 +37,7 @@
   </ng-container>
 
   <ng-template #defaultButtonGroup>
-    <div class="btn-group align-items-center" dropdown container="body">
+    <div class="btn-group align-items-center" dropdown [container]="dropdownContainer">
       <button id="button-basic" dropdownToggle type="button" title="Add Condition/Group"
         class="q-action-icons mb-0 fas fa-plus fa-xs ml-2" aria-controls="dropdown-basic">
       </button>
@@ -182,7 +182,7 @@
             [parentEmptyWarningTemplate]="parentEmptyWarningTemplate || emptyWarningTemplate"
             [parentArrowIconTemplate]="parentArrowIconTemplate || arrowIconTemplate" [parentValue]="data"
             [classNames]="classNames" [config]="config" [allowRuleset]="allowRuleset" [allowCollapse]="allowCollapse"
-            [emptyMessage]="emptyMessage" [operatorMap]="operatorMap" [submitted]="submitted">
+            [emptyMessage]="emptyMessage" [operatorMap]="operatorMap" [submitted]="submitted" [dropdownContainer]="dropdownContainer">
           </query-builder>
 
           <ng-container *ngIf="getEmptyWarningTemplate() as template; else defaultEmptyWarning">

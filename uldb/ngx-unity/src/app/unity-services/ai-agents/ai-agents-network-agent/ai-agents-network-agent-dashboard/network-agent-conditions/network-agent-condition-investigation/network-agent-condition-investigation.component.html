@@ -1,8 +1,8 @@
 <div class="container-fluid pt-2">
     <div class="animated-fadeIn">
         <div class="row" style="height:calc(100vh - 75px)">
-            <div  #leftSideContainer class="col-8 condition-detail h-100" [perfectScrollbar]="{suppressScrollX: true}">
-                <div class="card mb-2"
+            <div class="col-8 condition-detail h-100 d-flex flex-column">
+                <div class="card mb-0"
                     [ngClass]="{'h-100':(!initialChatResponseData?.length && !isAnyStepDataPresent)|| (initialChatResponseData?.length && !initialChatResponseData?.[0] && !isAnyStepDataPresent)}">
                     <div class="card-header border-bottom bg-white p-2 d-flex flex-column position-relative"
                         *ngIf="conditionDetailsViewData">
@@ -15,7 +15,7 @@
                             </div>
                             <div class="d-flex align-items-center w-60 mr-auto">
                                 <div class="font-lg font-500 event-name text-truncate">
-                                    {{conditionDetailsViewData.ruleName}}
+                                    {{conditionDetailsViewData.description}}
                                 </div>
                                 <div class="w-20 ml-2 mt-1 font-xs text-muted">
                                     {{conditionDetailsViewData.conditionDatetime}}
@@ -23,8 +23,7 @@
                             </div>
                             <div class="d-flex justify-content-end w-35">
                                 <button class="action-icons mb-0 fas fa-external-link-square-alt font-sm ml-1"
-                                    tooltip="Manage in same tab"
-                                    (click)="consoleSameTab(view)"></button>
+                                    tooltip="Manage in same tab" (click)="consoleSameTab(view)"></button>
                                 <span dropdown placement="bottom right" container="body">
                                     <!-- <button
                                         class="action-icons action-icons-disabled mb-0 fas fa-external-link-alt font-sm ml-1"
@@ -373,9 +372,11 @@
 
                 </ng-container> -->
 
-                <div class="card" *ngIf="chatResponseHistoryData.length">
+                <div #chatResponsHistoryScrollContainer class="card flex-grow-1 mb-0" *ngIf="chatResponseHistoryData.length"
+                    [perfectScrollbar]="{suppressScrollX: true}">
                     <div class="card-body">
-                        <div #chatResponseHistory *ngFor="let chat of chatResponseHistoryData;let i = index;let last = last" class="w-100"
+                        <div #chatResponseHistory
+                            *ngFor="let chat of chatResponseHistoryData;let i = index;let last = last" class="w-100"
                             style="max-width: 100%;">
                             <markdown (click)="onMarkdownClick($event)" [data]="chat.workSpaceData"></markdown>
                             <naci-zabbix-graphs [deviceData]="chat.meta?.device_data" [index]="i"

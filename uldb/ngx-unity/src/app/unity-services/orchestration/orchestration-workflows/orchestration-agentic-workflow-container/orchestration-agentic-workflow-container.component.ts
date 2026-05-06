@@ -161,6 +161,78 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
     };
     this.editor.start();
     this.editor.curvature = 0.5;
+
+    this.editor.createCurvature = function (
+      start_pos_x,
+      start_pos_y,
+      end_pos_x,
+      end_pos_y
+    ) {
+      const offsetX = 120;
+      const clearanceY = 80;
+
+      // adaptive radius (prevents sharp breaks on short segments)
+      const getRadius = (len: number) => Math.min(12, Math.abs(len) / 2);
+
+      const isForward = end_pos_x >= start_pos_x;
+
+      if (isForward) {
+        const mid_x = start_pos_x + (end_pos_x - start_pos_x) / 2;
+
+        const dx = mid_x - start_pos_x;
+        const dyTotal = end_pos_y - start_pos_y;
+
+        const rX = getRadius(dx);
+        const rY = getRadius(dyTotal);
+
+        const dy = dyTotal > 0 ? rY : -rY;
+
+        return `
+      M ${start_pos_x} ${start_pos_y}
+      L ${mid_x - rX} ${start_pos_y}
+      Q ${mid_x} ${start_pos_y} ${mid_x} ${start_pos_y + dy}
+      L ${mid_x} ${end_pos_y - dy}
+      Q ${mid_x} ${end_pos_y} ${mid_x + rX} ${end_pos_y}
+      L ${end_pos_x} ${end_pos_y}
+    `;
+      } else {
+        const mid_x1 = start_pos_x + offsetX;
+        const mid_x2 = end_pos_x - offsetX;
+        const drop_y = Math.max(start_pos_y, end_pos_y) + clearanceY;
+
+        const dx1 = mid_x1 - start_pos_x;
+        const dx2 = mid_x2 - end_pos_x;
+        const dy1 = drop_y - start_pos_y;
+        const dy2 = drop_y - end_pos_y;
+
+        const r1 = getRadius(dx1);
+        const r2 = getRadius(dx2);
+        const rY1 = getRadius(dy1);
+        const rY2 = getRadius(dy2);
+
+        const dirY1 = dy1 > 0 ? rY1 : -rY1;
+        const dirY2 = dy2 > 0 ? -rY2 : rY2;
+
+        return `
+      M ${start_pos_x} ${start_pos_y}
+      L ${mid_x1 - r1} ${start_pos_y}
+      Q ${mid_x1} ${start_pos_y} ${mid_x1} ${start_pos_y + dirY1}
+
+      L ${mid_x1} ${drop_y - dirY1}
+      Q ${mid_x1} ${drop_y} ${mid_x1 - r1} ${drop_y}
+
+      L ${mid_x2 + r2} ${drop_y}
+      Q ${mid_x2} ${drop_y} ${mid_x2} ${drop_y + dirY2}
+
+      L ${mid_x2} ${end_pos_y - dirY2}
+      Q ${mid_x2} ${end_pos_y} ${mid_x2 + r2} ${end_pos_y}
+
+      L ${end_pos_x} ${end_pos_y}
+    `;
+      }
+    };
+
+
     this.editor.force_first_input = true;
     this.getMetadata();
     this.manageWorkflowDetails();
@@ -213,6 +285,14 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
             llm_integ: selectedValue
           }
         };
+        if (!node.formErrors) node.formErrors = {};
+        node.formErrors.model = selectedValue ? '' : 'Model is required';
+        const hasErrors = this.hasAnyErrors(node.formErrors);
+        this.updateNodeStatusIcon(
+          nodeId,
+          hasErrors,
+          hasErrors ? 'Validation errors' : 'All required fields are filled up!'
+        );
       }
     };
 
@@ -373,10 +453,19 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   }
 
   addNode(node: NodeDataModel, positionX: number, positionY: number): void {
-    this.noOfOutputNode = node.type === nodeTypes.IfElse ? 2 : 1;
+    console.log(node)
+    if (node.type === nodeTypes.Loop) {
+      const loopNodeExist = this.nodeDetailsArr.find(n => n.node_type === nodeTypes.Loop);
+      if (loopNodeExist) {
+        this.notification.error(new Notification('Multiple Loop Nodes not allowed at the moment.'));
+        return;
+      }
+    }
+    this.noOfOutputNode = (node.type === nodeTypes.IfElse || node.type === nodeTypes.Loop) ? 2 : 1;
+    let noOfInputNode = node.type === nodeTypes.Loop ? 2 : 1;
     this.editor.addNode(
       node.name,
-      1, // One input
+      noOfInputNode,
       this.noOfOutputNode, // One output
       positionX,
       positionY,
@@ -404,6 +493,26 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
     });
   }
 
+  adjustNodeInputs(nodeId: number) {
+    const nodeEl = document.getElementById(`node-${nodeId}`);
+    if (!nodeEl) return;
+
+    const inputs: NodeListOf<HTMLElement> = nodeEl.querySelectorAll('.input');
+    const total = inputs.length;
+    const spacing = 70 / (total + 1);
+
+    inputs.forEach((input: HTMLElement, index: number) => {
+      const hasInput1 = input.classList.contains('input_1');
+
+      this.renderer.setStyle(input, 'top', `${spacing * (index + 1)}%`);
+      this.renderer.setStyle(input, 'right', '-6px');
+      this.renderer.setStyle(
+        input,
+        'transform',
+        hasInput1 ? 'translateY(-50%)' : 'translateY(55%)'
+      );
+    });
+  }
 
 
   /*
@@ -441,14 +550,28 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
                 } else if (this.latestDroppedNode.nodeType === 'action task') {
                   this.droppedAsTool ? this.getDetailsOfSelectedSourceTask(this.latestDroppedNode, `tool-${id}`) :
                     this.getDetailsOfSelectedSourceTask(this.latestDroppedNode, id);
-                } else if ((this.latestDroppedNode.type === nodeTypes.IfElse) || (this.latestDroppedNode.type === nodeTypes.Switch)) {
-                  if (!this.droppedAsTool) {
-                    this.adjustNodeOutputs(id);
-                    this.setNodeDetails(this.latestDroppedNode, id);
-                    this.selectedNode = this.nodeDetailsArr.find(n => n.node_id === Number(id));
-                    this.getConnectedNodeDetails(Number(id));
-                    this.openNodeModal(Number(id));
+                  // this.getDetailsOfSelectedSourceTask(this.latestDroppedNode, id);
+                } else if ((this.latestDroppedNode.type === nodeTypes.IfElse) ||
+                  (this.latestDroppedNode.type === nodeTypes.Switch)) {
+                  this.adjustNodeOutputs(id);
+                  this.setNodeDetails(this.latestDroppedNode, id);
+                  this.selectedNode = this.nodeDetailsArr.find(n => n.node_id === Number(id));
+                  this.getConnectedNodeDetails(Number(id));
+                  this.openNodeModal(Number(id));
+                } else if (this.latestDroppedNode.type === nodeTypes.Loop) {
+                  const loopNodeExist = this.nodeDetailsArr.find(n => n.node_type === nodeTypes.Loop);
+                  if (loopNodeExist) {
+                    this.notification.error(new Notification('Multiple Loop Nodes not allowed at the moment.'));
+                    return;
                   }
+                  this.adjustNodeInputs(id);
+                  this.adjustNodeOutputs(id);
+                  this.setNodeDetails(this.latestDroppedNode, id);
+                  this.selectedNode = this.nodeDetailsArr.find(n => n.node_id === Number(id));
+                  this.getConnectedNodeDetails(Number(id));
+                  this.openNodeModal(Number(id));
+                  this.droppedAsTool ? this.getDetailsOfSelectedSourceTask(this.latestDroppedNode, `tool-${id}`) :
+                    this.getDetailsOfSelectedSourceTask(this.latestDroppedNode, id);
                 } else {
                   const lastToolId = this.getLatestNodeIdForAITools();
                   let nodeId: any = id;
@@ -560,6 +683,8 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
 
             this.editor.on('connectionCreated', (connection) => {
               this.connectionList.push(connection);
+              console.log('created>>>>>', this.connectionList);
+              // this.addMiddleArrows();
             });
 
             // Remove when a connection is deleted in the canvas
@@ -573,6 +698,8 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
               );
             });
 
+            // this.editor.on('nodeMoved', () => this.addMiddleArrows());
+
           }, 0);
         }, 0);
       },
@@ -582,12 +709,114 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
     );
   }
 
+  //  addMiddleArrows(): void {
+  //   const marker = document.querySelector<SVGMarkerElement>('#arrow');
+  //   if (!marker) {
+  //     console.error('Arrow marker (#arrow) not found in SVG defs.');
+  //     return;
+  //   }
+
+  //   // Get the first shape inside the marker (path, polygon, etc.)
+  //   const arrowShape = marker.querySelector('path, polygon, polyline');
+  //   if (!arrowShape) {
+  //     console.error('No shape found inside #arrow marker.');
+  //     return;
+  //   }
+
+  //   const refX = parseFloat(marker.getAttribute('refX') || '0');
+  //   const refY = parseFloat(marker.getAttribute('refY') || '0');
+
+  //   // Clone the shape and modify it to be outline-only
+  //   const arrowClone = arrowShape.cloneNode(true) as SVGElement;
+  //   arrowClone.removeAttribute('fill'); // remove fill
+  //   arrowClone.setAttribute('stroke', '#000'); // outline color
+  //   arrowClone.setAttribute('stroke-width', '1.5'); // outline thickness
+
+  //   const arrowShapeHTML = arrowClone.outerHTML;
+
+  //   const paths = document.querySelectorAll<SVGPathElement>('.drawflow .connection path');
+
+  //   paths.forEach(path => {
+  //     const parentEl = path.parentNode as Element;
+
+  //     // Remove old middle arrows
+  //     const oldArrow = parentEl.querySelector('.middle-arrow');
+  //     if (oldArrow) oldArrow.remove();
+
+  //     const length = path.getTotalLength();
+  //     const midpoint = path.getPointAtLength(length / 2);
+  //     const beforeMid = path.getPointAtLength(length / 2 - 1);
+
+  //     const angle = Math.atan2(midpoint.y - beforeMid.y, midpoint.x - beforeMid.x) * 180 / Math.PI;
+
+  //     const gHTML = `
+  //       <g class="middle-arrow"
+  //          transform="translate(${midpoint.x},${midpoint.y}) rotate(${angle}) translate(${-refX},${-refY})">
+  //         ${arrowShapeHTML}
+  //       </g>
+  //     `;
+
+  //     parentEl.insertAdjacentHTML('beforeend', gHTML);
+  //   });
+  // }
+
+
+
+  buildLoopNodeAllConnectedChildren(loopNodeId: number, outputId: number) {
+    const visited = new Set<number>();
+    const collectedChildren: NodeDetailsArrayModel[] = [];
+
+    // Recursive DFS to collect all connected nodes
+    const collectChildren = (parentId: number) => {
+      this.connectionList
+        .filter(conn => Number(conn.output_id) === parentId)
+        .forEach(conn => {
+          const childId = Number(conn.input_id);
+          if (visited.has(childId)) return; // Avoid duplicates
+          visited.add(childId);
+
+          const childNode = this.nodeDetailsArr.find(n => n.node_id === childId);
+          if (childNode) {
+            collectedChildren.push(childNode);
+            collectChildren(childId); // Keep going to indirect connections
+          }
+        });
+    };
+
+    // Find the loop node
+    const loopNode = this.nodeDetailsArr.find(n => n.node_id === loopNodeId);
+    if (!loopNode) {
+      console.error(`Loop node with ID ${loopNodeId} not found`);
+      return;
+    }
+
+    // Start only from the given output of the loop node
+    this.connectionList
+      .filter(conn => {
+        const matchesNode = Number(conn.output_id) === loopNodeId;
+        return matchesNode && conn.output_class?.includes(`output_${outputId}`);
+      })
+      .forEach(conn => {
+        const childId = Number(conn.input_id);
+        if (!visited.has(childId)) {
+          visited.add(childId);
+          const childNode = this.nodeDetailsArr.find(n => n.node_id === childId);
+          if (childNode) {
+            collectedChildren.push(childNode);
+            collectChildren(childId); // Get indirect connections too
+          }
+        }
+      });
+
+    // Assign flat list to loop node
+    loopNode['children'] = collectedChildren;
+  }
+
+
+
   getConnectedNodeDetails(nodeId: any) {
     const visited = new Set<number>();
     const connectedNodeIds: number[] = [];
-
-    const getId = (val: any) =>
-      val?.includes?.('-') ? Number(val.split('-')[1]) : Number(val);
 
     const toolGroup = this.toolsArr.find(t =>
       t?.data?.some(n =>
@@ -1258,6 +1487,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
 
   buildConfig(node: any, formDatas: any) {
     const propertyForm = formDatas.propertyForm || {};
+    console.log(propertyForm, " property Form")
 
     switch (node.node_type) {
       case nodeTypes.ManualTrigger:
@@ -1323,7 +1553,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
       case nodeTypes.GetITSMTicket:
         return {
           itsm_table: formDatas?.getTicketForm?.itsm_table,
-          filter: [...formDatas?.getTicketForm?.filters],
+          filters: [...formDatas?.getTicketForm?.filters],
           settings: {
             retries: formDatas?.getTicketForm?.retries ?? node.config?.settings?.retries ?? 0,
             timeout: formDatas?.getTicketForm?.timeouts ?? node.config?.settings?.timeout ?? 3600,
@@ -1336,6 +1566,9 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
           duration_value: propertyForm?.duration_value,
           duration_unit: propertyForm?.duration_unit,
         }
+
+      case nodeTypes.Transform:
+        return this.prepareConfig(propertyForm)
 
       case nodeTypes.Email:
         return {
@@ -1436,9 +1669,53 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
           conditions: Array.isArray(propertyForm?.switchConditions) ? propertyForm.switchConditions : []
         };
 
+      case nodeTypes.Loop:
+        return {
+          conditions: propertyForm?.mode === 'WHILE' && Array.isArray(propertyForm?.conditions) ? propertyForm?.conditions : [],
+          mode: propertyForm?.mode,
+          items: _clone(propertyForm?.items),
+          max_iterations: propertyForm?.mode === 'WHILE' ? propertyForm?.max_iterations : 0,
+        }
+
       default:
         return node.config || {};
     }
+  }
+
+  prepareConfig(propertyForm) {
+    const form = propertyForm;
+
+    const config: any = {
+      input: form.input,
+      operation: form.operation
+    };
+
+    switch (form.operation) {
+      case 'SELECT_FIELDS':
+      case 'DROP_FIELDS':
+      case 'RENAME_FIELDS':
+      case 'ADD_FIELDS':
+        config.fields = form.fields;
+        break;
+
+      case 'FILTER_ITEMS':
+        config.field = form.field;
+        config.operator = form.operator;
+        config.value = form.value;
+        break;
+
+      case 'SORT_ITEMS':
+        config.field = form.field;
+        config.order = form.order;
+        break;
+
+      case 'SLICE_ITEMS':
+        config.limit = form.limit;
+        config.offset = form.offset;
+        break;
+    }
+
+    return config;
   }
 
 
@@ -1579,94 +1856,143 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
         });
       }
     }
-    return ids.sort()[ids.length - 1];
+    // FIX: remove NaN + duplicates + proper numeric max
+    ids = ids.filter(id => !isNaN(id));
+    const uniqueIds = [...new Set(ids)];
+
+    return uniqueIds.length ? Math.max(...uniqueIds) : 0;
   }
 
   getTemplateDetailsByTask(node: NodeDataModel, nodeId?: any) {
-    const isToolId = typeof nodeId === 'string' ? true : false;
+    const isToolId = typeof nodeId === 'string';
     const lastToolId = this.getLatestNodeIdForAITools();
-    isToolId && this.workFlowData ? nodeId = lastToolId ? `tool-${lastToolId + 1}` : nodeId : nodeId = nodeId;
-    console.log('??????????????????', lastToolId, nodeId)
+
+    if (isToolId && this.workFlowData) {
+      nodeId = lastToolId ? `tool-${lastToolId + 1}` : nodeId;
+    }
+
+    console.log('??????????????????', lastToolId, nodeId);
 
     this.spinner.start('main');
-    this.svc.getTemplatesByTaskId(node.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.taskDetails = res;
 
-      if (!this.nodeDetailsArr.some(n => n.node_id === nodeId) &&
-        !this.toolsArr.some(t =>
-          t?.data?.some(n =>
-            n?.tool_id === nodeId ||
-            n?.node_id === nodeId
-          )
-        )
-      ) {
-        isToolId ? this.setNodeDetails(node, nodeId.split('-')[1]) : this.setNodeDetails(node, nodeId);
-        const currentNode =
-          this.toolsArr
-            .flatMap(t => t?.data || [])
-            .find(n => n?.tool_id === nodeId || n?.node_id === nodeId)
-          || this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
-        currentNode.inputs = _clone(this.taskDetails.inputs);
-        currentNode.config.target_type = this.taskDetails.target_type;
-        if (this.taskDetails.target_type === 'Cloud') {
-          currentNode.config.cloud_type = this.taskDetails?.config?.cloud_type;
-        }
-        if (this.taskDetails.target_type === 'Host') {
-          // currentNode.config.target = '';
-          // currentNode.config.credential = '';
-        }
-        currentNode.description = this.taskDetails?.description;
-      }
+    this.svc.getTemplatesByTaskId(node.uuid)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        this.taskDetails = res;
 
-      this.selectedNode = this.toolsArr
-        .flatMap(t => t?.data || [])
-        .find(n => (n?.tool_id === nodeId || `tool-${n?.tool_id}` === nodeId) ||
-          (n?.node_id === nodeId || `tool-${n?.node_id}` === nodeId))
-        || this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
-      this.getConnectedNodeDetails(nodeId);
-      this.openNodeModal(nodeId);
-      this.spinner.stop('main');
-    }, (err: HttpErrorResponse) => {
-      this.spinner.stop('main');
-    })
+        console.log('tools in task>>>>', this.toolsArr, nodeId);
+        console.log('nodes in task>>>>', this.nodeDetailsArr, nodeId);
+
+        const nodeExistsInNodes = this.nodeDetailsArr.some(n => n.node_id === nodeId);
+        const nodeExistsInTools = this.toolsArr.some(t =>
+          t?.data?.some(n => n?.tool_id === nodeId || n?.node_id === nodeId)
+        );
+
+        if (!nodeExistsInNodes && !nodeExistsInTools) {
+          if (isToolId) {
+            this.setNodeDetails(node, nodeId.split('-')[1]);
+          } else {
+            this.setNodeDetails(node, nodeId);
+          }
+
+          console.log('tools in task>>>>', this.toolsArr, nodeId);
+
+          const allToolNodes = this.toolsArr.flatMap(t => t?.data || []);
+
+          const currentNode =
+            allToolNodes.find(n => n?.tool_id === nodeId || n?.node_id === nodeId) ||
+            this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
+
+          if (currentNode) {
+            currentNode.inputs = _clone(this.taskDetails.inputs);
+            currentNode.config.target_type = this.taskDetails.target_type;
+
+            if (this.taskDetails.target_type === 'Cloud') {
+              currentNode.config.cloud_type = this.taskDetails?.config?.cloud_type;
+            }
+
+            if (this.taskDetails.target_type === 'Host') {
+              // currentNode.config.target = '';
+              // currentNode.config.credential = '';
+            }
+
+            currentNode.description = this.taskDetails?.description;
+          }
+        }
+
+        const allToolNodes = this.toolsArr.flatMap(t => t?.data || []);
+
+        this.selectedNode =
+          allToolNodes.find(n =>
+            (n?.tool_id === nodeId || `tool-${n?.tool_id}` === nodeId) ||
+            (n?.node_id === nodeId || `tool-${n?.node_id}` === nodeId)
+          ) ||
+          this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
+
+        this.getConnectedNodeDetails(nodeId);
+        this.openNodeModal(nodeId);
+        this.spinner.stop('main');
+
+      }, (err: HttpErrorResponse) => {
+        this.spinner.stop('main');
+      });
   }
+
 
   getDetailsOfSelectedSourceTask(node: NodeDataModel, nodeId?: any) {
     const isToolId = typeof nodeId === 'string' ? true : false;
     const lastToolId = this.getLatestNodeIdForAITools();
-    isToolId && this.workFlowData ? nodeId = lastToolId ? `tool-${lastToolId + 1}` : nodeId : nodeId = nodeId;
+
+    if (isToolId && this.workFlowData) {
+      nodeId = lastToolId ? `tool-${lastToolId + 1}` : `tool-${nodeId}`;
+    }
+
     this.spinner.start('main');
 
-    this.svc.getSourceTaskDetails(node.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      // this.selectedSourceTaskDetails = res;
-      if (!this.nodeDetailsArr.some(n => n.node_id === nodeId) &&
-        !this.toolsArr.some(t =>
-          t?.data?.some(n =>
-            n?.tool_id === nodeId ||
-            n?.node_id === nodeId
-          )
-        )) {
-        isToolId ? this.setNodeDetails(node, nodeId.split('-')[1]) : this.setNodeDetails(node, nodeId);
-        const currentNode =
-          this.toolsArr
-            .flatMap(t => t?.data || [])
-            .find(n => n?.tool_id === nodeId || n?.node_id === nodeId)
-          || this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
-        currentNode.inputs = _clone(res?.inputs);
-        currentNode.description = res?.description;
-      }
+    this.svc.getSourceTaskDetails(node.uuid)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
 
-      this.selectedNode = this.toolsArr
-        .flatMap(t => t?.data || [])
-        .find(n => (n?.tool_id === nodeId || `tool-${n?.tool_id}` === nodeId) ||
-          (n?.node_id === nodeId || `tool-${n?.node_id}` === nodeId))
-        || this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
-      this.getConnectedNodeDetails(nodeId);
-      this.openNodeModal(nodeId);
-      this.spinner.stop('main');
-    }, (err: HttpErrorResponse) => {
-      this.spinner.stop('main');
-    })
+        const nodeExistsInNodes = this.nodeDetailsArr.some(n => n.node_id === nodeId);
+        const nodeExistsInTools = this.toolsArr.some(t =>
+          t?.data?.some(n => n?.tool_id === nodeId || n?.node_id === nodeId)
+        );
+
+        if (!nodeExistsInNodes && !nodeExistsInTools) {
+          if (isToolId) {
+            this.setNodeDetails(node, nodeId.split('-')[1]);
+          } else {
+            this.setNodeDetails(node, nodeId);
+          }
+
+          const allToolNodes = this.toolsArr.flatMap(t => t?.data || []);
+
+          const currentNode =
+            allToolNodes.find(n => n?.tool_id === nodeId || n?.node_id === nodeId) ||
+            this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
+
+          if (currentNode) {
+            currentNode.inputs = _clone(res?.inputs);
+            currentNode.description = res?.description;
+          }
+        }
+
+        const allToolNodes = this.toolsArr.flatMap(t => t?.data || []);
+
+        this.selectedNode =
+          allToolNodes.find(n =>
+            (n?.tool_id === nodeId || `tool-${n?.tool_id}` === nodeId) ||
+            (n?.node_id === nodeId || `tool-${n?.node_id}` === nodeId)
+          ) ||
+          this.nodeDetailsArr.find(n => Number(n.node_id) === Number(nodeId));
+
+        this.getConnectedNodeDetails(nodeId);
+        this.openNodeModal(nodeId);
+        this.spinner.stop('main');
+
+      }, (err: HttpErrorResponse) => {
+        this.spinner.stop('main');
+      });
   }
 
   handleNodeRemove(nodeId: number) {
@@ -1677,6 +2003,13 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   }
 
   saveWorkFlow() {
+    const hasNodeErrors  = this.nodeDetailsArr?.some(node => this.hasAnyErrors(node.formErrors)) ?? false;
+    const hasToolErrors = this.toolsArr?.some(group => group?.data?.some(tool => tool?.hasErrors )) ?? false;
+    console.log(this.toolsArr, "Tools Arr")
+    if (hasNodeErrors  || hasToolErrors) {
+      this.notification.error(new Notification('Workflow cannot be saved due to configuration errors in one or more nodes.'));
+      return
+    }
     if (!this.validateAgentTimeouts()) return;
     console.log('Drawflow data', this.editor.export());
     const workflowPayload = this.buildWorkflowPayload(
@@ -1732,7 +2065,12 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
       const drawflowNode = this.editor.getNodeFromId(node.node_id);
       node.pos_x = drawflowNode.pos_x;
       node.pos_y = drawflowNode.pos_y;
+      if (node.node_type === nodeTypes.Loop) {
+        this.buildLoopNodeAllConnectedChildren(node.node_id, 2);
+      }
     });
+
+    console.log('node Details after loop>>>>>>>>>', this.nodeDetailsArr)
 
     return {
       name: workflowMeta?.name || "",
@@ -1760,7 +2098,11 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
           param_name: output.param_name,
           expression_type: output.expression_type,
           expression: output.expression
-        }))
+        })),
+
+        // ...(node.node_type === nodeTypes.Loop && {
+        //   children: this.formatChildren(node)
+        // })
       })),
 
       // Connections transformation
@@ -1772,6 +2114,36 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
       }))
     };
   }
+
+  // formatChildren(loopNode) {
+  //   let formattedChildren = loopNode?.children?.map(ln => ({
+  //     name: ln.name,
+  //     node_id: ln.node_id,
+  //     node_type: ln.node_type,
+  //     type_version: 1,
+  //     pos_x: ln?.pos_x,
+  //     pos_y: ln?.pos_y,
+  //     config: ln.config || {},
+
+  //     // Inputs & Outputs
+  //     inputs: (ln.inputs || []).map(input => ({
+  //       param_name: input.param_name ?? input.field_name,
+  //       default_value: input.default_value,
+  //       param_type: input.param_type
+  //     })),
+  //     outputs: (ln.outputs || []).map(output => ({
+  //       param_name: output.param_name,
+  //       expression_type: output.expression_type,
+  //       expression: output.expression
+  //     })),
+
+  //     ...(ln.node_type === nodeTypes.Loop && {
+  //       children: ln.children || []
+  //     })
+  //   }));
+
+  //   return formattedChildren;
+  // }
 
 
   mapConnectionsForApi(connectionList: any[]) {
@@ -1823,7 +2195,7 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
         ? 'node-box llm'
         : node.type === nodeTypes.AIAgent
           ? 'node-box aiagent'
-          : 'node-box';
+          : node.type === nodeTypes.Loop ? 'node-box loop' : 'node-box';
 
     const iconClass = node.type === nodeTypes.LLM ? 'node-center-icon-llm' : 'node-center-icon-ai';
     const statusFa = this.hasRealTimeData ? this.getStatusFaClass(node.status) : '';

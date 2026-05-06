@@ -56,7 +56,6 @@
                                         <!-- CLOUD ACCOUNT  -->
                                         <div class="col-4"
                                             *ngIf="inputControl.get('param_type')?.value === 'Cloud Account'">
-                                            {{default_value}}
                                             <select class="text-dark form-control" formControlName="default_value"
                                                 [compareWith]="compareAccounts"
                                                 [ngClass]="{ 'is-invalid': manualFormErrors.inputs[i]?.default_value }">

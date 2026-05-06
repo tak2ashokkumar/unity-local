@@ -86,10 +86,10 @@ export interface InsightUrl {
 }
 
 export interface ChatDocuments {
-    documents: Document[];
+    documents: ChatDocument[];
 }
 
-export interface Document {
+export interface ChatDocument {
     file_name: string;
     conversation_id: string;
 }

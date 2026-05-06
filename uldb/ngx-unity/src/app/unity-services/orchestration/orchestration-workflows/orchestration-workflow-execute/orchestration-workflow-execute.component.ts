@@ -162,42 +162,42 @@ export class OrchestrationWorkflowExecuteComponent implements OnInit {
     if (this.selectedNode?.node_type === 'Manual Trigger') {
       return this.selectedNode;
     }
-    return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Manual Trigger');
+    // return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Manual Trigger');
   }
 
   getScheduleTriggerNode(): any {
     if (this.selectedNode?.node_type === 'Schedule Trigger') {
       return this.selectedNode;
     }
-    return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Schedule Trigger');
+    // return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Schedule Trigger');
   }
 
   getWebhookTriggerNode(): any {
     if (this.selectedNode?.node_type === 'Webhook Trigger') {
       return this.selectedNode;
     }
-    return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Webhook Trigger');
+    // return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Webhook Trigger');
   }
 
   getChatTriggerNode(): any {
     if (this.selectedNode?.node_type === 'Chat Trigger') {
       return this.selectedNode;
     }
-    return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Chat Trigger');
+    // return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'Chat Trigger');
   }
 
   getItsmTriggerNode(): any {
     if (this.selectedNode?.node_type === 'ITSM Event Trigger') {
       return this.selectedNode;
     }
-    return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'ITSM Event Trigger');
+    // return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'ITSM Event Trigger');
   }
 
   getAIMLTriggerNode(): any {
     if (this.selectedNode?.node_type === 'AIML Event Trigger') {
       return this.selectedNode;
     }
-    return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'AIML Event Trigger');
+    // return this.workFlowData?.nodes?.find((node: any) => node.node_type === 'AIML Event Trigger');
   }
 
   buildManualForm(param: any) {

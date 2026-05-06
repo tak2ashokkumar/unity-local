@@ -440,7 +440,7 @@ export class NetworkAgentConditionsComponent implements OnInit, OnDestroy {
     if (this.selectedCondition.conversation_detail.title && this.selectedCondition.conversation_detail.title.trim() !== '') {
       queryParams.title = this.selectedCondition.conversation_detail.title;
     }
-    return this.router.navigate([`/services/ai-agents/network-agent/conditions/${this.selectedCondition.id}/${this.conditionUuid}/investigate`],
+    return this.router.navigate([`/services/ops-co-pilot/network-ai-agent/conditions/${this.selectedCondition.id}/${this.conditionUuid}/investigate`],
       Object.keys(queryParams).length ? { queryParams } : {}
     );
   }

@@ -420,6 +420,18 @@ const conditionList = [
     icon: `${environment.assetsUrl}external-brand/workflow/wait.svg`,
     description: 'Wait for a specified time before an action to control workflow execution.',
     type: nodeTypes.Wait
+  },
+  {
+    name: 'Loop',
+    icon: `${environment.assetsUrl}external-brand/workflow/Loop.svg`,
+    description: 'Repeat workflow steps for each item or until a condition is met.',
+    type: nodeTypes.Loop
+  },
+  {
+    name: 'Transform',
+    icon: `${environment.assetsUrl}external-brand/workflow/Transform.svg`,
+    description: 'Modify and reshape input data using common transformation operations.',
+    type: nodeTypes.Transform
   }
 ];
 

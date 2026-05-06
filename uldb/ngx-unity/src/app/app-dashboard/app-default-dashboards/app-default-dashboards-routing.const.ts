@@ -26,6 +26,10 @@ import { IotDevicesZabbixComponent } from "src/app/united-cloud/shared/iot-devic
 import { ZABBIX_IOT_DEVICE_ROUTES } from "src/app/united-cloud/shared/iot-devices/iot-devices-zabbix/iot-devices-zabbix-routing.const";
 import { ApplicationOverviewDashboardComponent } from "./application-overview-dashboard/application-overview-dashboard.component";
 import { ExecutiveAiBusinessSummaryComponent } from "./application-overview-dashboard/executive-ai-business-summary/executive-ai-business-summary.component";
+import { PrivateCloudComputeDashboardComponent } from "./private-cloud-compute-dashboard/private-cloud-compute-dashboard.component";
+import { PublicCloudComputeDashboardComponent } from "./public-cloud-compute-dashboard/public-cloud-compute-dashboard.component";
+import { DatabaseDashboardComponent } from "./database-dashboard/database-dashboard.component";
+import { UnifiedAiopsCommandCentreComponent } from "./unified-aiops-command-centre/unified-aiops-command-centre.component";
 
 export const DEFAULT_DASHBOARD_ROUTES: Routes = [
     {
@@ -333,6 +337,46 @@ export const DEFAULT_DASHBOARD_ROUTES: Routes = [
         data: {
             breadcrumb: {
                 title: 'Task and Workflow Overview',
+                stepbackCount: 1
+            }
+        },
+    },
+    {
+        path: 'default/private-cloud-compute',
+        component: PrivateCloudComputeDashboardComponent,
+        data: {
+            breadcrumb: {
+                title: 'Private Cloud Compute Dashboard',
+                stepbackCount: 1
+            }
+        },
+    },
+    {
+        path: 'default/public-cloud-compute',
+        component: PublicCloudComputeDashboardComponent,
+        data: {
+            breadcrumb: {
+                title: 'Public Cloud Compute Dashboard',
+                stepbackCount: 1
+            }
+        },
+    },
+    {
+        path: 'default/database',
+        component: DatabaseDashboardComponent,
+        data: {
+            breadcrumb: {
+                title: 'Database Dashboard',
+                stepbackCount: 1
+            }
+        },
+    },
+    {
+        path: 'default/unified-aiops-command-centre',
+        component: UnifiedAiopsCommandCentreComponent,
+        data: {
+            breadcrumb: {
+                title: 'Unified AIOps Command Center',
                 stepbackCount: 1
             }
         },

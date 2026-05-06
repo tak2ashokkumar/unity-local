@@ -1,0 +1,235 @@
+.card-body-custom {
+    height: 100%;
+    overflow: hidden;
+    background-blend-mode: soft-light;
+    border-bottom-right-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+
+.custom-gradient-bg {
+    background: linear-gradient(135deg, #FFFBFB 0%, #E4F5F7 55%, #FDEFE9 100%);
+}
+
+.messages-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 0.5rem;
+    overflow-x: hidden;
+}
+
+.messages-container::-webkit-scrollbar {
+  display: none;
+}
+
+.message-box {
+    max-width: 75%;
+    min-width: fit-content;
+    font-size: 14px;
+    line-height: 1.4;
+    display: inline-block;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.bot-message {
+    padding: 8px 4px;
+    margin-right: 15px;
+    border-radius: 10px 10px 10px 2px;
+}
+
+.user-message {
+    background-color: #ffc2c2;
+    padding: 8px 12px;
+    margin-left: 15px;
+    border-radius: 10px 10px 2px 10px;
+}
+
+::ng-deep .message-box p {
+    margin: 0;
+    max-width: 100%;
+    display: inline-block;
+    white-space: normal;
+    word-break: break-word;
+}
+
+::ng-deep .message-box pre {
+    max-width: 100%;
+    overflow: hidden;
+    display: inline-block;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.pulse-loader {
+    width: 16px;
+    height: 5px;
+    display: flex;
+    align-items: center;
+
+    >div {
+        background-color: #fff;
+        margin-right: 5%;
+        width: 30%;
+        height: 100%;
+        border-radius: 100%;
+        animation: pulse 1s ease infinite;
+
+        &:nth-child(2) {
+            animation-delay: 100ms;
+        }
+
+        &:nth-child(3) {
+            margin-right: 0;
+            animation-delay: 200ms;
+        }
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    60%,
+    100% {
+        opacity: 1;
+        background-color: #576071;
+        transform: scale(1);
+    }
+
+    30% {
+        opacity: 0.3;
+        background-color: #c0c0c0;
+        transform: scale(0.8);
+    }
+}
+
+.suggested-action {
+    background-color: transparent;
+    color: #378ad8;
+    cursor: pointer;
+    border: 1px solid #378ad8;
+    border-radius: 0.95rem !important;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.suggested-action:hover {
+    color: white;
+    background-color: #378ad8;
+}
+
+/* =====================================================
+   Active AI Modal Model Selector
+===================================================== */
+
+.active-ai-modal-model-selector {
+  position: relative;
+}
+
+.active-ai-modal-model-btn {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  font-size: 13px;
+  padding: 5px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.active-ai-modal-model-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.active-ai-modal-model-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.active-ai-modal-model-dropdown {
+  position: absolute;
+  bottom: 40px;
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border-radius: 10px;
+  // box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  padding: 0px 0;
+  z-index: 9999;
+  max-height: 180px;
+  /* ~3-4 items visible */
+  overflow-y: auto;
+}
+
+.active-ai-modal-model-option {
+  display: flex;
+  align-items: center;
+  // padding: 10px 14px;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.active-ai-modal-model-option:hover {
+  background: #f4f6f9;
+}
+
+.active-ai-modal-model-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.active-ai-modal-model-dropdown::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.active-ai-modal-model-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.active-model-item {
+  background-color: #eef7ff;
+  color: #378ad8
+}
+
+.form-wrapper {
+  border: 1px solid #c8ced3 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.query-button {
+  border-radius: 0.75rem;
+}
+
+.query-button-success:hover {
+  color: white;
+  background-color: #0cbb70cc;
+  border-color: #0cbb70cc;
+}
+
+.query-button:focus,
+.query-button:active,
+.query-button:focus:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.no-hover:hover {
+  color: inherit;
+  background-color: inherit;
+  border-color: inherit;
+}
+
+.new-chat-button {
+  color: #cbd5e1;
+  border-color: #cbd5e1;
+}
+
+.new-chat-button:hover {
+  border-color: #cbd5e1;
+}
+
+.stop-button {
+  height: 2rem;
+  width: 2rem;
+}

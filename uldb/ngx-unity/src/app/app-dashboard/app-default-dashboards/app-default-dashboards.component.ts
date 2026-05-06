@@ -66,6 +66,10 @@ export class AppDefaultDashboardsComponent implements OnInit, OnDestroy {
   }
 
   goToDefaultDashboard(view: DefaultViewData) {
+    if (!view.defaultDashboardUrl) {
+      this.notification.error(new Notification('Dashboard route is not configured.'));
+      return;
+    }
     this.router.navigate([view.defaultDashboardUrl], { relativeTo: this.route });
   }
 

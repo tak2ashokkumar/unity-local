@@ -92,7 +92,8 @@
                                         </div>
                                     </div>
                                     <div class="p-0 event-name mr-auto text-truncate">
-                                        <h6 class="mb-0 text-truncate">{{view.ruleName}}</h6>
+                                        <h6 class="mb-0 text-truncate" [tooltip]="view.description">{{view.description}}
+                                        </h6>
                                         <div class="d-inline-flex">
                                             <div class="p-0">
                                                 <span class="font-sm-xs text-muted">ID: </span>
@@ -150,7 +151,7 @@
                                 </div>
                                 <div class="d-flex align-items-center w-60 mr-auto">
                                     <div class="font-lg font-500 event-name text-truncate">
-                                        {{viewData[selectedConditionIndex].ruleName}}
+                                        {{viewData[selectedConditionIndex].description}}
                                     </div>
                                     <div class="w-20 ml-2 mt-1 font-xs text-muted">
                                         {{viewData[selectedConditionIndex].conditionDatetime}}

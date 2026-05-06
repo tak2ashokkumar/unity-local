@@ -163,6 +163,10 @@ export class OrchestrationAgenticWorkflowContainerService {
         return `${environment.assetsUrl}external-brand/workflow/Switch.svg`;
       case nodeTypes.Wait:
         return `${environment.assetsUrl}external-brand/workflow/wait.svg`;
+      case nodeTypes.Loop:
+        return `${environment.assetsUrl}external-brand/workflow/Loop.svg`;
+      case nodeTypes.Transform:
+        return `${environment.assetsUrl}external-brand/workflow/Transform.svg`;
       case nodeTypes.Source:
         return `${environment.assetsUrl}external-brand/workflow/Source.svg`;
       case nodeTypes.LLM:
