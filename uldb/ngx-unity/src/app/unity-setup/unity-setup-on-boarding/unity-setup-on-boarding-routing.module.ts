@@ -7,6 +7,7 @@ import { UnitySetupOnBoardingResolverService } from './unity-setup-on-boarding-r
 import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.component';
 import { AdvancedDiscoveryConnectivityComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity.component';
 import { AdvancedDiscoveryPolicyCrudComponent } from './advanced-device-discovery/advanced-discovery-network-scan/advanced-discovery-policy-crud/advanced-discovery-policy-crud.component';
+import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-request/advanced-discovery-connectivity-request.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,15 @@ const routes: Routes = [
       }
     },
     children: [
+      {
+        path: 'connectivity/request-access',
+        component: AdvancedDiscoveryConnectivityRequestComponent,
+        data: {
+          breadcrumb: {
+            title: 'Request Access'
+          }
+        }
+      },
       {
         path: 'connectivity',
         component: AdvancedDiscoveryConnectivityComponent,

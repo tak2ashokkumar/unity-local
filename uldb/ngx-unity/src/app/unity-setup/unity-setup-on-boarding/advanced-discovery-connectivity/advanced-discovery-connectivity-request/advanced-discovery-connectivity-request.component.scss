@@ -1,0 +1,90 @@
+@import "variables";
+
+.step {
+  .icon-wrap {
+    align-items: center;
+    display: inline-flex;
+    height: 2.7rem;
+    justify-content: center;
+    padding: 0;
+    position: relative;
+    width: 2.7rem;
+    border: 2px solid $gray-300;
+    border-radius: 50%;
+    color: $white;
+    background-color: $gray-300;
+    z-index: 2;
+
+    & + label {
+      color: $gray-500;
+    }
+
+    span {
+      font-size: 1.05rem;
+    }
+  }
+
+  .icon-wrap.active {
+    border-color: $primary !important;
+    background-color: $primary !important;
+    color: $white !important;
+
+    & + label {
+      color: $primary !important;
+    }
+  }
+
+  .icon-wrap.success {
+    border-color: $success !important;
+    background-color: $success !important;
+    color: $white !important;
+
+    & + label {
+      color: $success !important;
+    }
+  }
+}
+
+.divider-wrap {
+  padding-left: 4rem;
+  padding-right: 1rem;
+
+  .divider-line {
+    background-color: $gray-300;
+    border: 0;
+    height: 2px;
+    margin-top: -4.3rem;
+    opacity: 1;
+    position: relative;
+    z-index: 1;
+
+    &.second-step-active {
+      background: linear-gradient(to right, $primary 0%, $primary 50%, $gray-300 50%, $gray-300 100%);
+    }
+
+    &.third-step-active {
+      background: linear-gradient(to right, $success 0%, $success 50%, $primary 50%, $primary 100%);
+    }
+  }
+}
+
+.download-file-step {
+  .download-file-title {
+    font-size: 1.35rem;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+  }
+
+  .download-file-description {
+    font-size: 1.15rem;
+    line-height: 1.75;
+    margin: 0 auto 1.75rem;
+    max-width: 58rem;
+  }
+}
+
+.command-box {
+  background-color: $gray-200;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}

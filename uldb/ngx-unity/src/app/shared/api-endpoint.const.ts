@@ -1090,9 +1090,17 @@ export const ADD_AGENT_CONFIGURATIONS = () => `customer/agent/config/`;
 
 export const DOWNLOAD_COLLECTOR = (type: string) => `customer/agent/config/download_collector/?type=${type}`;
 
+export const REQUEST_COLLECTOR_ACCESS = () => `customer/agent/config/request-collector/`;
+
+export const DOWNLOAD_COLLECTOR_BUNDLE = (uuid: string) => `customer/agent/config/${uuid}/download-bundle/`;
+
 export const EDIT_AGENT_CONFIGURATION = (uuid: string) => `customer/agent/config/${uuid}/`;
 
 export const DELETE_AGENT_CONFIGURATION = (uuid: string) => `customer/agent/config/${uuid}/`;
+
+export const UPDATE_AGENT_CONFIGURATION_TTL = (uuid: string) => `customer/agent/config/${uuid}/update-ttl/`;
+
+export const UPDATE_AGENT_CONFIGURATION_IP_ADDRESS = (uuid: string) => `customer/agent/config/${uuid}/update-ip-address/`;
 
 export const STOP_IMPERSONATING = () => `hijack/release-hijack/`;
 
