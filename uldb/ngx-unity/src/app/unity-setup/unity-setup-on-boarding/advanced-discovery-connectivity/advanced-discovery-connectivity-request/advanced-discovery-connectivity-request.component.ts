@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,13 +30,13 @@ export class AdvancedDiscoveryConnectivityRequestComponent implements OnInit, On
   collectorForm: FormGroup;
   formErrors: any;
   validationMessages: any;
-  
-  downloadProgress = 0;
-  isDownloading = false;
-  isDownloaded = false;
+
+  downloadProgress: number = 0;
+  isDownloading: boolean = false;
+  isDownloaded: boolean = false;
 
   commands: AdvancedDiscoveryConnectivityRequestCommand[] = [];
-  private collectorRequestUuid: string = '';
+  private collectorDetails: any = '';
   private isValidationSubscriptionAdded = false;
   nonFieldErr: string = '';
 
@@ -93,16 +93,65 @@ export class AdvancedDiscoveryConnectivityRequestComponent implements OnInit, On
     this.activeStep = this.activeStep === 'runCommand' ? 'downloadFile' : 'collectorDetails';
   }
 
-  goNextFromDetails() {
+  saveCollectorDetails() {
     this.nonFieldErr = '';
     if (!this.validateCollectorDetails()) {
       return;
     }
     this.spinner.start('main');
-    this.svc.createCollectorRequest(this.formPayload).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.handleCreateCollectorSuccess(res);
+    this.svc.saveCollectorDetails(this.formPayload).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.collectorDetails = res;
+      if (!this.collectorDetails || !this.collectorDetails.uuid) {
+        this.nonFieldErr = 'Something went wrong!! Please try again.';
+        this.spinner.stop('main');
+        return;
+      }
+      this.moveToDownloadStep();
     }, (err: HttpErrorResponse) => {
       this.handleCreateCollectorError(err);
+    });
+  }
+
+  downloadCollectorBundle() {
+    if (this.isDownloading) {
+      return;
+    }
+    this.isDownloading = true;
+    this.downloadProgress = 0;
+    // this.spinner.start('main');
+
+    this.svc.downloadCollectorBundle(this.collectorDetails.uuid).subscribe({
+      next: (event: any) => {
+        console.log('event : ', event);
+        if (event.type === HttpEventType.DownloadProgress) {
+          console.log('event.total : ', event.total);
+          if (event.total) {
+            this.downloadProgress = Math.round((event.loaded / event.total) * 100);
+          }
+        }
+
+        if (event.type === HttpEventType.Response) {
+          this.commands = this.svc.getCommands(this.formPayload);
+          console.log('event.type === HttpEventType.Response')
+          this.isDownloaded = true;
+          this.isDownloading = false;
+          this.downloadProgress = 100;
+
+          const blob = new Blob([event.body], { type: 'application/zip' });
+
+          const a = document.createElement('a');
+          const objectUrl = window.URL.createObjectURL(blob);
+
+          a.href = objectUrl;
+          a.download = "collector-bundle.zip";
+          a.click();
+          window.URL.revokeObjectURL(objectUrl);
+        }
+      },
+      error: (err) => {
+        this.isDownloading = false;
+        console.error("Download failed", err);
+      }
     });
   }
 
@@ -110,14 +159,14 @@ export class AdvancedDiscoveryConnectivityRequestComponent implements OnInit, On
     if (this.isDownloading) {
       return;
     }
-    if (!this.collectorRequestUuid) {
-      this.notification.error(new Notification('Error while downloading collector file. Please try again.'));
-      return;
-    }
+    // if (!this.collectorRequestUuid) {
+    //   this.notification.error(new Notification('Error while downloading collector file. Please try again.'));
+    //   return;
+    // }
     this.isDownloading = true;
     this.downloadProgress = 0;
     this.spinner.start('main');
-    this.svc.downloadCollectorBundle(this.collectorRequestUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.downloadCollectorBundle(this.collectorDetails.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.svc.saveCollectorFile(res);
       this.commands = this.svc.getCommands(this.formPayload);
       this.downloadProgress = 100;
@@ -168,17 +217,6 @@ export class AdvancedDiscoveryConnectivityRequestComponent implements OnInit, On
     return false;
   }
 
-  private handleCreateCollectorSuccess(res: AdvancedDiscoveryConnectivityRequestCreateResponse) {
-    this.collectorRequestUuid = this.svc.getCollectorRequestUuid(res);
-    // TODO: Enable this check once the create API response UUID shape is finalized.
-    // if (!this.collectorRequestUuid) {
-    //   this.nonFieldErr = 'Something went wrong!! Please try again.';
-    //   this.spinner.stop('main');
-    //   return;
-    // }
-    this.moveToDownloadStep();
-  }
-
   private moveToDownloadStep() {
     this.commands = this.svc.getCommands(this.formPayload);
     this.resetDownloadState();
@@ -188,11 +226,12 @@ export class AdvancedDiscoveryConnectivityRequestComponent implements OnInit, On
 
   private handleCreateCollectorError(err: HttpErrorResponse) {
     // TODO: Restore this error handling once the create API is ready for this flow.
-    // const errors = this.svc.applyCreateErrors(err.error, this.formErrors);
-    // this.formErrors = errors.formErrors;
-    // this.nonFieldErr = errors.nonFieldErr;
-    // this.subscribeForValidation();
-    this.moveToDownloadStep();
+    const errors = this.svc.applyCreateErrors(err.error, this.formErrors);
+    this.formErrors = errors.formErrors;
+    this.nonFieldErr = errors.nonFieldErr;
+    this.subscribeForValidation();
+    this.spinner.stop('main');
+    // this.moveToDownloadStep();
   }
 
   private resetDownloadState() {

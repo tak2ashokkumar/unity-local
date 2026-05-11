@@ -125,11 +125,9 @@
           <tr>
             <th>Collector Name</th>
             <th>IP Address</th>
-            <th>SSH User</th>
-            <th>SSH Port</th>
             <th>Deployment Status</th>
-            <th>Created On</th>
-            <th>Cert Valid</th>
+            <th>Cert Status</th>
+            <th>Cert Valid Till</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -137,11 +135,9 @@
           <tr *ngFor="let view of accessViewData">
             <td class="align-middle">{{view.agentName}}</td>
             <td class="align-middle">{{view.ipAddress}}</td>
-            <td class="align-middle">{{view.sshUser}}</td>
-            <td class="align-middle">{{view.sshPort}}</td>
             <td class="align-middle">{{view.deplymentState}}</td>
-            <td class="align-middle">{{view.createdOn}}</td>
-            <td class="align-middle">{{view.certValid}}</td>
+            <td class="align-middle">{{view.certStatus}}</td>
+            <td class="align-middle">{{view.certValidTill}}</td>
             <td class="align-middle">
               <button class="action-icons mb-0 fas fa-network-wired font-sm ml-1" container="body"
                 tooltip="Update Management IP" (click)="openUpdateCollectorModal(view, 'ip')" accessControl

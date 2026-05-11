@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { DOWNLOAD_COLLECTOR_BUNDLE, REQUEST_COLLECTOR_ACCESS } from 'src/app/shared/api-endpoint.const';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import {
+  AdvancedDiscoveryConnectivityRequest,
   AdvancedDiscoveryConnectivityRequestCommand,
   AdvancedDiscoveryConnectivityRequestCreatePayload,
   AdvancedDiscoveryConnectivityRequestCreateResponse
@@ -54,14 +55,15 @@ export class AdvancedDiscoveryConnectivityRequestService {
     };
   }
 
-  createCollectorRequest(payload: AdvancedDiscoveryConnectivityRequestCreatePayload): Observable<AdvancedDiscoveryConnectivityRequestCreateResponse> {
-    return this.http.post<AdvancedDiscoveryConnectivityRequestCreateResponse>(REQUEST_COLLECTOR_ACCESS(), payload);
+  saveCollectorDetails(payload: AdvancedDiscoveryConnectivityRequestCreatePayload): Observable<AdvancedDiscoveryConnectivityRequest> {
+    return this.http.post<AdvancedDiscoveryConnectivityRequest>(REQUEST_COLLECTOR_ACCESS(), payload);
   }
 
   downloadCollectorBundle(uuid: string): Observable<HttpResponse<Blob>> {
     return this.http.get(DOWNLOAD_COLLECTOR_BUNDLE(uuid), {
-      observe: 'response',
-      responseType: 'blob'
+      responseType: 'blob',
+      observe: 'events',
+      reportProgress: true
     }) as Observable<HttpResponse<Blob>>;
   }
 
@@ -98,6 +100,8 @@ export class AdvancedDiscoveryConnectivityRequestService {
 
     if (err && err.non_field_errors) {
       nonFieldErr = err.non_field_errors[0];
+    } else if (err && err.error && typeof err.error == 'string') {
+      nonFieldErr = err.error;
     } else if (typeof err === 'string') {
       nonFieldErr = err;
     } else if (err) {

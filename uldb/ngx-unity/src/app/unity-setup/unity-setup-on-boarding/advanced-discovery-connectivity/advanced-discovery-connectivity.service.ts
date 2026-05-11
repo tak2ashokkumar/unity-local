@@ -43,6 +43,8 @@ export class AdvancedDiscoveryConnectivityService {
       vd.snmpCommunity = this.toDisplayValue(config.snmp_community);
       vd.certTtl = config.cert_ttl;
       vd.certValid = this.toDisplayValue(config.cert_valid);
+      vd.certStatus = this.toDisplayValue(config.cert_status);
+      vd.certValidTill = config.cert_expiry ? this.utilSvc.toUnityOneDateFormat(config.cert_expiry) : 'NA';
       vd.testResult = config.test_result;
       if (vd.testResult) {
         vd.testResult.date = config.test_result && config.test_result.date ? this.utilSvc.toUnityOneDateFormat(config.test_result.date) : 'N/A';
@@ -193,6 +195,8 @@ export class AgentConfigurationViewData {
   testResult: ConnectionTestResult;
   certTtl: number | string;
   certValid: string;
+  certStatus: string;
+  certValidTill: string;
 
   isNewTabEnabled: boolean;
   newTabToolipMessage: string;

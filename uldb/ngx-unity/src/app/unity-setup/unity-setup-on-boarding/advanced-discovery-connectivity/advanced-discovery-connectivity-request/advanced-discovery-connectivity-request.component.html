@@ -50,7 +50,7 @@
         </form>
         <div class="d-flex justify-content-center mt-2">
           <button class="btn btn-outline-danger" type="button" (click)="goBack()">Cancel</button>
-          <button class="btn btn-success ml-3" type="button" (click)="goNextFromDetails()">Next</button>
+          <button class="btn btn-success ml-3" type="button" (click)="saveCollectorDetails()">Next</button>
         </div>
       </ng-container>
 
@@ -61,7 +61,7 @@
             Deploy your infrastructure monitoring in minutes. Download the ready-made collector container along with
             collector details and required certificates to begin the simplified onboarding process
           </p>
-          <div class="row justify-content-center mb-4" *ngIf="isDownloaded">
+          <div class="row justify-content-center mb-4" *ngIf="isDownloading || isDownloaded">
             <div class="col-3">
               <div class="progress mt-2">
                 <div class="progress-bar bg-success" role="progressbar" [style.width.%]="downloadProgress"></div>
@@ -70,7 +70,7 @@
             <div class="col-auto font-lg">{{downloadProgress}}%</div>
           </div>
           <button class="btn btn-outline-danger" type="button" (click)="goBack()">Back</button>
-          <button class="btn btn-success ml-3" type="button" *ngIf="!isDownloaded" (click)="requestAccess()"
+          <button class="btn btn-success ml-3" type="button" *ngIf="!isDownloaded" (click)="downloadCollectorBundle()"
             [disabled]="isDownloading">
             {{isDownloading ? 'Downloading...' : 'Download Now'}}
           </button>
