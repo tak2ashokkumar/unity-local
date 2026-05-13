@@ -1,0 +1,170 @@
+[
+    {
+        "id": 701,
+        "created_by": "Unity Demo",
+        "last_execution": null,
+        "unit": null,
+        "data": [
+            {
+                "count": 17,
+                "name": "Demo Cloud - Custom"
+            }
+        ],
+        "uuid": "54e18829-3b04-43ba-8598-fa859dfaa43e",
+        "name": "Alerts By",
+        "widget_type": "alerts",
+        "cloud": null,
+        "platform_type": null,
+        "group_by": "cloud_type",
+        "status": "published",
+        "created_at": "2026-05-13T10:58:21.178511-07:00",
+        "position": 3,
+        "filter_by": null,
+        "graph_type": null,
+        "period": "latest",
+        "period_hour": null,
+        "period_min": null,
+        "view_by": null,
+        "metrics_network_data": null,
+        "device_type": null,
+        "network_group_by": null,
+        "devices": null,
+        "top_count": null,
+        "device_items": null,
+        "group_by_filter": [
+            "Demo Cloud - Custom",
+            "2. DemoHyperV - HyperV Cloud",
+            "1.DemoVcloud"
+        ],
+        "view_graph_type": null,
+        "start_time": null,
+        "end_time": null,
+        "dashboard": 52,
+        "user": null,
+        "customer": 365
+    },
+    {
+        "id": 700,
+        "created_by": "Unity Demo",
+        "last_execution": null,
+        "unit": null,
+        "data": [
+            {
+                "count": 719,
+                "name": "Critical"
+            },
+            {
+                "count": 550,
+                "name": "Warning"
+            },
+            {
+                "count": 8,
+                "name": "Information"
+            }
+        ],
+        "uuid": "cd87fd15-38b8-4c46-9825-a5db13cc274f",
+        "name": "Alerts by Severity",
+        "widget_type": "alerts",
+        "cloud": null,
+        "platform_type": null,
+        "group_by": "severity",
+        "status": "published",
+        "created_at": "2026-05-13T10:57:18.672304-07:00",
+        "position": 2,
+        "filter_by": null,
+        "graph_type": null,
+        "period": "latest",
+        "period_hour": null,
+        "period_min": null,
+        "view_by": null,
+        "metrics_network_data": null,
+        "device_type": null,
+        "network_group_by": null,
+        "devices": null,
+        "top_count": null,
+        "device_items": null,
+        "group_by_filter": [
+            "Critical",
+            "Warning",
+            "Information"
+        ],
+        "view_graph_type": null,
+        "start_time": null,
+        "end_time": null,
+        "dashboard": 52,
+        "user": null,
+        "customer": 365
+    },
+    {
+        "id": 699,
+        "created_by": "Unity Demo",
+        "last_execution": null,
+        "unit": null,
+        "data": [
+            {
+                "count": 686,
+                "name": "Nagios"
+            },
+            {
+                "count": 574,
+                "name": "Unity"
+            },
+            {
+                "count": 10,
+                "name": "Zabbix"
+            },
+            {
+                "count": 2,
+                "name": "Oci"
+            },
+            {
+                "count": 2,
+                "name": "Aws"
+            },
+            {
+                "count": 2,
+                "name": "Azure"
+            },
+            {
+                "count": 1,
+                "name": "Gcp"
+            }
+        ],
+        "uuid": "0e6d24d0-34c1-4a61-b0de-8d87ccbaca05",
+        "name": "Alerts By Source",
+        "widget_type": "alerts",
+        "cloud": null,
+        "platform_type": null,
+        "group_by": "alert_source",
+        "status": "published",
+        "created_at": "2026-05-13T10:56:22.831964-07:00",
+        "position": 1,
+        "filter_by": null,
+        "graph_type": null,
+        "period": "latest",
+        "period_hour": null,
+        "period_min": null,
+        "view_by": null,
+        "metrics_network_data": null,
+        "device_type": null,
+        "network_group_by": null,
+        "devices": null,
+        "top_count": null,
+        "device_items": null,
+        "group_by_filter": [
+            "Unity",
+            "Zabbix",
+            "Gcp",
+            "Nagios",
+            "Azure",
+            "Aws",
+            "Oci"
+        ],
+        "view_graph_type": null,
+        "start_time": null,
+        "end_time": null,
+        "dashboard": 52,
+        "user": null,
+        "customer": 365
+    }
+]

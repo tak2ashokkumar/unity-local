@@ -1,11 +1,9 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { from, Subject } from 'rxjs';
-import { mergeMap, takeUntil } from 'rxjs/operators';
-import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { EMPTY, from, Subject } from 'rxjs';
+import { catchError, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { FaIconMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { UserInfoService } from 'src/app/shared/user-info.service';
 import { SYNC_IN_PROGRESS_MSG, WIDGET_DATA_LOAD_ERROR } from '../../app-dashboard.component';
 import { PersonaDashboard } from '../app-persona-dashboards.type';
 import { AppPersonaDashboardViewService, MetricesMappingViewData, PersonaDashboardWidgetViewData } from './app-persona-dashboard-view.service';
@@ -16,46 +14,41 @@ import { AppPersonaDashboardViewService, MetricesMappingViewData, PersonaDashboa
   styleUrls: ['./app-persona-dashboard-view.component.scss'],
   providers: [AppPersonaDashboardViewService]
 })
-export class AppPersonaDashboardViewComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() activeBoard: PersonaDashboard;
-  @Input() showHeader: boolean = true;
+export class AppPersonaDashboardViewComponent implements OnInit, OnDestroy {
+  private ngUnsubscribe = new Subject<void>();
+  collectionId: string;
+  dashboardId: string;
 
-  private ngUnsubscribe = new Subject();
+  dashboard: PersonaDashboard;
   dashboardWidgets: PersonaDashboardWidgetViewData[] = [];
   publishedWidgets: PersonaDashboardWidgetViewData[] = [];
-  dataSyncEnd: boolean = false;
+  dataSyncEnd: boolean = true;
   dataError: string = null;
   syncInProgressMsg: string = SYNC_IN_PROGRESS_MSG;
   private dashboardRefreshCountDownIntervalId: any;
-  dashboardRefreshCountDown: number;
-  dashboardId: string;
+  dashboardRefreshCountDown: number = 0;
+  private syncingDashboardUuid: string;
 
   constructor(private svc: AppPersonaDashboardViewService,
     private router: Router,
     private route: ActivatedRoute,
-    private spinner: AppSpinnerService,
-    public userSvc: UserInfoService,
-    private notification: AppNotificationService,) { }
+    private spinner: AppSpinnerService,) { }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
-      this.dashboardId = params.get('id');
+      this.collectionId = params.get('collectionId');
+      this.dashboardId = params.get('id') || params.get('dashboardId');
       if (this.dashboardId) {
-        this.getDashboardDetails();
+        this.loadDashboard(this.dashboardId);
+      } else {
+        this.resetDashboard();
       }
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.activeBoard && this.activeBoard?.uuid) {
-      this.loadActiveDashboard();
-    }
-  }
   ngOnDestroy(): void {
+    this.clearDashboardRefreshTimer();
     this.spinner.stop('main');
-    if (this.dashboardRefreshCountDownIntervalId) {
-      clearInterval(this.dashboardRefreshCountDownIntervalId);
-    }
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
@@ -64,81 +57,214 @@ export class AppPersonaDashboardViewComponent implements OnInit, OnChanges, OnDe
     this.syncWidgetsData();
   }
 
-  getDashboardDetails() {
-    this.spinner.start('main');
-    this.svc.getDashboardDetails(this.dashboardId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.activeBoard = res;
-      this.loadActiveDashboard();
-    }, err => {
-      this.activeBoard = null;
-      this.spinner.stop('main');
-    });
+  get refreshIntervalDisplay(): string {
+    return this.formatRefreshInterval(this.getDashboardRefreshInterval());
   }
 
-  loadActiveDashboard() {
-    if (!this.activeBoard?.uuid) {
+  loadDashboard(dashboardId: string) {
+    if (!dashboardId || this.dashboard?.uuid === dashboardId) {
       return;
     }
 
+    this.resetDashboard();
     this.spinner.start('main');
-    this.getDashboardWidgets();
-    this.syncWidgetsData();
+    this.svc.getDashboardDetails(dashboardId).pipe(
+      switchMap(dashboard => {
+        if (this.dashboardId !== dashboardId) {
+          return EMPTY;
+        }
+
+        this.dashboard = dashboard;
+        return this.svc.getDashboardWidgets(dashboard.uuid).pipe(
+          map(widgets => ({ dashboard, widgets })),
+          catchError(err => {
+            if (this.dashboardId === dashboardId) {
+              this.dashboardWidgets = [];
+              this.publishedWidgets = [];
+              this.dataError = WIDGET_DATA_LOAD_ERROR;
+              this.clearDashboardRefreshTimer();
+            }
+            return EMPTY;
+          })
+        );
+      }),
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => this.spinner.stop('main'))
+    ).subscribe(({ dashboard, widgets }) => {
+      if (this.dashboardId === dashboardId) {
+        this.dashboard = dashboard;
+        this.setDashboardWidgets(widgets);
+        this.manageDashboardRefresh();
+        this.syncWidgetsData();
+      }
+    }, err => {
+      if (this.dashboardId === dashboardId) {
+        this.showDashboardLoadError();
+      }
+    });
   }
 
   syncWidgetsData() {
+    const dashboardUuid = this.dashboard?.uuid;
+    if (!dashboardUuid || this.syncingDashboardUuid === dashboardUuid) {
+      return;
+    }
+
+    this.syncingDashboardUuid = dashboardUuid;
     this.dataSyncEnd = false;
     this.dataError = null;
-    this.svc.syncWidgetsData(this.activeBoard.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.getDashboardWidgets();
-      this.dataSyncEnd = true;
+    this.svc.syncWidgetsData(dashboardUuid).pipe(
+      takeUntil(this.ngUnsubscribe),
+      finalize(() => {
+        if (this.syncingDashboardUuid === dashboardUuid) {
+          this.syncingDashboardUuid = null;
+        }
+
+        if (this.dashboard?.uuid === dashboardUuid) {
+          this.dataSyncEnd = true;
+          this.resetDashboardRefreshCountdown();
+        }
+      })
+    ).subscribe(res => {
+      if (this.dashboard?.uuid === dashboardUuid) {
+        this.getDashboardWidgets();
+      }
     }, err => {
-      this.dataSyncEnd = true;
-      this.dataError = WIDGET_DATA_LOAD_ERROR;
+      if (this.dashboard?.uuid === dashboardUuid) {
+        this.dataError = WIDGET_DATA_LOAD_ERROR;
+      }
     })
   }
 
   getDashboardWidgets() {
-    this.svc.getDashboardWidgets(this.activeBoard.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.dashboardWidgets = res;
-      this.publishedWidgets = this.dashboardWidgets.filter(d => d.status == 'published');
-      this.getWidgetChartData();
+    const dashboardUuid = this.dashboard?.uuid;
+    if (!dashboardUuid) {
+      return;
+    }
+
+    this.svc.getDashboardWidgets(dashboardUuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (this.dashboard?.uuid !== dashboardUuid) {
+        return;
+      }
+
+      this.setDashboardWidgets(res);
       this.manageDashboardRefresh();
-      this.spinner.stop('main');
     }, err => {
+      if (this.dashboard?.uuid !== dashboardUuid) {
+        return;
+      }
+
       this.dashboardWidgets = [];
       this.publishedWidgets = [];
-      this.spinner.stop('main');
+      this.dataError = WIDGET_DATA_LOAD_ERROR;
+      this.clearDashboardRefreshTimer();
     })
   }
 
+  private setDashboardWidgets(widgets: PersonaDashboardWidgetViewData[]) {
+    this.dashboardWidgets = widgets || [];
+    this.publishedWidgets = this.dashboardWidgets.filter(d => d.status == 'published');
+    this.getWidgetChartData();
+  }
+
+  private resetDashboard() {
+    this.dashboard = null;
+    this.syncingDashboardUuid = null;
+    this.dashboardWidgets = [];
+    this.publishedWidgets = [];
+    this.dataSyncEnd = true;
+    this.dataError = null;
+    this.clearDashboardRefreshTimer();
+  }
+
+  private showDashboardLoadError() {
+    this.resetDashboard();
+    this.dataError = WIDGET_DATA_LOAD_ERROR;
+  }
+
   manageDashboardRefresh() {
-    if (this.dashboardRefreshCountDownIntervalId) {
-      clearInterval(this.dashboardRefreshCountDownIntervalId);
+    this.clearDashboardRefreshTimer();
+    if (!this.isDashboardRefreshEnabled()) {
+      this.dashboardRefreshCountDown = 0;
+      return;
     }
-    this.dashboardRefreshCountDown = this.activeBoard.refresh_interval_in_sec;
+
+    this.resetDashboardRefreshCountdown();
     this.dashboardRefreshCountDownIntervalId = setInterval(() => {
       this.dashboardRefreshCountDown--;
-      if (this.dashboardRefreshCountDown === 0) {
-        this.refreshData(); // or call API if soft refresh
+      if (this.dashboardRefreshCountDown <= 0) {
+        this.resetDashboardRefreshCountdown();
+        this.refreshData();
       }
     }, 1000);
+  }
+
+  private clearDashboardRefreshTimer() {
+    if (this.dashboardRefreshCountDownIntervalId) {
+      clearInterval(this.dashboardRefreshCountDownIntervalId);
+      this.dashboardRefreshCountDownIntervalId = null;
+    }
+  }
+
+  private isDashboardRefreshEnabled(): boolean {
+    const refreshInterval = this.getDashboardRefreshInterval();
+    return !!this.dashboard?.refresh && !!refreshInterval && refreshInterval > 0;
+  }
+
+  private resetDashboardRefreshCountdown() {
+    this.dashboardRefreshCountDown = this.isDashboardRefreshEnabled() ? this.getDashboardRefreshInterval() : 0;
+  }
+
+  private getDashboardRefreshInterval(): number {
+    return this.dashboard?.refresh_interval_in_sec || 0;
+  }
+
+  private formatRefreshInterval(value: number): string {
+    if (!value) {
+      return 'NA';
+    }
+
+    if (value < 60) {
+      return `${value} sec${value === 1 ? '' : 's'}`;
+    }
+
+    if (value < 3600) {
+      const minutes = value / 60;
+      return `${this.formatIntervalValue(minutes)} min${minutes === 1 ? '' : 's'}`;
+    }
+
+    const hours = value / 3600;
+    return `${this.formatIntervalValue(hours)} hour${hours === 1 ? '' : 's'}`;
+  }
+
+  private formatIntervalValue(value: number): string {
+    return Number.isInteger(value) ? value.toString() : value.toFixed(1);
   }
 
   getWidgetChartData() {
     from(this.dashboardWidgets).pipe(
       mergeMap((d) => this.svc.getWidgetChartData(d)),
       takeUntil(this.ngUnsubscribe))
-      .subscribe(res => { },
-        err => console.log(err)
-      )
+      .subscribe(res => { }, err => {
+        this.dataError = WIDGET_DATA_LOAD_ERROR;
+      });
   }
 
-  editDashboard(activeBoard: PersonaDashboard) {
-    this.router.navigate(['../', activeBoard.uuid, 'edit'], { relativeTo: this.route });
+  editDashboard(dashboard: PersonaDashboard) {
+    if (!dashboard?.uuid) {
+      return;
+    }
+
+    this.router.navigate(['/app-dashboard', 'my-dashboards', dashboard.uuid, 'edit']);
   }
 
   goToList() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    if (this.collectionId) {
+      this.router.navigate(['/app-dashboard', 'collections', this.collectionId]);
+      return;
+    }
+
+    this.router.navigate(['/app-dashboard', 'my-dashboards']);
   }
 
   onDeviceSelect(device: MetricesMappingViewData) {

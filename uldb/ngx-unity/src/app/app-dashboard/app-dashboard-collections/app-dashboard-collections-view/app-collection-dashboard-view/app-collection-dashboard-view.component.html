@@ -1,9 +1,7 @@
 <div class="collection-dashboard-page" *ngIf="selectedDashboard">
     <div class="collection-dashboard-body">
         <ng-container [ngSwitch]="selectedDashboard.source">
-            <app-persona-dashboard-view *ngSwitchCase="'personal'" [activeBoard]="activePersonalDashboard"
-                [showHeader]="false"
-                class="w-100">
+            <app-persona-dashboard-view *ngSwitchCase="'personal'" class="w-100">
             </app-persona-dashboard-view>
 
             <ng-container *ngSwitchCase="'default'">

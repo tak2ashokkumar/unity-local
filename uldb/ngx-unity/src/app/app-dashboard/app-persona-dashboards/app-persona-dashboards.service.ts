@@ -23,11 +23,12 @@ export class AppPersonaDashboardsService {
       let view: PersonaDashboardListViewData = new PersonaDashboardListViewData();
       view.dashboardId = d.uuid;
       view.name = d.name;
-      view.type = d.type;
+      view.type = d.type ? d.type : 'NA';
       // view.owner = d.owner;
       // view.group = d.group;
       // view.extraGroups = element.extra_groups;
       view.refreshInterval = d.refresh_interval_in_sec;
+      view.refreshIntervalDisplay = this.formatRefreshInterval(d.refresh_interval_in_sec);
       view.status = d.status;
       view.lastModified = d.updated_at ? this.utilSvc.toUnityOneDateFormat(d.updated_at) : 'NA';
       viewData.push(view);
@@ -42,6 +43,28 @@ export class AppPersonaDashboardsService {
   delete(id: string) {
     return this.http.delete(`/customer/persona/dashboards/${id}/`);
   }
+
+  private formatRefreshInterval(value: number | null): string {
+    if (!value) {
+      return 'NA';
+    }
+
+    if (value < 60) {
+      return `${value} sec${value === 1 ? '' : 's'}`;
+    }
+
+    if (value < 3600) {
+      const minutes = value / 60;
+      return `${this.formatIntervalValue(minutes)} min${minutes === 1 ? '' : 's'}`;
+    }
+
+    const hours = value / 3600;
+    return `${this.formatIntervalValue(hours)} hour${hours === 1 ? '' : 's'}`;
+  }
+
+  private formatIntervalValue(value: number): string {
+    return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+  }
 }
 
 export class PersonaDashboardListViewData {
@@ -54,4 +77,5 @@ export class PersonaDashboardListViewData {
   extraGroups: string[];
   status: string;
   refreshInterval: number;
+  refreshIntervalDisplay: string;
 }

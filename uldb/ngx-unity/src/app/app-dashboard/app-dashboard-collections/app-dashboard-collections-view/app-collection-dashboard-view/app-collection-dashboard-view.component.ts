@@ -6,7 +6,6 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { PersonaDashboard } from '../../../app-persona-dashboards/app-persona-dashboards.type';
 import { CollectionDetailResponse, DashboardItem } from '../../app-dashboard-collections-crud/app-dashboard-collections-crud.type';
 import { AppDashboardCollectionsViewService } from '../app-dashboard-collections-view.service';
 
@@ -46,10 +45,6 @@ export class AppCollectionDashboardViewComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  get activePersonalDashboard(): PersonaDashboard {
-    return this.selectedDashboard as any;
-  }
-
   get defaultDashboardRoute(): string {
     return this.selectedDashboard?.defaultDashboardRoute || '';
   }
@@ -59,6 +54,7 @@ export class AppCollectionDashboardViewComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.selectedDashboard = null;
     this.spinner.start('main');
     forkJoin({
       collection: this.svc.getCollection(this.collectionId),

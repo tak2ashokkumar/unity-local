@@ -1,11 +1,11 @@
-import { TitleCasePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 import { AppLevelService } from 'src/app/app-level.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
+import { CeleryTask, CeleryTaskV2 } from 'src/app/shared/SharedEntityTypes/celery-task.type';
+import { TaskStatus } from 'src/app/shared/SharedEntityTypes/task-status.type';
 import { UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { PersonaDashboard, PersonaDashboardWidget, PersonaDashboardWidgetData } from '../app-persona-dashboards.type';
 
@@ -15,16 +15,21 @@ export class AppPersonaDashboardViewService {
   constructor(private http: HttpClient,
     private chartConfigSvc: UnityChartConfigService,
     private utilSvc: AppUtilityService,
-    private appSvc: AppLevelService,
-    private titleCasePipe: TitleCasePipe) { }
+    private appSvc: AppLevelService) { }
 
   getDashboardDetails(dashboardId: string): Observable<PersonaDashboard> {
     return this.http.get<PersonaDashboard>(`/customer/persona/dashboards/${dashboardId}/`);
   }
 
-  syncWidgetsData(dashboardId: string) {
-    return this.http.get<CeleryTask>(`/customer/persona/dashboards/${dashboardId}/widgets/sync_widget_data/`)
-      .pipe(switchMap(res => this.appSvc.pollForTask(res.task_id, 4).pipe(take(1))), take(1));
+  syncWidgetsData(dashboardId: string): Observable<TaskStatus> {
+    return this.http.get<CeleryTask | CeleryTaskV2>(`/customer/persona/dashboards/${dashboardId}/widgets/sync_widget_data/`)
+      .pipe(switchMap(res => {
+        const taskId = this.getTaskId(res);
+        if (!taskId) {
+          throw new Error('Task id not found.');
+        }
+        return this.appSvc.pollForTask(taskId, 4).pipe(take(1));
+      }), take(1));
   }
 
   getDashboardWidgets(dashboardId: string): Observable<PersonaDashboardWidgetViewData[]> {
@@ -44,15 +49,15 @@ export class AppPersonaDashboardViewService {
       case 'public_cloud': return of(this.updatePublicCloudWidget(widget));
       case 'infra_summary': return of(this.updateInfraSummaryWidget(widget));
       case 'cloud_cost':
-        widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+        widget.totalCount = this.getWidgetTotalCount(widget);
         widget.chartData = this.convertToNightingaleChartData(widget);
         return of(widget);
       case 'alerts':
-        widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+        widget.totalCount = this.getWidgetTotalCount(widget);
         widget.chartData = this.convertToNightingaleChartData(widget);
         return of(widget);
       case 'sustainability':
-        widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+        widget.totalCount = this.getWidgetTotalCount(widget);
         widget.chartData = this.convertToNightingaleChartData(widget);
         return of(widget);
       case 'monitoring': return of(this.updateMonitoringWidget(widget));
@@ -62,8 +67,16 @@ export class AppPersonaDashboardViewService {
     }
   }
 
+  private getTaskId(task: CeleryTask | CeleryTaskV2): string | undefined {
+    return (task as CeleryTask).task_id || (task as CeleryTaskV2).celery_task?.task_id;
+  }
+
+  private getWidgetTotalCount(widget: PersonaDashboardWidgetViewData): number {
+    return (widget.data || []).reduce((total, item) => total + (Number(item.count) || 0), 0);
+  }
+
   updateHostAvailabilityWidget(widget: PersonaDashboardWidgetViewData) {
-    widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+    widget.totalCount = this.getWidgetTotalCount(widget);
     switch (widget.group_by) {
       case 'status':
         widget.chartData = this.convertToHostAvailabilityChartData(widget);
@@ -113,7 +126,7 @@ export class AppPersonaDashboardViewService {
   }
 
   updatePrivateCloudWidget(widget: PersonaDashboardWidgetViewData) {
-    widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+    widget.totalCount = this.getWidgetTotalCount(widget);
     widget.customLegends = true;
     widget.chartData = this.convertToPrivateCloudChartData(widget);
     return widget;
@@ -154,10 +167,9 @@ export class AppPersonaDashboardViewService {
   }
 
   updatePublicCloudWidget(widget: PersonaDashboardWidgetViewData) {
-    widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+    widget.totalCount = this.getWidgetTotalCount(widget);
     widget.customLegends = true;
     widget.chartData = this.convertToPublicCloudChartData(widget);
-    console.log('colors :', widget.chartData.options.color);
     return widget;
   }
   convertToPublicCloudChartData(widget: PersonaDashboardWidgetViewData) {
@@ -196,7 +208,7 @@ export class AppPersonaDashboardViewService {
   }
 
   updateInfraSummaryWidget(widget: PersonaDashboardWidgetViewData) {
-    widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+    widget.totalCount = this.getWidgetTotalCount(widget);
     widget.customLegends = true;
     widget.chartData = this.convertToInfraSummaryChartData(widget);
     return widget;
@@ -261,7 +273,7 @@ export class AppPersonaDashboardViewService {
   }
 
   updateMonitoringWidget(widget: PersonaDashboardWidgetViewData) {
-    widget.totalCount = widget.data.length ?? 0;
+    widget.totalCount = widget.data?.length || 0;
     widget.customLegends = true;
     if (widget.filter_by == 'latest') {
       widget.metricesMappingData = this.convertToMetricesMappingData(widget.data);
@@ -272,8 +284,9 @@ export class AppPersonaDashboardViewService {
     return widget;
   }
 
-  convertToLineChartData(graphData: any, filterType: string, deviceType: string) {
+  convertToLineChartData(graphData: any[] = [], filterType: string, deviceType: string) {
     let view: UnityChartDetails = new UnityChartDetails();
+    const safeGraphData = graphData || [];
     view.type = UnityChartTypes.LINE;
     view.options = this.chartConfigSvc.getDefaultLineChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.LINE);
@@ -282,13 +295,13 @@ export class AppPersonaDashboardViewService {
     const legendData: string[] = [];
     // const xAxisSet: Set<string> = new Set(); // Avoid duplicate
     const seriesData: any[] = [];
-    graphData?.forEach(dataItem => {
+    safeGraphData.forEach(dataItem => {
       if (!legendData.includes(dataItem.name)) {
         legendData.push(dataItem.name);
       }
 
       let Arr = [];
-      dataItem.series.forEach(s => {
+      (dataItem.series || []).forEach(s => {
         // xAxisSet.add(s.timestamp); // Collect unique timestamps        
         const value = Math.round(Number(s[filterType]));
         Arr.push(value);
@@ -306,7 +319,7 @@ export class AppPersonaDashboardViewService {
 
     // Sort x-axis if needed
     // const xAxisdata = [...xAxisSet];
-    const xAxisdata = this.trimData(this.getLabels(graphData))
+    const xAxisdata = this.trimData(this.getLabels(safeGraphData))
 
     // Assign chart options
     view.options = {
@@ -347,11 +360,11 @@ export class AppPersonaDashboardViewService {
     return view;
   }
 
-  getLabels(data: any[]) {
+  getLabels(data: any[] = []) {
     let labelArray: any[] = [];
     let date: any = ''
     let labels: any[] = [];
-    data.forEach(m => {
+    (data || []).forEach(m => {
       labelArray = [];
       if (m.series && m.series.length) {
         labelArray = m.series.map(d => d.timestamp);
@@ -367,8 +380,9 @@ export class AppPersonaDashboardViewService {
     return labels;
   }
 
-  trimData(data: any[]) {
+  trimData(data: any[] = []) {
     const max = 15;
+    data = data || [];
     if (data.length <= max) {
       return data;
     }
@@ -383,9 +397,9 @@ export class AppPersonaDashboardViewService {
     return trimmedData;
   }
 
-  convertToMetricesMappingData(data: any[]): MetricesMappingViewData[] {
+  convertToMetricesMappingData(data: any[] = []): MetricesMappingViewData[] {
     let viewData: MetricesMappingViewData[] = [];
-    data.forEach(device => {
+    (data || []).forEach(device => {
       let view: MetricesMappingViewData = new MetricesMappingViewData();
       view.name = device.device_name;
       if (device.status) {
@@ -393,8 +407,9 @@ export class AppPersonaDashboardViewService {
       } else {
         view.status = 'Not Configured';
       }
-      if (device.items.length) {
-        device.items.forEach(item => {
+      const items = device.items || [];
+      if (items.length) {
+        items.forEach(item => {
           let metric: MetricViewData = new MetricViewData();
           metric.name = item.name;
           metric.value = item.latest_value;
@@ -443,7 +458,7 @@ export class AppPersonaDashboardViewService {
   }
 
   updateDeviceByOSWidget(widget: PersonaDashboardWidgetViewData) {
-    widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
+    widget.totalCount = this.getWidgetTotalCount(widget);
     widget.customLegends = true;
     widget.chartData = this.convertToHostAvailabilityChartData(widget);
     return widget;
@@ -462,7 +477,7 @@ export class AppPersonaDashboardViewService {
     view.options = this.chartConfigSvc.getNightingalePieChartWithHorizontalLegendsOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
     let data: UnityChartDataType[] = [];
-    widget.data?.forEach(d => {
+    (widget.data || []).forEach(d => {
       if (d.count !== 0) {
         data.push({ name: d.name, value: d.count });
       }
