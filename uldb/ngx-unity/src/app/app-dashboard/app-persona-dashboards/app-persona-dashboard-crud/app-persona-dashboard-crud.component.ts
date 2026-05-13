@@ -17,22 +17,21 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { CustomDateRangeType } from 'src/app/shared/SharedEntityTypes/unity-utils.type';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { customDateRangeOptions, CustomDropdownOptions, deviceTypes, refreshIntervals, widgetCategories } from '../app-dashboard.service';
-import { AppDashboardListType } from '../app-dashboard.type';
-import { AppDashboardCrudService, AppDashboardWidgetCategoryOptions, MetricesMappingViewData } from './app-dashboard-crud.service';
-import { DashboardDevice } from './app-dashboard-crud.type';
+import { customDateRangeOptions, CustomDropdownOptions, deviceTypes, refreshIntervals, widgetCategories } from '../../app-dashboard.service';
+import { PersonaDashboard } from '../app-persona-dashboards.type';
+import { AppPersonaDashboardCrudService, AppDashboardWidgetCategoryOptions, DashboardDeviceViewData, MetricesMappingViewData } from './app-persona-dashboard-crud.service';
 
 @Component({
-  selector: 'app-dashboard-crud',
-  templateUrl: './app-dashboard-crud.component.html',
-  styleUrls: ['./app-dashboard-crud.component.scss'],
-  providers: [AppDashboardCrudService]
+  selector: 'app-persona-dashboard-crud',
+  templateUrl: './app-persona-dashboard-crud.component.html',
+  styleUrls: ['./app-persona-dashboard-crud.component.scss'],
+  providers: [AppPersonaDashboardCrudService]
 })
-export class AppDashboardCrudComponent implements OnInit, OnDestroy {
+export class AppPersonaDashboardCrudComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   subscr: Subscription;
   viewId: string;
-  viewData: AppDashboardListType;
+  viewData: PersonaDashboard;
 
   detailsForm: FormGroup;
   detailsFormErrors: any;
@@ -81,9 +80,9 @@ export class AppDashboardCrudComponent implements OnInit, OnDestroy {
   activeForm: string = 'detailsForm';
   nonFieldErr: string = '';
 
-  deviceList: Array<DashboardDevice> = [];
-  infiniteDeviceList: Array<DashboardDevice> = [];
-  selectedDevice: DashboardDevice;
+  deviceList: Array<DashboardDeviceViewData> = [];
+  infiniteDeviceList: Array<DashboardDeviceViewData> = [];
+  selectedDevice: DashboardDeviceViewData;
   infiniteMetricList: Array<any> = [];
   deviceCount: number = 0;
   // widgetDetails: CustomDashboardWidget = null;
@@ -107,7 +106,7 @@ export class AppDashboardCrudComponent implements OnInit, OnDestroy {
   deviceTypeList: Array<{ name: string, displayName: string }> = deviceTypes;
   customDateRange: any;
   customDateRangeValue: any = 'last_24_hours';
-  constructor(private svc: AppDashboardCrudService,
+  constructor(private svc: AppPersonaDashboardCrudService,
     private router: Router,
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
@@ -173,13 +172,13 @@ export class AppDashboardCrudComponent implements OnInit, OnDestroy {
   getDevices(deviceType: string, metricesMapping?: boolean) {
     this.isDeviceBottomLoader = this.isDeviceLoader ? false : true;
     this.svc.getDevicesByDeviceType(deviceType, metricesMapping, this.deviceCurrentCriteria).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.deviceCount = metricesMapping ? (res as PaginatedResult<DashboardDevice>).count : 0;
+      this.deviceCount = metricesMapping ? (res as PaginatedResult<DashboardDeviceViewData>).count : 0;
       if (deviceType == 'baremetal') {
         // this.deviceList = this.deviceList.concat(res.map(data => data.server));
-        this.deviceList = metricesMapping ? (res as PaginatedResult<DashboardDevice>).results.map(data => data.server) : (res as DashboardDevice[]).map(data => data.server);
+        this.deviceList = metricesMapping ? (res as PaginatedResult<DashboardDeviceViewData>).results.map(data => this.svc.toDashboardDeviceViewData(data.server)) : (res as DashboardDeviceViewData[]).map(data => this.svc.toDashboardDeviceViewData(data.server));
       } else {
         // this.deviceList = this.deviceList.concat(res);
-        this.deviceList = metricesMapping ? (res as PaginatedResult<DashboardDevice>).results : (res as DashboardDevice[]);
+        this.deviceList = metricesMapping ? (res as PaginatedResult<DashboardDeviceViewData>).results.map(data => this.svc.toDashboardDeviceViewData(data)) : (res as DashboardDeviceViewData[]).map(data => this.svc.toDashboardDeviceViewData(data));
       }
       this.infiniteDeviceList = this.infiniteDeviceList.concat(this.deviceList);
       this.isDeviceLoader = false;
@@ -371,7 +370,7 @@ export class AppDashboardCrudComponent implements OnInit, OnDestroy {
     });
   }
 
-  getDeviceClass(device: DashboardDevice) {
+  getDeviceClass(device: DashboardDeviceViewData) {
     const index = this.infiniteDeviceList.findIndex(d => d.uuid == device.uuid);
     if (index > -1) {
       if (this.infiniteDeviceList[index].isSelected) {
@@ -382,7 +381,7 @@ export class AppDashboardCrudComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectDevice(device: DashboardDevice) {
+  selectDevice(device: DashboardDeviceViewData) {
     this.deviceCurrentCriteria.pageNo = 1;
     this.metricCurrentCriteria.pageNo = 1;
     const index = this.infiniteDeviceList.findIndex(d => d.uuid == device.uuid);

@@ -8,11 +8,11 @@ import { AppUtilityService, NoWhitespaceValidator } from 'src/app/shared/app-uti
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { AppDashboardListType, AppDashboardWidgetType } from '../app-dashboard.type';
-import { DashboardDevice } from './app-dashboard-crud.type';
+import { PersonaDashboard, PersonaDashboardWidget } from '../app-persona-dashboards.type';
+import { BaremetalDevices, DashboardDevice } from './app-persona-dashboard-crud.type';
 
 @Injectable()
-export class AppDashboardCrudService {
+export class AppPersonaDashboardCrudService {
 
   constructor(private http: HttpClient,
     private tableSvc: TableApiServiceService,
@@ -40,7 +40,11 @@ export class AppDashboardCrudService {
     return this.tableSvc.getData<PaginatedResult<any>>(`rest/zabbix/device_items/`, criteria);
   }
 
-  buildDetailsForm(data?: AppDashboardListType): FormGroup {
+  toDashboardDeviceViewData(device: DashboardDevice | BaremetalDevices): DashboardDeviceViewData {
+    return Object.assign(new DashboardDeviceViewData(), device);
+  }
+
+  buildDetailsForm(data?: PersonaDashboard): FormGroup {
     if (data) {
       let form = this.builder.group({
         name: [data && data.name && data.name != '' ? data.name : '', [Validators.required, NoWhitespaceValidator]],
@@ -88,7 +92,7 @@ export class AppDashboardCrudService {
     },
   }
 
-  buildFilterForm(data?: AppDashboardListType): FormGroup {
+  buildFilterForm(data?: PersonaDashboard): FormGroup {
     if (data) {
       let form = this.builder.group({
         refresh: [data.refresh ? data.refresh : false, [Validators.required, NoWhitespaceValidator]],
@@ -125,16 +129,16 @@ export class AppDashboardCrudService {
 
   saveDashboardData(data: any, dashboardId?: string): Observable<any> {
     if (dashboardId) {
-      return this.http.patch<AppDashboardListType>(`/customer/persona/dashboards/${dashboardId}/`, data);
+      return this.http.patch<PersonaDashboard>(`/customer/persona/dashboards/${dashboardId}/`, data);
     } else {
-      return this.http.post<AppDashboardListType>(`/customer/persona/dashboards/`, data);
+      return this.http.post<PersonaDashboard>(`/customer/persona/dashboards/`, data);
     }
   }
 
-  getDashboardWidgets(viewId: string, criteria: SearchCriteria): Observable<AppDashboardWidgetType[]> {
+  getDashboardWidgets(viewId: string, criteria: SearchCriteria): Observable<PersonaDashboardWidget[]> {
     let params: HttpParams = this.tableSvc.getWithParam(criteria);
-    return this.http.get<AppDashboardWidgetType[]>(`/customer/persona/dashboards/${viewId}/widgets/`, { params: params }).pipe(
-      map((res: AppDashboardWidgetType[]) => {
+    return this.http.get<PersonaDashboardWidget[]>(`/customer/persona/dashboards/${viewId}/widgets/`, { params: params }).pipe(
+      map((res: PersonaDashboardWidget[]) => {
         return res.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       })
     );;
@@ -230,15 +234,15 @@ export class AppDashboardCrudService {
   }
 
   createDashboardWidget(data: any, dashboardId: string): Observable<any> {
-    return this.http.post<AppDashboardListType>(`/customer/persona/dashboards/${dashboardId}/widgets/`, data);
+    return this.http.post<PersonaDashboard>(`/customer/persona/dashboards/${dashboardId}/widgets/`, data);
   }
 
   updateDashboardWidget(data: any, widgetId: string): Observable<any> {
-    return this.http.put<AppDashboardListType>(`/customer/persona/widgets/${widgetId}/`, data);
+    return this.http.put<PersonaDashboard>(`/customer/persona/widgets/${widgetId}/`, data);
   }
 
   deleteDashboardWidget(widgetId: string): Observable<any> {
-    return this.http.delete<AppDashboardListType>(`/customer/persona/widgets/${widgetId}/`);
+    return this.http.delete<PersonaDashboard>(`/customer/persona/widgets/${widgetId}/`);
   }
 }
 
@@ -257,6 +261,16 @@ export class MetricesMappingViewData {
   status: string;
   isSelected: boolean = false;
   metrics: MetricViewData[] = [];
+}
+
+export class DashboardDeviceViewData implements DashboardDevice {
+  name?: string;
+  uuid?: string;
+  server?: BaremetalDevices;
+  status?: string;
+  isSelected: boolean = false;
+  items: any[] = [];
+  device_type: string;
 }
 
 export class MetricViewData {

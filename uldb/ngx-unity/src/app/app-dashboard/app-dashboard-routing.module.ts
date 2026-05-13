@@ -1,14 +1,15 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { AppDashboardCollectionsCrudComponent } from "./app-dashboard-collections/app-dashboard-collections-crud/app-dashboard-collections-crud.component";
+import { AppCollectionDashboardViewComponent } from "./app-dashboard-collections/app-dashboard-collections-view/app-collection-dashboard-view/app-collection-dashboard-view.component";
 import { AppDashboardCollectionsViewComponent } from "./app-dashboard-collections/app-dashboard-collections-view/app-dashboard-collections-view.component";
 import { AppDashboardCollectionsComponent } from "./app-dashboard-collections/app-dashboard-collections.component";
-import { AppDashboardCrudComponent } from "./app-dashboard-crud/app-dashboard-crud.component";
-import { AppDashboardListComponent } from "./app-dashboard-list/app-dashboard-list.component";
 import { AppDashboardComponent } from "./app-dashboard.component";
 import { DEFAULT_DASHBOARD_ROUTES } from "./app-default-dashboards/app-default-dashboards-routing.const";
 import { AppDefaultDashboardsComponent } from "./app-default-dashboards/app-default-dashboards.component";
-import { AppPersonaDashboardComponent } from "./app-persona-dashboard/app-persona-dashboard.component";
+import { AppPersonaDashboardCrudComponent } from "./app-persona-dashboards/app-persona-dashboard-crud/app-persona-dashboard-crud.component";
+import { AppPersonaDashboardViewComponent } from "./app-persona-dashboards/app-persona-dashboard-view/app-persona-dashboard-view.component";
+import { AppPersonaDashboardsComponent } from "./app-persona-dashboards/app-persona-dashboards.component";
 
 const routes: Routes = [
     {
@@ -40,7 +41,17 @@ const routes: Routes = [
                 }
             },
             {
-                path: 'collections/:collectionId/view',
+                path: 'collections/:collectionId/update',
+                component: AppDashboardCollectionsCrudComponent,
+                data: {
+                    breadcrumb: {
+                        title: 'Edit Collection',
+                        stepbackCount: 1
+                    }
+                }
+            },
+            {
+                path: 'collections/:collectionId',
                 component: AppDashboardCollectionsViewComponent,
                 data: {
                     breadcrumb: {
@@ -50,11 +61,11 @@ const routes: Routes = [
                 }
             },
             {
-                path: 'collections/:collectionId/update',
-                component: AppDashboardCollectionsCrudComponent,
+                path: 'collections/:collectionId/dashboard/:dashboardId',
+                component: AppCollectionDashboardViewComponent,
                 data: {
                     breadcrumb: {
-                        title: 'Edit Collection',
+                        title: 'Collection Dashboard',
                         stepbackCount: 1
                     }
                 }
@@ -70,27 +81,17 @@ const routes: Routes = [
             },
             ...DEFAULT_DASHBOARD_ROUTES,
             {
-                path: 'my-dashboard',
+                path: 'my-dashboards',
+                component: AppPersonaDashboardsComponent,
                 data: {
                     breadcrumb: {
-                        title: 'My Dashboard'
-                    }
-                },
-                component: AppPersonaDashboardComponent
-            },
-            {
-                path: 'my-dashboard/create',
-                component: AppDashboardCrudComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'Create',
-                        stepbackCount: 1
+                        title: 'My Dashboards'
                     }
                 },
             },
             {
-                path: 'my-dashboard/:id/edit',
-                component: AppDashboardCrudComponent,
+                path: 'my-dashboards/create',
+                component: AppPersonaDashboardCrudComponent,
                 data: {
                     breadcrumb: {
                         title: 'Create',
@@ -99,32 +100,22 @@ const routes: Routes = [
                 },
             },
             {
-                path: 'my-dashboard/list',
-                component: AppDashboardListComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'List',
-                        stepbackCount: 1
-                    }
-                },
-            },
-            {
-                path: 'my-dashboard/list/create',
-                component: AppDashboardCrudComponent,
-                data: {
-                    breadcrumb: {
-                        title: 'List',
-                        stepbackCount: 1
-                    }
-                },
-            },
-            {
-                path: 'my-dashboard/list/:id/edit',
-                component: AppDashboardCrudComponent,
+                path: 'my-dashboards/:id/edit',
+                component: AppPersonaDashboardCrudComponent,
                 data: {
                     breadcrumb: {
                         title: 'Edit',
-                        stepbackCount: 2
+                        stepbackCount: 1
+                    }
+                },
+            },
+            {
+                path: 'my-dashboards/:id',
+                component: AppPersonaDashboardViewComponent,
+                data: {
+                    breadcrumb: {
+                        title: 'My Dashboard',
+                        stepbackCount: 1
                     }
                 },
             },

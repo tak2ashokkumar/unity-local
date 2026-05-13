@@ -7,10 +7,10 @@ import { AppLevelService } from 'src/app/app-level.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { CeleryTask } from 'src/app/shared/SharedEntityTypes/celery-task.type';
 import { UnityChartConfigService, UnityChartDataType, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
-import { AppDashboardWidgetType } from '../app-dashboard.type';
+import { PersonaDashboard, PersonaDashboardWidget, PersonaDashboardWidgetData } from '../app-persona-dashboards.type';
 
 @Injectable()
-export class AppDashboardViewService {
+export class AppPersonaDashboardViewService {
 
   constructor(private http: HttpClient,
     private chartConfigSvc: UnityChartConfigService,
@@ -18,20 +18,26 @@ export class AppDashboardViewService {
     private appSvc: AppLevelService,
     private titleCasePipe: TitleCasePipe) { }
 
+  getDashboardDetails(dashboardId: string): Observable<PersonaDashboard> {
+    return this.http.get<PersonaDashboard>(`/customer/persona/dashboards/${dashboardId}/`);
+  }
+
   syncWidgetsData(dashboardId: string) {
     return this.http.get<CeleryTask>(`/customer/persona/dashboards/${dashboardId}/widgets/sync_widget_data/`)
       .pipe(switchMap(res => this.appSvc.pollForTask(res.task_id, 4).pipe(take(1))), take(1));
   }
 
-  getDashboardWidgets(dashboardId: string): Observable<AppDashboardWidgetType[]> {
-    return this.http.get<AppDashboardWidgetType[]>(`/customer/persona/dashboards/${dashboardId}/widgets/?page_size=0`).pipe(
-      map((res: AppDashboardWidgetType[]) => {
-        return res.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  getDashboardWidgets(dashboardId: string): Observable<PersonaDashboardWidgetViewData[]> {
+    return this.http.get<PersonaDashboardWidget[]>(`/customer/persona/dashboards/${dashboardId}/widgets/?page_size=0`).pipe(
+      map((res: PersonaDashboardWidget[]) => {
+        return res
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+          .map(widget => Object.assign(new PersonaDashboardWidgetViewData(), widget));
       })
     );
   }
 
-  getWidgetChartData(widget: AppDashboardWidgetType) {
+  getWidgetChartData(widget: PersonaDashboardWidgetViewData) {
     switch (widget.widget_type) {
       case 'host_availability': return of(this.updateHostAvailabilityWidget(widget));
       case 'private_cloud': return of(this.updatePrivateCloudWidget(widget));
@@ -56,7 +62,7 @@ export class AppDashboardViewService {
     }
   }
 
-  updateHostAvailabilityWidget(widget: AppDashboardWidgetType) {
+  updateHostAvailabilityWidget(widget: PersonaDashboardWidgetViewData) {
     widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
     switch (widget.group_by) {
       case 'status':
@@ -71,7 +77,7 @@ export class AppDashboardViewService {
     return widget;
   }
 
-  convertToHostAvailabilityChartData(widget: AppDashboardWidgetType) {
+  convertToHostAvailabilityChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     if (widget.customLegends) {
       view.options.series[0].center = ['50%', '50%']
@@ -106,13 +112,13 @@ export class AppDashboardViewService {
     return view;
   }
 
-  updatePrivateCloudWidget(widget: AppDashboardWidgetType) {
+  updatePrivateCloudWidget(widget: PersonaDashboardWidgetViewData) {
     widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
     widget.customLegends = true;
     widget.chartData = this.convertToPrivateCloudChartData(widget);
     return widget;
   }
-  convertToPrivateCloudChartData(widget: AppDashboardWidgetType) {
+  convertToPrivateCloudChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     if (widget.customLegends) {
       view.options.series[0].center = ['50%', '50%']
@@ -147,14 +153,14 @@ export class AppDashboardViewService {
     return view;
   }
 
-  updatePublicCloudWidget(widget: AppDashboardWidgetType) {
+  updatePublicCloudWidget(widget: PersonaDashboardWidgetViewData) {
     widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
     widget.customLegends = true;
     widget.chartData = this.convertToPublicCloudChartData(widget);
     console.log('colors :', widget.chartData.options.color);
     return widget;
   }
-  convertToPublicCloudChartData(widget: AppDashboardWidgetType) {
+  convertToPublicCloudChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     if (widget.customLegends) {
       view.options.series[0].center = ['50%', '50%']
@@ -189,13 +195,13 @@ export class AppDashboardViewService {
     return view;
   }
 
-  updateInfraSummaryWidget(widget: AppDashboardWidgetType) {
+  updateInfraSummaryWidget(widget: PersonaDashboardWidgetViewData) {
     widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
     widget.customLegends = true;
     widget.chartData = this.convertToInfraSummaryChartData(widget);
     return widget;
   }
-  convertToInfraSummaryChartData(widget: AppDashboardWidgetType) {
+  convertToInfraSummaryChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     if (widget.customLegends) {
       view.options.series[0].center = ['50%', '50%']
@@ -230,7 +236,7 @@ export class AppDashboardViewService {
     return view;
   }
 
-  convertToCloudCostChartData(widget: AppDashboardWidgetType) {
+  convertToCloudCostChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     view.options.legend = {
       show: false
@@ -238,7 +244,7 @@ export class AppDashboardViewService {
     return view;
   }
 
-  convertToAlertsChartData(widget: AppDashboardWidgetType) {
+  convertToAlertsChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     view.options.legend = {
       show: false
@@ -246,7 +252,7 @@ export class AppDashboardViewService {
     return view;
   }
 
-  convertToSustainabilityChartData(widget: AppDashboardWidgetType) {
+  convertToSustainabilityChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     view.options.legend = {
       show: false
@@ -254,7 +260,7 @@ export class AppDashboardViewService {
     return view;
   }
 
-  updateMonitoringWidget(widget: AppDashboardWidgetType) {
+  updateMonitoringWidget(widget: PersonaDashboardWidgetViewData) {
     widget.totalCount = widget.data.length ?? 0;
     widget.customLegends = true;
     if (widget.filter_by == 'latest') {
@@ -401,7 +407,7 @@ export class AppDashboardViewService {
     return viewData;
   }
 
-  convertToMonitoringChartData(widget: AppDashboardWidgetType) {
+  convertToMonitoringChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     if (widget.customLegends) {
       view.options.series[0].center = ['50%', '50%']
@@ -436,13 +442,13 @@ export class AppDashboardViewService {
     return view;
   }
 
-  updateDeviceByOSWidget(widget: AppDashboardWidgetType) {
+  updateDeviceByOSWidget(widget: PersonaDashboardWidgetViewData) {
     widget.totalCount = widget.data?.reduce((a, b) => a + b.count, 0);
     widget.customLegends = true;
     widget.chartData = this.convertToHostAvailabilityChartData(widget);
     return widget;
   }
-  convertToDeviceByOSChartData(widget: AppDashboardWidgetType) {
+  convertToDeviceByOSChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = this.convertToNightingaleChartData(widget);
     view.options.legend = {
       show: false
@@ -450,7 +456,7 @@ export class AppDashboardViewService {
     return view;
   }
 
-  convertToNightingaleChartData(widget: AppDashboardWidgetType) {
+  convertToNightingaleChartData(widget: PersonaDashboardWidgetViewData) {
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getNightingalePieChartWithHorizontalLegendsOptions();
@@ -498,6 +504,46 @@ export class AppDashboardViewService {
     return view;
   }
 
+}
+
+export class PersonaDashboardWidgetViewData implements PersonaDashboardWidget {
+  id: number;
+  created_by: string;
+  last_execution: string;
+  unit: string;
+  data: PersonaDashboardWidgetData[] = [];
+  uuid: string;
+  name: string;
+  widget_type: string;
+  cloud: string;
+  platform_type: string;
+  group_by: string;
+  status: string;
+  created_at: string;
+  position: number;
+  filter_by: string;
+  graph_type: string;
+  period: string;
+  period_hour: null;
+  period_min: null;
+  view_by: string;
+  metrics_network_data: null;
+  device_type: string;
+  network_group_by: string;
+  devices: string[];
+  top_count: null;
+  device_items: any;
+  group_by_filter: string[];
+  view_graph_type: string;
+  dashboard: number;
+  user: string;
+  customer: number;
+
+  chartData: UnityChartDetails;
+  metricesMappingData: MetricesMappingViewData[] = [];
+  totalCount: number = 0;
+  widgetSizeClass: string;
+  customLegends: boolean = false;
 }
 
 export class MetricesMappingViewData {

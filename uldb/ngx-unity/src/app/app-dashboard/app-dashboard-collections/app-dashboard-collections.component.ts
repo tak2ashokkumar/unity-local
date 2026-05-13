@@ -200,7 +200,7 @@ export class AppDashboardCollectionsComponent implements OnInit, OnDestroy {
   }
 
   viewCollection(view: CuratedCollectionViewData) {
-    this.router.navigate(['collections', view.collectionId, 'view'], { relativeTo: this.route.parent });
+    this.router.navigate(['collections', view.collectionId], { relativeTo: this.route.parent });
   }
 
   edit(view: CuratedCollectionViewData) {

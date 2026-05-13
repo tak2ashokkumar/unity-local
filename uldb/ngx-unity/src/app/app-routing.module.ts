@@ -38,7 +38,6 @@ export const routes: Routes = [
         }
       },
       { path: 'welcomepage', component: AppWelcomePageComponent },
-      // ...APP_DASHBOARD_ROUTES,
       {
         path: 'app-dashboard',
         canActivate: [LeftPanelRouteAccessGuard],

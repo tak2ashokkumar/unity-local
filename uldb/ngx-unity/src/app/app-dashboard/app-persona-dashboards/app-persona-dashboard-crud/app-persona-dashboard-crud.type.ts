@@ -1,8 +1,8 @@
 export interface DashboardDevice {
     name?: string;
     uuid?: string;
-    server?: BaremetalDevices
-    isSelected?: boolean;
+    server?: BaremetalDevices;
+    status?: string;
 }
 
 export interface BaremetalDevices {

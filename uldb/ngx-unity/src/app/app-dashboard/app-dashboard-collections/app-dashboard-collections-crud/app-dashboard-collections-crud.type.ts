@@ -19,6 +19,17 @@ export interface DashboardItem {
   source: 'default' | 'personal';
   checked: boolean;
   image_url?: string;
+  description?: string;
+  type?: string;
+  status?: string;
+  refresh_interval_in_sec?: number;
+  refresh?: boolean;
+  timeframe?: string;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  is_default?: boolean;
+  defaultDashboardRoute?: string;
 }
 
 export interface CollectionDashboardPayload {

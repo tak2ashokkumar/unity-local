@@ -16,13 +16,10 @@ import { AppCoreModule } from '../app-core/app-core.module';
 import { AppHomeModule } from '../app-home/app-home.module';
 import { SharedModule } from '../shared/shared.module';
 import { AppDashboardCollectionsCrudComponent } from './app-dashboard-collections/app-dashboard-collections-crud/app-dashboard-collections-crud.component';
+import { AppCollectionDashboardViewComponent } from './app-dashboard-collections/app-dashboard-collections-view/app-collection-dashboard-view/app-collection-dashboard-view.component';
 import { AppDashboardCollectionsViewComponent } from './app-dashboard-collections/app-dashboard-collections-view/app-dashboard-collections-view.component';
 import { AppDashboardCollectionsComponent } from './app-dashboard-collections/app-dashboard-collections.component';
-import { AdcPreviewComponent } from './app-dashboard-crud/adc-preview/adc-preview.component';
-import { AppDashboardCrudComponent } from './app-dashboard-crud/app-dashboard-crud.component';
-import { AppDashboardListComponent } from './app-dashboard-list/app-dashboard-list.component';
 import { AppDashboardRoutingModule } from './app-dashboard-routing.module';
-import { AppDashboardViewComponent } from './app-dashboard-view/app-dashboard-view.component';
 import { AppDashboardComponent } from './app-dashboard.component';
 import { AppDefaultDashboardsComponent } from './app-default-dashboards/app-default-dashboards.component';
 import { ApplicationOverviewDashboardComponent } from './app-default-dashboards/application-overview-dashboard/application-overview-dashboard.component';
@@ -40,7 +37,9 @@ import { OrchestrationOverviewDashboardComponent } from './app-default-dashboard
 import { PrivateCloudComputeDashboardComponent } from './app-default-dashboards/private-cloud-compute-dashboard/private-cloud-compute-dashboard.component';
 import { PublicCloudComputeDashboardComponent } from './app-default-dashboards/public-cloud-compute-dashboard/public-cloud-compute-dashboard.component';
 import { UnifiedAiopsCommandCentreComponent } from './app-default-dashboards/unified-aiops-command-centre/unified-aiops-command-centre.component';
-import { AppPersonaDashboardComponent } from './app-persona-dashboard/app-persona-dashboard.component';
+import { AppPersonaDashboardCrudComponent } from './app-persona-dashboards/app-persona-dashboard-crud/app-persona-dashboard-crud.component';
+import { AppPersonaDashboardViewComponent } from './app-persona-dashboards/app-persona-dashboard-view/app-persona-dashboard-view.component';
+import { AppPersonaDashboardsComponent } from './app-persona-dashboards/app-persona-dashboards.component';
 // import { DashboardMapWidgetComponent } from '../app-home/dashboard-map-widget/dashboard-map-widget.component';
 
 export const MY_NATIVE_FORMATS = {
@@ -56,10 +55,6 @@ export const MY_NATIVE_FORMATS = {
 @NgModule({
   declarations: [
     AppDashboardComponent,
-    AppPersonaDashboardComponent,
-    AppDashboardListComponent,
-    AppDashboardCrudComponent,
-    AppDashboardViewComponent,
     AppDefaultDashboardsComponent,
     CloudCostOverviewDashboardComponent,
     OrchestrationOverviewDashboardComponent,
@@ -69,7 +64,6 @@ export const MY_NATIVE_FORMATS = {
     NetworkDevicesOverviewDashboardComponent,
     InterfaceDetailsDashboardComponent,
     ApplicationOverviewDashboardComponent,
-    AdcPreviewComponent,
     AstronomyShopApplicationDashboardComponent,
     EasyTradeApplicationDashboardComponent,
     ExecutiveAiBusinessSummaryComponent,
@@ -79,7 +73,11 @@ export const MY_NATIVE_FORMATS = {
     UnifiedAiopsCommandCentreComponent,
     AppDashboardCollectionsComponent,
     AppDashboardCollectionsCrudComponent,
-    AppDashboardCollectionsViewComponent
+    AppDashboardCollectionsViewComponent,
+    AppCollectionDashboardViewComponent,
+    AppPersonaDashboardsComponent,
+    AppPersonaDashboardCrudComponent,
+    AppPersonaDashboardViewComponent
   ],
   imports: [
     AppCoreModule,

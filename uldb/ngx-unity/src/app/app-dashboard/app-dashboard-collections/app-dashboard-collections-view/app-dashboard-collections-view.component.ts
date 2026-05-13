@@ -247,6 +247,10 @@ export class AppDashboardCollectionsViewComponent implements OnInit, OnDestroy {
     return this.modalSelectedDashboards.some(dashboard => dashboard.uuid === item.uuid);
   }
 
+  openDashboard(dashboard: DashboardItem) {
+    this.router.navigate(['collections', this.collectionId, 'dashboard', dashboard.uuid], { relativeTo: this.route.parent });
+  }
+
   goBack() {
     this.router.navigate(['collections'], { relativeTo: this.route.parent });
   }

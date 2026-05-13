@@ -1,0 +1,31 @@
+<div class="collection-dashboard-page" *ngIf="selectedDashboard">
+    <div class="collection-dashboard-body">
+        <ng-container [ngSwitch]="selectedDashboard.source">
+            <app-persona-dashboard-view *ngSwitchCase="'personal'" [activeBoard]="activePersonalDashboard"
+                [showHeader]="false"
+                class="w-100">
+            </app-persona-dashboard-view>
+
+            <ng-container *ngSwitchCase="'default'">
+                <ng-container [ngSwitch]="defaultDashboardRoute">
+                    <infrastructure-overview-dashboard *ngSwitchCase="'infrastructure'"></infrastructure-overview-dashboard>
+                    <network-devices-overview-dashboard *ngSwitchCase="'network-devices'"></network-devices-overview-dashboard>
+                    <iot-devices-summary-dashboard *ngSwitchCase="'iot-devices'"></iot-devices-summary-dashboard>
+                    <cloud-cost-overview-dashboard *ngSwitchCase="'cloud-cost'"></cloud-cost-overview-dashboard>
+                    <orchestration-overview-dashboard *ngSwitchCase="'orchestration'"></orchestration-overview-dashboard>
+                    <application-overview-dashboard *ngSwitchCase="'application'"></application-overview-dashboard>
+                    <private-cloud-compute-dashboard *ngSwitchCase="'private-cloud-compute'"></private-cloud-compute-dashboard>
+                    <public-cloud-compute-dashboard *ngSwitchCase="'public-cloud-compute'"></public-cloud-compute-dashboard>
+                    <database-dashboard *ngSwitchCase="'database'"></database-dashboard>
+                    <unified-aiops-command-centre *ngSwitchCase="'unified-aiops-command-centre'"></unified-aiops-command-centre>
+
+                    <div *ngSwitchDefault class="card round-edge mt-2">
+                        <div class="card-body text-center text-muted">
+                            Dashboard route is not configured.
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>

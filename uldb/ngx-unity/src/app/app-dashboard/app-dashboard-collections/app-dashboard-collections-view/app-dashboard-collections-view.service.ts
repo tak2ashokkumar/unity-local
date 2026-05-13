@@ -17,7 +17,19 @@ export class AppDashboardCollectionsViewService {
   getDefaultDashboards(): Observable<DashboardItem[]> {
     return this.http.get<any[]>(`/customer/dashboards/?type=preset&page_size=0`).pipe(
       map(res => (res || []).map((d: any) => ({
-        id: d.id, uuid: d.uuid, name: d.name, source: 'default' as const, checked: false, image_url: d.image_url
+        id: d.id,
+        uuid: d.uuid,
+        name: d.name,
+        source: 'default' as const,
+        checked: false,
+        image_url: d.image_url,
+        description: d.description,
+        type: d.type,
+        status: d.status,
+        created_at: d.created_at,
+        updated_at: d.updated_at,
+        created_by: d.created_by,
+        defaultDashboardRoute: this.getDefaultDashboardRouteSegment(d.name)
       })))
     );
   }
@@ -27,7 +39,22 @@ export class AppDashboardCollectionsViewService {
       map(res => (res || [])
         .filter((d: any) => d.status === 'published')
         .map((d: any) => ({
-          id: d.id, uuid: d.uuid, name: d.name, source: 'personal' as const, checked: false, image_url: d.image_url
+          id: d.id,
+          uuid: d.uuid,
+          name: d.name,
+          source: 'personal' as const,
+          checked: false,
+          image_url: d.image_url,
+          description: d.description,
+          type: d.type,
+          status: d.status,
+          refresh_interval_in_sec: d.refresh_interval_in_sec,
+          refresh: d.refresh,
+          timeframe: d.timeframe,
+          created_at: d.created_at,
+          updated_at: d.updated_at,
+          created_by: d.created_by,
+          is_default: d.is_default
         }))
       )
     );
@@ -118,5 +145,33 @@ export class AppDashboardCollectionsViewService {
     return values
       .filter(value => value !== undefined && value !== null)
       .map(value => value.toString());
+  }
+
+  getDefaultDashboardRouteSegment(name: string): string {
+    switch ((name || '').trim().toLowerCase()) {
+      case 'infrastructure overview':
+        return 'infrastructure';
+      case 'network overview':
+        return 'network-devices';
+      case 'iot device overview':
+        return 'iot-devices';
+      case 'cloud cost overview':
+        return 'cloud-cost';
+      case 'task and workflow overview':
+        return 'orchestration';
+      case 'application dashboard':
+        return 'application';
+      case 'private cloud compute dashboard':
+        return 'private-cloud-compute';
+      case 'public cloud compute dashboard':
+        return 'public-cloud-compute';
+      case 'database dashboard':
+        return 'database';
+      case 'unified aiops command center':
+      case 'unified aiops command center dashboard':
+      case 'unified aiops command centre':
+      case 'unified aiops command centre dashboard':
+        return 'unified-aiops-command-centre';
+    }
   }
 }

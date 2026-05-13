@@ -27,7 +27,8 @@
         <div class="row collection-dashboard-grid">
             <div class="col-12 col-sm-6 col-lg-3 collection-dashboard-col" *ngFor="let dashboard of selectedDashboards">
                 <div class="collection-dashboard-card" [class.has-image]="dashboard.image_url"
-                    [ngStyle]="dashboard.image_url ? {'background-image': 'linear-gradient(rgba(55, 138, 216, 0.18), rgba(55, 138, 216, 0.78)), url(' + dashboard.image_url + ')'} : null">
+                    [ngStyle]="dashboard.image_url ? {'background-image': 'linear-gradient(rgba(55, 138, 216, 0.18), rgba(55, 138, 216, 0.78)), url(' + dashboard.image_url + ')'} : null"
+                    (click)="openDashboard(dashboard)">
                     <button type="button" class="collection-dashboard-upload-btn" tooltip="Upload Thumbnail"
                         container="body" (click)="openDashboardImageModal(dashboard); $event.stopPropagation()">
                         <i class="fas fa-pencil-alt"></i>

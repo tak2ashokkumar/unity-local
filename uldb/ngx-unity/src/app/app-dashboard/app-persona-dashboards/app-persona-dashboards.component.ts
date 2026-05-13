@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { AppDashboardListService, AppDashboardListViewData } from './app-dashboard-list.service';
+import { AppPersonaDashboardsService, PersonaDashboardListViewData } from './app-persona-dashboards.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -11,23 +11,23 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-dashboard-list',
-  templateUrl: './app-dashboard-list.component.html',
-  styleUrls: ['./app-dashboard-list.component.scss'],
-  providers: [AppDashboardListService]
+  selector: 'app-persona-dashboards',
+  templateUrl: './app-persona-dashboards.component.html',
+  styleUrls: ['./app-persona-dashboards.component.scss'],
+  providers: [AppPersonaDashboardsService]
 })
-export class AppDashboardListComponent implements OnInit, OnDestroy {
+export class AppPersonaDashboardsComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   count: number = 0;
   currentCriteria: SearchCriteria;
-  viewData: AppDashboardListViewData[] = [];
-  selectedView: AppDashboardListViewData;
+  viewData: PersonaDashboardListViewData[] = [];
+  selectedView: PersonaDashboardListViewData;
 
   @ViewChild('confirmDeleteRef') confirmDeleteRef: ElementRef;
   @ViewChild('confirmStatusChangeRef') confirmStatusChangeRef: ElementRef;
   modalRef: BsModalRef;
   popOverList: string[] = [];
-  constructor(private svc: AppDashboardListService,
+  constructor(private svc: AppPersonaDashboardsService,
     private router: Router,
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
@@ -98,11 +98,11 @@ export class AppDashboardListComponent implements OnInit, OnDestroy {
     });
   }
 
-  showGroups(view: AppDashboardListViewData) {
+  showGroups(view: PersonaDashboardListViewData) {
     this.popOverList = view.extraGroups;
   }
 
-  toggleStatus(view: AppDashboardListViewData, status: boolean) {
+  toggleStatus(view: PersonaDashboardListViewData, status: boolean) {
     // if (view.isActive == status) {
     //   return;
     // }
@@ -121,19 +121,19 @@ export class AppDashboardListComponent implements OnInit, OnDestroy {
     });
   }
 
-  viewDashboard(view: AppDashboardListViewData) {
-
+  viewDashboard(view: PersonaDashboardListViewData) {
+    this.router.navigate([view.dashboardId], { relativeTo: this.route });
   }
 
   add() {
     this.router.navigate(['create'], { relativeTo: this.route });
   }
 
-  edit(view: AppDashboardListViewData) {
+  edit(view: PersonaDashboardListViewData) {
     this.router.navigate([view.dashboardId, 'edit'], { relativeTo: this.route });
   }
 
-  delete(view: AppDashboardListViewData) {
+  delete(view: PersonaDashboardListViewData) {
     this.selectedView = view;
     this.modalRef = this.modalService.show(this.confirmDeleteRef, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
   }

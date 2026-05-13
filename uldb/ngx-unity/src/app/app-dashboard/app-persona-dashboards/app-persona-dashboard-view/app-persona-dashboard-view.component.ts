@@ -1,47 +1,54 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { from, Subject } from 'rxjs';
 import { mergeMap, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { FaIconMapping } from 'src/app/shared/app-utility/app-utility.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
-import { SYNC_IN_PROGRESS_MSG, WIDGET_DATA_LOAD_ERROR } from '../app-dashboard.component';
-import { AppDashboardListType, AppDashboardWidgetType } from '../app-dashboard.type';
-import { AppDashboardViewService, MetricesMappingViewData } from './app-dashboard-view.service';
+import { SYNC_IN_PROGRESS_MSG, WIDGET_DATA_LOAD_ERROR } from '../../app-dashboard.component';
+import { PersonaDashboard } from '../app-persona-dashboards.type';
+import { AppPersonaDashboardViewService, MetricesMappingViewData, PersonaDashboardWidgetViewData } from './app-persona-dashboard-view.service';
 
 @Component({
-  selector: 'app-dashboard-view',
-  templateUrl: './app-dashboard-view.component.html',
-  styleUrls: ['./app-dashboard-view.component.scss'],
-  providers: [AppDashboardViewService]
+  selector: 'app-persona-dashboard-view',
+  templateUrl: './app-persona-dashboard-view.component.html',
+  styleUrls: ['./app-persona-dashboard-view.component.scss'],
+  providers: [AppPersonaDashboardViewService]
 })
-export class AppDashboardViewComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() activeBoard: AppDashboardListType;
+export class AppPersonaDashboardViewComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() activeBoard: PersonaDashboard;
+  @Input() showHeader: boolean = true;
 
   private ngUnsubscribe = new Subject();
-  dashboardWidgets: AppDashboardWidgetType[] = [];
-  publishedWidgets: AppDashboardWidgetType[] = [];
+  dashboardWidgets: PersonaDashboardWidgetViewData[] = [];
+  publishedWidgets: PersonaDashboardWidgetViewData[] = [];
   dataSyncEnd: boolean = false;
   dataError: string = null;
   syncInProgressMsg: string = SYNC_IN_PROGRESS_MSG;
   private dashboardRefreshCountDownIntervalId: any;
   dashboardRefreshCountDown: number;
+  dashboardId: string;
 
-  constructor(private svc: AppDashboardViewService,
+  constructor(private svc: AppPersonaDashboardViewService,
     private router: Router,
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
     public userSvc: UserInfoService,
     private notification: AppNotificationService,) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
+      this.dashboardId = params.get('id');
+      if (this.dashboardId) {
+        this.getDashboardDetails();
+      }
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.activeBoard) {
-      this.spinner.start('main');
-      this.getDashboardWidgets();
-      this.syncWidgetsData();
+    if (changes.activeBoard && this.activeBoard?.uuid) {
+      this.loadActiveDashboard();
     }
   }
   ngOnDestroy(): void {
@@ -54,6 +61,27 @@ export class AppDashboardViewComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   refreshData() {
+    this.syncWidgetsData();
+  }
+
+  getDashboardDetails() {
+    this.spinner.start('main');
+    this.svc.getDashboardDetails(this.dashboardId).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.activeBoard = res;
+      this.loadActiveDashboard();
+    }, err => {
+      this.activeBoard = null;
+      this.spinner.stop('main');
+    });
+  }
+
+  loadActiveDashboard() {
+    if (!this.activeBoard?.uuid) {
+      return;
+    }
+
+    this.spinner.start('main');
+    this.getDashboardWidgets();
     this.syncWidgetsData();
   }
 
@@ -105,12 +133,12 @@ export class AppDashboardViewComponent implements OnInit, OnChanges, OnDestroy {
       )
   }
 
-  editDashboard(activeBoard: AppDashboardListType) {
-    this.router.navigate([activeBoard.uuid, 'edit'], { relativeTo: this.route });
+  editDashboard(activeBoard: PersonaDashboard) {
+    this.router.navigate(['../', activeBoard.uuid, 'edit'], { relativeTo: this.route });
   }
 
   goToList() {
-    this.router.navigate(['list'], { relativeTo: this.route });
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   onDeviceSelect(device: MetricesMappingViewData) {

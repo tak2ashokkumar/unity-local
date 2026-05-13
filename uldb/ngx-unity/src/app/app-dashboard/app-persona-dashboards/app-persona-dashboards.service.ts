@@ -4,23 +4,23 @@ import { Observable } from 'rxjs';
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { AppDashboardListType } from '../app-dashboard.type';
+import { PersonaDashboard } from './app-persona-dashboards.type';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 
 @Injectable()
-export class AppDashboardListService {
+export class AppPersonaDashboardsService {
   constructor(private http: HttpClient,
     private tableService: TableApiServiceService,
     private utilSvc: AppUtilityService) { }
 
-  getDashboardList(criteria: SearchCriteria): Observable<PaginatedResult<AppDashboardListType>> {
-    return this.tableService.getData<PaginatedResult<AppDashboardListType>>('/customer/persona/dashboards/', criteria);
+  getDashboardList(criteria: SearchCriteria): Observable<PaginatedResult<PersonaDashboard>> {
+    return this.tableService.getData<PaginatedResult<PersonaDashboard>>('/customer/persona/dashboards/', criteria);
   }
 
-  convertToViewData(data: AppDashboardListType[]): AppDashboardListViewData[] {
-    let viewData: AppDashboardListViewData[] = [];
+  convertToViewData(data: PersonaDashboard[]): PersonaDashboardListViewData[] {
+    let viewData: PersonaDashboardListViewData[] = [];
     data.forEach(d => {
-      let view: AppDashboardListViewData = new AppDashboardListViewData();
+      let view: PersonaDashboardListViewData = new PersonaDashboardListViewData();
       view.dashboardId = d.uuid;
       view.name = d.name;
       view.type = d.type;
@@ -44,7 +44,7 @@ export class AppDashboardListService {
   }
 }
 
-export class AppDashboardListViewData {
+export class PersonaDashboardListViewData {
   dashboardId: string;
   name: string;
   type: string;
@@ -53,5 +53,5 @@ export class AppDashboardListViewData {
   group: string;
   extraGroups: string[];
   status: string;
-  refreshInterval: string;
+  refreshInterval: number;
 }
