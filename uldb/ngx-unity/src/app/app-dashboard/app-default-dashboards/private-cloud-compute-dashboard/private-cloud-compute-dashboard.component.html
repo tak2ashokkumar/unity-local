@@ -1,9 +1,9 @@
 <div class="card border-0 mb-0">
     <div class="card-header d-flex justify-content-between align-items-center bg-white border-bottm-0 px-2 py-2">
-        <div class="px-1">
+        <div class="px-5">
             <a class="nav-link tabs-level1-link border-0 text-success p-0">Private Cloud Compute Dashboard</a>
             <div *ngIf="headerData" class="d-flex align-items-center justify-content-start text-muted">
-                <span class="pl-2 border-right">Refreshed: {{headerData?.lastRefreshed}}</span>
+                <span class="pr-2 border-right">Refreshed: {{headerData?.lastRefreshed}}</span>
                 <span class="pl-2">Scope: </span>
                 <span class="pl-2">{{topScope?.providers}}</span>
                 <span class="pl-2">{{topScope?.regions}}</span>
@@ -38,146 +38,175 @@
                     </multiselect-dropdown>
                 </div>
             </form>
+            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
             <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
                 [tooltip]="'Go Back'" container="body">
                 <i class="fa fa-arrow-left"></i>
             </button>
-            <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
         </div>
     </div>
 </div>
 
-<div class="row mx-0 my-2">
-    <div class="col-12 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Executive Summary / Cloud Inventory
-            </div>
-            <div class="card-body">
-                <div class="row justify-content-around">
-                    <div class="col-6 d-flex justify-content-around">
-                        <div class="text-center p-1">
-                            <div class="text-muted">Total VMs</div>
-                            <div class="font-lg-xl font-500 text-primary">{{executiveSummaryViewData?.totalVMs || 0}}
-                            </div>
-                        </div>
-                        <div class="my-2 border border-secondary"></div>
 
-                        <div class="text-center p-1">
-                            <div class="text-muted">Physical Hosts</div>
-                            <div class="font-lg font-500">{{executiveSummaryViewData?.physicalHosts || 0}}
-                            </div>
-                        </div>
+<div class="row mx-1 my-2">
+    <div class="col-12">
+        <div class=" bg-transparent font-500 font-lg p-2">
+            Executive Summary / Cloud Inventory
+        </div>
+        <div class="card round-edge equalize-card mb-3 p-4">
+            <div class="row justify-content-around">
+                <div class="col-6 d-flex justify-content-around">
+                    <app-spinner [name]="executiveSummaryWidgetData.executiveSummaryLoader"></app-spinner>
 
-                        <div class="my-2 border border-secondary"></div>
-                        <div class="text-center p-1">
-                            <div class="text-muted">Clusters</div>
-                            <div class="font-lg font-500">{{executiveSummaryViewData?.clusters || 0}}
-                            </div>
+                    <div class="text-center p-1">
+                        <div class="text-muted">Total VMs</div>
+                        <div class="font-lg-xl font-500 text-primary">
+                            {{executiveSummaryViewData?.totalVMs || 0}}
                         </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
 
-                        <div class="my-2 border border-secondary"></div>
-                        <div class="text-center p-1">
-                            <div class="text-muted">Powered On</div>
-                            <div class="font-lg-xl font-500 text-success">{{executiveSummaryViewData?.poweredOn || 0}}
-                            </div>
+                    <div class="text-center p-1">
+                        <div class="text-muted">Physical Hosts</div>
+                        <div class="font-lg font-500">
+                            {{executiveSummaryViewData?.physicalHosts || 0}}
                         </div>
+                    </div>
 
-                        <div class="my-2 border border-secondary"></div>
-                        <div class="text-center p-1">
-                            <div class="text-muted">Powered Off</div>
-                            <div class="font-lg-xl font-500 text-danger">{{executiveSummaryViewData?.poweredOff || 0}}
-                            </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div class="text-center p-1">
+                        <div class="text-muted">Clusters</div>
+                        <div class="font-lg font-500">{{executiveSummaryViewData?.clusters
+                            || 0}}
+                        </div>
+                    </div>
+
+                    <div class="my-2 border border-secondary"></div>
+                    <div class="text-center p-1">
+                        <div class="text-muted">Powered On</div>
+                        <div class="font-lg-xl font-500 text-success">
+                            {{executiveSummaryViewData?.poweredOn || 0}}
+                        </div>
+                    </div>
+
+                    <div class="my-2 border border-secondary"></div>
+                    <div class="text-center p-1">
+                        <div class="text-muted">Powered Off</div>
+                        <div class="font-lg-xl font-500 text-danger">
+                            {{executiveSummaryViewData?.poweredOff || 0}}
+                        </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div class="text-center p-1">
+                        <div class="text-muted">Idle VMs</div>
+                        <div class="font-lg-xl font-500 text-danger">
+                            {{executiveSummaryViewData?.idleVMs || 0}}
+                        </div>
+                    </div>
+                    <div class="my-2 border border-secondary"></div>
+                    <div class="text-center p-1">
+                        <div class="text-muted">Orphaned VMs</div>
+                        <div class="font-lg-xl font-500 ">
+                            {{executiveSummaryViewData?.orphanedVMs || 0}}
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-around">
-                    <div class="col-3 px-1">
-                        <div class="text-center p-2">
-                            Cloud type distribution
+            </div>
+            <div class="row justify-content-around mt-3">
+                <div class="col-3 px-1">
+                    <div class="text-center p-2">
+                        Cloud type distribution
+                    </div>
+                    <div class="card-body position-relative">
+                        <app-spinner [name]="'CloudTypeLoader'"></app-spinner>
+                        <ng-container *ngIf="executiveSummaryWidgetData?.cloudTypeChartData">
+                            <div echarts [options]="executiveSummaryWidgetData?.cloudTypeChartData?.options"
+                                [defaultHeight]="200" style="width: 100%; height:250px;">
+                            </div>
+                        </ng-container>
+                        <div *ngIf="!executiveSummaryWidgetData.cloudTypeChartData"
+                            class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
+                            No data
+                            available.
                         </div>
-                        <div class="card-body">
-                            <!-- <app-spinner [name]="executiveSummaryWidgetData.cloudTypeLoader"></app-spinner> -->
-                            <ng-container *ngIf="executiveSummaryWidgetData?.cloudTypeChartData">
-                                <div echarts [options]="executiveSummaryWidgetData?.cloudTypeChartData?.options"
-                                    [defaultHeight]="200" style="width: 100%; height: 200px;">
+                    </div>
+                </div>
+                <div class="col-3 px-1">
+                    <div class="text-center p-2">
+                        Power & activity state
+                    </div>
+                    <div class="card-body position-relative">
+                        <app-spinner [name]="executiveSummaryWidgetData.powerActivityLoader"></app-spinner>
+                        <ng-container *ngIf="executiveSummaryWidgetData?.powerActivityChartData">
+                            <div echarts [options]="executiveSummaryWidgetData?.powerActivityChartData?.options"
+                                [defaultHeight]="200" style="width: 100%; height:250px;">
+                            </div>
+                        </ng-container>
+                        <div *ngIf="!executiveSummaryWidgetData.powerActivityChartData"
+                            class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
+                            No data
+                            available.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3 px-1">
+                    <div class="text-center p-2">
+                        VM count by OS type
+                    </div>
+                    <div class="card-body position-relative">
+                        <app-spinner [name]="executiveSummaryWidgetData.vmCountByOSTypeLoader"></app-spinner>
+                        <ng-container *ngIf="executiveSummaryWidgetData?.vmCountByOSTypeChartData">
+                            <div echarts [options]="executiveSummaryWidgetData?.vmCountByOSTypeChartData?.options"
+                                [defaultHeight]="200" style="width: 100%; height:250px;">
+                            </div>
+                        </ng-container>
+                        <div *ngIf="!executiveSummaryWidgetData.vmCountByOSTypeChartData"
+                            class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
+                            No data
+                            available.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3 px-1">
+                    <div class="">
+                        <div class="text-center p-2">
+                            Environment & criticality
+                        </div>
+                        <div class="card-body position-relative pb-0">
+                            <app-spinner
+                                [name]="executiveSummaryWidgetData.environmentAndCriticalityLoader"></app-spinner>
+                            <ng-container *ngIf="executiveSummaryWidgetData?.environmentAndCriticalityChartData">
+                                <div echarts
+                                    [options]="executiveSummaryWidgetData?.environmentAndCriticalityChartData?.options"
+                                    [defaultHeight]="200" style="width: 100%; height: 250px;">
                                 </div>
                             </ng-container>
-                            <div *ngIf="!executiveSummaryWidgetData.cloudTypeChartData"
+                            <div *ngIf="!executiveSummaryWidgetData.environmentAndCriticalityChartData"
                                 class="d-flex justify-content-center align-items-center"
-                                style="width: 100%; height: 200px;">No data
+                                style="width: 100%; height: 250px;">No data
                                 available.
                             </div>
                         </div>
                     </div>
-                    <div class="col-3 px-1">
-                        <div class="text-center p-2">
-                            Power & activity state
+                    <div class="mt-2" *ngIf="executiveSummaryWidgetData?.alertSeverityViewData">
+                        <div class="text-center mb-3 font-weight-600">
+                            Alerts Severity
                         </div>
-                        <div class="card-body">
-                            <!-- <app-spinner [name]="executiveSummaryWidgetData.powerActivityLoader"></app-spinner> -->
-                            <ng-container *ngIf="executiveSummaryWidgetData?.powerActivityChartData">
-                                <div echarts [options]="executiveSummaryWidgetData?.powerActivityChartData?.options"
-                                    [defaultHeight]="200" style="width: 100%; height: 200px;">
-                                </div>
-                            </ng-container>
-                            <div *ngIf="!executiveSummaryWidgetData.powerActivityChartData"
-                                class="d-flex justify-content-center align-items-center"
-                                style="width: 100%; height: 200px;">No data
-                                available.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-3 px-1">
-                        <div class="text-center p-2">
-                            VM count by OS type
-                        </div>
-                        <div class="card-body">
-                            <!-- <app-spinner [name]="executiveSummaryWidgetData.vmCountByOSTypeLoader"></app-spinner> -->
-                            <ng-container *ngIf="executiveSummaryWidgetData?.vmCountByOSTypeChartData">
-                                <div echarts [options]="executiveSummaryWidgetData?.vmCountByOSTypeChartData?.options"
-                                    [defaultHeight]="200" style="width: 100%; height: 200px;">
-                                </div>
-                            </ng-container>
-                            <div *ngIf="!executiveSummaryWidgetData.vmCountByOSTypeChartData"
-                                class="d-flex justify-content-center align-items-center"
-                                style="width: 100%; height: 200px;">No data
-                                available.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-3 px-1">
-                        <div class="h-50">
-                            <div class="text-center p-2">
-                                Environment & criticality
-                            </div>
-                            <div class="card-body">
-                                <!-- <app-spinner [name]="executiveSummaryWidgetData.environmentAndCriticalityLoader"></app-spinner> -->
-                                <ng-container *ngIf="executiveSummaryWidgetData?.environmentAndCriticalityChartData">
-                                    <div echarts
-                                        [options]="executiveSummaryWidgetData?.environmentAndCriticalityChartData?.options"
-                                        [defaultHeight]="200" style="width: 100%; height: 200px;">
-                                    </div>
-                                </ng-container>
-                                <div *ngIf="!executiveSummaryWidgetData.environmentAndCriticalityChartData"
-                                    class="d-flex justify-content-center align-items-center"
-                                    style="width: 100%; height: 200px;">No data
-                                    available.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="py-2">
-                            <div class="text-center p-2">
-                                Alerts Severity
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span class="bg-danger-200 p-1 round-edge">Critical {{
-                                    executiveSummaryWidgetData?.alertSeverityViewData?.critical || '0' }} </span>
-                                <span class="bg-warning-200 p-1 round-edge">Warning {{
-                                    executiveSummaryWidgetData?.alertSeverityViewData?.warning || '0' }}</span>
-                                <span class="bg-primary-200 p-1 round-edge">Info {{
-                                    executiveSummaryWidgetData?.alertSeverityViewData?.info || '0' }}</span>
-                            </div>
+
+                        <div class="d-flex justify-content-center align-items-center flex-wrap " style="gap: 15px;">
+
+                            <span class="severity-pill severity-critical">
+                                Critical {{executiveSummaryWidgetData?.alertSeverityViewData?.critical || '0' }}
+                            </span>
+
+                            <span class="severity-pill severity-warning">
+                                Warning {{executiveSummaryWidgetData?.alertSeverityViewData?.warning|| '0' }}
+                            </span>
+
+                            <span class="severity-pill severity-info">
+                                Info {{executiveSummaryWidgetData?.alertSeverityViewData?.info ||'0' }}
+                            </span>
+
                         </div>
                     </div>
                 </div>
@@ -186,13 +215,13 @@
     </div>
 </div>
 
-<div class="row mx-0 my-2">
-    <div class="col-12 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Capacity & Growth Insights
-            </div>
-            <div class="card-body d-flex p-2">
+<div class="row mx-1 my-4 py-4">
+    <div class="col-12">
+        <div class="bg-transparent font-500 font-lg p-2">
+            Capacity and Growth Insights
+        </div>
+        <div class="card round-edge equalize-card p-4">
+            <div class="row">
                 <div class="col-4 px-1">
                     <div class=" p-2">
                         VM Density Per Host
@@ -206,7 +235,8 @@
                         </ng-container>
                         <div *ngIf="!capacityAndGrowthInsightsWidgetData.vmDensityChartData"
                             class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No data
+                            style="width: 100%; height: 200px;">No
+                            data
                             available.
                         </div>
                     </div>
@@ -224,7 +254,8 @@
                         </ng-container>
                         <div *ngIf="!capacityAndGrowthInsightsWidgetData.vmCapacityChartData"
                             class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No data
+                            style="width: 100%; height: 200px;">No
+                            data
                             available.
                         </div>
                     </div>
@@ -253,64 +284,58 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mx-0 my-2">
-    <div class="col-6 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <!-- <app-spinner [name]="'Loader'"></app-spinner> -->
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Top 10 Clusters By VM Count
-            </div>
-            <div class="card-body d-flex flex-column  p-2">
-                <!-- <app-spinner [name]="top10ClustersByVMsWidgetData.loader"></app-spinner> -->
-                <ng-container *ngIf="top10ClustersByVMsWidgetData?.chartData">
-                    <div echarts [options]="top10ClustersByVMsWidgetData?.chartData?.options" [defaultHeight]="200"
-                        style="width: 100%; height: 200px;">
-                    </div>
-                </ng-container>
-                <div *ngIf="!top10ClustersByVMsWidgetData.chartData"
-                    class="d-flex justify-content-center align-items-center" style="width: 100%; height: 200px;">No data
-                    available.
+<div class="row mx-1 my-4">
+    <div class="col-6">
+        <div class="bg-transparent font-500 font-lg py-2">
+            Top 10 Clusters by VM Count
+        </div>
+        <div class="card round-edge equalize-card d-flex flex-column  position-relative p-2">
+            <app-spinner [name]="top10ClustersByVMsWidgetData.loader"></app-spinner>
+            <ng-container *ngIf="top10ClustersByVMsWidgetData?.chartData">
+                <div echarts [options]="top10ClustersByVMsWidgetData?.chartData?.options" [defaultHeight]="200"
+                    style="width: 100%; height: 200px;">
                 </div>
+            </ng-container>
+            <div *ngIf="!top10ClustersByVMsWidgetData.chartData"
+                class="d-flex justify-content-center align-items-center" style="width: 100%; height: 200px;">No data
+                available.
             </div>
         </div>
     </div>
-    <div class="col-6 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <!-- <app-spinner [name]="'Loader'"></app-spinner> -->
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Cluster Capacity Utilization Trend (CPU & Memory %)
-            </div>
-            <div class="card-body d-flex flex-column  p-2">
-                <!-- <app-spinner [name]="clusterCapacityUtilTrendWidgetData.loader"></app-spinner> -->
-                <ng-container *ngIf="clusterCapacityUtilTrendWidgetData?.chartData">
-                    <div echarts [options]="clusterCapacityUtilTrendWidgetData?.chartData?.options"
-                        [defaultHeight]="200" style="width: 100%; height: 200px;">
-                    </div>
-                </ng-container>
-                <div *ngIf="!clusterCapacityUtilTrendWidgetData.chartData"
-                    class="d-flex justify-content-center align-items-center" style="width: 100%; height: 200px;">No data
-                    available.
+    <div class="col-6">
+        <div class="bg-transparent font-500 font-lg py-2">
+            Cluster Capacity Utilization Trend (CPU & Memory %)
+        </div>
+        <div class="card round-edge equalize-card d-flex flex-column p-2 position-relative">
+            <app-spinner [name]="clusterCapacityUtilTrendWidgetData.loader"></app-spinner>
+            <ng-container *ngIf="clusterCapacityUtilTrendWidgetData?.chartData">
+                <div echarts [options]="clusterCapacityUtilTrendWidgetData?.chartData?.options" [defaultHeight]="200"
+                    style="width: 100%; height: 200px;">
                 </div>
+            </ng-container>
+            <div *ngIf="!clusterCapacityUtilTrendWidgetData.chartData"
+                class="d-flex justify-content-center align-items-center" style="width: 100%; height: 200px;">No data
+                available.
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mx-0 my-2">
-    <div class="col-12 pr-0">
-        <div class="card round-edge equalize-card mb-0">
+<div class="row mx-1 py-4">
+    <div class="col-12">
+        <div class=" bg-transparent font-500 font-lg py-2">
+            Infrastructure Health / Hardware Status
+        </div>
+        <div class="card round-edge equalize-card mb-3 p-4">
             <app-spinner [name]="infrastructureHealthWidgetData.loader"></app-spinner>
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Infrastructure Health / Hardware Status
-            </div>
-            <div class="card-body d-flex p-2">
-                <!-- Power Status -->
-                <div class="col-4 px-1">
+            <div class="row">
+                <div class="col-4 px-5">
                     <h5 class="text-center mb-3">Power Status</h5>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -338,7 +363,7 @@
                     </div>
                 </div>
                 <!-- Host Health Status -->
-                <div class="col-4 px-1">
+                <div class="col-4 px-5">
                     <h5 class="text-center mb-3">Host health Status</h5>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -374,7 +399,7 @@
                     </div>
                 </div>
                 <!-- Fan / Temperature Sensors -->
-                <div class="col-4 px-1">
+                <div class="col-4 px-5">
                     <h5 class="text-center mb-3">Fan / Temperature Sensors</h5>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -410,20 +435,20 @@
                     </div>
                 </div>
             </div>
+
         </div>
+
     </div>
 </div>
 
-<div class="row mx-0 my-2">
-    <div class="col-12 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Performance Hotspots
-            </div>
-
-            <div class="card-body d-flex flex-column  p-2">
-                <app-spinner [name]="utilizationRows.loader" [width]="0"></app-spinner>
-
+<div class="row mx-1 py-4">
+    <div class="col-12">
+        <div class=" bg-transparent font-500 font-lg py-2">
+            Performance Hotspots
+        </div>
+        <div class="card round-edge equalize-card mb-3 p-4 position-relative">
+            <app-spinner [name]="utilizationRows.loader" [width]="0"></app-spinner>
+            <div class="row">
                 <div class="col-12 px-1">
                     <h5 class="text-center mb-3">Top 10 Utilization</h5>
                     <div class="table-responsive">
@@ -439,7 +464,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of utilizationRows.utilRow; trackBy: trackByIndex">
+                                <tr *ngFor="let row of utilizationRows?.utilRow; trackBy: trackByIndex">
                                     <td><button type="button" class="btn btn-link p-0 table-link">{{row.name}}</button>
                                     </td>
                                     <td>
@@ -458,7 +483,8 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="capacity-line">Capacity: {{row.storage.capacity}}</div>
+                                        <div class="capacity-line">Capacity:
+                                            {{row.storage.capacity}}</div>
                                         <div class="progress-track">
                                             <div class="progress-fill" [ngClass]="getStatusClass(row.storage.tone)"
                                                 [style.width.%]="row.storage.percent"></div>
@@ -472,7 +498,8 @@
                                         <div class="iops-cell">
                                             <div class="progress-track">
                                                 <div class="progress-fill" [ngClass]="getStatusClass(row.diskIops.tone)"
-                                                    [style.width.%]="row.diskIops.percent"></div>
+                                                    [style.width.%]="row.diskIops.percent">
+                                                </div>
                                             </div>
                                             <span>{{row.diskIops.label}}</span>
                                         </div>
@@ -481,6 +508,9 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div *ngIf="!utilizationRows?.utilRow?.length" class="text-center text-muted py-4">No data
+                            available.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -488,18 +518,18 @@
     </div>
 </div>
 
-<div class="row mx-0 my-2">
-    <div class="col-12 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Performance / Workload insights
-            </div>
-            <div class="card-body d-flex p-2">
+<div class="row mx-1 py-4">
+    <div class="col-12">
+        <div class=" bg-transparent font-500 font-lg py-2">
+            Performance / Workload insights
+        </div>
+        <div class="card round-edge equalize-card mb-3 p-4 position-relative">
+            <div class="row">
                 <div class="col-4">
                     <div class="text-center p-2">
                         Top 10 - Disk Latency (Ms)
                     </div>
-                    <div class="card-body">
+                    <div class="card-body position-relative">
                         <app-spinner [name]="diskLatencyWidgetData.loader"></app-spinner>
                         <ng-container *ngIf="diskLatencyWidgetData?.chartData">
                             <div echarts [options]="diskLatencyWidgetData?.chartData?.options" [defaultHeight]="200"
@@ -508,7 +538,8 @@
                         </ng-container>
                         <div *ngIf="!diskLatencyWidgetData.chartData"
                             class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No data
+                            style="width: 100%; height: 200px;">No
+                            data
                             available.
                         </div>
                     </div>
@@ -517,7 +548,7 @@
                     <div class="text-center p-2">
                         Top 10 - CPU Ready / Wait Time VMs (%)
                     </div>
-                    <div class="card-body">
+                    <div class="card-body position-relative">
                         <app-spinner [name]="cpuReadyWidgetData.loader"></app-spinner>
                         <ng-container *ngIf="cpuReadyWidgetData?.chartData">
                             <div echarts [options]="cpuReadyWidgetData?.chartData?.options" [defaultHeight]="200"
@@ -535,7 +566,7 @@
                     <div class="text-center p-2">
                         Top 10 - Swap Balloon Memory (GB)
                     </div>
-                    <div class="card-body">
+                    <div class="card-body position-relative">
                         <app-spinner [name]="swapBalloonMemoryWidgetData.loader"></app-spinner>
                         <ng-container *ngIf="swapBalloonMemoryWidgetData?.chartData">
                             <div echarts [options]="swapBalloonMemoryWidgetData?.chartData?.options"
@@ -544,220 +575,179 @@
                         </ng-container>
                         <div *ngIf="!swapBalloonMemoryWidgetData.chartData"
                             class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No data
+                            style="width: 100%; height: 200px;">No
+                            data
                             available.
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
 
-<div class="row mx-0 my-2 private-cloud-compute-dashboard">
-    <div class="col-12 pr-0">
-        <div class="card round-edge equalize-card mb-0">
+<div class="row mx-1 py-4">
+    <div class="col-8">
+        <div class="card round-edge  mb-0">
             <div class="card-header bg-transparent font-500 font-lg p-2">
-                Alert & Events View
+                <span
+                    class="badge badge-secondary font-lg font-500 mr-2">{{idleDevicesRow?.devicesRow?.length}}</span>Idle
+                Devices Analysis
             </div>
-            <div class="dashboard-content">
-                <div class="dashboard-card alert-card">
-                    <div class="alert-summary">
-                        <app-spinner [name]="alertSummaryMetrics?.loader" [width]="0"></app-spinner>
-                        <div class="alert-summary-metric">
-                            <div>Critical Alerts</div>
-                            <strong class="tone-danger">{{alertSummaryMetrics?.criticalAlerts}}</strong>
-                        </div>
-                        <div class="alert-summary-metric">
-                            <div>High Alerts</div>
-                            <strong class="tone-warning">{{alertSummaryMetrics?.highAlerts}}</strong>
-                        </div>
-                        <div class="alert-summary-metric">
-                            <div>Open ITSM Tickets</div>
-                            <strong class="tone-primary">{{alertSummaryMetrics?.openITSMTickets}}</strong>
-                        </div>
-                        <div class="alert-summary-metric">
-                            <div>Automation Success</div>
-                            <strong class="tone-success">{{alertSummaryMetrics?.automationSuccess}}</strong>
-                        </div>
-                        <div class="alert-summary-metric">
-                            <div>Avg MTTR</div>
-                            <strong class="tone-muted">{{alertSummaryMetrics?.avgMTTR}}</strong>
-                        </div>
+            <div class="card-body d-flex flex-column p-2 position-relative">
+                <div class="table-responsive">
+                    <app-spinner [name]="idleDevicesRow.loader" [width]="0"></app-spinner>
+                    <table class="table table-sm alert-table">
+                        <thead>
+                            <tr>
+                                <th>Device Name</th>
+                                <th>Resource Type</th>
+                                <th>Avg. CPU%</th>
+                                <th>Avg. Mem%</th>
+                                <th>Network I/O</th>
+                                <th>Idle Duration</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let device of idleDevicesRow?.devicesRow; trackBy: trackByIndex">
+                                <td class="text-primary">{{device.deviceName}}</td>
+                                <td>{{device.resourceType}}</td>
+                                <td>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" [ngClass]="getStatusClass(device.avgCpu.tone)"
+                                            [style.width.%]="device.avgCpu.percent"></div>
+                                    </div>
+                                    <div class="storage-meta">
+                                        <span>Used: {{device.avgCpu.used}}</span>
+                                        <span>Free: {{device.avgCpu.free}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" [ngClass]="getStatusClass(device.avgMem.tone)"
+                                            [style.width.%]="device.avgMem.percent"></div>
+                                    </div>
+                                    <div class="storage-meta">
+                                        <span>Used: {{device.avgMem.used}}</span>
+                                        <span>Free: {{device.avgMem.free}}</span>
+                                    </div>
+                                </td>
+                                <td>{{device.networkIO}}</td>
+                                <td>{{device.idleDuration}}</td>
+                                <td> <i [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="!idleDevicesRow?.devicesRow?.length" class="text-center text-muted py-4">No data
+                        available.
                     </div>
-
-                    <div class="subsection-title">Top 10 Critical Alerts</div>
-                    <div class="table-responsive">
-                        <app-spinner [name]="criticalAlerts.loader" [width]="0"></app-spinner>
-                        <table class="table table-sm alert-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Device Name</th>
-                                    <th>Severity</th>
-                                    <th>Description</th>
-                                    <th>Source</th>
-                                    <th>Acknowledged</th>
-                                    <th>Duration</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let alert of criticalAlerts.alertList; trackBy: trackByIndex">
-                                    <td><button type="button" class="btn btn-link p-0 table-link">{{alert.id}}</button>
-                                    </td>
-                                    <td>{{alert.deviceName}}</td>
-                                    <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td>
-                                    <td>{{alert.description}}</td>
-                                    <td>{{alert.source}}</td>
-                                    <td>{{alert.acknowledged}}</td>
-                                    <td>{{alert.duration}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card round-edge mb-0">
+            <div class="card-header bg-transparent font-500 font-lg p-2">
+                Idle Duration Distribution
+            </div>
+            <div class="card-body position-relative">
+                <app-spinner [name]="idleDistributionRows.loader" [width]="0">
+                </app-spinner>
+                <div class="distribution-row" *ngFor="let row of idleDistributionRows?.distributionRow; let i = index">
+                    <div class="distribution-label border-bottom">
+                        {{row.duration}}
                     </div>
-
-                    <div class="alert-trend-header">
-                        <div class="subsection-title mb-0">Alert Trend</div>
-                        <div class="alert-filters">
-                            <select class="form-control form-control-sm">
-                                <option>6 Hour</option>
-                            </select>
-                            <select class="form-control form-control-sm">
-                                <option>All Datacenter</option>
-                            </select>
-                            <select class="form-control form-control-sm">
-                                <option>All Cloud</option>
-                            </select>
-                            <select class="form-control form-control-sm">
-                                <option>Device Type</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="alert-trend-grid">
-                        <app-spinner [name]="loaderNames.alertTrend" [width]="0"></app-spinner>
-                        <app-spinner [name]="loaderNames.alertSideCards" [width]="0"></app-spinner>
-                        <div class="polar-area">
-                            <div echarts [options]="alertTrendPolarOptions" class="polar-chart"></div>
-                            <div class="trend-legend">
-                                <span class="legend-item"
-                                    *ngFor="let item of alertTrendPolarOptions; trackBy: trackByIndex">
-                                    <span class="large-dot" [style.background]="item.color"></span>
-                                    {{item.name}} <strong>{{item.value}}</strong>
+                    <div class="distribution-progress">
+                        <div class="progress-track-xl">
+                            <div class="progress-fill distribution-fill" [ngClass]="getDistributionClass(i)"
+                                [style.width.%]="row.percent">
+                                <span class="distribution-inside-value">
+                                    {{row.percent}}
                                 </span>
                             </div>
                         </div>
-                        <div class="stack-area">
-                            <div echarts [options]="alertTrendStackOptions" class="stack-chart"></div>
-                            <div class="stack-legend">
-                                <span><span class="legend-dot bg-critical"></span>Critical -
-                                    {{alertTrendLegend?.rawEvents.critical}}</span>
-                                <span><span class="legend-dot bg-dedupe"></span>Dedupe -
-                                    {{alertTrendLegend?.noiseReduction.dedupeEvents}}</span>
-                                <span><span class="legend-dot bg-auto"></span>Auto Cloned -
-                                    {{alertTrendLegend?.firstResponse.autoCloned}}</span>
-                                <span><span class="legend-dot bg-warning"></span>Warning -
-                                    {{alertTrendLegend?.rawEvents.warning}}</span>
-                                <span><span class="legend-dot bg-suppressed"></span>Suppressed -
-                                    {{alertTrendLegend?.noiseReduction.suppressedEvents}}</span>
-                                <span><span class="legend-dot bg-ticket"></span>Ticket Created -
-                                    {{alertTrendLegend?.firstResponse.ticketCreated}}</span>
-                                <span><span class="legend-dot bg-info"></span>Informative -
-                                    {{alertTrendLegend?.rawEvents.informative}}</span>
-                                <span><span class="legend-dot bg-correlated"></span>Correlated -
-                                    {{alertTrendLegend?.noiseReduction.correlated}}</span>
-                                <span><span class="legend-dot bg-closed"></span>Auto Closed -
-                                    {{alertTrendLegend?.firstResponse.autoClosed}}</span>
-                            </div>
-                        </div>
-                        <div class="side-metrics">
-                            <div class="side-metric-card" *ngFor="let card of alertSideCards; trackBy: trackByIndex">
-                                <div class="side-card-header">
-                                    <span>{{card.title}}</span>
-                                    <strong>{{card.value}}</strong>
-                                </div>
-                                <div class="side-card-row" *ngFor="let metric of card.metrics; trackBy: trackByIndex">
-                                    <span>
-                                        <span class="tiny-dot" *ngIf="metric.tone"
-                                            [ngClass]="getStatusClass(metric.tone)"></span>
-                                        {{metric.label}}
-                                    </span>
-                                    <strong>{{metric.value}}</strong>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-
-                    <div class="itsm-title">ITSM Tickets</div>
-                    <!-- <app-spinner [name]="loaderNames.ITSMTicket" [width]="0"></app-spinner> -->
-                    <div class="ticket-chart-panel">
-                        <app-spinner [name]="ticketPriorityOptionsWidgetData.loader" [width]="0"></app-spinner>
-                        <app-spinner [name]="ticketStatusOptions.loader" [width]="0"></app-spinner>
-                        <div echarts [options]="ticketPriorityOptionsWidgetData.chartData" class="ticket-donut"></div>
-                        <div echarts [options]="ticketStatusOptions.chartData" class="ticket-donut ticket-status"></div>
-                        <div class="no-ticket-widget">
-                            <div class="widget-title">Solved by Response Time</div>
-                            <div class="no-ticket-text">No Tickets Found.</div>
-                        </div>
+                    <div class="distribution-value">
+                        {{row.percent}}
                     </div>
-
-                    <div class="ticket-filter-bar">
-                        <label>Search :</label>
-                        <input class="form-control form-control-sm" type="text" placeholder="Enter Keyword">
-                        <label>State :</label>
-                        <select class="form-control form-control-sm">
-                            <option>All</option>
-                        </select>
-                        <label>Date Created :</label>
-                        <input class="form-control form-control-sm date-range-input" type="text"
-                            value="March 30, 2026 - April 13, 2026" readonly>
-                        <label>Priority :</label>
-                        <select class="form-control form-control-sm">
-                            <option>All</option>
-                        </select>
-                        <label>Type :</label>
-                        <select class="form-control form-control-sm">
-                            <option>All</option>
-                        </select>
-                        <button class="filter-ticket-btn" type="button">Filter Tickets</button>
-                        <div class="ticket-actions">
-                            <span>Show</span>
-                            <select class="form-control form-control-sm">
-                                <option>10</option>
-                            </select>
-                            <button class="create-ticket-btn" type="button">Create Ticket</button>
-                            <strong>{{totalTickets}}</strong>
-                            <span>Tickets</span>
-                        </div>
+                </div>
+                <ng-container *ngIf="idleDistributionRows?.chartData">
+                    <div echarts [options]="idleDistributionRows?.chartData?.options" [defaultHeight]="200"
+                        style="width: 100%; height: 300px;">
                     </div>
+                </ng-container>
+                <div *ngIf="!idleDistributionRows?.distributionRow?.length" class="text-center text-muted py-4">No data
+                    available.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    <div class="table-responsive">
-                        <app-spinner [name]="tickets.loader" [width]="0"></app-spinner>
-                        <table class="table table-sm tickets-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Ticket ID</th>
-                                    <th>Short Description</th>
-                                    <th>State</th>
-                                    <th>Priority</th>
-                                    <th>Created On</th>
-                                    <th>Updated On</th>
-                                    <th>Resolution</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let ticket of tickets.ticketList; trackBy: trackByIndex">
-                                    <td><button type="button"
-                                            class="btn btn-link p-0 table-link">{{ticket.ticketId}}</button>
-                                    </td>
-                                    <td>{{ticket.shortDescription}}</td>
-                                    <td>{{ticket.state}}</td>
-                                    <td>{{ticket.priority}}</td>
-                                    <td>{{ticket.createdOn}}</td>
-                                    <td>{{ticket.updatedOn}}</td>
-                                    <td>{{ticket.resolution}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+<div class="row mx-1 py-4">
+    <div class="col-6">
+        <div class="card round-edge mb-0">
+            <div class="card-header bg-transparent font-500 font-lg p-2">
+                <span
+                    class="badge badge-secondary font-lg font-500 mr-2">{{orphanedDeviceListViewData?.orphanList?.length}}</span>Orphaned
+                Device List
+            </div>
+            <div class="card-body d-flex flex-column p-2 position-relative">
+                <div class="table-responsive">
+                    <app-spinner [name]="orphanedDeviceListViewData.loader" [width]="0"></app-spinner>
+                    <table class="table table-sm alert-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Last Seen</th>
+                                <th>Datacenter</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let device of orphanedDeviceListViewData.orphanList; trackBy: trackByIndex">
+                                <td>{{device.name}}</td>
+                                <td> <i [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
+                                <td>{{device.lastSeen}}</td>
+                                <td>{{device.datacenter}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="card round-edge mb-0">
+            <div class="card-header bg-transparent font-500 font-lg p-2">
+                Orphaned By Category
+            </div>
+            <div class="card-body position-relative">
+                <app-spinner [name]="orphanedDeviceWidgetViewData.loader" [width]="0"></app-spinner>
+                <ng-container *ngIf="orphanedDeviceWidgetViewData?.chartData">
+                    <div echarts [options]="orphanedDeviceWidgetViewData?.chartData?.options" [defaultHeight]="400"
+                        style="width: 100%; height: 400px;">
+                    </div>
+                </ng-container>
+
+                <div class="custom-legend">
+                    <div class="legend-item" *ngFor="let item of orphanedByCategory; let i = index">
+
+                        <div class="d-flex align-items-center">
+                            <span class="legend-dot" [style.background]="orphanedByCategoryColors[i]">
+                            </span>
+
+                            <span class="legend-label">
+                                {{item.category}}
+                            </span>
+                        </div>
+
+                        <span class="legend-value">
+                            {{item.count}} ({{item.percentage}}%)
+                        </span>
                     </div>
                 </div>
             </div>
@@ -765,133 +755,54 @@
     </div>
 </div>
 
-<div class="row mx-0 my-2">
-    <div class="col-6 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <!-- <app-spinner [name]="'Loader'"></app-spinner> -->
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Risk / Optimization
-            </div>
-            <div class="card-body p-2">
-                <div class="col-12 d-flex justify-content-around">
-                    <div class="text-center p-1">
-                        <div class="text-muted">Overutilized Hosts</div>
-                        <div class="font-lg-xl font-500 text-primary">{{riskOptimizationViewData?.overUtilHosts}}
-                        </div>
-                        <div class="font-sm">{{riskOptimizationViewData?.overUtilHostsPercent}} CPU/Mem</div>
-                    </div>
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Underutilized Hosts</div>
-                        <div class="font-lg-xl font-500 text-primary">{{riskOptimizationViewData?.underUtilHosts}}
-                        </div>
-                        <div class="font-sm text-muted">{{riskOptimizationViewData?.underUtilHostsPercent}} Avg
-                            Utilization</div>
-                    </div>
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Idle VMs</div>
-                        <div class="font-lg-xl font-500 text-primary">{{riskOptimizationViewData?.idleVms}}
-                        </div>
-                        <div class="font-sm text-muted">{{riskOptimizationViewData?.idleVmsMsg}}</div>
-                    </div>
-                    <div class="my-2 border border-secondary"></div>
-                    <div class="text-center p-1">
-                        <div class="text-muted">Capacity Alerts</div>
-                        <div class="font-lg-xl font-500 text-primary">{{riskOptimizationViewData?.capacityAlerts}}
-                        </div>
-                        <div class="font-sm text-muted">{{riskOptimizationViewData?.capacityAlertsMsg}}</div>
-                    </div>
-                    <div class="my-2 border border-secondary"></div>
-                </div>
-                <div class="col-12">
-                    <div class="text-center p-2">
-                        Capacity Risk Alerts
-                    </div>
-                    <div class="card-body">
-                        <app-spinner [name]="riskOptimizationWidgetData.loader"></app-spinner>
-                        <ng-container *ngIf="riskOptimizationWidgetData?.chartData">
-                            <div echarts [options]="riskOptimizationWidgetData?.chartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height: 200px;">
-                            </div>
-                        </ng-container>
-                        <div *ngIf="!riskOptimizationWidgetData.chartData"
-                            class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No data
-                            available.
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="row mx-1">
+    <div class="col-12">
+        <div class=" bg-transparent font-500 font-lg py-2">
+            Recent Alerts
         </div>
-    </div>
-
-    <div class="col-6 pr-0">
-        <div class="card round-edge equalize-card mb-0">
-            <div class="card-header bg-transparent font-500 font-lg p-2">
-                Auto-Remediation Summary
-            </div>
-            <div class="card-body p-2">
-                <div class="">
-                    <div class="text-center p-2">
-                        Auto-Remediation Execution Summary
-                    </div>
-                    <div class="card-body">
-                        <app-spinner [name]="autoRemediationExecSummaryWidgetData.loader"></app-spinner>
-                        <!-- <div *ngIf="autoRemediationExecSummaryWidgetData?.chartData" class="run-status-widget d-flex align-items-center">
-                            <div echarts [options]="autoRemediationExecSummaryWidgetData?.chartData?.options" class="run-status-chart" [defaultHeight]="200" style="width: 100%; height: 200px;">
-                            </div>                        
-                            <div class="run-status-content ms-3">
-                                <div class="d-flex align-items-center mb-2">
-                                    <span class="status-dot me-1" [style.backgroundColor]="autoRemediationExecSummaryWidgetData?.graphData[0]?.color">
-                                    </span>
-                                    <span class="status-text me-3">
-                                        {{ autoRemediationExecSummaryWidgetData?.graphData[0]?.name }} {{ autoRemediationExecSummaryWidgetData?.graphData[0]?.value }}%
-                                    </span>
-                        
-                                    <span class="status-dot me-1" [style.backgroundColor]="autoRemediationExecSummaryWidgetData?.graphData[1]?.color">
-                                    </span>
-                                    <span class="status-text">
-                                        {{ autoRemediationExecSummaryWidgetData?.graphData[1]?.name }} {{ autoRemediationExecSummaryWidgetData?.graphData[1]?.value }}%
-                                    </span>
-                                </div>
-                        
-                                <div class="summary-text">
-                                    Total runs: {{ autoRemediationExecSummaryWidgetData.totalRuns }}
-                                    <span class="mx-2">|</span>
-                                    Avg duration: {{ autoRemediationExecSummaryWidgetData.avgDuration }}
-                                </div>
-                            </div>
-                        </div> -->
-                        <ng-container *ngIf="autoRemediationExecSummaryWidgetData?.chartData">
-                            <div echarts [options]="autoRemediationExecSummaryWidgetData?.chartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height: 200px;">
-                            </div>
-                        </ng-container>
-                        <div *ngIf="!autoRemediationExecSummaryWidgetData.chartData"
-                            class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No data
-                            available.
-                        </div>
-                    </div>
+        <div class="card round-edge equalize-card mb-3 p-4 position-relative">
+            <div class="alert-summary">
+                <app-spinner [name]="alertSummaryMetrics?.loader" [width]="0"></app-spinner>
+                <div class="alert-summary-metric">
+                    <div>Critical Alerts</div>
+                    <strong class="tone-danger">{{alertSummaryMetrics?.critical}}</strong>
                 </div>
-                <div class="">
-                    <div class="text-center p-2">
-                        Top Auto-Remediation Actions
-                    </div>
-                    <div class="card-body">
-                        <app-spinner [name]="topAutoRemediationActionWidgetData.loader"></app-spinner>
-                        <ng-container *ngIf="topAutoRemediationActionWidgetData?.chartData">
-                            <div echarts [options]="topAutoRemediationActionWidgetData?.chartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height: 200px;">
-                            </div>
-                        </ng-container>
-                        <div *ngIf="!topAutoRemediationActionWidgetData.chartData"
-                            class="d-flex justify-content-center align-items-center"
-                            style="width: 100%; height: 200px;">No data
-                            available.
-                        </div>
-                    </div>
+                <div class="alert-summary-metric">
+                    <div>Warning Alerts</div>
+                    <strong class="tone-warning">{{alertSummaryMetrics?.warning}}</strong>
+                </div>
+                <div class="alert-summary-metric">
+                    <div>Info Tickets</div>
+                    <strong class="tone-primary">{{alertSummaryMetrics?.information}}</strong>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <app-spinner [name]="criticalAlerts.loader" [width]="0"></app-spinner>
+                <table class="table table-sm alert-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Device Name</th>
+                            <th>Severity</th>
+                            <th>Description</th>
+                            <th>Source</th>
+                            <th>Acknowledged</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let alert of criticalAlerts.alertList; trackBy: trackByIndex">
+                            <td><button type="button" class="btn btn-link p-0 table-link">{{alert.id}}</button>
+                            </td>
+                            <td>{{alert.deviceName}}</td>
+                            <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td>
+                            <td>{{alert.description}}</td>
+                            <td>{{alert.source}}</td>
+                            <td>{{alert.acknowledged}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div *ngIf="!criticalAlerts?.alertList?.length" class="text-center text-muted py-4">No data
+                    available.
                 </div>
             </div>
         </div>

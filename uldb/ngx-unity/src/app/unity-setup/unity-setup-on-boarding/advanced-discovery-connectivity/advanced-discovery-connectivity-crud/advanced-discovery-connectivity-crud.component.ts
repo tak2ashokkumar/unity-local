@@ -206,13 +206,10 @@ export class AdvancedDiscoveryConnectivityCrudComponent implements OnInit, OnDes
 
   confirmDelete() {
     this.confirmModalRef.hide();
-    this.spinner.start('main');
     this.agentService.deleteConfig(this.selectedAgent.uuid).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.spinner.stop('main');
       this.notificationService.success(new Notification('Collector deleted sucessfully'));
       this.agentService.crudAnnounced();
     }, err => {
-      this.spinner.stop('main');
       this.notificationService.error(new Notification('Error while deleting. Please try again!!'));
     });
   }

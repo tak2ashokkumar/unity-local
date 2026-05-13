@@ -4,12 +4,13 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { AnyMxRecord } from 'dns';
 import * as echarts from 'echarts';
 import { EChartsOption } from 'echarts';
+import moment from 'moment';
 import { Observable, of } from 'rxjs';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
-import { PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS, PRIVATE_CLOUD_TICKETS_TOTAL, Top10ClustersByVMCount, VmDensityPerHostChartColors } from './private-cloud-compute-dashboard.const';
-import { AlertsEventsView, AlertsSeverityItem, AlertSummary, AlertTrends, AutoRemediationDataType, CapacityAndGrowthDataType, CapacityTrendAndForecastItem, CloudTypeDistributionItem, EnvironmentCriticalityItem, ExecutionSummaryItem, ExecutiveSummaryItem, ExecutiveSummaryWidgetType, InfrahealthstatusDataType, ITSMTicketView, PerformanceHotspots, PerformanceWorkloadDataType, PowerActivityStateItem, PrivateCloudAlertSideCard, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudStatusTone, PrivateCloudTicketDonutItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, PrivateCloudUtilizationViewRow, ProvisioningStatus, TicketsByPriority, TicketsByStatus, TicketsItem, TopActionsItem, TopCriticalAlertsItem, TopHeaderDataType, VmCountByOSTypeItem, VmDensityPerHostItem } from './private-cloud-compute-dashboard.type';
+import { PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS, PRIVATE_CLOUD_TICKETS_TOTAL, VmDensityPerHostChartColors } from './private-cloud-compute-dashboard.const';
+import { AlertsSeverityItem, CapacityAndGrowthDataType, CapacityTrendAndForecastItem, CloudTypeDistributionItem, ClusterCapacityUtilTrendData, EnvironmentCriticalityItem, ExecutiveSummaryItem, ExecutiveSummaryWidgetType, FiltersCriteriaType, IdleDevices, IdleDurationDistributionItem, InfrahealthstatusDataType, OrphanedCategory, OrphanedResourcesResponse, PerformanceHotspots, PerformanceWorkloadDataType, PowerActivityStateItem, PrivateCloudAlertSideCard, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudStatusTone, PrivateCloudTicketDonutItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, PrivateCloudUtilizationViewRow, ProvisioningStatus, RecentAlerts, RecentAlertsItem, Top10ClustersByVMsData, TopHeaderDataType, VmCountByOSTypeItem, VmDensityPerHostItem } from './private-cloud-compute-dashboard.type';
 
 
 @Injectable()
@@ -20,36 +21,23 @@ export class PrivateCloudComputeDashboardService {
     private chartConfigSvc: UnityChartConfigService,
     private utilSvc: AppUtilityService,
     private builder: FormBuilder,
-    private tableService: TableApiServiceService,) { }
+    private tableService: TableApiServiceService) { }
 
-  convertFiltersToParams(filters: any) {
+  private convertFiltersToParams(criteria?: FiltersCriteriaType): HttpParams {
     let params: HttpParams = new HttpParams();
-    console.log("filters - ", filters)
+    params = this.appendMultiValueParam(params, 'platform', criteria?.platforms);
+    params = this.appendMultiValueParam(params, 'datacenter', criteria?.datacenters);
+    params = this.appendMultiValueParam(params, 'environment', criteria?.environments);
+    params = this.appendMultiValueParam(params, 'account', criteria?.accounts);
+    return params;
+  }
 
-    //Need to check how backend receiving this.
-    if (filters?.platforms?.length) {
-      console.log('platforms present')
-      filters.platforms.forEach(val => {
-        params.append('platform', val);
-      });
-    }
-    if (filters?.datacenters?.length) {
-      filters.platforms.forEach(val => {
-        params.append('datacenter', val);
-      });
-    }
-    if (filters?.environments?.length) {
-      filters.platforms.forEach(val => {
-        params.append('environment', val);
-      });
-    }
-    if (filters?.accounts?.length) {
-      filters.platforms.forEach(val => {
-        params.append('account', val);
-      });
-    }
-    console.log("params - ", params)
-
+  private appendMultiValueParam(params: HttpParams, key: string, values?: string[]): HttpParams {
+    (values || []).forEach(value => {
+      if (value) {
+        params = params.append(key, value);
+      }
+    });
     return params;
   }
 
@@ -58,32 +46,62 @@ export class PrivateCloudComputeDashboardService {
   }
 
   getFilterDropdowns(): Observable<any> {
-    // return this.http.get<ExecutiveSummaryWidgetType>(`/customer/widgets/executive_summary/`);
-    return of({
-      "filters": {
-        "platforms": [
-          { "value": "VMware", "label": "VMware vCenter" },
-          { "value": "Custom", "label": "Custom" }
-        ],
-        "datacenters": [
-          { "value": "DC1", "label": "DC1" },
-          { "value": "DC2", "label": "DC2" }
-        ],
-        "accounts": [
-          { "value": "uuid-123", "label": "treas" },
-          { "value": "uuid-456", "label": "custom_clouds" }
-        ],
-        "environments": [
-          { "value": "Production", "label": "Production" },
-          { "value": "Development", "label": "Development" },
-          { "value": "Test", "label": "Test" },
-          { "value": "None", "label": "None" }
-        ]
-      }
-    })
+    return this.http.get<ExecutiveSummaryWidgetType>(`/customer/widgets/dashboard_filters/`);
+    // return of({
+    //   "filters": {
+    //     "platforms": [
+    //       { "value": "All", "label": "All" },
+    //       { "value": "VMware", "label": "VMware vCenter" },
+    //       { "value": "Custom", "label": "Custom" }
+    //     ],
+    //     "datacenters": [
+    //       { "value": "All", "label": "All" },
+    //       { "value": "DC1", "label": "DC1" },
+    //       { "value": "DC2", "label": "DC2" }
+    //     ],
+    //     "accounts": [
+    //       { "value": "All", "label": "All" },
+    //       { "value": "uuid-123", "label": "treas" },
+    //       { "value": "uuid-456", "label": "custom_clouds" }
+    //     ],
+    //     "environments": [
+    //       { "value": "All", "label": "All" },
+    //       { "value": "Production", "label": "Production" },
+    //       { "value": "Development", "label": "Development" },
+    //       { "value": "Test", "label": "Test" },
+    //       { "value": "None", "label": "None" }
+    //     ],
+    //     "timeRanges": [
+    //       { "value": "1", "label": "1 Hour" },
+    //       { "value": "6", "label": "6 Hour" },
+    //       { "value": "12", "label": "12 Hour" },
+    //       { "value": "24", "label": "24 Hour" },
+    //       { "value": "168", "label": "7 Days" },
+    //       { "value": "720", "label": "30 Days" }
+    //     ],
+    //     "eventDatacenters": [
+    //       { "value": "All Datacenter", "label": "All Datacenter" },
+    //       { "value": "DC1", "label": "DC1" },
+    //       { "value": "AWS-US-EAST-1", "label": "AWS-US-EAST-1" }
+    //     ],
+    //     "eventClouds": [
+    //       { "value": "All Cloud", "label": "All Cloud" },
+    //       { "value": "VMware", "label": "VMware" },
+    //       { "value": "AWS", "label": "AWS" },
+    //       { "value": "Azure", "label": "Azure" }
+    //     ],
+    //     "deviceTypes": [
+    //       { "value": "Device Type", "label": "Device Type" },
+    //       { "value": "Server", "label": "Server" },
+    //       { "value": "Switch", "label": "Switch" },
+    //       { "value": "Router", "label": "Router" },
+    //       { "value": "Firewall", "label": "Firewall" }
+    //     ]
+    //   }
+    // })
   }
 
-  buildFilterForm(platforms: any[], datacenters: any[], environments: any[], accounts: any[]): FormGroup {
+  buildFilterForm(platforms?: string[], datacenters?: string[], environments?: string[], accounts?: string[]): FormGroup {
     return this.builder.group({
       platforms: [platforms || []],
       datacenters: [datacenters || []],
@@ -93,18 +111,21 @@ export class PrivateCloudComputeDashboardService {
   }
 
   //Executive summary widget
-  getExecutiveSummaryWidgetData(filters: any): Observable<ExecutiveSummaryWidgetType> {
+  getExecutiveSummaryWidgetData(filters: FiltersCriteriaType): Observable<ExecutiveSummaryWidgetType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<ExecutiveSummaryWidgetType>(`/customer/widgets/executive_summary/`, { params });
   }
 
-  convertExecutiveSummaryViewData(data: ExecutiveSummaryItem) {
+  convertExecutiveSummaryViewData(data: ExecutiveSummaryItem): ExecutiveSummaryViewData {
     let summaryData = new ExecutiveSummaryViewData();
     summaryData.totalVMs = data.totalVMs;
     summaryData.physicalHosts = data.physicalHosts;
     summaryData.clusters = data.clusters;
     summaryData.poweredOn = data.poweredOnVMs;
     summaryData.poweredOff = data.poweredOffVMs;
+    summaryData.idleVMs = data.idleVMs;
+    summaryData.orphanedVMs = data.orphanedVMs;
+
     return summaryData;
   }
 
@@ -117,16 +138,7 @@ export class PrivateCloudComputeDashboardService {
 
     view.options = {
       ...view.options,
-      // title: {
-      //   text: 'Cloud type distribution',
-      //   left: 'center',
-      //   top: 10,
-      //   textStyle: {
-      //     fontSize: 16,
-      //     fontWeight: 500,
-      //     color: '#333'
-      //   }
-      // },
+
 
       tooltip: {
         trigger: 'item',
@@ -136,15 +148,16 @@ export class PrivateCloudComputeDashboardService {
       },
 
       legend: {
-        bottom: 10,
+        bottom: 20,
         left: 'center',
+        width: '90%',
         icon: 'circle',
         itemWidth: 10,
         itemHeight: 10,
-        itemGap: 16,
+        itemGap: 12,
         textStyle: {
           color: '#8a8a8a',
-          fontSize: 13
+          fontSize: 11
         },
         formatter: (name: string) => {
           const item = data.find(d => d.type === name);
@@ -156,19 +169,17 @@ export class PrivateCloudComputeDashboardService {
         {
           name: 'Cloud Type',
           type: 'pie',
-          radius: ['48%', '74%'],
-          center: ['50%', '43%'],
+          radius: ['45%', '78%'],
+          center: ['50%', '48%'],
+          bottom: 40,
 
           label: { show: false },
           labelLine: { show: false },
 
-          data: data.map((item, index) => ({
+          data: data.map((item) => ({
             value: item.percentage,
             name: item.type,
-            count: item.count,
-            itemStyle: {
-              color: index === 0 ? '#3a8dde' : '#f5a623'
-            }
+            count: item.count
           })),
 
           itemStyle: {
@@ -214,7 +225,7 @@ export class PrivateCloudComputeDashboardService {
       yAxis: {
         type: 'value',
         min: 0,
-        max: 3800, // to match visual scale in your image
+        // max: 3800, // to match visual scale in your image
         splitNumber: 4,
         axisLine: { show: false },
         axisTick: { show: false },
@@ -272,16 +283,6 @@ export class PrivateCloudComputeDashboardService {
 
     view.options = {
       ...view.options,
-      // title: {
-      //   text: 'VM count by OS type',
-      //   left: 'center',
-      //   top: 15,
-      //   textStyle: {
-      //     fontSize: 16,
-      //     fontWeight: 500,
-      //     color: '#333'
-      //   }
-      // },
 
       tooltip: {
         trigger: 'item',
@@ -313,6 +314,7 @@ export class PrivateCloudComputeDashboardService {
           type: 'pie',
           radius: ['45%', '72%'],
           center: ['50%', '48%'],
+          bottom: 30,
           label: { show: false },
           labelLine: { show: false },
 
@@ -337,23 +339,25 @@ export class PrivateCloudComputeDashboardService {
 
   convertToEnvironmentAndCriticalityChartData(data: EnvironmentCriticalityItem[]) {
     if (!data || !data.length) { return; }
+
     let view: UnityChartDetails = new UnityChartDetails();
+
     view.type = UnityChartTypes.BAR;
     view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
 
+    const colors = ['#e54b4b', '#f5a623', '#2f80d1', '#5c8f1f'];
+
     view.options = {
       ...view.options,
-      // title: {
-      //   text: 'Environment & criticality',
-      //   left: 'center',
-      //   top: 10,
-      //   textStyle: {
-      //     fontSize: 16,
-      //     fontWeight: 500,
-      //     color: '#333'
-      //   }
-      // },
+
+      grid: {
+        left: 85,
+        right: 55,
+        top: 0,
+        bottom: 25,
+        containLabel: true
+      },
 
       xAxis: {
         type: 'value',
@@ -365,11 +369,14 @@ export class PrivateCloudComputeDashboardService {
         type: 'category',
         inverse: true,
         data: data.map(d => d.environment),
+
         axisLine: { show: false },
         axisTick: { show: false },
+
         axisLabel: {
           color: '#8a8a8a',
-          fontSize: 12
+          fontSize: 11,
+          margin: 12
         }
       },
 
@@ -377,51 +384,63 @@ export class PrivateCloudComputeDashboardService {
         trigger: 'item',
         formatter: (params: any) => {
           const item = data[params.dataIndex];
-          return `${item.environment}<br/>Count: ${item.count}<br/>${item.percentage}%`;
+
+          return `
+          ${item.environment}<br/>
+          Count: ${item.count}<br/>
+          ${item.percentage}%
+        `;
         }
       },
 
       series: [
+        // background gray bars
         {
-          name: 'Background',
           type: 'bar',
-          barWidth: 9,
+          barWidth: 8,
           barGap: '-100%',
           silent: true,
-          data: data.map(() => 100),
-          itemStyle: {
-            color: '#f1f2f4',
-            borderRadius: 10
-          },
-          z: 1
-        },
-        {
-          name: 'Environment',
-          type: 'bar',
-          barWidth: 9,
-          data: data.map((item, index) => {
-            const colors = ['#e54b4b', '#f5a623', '#2f80d1', '#5c8f1f'];
+          z: 1,
 
-            return {
-              value: item.percentage,
-              count: item.count,
-              itemStyle: {
-                color: colors[index],
-                borderRadius: 10
-              }
-            };
-          }),
+          data: data.map(() => 100),
+
+          itemStyle: {
+            color: '#ececec',
+            borderRadius: 20
+          }
+        },
+
+        // actual colored bars
+        {
+          type: 'bar',
+          barWidth: 8,
+          z: 2,
+
+          data: data.map((item, index) => ({
+            value: item.percentage,
+
+            itemStyle: {
+              color: colors[index % colors.length],
+              borderRadius: 20
+            }
+          })),
+
           label: {
             show: true,
             position: 'right',
-            color: '#333',
-            fontSize: 12,
-            formatter: (params) => {
+            distance: 10,
+
+            color: '#555',
+            fontSize: 11,
+
+            formatter: (params: any) => {
               const item = data[params.dataIndex];
-              return item.count.toString();
-            },
-          },
-          z: 2
+
+              return item.count > 0
+                ? item.count.toLocaleString()
+                : '';
+            }
+          }
         }
       ]
     };
@@ -438,7 +457,9 @@ export class PrivateCloudComputeDashboardService {
   }
 
   //Capacity & Growth widget
-  getCapacityGrowthWidgetData(filters: any): Observable<CapacityAndGrowthDataType> {
+
+
+  getCapacityGrowthWidgetData(filters: FiltersCriteriaType): Observable<CapacityAndGrowthDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<CapacityAndGrowthDataType>('/customer/widgets/capacity_growth_insights/', { params });
   }
@@ -637,13 +658,28 @@ export class PrivateCloudComputeDashboardService {
   }
 
   //Top 10 clusters
-  getTop10ClustersByVMsWidgetData(filters: any): Observable<any> {
+
+
+  getTop10ClustersByVMsWidgetData(filters: FiltersCriteriaType): Observable<Top10ClustersByVMsData> {
     let params = this.convertFiltersToParams(filters)
-    return this.http.get<any>('/customer/widgets/', { params });
+    return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
+  }
+
+
+  convertToTop10ClustersByVMCountViewData(data: Top10ClustersByVMsData): Top10ClustersByVMCountViewData {
+
+    const view = new Top10ClustersByVMCountViewData();
+
+    view.clusterList = (data?.topClustersByVMCount || []).map(item => ({
+      host: item.clusterName || 'N/A',
+      value: item.vmCount ?? 0
+    }));
+
+    return view;
   }
 
   convertToTop10ClustersByVMsChartData(data: any) {
-    data = Top10ClustersByVMCount;
+    // data = Top10ClustersByVMCount;
     if (!data || !data.length) { return; }
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.BAR;
@@ -697,7 +733,7 @@ export class PrivateCloudComputeDashboardService {
           type: 'bar',
           barWidth: 52,
           data: data.map((item, index) => ({
-            value: item.vmCount,
+            value: item.value,
           }))
         }
       ]
@@ -706,21 +742,26 @@ export class PrivateCloudComputeDashboardService {
   }
 
   // Cluster capacity
-  getClusterCapacityUtilTrendWidgetData(filters: any): Observable<any> {
+  getClusterCapacityUtilTrendWidgetData(filters: FiltersCriteriaType): Observable<ClusterCapacityUtilTrendData> {
     let params = this.convertFiltersToParams(filters)
-    return this.http.get<any>('/customer/widgets/', { params });
+    return this.http.get<ClusterCapacityUtilTrendData>('/customer/widgets/cluster_capacity_utilization_trend/', { params });
   }
 
-  convertToClusterCapacityUtilTrendChartData(data: any) {
-    data = [
-      { month: 'Apr', actual: 4200, forecast: 4300 },
-      { month: 'May', actual: 4100, forecast: 4350 },
-      { month: 'Jun', actual: 4400, forecast: 4450 },
-      { month: 'Jul', actual: 4500, forecast: 4550 },
-      { month: 'Aug', actual: 4600, forecast: 4600 },
-      { month: 'Sep', actual: 4700, forecast: 4750 }
-    ];
 
+  convertToClusterCapacityUtilTrendViewData(data: ClusterCapacityUtilTrendData): ClusterCapacityUtilTrendViewData[] {
+
+    if (!data || !data.months || !data.cpuUtilizationTrend || !data.memoryUtilizationTrend) {
+      return [];
+    }
+
+    return data.months.map((month, index) => ({
+      month,
+      actual: data.cpuUtilizationTrend[index] || 0,
+      forecast: data.memoryUtilizationTrend[index] || 0
+    }));
+  }
+
+  convertToClusterCapacityUtilTrendChartData(data: ClusterCapacityUtilTrendViewData[]) {
     if (!data || !data.length) { return; }
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.LINE;
@@ -745,7 +786,6 @@ export class PrivateCloudComputeDashboardService {
           fontSize: 12
         }
       },
-
       yAxis: {
         type: 'value',
         axisLine: { show: false },
@@ -791,7 +831,7 @@ export class PrivateCloudComputeDashboardService {
   }
 
   //Infrastructure health / Hardware status
-  getInfrastructureHealthWidgetData(filters: any): Observable<InfrahealthstatusDataType> {
+  getInfrastructureHealthWidgetData(filters: FiltersCriteriaType): Observable<InfrahealthstatusDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<InfrahealthstatusDataType>('/customer/widgets/infrastructure_health_status/', { params });
   }
@@ -823,7 +863,7 @@ export class PrivateCloudComputeDashboardService {
   getUtilizationRows(filters?: any): Observable<PerformanceHotspots> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<PerformanceHotspots>('/customer/widgets/performance_hotspots/', { params });
-    // return of(Private_CLOUD_UTILIZATION_ROWS);
+
   }
 
   convertToUtilizationViewData(data: PerformanceHotspots): PrivateCloudUtilization {
@@ -837,6 +877,7 @@ export class PrivateCloudComputeDashboardService {
 
     return view;
   }
+
 
   transformToUtilizationRows(input: PerformanceHotspots): PrivateCloudUtilizationRow[] {
     return (input?.topUtilization || []).map(item => ({
@@ -917,12 +958,197 @@ export class PrivateCloudComputeDashboardService {
       ]
     };
   }
+
+  //Idle Devices
+
+  getIdleDevicesData(filters?: any): Observable<IdleDevices> {
+    let params = this.convertFiltersToParams(filters)
+    return this.http.get<IdleDevices>('/customer/widgets/idle_devices_analysis/', { params });
+    // return of({
+    //   "idleDeviceList": [
+    //     {
+    //       "deviceName": "unity-lab-Win-vm3",
+    //       "resourceType": "VM",
+    //       "avgCpu": {
+    //         "used": 25,
+    //         "free": 75
+    //       },
+    //       "avgMem": {
+    //         "used": 3.98,
+    //         "free": 96.02
+    //       },
+    //       "networkIO": "N/A",
+    //       "idleDuration": "158 days",
+    //       "status": "error"
+    //     },
+    //     {
+    //       "deviceName": "unity-lab-lnx-ubuntu-vm3",
+    //       "resourceType": "VM",
+    //       "avgCpu": {
+    //         "used": 15,
+    //         "free": 85
+    //       },
+    //       "avgMem": {
+    //         "used": 35.99,
+    //         "free": 64.01
+    //       },
+    //       "networkIO": "N/A",
+    //       "idleDuration": "158 days",
+    //       "status": "error"
+    //     },
+    //     {
+    //       "deviceName": "unity-lab-Win-vm4",
+    //       "resourceType": "VM",
+    //       "avgCpu": {
+    //         "used": 25,
+    //         "free": 75
+    //       },
+    //       "avgMem": {
+    //         "used": 10.99,
+    //         "free": 89.01
+    //       },
+    //       "networkIO": "N/A",
+    //       "idleDuration": "158 days",
+    //       "status": "error"
+    //     }
+    //   ],
+    //   "idleDurationDistribution": [
+    //     {
+    //       "duration": "0-7 days",
+    //       "count": 20
+    //     },
+    //     {
+    //       "duration": "7-15 days",
+    //       "count": 30
+    //     },
+    //     {
+    //       "duration": "15-30 days",
+    //       "count": 40
+    //     },
+    //     {
+    //       "duration": "30+ days",
+    //       "count": 10
+    //     }
+    //   ]
+    // })
+  }
+
+  convertToDeviceIdleViewData(data: IdleDevices): IdleDevicesViewData {
+    const view = new IdleDevicesViewData();
+    const rows = this.transformToIdleDevicesRows(data);
+
+    view.devicesRow = rows || [];
+
+    // const rows;
+    return view;
+  }
+
+  transformToIdleDevicesRows(input: IdleDevices): DevicesRowViewData[] {
+
+    return (input?.idleDeviceList || []).map(item => ({
+
+      deviceName: item.deviceName,
+      resourceType: item.resourceType,
+      networkIO: item.networkIO,
+      idleDuration: item.idleDuration,
+      status: item.status,
+
+      avgCpu: {
+        used: `${item.avgCpu?.used ?? 0}GB`,
+        free: `${item.avgCpu?.free ?? 0}%`,
+        percent: +(100 - (item.avgCpu?.free ?? 0)).toFixed(2),
+        tone: this.getProgressClass(100 - (item.avgCpu?.free ?? 0))
+      },
+
+      avgMem: {
+        used: `${item.avgMem?.used ?? 0}GB`,
+        free: `${item.avgMem?.free ?? 0}%`,
+        percent: +(100 - (item.avgMem?.free ?? 0)).toFixed(2),
+        tone: this.getProgressClass(100 - (item.avgMem?.free ?? 0))
+      }
+
+    }));
+  }
+
+  convertToIdleDevicesDistributionViewData(data: IdleDurationDistributionItem[]): IdleDevicesDistribution {
+    const view = new IdleDevicesDistribution();
+    view.distributionRow = (data || []).map(item => {
+      const row = new DistributionRowData();
+      row.duration = item.duration || 'N/A';
+      row.percent = item.count || 0;
+      return row;
+    });
+
+    return view;
+  }
+
+  convertToIdleDurationDistributionChartData(
+    data: DistributionRowData[]
+  ) {
+
+    if (!data || !data.length) {
+      return;
+    }
+    const view: UnityChartDetails = new UnityChartDetails();
+    view.type = UnityChartTypes.PIE;
+    view.options = this.chartConfigSvc.getDefaultPieChartOptions();
+    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
+    const colors = ['#18c06b', '#ff9800', '#d63b3b', '#f4a1a8'];
+
+    view.options = {
+      ...view.options,
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => {
+          return `
+          ${params.name}<br/>
+          ${params.value}%
+        `;
+        }
+      },
+      legend: {
+        show: false
+      },
+      series: [
+        {
+          type: 'pie',
+          radius: ['48%', '78%'],
+          center: ['50%', '50%'],
+          avoidLabelOverlap: false,
+
+          label: {
+            show: false
+          },
+
+          labelLine: {
+            show: false
+          },
+
+          data: data.map((item, index) => ({
+            value: item.percent,
+            name: item.duration,
+            itemStyle: {
+              color: colors[index % colors.length]
+            }
+          })),
+
+          itemStyle: {
+            borderColor: '#ffffff',
+            borderWidth: 8
+          }
+        }
+      ]
+    };
+
+    return view;
+  }
+
   /*
    * ******End ****** Performance Hotspots Widget Related ********************
    */
 
   //Performance / Workload widget
-  getPerformanceWorkloadWidgetData(filters: any): Observable<PerformanceWorkloadDataType> {
+  getPerformanceWorkloadWidgetData(filters: FiltersCriteriaType): Observable<PerformanceWorkloadDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<PerformanceWorkloadDataType>('/customer/widgets/performance_workload_insights/', { params });
   }
@@ -1048,27 +1274,22 @@ export class PrivateCloudComputeDashboardService {
   /*
      * -----Start----- Alert & Events View Widget Related -------------------
      */
-  getAlertEvents(_criteria?: any): Observable<AlertsEventsView> {
+  getRecentAlerts(_criteria?: any): Observable<RecentAlerts> {
     let params = this.convertFiltersToParams(_criteria)
-    return this.http.get<AlertsEventsView>(`/customer/widgets/alerts_events_view/`, { params });
-    // return of(PRIVATE_CLOUD_ALERT_SUMMARY);
+    return this.http.get<RecentAlerts>(` /customer/widgets/recent_alert/`, { params });
   }
 
-  convertToAlertSummaryView(data: AlertSummary): AlertSummaryViewData {
-    const view = new AlertSummaryViewData();
-
-    view.criticalAlerts = data?.criticalAlerts ?? 0;
-    view.highAlerts = data?.highAlerts ?? 0;
-    view.openITSMTickets = data?.openITSMTickets ?? 0;
-
-    view.automationSuccess = data?.automationSuccess || 'N/A';
-    view.avgMTTR = data?.avgMTTR || 'N/A';
-
+  convertToAlertSummaryView(data: RecentAlerts): RecentAlertSummaryViewData {
+    const view = new RecentAlertSummaryViewData();
+    view.total = data?.alertSummary.total ?? 0;
+    view.information = data?.alertSummary.information ?? 0;
+    view.critical = data?.alertSummary.critical ?? 0;
+    view.warning = data?.alertSummary.warning ?? 0;
     return view;
   }
 
 
-  convertToTopCriticalAlertsViewData(data: TopCriticalAlertsItem[]): TopCriticalAlertsViewData {
+  convertToTopCriticalAlertsViewData(data: RecentAlertsItem[]): TopCriticalAlertsViewData {
     const view = new TopCriticalAlertsViewData();
 
     view.alertList = (data || []).map(item => {
@@ -1084,7 +1305,7 @@ export class PrivateCloudComputeDashboardService {
 
       v.source = item?.source || 'N/A';
       v.acknowledged = item?.acknowledged || 'N/A';
-      v.duration = item?.duration || 'N/A';
+      // v.duration = item?.duration || 'N/A';
 
       return v;
     });
@@ -1092,612 +1313,126 @@ export class PrivateCloudComputeDashboardService {
     return view;
   }
 
-  // getAlertTrendLegend(filters?: any): Observable<PrivateCloudAlertTrendLegendItem[]> {
-  //   let params = this.convertFiltersToParams(filters)
-  //   // return this.http.get<PrivateCloudAlertTrendLegendItem>('/customer/widgets/performance_hotspots/', { params });
-  //   // return of(PRIVATE_CLOUD_ALERT_TREND_LEGEND);
-  // }
-
-  convertToAlertTrendLegendViewData(data: PrivateCloudAlertTrendLegendItem[]): PrivateCloudAlertTrendLegendItem[] {
-    return data || [];
-  }
-
-  convertToAlertTrendPolarOptions(data: AlertTrends): EChartsOption {
-    return this.getAlertTrendPolarOptions(this.convertPolarSummaryChartView(data) || []);
-  }
-
-  convertPolarSummaryChartView(data: any): Array<{ name: string; value: number; color: string }> {
-    if (!data?.summary) {
-      return [];
-    }
-
-    return SUMMARY_CHART_CONFIG.map(item => ({
-      name: item.name,
-      value: Number(data.summary?.[item.key] ?? 0),
-      color: item.color
-    }));
-  }
-
-  private getAlertTrendPolarOptions(items: PrivateCloudAlertTrendLegendItem[]): EChartsOption {
-    return {
-      color: items.map(item => item.color),
-      angleAxis: {
-        type: 'category',
-        data: items.map(item => item.name),
-        axisLabel: { show: false },
-        axisLine: { show: false },
-        axisTick: { show: false }
-      },
-      radiusAxis: {
-        min: 0,
-        max: 900,
-        splitNumber: 9,
-        axisLabel: {
-          color: '#6f7882',
-          fontSize: 9
-        },
-        axisLine: { show: false },
-        axisTick: { show: false }
-      },
-      polar: {
-        radius: '78%',
-        center: ['50%', '50%']
-      },
-      series: [
-        {
-          type: 'bar',
-          coordinateSystem: 'polar',
-          roundCap: false,
-          data: items.map(item => ({
-            value: item.value,
-            itemStyle: {
-              color: item.color,
-              borderColor: item.color.replace('0.35', '1'),
-              opacity: 0.75
-            }
-          }))
-        }
-      ]
-    };
-  }
-
-  getAlertTrendStackGroups(_criteria?: any): Observable<PrivateCloudAlertTrendBarGroup[]> {
-    return of(PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS);
-  }
-
-  convertToAlertTrendStackOptions(data: AlertTrends): EChartsOption {
-    return this.getAlertTrendStackOptions(this.convertToStackChartView(data) || []);
-  }
-
-  private getAlertTrendStackOptions(groups: PrivateCloudAlertTrendBarGroup[]): EChartsOption {
-    const categories = groups.map(group => group.name);
-    const names = ['Critical', 'Warning', 'Informative'];
-    const colors = ['#d90000', '#ff8a00', '#3f92d7'];
-    return {
-      animation: false,
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: { show: false },
-      grid: { top: 12, right: 8, bottom: 28, left: 40 },
-      xAxis: {
-        type: 'category',
-        data: categories,
-        axisTick: { show: false },
-        axisLabel: { color: '#3c4650', fontSize: 10 }
-      },
-      yAxis: {
-        type: 'value',
-        max: 900,
-        splitLine: { lineStyle: { color: '#e5e9ed' } },
-        axisLabel: { color: '#6f7882', fontSize: 10 }
-      },
-      series: names.map((name, index) => ({
-        name: name,
-        type: 'bar',
-        stack: 'total',
-        barWidth: 54,
-        itemStyle: { color: colors[index] },
-        data: groups.map(group => group.values[index])
-      }))
-    };
-  }
-
-  getAlertTrends(filters?: any): Observable<AlertTrends> {
-    let params = this.convertFiltersToParams(filters)
-    return this.http.get<AlertTrends>('/customer/widgets/performance_hotspots/', { params });
-    // return of(PRIVATE_CLOUD_ALERT_SIDE_CARDS);
-  }
-
-  convertToAlertSideCardsViewData(data: AlertTrends): PrivateCloudAlertSideCard[] {
-    if (!data) {
-      return [];
-    }
-
-    return [
-      {
-        title: 'Raw Events',
-        value: String(data.rawEvents?.total ?? 0),
-        metrics: [
-          {
-            label: 'Critical',
-            value: String(data.rawEvents?.critical ?? 0),
-            tone: 'danger'
-          },
-          {
-            label: 'Warning',
-            value: String(data.rawEvents?.warning ?? 0),
-            tone: 'warning'
-          },
-          {
-            label: 'Informative',
-            value: String(data.rawEvents?.informative ?? 0),
-            tone: 'primary'
-          }
-        ]
-      },
-      {
-        title: 'Noise Reduction',
-        value: `${data.noiseReduction?.percentage ?? 0}%`,
-        metrics: [
-          {
-            label: 'Dedupe Events',
-            value: String(data.noiseReduction?.dedupeEvents ?? 0)
-          },
-          {
-            label: 'Suppressed Events',
-            value: String(data.noiseReduction?.suppressedEvents ?? 0)
-          },
-          {
-            label: 'Correlated',
-            value: String(data.noiseReduction?.correlated ?? 0)
-          }
-        ]
-      },
-      {
-        title: 'First Response',
-        value: `${data.firstResponse?.percentage ?? 0}%`,
-        metrics: [
-          {
-            label: 'Auto Clonned',
-            value: String(data.firstResponse?.autoCloned ?? 0)
-          },
-          {
-            label: 'Ticket Created',
-            value: String(data.firstResponse?.ticketCreated ?? 0)
-          },
-          {
-            label: 'Auto Closed',
-            value: String(data.firstResponse?.autoClosed ?? 0)
-          }
-        ]
-      }
-    ];
-  }
 
 
-  convertToStackChartView(data: any): Array<{ name: string; values: number[] }> {
-    if (!data) {
-      return [];
-    }
 
-    return EVENT_CHART_SECTIONS.map(section => ({
-      name: section.name,
-      values: section.keys.map(key =>
-        Number(data?.[section.sourceKey]?.[key] ?? 0)
-      )
-    }));
-  }
+
   /*
    * ******End ****** Alert & Events View Widget Related ********************
    */
 
-  /*
-   * -----Start----- ITSM Tickets Widget Related -------------------
-   */
-  getITSMTicket(filters?: any): Observable<ITSMTicketView> {
+
+  //Orphaned Devcies
+
+  getOrphanedDeviceData(filters: FiltersCriteriaType): Observable<OrphanedResourcesResponse> {
     let params = this.convertFiltersToParams(filters)
-    return this.http.get<ITSMTicketView>(`/customer/widgets/itsm_tickets/`, { params });
-    // return of(PRIVATE_CLOUD_TICKET_PRIORITY);
+    return this.http.get<OrphanedResourcesResponse>('/customer/widgets/orphaned_devices_detailed/', { params });
   }
 
-  convertToTicketPriorityOptions(data: TicketsByPriority): EChartsOption {
-    return this.getTicketDonutOptions(this.transformTicketsByPriority(data) || [], 'Tickets by Priority');
-  }
+  convertToOrphanedDeviceListView(data: OrphanedResourcesResponse): OrphanedDeviceView {
+    const viewData = new OrphanedDeviceView();
 
-  transformTicketsByPriority(ticketsByPriority: TicketsByPriority): PrivateCloudTicketDonutItem[] {
-    return priorityConfig.map(config => ({
-      name: config.name,
-      value: ticketsByPriority[config.key] || 0,
-      color: config.color
-    }));
-  }
-
-  convertToTicketStatusOptions(data: TicketsByStatus): EChartsOption {
-    return this.getTicketDonutOptions(this.transformTicketsByStatus(data) || [], 'Tickets by Status');
-
-  }
-
-  convertToTicketViewData(tickets: TicketsItem[]): TicketsItemViewData {
-    const view = new TicketsItemViewData();
-
-    view.ticketList = (tickets || []).map(ticket => {
-      const t = new TicketsList();
-
-      t.ticketId = ticket.ticketId || 'N/A';
-
-      t.shortDescription = ticket.shortDescription ? ticket.shortDescription.replace(/(?:\r\n|\r|\n)/g, '<br>') : '';
-      t.state = ticket.state || 'N/A';
-      t.priority = ticket.priority || 'N/A';
-      t.createdOn = ticket.createdOn ? this.utilSvc.toUnityOneDateFormat(ticket.createdOn) : '';
-      t.updatedOn = ticket.updatedOn ? this.utilSvc.toUnityOneDateFormat(ticket.updatedOn) : '';
-      t.resolution = ticket.resolution || 'N/A';
-      return t;
+    viewData.orphanList = (data?.orphanedDeviceList || []).map((item: any) => {
+      return {
+        name: item.name,
+        status: item.status,
+        lastSeen: item.lastSeen,
+        datacenter: item.datacenter
+      } as OrphanedDeviceList;
     });
 
-    return view;
-  }
-
-  transformTicketsByStatus(ticketsByStatus: TicketsByStatus): PrivateCloudTicketDonutItem[] {
-    return statusConfig.map(config => ({
-      name: config.key,
-      value: ticketsByStatus[config.key] || 0,
-      color: config.color
-    }));
+    return viewData;
   }
 
 
-  getTicketsTotal(_criteria?: AnyMxRecord): Observable<number> {
-    return of(PRIVATE_CLOUD_TICKETS_TOTAL);
-  }
-
-  private getTicketDonutOptions(items: PrivateCloudTicketDonutItem[], title: string): EChartsOption {
-    return {
-      animation: false,
-      title: {
-        text: title,
-        left: 'center',
-        top: 0,
-        textStyle: {
-          fontSize: 11,
-          fontWeight: 600,
-          color: '#4d5966'
-        }
-      },
-      color: items.map(item => item.color),
-      tooltip: {
-        trigger: 'item',
-        formatter: '{b}: {c}'
-      },
-      legend: {
-        type: 'plain',
-        bottom: 0,
-        left: 'center',
-        itemWidth: 7,
-        itemHeight: 7,
-        textStyle: {
-          fontSize: 8,
-          color: '#566270'
-        }
-      },
-      series: [
-        {
-          type: 'pie',
-          radius: ['42%', '66%'],
-          center: ['50%', '46%'],
-          label: {
-            formatter: '{c}',
-            color: '#ffffff',
-            fontSize: 8
-          },
-          labelLine: { show: false },
-          data: items.map(item => ({
-            name: item.name,
-            value: item.value,
-            itemStyle: { color: item.color }
-          }))
-        }
-      ]
-    };
-  }
-  /*
-   * ******End ****** ITSM Tickets Widget Related ********************
-   */
-
-
-  //Risk Optimization
-  getRiskOptimizationWidgetData(filters: any): Observable<any> {
-    let params = this.convertFiltersToParams(filters)
-    return this.http.get<any>('/customer/widgets/risk_optimization', { params });
-    // return of({
-    //   "overUtilHosts": "18",
-    //   "overUtilHostsPercent": "45.0",
-    //   "underUtilHosts": "34",
-    //   "underUtilHostsPercent": "85.0",
-    //   "idleVms": "129",
-    //   "idleVmsMsg": "Reclamation candidates",
-    //   "capacityAlerts": "11",
-    //   "capacityAlertsMsg": "Projected 30-day risk",
-    //   "capacityRiskAlerts": [
-    //     { "name": "RDS-prod-01", "utilization": 88 },
-    //     { "name": "CloudSQL-01", "utilization": 74 },
-    //     { "name": "Azure SQL-02", "utilization": 69 }
-    //   ]
-    // })
-  }
-
-  convertRiskOptimizationWidgetData(data: any) {
-    // data = capacityRiskAlertsData;
+  convertToOrphanedByCategoryChartData(data: OrphanedCategory[]) {
     if (!data || !data.length) { return; }
-    let view: UnityChartDetails = new UnityChartDetails();
-    view.type = UnityChartTypes.BAR;
-    view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
-    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    const view: UnityChartDetails = new UnityChartDetails();
+    view.type = UnityChartTypes.PIE;
+    view.options = this.chartConfigSvc.getDefaultPieChartOptions();
+    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
+    const total = data.reduce((sum, item) => sum + item.count, 0);
 
     view.options = {
       ...view.options,
-      title: {
-        text: 'Capacity risk alerts',
-        left: 'center',
-        top: 0,
-        textStyle: {
-          fontSize: 18,
-          fontWeight: 400,
-          color: '#333'
-        }
-      },
-      legend: { show: false },
-      grid: {
-        left: '5%',
-        right: '5%',
-        top: '5%',
-        bottom: '5%',
-        containLabel: false
-      },
-      xAxis: {
-        type: 'value',
-        min: 0,
-        max: 100,
-        show: false
-      },
-      yAxis: {
-        type: 'category',
-        inverse: true,
-        data: data.map(item => item.name),
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#6f7b86',
-          fontSize: 12,
-          margin: 10
-        }
-      },
-      series: [
-        {
-          name: 'Background',
-          type: 'bar',
-          data: data.map(() => 100),
-          barWidth: 8,
-          barGap: '-100%',
-          silent: true,
-          itemStyle: {
-            color: '#f0f0f0',
-            borderRadius: [10, 10, 10, 10]
-          }
-        },
-        {
-          name: 'Risk',
-          type: 'bar',
-          data: data.map(item => ({
-            value: item.value,
-            itemStyle: {
-              color: this.setBarColor(item.value),
-              borderRadius: [10, 10, 10, 10]
-            },
-            label: {
-              show: true,
-              position: 'right',
-              distance: 8,
-              formatter: `{c}%`,
-              color: '#000',
-              fontSize: 12
-            }
-          })),
-          barWidth: 8,
-          z: 2
-        }
-      ],
+
       tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'none'
-        },
+        trigger: 'item',
         formatter: (params: any) => {
-          const data = params.find((item: any) => item.seriesName === 'Risk');
-          return `${data.name}: ${data.value}%`;
+          return `
+                    ${params.name}<br/>
+                    Count: ${params.data.count}<br/>
+                    ${params.data.percentage}%
+                `;
         }
-      }
-    };
-
-    return view;
-  }
-
-  setBarColor(value): string {
-    return value < 65 ? '#00b873' : value >= 65 && value < 85 ? '#f5a623' : '#ef4b4b';
-  }
-
-  convertRiskOptimizationSummaryData(data: any) {
-    console.log(data, 'service')
-    if (!data || !data.length) { return; }
-    let view = new RiskOptimizationViewData();
-    view.overUtilHosts = data?.overUtilHosts ? data?.overUtilHosts : '0';
-    view.overUtilHostsPercent = data?.overUtilHostsPercent ? data?.overUtilHostsPercent : '0';
-    view.underUtilHosts = data?.overUtilHosts ? data?.overUtilHosts : '0';
-    view.underUtilHostsPercent = data?.underUtilHostsPercent ? data?.underUtilHostsPercent : '0';
-    view.idleVms = data?.idleVms ? data?.idleVms : '0';
-    view.idleVmsMsg = data?.idleVmsMsg ? data?.idleVmsMsg : '0';
-    view.capacityAlerts = data?.capacityAlerts ? data?.capacityAlerts : '0';
-    view.capacityAlertsMsg = data?.capacityAlertsMsg ? data?.capacityAlertsMsg : '0';
-    return view;
-  }
-
-  // Auto Remediation Widget
-  getAutoRemediationSummaryWidgetData(filters: any): Observable<AutoRemediationDataType> {
-    let params = this.convertFiltersToParams(filters)
-    return this.http.get<AutoRemediationDataType>('/customer/widgets/auto_remediation_summary/', { params });
-  }
-
-  convertToAutoRemediationExecSummaryChartData(data: ExecutionSummaryItem) {
-    if (!data) { return; }
-    let view: UnityChartDetails = new UnityChartDetails();
-    view.type = UnityChartTypes.BAR;
-    view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
-    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
-
-    view.options = {
-      ...view.options,
-      tooltip: {
-        trigger: 'item',
-        formatter: '{b}: {c}%'
-      },
-
-      legend: {
-        show: false
       },
 
       graphic: [
         {
-          type: 'group',
-          right: 20,
-          top: 45,
-          children: [
-            {
-              type: 'rect',
-              shape: { width: 14, height: 14 },
-              style: { fill: '#5c9f22' }
-            },
-            {
-              type: 'text',
-              left: 20,
-              top: -2,
-              style: {
-                text: `Successful ${data.successfulPercentage}%`,
-                fill: '#000',
-                fontSize: 16
-              }
-            },
-            {
-              type: 'rect',
-              left: 145,
-              shape: { width: 14, height: 14 },
-              style: { fill: '#ef4b4b' }
-            },
-            {
-              type: 'text',
-              left: 165,
-              top: -2,
-              style: {
-                text: `Failed ${data.failedPercentage}%`,
-                fill: '#000',
-                fontSize: 16
-              }
-            },
-            {
-              type: 'text',
-              top: 35,
-              style: {
-                text: `Total runs: ${data.totalRuns.toLocaleString()}  |  Avg duration: ${data.avgDuration} min`,
-                fill: '#000',
-                fontSize: 16
-              }
-            }
-          ]
+          type: 'text',
+          left: 'center',
+          top: '36%',
+          style: {
+            text: `${total}`,
+            fill: '#222',
+            fontSize: 32,
+            fontWeight: 700
+          }
         }
       ],
 
-      series: [
-        {
-          name: 'Execution Summary',
-          type: 'pie',
-          radius: ['45%', '75%'],
-          center: ['22%', '50%'],
-          label: { show: false },
-          labelLine: { show: false },
-          data: [
-            {
-              value: data.successfulPercentage,
-              name: 'Successful',
-              itemStyle: { color: '#5c9f22' }
-            },
-            {
-              value: data.failedPercentage,
-              name: 'Failed',
-              itemStyle: { color: '#ef4b4b' }
-            }
-          ]
-        }
-      ]
-    };
-
-    return view;
-
-  }
-
-  convertToTopAutoRemediationActionChartData(data: TopActionsItem[]) {
-    if (!data || !data.length) { return; }
-    let view: UnityChartDetails = new UnityChartDetails();
-    view.type = UnityChartTypes.BAR;
-    view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
-    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
-
-    const max = Math.max(...data.map(item => item.executionCount));
-
-    const getColor = (value: number): string => {
-      const percent = (value / max) * 100;
-      if (percent > 80) return '#3a8dde';
-      if (percent > 50) return '#f5a623';
-      return '#5c8f1f';
-    };
-
-    view.options = {
-      ...view.options,
-      xAxis: {
-        type: 'value',
-        max,
-        show: false
-      },
-      yAxis: {
-        type: 'category',
-        inverse: true,
-        data: data.map(item => item.actionName),
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#000',
+      legend: {
+        show: false,
+        bottom: 5,
+        left: 15,
+        right: 15,
+        orient: 'vertical',
+        icon: 'circle',
+        itemWidth: 10,
+        itemHeight: 10,
+        itemGap: 18,
+        textStyle: {
+          color: '#555',
           fontSize: 14
-        }
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => {
-          return `${params.name}: ${params.value}`;
+        },
+        formatter: (name: string) => {
+          const item = data.find(d => d.category === name);
+          if (!item) {
+            return name;
+          }
+          const left = item.category.padEnd(22, ' ');
+          const right = `${item.count} (${item.percentage}%)`;
+
+          return `${left}${right}`;
         }
       },
       series: [
         {
-          type: 'bar',
-          barWidth: 12,
-          data: data.map(item => ({
-            value: item.executionCount,
+          name: 'Orphaned By Category',
+          type: 'pie',
+          radius: ['50%', '88%'],
+          center: ['50%', '50%'],
+          label: {
+            show: false
+          },
+          labelLine: {
+            show: false
+          },
+          data: data.map((item, index) => ({
+            value: item.count,
+            name: item.category,
+
+            count: item.count,
+            percentage: item.percentage,
+
             itemStyle: {
-              color: getColor(item.executionCount),
-              borderRadius: 10
+              color: chartColors[index]
             }
           })),
-          label: {
-            show: true,
-            position: 'right',
-            color: '#000',
-            fontSize: 14,
-            formatter: '{c}'
+
+          itemStyle: {
+            borderColor: '#ffffff',
+            borderWidth: 10
           }
         }
       ]
@@ -1705,7 +1440,6 @@ export class PrivateCloudComputeDashboardService {
 
     return view;
   }
-
 }
 
 export class ExecutiveSummaryViewData {
@@ -1714,9 +1448,13 @@ export class ExecutiveSummaryViewData {
   clusters: number;
   poweredOn: number;
   poweredOff: number;
+  orphanedVMs: number;
+  idleVMs: number;
+
 }
 
 export class ExecutiveSummaryWidgetData {
+  executiveSummaryLoader: string = 'executiveSummaryLoader';
   cloudTypeLoader: string = 'CloudTypeLoader';
   powerActivityLoader: string = 'PowerActivityLoader';
   vmCountByOSTypeLoader: string = 'VMCountByOSTypeLoader';
@@ -1729,12 +1467,6 @@ export class ExecutiveSummaryWidgetData {
   alertSeverityViewData: AlertSeverityData;
 }
 
-// export class EnvironmentAndCriticalityData {
-//   production: number;
-//   developement: number;
-//   test: number;
-//   none: number;
-// }
 
 export class AlertSeverityData {
   critical: number;
@@ -1855,13 +1587,12 @@ export class TopAutoRemediationActionWidgetData {
   chartData: UnityChartDetails;
 }
 
-export class AlertSummaryViewData {
+export class RecentAlertSummaryViewData {
   loader: string = 'publicCloudAlertSummaryLoader'
-  criticalAlerts: number;
-  highAlerts: number;
-  openITSMTickets: number;
-  automationSuccess: string;
-  avgMTTR: string;
+  total: number;
+  information: number;
+  critical: number;
+  warning: number;
 }
 
 export class TopCriticalAlertsViewData {
@@ -1870,13 +1601,32 @@ export class TopCriticalAlertsViewData {
 }
 
 export class TopCriticalAlertsList {
-  id: number;
+  status: string;
   deviceName: string;
   severity: string;
-  description: string;
   source: string;
+  dateTime: string;
   acknowledged: string;
-  duration: string;
+  id: number;
+  description: string;
+}
+
+export class OrphanedDeviceView {
+  loader: string = 'OrphanedDeviceListLoader';
+  orphanList: OrphanedDeviceList[] = [];
+}
+
+export class OrphanedDeviceList {
+  name: string;
+  status: string;
+  lastSeen: string;
+  datacenter: string;
+}
+
+export class OrphanedDeviceWidgetView {
+  loader: string = 'OrphanedDeviceWidgetLoader';
+  chartData: UnityChartDetails;
+
 }
 
 
@@ -1937,3 +1687,81 @@ export const SUMMARY_CHART_CONFIG = [
     color: '#9ed0ff'
   }
 ];
+
+export interface PublicCloudTicketFilterCriteria {
+  state: string;
+  ticket_type: string;
+  search: string;
+  priority: string;
+  dateRange: string;
+  start_date: string;
+  end_date: string;
+  page: number;
+  page_size: number;
+}
+
+export class Top10ClustersByVMCountViewData {
+  loader: string = 'top10ClustersByVMCountLoader';
+  clusterList: Top10ClustersByVMCountItemViewData[] = [];
+}
+
+export class Top10ClustersByVMCountItemViewData {
+  host: string;
+  value: number;
+}
+
+export class ClusterCapacityUtilTrendViewData {
+  month: string;
+  actual: number;
+  forecast: number;
+}
+
+export const chartColors = [
+  '#6677ee',
+  '#6fc98c',
+  '#f5aa4b',
+  '#1fc7ea',
+  '#9b87f5'
+];
+
+export class IdleDevicesViewData {
+  loader: string = 'IdleDevicesLoader';
+  devicesRow: DevicesRowViewData[];
+}
+
+export class DevicesRowViewData {
+  deviceName: string;
+  resourceType: string;
+  avgCpu: AvgCpu;
+  avgMem: AvgMem;
+  networkIO: string;
+  idleDuration: string;
+  status: string;
+}
+
+export class AvgCpu {
+  used: string;
+  free: string;
+  percent: number;
+  tone: PrivateCloudStatusTone;
+}
+export class AvgMem {
+  used: string;
+  free: string;
+  percent: number;
+  tone: PrivateCloudStatusTone;
+}
+
+export class IdleDevicesDistribution {
+  loader: string = 'IdleDevicesDistributionLoader';
+  distributionRow: DistributionRowData[];
+  chartData: UnityChartDetails;
+
+}
+
+export class DistributionRowData {
+  duration: string;
+  percent: number;
+}
+
+

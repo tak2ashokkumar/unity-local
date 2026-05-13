@@ -117,6 +117,7 @@ export class MsDynamicsTcktMgmtComponent extends SharedMsDynamicsTcktMgmtCompone
   updateParams() {
     this.setDates();
     this.currentCriteria.params[0] = _merge(this.currentCriteria.params[0], this.filterForm.getRawValue());
+    console.log(this.currentCriteria.params[0])
     this.currentCriteria.params[0]['dateRange'] = '';
     this.currentCriteria.pageNo = 1;
   }

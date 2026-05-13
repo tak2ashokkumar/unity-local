@@ -10,162 +10,141 @@
       </div>
       <div class="col-12">
         <div class="d-flex justify-content-center">
-          <button class="btn btn-outline-warning btn-sm btn-pill" type="button" (click)="requestAccess()"
-            accessControl moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="btn">Request
-            Access</button>
+          <div class="btn-group pull-right" dropdown accessControl moduleName="UnityCollector"
+            accessType="Manage UnityCollector" elementType="div">
+            <!-- <button id="button-basic" dropdownToggle type="button" aria-controls="collector-download"
+              class="btn btn-warning btn-sm btn-pill dropdown-toggle"> Download Image <span class="caret"></span>
+            </button> -->
+            <ul id="collector-download" *dropdownMenu class="dropdown-menu text-center" role="menu">
+              <li role="menuitem">
+                <a *ngIf="vmWareCollectorUrl" class="dropdown-item p-2 font-sm" href="{{vmWareCollectorUrl}}">VMware</a>
+              </li>
+              <li role="menuitem">
+                <a *ngIf="hyperVCollectorUrl" class="dropdown-item p-2 font-sm"
+                  href="{{hyperVCollectorUrl}}">Hyper-V</a>
+              </li>
+            </ul>
+          </div>
           <button class="btn btn-warning btn-sm btn-pill ml-2" (click)="addAgent()" accessControl
-            moduleName="UnityCollector" accessType="Register UnityCollector" elementType="btn">Add Appliance</button>
+            moduleName="UnityCollector" accessType="Register UnityCollector" elementType="btn">Add Collector</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<ng-container *ngIf="viewData.length">
-  <div class="card text-center connectivity-table-card">
-    <div class="card-header bg-transparent py-2">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="text-left">
-          <h5 class="mb-0 font-500">Appliances</h5>
-          <small class="text-muted">Collectors onboarded through the appliance flow</small>
-        </div>
-        <div>
-          <button class="btn btn-warning btn-sm btn-pill" (click)="addAgent()" [disabled]="!userInfo.isZabbixMonitoring"
-            accessControl moduleName="UnityCollector" accessType="Register UnityCollector" elementType="btn">Add
-            Appliance</button>
+
+<div class="card text-center" *ngIf="viewData.length">
+  <div class="card-header bg-transparent border-bottom-0 py-2">
+    <div class="row">
+      <div class="col">
+        <button class="btn btn-warning btn-sm btn-pill pull-right ml-1" (click)="addAgent()"
+          [disabled]="!userInfo.isZabbixMonitoring" accessControl moduleName="UnityCollector"
+          accessType="Register UnityCollector" elementType="btn">Add Collector</button>
+        <div class="btn-group pull-right" dropdown accessControl moduleName="UnityCollector"
+          accessType="Manage UnityCollector" elementType="div">
+          <!-- <button id="button-basic" dropdownToggle type="button" aria-controls="collector-download"
+            class="btn btn-warning btn-sm btn-pill dropdown-toggle"> Download Collector <span class="caret"></span>
+          </button> -->
+          <ul id="collector-download" *dropdownMenu class="dropdown-menu text-center" role="menu">
+            <li role="menuitem">
+              <a *ngIf="vmWareCollectorUrl" class="dropdown-item p-2 font-sm" href="{{vmWareCollectorUrl}}">VMware</a>
+            </li>
+            <li role="menuitem">
+              <a *ngIf="hyperVCollectorUrl" class="dropdown-item p-2 font-sm" href="{{hyperVCollectorUrl}}">Hyper-V</a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
-    <div class="card-body pt-0">
-      <table class="table text-left mb-0">
-        <thead>
-          <tr>
-            <th>Appliance Name</th>
-            <th>IP Address</th>
-            <th>SSH User</th>
-            <th>SSH Port</th>
-            <th>Deployment Status</th>
-            <th>Created On</th>
-            <th>Test Result</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let view of applianceViewData">
-            <td class="align-middle">{{view.agentName}}</td>
-            <td class="align-middle">{{view.ipAddress}}</td>
-            <td class="align-middle">{{view.sshUser}}</td>
-            <td class="align-middle">{{view.sshPort}}</td>
-            <td class="align-middle">{{view.deplymentState}}</td>
-            <td class="align-middle">{{view.createdOn}}</td>
-            <td class="align-middle">
-              <table>
-                <tr>
-                  <td class="p-0 border-0"><button class="test-result-action-icons mb-0 fas fa-link font-sm ml-1"
-                      container="body" [tooltip]="view.testResult?.ping?.msg"
-                      [ngClass]="{'test-success': view.testResult?.ping?.result, 'test-fail': !view.testResult?.ping?.result, 'test-result-action-icons-disabled': view.testing}"></button>
-                  </td>
-                  <td class="p-0 border-0"><button class="test-result-action-icons mb-0 fas fa-lock font-sm ml-1"
-                      container="body" [tooltip]="view.testResult?.ssh?.msg"
-                      [ngClass]="{'test-success': view.testResult?.ssh?.result, 'test-fail': !view.testResult?.ssh?.result, 'test-result-action-icons-disabled': view.testing}"></button>
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="2" class="text-center small p-0 border-0">{{view.testResult?.date}}</td>
-                </tr>
-              </table>
-            </td>
-            <td class="align-middle">
-              <button class="action-icons mb-0 font-sm ml-1" [class]="view.testConnectionIcon" container="body"
-                [tooltip]="view.testConnectionTooltipMsg" (click)="testConnection(view)" accessControl
-                moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
-              <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1"
-                [tooltip]="view.newTabToolipMessage" [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}"
-                (click)="consoleNewTab(view)" accessControl moduleName="UnityCollector"
-                accessType="Manage UnityCollector" elementType="actionbtn"></button>
-              <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" container="body" tooltip="Edit"
-                (click)="editAgent(view)" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
-                elementType="actionbtn"></button>
-              <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
-                tooltip="Manage by creating support ticket" (click)="createTicket(view)"></button>
-              <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body" tooltip="Delete"
-                (click)="deleteConfig(view)" accessControl moduleName="UnityCollector"
-                accessType="Manage UnityCollector" elementType="actionbtn"></button>
-              <button class="action-icons mb-0 fas fa-map-pin font-sm ml-1" container="body" tooltip="Ping"
-                (click)="openNWConnectionPopup(view, 'ping')" accessControl moduleName="UnityCollector"
-                accessType="Manage UnityCollector" elementType="actionbtn"></button>
-              <button class="action-icons mb-0 fas fa-anchor font-sm ml-1" container="body" tooltip="Telnet"
-                (click)="openNWConnectionPopup(view, 'telnet')" accessControl moduleName="UnityCollector"
-                accessType="Manage UnityCollector" elementType="actionbtn"></button>
-              <button class="action-icons mb-0 fas fa-route font-sm ml-1" container="body" tooltip="Traceroute"
-                (click)="openNWConnectionPopup(view, 'traceroute')" accessControl moduleName="UnityCollector"
-                accessType="Manage UnityCollector" elementType="actionbtn"></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="!applianceViewData.length" class="text-center text-muted py-3 mb-0">No appliances available.</p>
-    </div>
   </div>
-
-  <div class="card text-center connectivity-table-card mt-3">
-    <div class="card-header bg-transparent py-2">
-      <div class="d-flex justify-content-between align-items-center">
-        <div class="text-left">
-          <h5 class="mb-0 font-500">Access Requests</h5>
-          <small class="text-muted">Collectors requested through the access flow</small>
-        </div>
-        <button class="btn btn-outline-warning btn-sm btn-pill" type="button" (click)="requestAccess()" accessControl
-          moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="btn">Request Access</button>
-      </div>
-    </div>
-    <div class="card-body pt-0">
-      <table class="table text-left mb-0">
-        <thead>
-          <tr>
-            <th>Collector Name</th>
-            <th>IP Address</th>
-            <th>Deployment Status</th>
-            <th>Cert Status</th>
-            <th>Cert Valid Till</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let view of accessViewData">
-            <td class="align-middle">{{view.agentName}}</td>
-            <td class="align-middle">{{view.ipAddress}}</td>
-            <td class="align-middle">{{view.deplymentState}}</td>
-            <td class="align-middle">{{view.certStatus}}</td>
-            <td class="align-middle">{{view.certValidTill}}</td>
-            <td class="align-middle">
-              <button class="action-icons mb-0 fas fa-network-wired font-sm ml-1" container="body"
-                tooltip="Update Management IP" (click)="openUpdateCollectorModal(view, 'ip')" accessControl
-                moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
-              <button class="action-icons mb-0 far fa-clock font-sm ml-1" container="body" tooltip="Update TTL"
-                (click)="openUpdateCollectorModal(view, 'ttl')" accessControl moduleName="UnityCollector"
-                accessType="Manage UnityCollector" elementType="actionbtn"></button>
-              <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1"
-                tooltip="Manage by creating support ticket" (click)="createTicket(view)"></button>
-              <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body" tooltip="Delete"
-                (click)="deleteConfig(view)" accessControl moduleName="UnityCollector"
-                accessType="Manage UnityCollector" elementType="actionbtn"></button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="!accessViewData.length" class="text-center text-muted py-3 mb-0">No access requests available.</p>
-    </div>
-  </div>
-
-  <div class="pt-3">
+  <div class="card-body pt-0">
+    <table class="table text-left">
+      <thead>
+        <tr>
+          <th>Collector Name</th>
+          <th>IP Address</th>
+          <th>SSH User</th>
+          <th>SSH Port</th>
+          <th>Deployment Status</th>
+          <th>Created On</th>
+          <th>Test Result</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr *ngIf="scanForm" [formGroup]="scanForm">
+        <td>
+          <input class="form-control" formControlName="inet" [ngClass]="{'is-invalid' : formErrors.inet}" type="text">
+        </td>
+        <td colspan="2" class="align-middle">
+          <small class="text-danger" *ngIf="formErrors.inet">{{formErrors.inet}}</div>
+        </td>
+        <td class="align-middle">
+          <button class="btn btn-success btn-sm btn-pill" (click)="submitNewScan()">Initiate Scanning</button>
+          <button class="ml-2 btn btn-danger btn-sm btn-pill" (click)="cancelNewScan()">Cancel</button>
+        </td>
+      </tr> -->
+        <tr *ngFor="let view of viewData">
+          <td class="align-middle">{{view.agentName}}</td>
+          <td class="align-middle">{{view.ipAddress}}</td>
+          <td class="align-middle">{{view.sshUser}}</td>
+          <td class="align-middle">{{view.sshPort}}</td>
+          <td class="align-middle">{{view.deplymentState}}</td>
+          <td class="align-middle">{{view.createdOn}}</td>
+          <td class="align-middle">
+            <table>
+              <tr>
+                <td class="p-0 border-0"><button class="test-result-action-icons mb-0 fas fa-link font-sm ml-1"
+                    container="body" [tooltip]="view.testResult?.ping?.msg"
+                    [ngClass]="{'test-success': view.testResult?.ping?.result, 'test-fail': !view.testResult?.ping?.result, 'test-result-action-icons-disabled': view.testing}"></button>
+                </td>
+                <td class="p-0 border-0"><button class="test-result-action-icons mb-0 fas fa-lock font-sm ml-1"
+                    container="body" [tooltip]="view.testResult?.ssh?.msg"
+                    [ngClass]="{'test-success': view.testResult?.ssh?.result, 'test-fail': !view.testResult?.ssh?.result, 'test-result-action-icons-disabled': view.testing}"></button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" class="text-center small p-0 border-0">{{view.testResult?.date}}</td>
+              </tr>
+            </table>
+          </td>
+          <td colspan="2" class="align-middle">
+            <button class="action-icons mb-0 font-sm ml-1" [class]="view.testConnectionIcon" container="body"
+              [tooltip]="view.testConnectionTooltipMsg" (click)="testConnection(view)" accessControl
+              moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-external-link-alt font-sm ml-1" [tooltip]="view.newTabToolipMessage"
+              [ngClass]="{'action-icons-disabled':!view.isNewTabEnabled}" (click)="consoleNewTab(view)" accessControl
+              moduleName="UnityCollector" accessType="Manage UnityCollector" elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" container="body" tooltip="Edit"
+              (click)="editAgent(view)" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-ticket-alt font-sm ml-1" tooltip="Manage by creating support ticket"
+              (click)="createTicket(view)"></button>
+            <button class="action-icons mb-0 far fa-trash-alt font-sm ml-1" container="body" tooltip="Delete"
+              (click)="deleteConfig(view)" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-map-pin font-sm ml-1" container="body" tooltip="Ping"
+              (click)="openNWConnectionPopup(view, 'ping')" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-anchor font-sm ml-1" container="body" tooltip="Telnet"
+              (click)="openNWConnectionPopup(view, 'telnet')" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
+              elementType="actionbtn"></button>
+            <button class="action-icons mb-0 fas fa-route font-sm ml-1" container="body" tooltip="Traceroute"
+              (click)="openNWConnectionPopup(view, 'traceroute')" accessControl moduleName="UnityCollector" accessType="Manage UnityCollector"
+              elementType="actionbtn"></button>              
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="viewData.length==0" class="text-center py-3">No configurations to display</p>
     <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="goTo('onboarding')" accessControl
       moduleName="Onboarding" accessType="View Onboarding" elementType="btn">Import
       Inventory</button>
     <button class="btn btn-sm btn-primary pull-right ml-1" type="button" (click)="goTo('advanced-discovery')"
       accessControl moduleName="Onboarding" accessType="View Onboarding" elementType="btn">Discovery</button>
   </div>
-</ng-container>
+</div>
 
 <ng-template #testNWConnectionRef>
   <div class="card mb-0">
@@ -222,42 +201,5 @@
     <div *ngFor="let line of consoleResult.output">
       <span>{{line}}</span>
     </div>
-  </div>
-</ng-template>
-
-<ng-template #updateCollectorRef>
-  <div class="card mb-0">
-    <div class="card-header bg-transparent">
-      {{updateAction === 'ip' ? 'Update Management IP' : 'Update TTL'}}
-      <div class="card-header-actions">
-        <a class="card-header-action btn-close" (click)="updateCollectorModalRef.hide()">
-          <i class="fas fa-times"></i>
-        </a>
-      </div>
-    </div>
-    <form *ngIf="updateCollectorForm" [formGroup]="updateCollectorForm">
-      <div class="card-body">
-        <div class="form-group mb-0" *ngIf="updateAction === 'ip'">
-          <label for="collector-management-ip">Management IP<em>*</em></label>
-          <input id="collector-management-ip" class="form-control" type="text" formControlName="ip_address"
-            placeholder="Enter Management IP" [class.is-invalid]="updateCollectorFormErrors.ip_address">
-          <div class="invalid-feedback" *ngIf="updateCollectorFormErrors.ip_address">
-            {{updateCollectorFormErrors.ip_address}}
-          </div>
-        </div>
-        <div class="form-group mb-0" *ngIf="updateAction === 'ttl'">
-          <label for="collector-ttl">TTL in Days<em>*</em></label>
-          <input id="collector-ttl" class="form-control ttl-input" type="number" formControlName="cert_ttl"
-            [class.is-invalid]="updateCollectorFormErrors.cert_ttl">
-          <div class="invalid-feedback" *ngIf="updateCollectorFormErrors.cert_ttl">
-            {{updateCollectorFormErrors.cert_ttl}}
-          </div>
-        </div>
-      </div>
-      <div class="card-footer bg-white text-center">
-        <button class="btn btn-outline-danger" type="button" (click)="updateCollectorModalRef.hide()">Cancel</button>
-        <button class="btn btn-success ml-2" type="button" (click)="submitCollectorUpdate()">Submit</button>
-      </div>
-    </form>
   </div>
 </ng-template>

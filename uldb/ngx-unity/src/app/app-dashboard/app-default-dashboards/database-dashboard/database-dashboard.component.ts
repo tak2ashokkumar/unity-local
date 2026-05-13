@@ -11,18 +11,25 @@ import { DatabaseDashboardService } from './database-dashboard.service';
 import {
   DatabaseDashboardAlertSummaryMetric,
   DatabaseDashboardCapacityMetric,
-  DatabaseDashboardCriticalAlert,
+  DatabaseDashboardCriticalAlertViewData,
   DatabaseDashboardDonutItem,
   DatabaseDashboardFilterCriteria,
   DatabaseDashboardFilterOption,
-  DatabaseDashboardHealthGroup,
+  DbDashboardHealthGroup,
   DatabaseDashboardMetric,
+  DbDashboardReplicationSyncSummary,
   DatabaseDashboardStorageRow,
+  DbDashboardSummary,
   DatabaseDashboardTagItem,
   DatabaseDashboardTone,
   DatabaseDashboardUtilizationViewRow,
-  DatabaseDashboardVersionItem
+  DatabaseDashboardVersionItem,
+  DbDashboardReplicationSyncSummaryData
 } from './database-dashboard.type';
+import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
+import { Notification } from 'src/app/shared/app-notification/notification.type';
 
 @Component({
   selector: 'database-dashboard',
@@ -32,9 +39,12 @@ import {
 })
 export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
-
+  refreshedText: string = 'Today 10:00 IST';  
   filterForm: FormGroup;
   databaseOptions: DatabaseDashboardFilterOption[] = [];
+
+  // currentCriteriaForUtilization: SearchCriteria;
+  utilizationCount: number;
 
   summaryMetrics: DatabaseDashboardMetric[] = [];
   cloudTypeDistribution: DatabaseDashboardDonutItem[] = [];
@@ -43,6 +53,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   dbByEnvironmentOptions: EChartsOption = {};
   tags: DatabaseDashboardTagItem[] = [];
   databaseVersions: DatabaseDashboardVersionItem[] = [];
+
   utilizationRows: DatabaseDashboardUtilizationViewRow[] = [];
   queryResponseOptions: EChartsOption = {};
   queryLatencyOptions: EChartsOption = {};
@@ -50,6 +61,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   errorRateOptions: EChartsOption = {};
   transactionThroughputOptions: EChartsOption = {};
   cacheHitRatioOptions: EChartsOption = {};
+
   capacityMetrics: DatabaseDashboardCapacityMetric[] = [];
   storageRows: DatabaseDashboardStorageRow[] = [];
   tablespaceUsageOptions: EChartsOption = {};
@@ -59,12 +71,23 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   dbSizeByServerOptions: EChartsOption = {};
   logSizeByServerOptions: EChartsOption = {};
   diskUtilizationOptions: EChartsOption = {};
-  healthGroups: DatabaseDashboardHealthGroup[] = [];
+
+  healthGroups: DbDashboardHealthGroup[] = [];
+  databaseAvailabilityStatus: DbDashboardSummary;
+  replicationSync: DbDashboardReplicationSyncSummaryData;
+
   alertSummaryMetrics: DatabaseDashboardAlertSummaryMetric[] = [];
-  criticalAlerts: DatabaseDashboardCriticalAlert[] = [];
+  criticalAlerts: DatabaseDashboardCriticalAlertViewData[] = [];
 
   loaderNames = {
     filters: 'databaseDashboardFiltersLoader',
+    inventoryOverview: 'inventoryOverviewWidgetLoader',
+    performancWorkloadUtilization: 'workloadUtilizationWidgetLoader',
+    performanceQueryResponse: 'queryResponceWidgetLoader',
+    capacityGrowth: 'capacityGrowthWidgetLoader',
+    healthOverview: 'healthOverviewWidgetLoader',
+    alertAndEvents: 'alertAndEventsWidgetLoader',
+
     summaryMetrics: 'databaseDashboardSummaryMetricsLoader',
     cloudTypeDistribution: 'databaseDashboardCloudTypeDistributionLoader',
     platformCounts: 'databaseDashboardPlatformCountsLoader',
@@ -97,7 +120,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     lableToDisplay: 'label',
     enableSearch: true,
     checkedStyle: 'fontawesome',
-    buttonClasses: 'btn btn-default btn-block',
+    buttonClasses: 'btn btn-default btn-sm btn-block',
     dynamicTitleMaxItems: 2,
     displayAllSelectedText: true,
     showCheckAll: true,
@@ -119,7 +142,13 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   constructor(private svc: DatabaseDashboardService,
     private router: Router,
     private route: ActivatedRoute,
-    private spinnerService: AppSpinnerService) { }
+    private spinnerService: AppSpinnerService,
+    private notification: AppNotificationService,
+  ) {
+      // this.currentCriteriaForUtilization = {
+      //   sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE
+      // };  
+    }
 
   ngOnInit(): void {
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
@@ -150,12 +179,14 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     this.resetFilterState();
     this.spinnerService.start(this.loaderNames.filters);
     this.svc.getDatabases().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      console.log("getDatabases res, ", JSON.parse(JSON.stringify(res)));
       this.databaseOptions = res || [];
       this.buildFilterForm();
       this.stopFilterLoader();
       this.loadData();
     }, () => {
       this.databaseOptions = this.svc.getFallbackDatabases();
+      console.log("getFallbackDatabases res, ", JSON.parse(JSON.stringify(this.databaseOptions)));
       this.buildFilterForm();
       this.stopFilterLoader();
       this.loadData();
@@ -225,6 +256,22 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     return `${selectedValues.length} ${pluralLabel}`;
   }
 
+  // /** Pagination added for top 10 utlilization. */
+  // pageChange(pageNo: number) {
+  //   // this.spinnerService.start('main');
+  //   this.currentCriteriaForUtilization.pageNo = pageNo;
+  //   const filterFormOutput = this.getFilterFormOutput();
+  //   this.getUtilizationRows(filterFormOutput, this.currentCriteriaForUtilization);
+  // }
+
+  // pageSizeChange(pageSize: number) {
+  //   // this.spinnerService.start('main');
+  //   this.currentCriteriaForUtilization.pageSize = pageSize;
+  //   this.currentCriteriaForUtilization.pageNo = 1;
+  //   const filterFormOutput = this.getFilterFormOutput();
+  //   this.getUtilizationRows(filterFormOutput, this.currentCriteriaForUtilization);
+  // }
+
   /** Loads all dashboard widgets only after the filter form exists and has loaded filter data. */
   loadData() {
     if (!this.hasFilterFormData()) {
@@ -232,12 +279,21 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     }
     const filterFormOutput = this.getFilterFormOutput();
     setTimeout(() => {
+
+      this.getInventoryOverviewWidgetData(filterFormOutput);
+      this.getWorkloadInsightsTop10UtilData(filterFormOutput);
+      this.getWorkloadInsightsTop10QueryWidgetData(filterFormOutput);
+      this.getCapacityGrowthInsightsWidgetData(filterFormOutput);
+      this.getHealthOverviewWidgetData(filterFormOutput);
+      this.getAlertsOverviewWidgetData(filterFormOutput);
+
       this.getSummaryMetrics(filterFormOutput);
       this.getCloudTypeDistribution(filterFormOutput);
       this.getPlatformCounts(filterFormOutput);
       this.getEnvironmentCounts(filterFormOutput);
       this.getTags(filterFormOutput);
       this.getDatabaseVersions(filterFormOutput);
+
       this.getUtilizationRows(filterFormOutput);
       this.getQueryResponse(filterFormOutput);
       this.getQueryLatency(filterFormOutput);
@@ -245,6 +301,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       this.getErrorRate(filterFormOutput);
       this.getTransactionThroughput(filterFormOutput);
       this.getCacheHitRatio(filterFormOutput);
+
       this.getCapacityMetrics(filterFormOutput);
       this.getStorageRows(filterFormOutput);
       this.getTablespaceUsage(filterFormOutput);
@@ -254,11 +311,119 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       this.getDbSizeByServer(filterFormOutput);
       this.getLogSizeByServer(filterFormOutput);
       this.getDiskUtilization(filterFormOutput);
+
       this.getHealthGroups(filterFormOutput);
+
       this.getAlertSummaryMetrics(filterFormOutput);
       this.getCriticalAlerts(filterFormOutput);
     }, 0);
   }
+
+  getInventoryOverviewWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.inventoryOverview);
+    this.svc.getInventoryOverviewWidgetData(filterFormOutput)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          console.log("inventory resp,", res)
+        }
+        this.spinnerService.stop(this.loaderNames.inventoryOverview);
+      }, (_err: HttpErrorResponse) => {
+        this.spinnerService.stop(this.loaderNames.inventoryOverview);
+
+        this.notification.error(new Notification('Failed to get inventory overview data. Try again later'));
+      });
+  }
+
+  getWorkloadInsightsTop10UtilData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.performancWorkloadUtilization);
+    this.svc.getWorkloadInsightsTop10UtilData(filterFormOutput)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          console.log("top 10 util resp,", res)
+        }
+        this.spinnerService.stop(this.loaderNames.performancWorkloadUtilization);
+      }, (_err: HttpErrorResponse) => {
+        this.spinnerService.stop(this.loaderNames.performancWorkloadUtilization);
+
+        this.notification.error(new Notification('Failed to get top 10 utilization data. Try again later'));
+      });
+  }
+  
+  getWorkloadInsightsTop10QueryWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.performanceQueryResponse);
+    this.svc.getWorkloadInsightsTop10QueryWidgetData(filterFormOutput)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          console.log("top 10 Query resp,", res)
+        }
+        this.spinnerService.stop(this.loaderNames.performanceQueryResponse);
+      }, (_err: HttpErrorResponse) => {
+        this.spinnerService.stop(this.loaderNames.performanceQueryResponse);
+
+        this.notification.error(new Notification('Failed to get Categories Viewed data. Try again later'));
+      });
+  }
+  
+  getCapacityGrowthInsightsWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.capacityGrowth);
+    this.svc.getCapacityGrowthInsightsWidgetData(filterFormOutput)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          console.log("capacity growth insights,", res)
+        }
+        this.spinnerService.stop(this.loaderNames.capacityGrowth);
+      }, (_err: HttpErrorResponse) => {
+        this.spinnerService.stop(this.loaderNames.capacityGrowth);
+
+        this.notification.error(new Notification('Failed to get capacity growth insights data. Try again later'));
+      });
+  }
+  
+  getHealthOverviewWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.inventoryOverview);
+    this.svc.getHealthOverviewWidgetData(filterFormOutput)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          console.log("health overview,", res);
+          this.databaseAvailabilityStatus = this.svc.convertTodatabaseAvailabilityStatus(res.summary);
+          this.replicationSync = this.svc.convertToReplicationSync(res.replication_sync);
+        }
+        this.spinnerService.stop(this.loaderNames.inventoryOverview);
+      }, (_err: HttpErrorResponse) => {
+        this.spinnerService.stop(this.loaderNames.inventoryOverview);
+
+        this.notification.error(new Notification('Failed to get health overview data. Try again later'));
+      });
+  }
+
+  getAlertsOverviewWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
+    this.spinnerService.start(this.loaderNames.alertAndEvents);
+    this.alertSummaryMetrics = [];
+    this.criticalAlerts = [];
+    this.svc.getAlertsOverviewWidgetData(filterFormOutput)
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(res => {
+        if (res) {
+          this.alertSummaryMetrics = this.svc.convertToAlertSummaryViewData(res.summary);
+          this.criticalAlerts = this.svc.convertToCriticalAlertsTableData(res.critical_alerts);
+        }
+        this.spinnerService.stop(this.loaderNames.alertAndEvents);
+      }, (_err: HttpErrorResponse) => {
+        this.alertSummaryMetrics = [];
+        this.criticalAlerts = [];
+        this.spinnerService.stop(this.loaderNames.alertAndEvents);
+        this.notification.error(new Notification('Failed to get alerts and events overview data. Try again later'));
+      });
+  }
+
+  /* ------------------------------------------
+    original sub methods
+  */
 
   getSummaryMetrics(filterFormOutput: DatabaseDashboardFilterCriteria) {
     this.summaryMetrics = [];
@@ -317,9 +482,10 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  getUtilizationRows(filterFormOutput: DatabaseDashboardFilterCriteria) {
+  getUtilizationRows(filterFormOutput: DatabaseDashboardFilterCriteria, criteria?: SearchCriteria,) {
     this.utilizationRows = [];
     this.loadWidget(this.loaderNames.utilization, this.svc.getUtilizationRows(filterFormOutput), res => {
+      this.utilizationCount = res.length;
       this.utilizationRows = this.svc.convertToUtilizationRowsViewData(res);
     }, () => {
       this.utilizationRows = [];
@@ -469,7 +635,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       this.healthGroups = [];
     });
   }
-
+  
   getAlertSummaryMetrics(filterFormOutput: DatabaseDashboardFilterCriteria) {
     this.alertSummaryMetrics = [];
     this.loadWidget(this.loaderNames.alertSummary, this.svc.getAlertSummaryMetrics(filterFormOutput), res => {

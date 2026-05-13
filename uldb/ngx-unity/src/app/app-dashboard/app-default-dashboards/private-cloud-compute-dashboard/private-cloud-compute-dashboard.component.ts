@@ -1,17 +1,22 @@
+import { Overlay, ScrollStrategy } from '@angular/cdk/overlay';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EChartsOption } from 'echarts';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { AlertSummaryViewData, AutoRemediationExecSummaryWidgetData, CapacityAndGrowthInsightsWidgetData, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, InfrastructureHealthWidgetData, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RiskOptimizationViewData, RiskOptimizationWidgetData, SwapBalloonMemoryWidgetData, TicketPriorityOptionsWidgetData, TicketsItemViewData, TicketStatusOptionsWidgetData, Top10ClustersByVMsWidgetData, TopAutoRemediationActionWidgetData, TopCriticalAlertsViewData } from './private-cloud-compute-dashboard.service';
-import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudAlertTrendLegendItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
+import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { PUBLIC_CLOUD_TICKET_PRIORITY_OPTIONS, PUBLIC_CLOUD_TICKET_STATE_OPTIONS, PUBLIC_CLOUD_TICKET_TYPE_OPTIONS } from '../public-cloud-compute-dashboard/public-cloud-compute-dashboard.const';
+import { PublicCloudFilterOption } from '../public-cloud-compute-dashboard/public-cloud-compute-dashboard.type';
+import { AutoRemediationExecSummaryWidgetData, CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, RiskOptimizationViewData, RiskOptimizationWidgetData, SwapBalloonMemoryWidgetData, TicketPriorityOptionsWidgetData, TicketsItemViewData, TicketStatusOptionsWidgetData, Top10ClustersByVMsWidgetData, TopAutoRemediationActionWidgetData, TopCriticalAlertsViewData } from './private-cloud-compute-dashboard.service';
+import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
+import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
+
 
 @Component({
   selector: 'private-cloud-compute-dashboard',
@@ -25,6 +30,12 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   filterForm: FormGroup;
   platformOptions: labelAndValueType[] = [];
+  timeRanges: any[] = []
+  eventDatacenters: any[] = []
+  eventClouds: any[] = []
+  deviceTypes: any[] = []
+  ticketDatePickerScrollStrategy: ScrollStrategy;
+
   datacenterOptions: labelAndValueType[] = [];
   environmentOptions: labelAndValueType[] = [];
   accountOptions: labelAndValueType[] = [];
@@ -85,54 +96,70 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   performanceHotspotWidgetData: PerformanceHotspotWidgetData = new PerformanceHotspotWidgetData();
   utilizationRows: PrivateCloudUtilization = new PrivateCloudUtilization()
 
+  idleDevicesRow: IdleDevicesViewData = new IdleDevicesViewData()
+  idleDistributionRows: IdleDevicesDistribution = new IdleDevicesDistribution()
+
   diskLatencyWidgetData: DiskLatencyWidgetData = new DiskLatencyWidgetData();
   cpuReadyWidgetData: CpuReadyWidgetData = new CpuReadyWidgetData();
   swapBalloonMemoryWidgetData: SwapBalloonMemoryWidgetData = new SwapBalloonMemoryWidgetData();
 
-  riskOptimizationViewData: RiskOptimizationViewData = new RiskOptimizationViewData();
-  riskOptimizationWidgetData: RiskOptimizationWidgetData = new RiskOptimizationWidgetData();
-  autoRemediationExecSummaryWidgetData: AutoRemediationExecSummaryWidgetData = new AutoRemediationExecSummaryWidgetData();
-  topAutoRemediationActionWidgetData: TopAutoRemediationActionWidgetData = new TopAutoRemediationActionWidgetData()
 
 
-  alertSummaryMetrics: AlertSummaryViewData = new AlertSummaryViewData();
+  alertSummaryMetrics: RecentAlertSummaryViewData = new RecentAlertSummaryViewData();
   criticalAlerts: TopCriticalAlertsViewData = new TopCriticalAlertsViewData()
   alertTrendLegend: any;
   alertTrendPolarOptions: EChartsOption = {};
   alertTrendStackOptions: EChartsOption = {};
   alertSideCards: PrivateCloudAlertSideCard[] = [];
-  ticketPriorityOptionsWidgetData: TicketPriorityOptionsWidgetData = new TicketPriorityOptionsWidgetData();
-  ticketStatusOptions: TicketStatusOptionsWidgetData = new TicketStatusOptionsWidgetData();
-  tickets: TicketsItemViewData = new TicketsItemViewData();
-  totalTickets = 0;
+
+  timeRangeFilter: string = '';
+  eventDatacentersFilter: string = '';
+  eventCloudsFilter: string = '';
+  deviceTypesFilter: string = '';
+
+  orphanedDeviceListViewData: OrphanedDeviceView = new OrphanedDeviceView()
+  orphanedDeviceWidgetViewData: OrphanedDeviceWidgetView = new OrphanedDeviceWidgetView()
+
+  orphanedByCategoryColors = chartColors;
+  orphanedByCategory: any[] = []
+
+
+
 
   loaderNames = {
-    filters: 'publicCloudFiltersLoader',
-    utilization: 'publicCloudUtilizationLoader',
-    latencyWorkloads: 'publicCloudLatencyWorkloadsLoader',
-    errorRateWorkloads: 'publicCloudErrorRateWorkloadsLoader',
-    databasePerformance: 'publicCloudDatabasePerformanceLoader',
-    databaseLatencyBadges: 'publicCloudDatabaseLatencyBadgesLoader',
-    alertSummary: 'publicCloudAlertSummaryLoader',
-    criticalAlerts: 'publicCloudCriticalAlertsLoader',
-    alertTrend: 'publicCloudAlertTrendLoader',
-    alertSideCards: 'publicCloudAlertSideCardsLoader',
+    filters: 'privateCloudFiltersLoader',
+    utilization: 'privateCloudUtilizationLoader',
+    latencyWorkloads: 'privateCloudLatencyWorkloadsLoader',
+    errorRateWorkloads: 'privateCloudErrorRateWorkloadsLoader',
+    databasePerformance: 'privateCloudDatabasePerformanceLoader',
+    databaseLatencyBadges: 'privateCloudDatabaseLatencyBadgesLoader',
+    alertSummary: 'privateCloudAlertSummaryLoader',
+    criticalAlerts: 'privateCloudCriticalAlertsLoader',
+    alertTrend: 'privateCloudAlertTrendLoader',
+    alertSideCards: 'privateCloudAlertSideCardsLoader',
     ITSMTicketList: 'ITSMTicketLoader',
     performanceHotspot: 'performanceHotspotLoader'
   };
+  idleDistributionChartData: UnityChartDetails;
 
   constructor(private svc: PrivateCloudComputeDashboardService,
     private router: Router,
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
-    private notification: AppNotificationService) {
+    private notification: AppNotificationService, private overlay: Overlay) {
+    this.ticketDatePickerScrollStrategy = this.overlay.scrollStrategies.reposition();
+    this.currentCriteria = {
+      sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ 'ticket_type': null }]
+    };
   }
 
   ngOnInit(): void {
     this.getHeaderInfo();
     this.getFilterDropdowns();
     this.buildFilterForm();
-    this.loadWidgets();
+    setTimeout(() => {
+      this.loadWidgets();
+    });
   }
 
   ngOnDestroy(): void {
@@ -159,12 +186,16 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     this.svc.getFilterDropdowns()
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
-        // console.log("filters res,", res)
-        if (res?.filters) {
-          this.accountOptions = res.filters.accounts ? res.filters.accounts : [];
-          this.datacenterOptions = res.filters.datacenters ? res.filters.datacenters : [];
-          this.environmentOptions = res.filters.environments ? res.filters.environments : [];
-          this.platformOptions = res.filters.platforms ? res.filters.platforms : [];
+        if (res) {
+          this.accountOptions = res.accounts ? res.accounts : [];
+          this.datacenterOptions = res.datacenters ? res.datacenters : [];
+          this.environmentOptions = res.environments ? res.environments : [];
+          this.platformOptions = res.platforms ? res.platforms : [];
+          this.deviceTypes = res.deviceTypes ? res.deviceTypes : [];
+          this.eventClouds = res.eventClouds ? res.eventClouds : [];
+          this.eventDatacenters = res.eventDatacenters ? res.eventDatacenters : [];
+          this.timeRanges = res.timeRanges ? res.timeRanges : [];
+
         }
       }, (_err: HttpErrorResponse) => {
         this.notification.error(new Notification('Failed to get filter dropdown values data. Try again later'));
@@ -173,7 +204,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   private buildFilterForm() {
     this.filterFormUnsubscribe.next();
-    this.filterForm = this.svc.buildFilterForm(this.platformOptions, this.datacenterOptions, this.environmentOptions, this.accountOptions);
+    this.filterForm = this.svc.buildFilterForm();
     this.watchFilterChanges();
   }
 
@@ -203,6 +234,8 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   }
 
   loadWidgets() {
+    // const filterFormOutput = this.getFilterFormOutput();
+
     this.getExecutiveSummaryWidgetData();
     this.getCapacityGrowthWidgetData();
     this.getTop10ClustersByVMsWidgetData();
@@ -211,14 +244,15 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     this.getPerformanceHotspotWidgetData();
     this.getPerformanceWorkloadWidgetData();
     this.getAlertAndEventsWidgetData();
-    this.getRiskOptimizationWidgetData();
-    this.getAutoRemediationSummaryWidgetData();
+    this.getOrphanedDeviceData()
+    this.getIdleDevicesData()
   }
 
   private resetFilterState() {
     this.filterFormUnsubscribe.next();
     this.filterForm = null;
     this.platformOptions = [];
+    this.datacenterOptions = [];
     this.environmentOptions = [];
     this.accountOptions = [];
   }
@@ -226,16 +260,18 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   //---------Executive Summary / Cloud Inventory------
 
   getExecutiveSummaryWidgetData() {
-    this.spinner.start(this.executiveSummaryWidgetData.cloudTypeLoader);
-    this.spinner.start(this.executiveSummaryWidgetData.powerActivityLoader);
-    this.spinner.start(this.executiveSummaryWidgetData.vmCountByOSTypeLoader)
+
+
     this.executiveSummaryWidgetData.cloudTypeChartData = null;
     this.executiveSummaryWidgetData.powerActivityChartData = null;
     this.executiveSummaryWidgetData.vmCountByOSTypeChartData = null;
     this.executiveSummaryWidgetData.environmentAndCriticalityChartData = null;
     this.executiveSummaryWidgetData.alertSeverityViewData = null;
+
+
+    this.startExecutiveSummaryWidgetLoaders()
     this.svc.getExecutiveSummaryWidgetData(this.filterForm.getRawValue())
-      .pipe(takeUntil(this.ngUnsubscribe))
+      .pipe(takeUntil(this.ngUnsubscribe), finalize(() => this.stopExecutiveSummaryWidgetLoaders()))
       .subscribe(res => {
         if (res) {
           this.executiveSummaryViewData = this.svc.convertExecutiveSummaryViewData(res.executiveSummary);
@@ -245,15 +281,34 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
           this.executiveSummaryWidgetData.environmentAndCriticalityChartData = this.svc.convertToEnvironmentAndCriticalityChartData(res.environmentCriticality);
           this.executiveSummaryWidgetData.alertSeverityViewData = this.svc.convertToAlertSeverityViewData(res.alertsSeverity);
         }
-        this.spinner.stop(this.executiveSummaryWidgetData.cloudTypeLoader);
-        this.spinner.stop(this.executiveSummaryWidgetData.powerActivityLoader);
-        this.spinner.stop(this.executiveSummaryWidgetData.vmCountByOSTypeLoader)
       }, (_err: HttpErrorResponse) => {
-        this.spinner.stop(this.executiveSummaryWidgetData.cloudTypeLoader);
-        this.spinner.stop(this.executiveSummaryWidgetData.powerActivityLoader);
-        this.spinner.stop(this.executiveSummaryWidgetData.vmCountByOSTypeLoader)
-        this.notification.error(new Notification('Failed to get Executive Summary Data data. Try again later'));
+        this.executiveSummaryWidgetData.cloudTypeChartData = null;
+        this.executiveSummaryWidgetData.powerActivityChartData = null;
+        this.executiveSummaryWidgetData.vmCountByOSTypeChartData = null;
+        this.executiveSummaryWidgetData.environmentAndCriticalityChartData = null;
+        this.executiveSummaryWidgetData.alertSeverityViewData = null;
+        this.notification.error(
+          new Notification('Failed to get Executive Summary Data data. Try again later')
+        );
       });
+  }
+
+  private startExecutiveSummaryWidgetLoaders() {
+    [this.executiveSummaryWidgetData.executiveSummaryLoader,
+    this.executiveSummaryWidgetData.cloudTypeLoader,
+    this.executiveSummaryWidgetData.powerActivityLoader,
+    this.executiveSummaryWidgetData.vmCountByOSTypeLoader,
+    this.executiveSummaryWidgetData.environmentAndCriticalityLoader,
+    ].forEach(loaderName => this.spinner.start(loaderName));
+  }
+
+  private stopExecutiveSummaryWidgetLoaders() {
+    [this.executiveSummaryWidgetData.cloudTypeLoader,
+    this.executiveSummaryWidgetData.executiveSummaryLoader,
+    this.executiveSummaryWidgetData.powerActivityLoader,
+    this.executiveSummaryWidgetData.vmCountByOSTypeLoader,
+    this.executiveSummaryWidgetData.environmentAndCriticalityLoader,
+    ].forEach(loaderName => this.spinner.stop(loaderName));
   }
 
   //------------Capacity and Growth Insight ----------------------
@@ -277,6 +332,9 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       }, (_err: HttpErrorResponse) => {
         this.spinner.stop(this.capacityAndGrowthInsightsWidgetData.vmDensityLoader);
         this.spinner.stop(this.capacityAndGrowthInsightsWidgetData.vmCapacityLoader);
+        this.capacityAndGrowthInsightsWidgetData.vmDensityChartData = null;
+        this.capacityAndGrowthInsightsWidgetData.vmCapacityChartData = null;
+        this.capacityAndGrowthInsightsWidgetData.vmProvisioningViewData = null;
         this.notification.error(new Notification('Failed to get Capacity and Growth data. Try again later'));
       });
   }
@@ -286,15 +344,17 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   getTop10ClustersByVMsWidgetData() {
     this.spinner.start(this.top10ClustersByVMsWidgetData.loader);
     this.top10ClustersByVMsWidgetData.chartData = null;
-    this.svc.getTop10ClustersByVMsWidgetData(this.filterForm.getRawValue())
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        if (res) {
-          this.top10ClustersByVMsWidgetData.chartData = this.svc.convertToTop10ClustersByVMsChartData(res);
-        }
-      }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get top10 Clusters By VMs data. Try again later'));
-      });
+    this.svc.getTop10ClustersByVMsWidgetData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (res) {
+        this.spinner.stop(this.top10ClustersByVMsWidgetData.loader);
+        let chartdata = this.svc.convertToTop10ClustersByVMCountViewData(res)
+        this.top10ClustersByVMsWidgetData.chartData = this.svc.convertToTop10ClustersByVMsChartData(chartdata.clusterList);
+      }
+    }, (_err: HttpErrorResponse) => {
+      this.spinner.stop(this.top10ClustersByVMsWidgetData.loader);
+
+      this.notification.error(new Notification('Failed to get top10 Clusters By VMs data. Try again later'));
+    });
   }
 
   //-----Cluster Capacity Utilization Trend-----------
@@ -302,15 +362,17 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   getClusterCapacityUtilTrendWidgetData() {
     this.spinner.start(this.clusterCapacityUtilTrendWidgetData.loader);
     this.clusterCapacityUtilTrendWidgetData.chartData = null;
-    this.svc.getClusterCapacityUtilTrendWidgetData(this.filterForm.getRawValue())
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        if (res) {
-          this.clusterCapacityUtilTrendWidgetData.chartData = this.svc.convertToClusterCapacityUtilTrendChartData(res);
-        }
-      }, (_err: HttpErrorResponse) => {
-        this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
-      });
+    this.svc.getClusterCapacityUtilTrendWidgetData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      if (res) {
+        this.spinner.stop(this.clusterCapacityUtilTrendWidgetData.loader);
+        let data = this.svc.convertToClusterCapacityUtilTrendViewData(res);
+        this.clusterCapacityUtilTrendWidgetData.chartData = this.svc.convertToClusterCapacityUtilTrendChartData(data);
+      }
+    }, (_err: HttpErrorResponse) => {
+      this.spinner.stop(this.clusterCapacityUtilTrendWidgetData.loader);
+      this.clusterCapacityUtilTrendWidgetData.chartData = null;
+      this.notification.error(new Notification('Failed to get Cluster Capacity Util Trend Widget data. Try again later'));
+    });
   }
 
   //-----Infrastructure Health / Hardware Status------
@@ -339,11 +401,52 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     this.utilizationRows.utilRow = [];
     this.spinner.start(this.loaderNames.performanceHotspot);
     this.svc.getUtilizationRows(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.spinner.stop(this.loaderNames.performanceHotspot);
       this.utilizationRows = this.svc.convertToUtilizationViewData(res);
     }, () => {
       this.utilizationRows.utilRow = [];
+      this.spinner.stop(this.loaderNames.performanceHotspot);
       this.notification.error(new Notification('Failed to get Performance Hotspot data. Try again later'));
     });
+  }
+
+  getIdleDevicesData() {
+    this.idleDevicesRow.devicesRow = []
+    this.idleDistributionRows.distributionRow = []
+    this.idleDistributionRows.chartData = null;
+
+    this.spinner.start(this.idleDevicesRow.loader);
+    this.spinner.start(this.idleDistributionRows.loader);
+    this.svc.getIdleDevicesData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.spinner.stop(this.idleDevicesRow.loader);
+      this.spinner.stop(this.idleDistributionRows.loader);
+
+      this.idleDevicesRow = this.svc.convertToDeviceIdleViewData(res)
+      this.idleDistributionRows = this.svc.convertToIdleDevicesDistributionViewData(res.idleDurationDistribution)
+      this.idleDistributionRows.chartData = this.svc.convertToIdleDurationDistributionChartData(this.idleDistributionRows.distributionRow)
+    }, () => {
+      this.idleDistributionRows.chartData = null;
+      this.idleDevicesRow.devicesRow = []
+      this.idleDistributionRows.distributionRow = []
+      this.spinner.stop(this.idleDistributionRows.loader);
+      this.spinner.stop(this.idleDevicesRow.loader);
+      this.notification.error(new Notification('Failed to get Idle Devices data. Try again later'));
+    });
+  }
+
+  getDistributionClass(index: number): string {
+    switch (index) {
+      case 0:
+        return 'bg-success';
+      case 1:
+        return 'bg-warning';
+      case 2:
+        return 'bg-danger';
+      case 3:
+        return 'distribution-pink';
+      default:
+        return 'bg-secondary';
+    }
   }
 
   getPerformanceWorkloadWidgetData() {
@@ -368,6 +471,9 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
         this.spinner.stop(this.diskLatencyWidgetData.loader);
         this.spinner.stop(this.cpuReadyWidgetData.loader);
         this.spinner.stop(this.swapBalloonMemoryWidgetData.loader);
+        this.diskLatencyWidgetData.chartData = null;
+        this.cpuReadyWidgetData.chartData = null;
+        this.swapBalloonMemoryWidgetData.chartData = null;
         this.notification.error(new Notification('Failed to get Disk Latency data. Try again later'));
       });
   }
@@ -376,118 +482,59 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   getAlertAndEventsWidgetData() {
     let filterFormOutput = this.filterForm.getRawValue();
-    this.getAlertEvents(filterFormOutput);
-    this.getAlertTrends(filterFormOutput);
-
+    this.getRecentAlerts(filterFormOutput);
   }
 
-  getAlertEvents(filterFormOutput: any) {
+  getRecentAlerts(filterFormOutput: any) {
     this.criticalAlerts.alertList = null;
-    // this.alertSummaryMetrics = null;
     this.spinner.start(this.alertSummaryMetrics.loader)
     this.spinner.start(this.criticalAlerts.loader)
-    this.svc.getAlertEvents(filterFormOutput).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.alertSummaryMetrics = this.svc.convertToAlertSummaryView(res.alertSummary);
-      this.criticalAlerts = this.svc.convertToTopCriticalAlertsViewData(res.topCriticalAlerts);
+    this.svc.getRecentAlerts(filterFormOutput).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.alertSummaryMetrics = this.svc.convertToAlertSummaryView(res);
+      this.criticalAlerts = this.svc.convertToTopCriticalAlertsViewData(res.recentAlerts);
       this.spinner.stop(this.alertSummaryMetrics.loader)
       this.spinner.stop(this.criticalAlerts.loader)
     }, () => {
-      // this.alertSummaryMetrics = null;
       this.criticalAlerts.alertList = null;
-      this.spinner.stop(this.loaderNames.alertSummary)
       this.spinner.stop(this.alertSummaryMetrics.loader)
       this.spinner.stop(this.criticalAlerts.loader)
     });
   }
 
-
-  getAlertTrends(filterFormOutput: any) {
-    this.alertSideCards = [];
-    this.alertTrendPolarOptions = {};
-    this.alertTrendStackOptions = {};
-    this.spinner.start(this.loaderNames.criticalAlerts)
-    this.spinner.start(this.loaderNames.alertTrend)
-    this.spinner.start(this.loaderNames.alertSideCards)
-    this.svc.getAlertTrends(filterFormOutput).pipe(takeUntil(this.ngUnsubscribe))
+  getOrphanedDeviceData() {
+    this.spinner.start(this.orphanedDeviceListViewData.loader);
+    this.orphanedDeviceListViewData.orphanList = null;
+    this.svc.getOrphanedDeviceData(this.filterForm.getRawValue())
+      .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
-        this.alertTrendLegend = res;
-        this.alertSideCards = this.svc.convertToAlertSideCardsViewData(res);
-        this.alertTrendStackOptions = this.svc.convertToAlertTrendStackOptions(res);
-        this.alertTrendPolarOptions = this.svc.convertToAlertTrendPolarOptions(res);
-        this.spinner.stop(this.loaderNames.criticalAlerts)
-        this.spinner.stop(this.loaderNames.alertTrend)
-        this.spinner.stop(this.loaderNames.alertSideCards)
-      }, () => {
-        this.alertSideCards = [];
-        this.alertTrendPolarOptions = {};
-        this.alertTrendStackOptions = {};
-        this.spinner.stop(this.loaderNames.criticalAlerts)
-        this.spinner.stop(this.loaderNames.alertTrend)
-        this.spinner.stop(this.loaderNames.alertSideCards)
+        if (res) {
+          this.orphanedDeviceListViewData = this.svc.convertToOrphanedDeviceListView(res);
+          this.orphanedByCategory = res.orphanedByCategory
+          this.orphanedDeviceWidgetViewData.chartData = this.svc.convertToOrphanedByCategoryChartData(res.orphanedByCategory)
+        }
+        this.spinner.stop(this.orphanedDeviceListViewData.loader);
+
+      }, (_err: HttpErrorResponse) => {
+        this.spinner.stop(this.orphanedDeviceListViewData.loader);
+        this.orphanedDeviceListViewData.orphanList = null;
+        this.notification.error(new Notification('Failed to get Orphaned Device data. Try again later'));
       });
   }
 
-  getITSMTicket(filterFormOutput: any) {
-    this.spinner.start(this.ticketPriorityOptionsWidgetData.loader);
-    this.spinner.start(this.ticketStatusOptions.loader);
-    this.spinner.start(this.tickets.loader);
-    this.ticketPriorityOptionsWidgetData.chartData = null;
-    this.ticketStatusOptions.chartData = null;
-    this.tickets = null;
-    this.svc.getITSMTicket(filterFormOutput).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.ticketPriorityOptionsWidgetData.chartData = this.svc.convertToTicketPriorityOptions(res.ticketsByPriority);
-      this.ticketStatusOptions.chartData = this.svc.convertToTicketStatusOptions(res.ticketsByStatus);
-      this.tickets = this.svc.convertToTicketViewData(res.tickets);
-      this.spinner.stop(this.ticketPriorityOptionsWidgetData.loader);
-      this.spinner.stop(this.ticketStatusOptions.loader);
-      this.spinner.start(this.tickets.loader);
-    }, () => {
-      this.tickets = null;
-      this.ticketPriorityOptionsWidgetData.chartData = null;
-      this.ticketStatusOptions.chartData = null;
-      this.spinner.stop(this.ticketPriorityOptionsWidgetData.loader);
-      this.spinner.stop(this.ticketStatusOptions.loader);
-      this.spinner.stop(this.tickets.loader);
+  getOrphanedStatusIconClass(status: string): string {
+    switch (status) {
+      case 'error':
+        return 'fas fa-exclamation-triangle text-danger font-xs-sm';
 
-    });
-  }
+      case 'warning':
+        return 'fas fa-exclamation-circle text-warning font-xs-sm';
 
-  // Risk Optimization
-  getRiskOptimizationWidgetData() {
-    this.spinner.start(this.riskOptimizationWidgetData.loader);
-    this.riskOptimizationWidgetData.chartData = null;
-    this.riskOptimizationViewData = null;
-    this.svc.getRiskOptimizationWidgetData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      if (res) {
-        console.log(res)
-        this.riskOptimizationWidgetData.chartData = this.svc.convertRiskOptimizationWidgetData(res.capacityRiskAlerts);
-        this.riskOptimizationViewData = this.svc.convertRiskOptimizationSummaryData(res);
-      }
-      this.spinner.stop(this.riskOptimizationWidgetData.loader);
-    }, (_err: HttpErrorResponse) => {
-      this.spinner.stop(this.riskOptimizationWidgetData.loader);
-      this.notification.error(new Notification('Failed to get Risk Optimization widget data. Try again later'));
-    });
-  }
+      case 'success':
+        return 'fas fa-check-circle text-success font-xs-sm';
 
-  // Auto Remediation Summary
-  getAutoRemediationSummaryWidgetData() {
-    this.spinner.start(this.autoRemediationExecSummaryWidgetData.loader);
-    this.spinner.start(this.topAutoRemediationActionWidgetData.loader);
-    this.autoRemediationExecSummaryWidgetData.chartData = null;
-    this.topAutoRemediationActionWidgetData.chartData = null;
-    this.svc.getAutoRemediationSummaryWidgetData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      if (res) {
-        this.autoRemediationExecSummaryWidgetData.chartData = this.svc.convertToAutoRemediationExecSummaryChartData(res.executionSummary);
-        this.topAutoRemediationActionWidgetData.chartData = this.svc.convertToTopAutoRemediationActionChartData(res.topActions);
-      }
-      this.spinner.stop(this.autoRemediationExecSummaryWidgetData.loader);
-      this.spinner.stop(this.topAutoRemediationActionWidgetData.loader);
-    }, (_err: HttpErrorResponse) => {
-      this.spinner.stop(this.autoRemediationExecSummaryWidgetData.loader);
-      this.spinner.stop(this.topAutoRemediationActionWidgetData.loader);
-      this.notification.error(new Notification('Failed to get Auto Remediation Execution data. Try again later'));
-    });
+      default:
+        return 'fas fa-question-circle text-muted font-xs-sm';
+    }
   }
 
   goBack() {

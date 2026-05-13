@@ -1,4 +1,4 @@
-import { AlertTrends, CapacityRiskAlert, ITSMTicketView, PerformanceHotspots, PrivateCloudAlertSideCard, PrivateCloudAlertSummaryMetric, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudCriticalAlert, PrivateCloudTicketDonutItem, PrivateCloudTicketRow, PrivateCloudUtilizationRow } from "./private-cloud-compute-dashboard.type";
+import { PerformanceHotspots, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudCriticalAlert, PrivateCloudTicketDonutItem, PrivateCloudTicketRow } from "./private-cloud-compute-dashboard.type";
 
 
 //Top 10 clusters
@@ -120,57 +120,31 @@ export const PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS: PrivateCloudAlertTrendBarGr
   { name: 'First Response', values: [156, 305, 417] }
 ];
 
-export const PRIVATE_CLOUD_ALERT_SIDE_CARDS: AlertTrends = {
-  "summary": {
-    "rawEvents": 878,
-    "alerts": 109,
-    "conditions": 32
-  },
-  "rawEvents": {
-    "total": 878,
-    "critical": 156,
-    "warning": 305,
-    "informative": 417
-  },
-  "noiseReduction": {
-    "percentage": 77,
-    "dedupeEvents": 589,
-    "suppressedEvents": 289,
-    "correlated": 32
-  },
-  "firstResponse": {
-    "percentage": 92,
-    "autoCloned": 126,
-    "ticketCreated": 456,
-    "autoClosed": 378
-  }
-}
-export const PRIVATE_CLOUD_TICKET_PRIORITY: ITSMTicketView = {
-  "ticketsByPriority": {
-    "High": 9,
-    "Moderate": 207,
-    "Low": 11,
-    "Critical": 0,
-    "Planning": 0
-  },
-  "ticketsByStatus": {
-    "Resolved": 219,
-    "Open": 8,
-    "Closed": 0,
-    "In Progress": 0
-  },
-  "tickets": [
-    {
-      "ticketId": "INC0022446",
-      "shortDescription": "trigger-11",
-      "state": "Resolved",
-      "priority": "3 - Moderate",
-      "createdOn": "Aug 22, 2024, 12:33:09",
-      "updatedOn": "Feb 27, 2026, 19:18:47",
-      "resolution": "Resolved"
-    }
-  ],
-}
+// export const PRIVATE_CLOUD_ALERT_SIDE_CARDS: AlertTrends = {
+//   "summary": {
+//     "rawEvents": 878,
+//     "alerts": 109,
+//     "conditions": 32
+//   },
+//   "rawEvents": {
+//     "total": 878,
+//     "critical": 156,
+//     "warning": 305,
+//     "informative": 417
+//   },
+//   "noiseReduction": {
+//     "percentage": 77,
+//     "dedupeEvents": 589,
+//     "suppressedEvents": 289,
+//     "correlated": 32
+//   },
+//   "firstResponse": {
+//     "percentage": 92,
+//     "autoCloned": 126,
+//     "ticketCreated": 456,
+//     "autoClosed": 378
+//   }
+// }
 
 export const PRIVATE_CLOUD_TICKET_STATUS: PrivateCloudTicketDonutItem[] = [
   { name: 'Closed with ST Self heal', value: 22, color: '#696cff' },

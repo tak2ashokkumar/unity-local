@@ -8,7 +8,7 @@ import { DatabaseServersService } from 'src/app/united-cloud/shared/database-ser
 import { DatabaseServer } from 'src/app/united-cloud/shared/entities/database-servers.type';
 import {
   DATABASE_DASHBOARD_ACTIVE_SESSIONS,
-  DATABASE_DASHBOARD_ALERT_SUMMARY,
+  DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG,
   DATABASE_DASHBOARD_ALL_SELECTED_VALUE,
   DATABASE_DASHBOARD_CACHE_HIT_RATIO,
   DATABASE_DASHBOARD_CAPACITY_METRICS,
@@ -33,6 +33,7 @@ import {
   DATABASE_DASHBOARD_VERSIONS
 } from './database-dashboard.const';
 import {
+  DatabaseDashboardTopCriticalAlertsResponse,
   DatabaseDashboardAlertSummaryMetric,
   DatabaseDashboardBarItem,
   DatabaseDashboardCapacityMetric,
@@ -40,25 +41,36 @@ import {
   DatabaseDashboardDonutItem,
   DatabaseDashboardFilterCriteria,
   DatabaseDashboardFilterOption,
-  DatabaseDashboardHealthGroup,
+  DbDashboardHealthGroup,
   DatabaseDashboardMetric,
   DatabaseDashboardStorageRow,
   DatabaseDashboardTagItem,
   DatabaseDashboardUtilizationRow,
   DatabaseDashboardUtilizationViewRow,
-  DatabaseDashboardVersionItem
+  DatabaseDashboardVersionItem,
+  InventoryWidgetType,
+  DatabaseDashboardTopCriticalAlertsSummary,
+  DatabaseDashboardCriticalAlertViewData,
+  DbDashboardHealthGroupType,
+  DbDashboardSummary,
+  DbDashboardReplicationSyncSummary,
+  DbDashboardSummaryViewData,
+  DbDashboardReplicationSyncSummaryData,
+  DbDashboardReplicationSync
 } from './database-dashboard.type';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable()
 export class DatabaseDashboardService {
 
   constructor(private builder: FormBuilder,
-    private databaseServersService: DatabaseServersService) { }
+    private databaseServersService: DatabaseServersService,
+    private http: HttpClient) { }
 
   /*
    * -----Start----- Filters Related -------------------
    */
-  buildFilterForm(databases: DatabaseDashboardFilterOption[]): FormGroup {
+  buildFilterForm(databases?: DatabaseDashboardFilterOption[]): FormGroup {
     return this.builder.group({
       databases: [databases || []]
     });
@@ -99,17 +111,44 @@ export class DatabaseDashboardService {
       }
     });
 
+    console.log("database options, ", JSON.parse(JSON.stringify(options)));
+
     return options.size
       ? Array.from(options.values())
       : DATABASE_DASHBOARD_DATABASE_OPTIONS.filter(option => option.value !== DATABASE_DASHBOARD_ALL_SELECTED_VALUE);
   }
+
+  private convertFiltersToApiParams(criteria?: DatabaseDashboardFilterCriteria): HttpParams {
+    console.log("criteria", JSON.parse(JSON.stringify(criteria)));
+    let params: HttpParams = new HttpParams();
+    params = this.appendMultiValueParam(params, 'database', criteria?.databases);
+    console.log("params", JSON.parse(JSON.stringify(params)));
+    return params;
+  }
+
+  private appendMultiValueParam(params: HttpParams, key: string, values?: string[]): HttpParams {
+    (values || []).forEach(value => {
+      if (value) {
+        params = params.append(key, value);
+      }
+    });
+    return params;
+  }
+
   /*
    * ******End ****** Filters Related ********************
-   */
+   */  
 
   /*
    * -----Start----- Database Estate / Inventory Overview Widget Related -------------------
    */
+
+  getInventoryOverviewWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<InventoryWidgetType> {
+    return this.http.get<InventoryWidgetType>('/customer/persona/database-dashboard/inventory-overview/', {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
   getSummaryMetrics(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardMetric[]> {
     return of(DATABASE_DASHBOARD_SUMMARY_METRICS);
   }
@@ -266,7 +305,14 @@ export class DatabaseDashboardService {
   /*
    * -----Start----- Performance / Workload Insights Widget Related -------------------
    */
-  getUtilizationRows(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardUtilizationRow[]> {
+
+  getWorkloadInsightsTop10UtilData(criteria?: DatabaseDashboardFilterCriteria): Observable<InventoryWidgetType> {
+    return this.http.get<InventoryWidgetType>('/customer/persona/database-dashboard/workload-insights/', {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  getUtilizationRows(_criteria?: DatabaseDashboardFilterCriteria, criteria?: SearchCriteria,): Observable<DatabaseDashboardUtilizationRow[]> {
     return of(DATABASE_DASHBOARD_UTILIZATION_ROWS);
   }
 
@@ -309,6 +355,12 @@ export class DatabaseDashboardService {
         }
       ]
     };
+  }
+
+  getWorkloadInsightsTop10QueryWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<InventoryWidgetType> {
+    return this.http.get<InventoryWidgetType>('/customer/persona/database-dashboard/top-query-performance/', {
+      params: this.convertFiltersToApiParams(criteria)
+    });
   }
 
   getQueryResponse(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardBarItem[]> {
@@ -365,6 +417,13 @@ export class DatabaseDashboardService {
   /*
    * -----Start----- Capacity / Growth Insights Widget Related -------------------
    */
+
+  getCapacityGrowthInsightsWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<InventoryWidgetType> {
+    return this.http.get<InventoryWidgetType>('/customer/persona/database-dashboard/growth-insights/', {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
   getCapacityMetrics(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardCapacityMetric[]> {
     return of(DATABASE_DASHBOARD_CAPACITY_METRICS);
   }
@@ -443,11 +502,44 @@ export class DatabaseDashboardService {
   /*
    * -----Start----- Availability / Health Overview Widget Related -------------------
    */
-  getHealthGroups(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardHealthGroup[]> {
+
+  getHealthOverviewWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DbDashboardHealthGroupType> {
+    return this.http.get<DbDashboardHealthGroupType>('/customer/persona/database-dashboard/health-overview/', {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertTodatabaseAvailabilityStatus(data: DbDashboardSummary): DbDashboardSummaryViewData  { 
+    let obj = new DbDashboardSummaryViewData();
+    obj.online = data.online;
+    obj.degraded = data.degraded;
+    obj.unreachable = data.unreachable;
+    obj.maintenance = data.maintenance;
+    obj.inactive = data.inactive;
+    obj.total = data.total;
+    return obj;
+  }
+
+  convertToReplicationSync(data: DbDashboardReplicationSync): DbDashboardReplicationSyncSummaryData  {
+    if(!data || !data.summary){
+      return;
+    }
+    let syncData = data.summary
+    let obj = new DbDashboardReplicationSyncSummaryData();
+    obj.syncHealthy = syncData.sync_healthy;
+    obj.lagOver30s = syncData.lag_over_30s;
+    obj.deadlocks = syncData.deadlocks;
+    obj.errorsPerSecond = syncData.errors_per_second;
+    obj.connectionErrors = syncData.connection_errors;
+    obj.noReplication = syncData.no_replication;
+    return obj;
+  }
+
+  getHealthGroups(_criteria?: DatabaseDashboardFilterCriteria): Observable<DbDashboardHealthGroup[]> {
     return of(DATABASE_DASHBOARD_HEALTH_GROUPS);
   }
 
-  convertToHealthGroupsViewData(data: DatabaseDashboardHealthGroup[]): DatabaseDashboardHealthGroup[] {
+  convertToHealthGroupsViewData(data: DbDashboardHealthGroup[]): DbDashboardHealthGroup[] {
     return data || [];
   }
   /*
@@ -457,21 +549,75 @@ export class DatabaseDashboardService {
   /*
    * -----Start----- Alert & Events View Widget Related -------------------
    */
+  getAlertsOverviewWidgetData(criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardTopCriticalAlertsResponse> {
+    return this.http.get<DatabaseDashboardTopCriticalAlertsResponse>('/customer/persona/database-dashboard/alerts-overview/', {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
   getAlertSummaryMetrics(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardAlertSummaryMetric[]> {
-    return of(DATABASE_DASHBOARD_ALERT_SUMMARY);
+    return of(DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG);
   }
 
   convertToAlertSummaryMetricsViewData(data: DatabaseDashboardAlertSummaryMetric[]): DatabaseDashboardAlertSummaryMetric[] {
     return data || [];
   }
 
-  getCriticalAlerts(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardCriticalAlert[]> {
+  convertToAlertSummaryViewData(data: DatabaseDashboardTopCriticalAlertsSummary): DatabaseDashboardAlertSummaryMetric[] {
+    const summary = (data || {}) as Record<string, number | string>;
+    return DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG.map(item => ({
+      label: item.label,
+      value: this.formatAlertSummaryValue(summary[item.key], item.suffix),
+      tone: item.tone
+    }));
+  }
+
+  getCriticalAlerts(_criteria?: DatabaseDashboardFilterCriteria): Observable<DatabaseDashboardCriticalAlertViewData[]> {
     return of(DATABASE_DASHBOARD_CRITICAL_ALERTS);
   }
 
-  convertToCriticalAlertsViewData(data: DatabaseDashboardCriticalAlert[]): DatabaseDashboardCriticalAlert[] {
+  convertToCriticalAlertsViewData(data: DatabaseDashboardCriticalAlertViewData[]): DatabaseDashboardCriticalAlertViewData[] {
+    data.forEach(al => {
+      if (al.severity == 'Critical') {
+        al.severityClass = 'text-danger';
+        al.severityIcon = 'fa-exclamation-circle text-danger';
+      } else if (al.severity == 'Warning') {
+        al.severityClass = 'text-warning';
+        al.severityIcon = 'fa-exclamation-circle text-warning';
+      } else {
+        al.severityClass = 'text-primary';
+        al.severityIcon = 'fa-info-circle text-primary';
+      }
+    });
+
     return data || [];
   }
+
+  convertToCriticalAlertsTableData(data: DatabaseDashboardCriticalAlert[]): DatabaseDashboardCriticalAlertViewData[] {
+    return (data || []).map(alert => ({
+      id: alert.id,
+      deviceName: alert.device_name,
+      severity: alert.severity,
+      // severity: alert.severity === 'high' ? 'high' : 'critical',
+      severityClass: alert.severity == 'Critical' ? 'text-danger' : alert.severity == 'Warning' ? 'text-warning' : 'text-primary',
+      severityIcon: alert.severity == 'Critical' ? 'fa-exclamation-circle text-danger' : alert.severity == 'Warning' ? 'fa-exclamation-circle text-warning' : 'fa-info-circle text-primary',
+      description: alert.description,
+      source: alert.source,
+      acknowledged: alert.acknowledged,
+      duration: alert.age
+    }));
+  }
+
+  private formatAlertSummaryValue(value: number | string, suffix?: string): string {
+    const formattedValue = typeof value === 'number' ? this.formatNumber(value) : String(value || '0');
+    return suffix && !formattedValue.endsWith(suffix) ? `${formattedValue}${suffix}` : formattedValue;
+  }
+
+  private formatNumber(value: number | string): string {
+    const numericValue = Number(value || 0);
+    return isNaN(numericValue) ? '0' : numericValue.toLocaleString('en-US');
+  }
+
   /*
    * ******End ****** Alert & Events View Widget Related ********************
    */

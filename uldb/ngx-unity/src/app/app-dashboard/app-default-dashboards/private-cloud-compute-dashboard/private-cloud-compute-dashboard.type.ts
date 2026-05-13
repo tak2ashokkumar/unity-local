@@ -21,31 +21,40 @@ export interface labelAndValueType {
   label: string;
 }
 
+export interface FiltersCriteriaType {
+  platforms: string[];
+  datacenters: string[];
+  accounts: string[];
+  environments: string[];
+}
+
+//------Executive Summary-------------
 
 export interface ExecutiveSummaryWidgetType {
-  executiveSummary: ExecutiveSummaryItem;
   cloudTypeDistribution: CloudTypeDistributionItem[];
-  powerActivityState: PowerActivityStateItem[];
-  vmCountByOSType: VmCountByOSTypeItem[];
-  environmentCriticality: EnvironmentCriticalityItem[];
+  executiveSummary: ExecutiveSummaryItem;
   alertsSeverity: AlertsSeverityItem;
-  filters: Filters;
+  environmentCriticality: EnvironmentCriticalityItem[];
+  vmCountByOSType: VmCountByOSTypeItem[];
+  powerActivityState: PowerActivityStateItem[];
 }
 export interface ExecutiveSummaryItem {
   totalVMs: number;
   physicalHosts: number;
-  clusters: number;
+  idleVMs: number;
   poweredOnVMs: number;
   poweredOffVMs: number;
+  clusters: number;
+  orphanedVMs: number;
 }
 export interface CloudTypeDistributionItem {
-  type: string;
-  percentage: number;
   count: number;
+  percentage: number;
+  type: string;
 }
 export interface PowerActivityStateItem {
-  state: string;
   count: number;
+  state: string;
   percentage: number;
 }
 export interface VmCountByOSTypeItem {
@@ -59,11 +68,22 @@ export interface EnvironmentCriticalityItem {
   percentage: number;
 }
 export interface AlertsSeverityItem {
-  critical: number;
-  warning: number;
   info: number;
   total: number;
+  critical: number;
+  warning: number;
 }
+
+export interface Top10ClustersByVMsData {
+  topClustersByVMCount: TopClustersByVMCountItem[];
+}
+export interface TopClustersByVMCountItem {
+  clusterName: string;
+  vmCount: number;
+  hostCount: number;
+  datastoreCount: number;
+}
+
 
 
 
@@ -87,10 +107,11 @@ export interface ProvisioningStatus {
   decommissioned: number;
 }
 
-
-//
-
-//
+export interface ClusterCapacityUtilTrendData {
+  cpuUtilizationTrend: number[];
+  months: string[];
+  memoryUtilizationTrend: number[];
+}
 
 
 //Infrastucture Health Status
@@ -155,79 +176,31 @@ export interface CapacityRiskAlert {
   color: string;
 }
 
-//Auto remediation
-export interface AutoRemediationDataType {
-  executionSummary: ExecutionSummaryItem;
-  topActions: TopActionsItem[];
-}
-export interface ExecutionSummaryItem {
-  successfulPercentage: number;
-  failedPercentage: number;
-  totalRuns: number;
-  avgDuration: number;
-}
-export interface TopActionsItem {
-  actionName: string;
-  executionCount: number;
-}
 
 //Alert and Events
 
 //Original JSON structure
-
-export interface AlertsEventsView {
+export interface RecentAlerts {
+  recentAlerts: RecentAlertsItem[];
   alertSummary: AlertSummary;
-  topCriticalAlerts: TopCriticalAlertsItem[];
-  filters: Filters;
 }
-
-export interface AlertSummary {
-  criticalAlerts: number;
-  highAlerts: number;
-  openITSMTickets: number;
-  automationSuccess: string;
-  avgMTTR: string;
-}
-export interface TopCriticalAlertsItem {
-  id: number;
+export interface RecentAlertsItem {
+  status: string;
   deviceName: string;
   severity: string;
-  description: string;
   source: string;
+  dateTime: string;
   acknowledged: string;
-  duration: string;
+  id: number;
+  description: string;
+}
+export interface AlertSummary {
+  total: number;
+  information: number;
+  critical: number;
+  warning: number;
 }
 
-
-//-------ORIGINAL ITSM TICKETS-----------------
-export interface ITSMTicketView {
-  ticketsByPriority: TicketsByPriority;
-  ticketsByStatus: TicketsByStatus;
-  tickets: TicketsItem[];
-  // filters: Filters;
-}
-export interface TicketsByPriority {
-  High: number;
-  Moderate: number;
-  Low: number;
-  Critical: number;
-  Planning: number;
-}
-export interface TicketsByStatus {
-  Resolved: number;
-  Open: number;
-  Closed: number;
-  'In Progress': number;
-}
-export interface TicketsItem {
-  ticketId: string;
-  shortDescription: string;
-  state: string;
-  priority: string;
-  createdOn: string;
-  updatedOn: string;
-  resolution: string;
-}
 
 
 
@@ -265,6 +238,8 @@ export interface DiskIOPS {
 
 
 //--------------------------------------------
+
+
 
 //Need to integarte original model
 
@@ -375,33 +350,50 @@ export interface PrivateCloudTicketRow {
 }
 
 
-export interface AlertTrends {
-  summary: Summary;
-  rawEvents: RawEvents;
-  noiseReduction: NoiseReduction;
-  firstResponse: FirstResponse;
+
+export interface OrphanedDevice {
+  name: string;
+  status: string;
+  lastSeen: string;
+  datacenter: string;
 }
-export interface Summary {
-  rawEvents: number;
-  alerts: number;
-  conditions: number;
-}
-export interface RawEvents {
-  total: number;
-  critical: number;
-  warning: number;
-  informative: number;
-}
-export interface NoiseReduction {
+
+export interface OrphanedCategory {
+  category: string;
+  count: number;
   percentage: number;
-  dedupeEvents: number;
-  suppressedEvents: number;
-  correlated: number;
 }
-export interface FirstResponse {
-  percentage: number;
-  autoCloned: number;
-  ticketCreated: number;
-  autoClosed: number;
+
+export interface OrphanedResourcesResponse {
+  orphanedDeviceList: OrphanedDevice[];
+  orphanedByCategory: OrphanedCategory[];
+  totalOrphaned: number;
 }
+
+export interface IdleDevices {
+  idleDeviceList: IdleDeviceListItem[];
+  idleDurationDistribution: IdleDurationDistributionItem[];
+}
+export interface IdleDeviceListItem {
+  deviceName: string;
+  resourceType: string;
+  avgCpu: AvgCpu;
+  avgMem: AvgMem;
+  networkIO: string;
+  idleDuration: string;
+  status: string;
+}
+export interface AvgCpu {
+  used: number;
+  free: number;
+}
+export interface AvgMem {
+  used: number;
+  free: number;
+}
+export interface IdleDurationDistributionItem {
+  duration: string;
+  count: number;
+}
+
 

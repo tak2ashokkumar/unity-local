@@ -3,9 +3,10 @@ import {
   DatabaseDashboardBarItem,
   DatabaseDashboardCapacityMetric,
   DatabaseDashboardCriticalAlert,
+  DatabaseDashboardCriticalAlertViewData,
   DatabaseDashboardDonutItem,
   DatabaseDashboardFilterOption,
-  DatabaseDashboardHealthGroup,
+  DbDashboardHealthGroup,
   DatabaseDashboardMetric,
   DatabaseDashboardStorageRow,
   DatabaseDashboardTagItem,
@@ -325,7 +326,7 @@ export const DATABASE_DASHBOARD_DISK_UTILIZATION: DatabaseDashboardBarItem[] = [
   { name: 'DB-SRV-10', value: 44, label: '44%', color: '#2f8bd7' }
 ];
 
-export const DATABASE_DASHBOARD_HEALTH_GROUPS: DatabaseDashboardHealthGroup[] = [
+export const DATABASE_DASHBOARD_HEALTH_GROUPS: DbDashboardHealthGroup[] = [
   {
     title: 'Database Availability Status',
     metrics: [
@@ -349,23 +350,23 @@ export const DATABASE_DASHBOARD_HEALTH_GROUPS: DatabaseDashboardHealthGroup[] = 
   }
 ];
 
-export const DATABASE_DASHBOARD_ALERT_SUMMARY: DatabaseDashboardAlertSummaryMetric[] = [
-  { label: 'Critical Alerts', value: '24', tone: 'danger' },
-  { label: 'High Alerts', value: '67', tone: 'warning' },
-  { label: 'Open ITSM Tickets', value: '14', tone: 'primary' },
-  { label: 'Automation Success', value: '91%', tone: 'success' },
-  { label: 'Avg MTTR', value: '3.2h', tone: 'muted' }
+export const DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG: DatabaseDashboardAlertSummaryMetric[] = [
+  { key: 'critical_alerts', label: 'Critical Alerts', value: '24', tone: 'danger' },
+  { key: 'high_alerts', label: 'High Alerts', value: '67', tone: 'warning' },
+  { key: 'open_itsm_tickets', label: 'Open ITSM Tickets', value: '14', tone: 'primary' },
+  { key: 'automation_success_pct', label: 'Automation Success', value: '91', tone: 'success', suffix: '%' },
+  { key: 'avg_mttr', label: 'Avg MTTR', value: '3.2', tone: 'muted', suffix: 'h' }
 ];
 
-export const DATABASE_DASHBOARD_CRITICAL_ALERTS: DatabaseDashboardCriticalAlert[] = [
-  { id: '1744', deviceName: 'UL_Switch_Disk', severity: 'critical', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'Yes', duration: '34s' },
-  { id: '1746', deviceName: 'UL_Switch_Test', severity: 'critical', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'No', duration: '36s' },
-  { id: '2319', deviceName: 'UL_Firewall_Test', severity: 'critical', description: 'High bandwidth usage...', source: 'Unity', acknowledged: 'No', duration: '39s' },
-  { id: '6664', deviceName: 'UL_Switch_AT', severity: 'high', description: 'Device has been repla...', source: 'Zabbix', acknowledged: 'Yes', duration: '01m' },
-  { id: '9956', deviceName: 'UL_LoadBalancer_09', severity: 'high', description: 'System name has bee...', source: 'Nagios', acknowledged: 'No', duration: '02m 44s' },
-  { id: '1470', deviceName: 'UL_Router_AT', severity: 'high', description: 'Device has been repla...', source: 'Unity', acknowledged: 'Yes', duration: '08m 56s' },
-  { id: '7452', deviceName: 'UL_LoadBalancer_04', severity: 'critical', description: 'Interface Link down...', source: 'Nagios', acknowledged: 'Yes', duration: '10m 15s' },
-  { id: '2354', deviceName: 'UL_Switch_BT', severity: 'high', description: 'Interface : High error...', source: 'Unity', acknowledged: 'No', duration: '20m 13s' },
-  { id: '0996', deviceName: 'UL_Firewall_007', severity: 'critical', description: 'Unavailable by ICMP...', source: 'Nagios', acknowledged: 'No', duration: '01h 09m' },
-  { id: '0994', deviceName: 'UL_Firewall_007', severity: 'critical', description: 'Unavailable by ICMP...', source: 'Zabbix', acknowledged: 'Yes', duration: '01h 09m' }
+export const DATABASE_DASHBOARD_CRITICAL_ALERTS: DatabaseDashboardCriticalAlertViewData[] = [
+  { id: '1744', deviceName: 'UL_Switch_Disk', severity: 'Critical', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'Yes', duration: '34s' },
+  { id: '1746', deviceName: 'UL_Switch_Test', severity: 'Warning', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'No', duration: '36s' },
+  { id: '2319', deviceName: 'UL_Firewall_Test', severity: 'Critical', description: 'High bandwidth usage...', source: 'Unity', acknowledged: 'No', duration: '39s' },
+  { id: '6664', deviceName: 'UL_Switch_AT', severity: 'Info', description: 'Device has been repla...', source: 'Zabbix', acknowledged: 'Yes', duration: '01m' },
+  { id: '9956', deviceName: 'UL_LoadBalancer_09', severity: 'Warning', description: 'System name has bee...', source: 'Nagios', acknowledged: 'No', duration: '02m 44s' },
+  { id: '1470', deviceName: 'UL_Router_AT', severity: 'Info', description: 'Device has been repla...', source: 'Unity', acknowledged: 'Yes', duration: '08m 56s' },
+  { id: '7452', deviceName: 'UL_LoadBalancer_04', severity: 'Critical', description: 'Interface Link down...', source: 'Nagios', acknowledged: 'Yes', duration: '10m 15s' },
+  { id: '2354', deviceName: 'UL_Switch_BT', severity: 'Info', description: 'Interface : High error...', source: 'Unity', acknowledged: 'No', duration: '20m 13s' },
+  { id: '0996', deviceName: 'UL_Firewall_007', severity: 'Critical', description: 'Unavailable by ICMP...', source: 'Nagios', acknowledged: 'No', duration: '01h 09m' },
+  { id: '0994', deviceName: 'UL_Firewall_007', severity: 'Warning', description: 'Unavailable by ICMP...', source: 'Zabbix', acknowledged: 'Yes', duration: '01h 09m' }
 ];

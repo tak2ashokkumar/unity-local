@@ -2,17 +2,17 @@
     <div class="dashboard-topbar">
         <div>
             <div class="dashboard-title">Database Dashboard</div>
-            <div class="dashboard-subtitle">Refreshed: Today 10:00 IST | Scope: {{scopeText}}</div>
+            <div class="dashboard-subtitle">Refreshed: {{refreshedText}} | Scope: {{scopeText}}</div>
         </div>
-        <div class="dashboard-filters filter-loading-surface" *ngIf="!filterForm">
+        <!-- <div class="dashboard-filters filter-loading-surface" *ngIf="!filterForm">
             <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
-        </div>
+        </div> -->
         <form class="dashboard-filters" *ngIf="filterForm" [formGroup]="filterForm">
-            <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
+            <!-- <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner> -->
             <div class="filter-control multi-filter-control">
                 <label>Database</label>
                 <multiselect-dropdown [options]="databaseOptions" [settings]="multiselectSettings"
-                    [texts]="multiselectTexts" class="form-control p-0 dashboard-multiselect"
+                    [texts]="multiselectTexts" class="form-control form-control-sm p-0 dashboard-multiselect"
                     formControlName="databases">
                 </multiselect-dropdown>
             </div>
@@ -32,136 +32,141 @@
 
     <div class="dashboard-content" *ngIf="filterForm">
         <div class="section-title">Database Estate / Inventory Overview</div>
-        <div class="dashboard-card inventory-card">
-            <div class="summary-metrics">
-                <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
-                <div class="summary-metric"
-                    *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex">
-                    <div class="metric-label">{{metric.label}}</div>
-                    <div class="metric-value" [ngClass]="{'metric-primary': first}">{{metric.value}}</div>
+        <div class="card bg-white px-2">
+            <div class="row justify-content-center align-items-center py-2">
+                <div class="col-6">
+                    <div class="p-0 m-0">
+                        <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
+                        <div class="summary-metrics">
+                            <div class="summary-metric"
+                                *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex">
+                                <div class="metric-label">{{metric.label}}</div>
+                                <div class="metric-value" [ngClass]="{'metric-primary': first}">{{metric.value}}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="inventory-grid">
-                <div class="inventory-widget cloud-type-widget">
-                    <app-spinner [name]="loaderNames.cloudTypeDistribution" [width]="0"></app-spinner>
-                    <div class="widget-title">Cloud Type Distribution</div>
-                    <div echarts [options]="cloudTypeDistributionOptions" class="cloud-type-chart"></div>
-                    <div class="cloud-type-legend">
-                        <span class="legend-item" *ngFor="let item of cloudTypeDistribution; trackBy: trackByIndex">
-                            <span class="legend-dot" [style.background]="item.color"></span>
-                            {{item.name}} {{item.value}}%
-                        </span>
+            <div class="row align-items-center pb-2">
+                <div class="col inventory-grid equalize-card">
+                    <div class="inventory-widget cloud-type-widget">
+                        <app-spinner [name]="loaderNames.cloudTypeDistribution" [width]="0"></app-spinner>
+                        <div class="widget-title">Cloud Type Distribution</div>
+                        <div echarts [options]="cloudTypeDistributionOptions" class="cloud-type-chart"></div>
+                        <div class="cloud-type-legend">
+                            <span class="legend-item" *ngFor="let item of cloudTypeDistribution; trackBy: trackByIndex">
+                                <span class="legend-dot" [style.background]="item.color"></span>
+                                {{item.name}} {{item.value}}%
+                            </span>
+                        </div>
                     </div>
-                </div>
-                <div class="inventory-widget platform-widget">
-                    <app-spinner [name]="loaderNames.platformCounts" [width]="0"></app-spinner>
-                    <div class="widget-title">DB Count by Platform / Technology</div>
-                    <div echarts [options]="dbCountByPlatformOptions" class="platform-chart"></div>
-                    <div class="state-legend">
-                        <span><span class="legend-dot bg-active"></span>On / Active</span>
-                        <span><span class="legend-dot bg-idle"></span>Off / Idle</span>
+                    <div class="inventory-widget platform-widget">
+                        <app-spinner [name]="loaderNames.platformCounts" [width]="0"></app-spinner>
+                        <div class="widget-title">DB Count by Platform / Technology</div>
+                        <div echarts [options]="dbCountByPlatformOptions" class="platform-chart"></div>
+                        <div class="state-legend">
+                            <span><span class="legend-dot bg-active"></span>On / Active</span>
+                            <span><span class="legend-dot bg-idle"></span>Off / Idle</span>
+                        </div>
                     </div>
-                </div>
-                <div class="inventory-widget environment-widget">
-                    <app-spinner [name]="loaderNames.environmentCounts" [width]="0"></app-spinner>
-                    <app-spinner [name]="loaderNames.tags" [width]="0"></app-spinner>
-                    <div class="widget-title">DB by Environment &amp; Business Service</div>
-                    <div echarts [options]="dbByEnvironmentOptions" class="environment-chart"></div>
-                    <div class="tags-title">Tags</div>
-                    <div class="tag-list">
-                        <span class="tag-chip" *ngFor="let tag of tags; trackBy: trackByIndex"
-                            [style.color]="tag.textColor" [style.background]="tag.backgroundColor">
-                            {{tag.name}} {{tag.count}}
-                        </span>
+                    <div class="inventory-widget environment-widget">
+                        <div class="col p-0 m-0">
+                            <app-spinner [name]="loaderNames.environmentCounts" [width]="0"></app-spinner>
+                            <div class="widget-title">DB by Environment &amp; Business Service</div>
+                            <div echarts [options]="dbByEnvironmentOptions" class="environment-chart"></div>
+                        </div>
+                        <div class="col p-0 m-0">
+                            <app-spinner [name]="loaderNames.tags" [width]="0"></app-spinner>
+                            <div class="tags-title">Tags</div>
+                            <div class="tag-list">
+                                <span class="tag-chip" *ngFor="let tag of tags; trackBy: trackByIndex" [style.color]="tag.textColor"
+                                    [style.background]="tag.backgroundColor">
+                                    {{tag.name}} {{tag.count}}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="inventory-widget version-widget">
-                    <app-spinner [name]="loaderNames.databaseVersions" [width]="0"></app-spinner>
-                    <div class="widget-title text-left">Database Version</div>
-                    <div class="version-row" *ngFor="let version of databaseVersions; trackBy: trackByIndex">
-                        <span>{{version.name}}</span>
-                        <strong>{{version.count}}</strong>
+                    <div class="inventory-widget version-widget">
+                        <app-spinner [name]="loaderNames.databaseVersions" [width]="0"></app-spinner>
+                        <div class="widget-title text-left">Database Version</div>
+                        <div class="version-row" *ngFor="let version of databaseVersions; trackBy: trackByIndex">
+                            <span>{{version.name}}</span>
+                            <strong>{{version.count}}</strong>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="section-title mt-3">Performance / Workload Insights</div>
-        <div class="dashboard-card performance-card">
-            <app-spinner [name]="loaderNames.utilization" [width]="0"></app-spinner>
-            <div class="card-title-center">Top 10 Utilization</div>
-            <div class="table-responsive">
-                <table class="table table-sm utilization-table mb-0">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>CPU Utilization</th>
-                            <th>Memory Utilization</th>
-                            <th>Storage Utilization</th>
-                            <th>Disk IOPS</th>
-                            <th>Up Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let row of utilizationRows; trackBy: trackByIndex">
-                            <td><button type="button" class="btn btn-link p-0 table-link">{{row.name}}</button></td>
-                            <td>
-                                <div class="sparkline-cell">
-                                    <div echarts [options]="row.cpuChartOptions" class="sparkline-chart"></div>
-                                    <span class="status-badge"
-                                        [ngClass]="getStatusClass(row.cpuTone)">{{row.cpuStatus}}%</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="sparkline-cell">
-                                    <div echarts [options]="row.memoryChartOptions" class="sparkline-chart"></div>
-                                    <span class="status-badge"
-                                        [ngClass]="getStatusClass(row.memoryTone)">{{row.memoryStatus}}%</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="capacity-line">Capacity: {{row.storage.capacity}}</div>
-                                <div class="progress-track">
-                                    <div class="progress-fill" [ngClass]="getStatusClass(row.storage.tone)"
-                                        [style.width.%]="row.storage.percent"></div>
-                                </div>
-                                <div class="storage-meta">
-                                    <span>Used: {{row.storage.used}}</span>
-                                    <span>Free: {{row.storage.free}}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="iops-cell">
-                                    <div class="progress-track">
-                                        <div class="progress-fill" [ngClass]="getStatusClass(row.diskIops.tone)"
-                                            [style.width.%]="row.diskIops.percent"></div>
+        <div class="card bg-white px-2">
+            <div class="font-500 font-md text-center pt-1 pb-2">Top 10 Utilization</div>
+            <div class="col-12 p-0">
+                <app-spinner [name]="loaderNames.utilization" [width]="0"></app-spinner>
+                <div class="table-responsive">
+                    <table class="table table-sm utilization-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>CPU Utilization</th>
+                                <th>Memory Utilization</th>
+                                <th>Storage Utilization</th>
+                                <th>Disk IOPS</th>
+                                <th>Up Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let row of utilizationRows; trackBy: trackByIndex">
+                                <td><button type="button" class="btn btn-link p-0 table-link">{{row.name}}</button></td>
+                                <td>
+                                    <div class="sparkline-cell">
+                                        <div echarts [options]="row.cpuChartOptions" class="sparkline-chart"></div>
+                                        <span class="status-badge"
+                                            [ngClass]="getStatusClass(row.cpuTone)">{{row.cpuStatus}}%</span>
                                     </div>
-                                    <span>{{row.diskIops.label}}</span>
-                                </div>
-                            </td>
-                            <td class="uptime-cell">{{row.upTime}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="table-footer">
-                <div class="show-control">
-                    <span>Show</span>
-                    <select class="form-control form-control-sm">
-                        <option>10</option>
-                    </select>
+                                </td>
+                                <td>
+                                    <div class="sparkline-cell">
+                                        <div echarts [options]="row.memoryChartOptions" class="sparkline-chart"></div>
+                                        <span class="status-badge"
+                                            [ngClass]="getStatusClass(row.memoryTone)">{{row.memoryStatus}}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="capacity-line">Capacity: {{row.storage.capacity}}</div>
+                                    <div class="progress-track">
+                                        <div class="progress-fill" [ngClass]="getStatusClass(row.storage.tone)"
+                                            [style.width.%]="row.storage.percent"></div>
+                                    </div>
+                                    <div class="storage-meta">
+                                        <span>Used: {{row.storage.used}}</span>
+                                        <span>Free: {{row.storage.free}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="iops-cell">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" [ngClass]="getStatusClass(row.diskIops.tone)"
+                                                [style.width.%]="row.diskIops.percent"></div>
+                                        </div>
+                                        <span>{{row.diskIops.label}}</span>
+                                    </div>
+                                </td>
+                                <td class="uptime-cell">{{row.upTime}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- <table-entries [pageNo]="currentCriteriaForUtilization.pageNo"
+                        [pageSize]="currentCriteriaForUtilization.pageSize" [totalCount]="utilizationCount">
+                    </table-entries>
+                    <table-page-size [currentPageSize]="currentCriteriaForUtilization.pageSize" [totalCount]="utilizationCount"
+                        (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                    <table-pager *ngIf="utilizationRows.length" [pageNo]="currentCriteriaForUtilization.pageNo"
+                        [pageSize]="currentCriteriaForUtilization.pageSize" [totalCount]="utilizationCount"
+                        (pageChange)="pageChange($event)"></table-pager> -->
+                    <div class="text-center text-muted py-4" *ngIf="!utilizationRows.length">No records to display</div>
                 </div>
-                <div class="pagination-control">
-                    <button type="button"><i class="fa fa-chevron-left"></i></button>
-                    <button type="button" class="active">1</button>
-                    <button type="button">2</button>
-                    <button type="button">3</button>
-                    <button type="button">4</button>
-                    <button type="button"><i class="fa fa-chevron-right"></i></button>
-                </div>
             </div>
-
             <div class="workload-grid">
                 <div class="chart-widget">
                     <app-spinner [name]="loaderNames.queryResponse" [width]="0"></app-spinner>
@@ -197,52 +202,61 @@
         </div>
 
         <div class="section-title mt-3">Capacity / growth Insights</div>
-        <div class="dashboard-card capacity-card">
-            <app-spinner [name]="loaderNames.capacityMetrics" [width]="0"></app-spinner>
-            <app-spinner [name]="loaderNames.storageRows" [width]="0"></app-spinner>
-            <div class="widget-title mb-2">Database Storage Growth Trend (TB)</div>
-            <div class="capacity-top-grid">
-                <div>
-                    <div class="capacity-metrics">
-                        <div class="capacity-metric" *ngFor="let metric of capacityMetrics; trackBy: trackByIndex">
-                            <div>{{metric.label}}</div>
-                            <strong>{{metric.value}}</strong>
-                            <span>{{metric.helper}}</span>
+        <div class="card bg-white px-2">
+            <div class="row justify-content-start align-items-center">
+                <div class="col-6">
+                    <div class="col p-0 m-0">
+                        <app-spinner [name]="loaderNames.capacityMetrics" [width]="0"></app-spinner>
+                        <div class="subsection-title text-center">Database Storage Growth Trend (TB)</div>
+                        <div class="capacity-metrics">
+                            <div class="capacity-metric" *ngFor="let metric of capacityMetrics; trackBy: trackByIndex">
+                                <div>{{metric.label}}</div>
+                                <strong>{{metric.value}}</strong>
+                                <span>{{metric.helper}}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="subsection-title text-center">Top 10 Servers</div>
-                    <div class="table-responsive">
-                        <table class="table table-sm storage-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>SERVER</th>
-                                    <th>USED %</th>
-                                    <th>FREE (GB)</th>
-                                    <th>DB SIZE (GB)</th>
-                                    <th>LOG SIZE (GB)</th>
-                                    <th>LOG GROWTH (GB/DAY)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of storageRows; trackBy: trackByIndex">
-                                    <td>{{row.server}}</td>
-                                    <td>{{row.used}}</td>
-                                    <td>{{row.free}}</td>
-                                    <td>{{row.dbSize}}</td>
-                                    <td>{{row.logSize}}</td>
-                                    <td>{{row.logGrowth}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="chart-widget">
-                    <app-spinner [name]="loaderNames.tablespaceUsage" [width]="0"></app-spinner>
-                    <div class="widget-title">Top 10 Tablespace / Filesystem Usage</div>
-                    <div echarts [options]="tablespaceUsageOptions" class="tablespace-chart"></div>
                 </div>
             </div>
-
+            <div class="row align-items-center">
+                <div class="col-6">
+                    <div class="col p-0 m-0">
+                        <app-spinner [name]="loaderNames.storageRows" [width]="0"></app-spinner>
+                        <div class="subsection-title text-center">Top 10 Servers</div>
+                        <div class="table-responsive">
+                            <table class="table table-sm storage-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>SERVER</th>
+                                        <th>USED %</th>
+                                        <th>FREE (GB)</th>
+                                        <th>DB SIZE (GB)</th>
+                                        <th>LOG SIZE (GB)</th>
+                                        <th>LOG GROWTH (GB/DAY)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let row of storageRows; trackBy: trackByIndex">
+                                        <td>{{row.server}}</td>
+                                        <td>{{row.used}}</td>
+                                        <td>{{row.free}}</td>
+                                        <td>{{row.dbSize}}</td>
+                                        <td>{{row.logSize}}</td>
+                                        <td>{{row.logGrowth}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="chart-widget">
+                        <app-spinner [name]="loaderNames.tablespaceUsage" [width]="0"></app-spinner>
+                        <div class="widget-title">Top 10 Tablespace / Filesystem Usage</div>
+                        <div echarts [options]="tablespaceUsageOptions" class="tablespace-chart"></div>
+                    </div>
+                </div>
+            </div>
             <div class="capacity-chart-grid">
                 <div class="chart-widget">
                     <app-spinner [name]="loaderNames.storageGrowth" [width]="0"></app-spinner>
@@ -278,58 +292,163 @@
         </div>
 
         <div class="section-title mt-3">Availability / Health Overview</div>
-        <div class="dashboard-card health-card">
-            <app-spinner [name]="loaderNames.healthGroups" [width]="0"></app-spinner>
-            <div class="health-group" *ngFor="let group of healthGroups; trackBy: trackByIndex">
-                <div class="widget-title">{{group.title}}</div>
-                <div class="health-subtitle" *ngIf="group.subtitle">{{group.subtitle}}</div>
-                <div class="health-row" *ngFor="let metric of group.metrics; trackBy: trackByIndex">
-                    <span>
-                        <span class="health-dot" [ngClass]="getStatusClass(metric.tone)"></span>
-                        {{metric.label}}
-                    </span>
-                    <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+        <div class="card bg-white px-2">
+            <!-- <div class="row">
+                <app-spinner [name]="loaderNames.healthGroups" [width]="0"></app-spinner>
+                <div class="col-12 d-flex justify-content-around">
+                    <div class="col-5 health-group px-3 py-2" *ngFor="let group of healthGroups; trackBy: trackByIndex">
+                        <div class="widget-title">{{group.title}}</div>
+                        <div class="health-subtitle" *ngIf="group.subtitle">{{group.subtitle}}</div>
+                        <div class="health-row" *ngFor="let metric of group.metrics; trackBy: trackByIndex">
+                            <span>
+                                <span class="health-dot" [ngClass]="getStatusClass(metric.tone)"></span>
+                                {{metric.label}}
+                            </span>
+                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <div class="row">
+                <app-spinner [name]="loaderNames.healthGroups" [width]="0"></app-spinner>
+                <div class="col-12 d-flex justify-content-around">
+                    <div class="col-5 health-group px-3 py-2">
+                        <div class="widget-title">Database Availability Status</div>
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-success'"></span>
+                                Available / online
+                            </span>
+                            <strong [ngClass]="'tone-success'">{{databaseAvailabilityStatus?.online}}</strong>
+                        </div>   
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-warning'"></span>
+                                Degraded performance
+                            </span>
+                            <strong [ngClass]="'tone-warning'">{{databaseAvailabilityStatus?.degraded}}</strong>
+                        </div> 
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-danger'"></span>
+                                Unreachable / down
+                            </span>
+                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.unreachable}}</strong>
+                        </div> 
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-danger'"></span>
+                                Maintenance mode
+                            </span>
+                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.maintenance}}</strong>
+                        </div> 
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-danger'"></span>
+                                Inactive / dormant
+                            </span>
+                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.inactive}}</strong>
+                        </div>
+                    </div>
+                    <div class="col-5 health-group px-3 py-2">
+                        <div class="widget-title">Replication / Sync & Failover Status</div>
+                        <div class="health-subtitle">Replication health</div>
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-success'"></span>
+                                Sync healthy
+                            </span>
+                            <strong [ngClass]="'tone-success'">{{replicationSync?.syncHealthy}}</strong>
+                        </div>
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-warning'"></span>
+                                Lag >30s
+                            </span>
+                            <strong [ngClass]="'tone-warning'">{{replicationSync?.lagOver30s}}</strong>
+                        </div>
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-danger'"></span>
+                                Deadlocks
+                            </span>
+                            <strong [ngClass]="'tone-danger'">{{replicationSync?.deadlocks}}</strong>
+                        </div>
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-success'"></span>
+                                Errors per second
+                            </span>
+                            <strong [ngClass]="'tone-success'">{{replicationSync?.errorsPerSecond}}</strong>
+                        </div>
+                        <div class="health-row">
+                            <span>
+                                <span class="health-dot" [ngClass]="'tone-success'"></span>
+                                Connection Errors
+                            </span>
+                            <strong [ngClass]="'tone-success'">{{replicationSync?.connectionErrors}}</strong>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="section-title mt-3">Alert &amp; Events View</div>
-        <div class="dashboard-card alert-card">
-            <app-spinner [name]="loaderNames.alertSummary" [width]="0"></app-spinner>
-            <app-spinner [name]="loaderNames.criticalAlerts" [width]="0"></app-spinner>
-            <div class="alert-summary">
-                <div class="alert-summary-metric" *ngFor="let metric of alertSummaryMetrics; trackBy: trackByIndex">
-                    <div>{{metric.label}}</div>
-                    <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+        <div class="section-title mt-3">Alert & Events View</div>
+        <div class="card bg-white px-2 mb-0">
+            <app-spinner [name]="loaderNames.healthGroups" [width]="0"></app-spinner>
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <!-- <app-spinner [name]="loaderNames.alertSummary" [width]="0"></app-spinner> -->
+                    <div class="d-flex justify-content-center p-3" [width]="0">
+                        <div class="alert-summary-metric" *ngFor="let metric of alertSummaryMetrics; trackBy: trackByIndex">
+                            <div>{{metric.label}}</div>
+                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="subsection-title">Top 10 Critical Alerts</div>
-            <div class="table-responsive">
-                <table class="table table-sm alert-table mb-0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Device Name</th>
-                            <th>Severity</th>
-                            <th>Description</th>
-                            <th>Source</th>
-                            <th>Acknowledged</th>
-                            <th>Duration</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let alert of criticalAlerts; trackBy: trackByIndex">
-                            <td><button type="button" class="btn btn-link p-0 table-link">{{alert.id}}</button></td>
-                            <td>{{alert.deviceName}}</td>
-                            <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td>
-                            <td>{{alert.description}}</td>
-                            <td>{{alert.source}}</td>
-                            <td>{{alert.acknowledged}}</td>
-                            <td>{{alert.duration}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="row">
+                <div class="col-12">
+                    <div class="subsection-title">Top 10 Critical Alerts</div>
+                    <div class="card border-0">
+                        <app-spinner [name]="loaderNames.alertAndEvents" [width]="0"></app-spinner>
+                        <div class="table-responsive">
+                            <table class="table table-sm alert-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Device Name</th>
+                                        <th>Severity</th>
+                                        <th>Description</th>
+                                        <th>Source</th>
+                                        <th>Acknowledged</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let alert of criticalAlerts; trackBy: trackByIndex">
+                                        <td><button type="button" class="btn btn-link p-0 table-link">{{alert.id}}</button></td>
+                                        <td>{{alert.deviceName}}</td>
+                                        <!-- <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td> -->
+                                        <td>
+                                            <div class="text-center">
+                                                <i class="fa status-icon" [ngClass]="alert.severityIcon" [tooltip]="alert.severity" container="body"></i>
+                                            </div>
+                                        </td>
+                                        <td>{{alert.description}}</td>
+                                        <td>{{alert.source}}</td>
+                                        <td>{{alert.acknowledged}}</td>
+                                        <td>{{alert.duration}}</td>
+                                    </tr>
+                                    <tr></tr>
+                                </tbody>
+                            </table>
+                            <div *ngIf="!criticalAlerts.length" class="d-flex h-100 justify-content-center align-items-center">
+                                No alerts available.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

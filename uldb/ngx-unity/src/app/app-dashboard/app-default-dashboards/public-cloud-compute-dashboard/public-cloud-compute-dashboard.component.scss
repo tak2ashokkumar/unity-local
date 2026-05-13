@@ -121,7 +121,7 @@
   pointer-events: none;
 }
 
-:host ::ng-deep .public-cloud-compute-dashboard app-spinner .wave-spinner > div {
+:host ::ng-deep .public-cloud-compute-dashboard app-spinner .wave-spinner>div {
   background-color: #ff8900 !important;
 }
 
@@ -617,6 +617,7 @@
 }
 
 .alert-table {
+
   th,
   td {
     text-align: left;
@@ -982,6 +983,7 @@
 }
 
 @media (max-width: 1200px) {
+
   .inventory-grid,
   .insight-card,
   .alert-trend-grid,

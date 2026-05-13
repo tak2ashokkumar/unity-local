@@ -26,7 +26,6 @@ import { AdvancedDiscoveryConnectivityCrudComponent } from './advanced-discovery
 import { AdvancedDiscoveryConnectivityCrudService } from './advanced-discovery-connectivity/advanced-discovery-connectivity-crud/advanced-discovery-connectivity-crud.service';
 import { AdvancedDiscoveryConnectivityComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity.component';
 import { AdvancedDiscoveryConnectivityService } from './advanced-discovery-connectivity/advanced-discovery-connectivity.service';
-import { AdvancedDiscoveryConnectivityRequestComponent } from './advanced-discovery-connectivity/advanced-discovery-connectivity-request/advanced-discovery-connectivity-request.component';
 import { ExcelOnBoardFilesComponent } from './excel-on-boarding/excel-on-board-files/excel-on-board-files.component';
 import { ExcelOnBoardingInventoryComponent } from './excel-on-boarding/excel-on-board-inventory/excel-on-boarding-inventory.component';
 import { ExcelOnBoardingBmsComponent } from './excel-on-boarding/excel-on-boarding-bms/excel-on-boarding-bms.component';
@@ -144,7 +143,6 @@ import { UnitySetupOnBoardingComponent } from './unity-setup-on-boarding.compone
     AdvancedDiscoverySummaryNetworkViewComponent,
     ExcelOnBoardingDatabaseComponent,
     AdvancedDiscoveryConnectivityCrudComponent,
-    AdvancedDiscoveryConnectivityRequestComponent,
     AdvancedDiscoveryPolicyCrudComponent,
   ],
   imports: [

@@ -15,10 +15,6 @@ export interface DeviceDiscoveryAgentConfigurationType {
     updated_at: string;
     customer: number;
     test_result: ConnectionTestResult;
-    cert_ttl?: number | string;
-    cert_valid?: string | boolean;
-    cert_status?: string;
-    cert_expiry?: string;
 }
 
 export interface ConnectionTestResult {
