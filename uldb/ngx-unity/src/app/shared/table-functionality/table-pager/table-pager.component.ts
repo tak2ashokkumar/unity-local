@@ -24,6 +24,7 @@ export class TablePagerComponent implements OnInit {
   @Input('pageNo') pageNo: number = 0;
   @Input('pageSize') pageSize: number = 0;
   @Input('minPager') minPager?: boolean = false;
+  @Input('compact') compact: boolean = false;
   @Output() pageChange: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() {
@@ -84,6 +85,16 @@ export class TablePagerComponent implements OnInit {
   getPages(currentPage: number, totalPages: number) {
     let pages = [];
     let startPage: number = 1, endPage: number = totalPages;
+    if (this.compact) {
+      const maxVisiblePages = 4;
+      startPage = Math.min(Math.max(currentPage - 1, 1), Math.max(totalPages - maxVisiblePages + 1, 1));
+      endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+      for (let num = startPage; num <= endPage; num++) {
+        let page = this.makePage(num, num.toString(), num === currentPage);
+        pages.push(page);
+      }
+      return pages;
+    }
     if (this.minPager) {
       startPage = this.pageNo > startPage ? this.pageNo - startPage : this.pageNo;
       endPage = this.pageNo < endPage ? this.pageNo + 1 : this.pageNo;

@@ -4,75 +4,69 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { EChartsOption } from 'echarts';
 import * as moment from 'moment';
 import { Observable, of } from 'rxjs';
-import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import {
   PUBLIC_CLOUD_ACCOUNT_OPTIONS,
-  PUBLIC_CLOUD_AIOPS_DETAILS_ENDPOINT,
-  PUBLIC_CLOUD_ALERT_SIDE_CARD_CONFIG,
-  PUBLIC_CLOUD_ALERT_SUMMARY_CONFIG,
-  PUBLIC_CLOUD_ALERT_TREND_PIE_CONFIG,
-  PUBLIC_CLOUD_ALERT_TREND_STACK_CONFIG,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG,
-  PUBLIC_CLOUD_DATABASE_LATENCY_BADGES,
-  PUBLIC_CLOUD_DATABASE_PERFORMANCE,
-  PUBLIC_CLOUD_HIGH_ERROR_WORKLOADS,
-  PUBLIC_CLOUD_HIGH_LATENCY_WORKLOADS,
+  PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT,
+  PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT,
+  PUBLIC_CLOUD_IDLE_DURATION_COLORS,
   PUBLIC_CLOUD_INVENTORY_SUMMARY_ENDPOINT,
+  PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS,
+  PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
+  PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT,
   PUBLIC_CLOUD_PLATFORM_OPTIONS,
   PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG,
-  PUBLIC_CLOUD_REGION_HEATMAP,
+  PUBLIC_CLOUD_RECENT_ALERTS_ENDPOINT,
   PUBLIC_CLOUD_REGION_OPTIONS,
   PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG,
-  PUBLIC_CLOUD_TAG_STYLE_CONFIG,
-  PUBLIC_CLOUD_TICKET_CHART_COLORS,
-  PUBLIC_CLOUD_TICKET_GRAPH_DATA_ENDPOINT,
-  PUBLIC_CLOUD_TICKET_RESPONSE_TIME_CONFIG,
-  PUBLIC_CLOUD_TICKETS_ENDPOINT,
-  PUBLIC_CLOUD_TOP_CRITICAL_ALERTS_ENDPOINT,
-  PUBLIC_CLOUD_UTILIZATION_ROWS
+  PUBLIC_CLOUD_TAG_STYLE_CONFIG
 } from './public-cloud-compute-dashboard.const';
 import {
   PublicCloudAccountOption,
-  PublicCloudAIOpsDetailsResponse,
-  PublicCloudAlertSideCard,
   PublicCloudAlertSummaryMetric,
-  PublicCloudAlertTrendBarGroup,
-  PublicCloudAlertTrendLegendItem,
-  PublicCloudAlertTrendStackLegendItem,
   PublicCloudComputeBreakdownProvider,
-  PublicCloudCriticalAlert,
+  PublicCloudComputeBreakdownProviderKey,
   PublicCloudDashboardFilterCriteria,
-  PublicCloudDatabaseLatencyBadge,
   PublicCloudFilterOption,
-  PublicCloudHeatmapGroup,
-  PublicCloudHorizontalBarItem,
   PublicCloudComputeBreakdownResponse,
+  PublicCloudIdleDeviceRow,
+  PublicCloudIdleDevicesResponse,
+  PublicCloudIdleDurationApiResponse,
+  PublicCloudIdleDurationItem,
+  PublicCloudIdleDurationResponse,
+  PublicCloudIdleDurationResponseItem,
+  PublicCloudIdleMetric,
+  PublicCloudIdleMetricResponse,
   PublicCloudInventorySummaryResponse,
+  PublicCloudOrphanedCategoryItem,
+  PublicCloudOrphanedCategoryResponseItem,
+  PublicCloudOrphanedDeviceResponseItem,
+  PublicCloudOrphanedDeviceRow,
+  PublicCloudOrphanedDevicesByCategoryApiResponse,
+  PublicCloudOrphanedDevicesByCategoryResponse,
+  PublicCloudOrphanedDevicesResponse,
   PublicCloudProviderDistributionKey,
   PublicCloudPlatform,
   PublicCloudProviderDistributionItem,
+  PublicCloudRecentAlert,
+  PublicCloudRecentAlertResponseItem,
+  PublicCloudRecentAlertSeverity,
+  PublicCloudRecentAlertsResponse,
+  PublicCloudRecentAlertsSummary,
   PublicCloudRegionOption,
   PublicCloudSummaryMetric,
-  PublicCloudTagItem,
-  PublicCloudTicketDonutItem,
-  PublicCloudTicketFilterCriteria,
-  PublicCloudTicketGraphDataResponse,
-  PublicCloudTicketsResponse,
-  PublicCloudTicketRow,
-  PublicCloudTopCriticalAlertsResponse,
-  PublicCloudUtilizationRow,
-  PublicCloudUtilizationViewRow
+  PublicCloudStatusTone,
+  PublicCloudTagItem
 } from './public-cloud-compute-dashboard.type';
 
 @Injectable()
 export class PublicCloudComputeDashboardService {
 
   constructor(private builder: FormBuilder,
-    private http: HttpClient,
-    private utilSvc: AppUtilityService) { }
+    private http: HttpClient) { }
 
   /*
    * -----Start----- Filters Related -------------------
@@ -171,6 +165,7 @@ export class PublicCloudComputeDashboardService {
   convertToSummaryMetricsViewData(data: PublicCloudInventorySummaryResponse): PublicCloudSummaryMetric[] {
     const summary = (data?.summary || {}) as Record<string, number>;
     return PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG.map(item => ({
+      key: item.key,
       label: item.label,
       value: this.formatNumber(summary[item.key])
     }));
@@ -180,6 +175,7 @@ export class PublicCloudComputeDashboardService {
     return (Object.keys(PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG) as PublicCloudProviderDistributionKey[]).map(key => {
       const config = PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG[key];
       return {
+        key,
         name: config.name,
         value: this.getProviderDistributionPercentage(data, key),
         color: config.color
@@ -211,6 +207,7 @@ export class PublicCloudComputeDashboardService {
           labelLine: { show: false },
           data: items.map(item => ({
             name: `${item.name} ${item.value}%`,
+            key: item.key,
             value: item.value,
             itemStyle: { color: item.color }
           }))
@@ -254,134 +251,6 @@ export class PublicCloudComputeDashboardService {
     return isNaN(numericValue) ? '0' : numericValue.toLocaleString('en-US');
   }
 
-  getRegionHeatmap(_criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudHeatmapGroup[]> {
-    return of(PUBLIC_CLOUD_REGION_HEATMAP);
-  }
-
-  convertToRegionHeatmapOptions(data: PublicCloudHeatmapGroup[]): EChartsOption {
-    return this.getRegionHeatmapOptions(data || []);
-  }
-
-  private getRegionHeatmapOptions(groups: PublicCloudHeatmapGroup[]): EChartsOption {
-    const cells = groups.reduce((items: any[], group) => {
-      group.children.forEach(child => {
-        items.push({
-          name: child.name,
-          region: group.name,
-          value: [child.x, child.y, child.width, child.height],
-          usage: child.usage,
-          color: group.color
-        });
-      });
-      return items;
-    }, []);
-    const labels = groups.map(group => ({
-      name: group.name,
-      value: [group.labelX, group.labelY]
-    }));
-
-    return {
-      animation: false,
-      tooltip: {
-        formatter: (info: any) => {
-          const data = info.data || {};
-          const region = data.region ? String(data.region).replace(/\n/g, ' ') : '';
-          return data.usage ? `${region}<br/>${data.name}<br/>${data.usage}` : `${region}<br/>${data.name}`;
-        }
-      },
-      grid: {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0
-      },
-      xAxis: {
-        type: 'value',
-        min: 0,
-        max: 100,
-        show: false
-      },
-      yAxis: {
-        type: 'value',
-        min: 0,
-        max: 100,
-        inverse: true,
-        show: false
-      },
-      series: [
-        {
-          type: 'custom',
-          coordinateSystem: 'cartesian2d',
-          clip: false,
-          renderItem: (params: any, api: any) => {
-            const item = cells[params.dataIndex];
-            const start = api.coord([item.value[0], item.value[1]]);
-            const end = api.coord([item.value[0] + item.value[2], item.value[1] + item.value[3]]);
-            const width = end[0] - start[0];
-            const height = end[1] - start[1];
-
-            return {
-              type: 'group',
-              children: [
-                {
-                  type: 'rect',
-                  shape: {
-                    x: start[0],
-                    y: start[1],
-                    width,
-                    height
-                  },
-                  style: {
-                    fill: item.color,
-                    stroke: 'rgba(255, 255, 255, 0.35)',
-                    lineWidth: 1
-                  }
-                },
-                {
-                  type: 'text',
-                  silent: true,
-                  style: {
-                    text: item.name,
-                    x: start[0] + width / 2,
-                    y: start[1] + height / 2,
-                    fill: '#26313b',
-                    font: '8px Arial',
-                    textAlign: 'center',
-                    textVerticalAlign: 'middle'
-                  }
-                }
-              ]
-            };
-          },
-          data: cells
-        },
-        {
-          type: 'custom',
-          coordinateSystem: 'cartesian2d',
-          silent: true,
-          clip: false,
-          renderItem: (params: any, api: any) => {
-            const item = labels[params.dataIndex];
-            const point = api.coord(item.value);
-
-            return {
-              type: 'text',
-              style: {
-                text: item.name,
-                x: point[0],
-                y: point[1],
-                fill: '#26313b',
-                font: '8px Arial',
-                textAlign: 'left',
-                textVerticalAlign: 'top'
-              }
-            };
-          },
-          data: labels
-        }
-      ]
-    };
-  }
   /*
    * ******End ****** Executive Summary / Cloud Inventory Widget Related ********************
    */
@@ -395,562 +264,599 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  convertToComputeBreakdownViewData(data: PublicCloudComputeBreakdownResponse): PublicCloudComputeBreakdownProvider[] {
-    return PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG.map(provider => ({
+  convertToComputeBreakdownViewData(data: PublicCloudComputeBreakdownResponse, criteria?: PublicCloudDashboardFilterCriteria): PublicCloudComputeBreakdownProvider[] {
+    const selectedProviderKeys = this.getComputeBreakdownProviderKeys(criteria);
+    return PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG.filter(provider =>
+      (!selectedProviderKeys.length || selectedProviderKeys.includes(provider.key)) &&
+      this.hasComputeBreakdownProviderData(data, provider.key)
+    ).map(provider => ({
+      key: provider.key,
       name: provider.name,
       displayName: provider.displayName,
       brandClass: provider.brandClass,
       logoPath: provider.logoPath,
       stats: PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG.map(stat => ({
+        key: stat.key,
         name: stat.name,
         value: Number(data?.[provider.key]?.[stat.key] || 0)
       }))
     }));
+  }
+
+  private getComputeBreakdownProviderKeys(criteria?: PublicCloudDashboardFilterCriteria): PublicCloudComputeBreakdownProviderKey[] {
+    return this.getSelectedValues(criteria?.platforms || []).map(platform => {
+      return platform === 'gcp' ? 'google_cloud' : platform;
+    }) as PublicCloudComputeBreakdownProviderKey[];
+  }
+
+  private hasComputeBreakdownProviderData(data: PublicCloudComputeBreakdownResponse, providerKey: PublicCloudComputeBreakdownProviderKey): boolean {
+    return PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG.some(stat => Number(data?.[providerKey]?.[stat.key] || 0) > 0);
   }
   /*
    * ******End ****** Compute Breakdown Widget Related ********************
    */
 
   /*
-   * -----Start----- Performance Hotspots Widget Related -------------------
+   * -----Start----- Orphaned Devices Widgets Related -------------------
    */
-  getUtilizationRows(_criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudUtilizationRow[]> {
-    return of(PUBLIC_CLOUD_UTILIZATION_ROWS);
+  getOrphanedDevices(criteria?: PublicCloudDashboardFilterCriteria, page = 1, pageSize = 10): Observable<PublicCloudOrphanedDevicesResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
+    return this.http.get<PublicCloudOrphanedDevicesResponse>(PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT, { params });
   }
 
-  convertToUtilizationRowsViewData(data: PublicCloudUtilizationRow[]): PublicCloudUtilizationViewRow[] {
-    return (data || []).map(row => this.convertToUtilizationViewRow(row));
+  getOrphanedDevicesByCategory(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudOrphanedDevicesByCategoryApiResponse> {
+    return this.http.get<PublicCloudOrphanedDevicesByCategoryApiResponse>(PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
   }
 
-  private convertToUtilizationViewRow(row: PublicCloudUtilizationRow): PublicCloudUtilizationViewRow {
+  convertToOrphanedDevicesViewData(data: PublicCloudOrphanedDevicesResponse): PublicCloudOrphanedDeviceRow[] {
+    return this.getOrphanedDeviceResults(data).map(item => ({
+      name: this.getFirstValue(item.name, item.device_name, item.instance_name),
+      status: this.getFirstValue(item.status),
+      lastSeen: this.formatOrphanedDate(this.getFirstValue(item.lastSeen, item.last_seen)),
+      datacenter: this.getFirstValue(item.datacenter, item.datacenter_name, item.cloud, item.provider, item.platform, item.account)
+    }));
+  }
+
+  convertToOrphanedDevicesTotal(data: PublicCloudOrphanedDevicesResponse): number {
+    return Number(data?.count || data?.totalOrphaned || this.getOrphanedDeviceResults(data).length || 0);
+  }
+
+  convertToOrphanedByCategoryViewData(data: PublicCloudOrphanedDevicesByCategoryApiResponse): PublicCloudOrphanedCategoryItem[] {
+    const categoryData = this.getOrphanedCategoryResults(data);
+    const total = this.getOrphanedByCategoryTotal(data, categoryData);
+    const categoryTotal = (categoryData || []).reduce((sum, item) => sum + this.getOrphanedCategoryCount(item), 0);
+    return categoryData.filter(item => this.getOrphanedCategoryCount(item) > 0).map((item, index) => {
+      const count = this.getOrphanedCategoryCount(item);
+      return {
+        category: this.formatOrphanedCategoryLabel(this.getFirstValue(item.category, item.name, item.label, item.display_name, item.type, item.resource_type)),
+        count,
+        percentage: this.getOrphanedCategoryPercentage(item, count, categoryTotal),
+        color: PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS[index % PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS.length],
+        totalCount: total
+      };
+    });
+  }
+
+  convertToOrphanedByCategoryOptions(data: PublicCloudOrphanedCategoryItem[]): EChartsOption {
+    const total = Number(data?.[0]?.totalCount || 0) || (data || []).reduce((sum, item) => sum + Number(item.count || 0), 0);
     return {
-      ...row,
-      cpuChartOptions: this.getSparklineOptions(row.cpuSeries, '#5d8df5', 'rgba(93, 141, 245, 0.28)'),
-      memoryChartOptions: this.getSparklineOptions(row.memorySeries, '#6aa544', 'rgba(106, 165, 68, 0.28)')
-    };
-  }
-
-  private getSparklineOptions(data: number[], lineColor: string, areaColor: string): EChartsOption {
-    return {
-      animation: false,
-      grid: { top: 2, right: 1, bottom: 2, left: 1 },
-      xAxis: {
-        type: 'category',
-        show: false,
-        boundaryGap: false,
-        data: data.map((_, index) => index)
+      color: (data || []).map(item => item.color),
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params.name}<br/>Count: ${params.data.count}<br/>${params.data.percentage}%`
       },
-      yAxis: {
-        type: 'value',
-        show: false,
-        min: 0,
-        max: 100
+      legend: {
+        show: false
       },
+      graphic: [
+        {
+          type: 'text',
+          left: 'center',
+          top: 'center',
+          style: {
+            text: this.formatNumber(total),
+            fill: '#222222',
+            fontSize: 28,
+            fontWeight: 700
+          }
+        }
+      ],
       series: [
         {
-          type: 'line',
-          data: data,
-          symbol: 'none',
-          smooth: false,
-          lineStyle: {
-            width: 1.5,
-            color: lineColor
-          },
-          areaStyle: {
-            color: areaColor
+          name: 'Orphaned by Category',
+          type: 'pie',
+          radius: ['46%', '76%'],
+          center: ['50%', '48%'],
+          avoidLabelOverlap: true,
+          label: { show: false },
+          labelLine: { show: false },
+          data: (data || []).map(item => ({
+            value: item.count,
+            name: item.category,
+            category: item.category,
+            count: item.count,
+            percentage: item.percentage,
+            itemStyle: { color: item.color }
+          })),
+          itemStyle: {
+            borderColor: '#ffffff',
+            borderWidth: 6
           }
         }
       ]
     };
   }
-  /*
-   * ******End ****** Performance Hotspots Widget Related ********************
-   */
 
-  /*
-   * -----Start----- Performance / Workload Insights Widget Related -------------------
-   */
-  getLatencyWorkloads(_criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudHorizontalBarItem[]> {
-    return of(PUBLIC_CLOUD_HIGH_LATENCY_WORKLOADS);
+  hasOrphanedByCategoryData(data: PublicCloudOrphanedCategoryItem[]): boolean {
+    return (data || []).some(item => Number(item.count || 0) > 0);
   }
 
-  convertToLatencyWorkloadOptions(data: PublicCloudHorizontalBarItem[]): EChartsOption {
-    return this.getHorizontalBarOptions(data || [], 900);
+  private getOrphanedDeviceResults(data: PublicCloudOrphanedDevicesResponse): PublicCloudOrphanedDeviceResponseItem[] {
+    return data?.results || data?.orphanedDeviceList || data?.data || data?.items || [];
   }
 
-  getErrorRateWorkloads(_criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudHorizontalBarItem[]> {
-    return of(PUBLIC_CLOUD_HIGH_ERROR_WORKLOADS);
-  }
-
-  convertToErrorRateWorkloadOptions(data: PublicCloudHorizontalBarItem[]): EChartsOption {
-    return this.getHorizontalBarOptions(data || [], 9);
-  }
-
-  getDatabasePerformance(_criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudHorizontalBarItem[]> {
-    return of(PUBLIC_CLOUD_DATABASE_PERFORMANCE);
-  }
-
-  convertToDatabasePerformanceOptions(data: PublicCloudHorizontalBarItem[]): EChartsOption {
-    return this.getHorizontalBarOptions(data || [], 100);
-  }
-
-  getDatabaseLatencyBadges(_criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudDatabaseLatencyBadge[]> {
-    return of(PUBLIC_CLOUD_DATABASE_LATENCY_BADGES);
-  }
-
-  convertToDatabaseLatencyBadgesViewData(data: PublicCloudDatabaseLatencyBadge[]): PublicCloudDatabaseLatencyBadge[] {
-    return data || [];
-  }
-
-  private getHorizontalBarOptions(items: PublicCloudHorizontalBarItem[], max: number): EChartsOption {
-    return {
-      animation: false,
-      grid: { top: 4, right: 36, bottom: 0, left: 104 },
-      xAxis: {
-        type: 'value',
-        show: false,
-        max: max
-      },
-      yAxis: {
-        type: 'category',
-        inverse: true,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#55616d',
-          fontSize: 10
-        },
-        data: items.map(item => item.name)
-      },
-      series: [
-        {
-          type: 'bar',
-          barWidth: 8,
-          barGap: '-100%',
-          silent: true,
-          itemStyle: {
-            color: '#eef1f3',
-            borderRadius: 4
-          },
-          data: items.map(() => max)
-        },
-        {
-          type: 'bar',
-          barWidth: 8,
-          label: {
-            show: true,
-            position: 'right',
-            formatter: (params: any) => items[params.dataIndex].label,
-            color: '#2e3338',
-            fontSize: 10
-          },
-          itemStyle: {
-            borderRadius: 4,
-            color: (params: any) => items[params.dataIndex].color
-          },
-          data: items.map(item => item.value)
-        }
-      ]
-    };
-  }
-  /*
-   * ******End ****** Performance / Workload Insights Widget Related ********************
-   */
-
-  /*
-   * -----Start----- Alert & Events View Widget Related -------------------
-   */
-  getTopCriticalAlerts(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudTopCriticalAlertsResponse> {
-    return this.http.get<PublicCloudTopCriticalAlertsResponse>(PUBLIC_CLOUD_TOP_CRITICAL_ALERTS_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToAlertSummaryMetricsViewData(data: PublicCloudTopCriticalAlertsResponse): PublicCloudAlertSummaryMetric[] {
-    const summary = (data?.summary || {}) as Record<string, number | string>;
-    return PUBLIC_CLOUD_ALERT_SUMMARY_CONFIG.map(item => ({
-      label: item.label,
-      value: this.formatAlertSummaryValue(summary[item.key], item.suffix),
-      tone: item.tone
-    }));
-  }
-
-  convertToCriticalAlertsViewData(data: PublicCloudTopCriticalAlertsResponse): PublicCloudCriticalAlert[] {
-    return (data?.top_alerts || []).map(alert => ({
-      id: alert.id,
-      deviceName: alert.device_name,
-      severity: alert.severity === 'high' ? 'high' : 'critical',
-      description: alert.description,
-      source: alert.source,
-      acknowledged: alert.acknowledged,
-      duration: alert.duration
-    }));
-  }
-
-  private formatAlertSummaryValue(value: number | string, suffix?: string): string {
-    const formattedValue = typeof value === 'number' ? this.formatNumber(value) : String(value || '0');
-    return suffix && !formattedValue.endsWith(suffix) ? `${formattedValue}${suffix}` : formattedValue;
-  }
-  /*
-   * ******End ****** Alert & Events View Widget Related ********************
-   */
-
-  /*
-   * -----Start----- Alert Trend Widget Related -------------------
-   */
-  getAIOpsDetails(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudAIOpsDetailsResponse> {
-    return this.http.get<PublicCloudAIOpsDetailsResponse>(PUBLIC_CLOUD_AIOPS_DETAILS_ENDPOINT, {
-      params: this.convertFiltersToApiParams(criteria)
-    });
-  }
-
-  convertToAlertTrendLegendViewData(data: PublicCloudAIOpsDetailsResponse): PublicCloudAlertTrendLegendItem[] {
-    const alertsPie = (data?.alerts_pie || {}) as Record<string, number>;
-    return PUBLIC_CLOUD_ALERT_TREND_PIE_CONFIG.map(item => ({
-      name: item.name,
-      value: Number(alertsPie[item.key] || 0),
-      color: item.color
-    }));
-  }
-
-  convertToAlertTrendPolarOptions(data: PublicCloudAlertTrendLegendItem[]): EChartsOption {
-    return this.getAlertTrendPolarOptions(data || []);
-  }
-
-  private getAlertTrendPolarOptions(items: PublicCloudAlertTrendLegendItem[]): EChartsOption {
-    return {
-      color: items.map(item => item.color),
-      angleAxis: {
-        type: 'category',
-        data: items.map(item => item.name),
-        axisLabel: { show: false },
-        axisLine: { show: false },
-        axisTick: { show: false }
-      },
-      radiusAxis: {
-        min: 0,
-        max: 900,
-        splitNumber: 9,
-        axisLabel: {
-          color: '#6f7882',
-          fontSize: 9
-        },
-        axisLine: { show: false },
-        axisTick: { show: false }
-      },
-      polar: {
-        radius: '78%',
-        center: ['50%', '50%']
-      },
-      series: [
-        {
-          type: 'bar',
-          coordinateSystem: 'polar',
-          roundCap: false,
-          data: items.map(item => ({
-            value: item.value,
-            itemStyle: {
-              color: item.color,
-              borderColor: item.color.replace('0.35', '1'),
-              opacity: 0.75
-            }
-          }))
-        }
-      ]
-    };
-  }
-
-  convertToAlertTrendStackGroupsViewData(data: PublicCloudAIOpsDetailsResponse): PublicCloudAlertTrendBarGroup[] {
-    const aiopsGraph = (data?.aiops_graph || {}) as Record<string, Record<string, number>>;
-    return PUBLIC_CLOUD_ALERT_TREND_STACK_CONFIG.map(group => ({
-      name: group.name,
-      items: group.items.map(item => ({
-        label: item.label,
-        value: Number(aiopsGraph[group.key]?.[item.key] || 0),
-        color: item.color
-      }))
-    }));
-  }
-
-  convertToAlertTrendStackLegendViewData(data: PublicCloudAlertTrendBarGroup[]): PublicCloudAlertTrendStackLegendItem[] {
-    return (data || []).reduce((legend: PublicCloudAlertTrendStackLegendItem[], group) => {
-      return legend.concat(group.items || []);
-    }, []);
-  }
-
-  convertToAlertTrendStackOptions(data: PublicCloudAlertTrendBarGroup[]): EChartsOption {
-    return this.getAlertTrendStackOptions(data || []);
-  }
-
-  private getAlertTrendStackOptions(groups: PublicCloudAlertTrendBarGroup[]): EChartsOption {
-    const categories = groups.map(group => group.name);
-    const maxSeriesLength = Math.max(...groups.map(group => group.items.length), 0);
-    const maxStackValue = groups.reduce((maxValue, group) => {
-      const groupTotal = group.items.reduce((total, item) => total + item.value, 0);
-      return Math.max(maxValue, groupTotal);
-    }, 0);
-    const yAxisMax = Math.max(900, Math.ceil(maxStackValue / 100) * 100);
-    return {
-      animation: false,
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        formatter: (params: any) => {
-          const items = Array.isArray(params) ? params : [params];
-          const group = groups[items[0]?.dataIndex];
-          return (group?.items || []).map(item => `${item.label}: ${item.value}`).join('<br/>');
-        }
-      },
-      legend: { show: false },
-      grid: { top: 12, right: 8, bottom: 28, left: 46 },
-      xAxis: {
-        type: 'category',
-        data: categories,
-        axisTick: { show: false },
-        axisLabel: { color: '#3c4650', fontSize: 10 }
-      },
-      yAxis: {
-        type: 'value',
-        max: yAxisMax,
-        splitLine: { lineStyle: { color: '#e5e9ed' } },
-        axisLabel: { color: '#6f7882', fontSize: 10 }
-      },
-      series: Array.from({ length: maxSeriesLength }).map((_, index) => ({
-        name: `segment-${index}`,
-        type: 'bar',
-        stack: 'total',
-        barWidth: 54,
-        data: groups.map(group => {
-          const item = group.items[index];
-          return {
-            value: item?.value || 0,
-            itemStyle: { color: item?.color || 'transparent' }
-          };
-        })
-      }))
-    };
-  }
-
-  convertToAlertSideCardsViewData(data: PublicCloudAIOpsDetailsResponse): PublicCloudAlertSideCard[] {
-    const details = (data?.raw_events_details || {}) as Record<string, number | string>;
-    return PUBLIC_CLOUD_ALERT_SIDE_CARD_CONFIG.map(card => ({
-      title: card.title,
-      value: this.formatAlertSummaryValue(details[card.valueKey], card.suffix),
-      metrics: card.metrics.map(metric => ({
-        label: metric.label,
-        value: this.formatAlertSummaryValue(details[metric.key]),
-        tone: metric.tone
-      }))
-    }));
-  }
-  /*
-   * ******End ****** Alert Trend Widget Related ********************
-   */
-
-  /*
-   * -----Start----- ITSM Tickets Widget Related -------------------
-   */
-  buildTicketFilterForm(): FormGroup {
-    const dateRange = this.getDefaultTicketDateRange();
-    return this.builder.group({
-      state: [''],
-      ticket_type: [''],
-      search: [''],
-      priority: [''],
-      dateRange: [[dateRange.startDate, dateRange.endDate]],
-      start_date: [this.getTicketFilterDateValue(dateRange.startDate)],
-      end_date: [this.getTicketFilterDateValue(dateRange.endDate)]
-    });
-  }
-
-  getTicketGraphData(criteria?: PublicCloudDashboardFilterCriteria, ticketFilters?: PublicCloudTicketFilterCriteria): Observable<PublicCloudTicketGraphDataResponse> {
-    return this.http.get<PublicCloudTicketGraphDataResponse>(PUBLIC_CLOUD_TICKET_GRAPH_DATA_ENDPOINT, {
-      params: this.convertTicketFiltersToApiParams(criteria, ticketFilters)
-    });
-  }
-
-  getTickets(criteria?: PublicCloudDashboardFilterCriteria, ticketFilters?: PublicCloudTicketFilterCriteria): Observable<PublicCloudTicketsResponse> {
-    return this.http.get<PublicCloudTicketsResponse>(PUBLIC_CLOUD_TICKETS_ENDPOINT, {
-      params: this.convertTicketFiltersToApiParams(criteria, ticketFilters, true)
-    });
-  }
-
-  convertToTicketPriorityViewData(data: PublicCloudTicketGraphDataResponse): PublicCloudTicketDonutItem[] {
-    return this.convertRecordToTicketDonutItems(data?.by_priority || {});
-  }
-
-  convertToTicketStatusViewData(data: PublicCloudTicketGraphDataResponse): PublicCloudTicketDonutItem[] {
-    return this.convertRecordToTicketDonutItems(data?.by_state || {});
-  }
-
-  convertToTicketResponseTimeViewData(data: PublicCloudTicketGraphDataResponse): PublicCloudTicketDonutItem[] {
-    const responseTime = (data?.closed_tickets_count_by_response_time || {}) as Record<string, number>;
-    return PUBLIC_CLOUD_TICKET_RESPONSE_TIME_CONFIG.map(item => ({
-      name: item.name,
-      value: Number(responseTime[item.key] || 0),
-      color: item.color
-    }));
-  }
-
-  convertToTicketPriorityOptions(data: PublicCloudTicketDonutItem[]): EChartsOption {
-    return this.getTicketDonutOptions(data || [], 'Tickets by Priority');
-  }
-
-  convertToTicketStatusOptions(data: PublicCloudTicketDonutItem[]): EChartsOption {
-    return this.getTicketDonutOptions(data || [], 'Tickets by Status');
-  }
-
-  convertToTicketResponseTimeOptions(data: PublicCloudTicketDonutItem[]): EChartsOption {
-    return this.getTicketDonutOptions(data || [], 'Solved by Response Time');
-  }
-
-  hasTicketDonutData(data: PublicCloudTicketDonutItem[]): boolean {
-    return (data || []).some(item => Number(item.value || 0) > 0);
-  }
-
-  convertToTicketsViewData(data: PublicCloudTicketsResponse): PublicCloudTicketRow[] {
-    return (data?.results || []).map(ticket => ({
-      id: this.getTicketFieldValue(ticket.number || ticket.task_effective_number),
-      shortDescription: this.getTicketFieldValue(ticket.short_description),
-      state: this.getTicketFieldValue(ticket.state),
-      priority: this.getTicketFieldValue(ticket.priority),
-      createdOn: this.formatTicketDate(this.getTicketRawValue(ticket.opened_at)),
-      updatedOn: this.formatTicketDate(this.getTicketRawValue(ticket.sys_updated_on)),
-      resolution: ticket.resolved_at ? this.formatTicketDate(this.getTicketRawValue(ticket.resolved_at)) : this.getTicketFieldValue(ticket.state)
-    }));
-  }
-
-  convertToTicketsTotal(data: PublicCloudTicketsResponse): number {
-    return Number(data?.count || 0);
-  }
-
-  private convertTicketFiltersToApiParams(criteria?: PublicCloudDashboardFilterCriteria, ticketFilters?: PublicCloudTicketFilterCriteria, includePagination = false): HttpParams {
-    let params = this.convertFiltersToApiParams(criteria);
-    if (includePagination) {
-      params = params.set('page', String(ticketFilters?.page || 1));
-      params = params.set('page_size', String(ticketFilters?.page_size || 10));
-      params = params.set('offset', String(((ticketFilters?.page || 1) - 1) * (ticketFilters?.page_size || 10)));
+  private getOrphanedCategoryResults(data: PublicCloudOrphanedDevicesByCategoryApiResponse): PublicCloudOrphanedCategoryResponseItem[] {
+    if (Array.isArray(data)) {
+      return data;
     }
-    const filterKeys: Array<keyof PublicCloudTicketFilterCriteria> = [
-      'state',
-      'ticket_type',
-      'search',
-      'priority',
-      'dateRange',
-      'start_date',
-      'end_date'
-    ];
-    filterKeys.forEach(key => {
-      const value = ticketFilters?.[key];
-      if (value !== undefined && value !== null) {
-        params = params.set(key, String(value));
+    const categoryData = data?.breakdown || data?.results || data?.orphanedByCategory || data?.categories || data?.by_category || data?.data;
+    if (Array.isArray(categoryData)) {
+      return categoryData;
+    }
+    if (categoryData) {
+      return this.convertOrphanedCategoryRecordToItems(categoryData as unknown as PublicCloudOrphanedDevicesByCategoryResponse);
+    }
+    return this.convertOrphanedCategoryRecordToItems(data);
+  }
+
+  private convertOrphanedCategoryRecordToItems(data: PublicCloudOrphanedDevicesByCategoryResponse): PublicCloudOrphanedCategoryResponseItem[] {
+    const record = data as unknown as Record<string, string | number | PublicCloudOrphanedCategoryResponseItem>;
+    return Object.keys(data || {}).filter(key => !['total', 'totalOrphaned', 'total_count', 'totalCount', 'count', 'breakdown'].includes(key)).map(key => {
+      const value = record[key];
+      if (value && typeof value === 'object') {
+        return {
+          ...value,
+          category: value.category || key
+        };
       }
+      return {
+        category: key,
+        count: Number(value || 0)
+      };
     });
-    return params;
   }
 
-  private convertRecordToTicketDonutItems(data: Record<string, number>): PublicCloudTicketDonutItem[] {
-    return Object.keys(data || {}).map((key, index) => ({
-      name: key,
-      value: Number(data[key] || 0),
-      color: PUBLIC_CLOUD_TICKET_CHART_COLORS[index % PUBLIC_CLOUD_TICKET_CHART_COLORS.length]
-    }));
+  private getOrphanedByCategoryTotal(data: PublicCloudOrphanedDevicesByCategoryApiResponse, categoryData: PublicCloudOrphanedCategoryResponseItem[]): number {
+    if (!Array.isArray(data)) {
+      const total = Number(data?.total || data?.totalOrphaned || data?.total_count || data?.totalCount || 0);
+      if (total) {
+        return total;
+      }
+    }
+    return (categoryData || []).reduce((sum, item) => sum + this.getOrphanedCategoryCount(item), 0);
   }
 
-  getTicketFilterDateValue(value: any): string {
+  private getOrphanedCategoryCount(item: PublicCloudOrphanedCategoryResponseItem): number {
+    return Number(item?.count || item?.value || 0);
+  }
+
+  private getOrphanedCategoryPercentage(item: PublicCloudOrphanedCategoryResponseItem, count: number, total: number): number {
+    const apiPercentage = Number(String(item.percentage || item.percent || 0).replace('%', ''));
+    if (apiPercentage) {
+      return Math.round(apiPercentage);
+    }
+    return total ? Math.round((count / total) * 100) : 0;
+  }
+
+  private getFirstValue(...values: Array<string | number | undefined | null>): string {
+    const value = values.find(item => item !== undefined && item !== null && item !== '');
+    return value === undefined || value === null ? '' : String(value);
+  }
+
+  private formatOrphanedCategoryLabel(value: string): string {
     if (!value) {
       return '';
     }
-    if (value.format) {
-      return value.format('YYYY-MM-DD');
-    }
-    const date = new Date(value);
-    return isNaN(date.getTime()) ? '' : this.formatDateForInput(date);
-  }
-
-  private getDefaultTicketDateRange(): { startDate: moment.Moment, endDate: moment.Moment } {
-    const endDate = moment().subtract(1, 'day');
-    const startDate = endDate.clone().subtract(14, 'days');
-    return {
-      startDate,
-      endDate
+    const labels: Record<string, string> = {
+      vm: 'VM Instances',
+      vms: 'VM Instances',
+      vm_instances: 'VM Instances',
+      virtual_machine: 'VM Instances',
+      virtual_machines: 'VM Instances',
+      bare_metal: 'Bare Metal',
+      baremetal: 'Bare Metal',
+      gpu: 'GPUs',
+      gpus: 'GPUs',
+      storage: 'Storage Volumes',
+      storage_volume: 'Storage Volumes',
+      storage_volumes: 'Storage Volumes',
+      network: 'Network Devices',
+      network_device: 'Network Devices',
+      network_devices: 'Network Devices'
     };
+    const normalizedValue = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+    return labels[normalizedValue] || value.replace(/_/g, ' ').replace(/\b\w/g, match => match.toUpperCase());
   }
 
-  private formatDateForInput(date: Date): string {
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const day = `${date.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  private formatOrphanedDate(value: string): string {
+    if (!value) {
+      return '';
+    }
+    const date = moment(value, [
+      moment.ISO_8601,
+      'DD MMM YYYY HH:mm',
+      'D MMM YYYY HH:mm',
+      'DD MMMM YYYY HH:mm',
+      'D MMMM YYYY HH:mm',
+      'DD MMM YYYY hh:mm A',
+      'D MMM YYYY hh:mm A',
+      'DD MMMM YYYY hh:mm A',
+      'D MMMM YYYY hh:mm A',
+      'YYYY-MM-DD HH:mm:ss',
+      'YYYY-MM-DD HH:mm',
+      'DD/MM/YYYY HH:mm',
+      'MM/DD/YYYY HH:mm'
+    ], true);
+    return date.isValid() ? date.format('DD MMM YYYY HH:mm') : value;
+  }
+  /*
+   * ******End ****** Orphaned Devices Widgets Related ********************
+   */
+
+  /*
+   * -----Start----- Idle Devices Widgets Related -------------------
+   */
+  getIdleDevices(criteria?: PublicCloudDashboardFilterCriteria, page = 1, pageSize = 10): Observable<PublicCloudIdleDevicesResponse> {
+    let params = this.convertFiltersToApiParams(criteria);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
+    return this.http.get<PublicCloudIdleDevicesResponse>(PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT, { params });
   }
 
-  private getTicketFieldValue(field: { display_value?: string, value?: string }): string {
-    return field?.display_value || field?.value || '';
+  getIdleDevicesByDuration(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudIdleDurationApiResponse> {
+    return this.http.get<PublicCloudIdleDurationApiResponse>(PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
   }
 
-  private getTicketRawValue(field: { display_value?: string, value?: string }): string {
-    return field?.value || field?.display_value || '';
+  convertToIdleDevicesViewData(data: PublicCloudIdleDevicesResponse): PublicCloudIdleDeviceRow[] {
+    return (data?.results || []).map(item => {
+      const row = item as Record<string, any>;
+      return {
+        id: this.getFirstValue(row.id),
+        uuid: this.getFirstValue(row.uuid, row.id),
+        deviceId: this.getFirstValue(row.device_id, row.deviceId, row.device_uuid, row.deviceUuid, row.uuid, row.id),
+        resourceId: this.getFirstValue(row.resource_id, row.resourceId, row.uuid, row.id),
+        deviceName: this.getFirstValue(row.device_name, row.deviceName, row.name, row.instance_name),
+        resourceType: this.getFirstValue(row.resource_type, row.resourceType, row.type),
+        provider: this.getFirstValue(row.provider, row.platform, row.cloud_provider, row.cloudProvider, row.cloud, row.cloud_type, row.cloudType),
+        cloudType: this.getFirstValue(row.cloud_type, row.cloudType, row.cloud, row.provider, row.platform),
+        monitoringType: this.getFirstValue(row.monitoring_type, row.monitoringType),
+        monitoring: row.monitoring,
+        avgCpu: this.convertToIdleMetric(
+          this.getFirstObject(row.avg_cpu, row.avgCpu, row.avgCPU, row.cpu, row.cpu_usage, row.average_cpu),
+          this.getFirstScalar(row.avg_cpu_percent, row.avgCpuPercent, row.avg_cpu_percentage, row.cpu_percent, row.cpuPercentage, row.avg_cpu, row.avgCpu, row.avgCPU, row.cpu, row.cpu_usage, row.average_cpu)
+        ),
+        avgMem: this.convertToIdleMetric(
+          this.getFirstObject(row.avg_mem, row.avgMem, row.avg_memory, row.memory, row.memory_usage, row.average_memory),
+          this.getFirstScalar(row.avg_mem_percent, row.avgMemPercent, row.avg_mem_percentage, row.memory_percent, row.memoryPercentage, row.avg_mem, row.avgMem, row.avg_memory, row.memory, row.memory_usage, row.average_memory)
+        ),
+        networkIO: this.getFirstValue(row.network_io, row.networkIO, row.network, row.network_in_out),
+        idleDuration: this.getFirstValue(row.idle_duration, row.idleDuration, row.duration),
+        status: this.getFirstValue(row.status)
+      };
+    });
   }
 
-  private formatTicketDate(value: string): string {
-    return value ? this.utilSvc.toUnityOneDateFormat(value) : '';
+  convertToIdleDevicesTotal(data: PublicCloudIdleDevicesResponse): number {
+    return Number(data?.count || 0);
   }
 
-  private getTicketDonutOptions(items: PublicCloudTicketDonutItem[], title: string): EChartsOption {
+  convertToIdleDurationViewData(data: PublicCloudIdleDurationApiResponse): PublicCloudIdleDurationItem[] {
+    const durationData = this.sortIdleDurationBuckets(this.getIdleDurationResults(data));
+    const maxCount = Math.max(...durationData.map(item => this.getIdleDurationCount(item)), 0);
+    return durationData.filter(item => this.getIdleDurationCount(item) > 0).map((item, index) => {
+      const count = this.getIdleDurationCount(item);
+      const duration = this.getIdleDurationLabel(item);
+      return {
+        duration,
+        count,
+        percent: maxCount ? Math.round((count / maxCount) * 100) : 0,
+        color: PUBLIC_CLOUD_IDLE_DURATION_COLORS[index % PUBLIC_CLOUD_IDLE_DURATION_COLORS.length]
+      };
+    });
+  }
+
+  convertToIdleDurationOptions(data: PublicCloudIdleDurationItem[]): EChartsOption {
     return {
-      animation: false,
-      title: {
-        text: title,
-        left: 'center',
-        top: 0,
-        textStyle: {
-          fontSize: 11,
-          fontWeight: 600,
-          color: '#4d5966'
-        }
-      },
-      color: items.map(item => item.color),
+      color: (data || []).map(item => item.color),
       tooltip: {
         trigger: 'item',
         formatter: '{b}: {c}'
       },
       legend: {
-        type: 'plain',
-        bottom: 0,
-        left: 'center',
-        itemWidth: 7,
-        itemHeight: 7,
-        textStyle: {
-          fontSize: 8,
-          color: '#566270'
-        }
+        show: false
       },
       series: [
         {
+          name: 'Idle Duration Distribution',
           type: 'pie',
-          radius: ['43%', '67%'],
-          center: ['50%', '46%'],
-          label: {
-            show: false
-          },
+          radius: ['48%', '78%'],
+          center: ['50%', '50%'],
+          avoidLabelOverlap: false,
+          label: { show: false },
           labelLine: { show: false },
-          emphasis: {
-            scale: false
-          },
-          data: items.map(item => ({
-            name: item.name,
-            value: item.value,
-            itemStyle: {
-              color: item.color,
-              borderColor: '#ffffff',
-              borderWidth: 2
-            }
-          }))
+          data: (data || []).map(item => ({
+            value: item.count,
+            name: item.duration,
+            itemStyle: { color: item.color }
+          })),
+          itemStyle: {
+            borderColor: '#ffffff',
+            borderWidth: 8
+          }
         }
       ]
     };
   }
+
+  hasIdleDurationData(data: PublicCloudIdleDurationItem[]): boolean {
+    return (data || []).some(item => Number(item.count || 0) > 0);
+  }
+
+  private convertToIdleMetric(metric?: PublicCloudIdleMetricResponse, percentValue?: string | number): PublicCloudIdleMetric {
+    const usedValue = metric?.used ?? metric?.value;
+    const freeValue = metric?.free;
+    const explicitPercent = this.getNumericValue(metric?.percent || metric?.percentage || percentValue);
+    const freePercent = this.getNumericValue(freeValue);
+    const usedPercent = explicitPercent || (freePercent ? 100 - freePercent : this.getNumericValue(usedValue));
+    const percent = Math.max(Math.min(Number(usedPercent || 0), 100), 0);
+    return {
+      used: this.getFirstValue(usedValue, percent),
+      free: this.getFirstValue(freeValue, `${Math.max(100 - percent, 0)}%`),
+      percent,
+      tone: this.getProgressTone(percent)
+    };
+  }
+
+  private getIdleDurationResults(data: PublicCloudIdleDurationApiResponse): PublicCloudIdleDurationResponseItem[] {
+    return this.getIdleDurationResultsFromValue(data);
+  }
+
+  private getIdleDurationResultsFromValue(value: any): PublicCloudIdleDurationResponseItem[] {
+    if (!value) {
+      return [];
+    }
+    if (Array.isArray(value)) {
+      return value.filter(item => this.isIdleDurationBucketItem(item));
+    }
+
+    const record = value as Record<string, any>;
+    const containerKeys = [
+      'idleDurationDistribution',
+      'idle_duration_distribution',
+      'durationDistribution',
+      'duration_distribution',
+      'idle_devices_by_duration',
+      'summary',
+      'distribution',
+      'breakdown',
+      'results'
+    ];
+
+    for (const key of containerKeys) {
+      const rows = this.getIdleDurationResultsFromValue(record[key]);
+      if (rows.length) {
+        return rows;
+      }
+    }
+
+    const nestedRows = this.getIdleDurationResultsFromValue(record.data);
+    if (nestedRows.length) {
+      return nestedRows;
+    }
+
+    return this.convertIdleDurationRecordToItems(value as PublicCloudIdleDurationResponse);
+  }
+
+  private convertIdleDurationRecordToItems(data: PublicCloudIdleDurationResponse): PublicCloudIdleDurationResponseItem[] {
+    const record = data as unknown as Record<string, string | number | PublicCloudIdleDurationResponseItem>;
+    return Object.keys(data || {}).reduce((items: PublicCloudIdleDurationResponseItem[], key) => {
+      if (this.isIdleDurationMetadataKey(key)) {
+        return items;
+      }
+      const value = record[key];
+      if (value && typeof value === 'object') {
+        const item = {
+          ...value,
+          duration: value.duration || value.idle_duration || value.idleDuration || value.range || value.name || value.label || key
+        };
+        if (this.isIdleDurationBucketItem(item)) {
+          items.push(item);
+        }
+        return items;
+      }
+      if (this.isIdleDurationBucketKey(key)) {
+        items.push({
+          duration: key,
+          count: Number(value || 0)
+        });
+      }
+      return items;
+    }, []);
+  }
+
+  private getIdleDurationCount(item: PublicCloudIdleDurationResponseItem): number {
+    return Number(item?.count || item?.value || item?.total || item?.total_count || item?.totalCount || item?.devices || item?.percent || item?.percentage || 0);
+  }
+
+  private getIdleDurationLabel(item: PublicCloudIdleDurationResponseItem): string {
+    return this.getFirstValue(item.duration, item.idle_duration, item.idleDuration, item.range, item.name, item.label);
+  }
+
+  private sortIdleDurationBuckets(items: PublicCloudIdleDurationResponseItem[]): PublicCloudIdleDurationResponseItem[] {
+    return [...(items || [])].sort((first, second) => {
+      return this.getIdleDurationSortValue(this.getIdleDurationLabel(first)) - this.getIdleDurationSortValue(this.getIdleDurationLabel(second));
+    });
+  }
+
+  private getIdleDurationSortValue(label: string): number {
+    const normalizedLabel = String(label || '').toLowerCase().replace(/\s+/g, '');
+    if (normalizedLabel.startsWith('0-7')) {
+      return 0;
+    }
+    if (normalizedLabel.startsWith('7-15')) {
+      return 1;
+    }
+    if (normalizedLabel.startsWith('15-30')) {
+      return 2;
+    }
+    if (normalizedLabel.startsWith('30+')) {
+      return 3;
+    }
+    const firstNumber = normalizedLabel.match(/^\d+/);
+    return firstNumber ? Number(firstNumber[0]) : 999;
+  }
+
+  private isIdleDurationBucketItem(item: PublicCloudIdleDurationResponseItem): boolean {
+    return !!item && this.getIdleDurationCount(item) > 0 && this.isIdleDurationBucketKey(this.getIdleDurationLabel(item));
+  }
+
+  private isIdleDurationMetadataKey(key: string): boolean {
+    return ['total_idle_count', 'total_count', 'totalCount', 'total', 'count'].includes(key);
+  }
+
+  private isIdleDurationBucketKey(key: string): boolean {
+    const normalizedKey = String(key || '').toLowerCase().replace(/_/g, ' ').trim();
+    return !!normalizedKey && !this.isIdleDurationMetadataKey(key) && (
+      normalizedKey.includes('day') ||
+      /^\d+\s*[-+]\s*\d*/.test(normalizedKey) ||
+      /^\d+\+/.test(normalizedKey)
+    );
+  }
+
+  private getFirstObject(...values: any[]): PublicCloudIdleMetricResponse | undefined {
+    return values.find(value => value && typeof value === 'object');
+  }
+
+  private getFirstScalar(...values: any[]): string | number {
+    const value = values.find(item => item !== undefined && item !== null && item !== '' && typeof item !== 'object');
+    return value === undefined || value === null ? '' : value;
+  }
+
+  private getProgressTone(percent: number): PublicCloudStatusTone {
+    return percent < 65 ? 'success' : percent < 85 ? 'warning' : 'danger';
+  }
+
+  private getNumericValue(value: string | number | undefined | null): number {
+    return Number(String(value ?? '').replace(/[^0-9.-]/g, '')) || 0;
+  }
   /*
-   * ******End ****** ITSM Tickets Widget Related ********************
+   * ******End ****** Idle Devices Widgets Related ********************
    */
+
+  /*
+   * -----Start----- Alert & Events View Widget Related -------------------
+   */
+  getRecentAlerts(criteria?: PublicCloudDashboardFilterCriteria): Observable<PublicCloudRecentAlertsResponse> {
+    return this.http.get<PublicCloudRecentAlertsResponse>(PUBLIC_CLOUD_RECENT_ALERTS_ENDPOINT, {
+      params: this.convertFiltersToApiParams(criteria)
+    });
+  }
+
+  convertToRecentAlertSummaryMetricsViewData(data: PublicCloudRecentAlertsResponse): PublicCloudAlertSummaryMetric[] {
+    const summary = this.getRecentAlertSummary(data);
+    return [
+      {
+        label: 'Critical Alerts',
+        value: String(this.getRecentAlertSummaryValue(summary, ['critical_alerts', 'criticalAlerts', 'critical'])),
+        tone: 'danger'
+      },
+      {
+        label: 'Warning Alerts',
+        value: String(this.getRecentAlertSummaryValue(summary, ['warning_alerts', 'warningAlerts', 'warning'])),
+        tone: 'warning'
+      },
+      {
+        label: 'Info Alerts',
+        value: String(this.getRecentAlertSummaryValue(summary, ['info_alerts', 'infoAlerts', 'information', 'info'])),
+        tone: 'primary'
+      }
+    ];
+  }
+
+  convertToRecentAlertsViewData(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlert[] {
+    return this.getRecentAlertRows(data).map(item => ({
+      id: this.getFirstValue(item.id, item.alert_id, item.alertId, item.uuid, item.alert_uuid, item.alertUuid),
+      uuid: this.getFirstValue(item.uuid, item.alert_uuid, item.alertUuid, item.id, item.alert_id, item.alertId),
+      deviceName: this.getFirstValue(item.device_name, item.deviceName, item.name),
+      severity: this.getRecentAlertSeverity(this.getFirstValue(item.severity, item.status)),
+      description: this.getFirstValue(item.description),
+      source: this.getFirstValue(item.source),
+      acknowledged: this.formatRecentAlertAcknowledged(item.acknowledged),
+      duration: this.getFirstValue(item.duration)
+    }));
+  }
+
+  private getRecentAlertSummary(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlertsSummary {
+    const nestedData = !Array.isArray(data?.data) ? data?.data : null;
+    return data?.alertSummary || data?.alert_summary || data?.summary ||
+      nestedData?.alertSummary || nestedData?.alert_summary || nestedData?.summary || {};
+  }
+
+  private getRecentAlertSummaryValue(summary: PublicCloudRecentAlertsSummary, keys: Array<keyof PublicCloudRecentAlertsSummary>): number {
+    const value = keys.map(key => summary?.[key]).find(item => item !== undefined && item !== null);
+    return Number(value || 0);
+  }
+
+  private getRecentAlertRows(data: PublicCloudRecentAlertsResponse): PublicCloudRecentAlertResponseItem[] {
+    if (Array.isArray(data?.data)) {
+      return data.data;
+    }
+    const nestedData = !Array.isArray(data?.data) ? data?.data : null;
+    return data?.recentAlerts || data?.recent_alerts || data?.alerts || data?.results ||
+      nestedData?.recentAlerts || nestedData?.recent_alerts || nestedData?.alerts || nestedData?.results || [];
+  }
+
+  private getRecentAlertSeverity(value: string): PublicCloudRecentAlertSeverity {
+    switch ((value || '').toLowerCase()) {
+      case 'critical':
+      case 'error':
+        return 'critical';
+      case 'warning':
+      case 'warn':
+      case 'high':
+        return 'warning';
+      case 'info':
+      case 'information':
+      case 'informative':
+        return 'info';
+      default:
+        return 'muted';
+    }
+  }
+
+  private formatRecentAlertAcknowledged(value: string | boolean | undefined): string {
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+    const normalizedValue = String(value || '').toLowerCase();
+    if (normalizedValue === 'true') {
+      return 'Yes';
+    }
+    if (normalizedValue === 'false') {
+      return 'No';
+    }
+    return String(value || '');
+  }
+  /*
+   * ******End ****** Alert & Events View Widget Related ********************
+   */
+
 }

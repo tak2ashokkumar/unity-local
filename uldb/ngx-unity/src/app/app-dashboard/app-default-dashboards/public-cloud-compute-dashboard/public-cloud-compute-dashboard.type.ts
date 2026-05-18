@@ -1,5 +1,3 @@
-import { EChartsOption } from 'echarts';
-
 export type PublicCloudPlatform = 'aws' | 'azure' | 'gcp' | 'oracle';
 export type PublicCloudStatusTone = 'primary' | 'success' | 'warning' | 'danger' | 'muted';
 
@@ -24,6 +22,7 @@ export interface PublicCloudDashboardFilterCriteria {
 }
 
 export interface PublicCloudSummaryMetric {
+  key: PublicCloudInventorySummaryKey;
   label: string;
   value: string;
   tone?: PublicCloudStatusTone;
@@ -45,6 +44,7 @@ export interface PublicCloudInventoryTagResponse {
 }
 
 export interface PublicCloudProviderDistributionItem {
+  key: PublicCloudProviderDistributionKey;
   name: string;
   value: number;
   color: string;
@@ -57,29 +57,12 @@ export interface PublicCloudTagItem {
   backgroundColor: string;
 }
 
-export interface PublicCloudHeatmapGroup {
-  name: string;
-  color: string;
-  labelX: number;
-  labelY: number;
-  children: PublicCloudHeatmapItem[];
-}
-
-export interface PublicCloudHeatmapItem {
-  name: string;
-  value: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  usage?: string;
-}
-
 export type PublicCloudComputeBreakdownProviderKey = 'google_cloud' | 'azure' | 'aws' | 'oracle';
 export type PublicCloudComputeBreakdownStatKey = 'virtual_machine' | 'containers' | 'kubernetes';
-export type PublicCloudComputeBreakdownResponse = Record<PublicCloudComputeBreakdownProviderKey, Record<PublicCloudComputeBreakdownStatKey, number>>;
+export type PublicCloudComputeBreakdownResponse = Partial<Record<PublicCloudComputeBreakdownProviderKey, Partial<Record<PublicCloudComputeBreakdownStatKey, number>>>>;
 
 export interface PublicCloudComputeBreakdownProvider {
+  key: PublicCloudComputeBreakdownProviderKey;
   name: string;
   displayName: string;
   brandClass: string;
@@ -88,69 +71,214 @@ export interface PublicCloudComputeBreakdownProvider {
 }
 
 export interface PublicCloudComputeBreakdownStat {
+  key: PublicCloudComputeBreakdownStatKey;
   name: string;
   value: number;
 }
 
-export interface PublicCloudStorageUtilization {
-  capacity: string;
+export interface PublicCloudOrphanedDeviceResponseItem {
+  name?: string;
+  device_name?: string;
+  instance_name?: string;
+  status?: string;
+  lastSeen?: string;
+  last_seen?: string;
+  datacenter?: string;
+  datacenter_name?: string;
+  cloud?: string;
+  provider?: string;
+  platform?: string;
+  account?: string;
+}
+
+export interface PublicCloudOrphanedDevicesResponse {
+  count?: string | number;
+  results?: PublicCloudOrphanedDeviceResponseItem[];
+  orphanedDeviceList?: PublicCloudOrphanedDeviceResponseItem[];
+  data?: PublicCloudOrphanedDeviceResponseItem[];
+  items?: PublicCloudOrphanedDeviceResponseItem[];
+  totalOrphaned?: string | number;
+}
+
+export interface PublicCloudOrphanedDeviceRow {
+  name: string;
+  status: string;
+  lastSeen: string;
+  datacenter: string;
+}
+
+export interface PublicCloudOrphanedCategoryResponseItem {
+  category?: string;
+  name?: string;
+  label?: string;
+  display_name?: string;
+  type?: string;
+  resource_type?: string;
+  count?: string | number;
+  value?: string | number;
+  percentage?: string | number;
+  percent?: string | number;
+}
+
+export interface PublicCloudOrphanedDevicesByCategoryResponse {
+  results?: PublicCloudOrphanedCategoryResponseItem[];
+  orphanedByCategory?: PublicCloudOrphanedCategoryResponseItem[];
+  categories?: PublicCloudOrphanedCategoryResponseItem[];
+  by_category?: PublicCloudOrphanedCategoryResponseItem[];
+  data?: PublicCloudOrphanedCategoryResponseItem[];
+  breakdown?: PublicCloudOrphanedCategoryResponseItem[] | Record<string, string | number | PublicCloudOrphanedCategoryResponseItem>;
+  total?: string | number;
+  totalOrphaned?: string | number;
+  total_count?: string | number;
+  totalCount?: string | number;
+}
+
+export type PublicCloudOrphanedDevicesByCategoryApiResponse = PublicCloudOrphanedDevicesByCategoryResponse | PublicCloudOrphanedCategoryResponseItem[];
+
+export interface PublicCloudOrphanedCategoryItem {
+  category: string;
+  count: number;
+  percentage: number;
+  color: string;
+  totalCount?: number;
+}
+
+export interface PublicCloudIdleMetricResponse {
+  used?: string | number;
+  free?: string | number;
+  percent?: string | number;
+  percentage?: string | number;
+  value?: string | number;
+}
+
+export interface PublicCloudIdleDeviceResponseItem {
+  id?: string | number;
+  uuid?: string;
+  device_id?: string | number;
+  deviceId?: string | number;
+  device_uuid?: string;
+  deviceUuid?: string;
+  resource_id?: string | number;
+  resourceId?: string | number;
+  device_name?: string;
+  deviceName?: string;
+  name?: string;
+  resource_type?: string;
+  resourceType?: string;
+  type?: string;
+  provider?: string;
+  platform?: string;
+  cloud?: string;
+  cloud_provider?: string;
+  cloudProvider?: string;
+  cloud_type?: string;
+  cloudType?: string;
+  monitoring_type?: string;
+  monitoringType?: string;
+  monitoring?: {
+    configured?: boolean;
+    enabled?: boolean;
+    observium?: boolean;
+    zabbix?: boolean;
+  };
+  avg_cpu?: PublicCloudIdleMetricResponse;
+  avgCpu?: PublicCloudIdleMetricResponse;
+  avgCPU?: PublicCloudIdleMetricResponse;
+  cpu?: PublicCloudIdleMetricResponse;
+  cpu_usage?: PublicCloudIdleMetricResponse;
+  avg_cpu_percent?: string | number;
+  avgCpuPercent?: string | number;
+  avg_cpu_percentage?: string | number;
+  cpu_percent?: string | number;
+  avg_mem?: PublicCloudIdleMetricResponse;
+  avgMem?: PublicCloudIdleMetricResponse;
+  avg_memory?: PublicCloudIdleMetricResponse;
+  memory?: PublicCloudIdleMetricResponse;
+  memory_usage?: PublicCloudIdleMetricResponse;
+  avg_mem_percent?: string | number;
+  avgMemPercent?: string | number;
+  avg_mem_percentage?: string | number;
+  memory_percent?: string | number;
+  network_io?: string | number;
+  networkIO?: string | number;
+  network?: string | number;
+  idle_duration?: string | number;
+  idleDuration?: string | number;
+  status?: string;
+}
+
+export interface PublicCloudIdleDevicesResponse {
+  count: string | number;
+  results: PublicCloudIdleDeviceResponseItem[];
+}
+
+export interface PublicCloudIdleMetric {
   used: string;
   free: string;
   percent: number;
   tone: PublicCloudStatusTone;
 }
 
-export interface PublicCloudDiskIops {
-  label: string;
+export interface PublicCloudIdleDeviceRow {
+  id: string;
+  uuid: string;
+  deviceId: string;
+  resourceId: string;
+  deviceName: string;
+  resourceType: string;
+  provider: string;
+  cloudType: string;
+  monitoringType: string;
+  monitoring?: {
+    configured?: boolean;
+    enabled?: boolean;
+    observium?: boolean;
+    zabbix?: boolean;
+  };
+  avgCpu: PublicCloudIdleMetric;
+  avgMem: PublicCloudIdleMetric;
+  networkIO: string;
+  idleDuration: string;
+  status: string;
+}
+
+export interface PublicCloudIdleDurationResponseItem {
+  duration?: string;
+  idle_duration?: string;
+  idleDuration?: string;
+  range?: string;
+  name?: string;
+  label?: string;
+  count?: string | number;
+  value?: string | number;
+  total?: string | number;
+  total_count?: string | number;
+  totalCount?: string | number;
+  devices?: string | number;
+  percent?: string | number;
+  percentage?: string | number;
+}
+
+export interface PublicCloudIdleDurationResponse {
+  results?: PublicCloudIdleDurationResponseItem[];
+  data?: PublicCloudIdleDurationResponseItem[] | PublicCloudIdleDurationResponse;
+  summary?: PublicCloudIdleDurationResponseItem[] | Record<string, string | number | PublicCloudIdleDurationResponseItem>;
+  distribution?: PublicCloudIdleDurationResponseItem[];
+  duration_distribution?: PublicCloudIdleDurationResponseItem[];
+  durationDistribution?: PublicCloudIdleDurationResponseItem[];
+  idleDurationDistribution?: PublicCloudIdleDurationResponseItem[];
+  idle_duration_distribution?: PublicCloudIdleDurationResponseItem[];
+  idle_devices_by_duration?: PublicCloudIdleDurationResponseItem[];
+  breakdown?: PublicCloudIdleDurationResponseItem[] | Record<string, string | number | PublicCloudIdleDurationResponseItem>;
+}
+
+export type PublicCloudIdleDurationApiResponse = PublicCloudIdleDurationResponse | PublicCloudIdleDurationResponseItem[];
+
+export interface PublicCloudIdleDurationItem {
+  duration: string;
+  count: number;
   percent: number;
-  tone: PublicCloudStatusTone;
-}
-
-export interface PublicCloudUtilizationRow {
-  name: string;
-  cpuSeries: number[];
-  cpuStatus: number;
-  cpuTone: PublicCloudStatusTone;
-  memorySeries: number[];
-  memoryStatus: number;
-  memoryTone: PublicCloudStatusTone;
-  storage: PublicCloudStorageUtilization;
-  diskIops: PublicCloudDiskIops;
-  upTime: string;
-}
-
-export interface PublicCloudUtilizationViewRow extends PublicCloudUtilizationRow {
-  cpuChartOptions: EChartsOption;
-  memoryChartOptions: EChartsOption;
-}
-
-export interface PublicCloudHorizontalBarItem {
-  name: string;
-  value: number;
-  label: string;
   color: string;
-}
-
-export interface PublicCloudDatabaseLatencyBadge {
-  name: string;
-  value: string;
-  textColor: string;
-  backgroundColor: string;
-}
-
-export type PublicCloudAlertSummaryKey = 'critical_alerts' | 'high_alerts' | 'open_itsm_tickets' | 'automation_success' | 'avg_mttr';
-
-export interface PublicCloudTopCriticalAlertsSummary {
-  critical_alerts: number;
-  high_alerts: number;
-  open_itsm_tickets: number;
-  automation_success: string;
-  avg_mttr: string;
-}
-
-export interface PublicCloudTopCriticalAlertsResponse {
-  summary: PublicCloudTopCriticalAlertsSummary;
-  top_alerts: PublicCloudCriticalAlertResponse[];
 }
 
 export interface PublicCloudAlertSummaryMetric {
@@ -159,163 +287,66 @@ export interface PublicCloudAlertSummaryMetric {
   tone: PublicCloudStatusTone;
 }
 
-export interface PublicCloudCriticalAlertResponse {
-  id: string;
-  device_name: string;
-  severity: 'critical' | 'high';
-  description: string;
-  source: string;
-  acknowledged: string;
-  duration: string;
+export interface PublicCloudRecentAlertsSummary {
+  total?: number;
+  critical?: number;
+  critical_alerts?: number;
+  criticalAlerts?: number;
+  warning?: number;
+  warning_alerts?: number;
+  warningAlerts?: number;
+  information?: number;
+  info?: number;
+  info_alerts?: number;
+  infoAlerts?: number;
 }
 
-export interface PublicCloudCriticalAlert {
+export interface PublicCloudRecentAlertResponseItem {
+  id?: string | number;
+  uuid?: string;
+  alert_id?: string | number;
+  alertId?: string | number;
+  alert_uuid?: string;
+  alertUuid?: string;
+  device_name?: string;
+  deviceName?: string;
+  name?: string;
+  severity?: string;
+  status?: string;
+  description?: string;
+  source?: string;
+  acknowledged?: string | boolean;
+  duration?: string;
+}
+
+export interface PublicCloudRecentAlertsResponse {
+  alertSummary?: PublicCloudRecentAlertsSummary;
+  alert_summary?: PublicCloudRecentAlertsSummary;
+  summary?: PublicCloudRecentAlertsSummary;
+  recentAlerts?: PublicCloudRecentAlertResponseItem[];
+  recent_alerts?: PublicCloudRecentAlertResponseItem[];
+  alerts?: PublicCloudRecentAlertResponseItem[];
+  results?: PublicCloudRecentAlertResponseItem[];
+  data?: PublicCloudRecentAlertResponseItem[] | {
+    alertSummary?: PublicCloudRecentAlertsSummary;
+    alert_summary?: PublicCloudRecentAlertsSummary;
+    summary?: PublicCloudRecentAlertsSummary;
+    recentAlerts?: PublicCloudRecentAlertResponseItem[];
+    recent_alerts?: PublicCloudRecentAlertResponseItem[];
+    alerts?: PublicCloudRecentAlertResponseItem[];
+    results?: PublicCloudRecentAlertResponseItem[];
+  };
+}
+
+export type PublicCloudRecentAlertSeverity = 'critical' | 'warning' | 'info' | 'high' | 'muted';
+
+export interface PublicCloudRecentAlert {
   id: string;
+  uuid: string;
   deviceName: string;
-  severity: 'critical' | 'high';
+  severity: PublicCloudRecentAlertSeverity;
   description: string;
   source: string;
   acknowledged: string;
   duration: string;
-}
-
-export type PublicCloudAlertPieKey = 'raw_events' | 'alerts' | 'conditions';
-export type PublicCloudAIOpsGraphGroupKey = 'raw_events' | 'noise_reduction' | 'first_response';
-export type PublicCloudAIOpsGraphMetricKey = 'critical' | 'warning' | 'informative' | 'dedupe' | 'suppressed' | 'correlated' | 'auto_cloned' | 'ticket_created' | 'auto_closed';
-
-export interface PublicCloudAIOpsDetailsResponse {
-  alerts_pie: Record<PublicCloudAlertPieKey, number>;
-  aiops_graph: PublicCloudAIOpsGraph;
-  raw_events_details: PublicCloudAIOpsDetailsRawEventsDetails;
-}
-
-export interface PublicCloudAIOpsGraph {
-  raw_events: PublicCloudAIOpsRawEventsGraph;
-  noise_reduction: PublicCloudAIOpsNoiseReductionGraph;
-  first_response: PublicCloudAIOpsFirstResponseGraph;
-}
-
-export interface PublicCloudAIOpsRawEventsGraph {
-  critical: number;
-  warning: number;
-  informative: number;
-}
-
-export interface PublicCloudAIOpsNoiseReductionGraph {
-  dedupe: number;
-  suppressed: number;
-  correlated: number;
-}
-
-export interface PublicCloudAIOpsFirstResponseGraph {
-  auto_cloned: number;
-  ticket_created: number;
-  auto_closed: number;
-}
-
-export interface PublicCloudAIOpsDetailsRawEventsDetails {
-  raw_events: number;
-  critical: number;
-  warning: number;
-  informative: number;
-  noise_reduction: string;
-  dedupe_events: number;
-  suppressed_events: number;
-  correlated: number;
-  first_response: string;
-  auto_cloned: number;
-  ticket_created: number;
-  auto_closed: number;
-}
-
-export interface PublicCloudAlertTrendLegendItem {
-  name: string;
-  value: number;
-  color: string;
-}
-
-export interface PublicCloudAlertTrendStackItem {
-  label: string;
-  value: number;
-  color: string;
-}
-
-export interface PublicCloudAlertTrendBarGroup {
-  name: string;
-  items: PublicCloudAlertTrendStackItem[];
-}
-
-export interface PublicCloudAlertTrendStackLegendItem extends PublicCloudAlertTrendStackItem { }
-
-export interface PublicCloudAlertSideMetric {
-  label: string;
-  value: string;
-  tone?: PublicCloudStatusTone;
-}
-
-export interface PublicCloudAlertSideCard {
-  title: string;
-  value: string;
-  metrics: PublicCloudAlertSideMetric[];
-}
-
-export type PublicCloudTicketResponseTimeKey = 'one_day' | 'one_week' | 'one_month' | 'greaterthan_month';
-
-export interface PublicCloudTicketGraphDataResponse {
-  by_state: Record<string, number>;
-  by_priority: Record<string, number>;
-  closed_tickets_count_by_response_time: Record<PublicCloudTicketResponseTimeKey, number>;
-}
-
-export interface PublicCloudTicketDonutItem {
-  name: string;
-  value: number;
-  color: string;
-}
-
-export interface PublicCloudTicketField {
-  display_value: string;
-  value: string;
-}
-
-export interface PublicCloudTicketResponseItem {
-  description: PublicCloudTicketField;
-  task_effective_number: PublicCloudTicketField;
-  ticket_type: string;
-  sys_updated_on: PublicCloudTicketField;
-  number: PublicCloudTicketField;
-  priority: PublicCloudTicketField;
-  state: PublicCloudTicketField;
-  sys_id: PublicCloudTicketField;
-  opened_at: PublicCloudTicketField;
-  short_description: PublicCloudTicketField;
-  urgency: PublicCloudTicketField;
-  resolved_at?: PublicCloudTicketField;
-}
-
-export interface PublicCloudTicketsResponse {
-  count: string | number;
-  results: PublicCloudTicketResponseItem[];
-}
-
-export interface PublicCloudTicketFilterCriteria {
-  state: string;
-  ticket_type: string;
-  search: string;
-  priority: string;
-  dateRange: string;
-  start_date: string;
-  end_date: string;
-  page: number;
-  page_size: number;
-}
-
-export interface PublicCloudTicketRow {
-  id: string;
-  shortDescription: string;
-  state: string;
-  priority: string;
-  createdOn: string;
-  updatedOn: string;
-  resolution: string;
 }

@@ -12,8 +12,6 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
-import { PUBLIC_CLOUD_TICKET_PRIORITY_OPTIONS, PUBLIC_CLOUD_TICKET_STATE_OPTIONS, PUBLIC_CLOUD_TICKET_TYPE_OPTIONS } from '../public-cloud-compute-dashboard/public-cloud-compute-dashboard.const';
-import { PublicCloudFilterOption } from '../public-cloud-compute-dashboard/public-cloud-compute-dashboard.type';
 import { AutoRemediationExecSummaryWidgetData, CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, RiskOptimizationViewData, RiskOptimizationWidgetData, SwapBalloonMemoryWidgetData, TicketPriorityOptionsWidgetData, TicketsItemViewData, TicketStatusOptionsWidgetData, Top10ClustersByVMsWidgetData, TopAutoRemediationActionWidgetData, TopCriticalAlertsViewData, VmDensityHost } from './private-cloud-compute-dashboard.service';
 import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';

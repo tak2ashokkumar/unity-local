@@ -1,37 +1,33 @@
+import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Overlay, ScrollStrategy } from '@angular/cdk/overlay';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
 import { Observable, Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
+import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
-import {
-  PUBLIC_CLOUD_TICKET_PRIORITY_OPTIONS,
-  PUBLIC_CLOUD_TICKET_STATE_OPTIONS,
-  PUBLIC_CLOUD_TICKET_TYPE_OPTIONS
-} from './public-cloud-compute-dashboard.const';
 import { PublicCloudComputeDashboardService } from './public-cloud-compute-dashboard.service';
 import {
   PublicCloudAccountOption,
-  PublicCloudAlertSideCard,
   PublicCloudAlertSummaryMetric,
-  PublicCloudAlertTrendLegendItem,
-  PublicCloudAlertTrendStackLegendItem,
   PublicCloudComputeBreakdownProvider,
-  PublicCloudCriticalAlert,
+  PublicCloudComputeBreakdownStat,
   PublicCloudDashboardFilterCriteria,
-  PublicCloudDatabaseLatencyBadge,
   PublicCloudFilterOption,
+  PublicCloudIdleDeviceRow,
+  PublicCloudIdleDurationItem,
+  PublicCloudInventorySummaryKey,
+  PublicCloudOrphanedCategoryItem,
+  PublicCloudOrphanedDeviceRow,
+  PublicCloudProviderDistributionKey,
   PublicCloudProviderDistributionItem,
+  PublicCloudRecentAlert,
   PublicCloudRegionOption,
   PublicCloudSummaryMetric,
-  PublicCloudTagItem,
-  PublicCloudTicketFilterCriteria,
-  PublicCloudTicketRow,
-  PublicCloudUtilizationViewRow
+  PublicCloudTagItem
 } from './public-cloud-compute-dashboard.type';
 
 @Component({
@@ -43,67 +39,69 @@ import {
 export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
   private filterFormUnsubscribe = new Subject<void>();
-  private appliedTicketDateRangeKey = '';
+  private readonly linkRoutes = {
+    publicCloud: ['/unitycloud/publiccloud'],
+    devices: ['/unitycloud/devices'],
+    vmAll: ['/unitycloud/devices/vms/allvms'],
+    kubernetes: ['/unitycloud/devices/kubernetes'],
+    alerts: ['/services/aiml-event-mgmt/alerts'],
+    gpu: ['/services/ai-observability/gpu'],
+    storage: ['/unitycloud/devices/storagedevices'],
+    bmservers: ['/unitycloud/devices/bmservers'],
+    provider: {
+      aws: ['/unitycloud/publiccloud/aws'],
+      azure: ['/unitycloud/publiccloud/azure'],
+      gcp: ['/unitycloud/publiccloud/gcp'],
+      oci: ['/unitycloud/publiccloud/oracle'],
+      oracle: ['/unitycloud/publiccloud/oracle']
+    },
+    providerVm: {
+      aws: ['/unitycloud/devices/vms/aws'],
+      azure: ['/unitycloud/devices/vms/azure'],
+      gcp: ['/unitycloud/devices/vms/gcp'],
+      oracle: ['/unitycloud/devices/vms/oracle']
+    }
+  };
 
   filterForm: FormGroup;
-  ticketFilterForm: FormGroup;
   platformOptions: PublicCloudFilterOption[] = [];
   regionOptions: PublicCloudRegionOption[] = [];
   accountOptions: PublicCloudAccountOption[] = [];
-  ticketStateFilterOptions: PublicCloudFilterOption[] = PUBLIC_CLOUD_TICKET_STATE_OPTIONS;
-  ticketPriorityFilterOptions: PublicCloudFilterOption[] = PUBLIC_CLOUD_TICKET_PRIORITY_OPTIONS;
-  ticketTypeFilterOptions: PublicCloudFilterOption[] = PUBLIC_CLOUD_TICKET_TYPE_OPTIONS;
 
   summaryMetrics: PublicCloudSummaryMetric[] = [];
   providerDistribution: PublicCloudProviderDistributionItem[] = [];
   providerDistributionOptions: EChartsOption = {};
   tags: PublicCloudTagItem[] = [];
-  heatmapOptions: EChartsOption = {};
   computeBreakdown: PublicCloudComputeBreakdownProvider[] = [];
-  utilizationRows: PublicCloudUtilizationViewRow[] = [];
-  latencyWorkloadOptions: EChartsOption = {};
-  errorRateWorkloadOptions: EChartsOption = {};
-  databasePerformanceOptions: EChartsOption = {};
-  databaseLatencyBadges: PublicCloudDatabaseLatencyBadge[] = [];
-  alertSummaryMetrics: PublicCloudAlertSummaryMetric[] = [];
-  criticalAlerts: PublicCloudCriticalAlert[] = [];
-  alertTrendLegend: PublicCloudAlertTrendLegendItem[] = [];
-  alertTrendPolarOptions: EChartsOption = {};
-  alertTrendStackOptions: EChartsOption = {};
-  alertTrendStackLegend: PublicCloudAlertTrendStackLegendItem[] = [];
-  alertSideCards: PublicCloudAlertSideCard[] = [];
-  ticketPriorityOptions: EChartsOption = {};
-  ticketStatusOptions: EChartsOption = {};
-  ticketResponseTimeOptions: EChartsOption = {};
-  ticketPriorityHasData = false;
-  ticketStatusHasData = false;
-  ticketResponseTimeHasData = false;
-  tickets: PublicCloudTicketRow[] = [];
-  totalTickets = 0;
-  ticketPageNo = 1;
-  ticketPageSize = 10;
-  ticketDatePickerScrollStrategy: ScrollStrategy;
+  orphanedDevices: PublicCloudOrphanedDeviceRow[] = [];
+  orphanedDevicesTotal = 0;
+  orphanedDevicesPageNo = 1;
+  orphanedDevicesPageSize = 10;
+  orphanedByCategory: PublicCloudOrphanedCategoryItem[] = [];
+  orphanedByCategoryOptions: EChartsOption = {};
+  orphanedByCategoryHasData = false;
+  idleDevices: PublicCloudIdleDeviceRow[] = [];
+  idleDevicesTotal = 0;
+  idleDevicesPageNo = 1;
+  idleDevicesPageSize = 10;
+  idleDurationRows: PublicCloudIdleDurationItem[] = [];
+  idleDurationOptions: EChartsOption = {};
+  idleDurationHasData = false;
+  recentAlertSummaryMetrics: PublicCloudAlertSummaryMetric[] = [];
+  recentAlerts: PublicCloudRecentAlert[] = [];
 
   loaderNames = {
     filters: 'publicCloudFiltersLoader',
     summaryMetrics: 'publicCloudSummaryMetricsLoader',
     providerDistribution: 'publicCloudProviderDistributionLoader',
     tags: 'publicCloudTagsLoader',
-    regionHeatmap: 'publicCloudRegionHeatmapLoader',
     computeBreakdown: 'publicCloudComputeBreakdownLoader',
-    utilization: 'publicCloudUtilizationLoader',
-    latencyWorkloads: 'publicCloudLatencyWorkloadsLoader',
-    errorRateWorkloads: 'publicCloudErrorRateWorkloadsLoader',
-    databasePerformance: 'publicCloudDatabasePerformanceLoader',
-    databaseLatencyBadges: 'publicCloudDatabaseLatencyBadgesLoader',
-    alertSummary: 'publicCloudAlertSummaryLoader',
-    criticalAlerts: 'publicCloudCriticalAlertsLoader',
-    alertTrend: 'publicCloudAlertTrendLoader',
-    alertSideCards: 'publicCloudAlertSideCardsLoader',
-    ticketPriority: 'publicCloudTicketPriorityLoader',
-    ticketStatus: 'publicCloudTicketStatusLoader',
-    ticketResponseTime: 'publicCloudTicketResponseTimeLoader',
-    tickets: 'publicCloudTicketsLoader'
+    orphanedDevices: 'publicCloudOrphanedDevicesLoader',
+    orphanedDevicesByCategory: 'publicCloudOrphanedDevicesByCategoryLoader',
+    idleDevices: 'publicCloudIdleDevicesLoader',
+    idleDuration: 'publicCloudIdleDurationLoader',
+    recentAlertSummary: 'publicCloudRecentAlertSummaryLoader',
+    recentAlerts: 'publicCloudRecentAlertsLoader'
   };
 
   multiselectSettings: IMultiSelectSettings = {
@@ -132,11 +130,10 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   constructor(private svc: PublicCloudComputeDashboardService,
     private router: Router,
+    private location: Location,
     private route: ActivatedRoute,
     private spinnerService: AppSpinnerService,
-    private overlay: Overlay) {
-    this.ticketDatePickerScrollStrategy = this.overlay.scrollStrategies.reposition();
-  }
+    private alertDetailSvc: AimlAlertDetailsService) { }
 
   ngOnInit(): void {
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
@@ -151,6 +148,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   /** Applies the current filter form output to every widget request. */
   applyFilters() {
+    this.orphanedDevicesPageNo = 1;
+    this.idleDevicesPageNo = 1;
     this.loadData();
   }
 
@@ -195,7 +194,6 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.svc.getAccounts(platformValues, regionValues).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.accountOptions = res || [];
       this.buildFilterForm();
-      this.buildTicketFilterForm();
       this.stopFilterLoader();
       this.loadData();
     }, () => {
@@ -258,20 +256,12 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.watchFilterChanges();
   }
 
-  /** Creates the ITSM ticket filter form with the default two-week date window. */
-  private buildTicketFilterForm() {
-    this.ticketFilterForm = this.svc.buildTicketFilterForm();
-    this.ticketPageNo = 1;
-    this.ticketPageSize = 10;
-    this.appliedTicketDateRangeKey = this.getTicketDateRangeKey();
-  }
-
   /** Clears existing filter form/options so a fresh filter loading sequence can run. */
   private resetFilterState() {
     this.filterFormUnsubscribe.next();
     this.filterForm = null;
-    this.ticketFilterForm = null;
-    this.appliedTicketDateRangeKey = '';
+    this.orphanedDevicesPageNo = 1;
+    this.idleDevicesPageNo = 1;
     this.platformOptions = [];
     this.regionOptions = [];
     this.accountOptions = [];
@@ -355,19 +345,12 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     const filterFormOutput = this.getFilterFormOutput();
     setTimeout(() => {
       this.getInventorySummary(filterFormOutput);
-      // Next sprint: uncomment this call with the Regions / AZ Usage Heatmap template block.
-      // this.getRegionHeatmap(filterFormOutput);
       this.getComputeBreakdown(filterFormOutput);
-      // Next sprint: uncomment these calls with the Performance Hotspots and Performance / Workload Insights template blocks.
-      // this.getUtilizationRows(filterFormOutput);
-      // this.getLatencyWorkloads(filterFormOutput);
-      // this.getErrorRateWorkloads(filterFormOutput);
-      // this.getDatabasePerformance(filterFormOutput);
-      // this.getDatabaseLatencyBadges(filterFormOutput);
-      this.getTopCriticalAlerts(filterFormOutput);
-      this.getAlertTrend(filterFormOutput);
-      this.getTicketGraphData(filterFormOutput);
-      this.getTickets(filterFormOutput);
+      this.getOrphanedDevices(filterFormOutput);
+      this.getOrphanedDevicesByCategory(filterFormOutput);
+      this.getIdleDevices(filterFormOutput);
+      this.getIdleDevicesByDuration(filterFormOutput);
+      this.getRecentAlerts(filterFormOutput);
     }, 0);
   }
 
@@ -415,329 +398,156 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.tags = [];
   }
 
-  getRegionHeatmap(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.heatmapOptions = {};
-    this.loadWidget(this.loaderNames.regionHeatmap, this.svc.getRegionHeatmap(filterFormOutput), res => {
-      this.heatmapOptions = this.svc.convertToRegionHeatmapOptions(res);
-    }, () => {
-      this.heatmapOptions = {};
-    });
-  }
-
   getComputeBreakdown(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.computeBreakdown = [];
     this.loadWidget(this.loaderNames.computeBreakdown, this.svc.getComputeBreakdown(filterFormOutput), res => {
-      this.computeBreakdown = this.svc.convertToComputeBreakdownViewData(res);
+      this.computeBreakdown = this.svc.convertToComputeBreakdownViewData(res, filterFormOutput);
     }, () => {
       this.computeBreakdown = [];
     });
   }
 
-  getUtilizationRows(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.utilizationRows = [];
-    this.loadWidget(this.loaderNames.utilization, this.svc.getUtilizationRows(filterFormOutput), res => {
-      this.utilizationRows = this.svc.convertToUtilizationRowsViewData(res);
+  getOrphanedDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.orphanedDevices = [];
+    this.orphanedDevicesTotal = 0;
+    this.loadWidget(this.loaderNames.orphanedDevices, this.svc.getOrphanedDevices(filterFormOutput, this.orphanedDevicesPageNo, this.orphanedDevicesPageSize), res => {
+      this.orphanedDevices = this.svc.convertToOrphanedDevicesViewData(res);
+      this.orphanedDevicesTotal = this.svc.convertToOrphanedDevicesTotal(res);
     }, () => {
-      this.utilizationRows = [];
+      this.orphanedDevices = [];
+      this.orphanedDevicesTotal = 0;
     });
   }
 
-  getLatencyWorkloads(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.latencyWorkloadOptions = {};
-    this.loadWidget(this.loaderNames.latencyWorkloads, this.svc.getLatencyWorkloads(filterFormOutput), res => {
-      this.latencyWorkloadOptions = this.svc.convertToLatencyWorkloadOptions(res);
+  getOrphanedDevicesByCategory(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.orphanedByCategory = [];
+    this.orphanedByCategoryOptions = {};
+    this.orphanedByCategoryHasData = false;
+    this.loadWidget(this.loaderNames.orphanedDevicesByCategory, this.svc.getOrphanedDevicesByCategory(filterFormOutput), res => {
+      this.orphanedByCategory = this.svc.convertToOrphanedByCategoryViewData(res);
+      this.orphanedByCategoryOptions = this.svc.convertToOrphanedByCategoryOptions(this.orphanedByCategory);
+      this.orphanedByCategoryHasData = this.svc.hasOrphanedByCategoryData(this.orphanedByCategory);
     }, () => {
-      this.latencyWorkloadOptions = {};
+      this.orphanedByCategory = [];
+      this.orphanedByCategoryOptions = {};
+      this.orphanedByCategoryHasData = false;
     });
   }
 
-  getErrorRateWorkloads(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.errorRateWorkloadOptions = {};
-    this.loadWidget(this.loaderNames.errorRateWorkloads, this.svc.getErrorRateWorkloads(filterFormOutput), res => {
-      this.errorRateWorkloadOptions = this.svc.convertToErrorRateWorkloadOptions(res);
+  orphanedDevicesPageChange(pageNo: number) {
+    if (this.orphanedDevicesPageNo === pageNo) {
+      return;
+    }
+    this.orphanedDevicesPageNo = pageNo;
+    this.getOrphanedDevices(this.getFilterFormOutput());
+  }
+
+  orphanedDevicesPageSizeChange(event: Event) {
+    this.orphanedDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
+    this.orphanedDevicesPageNo = 1;
+    this.getOrphanedDevices(this.getFilterFormOutput());
+  }
+
+  getIdleDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.idleDevices = [];
+    this.idleDevicesTotal = 0;
+    this.loadWidget(this.loaderNames.idleDevices, this.svc.getIdleDevices(filterFormOutput, this.idleDevicesPageNo, this.idleDevicesPageSize), res => {
+      this.idleDevices = this.svc.convertToIdleDevicesViewData(res);
+      this.idleDevicesTotal = this.svc.convertToIdleDevicesTotal(res);
     }, () => {
-      this.errorRateWorkloadOptions = {};
+      this.idleDevices = [];
+      this.idleDevicesTotal = 0;
     });
   }
 
-  getDatabasePerformance(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databasePerformanceOptions = {};
-    this.loadWidget(this.loaderNames.databasePerformance, this.svc.getDatabasePerformance(filterFormOutput), res => {
-      this.databasePerformanceOptions = this.svc.convertToDatabasePerformanceOptions(res);
+  getIdleDevicesByDuration(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.idleDurationRows = [];
+    this.idleDurationOptions = {};
+    this.idleDurationHasData = false;
+    this.loadWidget(this.loaderNames.idleDuration, this.svc.getIdleDevicesByDuration(filterFormOutput), res => {
+      this.idleDurationRows = this.svc.convertToIdleDurationViewData(res);
+      this.idleDurationHasData = this.svc.hasIdleDurationData(this.idleDurationRows);
+      this.idleDurationOptions = this.idleDurationHasData ? this.svc.convertToIdleDurationOptions(this.idleDurationRows) : {};
     }, () => {
-      this.databasePerformanceOptions = {};
+      this.idleDurationRows = [];
+      this.idleDurationOptions = {};
+      this.idleDurationHasData = false;
     });
   }
 
-  getDatabaseLatencyBadges(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.databaseLatencyBadges = [];
-    this.loadWidget(this.loaderNames.databaseLatencyBadges, this.svc.getDatabaseLatencyBadges(filterFormOutput), res => {
-      this.databaseLatencyBadges = this.svc.convertToDatabaseLatencyBadgesViewData(res);
-    }, () => {
-      this.databaseLatencyBadges = [];
-    });
+  idleDevicesPageChange(pageNo: number) {
+    if (this.idleDevicesPageNo === pageNo) {
+      return;
+    }
+    this.idleDevicesPageNo = pageNo;
+    this.getIdleDevices(this.getFilterFormOutput());
   }
 
-  getTopCriticalAlerts(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.alertSummaryMetrics = [];
-    this.criticalAlerts = [];
-    this.startTopCriticalAlertsLoaders();
-    this.svc.getTopCriticalAlerts(filterFormOutput).pipe(
+  idleDevicesPageSizeChange(event: Event) {
+    this.idleDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
+    this.idleDevicesPageNo = 1;
+    this.getIdleDevices(this.getFilterFormOutput());
+  }
+
+  getRecentAlerts(filterFormOutput: PublicCloudDashboardFilterCriteria) {
+    this.recentAlertSummaryMetrics = [];
+    this.recentAlerts = [];
+    this.startRecentAlertsLoaders();
+    this.svc.getRecentAlerts(filterFormOutput).pipe(
       takeUntil(this.ngUnsubscribe),
-      finalize(() => this.stopTopCriticalAlertsLoaders())
+      finalize(() => this.stopRecentAlertsLoaders())
     ).subscribe(res => {
-      this.alertSummaryMetrics = this.svc.convertToAlertSummaryMetricsViewData(res);
-      this.criticalAlerts = this.svc.convertToCriticalAlertsViewData(res);
+      this.recentAlertSummaryMetrics = this.svc.convertToRecentAlertSummaryMetricsViewData(res);
+      this.recentAlerts = this.svc.convertToRecentAlertsViewData(res);
     }, () => {
-      this.clearTopCriticalAlertsViewData();
+      this.clearRecentAlertsViewData();
     });
   }
 
-  private startTopCriticalAlertsLoaders() {
+  private startRecentAlertsLoaders() {
     [
-      this.loaderNames.alertSummary,
-      this.loaderNames.criticalAlerts
+      this.loaderNames.recentAlertSummary,
+      this.loaderNames.recentAlerts
     ].forEach(loaderName => this.spinnerService.start(loaderName));
   }
 
-  private stopTopCriticalAlertsLoaders() {
+  private stopRecentAlertsLoaders() {
     setTimeout(() => {
       [
-        this.loaderNames.alertSummary,
-        this.loaderNames.criticalAlerts
+        this.loaderNames.recentAlertSummary,
+        this.loaderNames.recentAlerts
       ].forEach(loaderName => this.spinnerService.stop(loaderName));
     }, 0);
   }
 
-  private clearTopCriticalAlertsViewData() {
-    this.alertSummaryMetrics = [];
-    this.criticalAlerts = [];
-  }
-
-  getAlertTrend(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.alertTrendLegend = [];
-    this.alertTrendPolarOptions = {};
-    this.alertTrendStackOptions = {};
-    this.alertTrendStackLegend = [];
-    this.alertSideCards = [];
-    this.startAlertTrendLoaders();
-    this.svc.getAIOpsDetails(filterFormOutput).pipe(
-      takeUntil(this.ngUnsubscribe),
-      finalize(() => this.stopAlertTrendLoaders())
-    ).subscribe(res => {
-      const stackGroups = this.svc.convertToAlertTrendStackGroupsViewData(res);
-      this.alertTrendLegend = this.svc.convertToAlertTrendLegendViewData(res);
-      this.alertTrendPolarOptions = this.svc.convertToAlertTrendPolarOptions(this.alertTrendLegend);
-      this.alertTrendStackOptions = this.svc.convertToAlertTrendStackOptions(stackGroups);
-      this.alertTrendStackLegend = this.svc.convertToAlertTrendStackLegendViewData(stackGroups);
-      this.alertSideCards = this.svc.convertToAlertSideCardsViewData(res);
-    }, () => {
-      this.clearAlertTrendViewData();
-    });
-  }
-
-  private startAlertTrendLoaders() {
-    [
-      this.loaderNames.alertTrend,
-      this.loaderNames.alertSideCards
-    ].forEach(loaderName => this.spinnerService.start(loaderName));
-  }
-
-  private stopAlertTrendLoaders() {
-    setTimeout(() => {
-      [
-        this.loaderNames.alertTrend,
-        this.loaderNames.alertSideCards
-      ].forEach(loaderName => this.spinnerService.stop(loaderName));
-    }, 0);
-  }
-
-  private clearAlertTrendViewData() {
-    this.alertTrendLegend = [];
-    this.alertTrendPolarOptions = {};
-    this.alertTrendStackOptions = {};
-    this.alertTrendStackLegend = [];
-    this.alertSideCards = [];
-  }
-
-  getTicketGraphData(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.clearTicketGraphViewData();
-    this.startTicketGraphLoaders();
-    this.svc.getTicketGraphData(filterFormOutput, this.getTicketDateFilterFormOutput()).pipe(
-      takeUntil(this.ngUnsubscribe),
-      finalize(() => this.stopTicketGraphLoaders())
-    ).subscribe(res => {
-      const priorityData = this.svc.convertToTicketPriorityViewData(res);
-      const statusData = this.svc.convertToTicketStatusViewData(res);
-      const responseTimeData = this.svc.convertToTicketResponseTimeViewData(res);
-      this.ticketPriorityHasData = this.svc.hasTicketDonutData(priorityData);
-      this.ticketStatusHasData = this.svc.hasTicketDonutData(statusData);
-      this.ticketResponseTimeHasData = this.svc.hasTicketDonutData(responseTimeData);
-      this.ticketPriorityOptions = this.ticketPriorityHasData ? this.svc.convertToTicketPriorityOptions(priorityData) : {};
-      this.ticketStatusOptions = this.ticketStatusHasData ? this.svc.convertToTicketStatusOptions(statusData) : {};
-      this.ticketResponseTimeOptions = this.ticketResponseTimeHasData ? this.svc.convertToTicketResponseTimeOptions(responseTimeData) : {};
-    }, () => {
-      this.clearTicketGraphViewData();
-    });
-  }
-
-  private startTicketGraphLoaders() {
-    [
-      this.loaderNames.ticketPriority,
-      this.loaderNames.ticketStatus,
-      this.loaderNames.ticketResponseTime
-    ].forEach(loaderName => this.spinnerService.start(loaderName));
-  }
-
-  private stopTicketGraphLoaders() {
-    setTimeout(() => {
-      [
-        this.loaderNames.ticketPriority,
-        this.loaderNames.ticketStatus,
-        this.loaderNames.ticketResponseTime
-      ].forEach(loaderName => this.spinnerService.stop(loaderName));
-    }, 0);
-  }
-
-  private clearTicketGraphViewData() {
-    this.ticketPriorityOptions = {};
-    this.ticketStatusOptions = {};
-    this.ticketResponseTimeOptions = {};
-    this.ticketPriorityHasData = false;
-    this.ticketStatusHasData = false;
-    this.ticketResponseTimeHasData = false;
-  }
-
-  getTickets(filterFormOutput: PublicCloudDashboardFilterCriteria) {
-    this.tickets = [];
-    this.totalTickets = 0;
-    this.loadWidget(this.loaderNames.tickets, this.svc.getTickets(filterFormOutput, this.getTicketFilterFormOutput()), res => {
-      this.tickets = this.svc.convertToTicketsViewData(res);
-      this.totalTickets = this.svc.convertToTicketsTotal(res);
-    }, () => {
-      this.tickets = [];
-      this.totalTickets = 0;
-    });
-  }
-
-  filterTickets() {
-    if (!this.hasFilterFormData() || !this.ticketFilterForm) {
-      return;
-    }
-    this.ticketPageNo = 1;
-    this.syncTicketDateRangeFields();
-    this.appliedTicketDateRangeKey = this.getTicketDateRangeKey();
-    const filterFormOutput = this.getFilterFormOutput();
-    this.getTickets(filterFormOutput);
-  }
-
-  ticketDateRangeChange() {
-    if (!this.hasFilterFormData() || !this.ticketFilterForm) {
-      return;
-    }
-    this.syncTicketDateRangeFields();
-    const nextDateRangeKey = this.getTicketDateRangeKey();
-    if (!nextDateRangeKey || nextDateRangeKey === this.appliedTicketDateRangeKey) {
-      return;
-    }
-    this.appliedTicketDateRangeKey = nextDateRangeKey;
-    this.ticketPageNo = 1;
-    const filterFormOutput = this.getFilterFormOutput();
-    this.getTicketGraphData(filterFormOutput);
-    this.getTickets(filterFormOutput);
-  }
-
-  refreshTickets() {
-    if (!this.hasFilterFormData()) {
-      return;
-    }
-    this.syncTicketDateRangeFields();
-    this.appliedTicketDateRangeKey = this.getTicketDateRangeKey();
-    const filterFormOutput = this.getFilterFormOutput();
-    this.getTicketGraphData(filterFormOutput);
-    this.getTickets(filterFormOutput);
-  }
-
-  ticketPageChange(pageNo: number) {
-    if (this.ticketPageNo === pageNo) {
-      return;
-    }
-    this.ticketPageNo = pageNo;
-    this.getTickets(this.getFilterFormOutput());
-  }
-
-  ticketPageSizeChange(event: Event) {
-    this.ticketPageSize = Number((event.target as HTMLSelectElement).value || 10);
-    this.ticketPageNo = 1;
-    this.getTickets(this.getFilterFormOutput());
-  }
-
-  private getTicketFilterFormOutput(): PublicCloudTicketFilterCriteria {
-    const data = this.ticketFilterForm?.getRawValue() || {};
-    const dateRangeValues = this.getTicketDateRangeValues();
-    return {
-      state: data.state || '',
-      ticket_type: data.ticket_type || '',
-      search: data.search || '',
-      priority: data.priority || '',
-      dateRange: '',
-      start_date: dateRangeValues.startDate,
-      end_date: dateRangeValues.endDate,
-      page: this.ticketPageNo,
-      page_size: this.ticketPageSize
-    };
-  }
-
-  private getTicketDateFilterFormOutput(): PublicCloudTicketFilterCriteria {
-    const dateRangeValues = this.getTicketDateRangeValues();
-    return {
-      state: '',
-      ticket_type: '',
-      search: '',
-      priority: '',
-      dateRange: '',
-      start_date: dateRangeValues.startDate,
-      end_date: dateRangeValues.endDate,
-      page: 1,
-      page_size: this.ticketPageSize
-    };
-  }
-
-  private syncTicketDateRangeFields() {
-    const dateRangeValues = this.getTicketDateRangeValues();
-    if (!dateRangeValues.isComplete || !this.ticketFilterForm) {
-      return;
-    }
-    this.ticketFilterForm.patchValue({
-      start_date: dateRangeValues.startDate,
-      end_date: dateRangeValues.endDate
-    }, { emitEvent: false });
-  }
-
-  private getTicketDateRangeKey(): string {
-    const dateRangeValues = this.getTicketDateRangeValues();
-    if (!dateRangeValues.isComplete) {
-      return '';
-    }
-    return `${dateRangeValues.startDate}|${dateRangeValues.endDate}`;
-  }
-
-  private getTicketDateRangeValues(): { startDate: string; endDate: string; isComplete: boolean } {
-    const data = this.ticketFilterForm?.getRawValue() || {};
-    const dateRange = Array.isArray(data.dateRange) ? data.dateRange : [];
-    const hasDateRangeValue = !!dateRange.length;
-    const hasPartialDateRange = hasDateRangeValue && (!dateRange[0] || !dateRange[1]);
-    const startDate = this.svc.getTicketFilterDateValue(dateRange[0]) || data.start_date || '';
-    const endDate = this.svc.getTicketFilterDateValue(dateRange[1]) || data.end_date || '';
-    return {
-      startDate,
-      endDate,
-      isComplete: !hasPartialDateRange && !!startDate && !!endDate
-    };
+  private clearRecentAlertsViewData() {
+    this.recentAlertSummaryMetrics = [];
+    this.recentAlerts = [];
   }
 
   getStatusClass(tone?: string): string {
     return `tone-${tone || 'muted'}`;
+  }
+
+  getOrphanedStatusIconClass(status: string): string {
+    switch ((status || '').toLowerCase()) {
+      case 'success':
+      case 'healthy':
+      case 'ok':
+      case 'up':
+        return 'fas fa-check-circle text-success font-xs-sm';
+      case 'warning':
+      case 'warn':
+      case 'unknown':
+        return 'fas fa-exclamation-circle text-warning font-xs-sm';
+      case 'error':
+      case 'critical':
+      case 'down':
+      case 'failed':
+        return 'fas fa-exclamation-triangle text-danger font-xs-sm';
+      default:
+        return 'fas fa-question-circle text-muted font-xs-sm';
+    }
   }
 
   trackByValue(index: number, option: PublicCloudFilterOption) {
@@ -750,6 +560,235 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   goBack() {
     goBackFromDefaultDashboard(this.router, this.route);
+  }
+
+  openSummaryMetric(metric: PublicCloudSummaryMetric) {
+    const routes: Record<PublicCloudInventorySummaryKey, any[]> = {
+      cloud_accounts: this.linkRoutes.publicCloud,
+      active_regions: this.linkRoutes.publicCloud,
+      vms: this.linkRoutes.vmAll,
+      services: this.linkRoutes.publicCloud,
+      running_resources: this.linkRoutes.publicCloud,
+      stopped_resources: this.linkRoutes.publicCloud
+    };
+    this.openRouteInNewTab(routes[metric.key] || this.linkRoutes.publicCloud);
+  }
+
+  openProviderDistribution(provider: PublicCloudProviderDistributionItem) {
+    this.openProviderRoute(provider.key);
+  }
+
+  onProviderDistributionChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openProviderRoute(this.getProviderDistributionKey(params?.data?.key || params?.name));
+    });
+  }
+
+  openComputeProvider(provider: PublicCloudComputeBreakdownProvider) {
+    this.openRouteInNewTab(this.getProviderRoute(provider.name));
+  }
+
+  openComputeStat(provider: PublicCloudComputeBreakdownProvider, stat: PublicCloudComputeBreakdownStat) {
+    if (stat.key === 'virtual_machine') {
+      this.openRouteInNewTab(this.getProviderVmRoute(provider.name));
+      return;
+    }
+    this.openRouteInNewTab(this.linkRoutes.kubernetes);
+  }
+
+  openOrphanedDevices() {
+    this.openRouteInNewTab(this.linkRoutes.devices);
+  }
+
+  openOrphanedCategory(item: PublicCloudOrphanedCategoryItem) {
+    this.openRouteInNewTab(this.getOrphanedCategoryRoute(item.category));
+  }
+
+  onOrphanedCategoryChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openRouteInNewTab(this.getOrphanedCategoryRoute(params?.data?.category || params?.name));
+    });
+  }
+
+  openIdleDevice(device: PublicCloudIdleDeviceRow) {
+    this.openRouteInNewTab(this.getIdleDeviceRoute(device));
+  }
+
+  openRecentAlerts() {
+    this.openRouteInNewTab(this.linkRoutes.alerts);
+  }
+
+  showAlertDetails(alert: PublicCloudRecentAlert) {
+    const alertId = alert?.uuid || alert?.id;
+    if (alertId) {
+      this.alertDetailSvc.showAlertDetails(alertId);
+    }
+  }
+
+  private openRouteInNewTab(commands: any[]) {
+    const routeUrl = this.router.serializeUrl(this.router.createUrlTree(commands));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  private bindChartClick(chartInstance: any, handler: (params: any) => void) {
+    if (!chartInstance?.on) {
+      return;
+    }
+    if (chartInstance.off) {
+      chartInstance.off('click');
+    }
+    chartInstance.on('click', handler);
+  }
+
+  private openProviderRoute(key: string) {
+    this.openRouteInNewTab(this.getProviderRoute(key));
+  }
+
+  private getProviderRoute(value: string): any[] {
+    switch (this.getProviderKey(value)) {
+      case 'aws':
+        return this.linkRoutes.provider.aws;
+      case 'azure':
+        return this.linkRoutes.provider.azure;
+      case 'gcp':
+        return this.linkRoutes.provider.gcp;
+      case 'oci':
+      case 'oracle':
+        return this.linkRoutes.provider.oracle;
+      default:
+        return this.linkRoutes.publicCloud;
+    }
+  }
+
+  private getProviderVmRoute(value: string): any[] {
+    switch (this.getProviderKey(value)) {
+      case 'aws':
+        return this.linkRoutes.providerVm.aws;
+      case 'azure':
+        return this.linkRoutes.providerVm.azure;
+      case 'gcp':
+        return this.linkRoutes.providerVm.gcp;
+      case 'oci':
+      case 'oracle':
+        return this.linkRoutes.providerVm.oracle;
+      default:
+        return this.linkRoutes.vmAll;
+    }
+  }
+
+  private getProviderDistributionKey(value: string): PublicCloudProviderDistributionKey {
+    const provider = this.getProviderKey(value);
+    return provider === 'oracle' ? 'oci' : provider as PublicCloudProviderDistributionKey;
+  }
+
+  private getProviderKey(value: string): string {
+    const normalizedValue = this.normalizeLinkText(value);
+    if (normalizedValue.includes('aws') || normalizedValue.includes('amazon')) {
+      return 'aws';
+    }
+    if (normalizedValue.includes('azure') || normalizedValue.includes('microsoft')) {
+      return 'azure';
+    }
+    if (normalizedValue.includes('gcp') || normalizedValue.includes('google')) {
+      return 'gcp';
+    }
+    if (normalizedValue.includes('oci') || normalizedValue.includes('oracle')) {
+      return 'oracle';
+    }
+    if (normalizedValue.includes('custom')) {
+      return 'custom';
+    }
+    return normalizedValue;
+  }
+
+  private getOrphanedCategoryRoute(category: string): any[] {
+    const normalizedCategory = this.normalizeLinkText(category);
+    if (normalizedCategory.includes('vm') || normalizedCategory.includes('virtual_machine')) {
+      return this.linkRoutes.vmAll;
+    }
+    if (normalizedCategory.includes('bare_metal') || normalizedCategory.includes('baremetal')) {
+      return this.linkRoutes.bmservers;
+    }
+    if (normalizedCategory.includes('gpu')) {
+      return this.linkRoutes.gpu;
+    }
+    if (normalizedCategory.includes('storage') || normalizedCategory.includes('volume')) {
+      return this.linkRoutes.storage;
+    }
+    return this.linkRoutes.devices;
+  }
+
+  private getIdleDeviceRoute(device: PublicCloudIdleDeviceRow): any[] {
+    const resourceType = this.normalizeLinkText(device?.resourceType);
+    if (this.isStorageResource(resourceType)) {
+      return this.getStorageDetailRoute(device) || this.linkRoutes.storage;
+    }
+    if (this.isGpuResource(resourceType)) {
+      return this.linkRoutes.gpu;
+    }
+    if (this.isVmResource(resourceType)) {
+      return this.getVmDetailRoute(device) || this.getProviderVmRoute(this.getIdleDeviceProvider(device));
+    }
+    return this.linkRoutes.devices;
+  }
+
+  private getStorageDetailRoute(device: PublicCloudIdleDeviceRow): any[] | null {
+    const deviceId = this.getIdleDeviceId(device);
+    const monitoringRoute = this.getMonitoringRouteSegment(device);
+    if (!deviceId || !monitoringRoute) {
+      return null;
+    }
+    return monitoringRoute === 'zbx' ?
+      ['/unitycloud/devices/storagedevices', deviceId, 'zbx', 'details'] :
+      ['/unitycloud/devices/storagedevices', deviceId, 'obs', 'overview'];
+  }
+
+  private getVmDetailRoute(device: PublicCloudIdleDeviceRow): any[] | null {
+    const provider = this.getIdleDeviceProvider(device);
+    const deviceId = this.getIdleDeviceId(device);
+    const monitoringRoute = this.getMonitoringRouteSegment(device);
+    if (!deviceId || !monitoringRoute || provider !== 'custom') {
+      return null;
+    }
+    return monitoringRoute === 'zbx' ?
+      ['/unitycloud/devices/vms/custom', deviceId, 'zbx', 'details'] :
+      ['/unitycloud/devices/vms/custom', deviceId, 'obs', 'overview'];
+  }
+
+  private getIdleDeviceId(device: PublicCloudIdleDeviceRow): string {
+    return device?.deviceId || device?.resourceId || device?.uuid || device?.id || '';
+  }
+
+  private getIdleDeviceProvider(device: PublicCloudIdleDeviceRow): string {
+    return this.getProviderKey([device?.provider, device?.cloudType, device?.resourceType].filter(value => !!value).join(' '));
+  }
+
+  private getMonitoringRouteSegment(device: PublicCloudIdleDeviceRow): 'obs' | 'zbx' | null {
+    const monitoringType = this.normalizeLinkText(device?.monitoringType);
+    if (device?.monitoring?.zabbix || monitoringType.includes('zabbix') || monitoringType.includes('zbx')) {
+      return 'zbx';
+    }
+    if (device?.monitoring?.observium || monitoringType.includes('observium') || monitoringType.includes('obs')) {
+      return 'obs';
+    }
+    return null;
+  }
+
+  private isVmResource(value: string): boolean {
+    return value.includes('vm') || value.includes('virtual_machine') || value.includes('instance');
+  }
+
+  private isStorageResource(value: string): boolean {
+    return value.includes('storage') || value.includes('volume') || value.includes('disk');
+  }
+
+  private isGpuResource(value: string): boolean {
+    return value.includes('gpu');
+  }
+
+  private normalizeLinkText(value: string): string {
+    return String(value || '').toLowerCase().replace(/[\s-]+/g, '_');
   }
 
   private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {
