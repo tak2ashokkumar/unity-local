@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
 import { Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
@@ -13,9 +14,11 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { PUBLIC_CLOUD_TICKET_PRIORITY_OPTIONS, PUBLIC_CLOUD_TICKET_STATE_OPTIONS, PUBLIC_CLOUD_TICKET_TYPE_OPTIONS } from '../public-cloud-compute-dashboard/public-cloud-compute-dashboard.const';
 import { PublicCloudFilterOption } from '../public-cloud-compute-dashboard/public-cloud-compute-dashboard.type';
-import { AutoRemediationExecSummaryWidgetData, CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, RiskOptimizationViewData, RiskOptimizationWidgetData, SwapBalloonMemoryWidgetData, TicketPriorityOptionsWidgetData, TicketsItemViewData, TicketStatusOptionsWidgetData, Top10ClustersByVMsWidgetData, TopAutoRemediationActionWidgetData, TopCriticalAlertsViewData } from './private-cloud-compute-dashboard.service';
+import { AutoRemediationExecSummaryWidgetData, CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, RiskOptimizationViewData, RiskOptimizationWidgetData, SwapBalloonMemoryWidgetData, TicketPriorityOptionsWidgetData, TicketsItemViewData, TicketStatusOptionsWidgetData, Top10ClustersByVMsWidgetData, TopAutoRemediationActionWidgetData, TopCriticalAlertsViewData, VmDensityHost } from './private-cloud-compute-dashboard.service';
 import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
+import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
+import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-event-details.service';
 
 
 @Component({
@@ -144,6 +147,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   constructor(private svc: PrivateCloudComputeDashboardService,
     private router: Router,
+    private alertDetailSvc: AimlEventDetailsService,
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
     private notification: AppNotificationService, private overlay: Overlay) {
@@ -313,8 +317,11 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   //------------Capacity and Growth Insight ----------------------
 
+  densityHostVm: VmDensityHost = new VmDensityHost();
+
   getCapacityGrowthWidgetData() {
-    this.spinner.start(this.capacityAndGrowthInsightsWidgetData.vmDensityLoader);
+    this.densityHostVm.desnityHostRows = []
+    this.spinner.start(this.densityHostVm.loader);
     this.spinner.start(this.capacityAndGrowthInsightsWidgetData.vmCapacityLoader);
     this.capacityAndGrowthInsightsWidgetData.vmDensityChartData = null;
     this.capacityAndGrowthInsightsWidgetData.vmCapacityChartData = null;
@@ -323,20 +330,41 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          this.capacityAndGrowthInsightsWidgetData.vmDensityChartData = this.svc.convertToVmDensityChartDataChartData(res.vmDensityPerHost);
+          this.densityHostVm = this.svc.convertToVmDensityHostViewData(res.topHostUtilization);
           this.capacityAndGrowthInsightsWidgetData.vmCapacityChartData = this.svc.convertToVmCapacityChartData(res.capacityTrendAndForecast);
           this.capacityAndGrowthInsightsWidgetData.vmProvisioningViewData = this.svc.convertToVmProvisioningViewData(res.provisioningStatus);
         }
-        this.spinner.stop(this.capacityAndGrowthInsightsWidgetData.vmDensityLoader);
+        this.spinner.stop(this.densityHostVm.loader);
         this.spinner.stop(this.capacityAndGrowthInsightsWidgetData.vmCapacityLoader);
       }, (_err: HttpErrorResponse) => {
-        this.spinner.stop(this.capacityAndGrowthInsightsWidgetData.vmDensityLoader);
+        this.densityHostVm.desnityHostRows = []
+        this.spinner.stop(this.densityHostVm.loader);
         this.spinner.stop(this.capacityAndGrowthInsightsWidgetData.vmCapacityLoader);
         this.capacityAndGrowthInsightsWidgetData.vmDensityChartData = null;
         this.capacityAndGrowthInsightsWidgetData.vmCapacityChartData = null;
-        this.capacityAndGrowthInsightsWidgetData.vmProvisioningViewData = null;
-        this.notification.error(new Notification('Failed to get Capacity and Growth data. Try again later'));
+        this.capacityAndGrowthInsightsWidgetData.vmProvisioningViewData = null; this.notification.error(new Notification('Failed to get Capacity and Growth data. Try again later'));
       });
+  }
+
+  getUtilizationClass(utilizationPct: number): string {
+
+    if (utilizationPct >= 50 && utilizationPct <= 70) {
+      return 'bg-success';
+    }
+
+    if (utilizationPct > 85) {
+      return 'bg-danger';
+    }
+
+    if (utilizationPct >= 71 && utilizationPct <= 85) {
+      return 'bg-warning';
+    }
+
+    if (utilizationPct < 49) {
+      return 'bg-primary';
+    }
+
+    return 'bg-secondary';
   }
 
   //-----Top 10 Clusters By VM Count-----------
@@ -501,6 +529,11 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     });
   }
 
+  viewAlertDetails(index: number) {
+    this.alertDetailSvc.showEventDetails(this.criticalAlerts.alertList[index].uuid);
+  }
+
+
   getOrphanedDeviceData() {
     this.spinner.start(this.orphanedDeviceListViewData.loader);
     this.orphanedDeviceListViewData.orphanList = null;
@@ -538,7 +571,7 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 
   refreshData() {

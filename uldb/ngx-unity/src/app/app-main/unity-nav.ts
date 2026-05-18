@@ -862,7 +862,7 @@ const DASBOARD_NAV_ITEMS = (svc: PermissionService) => {
         {
             name: 'My Dashboards',
             url: '/app-dashboard/my-dashboards',
-            icon: 'fas fa-list',
+            icon: 'fas fa-tachometer-alt',
             attributes: {
                 module: UnityModules.DASHBOARD,
             }

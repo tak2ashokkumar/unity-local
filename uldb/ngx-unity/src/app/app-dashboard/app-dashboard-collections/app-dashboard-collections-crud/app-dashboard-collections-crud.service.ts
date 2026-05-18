@@ -186,9 +186,6 @@ function accessScopeValidator(): ValidatorFn {
     if (!hasGroups && !hasRoles) {
       return { accessScopeRequired: true };
     }
-    if (hasGroups && hasRoles) {
-      return { accessScopeExclusive: true };
-    }
     return null;
   };
 }

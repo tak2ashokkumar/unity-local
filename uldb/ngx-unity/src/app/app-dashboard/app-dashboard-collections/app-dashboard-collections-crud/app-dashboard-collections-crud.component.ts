@@ -229,9 +229,7 @@ export class AppDashboardCollectionsCrudComponent implements OnInit, OnDestroy {
     this.formErrors.access_scope = '';
     this.formErrors.dashboards = '';
 
-    if (this.form.hasError('accessScopeExclusive')) {
-      this.formErrors.access_scope = 'Select either Groups or Roles, not both.';
-    } else if (this.form.hasError('accessScopeRequired')) {
+    if (this.form.hasError('accessScopeRequired')) {
       this.formErrors.access_scope = 'Select at least one Group or Role.';
     }
 

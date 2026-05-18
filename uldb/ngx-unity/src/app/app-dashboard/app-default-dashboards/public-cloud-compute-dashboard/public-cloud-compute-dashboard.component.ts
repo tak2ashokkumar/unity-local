@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Overlay, ScrollStrategy } from '@angular/cdk/overlay';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
 import { Observable, Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
@@ -748,7 +749,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 
   private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {

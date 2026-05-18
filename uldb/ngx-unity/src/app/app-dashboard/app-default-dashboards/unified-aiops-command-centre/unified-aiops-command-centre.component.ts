@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -640,7 +641,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 
   private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {

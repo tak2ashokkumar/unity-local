@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
 import { Observable, Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
@@ -17,19 +18,22 @@ import {
   DatabaseDashboardFilterOption,
   DbDashboardHealthGroup,
   DatabaseDashboardMetric,
-  DbDashboardReplicationSyncSummary,
   DatabaseDashboardStorageRow,
   DbDashboardSummary,
   DatabaseDashboardTagItem,
   DatabaseDashboardTone,
   DatabaseDashboardUtilizationViewRow,
   DatabaseDashboardVersionItem,
-  DbDashboardReplicationSyncSummaryData
+  DbDashboardReplicationSyncSummaryData,
+  DBDashboardTopServersViewData,
+  DBDashboardTopTableSpaceUsageViewData,
+  DatabaseDashboardTop10UtilizationViewData
 } from './database-dashboard.type';
-import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
+import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
+import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-event-details.service';
 
 @Component({
   selector: 'database-dashboard',
@@ -39,38 +43,35 @@ import { Notification } from 'src/app/shared/app-notification/notification.type'
 })
 export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
-  refreshedText: string = 'Today 10:00 IST';  
-  filterForm: FormGroup;
-  databaseOptions: DatabaseDashboardFilterOption[] = [];
-
-  // currentCriteriaForUtilization: SearchCriteria;
-  utilizationCount: number;
+  refreshedText: string = 'Today 10:00 IST';
+  // filterForm: FormGroup;
+  // databaseOptions: DatabaseDashboardFilterOption[] = [];
 
   summaryMetrics: DatabaseDashboardMetric[] = [];
-  cloudTypeDistribution: DatabaseDashboardDonutItem[] = [];
-  cloudTypeDistributionOptions: EChartsOption = {};
-  dbCountByPlatformOptions: EChartsOption = {};
-  dbByEnvironmentOptions: EChartsOption = {};
+  // cloudTypeDistribution: DatabaseDashboardDonutItem[] = [];
+  cloudTypeDistributionOptions: EChartsOption;
+  dbCountByPlatformOptions: EChartsOption;
+  dbByEnvironmentOptions: EChartsOption;
   tags: DatabaseDashboardTagItem[] = [];
   databaseVersions: DatabaseDashboardVersionItem[] = [];
 
-  utilizationRows: DatabaseDashboardUtilizationViewRow[] = [];
-  queryResponseOptions: EChartsOption = {};
-  queryLatencyOptions: EChartsOption = {};
-  activeSessionsOptions: EChartsOption = {};
-  errorRateOptions: EChartsOption = {};
-  transactionThroughputOptions: EChartsOption = {};
-  cacheHitRatioOptions: EChartsOption = {};
+  utilizationRows: DatabaseDashboardTop10UtilizationViewData[] = [];
+  queryResponseOptions: EChartsOption;
+  queryLatencyOptions: EChartsOption;
+  activeSessionsOptions: EChartsOption;
+  errorRateOptions: EChartsOption;
+  transactionThroughputOptions: EChartsOption;
+  cacheHitRatioOptions: EChartsOption;
 
   capacityMetrics: DatabaseDashboardCapacityMetric[] = [];
-  storageRows: DatabaseDashboardStorageRow[] = [];
-  tablespaceUsageOptions: EChartsOption = {};
-  storageGrowthOptions: EChartsOption = {};
-  archiveLogGrowthOptions: EChartsOption = {};
-  logGrowthRateOptions: EChartsOption = {};
-  dbSizeByServerOptions: EChartsOption = {};
-  logSizeByServerOptions: EChartsOption = {};
-  diskUtilizationOptions: EChartsOption = {};
+  storageRows: DBDashboardTopServersViewData[] = [];
+  tablespaceUsageOptions: EChartsOption;
+  storageGrowthOptions: EChartsOption;
+  archiveLogGrowthOptions: EChartsOption;
+  logGrowthRateOptions: EChartsOption;
+  dbSizeByServerOptions: EChartsOption;
+  logSizeByServerOptions: EChartsOption;
+  diskUtilizationOptions: EChartsOption;
 
   healthGroups: DbDashboardHealthGroup[] = [];
   databaseAvailabilityStatus: DbDashboardSummary;
@@ -80,7 +81,8 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   criticalAlerts: DatabaseDashboardCriticalAlertViewData[] = [];
 
   loaderNames = {
-    filters: 'databaseDashboardFiltersLoader',
+    // filters: 'databaseDashboardFiltersLoader',
+
     inventoryOverview: 'inventoryOverviewWidgetLoader',
     performancWorkloadUtilization: 'workloadUtilizationWidgetLoader',
     performanceQueryResponse: 'queryResponceWidgetLoader',
@@ -144,14 +146,12 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private spinnerService: AppSpinnerService,
     private notification: AppNotificationService,
-  ) {
-      // this.currentCriteriaForUtilization = {
-      //   sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE
-      // };  
-    }
+    private alertDetailSvc: AimlEventDetailsService,    
+  ) { }
 
   ngOnInit(): void {
-    setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
+    // setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
+    setTimeout(() => this.loadData(), 0);
   }
 
   ngOnDestroy(): void {
@@ -159,232 +159,290 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  /** Applies the current filter form output to every database dashboard widget request. */
-  applyFilters() {
-    this.loadData();
-  }
+  // /** Applies the current filter form output to every database dashboard widget request. */
+  // applyFilters() {
+  //   this.loadData();
+  // }
 
   /** Reloads database filter options and rebuilds the dashboard after the filter form is ready. */
   refreshData() {
-    this.loadFilterOptionsAndDashboard();
+    // this.loadFilterOptionsAndDashboard();
+    setTimeout(() => this.loadData(), 0);
   }
 
-  /** Reloads all filter options and recreates the filter form only after database data is ready. */
-  refreshFilters() {
-    this.loadFilterOptionsAndDashboard();
-  }
-
-  /** Loads database options first, then creates the filter form and starts widget loading. */
-  loadFilterOptionsAndDashboard() {
-    this.resetFilterState();
-    this.spinnerService.start(this.loaderNames.filters);
-    this.svc.getDatabases().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      console.log("getDatabases res, ", JSON.parse(JSON.stringify(res)));
-      this.databaseOptions = res || [];
-      this.buildFilterForm();
-      this.stopFilterLoader();
-      this.loadData();
-    }, () => {
-      this.databaseOptions = this.svc.getFallbackDatabases();
-      console.log("getFallbackDatabases res, ", JSON.parse(JSON.stringify(this.databaseOptions)));
-      this.buildFilterForm();
-      this.stopFilterLoader();
-      this.loadData();
-    });
-  }
-
-  /** Creates the filter form with all currently loaded database options selected by default. */
-  private buildFilterForm() {
-    this.filterForm = this.svc.buildFilterForm(this.databaseOptions);
-  }
-
-  /** Clears existing filter form/options so a fresh filter loading sequence can run. */
-  private resetFilterState() {
-    this.filterForm = null;
-    this.databaseOptions = [];
-  }
-
-  /** Reads selected option values from a filter form control. */
-  private getSelectedValues(controlName: string): string[] {
-    const values = this.filterForm?.get(controlName)?.value || [];
-    return this.getValuesFromOptions(values);
-  }
-
-  /** Normalizes selected filter option objects into API-friendly string values. */
-  private getValuesFromOptions(options: Array<DatabaseDashboardFilterOption | string>): string[] {
-    return (options || [])
-      .map((item: DatabaseDashboardFilterOption | string) => typeof item === 'string' ? item : item?.value)
-      .filter((value: string | undefined) => !!value) as string[];
-  }
-
-  /** Returns the normalized filter form output passed to all dashboard service calls. */
-  private getFilterFormOutput(): DatabaseDashboardFilterCriteria {
-    return {
-      databases: this.getSelectedValues('databases')
-    };
-  }
-
-  /** Confirms the filter form exists and has loaded option data before widget APIs are called. */
-  private hasFilterFormData(): boolean {
-    return !!this.filterForm && !!this.databaseOptions.length;
-  }
-
-  /** Stops the top filter loader in the next tick so synchronous static responses still render the loader correctly. */
-  private stopFilterLoader() {
-    setTimeout(() => this.spinnerService.stop(this.loaderNames.filters), 0);
-  }
-
-  /** Builds the visible scope text from the current database filter selections. */
-  get scopeText(): string {
-    if (!this.filterForm) {
-      return 'Loading filters';
-    }
-    return this.getSelectedLabel(this.databaseOptions, this.getSelectedValues('databases'), 'All databases', 'databases', 'No databases');
-  }
-
-  /** Converts selected values into a compact filter label for the header scope text. */
-  getSelectedLabel(options: DatabaseDashboardFilterOption[], selectedValues: string[], allLabel: string, pluralLabel: string, emptyLabel: string): string {
-    if (!selectedValues.length) {
-      return emptyLabel;
-    }
-    if (options?.length && selectedValues.length === options.length) {
-      return allLabel;
-    }
-    if (selectedValues.length === 1) {
-      return options?.find(option => option.value === selectedValues[0])?.label || allLabel;
-    }
-    return `${selectedValues.length} ${pluralLabel}`;
-  }
-
-  // /** Pagination added for top 10 utlilization. */
-  // pageChange(pageNo: number) {
-  //   // this.spinnerService.start('main');
-  //   this.currentCriteriaForUtilization.pageNo = pageNo;
-  //   const filterFormOutput = this.getFilterFormOutput();
-  //   this.getUtilizationRows(filterFormOutput, this.currentCriteriaForUtilization);
+  // /** Reloads all filter options and recreates the filter form only after database data is ready. */
+  // refreshFilters() {
+  //   this.loadFilterOptionsAndDashboard();
   // }
 
-  // pageSizeChange(pageSize: number) {
-  //   // this.spinnerService.start('main');
-  //   this.currentCriteriaForUtilization.pageSize = pageSize;
-  //   this.currentCriteriaForUtilization.pageNo = 1;
-  //   const filterFormOutput = this.getFilterFormOutput();
-  //   this.getUtilizationRows(filterFormOutput, this.currentCriteriaForUtilization);
+  // /** Loads database options first, then creates the filter form and starts widget loading. */
+  // loadFilterOptionsAndDashboard() {
+  //   this.resetFilterState();
+  //   this.spinnerService.start(this.loaderNames.filters);
+  //   this.svc.getDatabases().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+  //     console.log("getDatabases res, ", JSON.parse(JSON.stringify(res)));
+  //     this.databaseOptions = res || [];
+  //     this.buildFilterForm();
+  //     this.stopFilterLoader();
+  //     this.loadData();
+  //   }, () => {
+  //     this.databaseOptions = this.svc.getFallbackDatabases();
+  //     console.log("getFallbackDatabases res, ", JSON.parse(JSON.stringify(this.databaseOptions)));
+  //     this.buildFilterForm();
+  //     this.stopFilterLoader();
+  //     this.loadData();
+  //   });
+  // }
+
+  // /** Creates the filter form with all currently loaded database options selected by default. */
+  // private buildFilterForm() {
+  //   this.filterForm = this.svc.buildFilterForm(this.databaseOptions);
+  // }
+
+  // /** Clears existing filter form/options so a fresh filter loading sequence can run. */
+  // private resetFilterState() {
+  //   this.filterForm = null;
+  //   this.databaseOptions = [];
+  // }
+
+  // /** Reads selected option values from a filter form control. */
+  // private getSelectedValues(controlName: string): string[] {
+  //   const values = this.filterForm?.get(controlName)?.value || [];
+  //   return this.getValuesFromOptions(values);
+  // }
+
+  // /** Normalizes selected filter option objects into API-friendly string values. */
+  // private getValuesFromOptions(options: Array<DatabaseDashboardFilterOption | string>): string[] {
+  //   return (options || [])
+  //     .map((item: DatabaseDashboardFilterOption | string) => typeof item === 'string' ? item : item?.value)
+  //     .filter((value: string | undefined) => !!value) as string[];
+  // }
+
+  // /** Returns the normalized filter form output passed to all dashboard service calls. */
+  // private getFilterFormOutput(): DatabaseDashboardFilterCriteria {
+  //   return {
+  //     databases: this.getSelectedValues('databases')
+  //   };
+  // }
+
+  // /** Confirms the filter form exists and has loaded option data before widget APIs are called. */
+  // private hasFilterFormData(): boolean {
+  //   return !!this.filterForm && !!this.databaseOptions.length;
+  // }
+
+  // /** Stops the top filter loader in the next tick so synchronous static responses still render the loader correctly. */
+  // private stopFilterLoader() {
+  //   setTimeout(() => this.spinnerService.stop(this.loaderNames.filters), 0);
+  // }
+
+  // /** Builds the visible scope text from the current database filter selections. */
+  // get scopeText(): string {
+  //   if (!this.filterForm) {
+  //     return 'Loading filters';
+  //   }
+  //   return this.getSelectedLabel(this.databaseOptions, this.getSelectedValues('databases'), 'All databases', 'databases', 'No databases');
+  // }
+
+  // /** Converts selected values into a compact filter label for the header scope text. */
+  // getSelectedLabel(options: DatabaseDashboardFilterOption[], selectedValues: string[], allLabel: string, pluralLabel: string, emptyLabel: string): string {
+  //   if (!selectedValues.length) {
+  //     return emptyLabel;
+  //   }
+  //   if (options?.length && selectedValues.length === options.length) {
+  //     return allLabel;
+  //   }
+  //   if (selectedValues.length === 1) {
+  //     return options?.find(option => option.value === selectedValues[0])?.label || allLabel;
+  //   }
+  //   return `${selectedValues.length} ${pluralLabel}`;
   // }
 
   /** Loads all dashboard widgets only after the filter form exists and has loaded filter data. */
   loadData() {
-    if (!this.hasFilterFormData()) {
-      return;
-    }
-    const filterFormOutput = this.getFilterFormOutput();
+    // if (!this.hasFilterFormData()) {
+    //   return;
+    // }
+    // const filterFormOutput = this.getFilterFormOutput();
+    const filterFormOutput = null;
     setTimeout(() => {
-
       this.getInventoryOverviewWidgetData(filterFormOutput);
       this.getWorkloadInsightsTop10UtilData(filterFormOutput);
       this.getWorkloadInsightsTop10QueryWidgetData(filterFormOutput);
       this.getCapacityGrowthInsightsWidgetData(filterFormOutput);
       this.getHealthOverviewWidgetData(filterFormOutput);
       this.getAlertsOverviewWidgetData(filterFormOutput);
-
-      this.getSummaryMetrics(filterFormOutput);
-      this.getCloudTypeDistribution(filterFormOutput);
-      this.getPlatformCounts(filterFormOutput);
-      this.getEnvironmentCounts(filterFormOutput);
-      this.getTags(filterFormOutput);
-      this.getDatabaseVersions(filterFormOutput);
-
-      this.getUtilizationRows(filterFormOutput);
-      this.getQueryResponse(filterFormOutput);
-      this.getQueryLatency(filterFormOutput);
-      this.getActiveSessions(filterFormOutput);
-      this.getErrorRate(filterFormOutput);
-      this.getTransactionThroughput(filterFormOutput);
-      this.getCacheHitRatio(filterFormOutput);
-
-      this.getCapacityMetrics(filterFormOutput);
-      this.getStorageRows(filterFormOutput);
-      this.getTablespaceUsage(filterFormOutput);
-      this.getStorageGrowth(filterFormOutput);
-      this.getArchiveLogGrowth(filterFormOutput);
-      this.getLogGrowthRate(filterFormOutput);
-      this.getDbSizeByServer(filterFormOutput);
-      this.getLogSizeByServer(filterFormOutput);
-      this.getDiskUtilization(filterFormOutput);
-
-      this.getHealthGroups(filterFormOutput);
-
-      this.getAlertSummaryMetrics(filterFormOutput);
-      this.getCriticalAlerts(filterFormOutput);
     }, 0);
   }
 
   getInventoryOverviewWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.spinnerService.start(this.loaderNames.inventoryOverview);
+    // this.spinnerService.start(this.loaderNames.inventoryOverview);
+    this.spinnerService.start(this.loaderNames.summaryMetrics);
+    this.spinnerService.start(this.loaderNames.cloudTypeDistribution);
+    this.spinnerService.start(this.loaderNames.platformCounts);
+    this.spinnerService.start(this.loaderNames.environmentCounts);
+    this.spinnerService.start(this.loaderNames.tags);
+    this.spinnerService.start(this.loaderNames.databaseVersions);
+    this.summaryMetrics = [];
+    this.cloudTypeDistributionOptions = null;
+    this.dbCountByPlatformOptions = null;
+    this.dbByEnvironmentOptions = null;
+    this.tags = [];
+    this.databaseVersions = [];
     this.svc.getInventoryOverviewWidgetData(filterFormOutput)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
           console.log("inventory resp,", res)
+          this.summaryMetrics = this.svc.convertToSummaryViewData(res);
+          this.cloudTypeDistributionOptions = this.svc.convertToCloudTypeDistributionOptions(res.by_category);
+          this.dbCountByPlatformOptions = this.svc.convertToPlatformCountOptions(res.by_type);
+          this.dbByEnvironmentOptions = this.svc.convertToEnvironmentOptions(res.by_environment);
+          this.tags = this.svc.convertToTagsViewData(res.by_tags);
+          this.databaseVersions = this.svc.convertToDatabaseVersionsViewData(res.by_version);
         }
-        this.spinnerService.stop(this.loaderNames.inventoryOverview);
+        // this.spinnerService.stop(this.loaderNames.inventoryOverview);
+        this.spinnerService.stop(this.loaderNames.summaryMetrics);
+        this.spinnerService.stop(this.loaderNames.cloudTypeDistribution);
+        this.spinnerService.stop(this.loaderNames.platformCounts);
+        this.spinnerService.stop(this.loaderNames.environmentCounts);
+        this.spinnerService.stop(this.loaderNames.tags);
+        this.spinnerService.stop(this.loaderNames.databaseVersions);
       }, (_err: HttpErrorResponse) => {
-        this.spinnerService.stop(this.loaderNames.inventoryOverview);
-
+        // this.spinnerService.stop(this.loaderNames.inventoryOverview);
+        this.spinnerService.stop(this.loaderNames.summaryMetrics);
+        this.spinnerService.stop(this.loaderNames.cloudTypeDistribution);
+        this.spinnerService.stop(this.loaderNames.platformCounts);
+        this.spinnerService.stop(this.loaderNames.environmentCounts);
+        this.spinnerService.stop(this.loaderNames.tags);
+        this.spinnerService.stop(this.loaderNames.databaseVersions);
         this.notification.error(new Notification('Failed to get inventory overview data. Try again later'));
       });
   }
 
   getWorkloadInsightsTop10UtilData(filterFormOutput: DatabaseDashboardFilterCriteria) {
     this.spinnerService.start(this.loaderNames.performancWorkloadUtilization);
-    this.svc.getWorkloadInsightsTop10UtilData(filterFormOutput)
+    this.utilizationRows = [];
+    this.svc.getWorkloadInsightsTop10UtilizationViewData(filterFormOutput)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
           console.log("top 10 util resp,", res)
+          this.utilizationRows = this.svc.convertToUtilizationRowsViewData(res);
         }
         this.spinnerService.stop(this.loaderNames.performancWorkloadUtilization);
       }, (_err: HttpErrorResponse) => {
         this.spinnerService.stop(this.loaderNames.performancWorkloadUtilization);
-
         this.notification.error(new Notification('Failed to get top 10 utilization data. Try again later'));
       });
   }
-  
+
   getWorkloadInsightsTop10QueryWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.spinnerService.start(this.loaderNames.performanceQueryResponse);
+    // this.spinnerService.start(this.loaderNames.performanceQueryResponse);
+
+    this.spinnerService.start(this.loaderNames.queryResponse);
+    this.spinnerService.start(this.loaderNames.queryLatency);
+    this.spinnerService.start(this.loaderNames.activeSessions);
+    this.spinnerService.start(this.loaderNames.errorRate);
+    this.spinnerService.start(this.loaderNames.transactionThroughput);
+    this.spinnerService.start(this.loaderNames.cacheHitRatio);
+    this.queryResponseOptions = null;
+    this.queryLatencyOptions = null;
+    this.activeSessionsOptions = null;
+    this.errorRateOptions = null;
+    this.transactionThroughputOptions = null;
+    this.cacheHitRatioOptions = null;
     this.svc.getWorkloadInsightsTop10QueryWidgetData(filterFormOutput)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          console.log("top 10 Query resp,", res)
+          console.log("top 10 query resp,", res)
+          this.queryResponseOptions = this.svc.convertToQueryResponseOptions(res.top_response_time);
+          this.queryLatencyOptions = this.svc.convertToQueryLatencyOptions(res.top_latency);
+          this.activeSessionsOptions = this.svc.convertToActiveSessionsOptions(res.top_connections);
+          this.errorRateOptions = this.svc.convertToErrorRateOptions(res.top_errors_deadlocks);
+          this.transactionThroughputOptions = this.svc.convertToTransactionThroughputOptions(res.top_throughput);
+          this.cacheHitRatioOptions = this.svc.convertToCacheHitRatioOptions(res.top_cache_hit_ratio);
         }
-        this.spinnerService.stop(this.loaderNames.performanceQueryResponse);
+        // this.spinnerService.stop(this.loaderNames.performanceQueryResponse);
+        this.spinnerService.stop(this.loaderNames.queryResponse);
+        this.spinnerService.stop(this.loaderNames.queryLatency);
+        this.spinnerService.stop(this.loaderNames.activeSessions);
+        this.spinnerService.stop(this.loaderNames.errorRate);
+        this.spinnerService.stop(this.loaderNames.transactionThroughput);
+        this.spinnerService.stop(this.loaderNames.cacheHitRatio);
       }, (_err: HttpErrorResponse) => {
-        this.spinnerService.stop(this.loaderNames.performanceQueryResponse);
-
-        this.notification.error(new Notification('Failed to get Categories Viewed data. Try again later'));
+        // this.spinnerService.stop(this.loaderNames.performanceQueryResponse);
+        this.spinnerService.stop(this.loaderNames.queryResponse);
+        this.spinnerService.stop(this.loaderNames.queryLatency);
+        this.spinnerService.stop(this.loaderNames.activeSessions);
+        this.spinnerService.stop(this.loaderNames.errorRate);
+        this.spinnerService.stop(this.loaderNames.transactionThroughput);
+        this.spinnerService.stop(this.loaderNames.cacheHitRatio);
+        this.notification.error(new Notification('Failed to get workload insights data. Try again later'));
       });
   }
-  
+
   getCapacityGrowthInsightsWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.spinnerService.start(this.loaderNames.capacityGrowth);
+    // this.spinnerService.start(this.loaderNames.capacityGrowth);
+    this.spinnerService.start(this.loaderNames.storageGrowth);
+    this.spinnerService.start(this.loaderNames.tablespaceUsage);
+    this.spinnerService.start(this.loaderNames.storageGrowth);
+    this.spinnerService.start(this.loaderNames.archiveLogGrowth);
+    this.spinnerService.start(this.loaderNames.logGrowthRate);
+    this.spinnerService.start(this.loaderNames.dbSizeByServer);
+    this.spinnerService.start(this.loaderNames.logSizeByServer);
+    this.spinnerService.start(this.loaderNames.diskUtilization);
+    this.capacityMetrics = [];
+    this.storageRows = [];
+    this.tablespaceUsageOptions = null;
+    this.storageGrowthOptions = null;
+    this.archiveLogGrowthOptions = null;
+    this.logGrowthRateOptions = null;
+    this.dbSizeByServerOptions = null;
+    this.logSizeByServerOptions = null;
+    this.diskUtilizationOptions = null;
     this.svc.getCapacityGrowthInsightsWidgetData(filterFormOutput)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
           console.log("capacity growth insights,", res)
+          this.capacityMetrics = this.svc.convertToCapacityMetricsViewData(res.summary_stats);
+          this.storageRows = this.svc.convertToStorageRowsViewData(res.top_servers);
+          this.tablespaceUsageOptions = this.svc.convertToTablespaceUsageOptions(res.top_tablespace_filesystem_usage);
+          this.storageGrowthOptions = this.svc.convertToStorageGrowthOptions(res.storage_growth_trend);
+          this.archiveLogGrowthOptions = this.svc.convertToArchiveLogGrowthOptions(res.archive_log_growth_trend);
+          this.logGrowthRateOptions = this.svc.convertToLogGrowthRateOptions(res.log_growth_rate);
+          this.dbSizeByServerOptions = this.svc.convertToDbSizeByServerOptions(res.db_size_by_server);
+          this.logSizeByServerOptions = this.svc.convertToLogSizeByServerOptions(res.log_size_by_server);
+          this.diskUtilizationOptions = this.svc.convertToDiskUtilizationOptions(res.disk_utilization);
         }
-        this.spinnerService.stop(this.loaderNames.capacityGrowth);
+        // this.spinnerService.stop(this.loaderNames.capacityGrowth);
+        this.spinnerService.stop(this.loaderNames.storageGrowth);
+        this.spinnerService.stop(this.loaderNames.tablespaceUsage);
+        this.spinnerService.stop(this.loaderNames.storageGrowth);
+        this.spinnerService.stop(this.loaderNames.archiveLogGrowth);
+        this.spinnerService.stop(this.loaderNames.logGrowthRate);
+        this.spinnerService.stop(this.loaderNames.dbSizeByServer);
+        this.spinnerService.stop(this.loaderNames.logSizeByServer);
+        this.spinnerService.stop(this.loaderNames.diskUtilization);
       }, (_err: HttpErrorResponse) => {
-        this.spinnerService.stop(this.loaderNames.capacityGrowth);
-
+        // this.spinnerService.stop(this.loaderNames.capacityGrowth);        
+        this.spinnerService.stop(this.loaderNames.storageGrowth);
+        this.spinnerService.stop(this.loaderNames.tablespaceUsage);
+        this.spinnerService.stop(this.loaderNames.storageGrowth);
+        this.spinnerService.stop(this.loaderNames.archiveLogGrowth);
+        this.spinnerService.stop(this.loaderNames.logGrowthRate);
+        this.spinnerService.stop(this.loaderNames.dbSizeByServer);
+        this.spinnerService.stop(this.loaderNames.logSizeByServer);
+        this.spinnerService.stop(this.loaderNames.diskUtilization);
         this.notification.error(new Notification('Failed to get capacity growth insights data. Try again later'));
       });
   }
-  
+
   getHealthOverviewWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.spinnerService.start(this.loaderNames.inventoryOverview);
+    this.spinnerService.start(this.loaderNames.healthOverview);
+    this.databaseAvailabilityStatus = null;
+    this.replicationSync = null;
     this.svc.getHealthOverviewWidgetData(filterFormOutput)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
@@ -393,265 +451,41 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
           this.databaseAvailabilityStatus = this.svc.convertTodatabaseAvailabilityStatus(res.summary);
           this.replicationSync = this.svc.convertToReplicationSync(res.replication_sync);
         }
-        this.spinnerService.stop(this.loaderNames.inventoryOverview);
+        this.spinnerService.stop(this.loaderNames.healthOverview);
       }, (_err: HttpErrorResponse) => {
-        this.spinnerService.stop(this.loaderNames.inventoryOverview);
-
+        this.spinnerService.stop(this.loaderNames.healthOverview);
         this.notification.error(new Notification('Failed to get health overview data. Try again later'));
       });
   }
 
   getAlertsOverviewWidgetData(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.spinnerService.start(this.loaderNames.alertAndEvents);
+    // this.spinnerService.start(this.loaderNames.alertAndEvents);
+    this.spinnerService.start(this.loaderNames.alertSummary);
+    this.spinnerService.start(this.loaderNames.criticalAlerts);
     this.alertSummaryMetrics = [];
     this.criticalAlerts = [];
     this.svc.getAlertsOverviewWidgetData(filterFormOutput)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
+          console.log("alerts and events resp,", res)
           this.alertSummaryMetrics = this.svc.convertToAlertSummaryViewData(res.summary);
           this.criticalAlerts = this.svc.convertToCriticalAlertsTableData(res.critical_alerts);
         }
-        this.spinnerService.stop(this.loaderNames.alertAndEvents);
+        // this.spinnerService.stop(this.loaderNames.alertAndEvents);
+        this.spinnerService.stop(this.loaderNames.alertSummary);
+        this.spinnerService.stop(this.loaderNames.criticalAlerts);
       }, (_err: HttpErrorResponse) => {
-        this.alertSummaryMetrics = [];
-        this.criticalAlerts = [];
-        this.spinnerService.stop(this.loaderNames.alertAndEvents);
+        // this.spinnerService.stop(this.loaderNames.alertAndEvents);        
+        this.spinnerService.stop(this.loaderNames.alertSummary);
+        this.spinnerService.stop(this.loaderNames.criticalAlerts);
         this.notification.error(new Notification('Failed to get alerts and events overview data. Try again later'));
       });
   }
 
-  /* ------------------------------------------
-    original sub methods
-  */
-
-  getSummaryMetrics(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.summaryMetrics = [];
-    this.loadWidget(this.loaderNames.summaryMetrics, this.svc.getSummaryMetrics(filterFormOutput), res => {
-      this.summaryMetrics = this.svc.convertToMetricsViewData(res);
-    }, () => {
-      this.summaryMetrics = [];
-    });
-  }
-
-  getCloudTypeDistribution(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.cloudTypeDistribution = [];
-    this.cloudTypeDistributionOptions = {};
-    this.loadWidget(this.loaderNames.cloudTypeDistribution, this.svc.getCloudTypeDistribution(filterFormOutput), res => {
-      this.cloudTypeDistribution = this.svc.convertToCloudTypeDistributionViewData(res);
-      this.cloudTypeDistributionOptions = this.svc.convertToCloudTypeDistributionOptions(this.cloudTypeDistribution);
-    }, () => {
-      this.cloudTypeDistribution = [];
-      this.cloudTypeDistributionOptions = {};
-    });
-  }
-
-  getPlatformCounts(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.dbCountByPlatformOptions = {};
-    this.loadWidget(this.loaderNames.platformCounts, this.svc.getPlatformCounts(filterFormOutput), res => {
-      this.dbCountByPlatformOptions = this.svc.convertToPlatformCountOptions(res);
-    }, () => {
-      this.dbCountByPlatformOptions = {};
-    });
-  }
-
-  getEnvironmentCounts(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.dbByEnvironmentOptions = {};
-    this.loadWidget(this.loaderNames.environmentCounts, this.svc.getEnvironmentCounts(filterFormOutput), res => {
-      this.dbByEnvironmentOptions = this.svc.convertToEnvironmentOptions(res);
-    }, () => {
-      this.dbByEnvironmentOptions = {};
-    });
-  }
-
-  getTags(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.tags = [];
-    this.loadWidget(this.loaderNames.tags, this.svc.getTags(filterFormOutput), res => {
-      this.tags = this.svc.convertToTagsViewData(res);
-    }, () => {
-      this.tags = [];
-    });
-  }
-
-  getDatabaseVersions(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.databaseVersions = [];
-    this.loadWidget(this.loaderNames.databaseVersions, this.svc.getDatabaseVersions(filterFormOutput), res => {
-      this.databaseVersions = this.svc.convertToDatabaseVersionsViewData(res);
-    }, () => {
-      this.databaseVersions = [];
-    });
-  }
-
-  getUtilizationRows(filterFormOutput: DatabaseDashboardFilterCriteria, criteria?: SearchCriteria,) {
-    this.utilizationRows = [];
-    this.loadWidget(this.loaderNames.utilization, this.svc.getUtilizationRows(filterFormOutput), res => {
-      this.utilizationCount = res.length;
-      this.utilizationRows = this.svc.convertToUtilizationRowsViewData(res);
-    }, () => {
-      this.utilizationRows = [];
-    });
-  }
-
-  getQueryResponse(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.queryResponseOptions = {};
-    this.loadWidget(this.loaderNames.queryResponse, this.svc.getQueryResponse(filterFormOutput), res => {
-      this.queryResponseOptions = this.svc.convertToQueryResponseOptions(res);
-    }, () => {
-      this.queryResponseOptions = {};
-    });
-  }
-
-  getQueryLatency(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.queryLatencyOptions = {};
-    this.loadWidget(this.loaderNames.queryLatency, this.svc.getQueryLatency(filterFormOutput), res => {
-      this.queryLatencyOptions = this.svc.convertToQueryLatencyOptions(res);
-    }, () => {
-      this.queryLatencyOptions = {};
-    });
-  }
-
-  getActiveSessions(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.activeSessionsOptions = {};
-    this.loadWidget(this.loaderNames.activeSessions, this.svc.getActiveSessions(filterFormOutput), res => {
-      this.activeSessionsOptions = this.svc.convertToActiveSessionsOptions(res);
-    }, () => {
-      this.activeSessionsOptions = {};
-    });
-  }
-
-  getErrorRate(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.errorRateOptions = {};
-    this.loadWidget(this.loaderNames.errorRate, this.svc.getErrorRate(filterFormOutput), res => {
-      this.errorRateOptions = this.svc.convertToErrorRateOptions(res);
-    }, () => {
-      this.errorRateOptions = {};
-    });
-  }
-
-  getTransactionThroughput(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.transactionThroughputOptions = {};
-    this.loadWidget(this.loaderNames.transactionThroughput, this.svc.getTransactionThroughput(filterFormOutput), res => {
-      this.transactionThroughputOptions = this.svc.convertToTransactionThroughputOptions(res);
-    }, () => {
-      this.transactionThroughputOptions = {};
-    });
-  }
-
-  getCacheHitRatio(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.cacheHitRatioOptions = {};
-    this.loadWidget(this.loaderNames.cacheHitRatio, this.svc.getCacheHitRatio(filterFormOutput), res => {
-      this.cacheHitRatioOptions = this.svc.convertToCacheHitRatioOptions(res);
-    }, () => {
-      this.cacheHitRatioOptions = {};
-    });
-  }
-
-  getCapacityMetrics(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.capacityMetrics = [];
-    this.loadWidget(this.loaderNames.capacityMetrics, this.svc.getCapacityMetrics(filterFormOutput), res => {
-      this.capacityMetrics = this.svc.convertToCapacityMetricsViewData(res);
-    }, () => {
-      this.capacityMetrics = [];
-    });
-  }
-
-  getStorageRows(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.storageRows = [];
-    this.loadWidget(this.loaderNames.storageRows, this.svc.getStorageRows(filterFormOutput), res => {
-      this.storageRows = this.svc.convertToStorageRowsViewData(res);
-    }, () => {
-      this.storageRows = [];
-    });
-  }
-
-  getTablespaceUsage(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.tablespaceUsageOptions = {};
-    this.loadWidget(this.loaderNames.tablespaceUsage, this.svc.getTablespaceUsage(filterFormOutput), res => {
-      this.tablespaceUsageOptions = this.svc.convertToTablespaceUsageOptions(res);
-    }, () => {
-      this.tablespaceUsageOptions = {};
-    });
-  }
-
-  getStorageGrowth(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.storageGrowthOptions = {};
-    this.loadWidget(this.loaderNames.storageGrowth, this.svc.getStorageGrowth(filterFormOutput), res => {
-      this.storageGrowthOptions = this.svc.convertToStorageGrowthOptions(res);
-    }, () => {
-      this.storageGrowthOptions = {};
-    });
-  }
-
-  getArchiveLogGrowth(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.archiveLogGrowthOptions = {};
-    this.loadWidget(this.loaderNames.archiveLogGrowth, this.svc.getArchiveLogGrowth(filterFormOutput), res => {
-      this.archiveLogGrowthOptions = this.svc.convertToArchiveLogGrowthOptions(res);
-    }, () => {
-      this.archiveLogGrowthOptions = {};
-    });
-  }
-
-  getLogGrowthRate(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.logGrowthRateOptions = {};
-    this.loadWidget(this.loaderNames.logGrowthRate, this.svc.getLogGrowthRate(filterFormOutput), res => {
-      this.logGrowthRateOptions = this.svc.convertToLogGrowthRateOptions(res);
-    }, () => {
-      this.logGrowthRateOptions = {};
-    });
-  }
-
-  getDbSizeByServer(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.dbSizeByServerOptions = {};
-    this.loadWidget(this.loaderNames.dbSizeByServer, this.svc.getDbSizeByServer(filterFormOutput), res => {
-      this.dbSizeByServerOptions = this.svc.convertToDbSizeByServerOptions(res);
-    }, () => {
-      this.dbSizeByServerOptions = {};
-    });
-  }
-
-  getLogSizeByServer(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.logSizeByServerOptions = {};
-    this.loadWidget(this.loaderNames.logSizeByServer, this.svc.getLogSizeByServer(filterFormOutput), res => {
-      this.logSizeByServerOptions = this.svc.convertToLogSizeByServerOptions(res);
-    }, () => {
-      this.logSizeByServerOptions = {};
-    });
-  }
-
-  getDiskUtilization(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.diskUtilizationOptions = {};
-    this.loadWidget(this.loaderNames.diskUtilization, this.svc.getDiskUtilization(filterFormOutput), res => {
-      this.diskUtilizationOptions = this.svc.convertToDiskUtilizationOptions(res);
-    }, () => {
-      this.diskUtilizationOptions = {};
-    });
-  }
-
-  getHealthGroups(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.healthGroups = [];
-    this.loadWidget(this.loaderNames.healthGroups, this.svc.getHealthGroups(filterFormOutput), res => {
-      this.healthGroups = this.svc.convertToHealthGroupsViewData(res);
-    }, () => {
-      this.healthGroups = [];
-    });
-  }
-  
-  getAlertSummaryMetrics(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.alertSummaryMetrics = [];
-    this.loadWidget(this.loaderNames.alertSummary, this.svc.getAlertSummaryMetrics(filterFormOutput), res => {
-      this.alertSummaryMetrics = this.svc.convertToAlertSummaryMetricsViewData(res);
-    }, () => {
-      this.alertSummaryMetrics = [];
-    });
-  }
-
-  getCriticalAlerts(filterFormOutput: DatabaseDashboardFilterCriteria) {
-    this.criticalAlerts = [];
-    this.loadWidget(this.loaderNames.criticalAlerts, this.svc.getCriticalAlerts(filterFormOutput), res => {
-      this.criticalAlerts = this.svc.convertToCriticalAlertsViewData(res);
-    }, () => {
-      this.criticalAlerts = [];
-    });
+  viewAlertDetails(uuid: string) {
+    if(!uuid) { return; }
+    this.alertDetailSvc.showEventDetails(uuid);
   }
 
   getStatusClass(tone: DatabaseDashboardTone): string {
@@ -667,18 +501,19 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 
-  private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {
-    this.spinnerService.start(loaderName);
-    request.pipe(
-      takeUntil(this.ngUnsubscribe),
-      finalize(() => setTimeout(() => this.spinnerService.stop(loaderName), 0))
-    ).subscribe(res => {
-      onSuccess(res);
-    }, () => {
-      onError();
-    });
-  }
+  // private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {
+  //   this.spinnerService.start(loaderName);
+  //   request.pipe(
+  //     takeUntil(this.ngUnsubscribe),
+  //     finalize(() => setTimeout(() => this.spinnerService.stop(loaderName), 0))
+  //   ).subscribe(res => {
+  //     onSuccess(res);
+  //   }, () => {
+  //     onError();
+  //   });
+  // }
+
 }

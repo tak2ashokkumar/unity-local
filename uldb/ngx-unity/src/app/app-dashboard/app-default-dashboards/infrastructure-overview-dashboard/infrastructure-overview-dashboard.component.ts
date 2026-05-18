@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
@@ -642,6 +643,6 @@ export class InfrastructureOverviewDashboardComponent implements OnInit, AfterVi
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 }

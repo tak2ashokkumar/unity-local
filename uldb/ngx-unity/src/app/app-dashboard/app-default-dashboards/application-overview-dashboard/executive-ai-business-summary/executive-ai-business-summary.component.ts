@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AppDataType, ExecutiveAiBusinessSummaryService, ExecutiveAIBusinnesSummaryViewData } from './executive-ai-business-summary.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../../app-default-dashboards.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
@@ -63,7 +64,7 @@ export class ExecutiveAiBusinessSummaryComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['../../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route, ['../../']);
   }
 
 }

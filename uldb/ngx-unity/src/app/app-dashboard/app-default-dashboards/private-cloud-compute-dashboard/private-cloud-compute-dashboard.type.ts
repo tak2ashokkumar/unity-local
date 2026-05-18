@@ -55,7 +55,6 @@ export interface CloudTypeDistributionItem {
 export interface PowerActivityStateItem {
   count: number;
   state: string;
-  percentage: number;
 }
 export interface VmCountByOSTypeItem {
   os: string;
@@ -88,14 +87,18 @@ export interface TopClustersByVMCountItem {
 
 
 export interface CapacityAndGrowthDataType {
-  vmDensityPerHost: VmDensityPerHostItem[];
   capacityTrendAndForecast: CapacityTrendAndForecastItem[];
   provisioningStatus: ProvisioningStatus;
+
+  topHostUtilization: TopHostUtilizationItem[];
   // filters: Filters;
 }
-export interface VmDensityPerHostItem {
+export interface TopHostUtilizationItem {
   hostName: string;
-  vmCount: number;
+  utilizationPct: number;
+  totalStorageGB: number;
+  usedStorageGB: number;
+  category: string;
 }
 export interface CapacityTrendAndForecastItem {
   month: string;
@@ -189,8 +192,9 @@ export interface RecentAlertsItem {
   deviceName: string;
   severity: string;
   source: string;
-  dateTime: string;
+  duration: string;
   acknowledged: string;
+  uuid: string;
   id: number;
   description: string;
 }

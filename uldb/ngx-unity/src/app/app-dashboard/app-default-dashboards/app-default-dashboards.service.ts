@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 
@@ -60,6 +61,33 @@ export class AppDefaultDashboardsService {
         return 'unified-aiops-command-centre';
     }
   }
+}
+
+export function goBackFromDefaultDashboard(
+  router: Router,
+  route: ActivatedRoute,
+  defaultCommands: any[] = ['../']
+): void {
+  if (hasRouteParam(route, 'collectionId')) {
+    router.navigate(['../../'], { relativeTo: route });
+    return;
+  }
+
+  router.navigate(defaultCommands, { relativeTo: route });
+}
+
+function hasRouteParam(route: ActivatedRoute, paramName: string): boolean {
+  let currentRoute: ActivatedRoute | null = route;
+
+  while (currentRoute) {
+    if (currentRoute.snapshot.paramMap.has(paramName)) {
+      return true;
+    }
+
+    currentRoute = currentRoute.parent;
+  }
+
+  return false;
 }
 
 export class DefaultViewData {

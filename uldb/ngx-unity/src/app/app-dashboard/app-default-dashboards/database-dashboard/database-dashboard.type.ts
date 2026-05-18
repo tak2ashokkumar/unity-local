@@ -11,41 +11,6 @@ export interface DatabaseDashboardFilterCriteria {
   databases: string[];
 }
 
-// Inventory Overview Widget Type Start 
-export interface InventoryWidgetType {
-  total_databases: number;
-  by_type: ByTypeItem[];
-  status: SummaryStatus;
-  by_environment: ByEnvironmentItem[];
-  by_version: ByVersionItem[];
-  by_tags: ByTagsItem[];
-}
-export interface ByTypeItem {
-  db_type: string;
-  count: number;
-  percentage: number;
-}
-export interface SummaryStatus {
-  active: number;
-  inactive: number;
-}
-export interface ByEnvironmentItem {
-  environment: string;
-  count: number;
-  percentage: number;
-}
-export interface ByVersionItem {
-  version: string;
-  count: number;
-  percentage: number;
-}
-export interface ByTagsItem {
-  tag: string;
-  count: number;
-  percentage: number;
-}
-// Inventory Overview Widget Type Ends
-
 export interface DatabaseDashboardMetric {
   label: string;
   value: string;
@@ -55,19 +20,28 @@ export interface DatabaseDashboardMetric {
 export interface DatabaseDashboardDonutItem {
   name: string;
   value: number;
-  color: string;
+  color?: string;
+  percentage?: string;
 }
 
 export interface DatabaseDashboardBarItem {
   name: string;
   value: number;
   label?: string;
-  color: string;
+  color?: string;
+}
+
+export interface DatabaseDashboardStackedBarItem {
+  name: string;
+  onCount: number;
+  offCount: number;
+  color?: string;
+  percentage?: string;
 }
 
 export interface DatabaseDashboardTagItem {
   name: string;
-  count: string;
+  count: number;
   textColor: string;
   backgroundColor: string;
 }
@@ -76,6 +50,7 @@ export interface DatabaseDashboardVersionItem {
   name: string;
   count: number;
 }
+
 
 export interface DatabaseDashboardStorageUtilization {
   capacity: string;
@@ -124,7 +99,6 @@ export interface DatabaseDashboardStorageRow {
   logGrowth: number;
 }
 
-//HealthGroup
 export interface DbDashboardHealthMetric {
   label: string;
   value: string;
@@ -137,6 +111,206 @@ export interface DbDashboardHealthGroup {
   metrics: DbDashboardHealthMetric[];
 }
 
+//single API response interface
+//inventory
+export interface InventoryWidgetType {
+  total_databases: number;
+  by_category: InventoryWidgetByCategoryType[];
+  by_type: InventoryWidgetByPlatformType[];
+  status: InventoryWidgetSummaryStatus;
+  by_environment: InventoryWidgetByEnvironment[];
+  by_version: InventoryWidgetByVersion[];
+  by_tags: InventoryWidgetByTags[];
+}
+export interface InventoryWidgetByCategoryType {
+  category: string;
+  count: number;
+  percentage: number;
+}
+export interface InventoryWidgetByPlatformType {
+  db_type: string;
+  on_count: number;
+  off_count: number;
+  percentage: number;
+}
+export interface InventoryWidgetSummaryStatus {
+  active: number;
+  inactive: number;
+}
+export interface InventoryWidgetByEnvironment {
+  environment: string;
+  count: number;
+  percentage: number;
+}
+export interface InventoryWidgetByTags {
+  tag: string;
+  count: number;
+  percentage: number;
+}
+export interface InventoryWidgetByVersion {
+  version: string;
+  count: number;
+  percentage: number;
+}
+
+//performance workload
+export interface DatabaseDashboardTop10Utilization {
+  host_id: number;
+  name: string;
+  cpu_usage_system_percent: number;
+  cpu_usage_user_percent: number;
+  memory_used_percent: number;
+  stroage_used: number;
+  stroage_capacity: string;
+  stroage_free_percent: number;
+  disk_usage_percent: number;
+  disk_read_ops: number;
+  disk_write_ops: number;
+  system_uptime_seconds: number;
+}
+
+export class DatabaseDashboardTop10UtilizationViewData {
+  constructor() { }
+  hostId: number;
+  name: string;
+  cpuChartOptions?: EChartsOption;
+  cpuUtilizationPercent: number;
+  cpuTone: string;
+  memoryChartOptions?: EChartsOption;
+  memoryUtilizationPercent: number;
+  memoryTone: string;
+  storageCapacityGB: string;
+  storageUsedGB: number;
+  storageUsedPercent: number;
+  storageFreePercent: number;
+  storageTone: string;
+  diskIops: number;
+  diskIopsTone: string;
+  uptime: string;
+}
+
+export interface DatabaseDashboardTopQueryType {
+  top_response_time: DBDashboardTopResponseTimeType[];
+  top_latency: DBDashboardTopLatencyType[];
+  top_connections: DBDashboardTopConnectionsType[];
+  top_errors_deadlocks: DBDashboardTopErrorsDeadlocksType[];
+  top_throughput: DBDashboardTopThroughputType[];
+  top_cache_hit_ratio: DBDashboardTopCacheHitRatioType[];
+}
+export interface DBDashboardTopQueryType {
+  host_id: number;
+  name: string;
+  db_type: string;
+}
+export interface DBDashboardTopResponseTimeType extends DBDashboardTopQueryType {
+  response_time_ms: number;
+}
+export interface DBDashboardTopLatencyType extends DBDashboardTopQueryType {
+  response_time_ms: number;
+}
+export interface DBDashboardTopConnectionsType extends DBDashboardTopQueryType {
+  active_connections: number;
+}
+export interface DBDashboardTopErrorsDeadlocksType extends DBDashboardTopQueryType {
+  deadlock_count: number;
+}
+// export interface DBDashboardTopThroughputType extends DBDashboardTopQueryType {
+//   transactions_per_sec: number;
+// }
+export interface DBDashboardTopThroughputType {
+  host_id: number;
+  name: string;
+  db_type: string;
+  transactions_per_sec: number;
+  trend: DBDashboardTopThroughputTrendType[];
+}
+export interface DBDashboardTopThroughputTrendType {
+  date: string;
+  value: number;
+}
+export interface DBDashboardTopCacheHitRatioType extends DBDashboardTopQueryType {
+  hit_ratio_pct: number;
+}
+
+//Capacity Insights
+export interface DBDashboardCapacityGrowthType {
+  summary_stats: DBDashboardSummaryStats;
+  top_servers: DBDashboardTopServersType[];
+  top_tablespace_filesystem_usage: DBDashboardTopTableSpaceUsageType[];
+  storage_growth_trend: any[];
+  log_growth_rate: DBDashboardLogGrowthRateType[];
+  disk_utilization: DBDashboardDiskUtilizationType[];
+  log_size_by_server: DBDashboardLogSizeByServerType[];
+  db_size_by_server: DBDashboardDbSizeByServerType[];
+  archive_log_growth_trend: DBDashboardArchiveLogGrowthTrendType[];
+}
+export interface DBDashboardSummaryStats {
+  total_db_size_gb: number;
+  total_free_space_gb: number;
+  avg_used_percentage: number;
+}
+export interface DBDashboardTopServersType {
+  name: string;
+  used_percentage: number;
+  free_gb: number;
+  db_size_gb: number;
+  log_size_gb: number;
+  log_growth_gb_per_day: number;
+}
+
+export class DBDashboardTopServersViewData {
+  constructor() { }
+  server: string;
+  used: number;
+  free: number;
+  dbSize: number;
+  logSize: number;
+  logGrowth: number;
+}
+
+export interface DBDashboardTopTableSpaceUsageType {
+  name: string;
+  disk_used_pct: number;
+  disk_free_gb: number;
+  disk_total_gb: number;
+}
+
+export class DBDashboardTopTableSpaceUsageViewData {
+  constructor() { }
+  name: string;
+  diskUsedPct: number;
+  diskFreeGb: number;
+  diskTotalGb: number;
+}
+
+export interface DBDashboardLogGrowthRateType {
+  name: string;
+  log_growth_gb_per_day: number;
+}
+export interface DBDashboardDiskUtilizationType {
+  name: string;
+  disk_used_pct: number;
+  disk_free_gb: number;
+  disk_total_gb: number;
+}
+export interface DBDashboardLogSizeByServerType {
+  name: string;
+  log_size_gb: number;
+}
+export interface DBDashboardDbSizeByServerType {
+  name: string;
+  db_size_gb: number;
+}
+export interface DBDashboardArchiveLogGrowthTrendType {
+  name: string;
+  trend: DBDashboardTrendType[];
+}
+export interface DBDashboardTrendType {
+  date: string;
+  log_growth_gb: number;
+}
+
+//Health
 export interface DbDashboardHealthGroupType {
   summary: DbDashboardSummary;
   servers: DbDashboardServers[];
@@ -150,9 +324,8 @@ export interface DbDashboardSummary {
   inactive: number;
   total: number;
 }
-
 export class DbDashboardSummaryViewData {
-  constructor(){}
+  constructor() { }
   online: number;
   degraded: number;
   unreachable: number;
@@ -163,9 +336,8 @@ export class DbDashboardSummaryViewData {
 export interface DbDashboardServers {
   name: string;
   status: string;
-  cpu_pct: number;
+  cpu_pct?: number;
 }
-
 export interface DbDashboardReplicationSync {
   summary: DbDashboardReplicationSyncSummary;
   servers: DbDashboardReplicationSyncServers[];
@@ -178,9 +350,8 @@ export interface DbDashboardReplicationSyncSummary {
   connection_errors: number;
   no_replication: number;
 }
-
 export class DbDashboardReplicationSyncSummaryData {
-  constructor(){}
+  constructor() { }
   syncHealthy: number;
   lagOver30s: number;
   deadlocks: number;
@@ -191,13 +362,14 @@ export class DbDashboardReplicationSyncSummaryData {
 export interface DbDashboardReplicationSyncServers {
   name: string;
   replication_status: string;
-  lag_sec: number;
-  deadlock_count: number;
-  errors_per_sec: number;
-  connection_errors: number;
+  lag_sec?: number;
+  deadlock_count?: number;
+  errors_per_sec?: number;
+  connection_errors?: number;
 }
 
-//Database
+
+//Alerts
 export type DatabaseDashboardAlertSummaryKey = 'critical_alerts' | 'high_alerts' | 'open_itsm_tickets' | 'automation_success_pct' | 'automation_total_runs' | 'avg_mttr';
 
 export interface DatabaseDashboardTopCriticalAlertsResponse {
@@ -212,17 +384,18 @@ export interface DatabaseDashboardTopCriticalAlertsSummary {
   open_itsm_tickets: number;
   automation_success_pct: number;
   automation_total_runs: number;
-  avg_mttr: number;
+  // avg_mttr: number;
 }
 
 export interface DatabaseDashboardCriticalAlert {
-  id: string;
+  uuid: string;
+  id: number;
   device_name: string;
-  severity: string;
+  severity?: string;
   description: string;
-  source: string;
+  source?: string;
   event_count: number;
-  acknowledged: string;
+  acknowledged: boolean;
   age: string;
 }
 
@@ -231,7 +404,7 @@ interface DatabaseDashboardHighAlerts {
   device_name: string;
   description: string;
   event_count: number;
-  acknowledged: string;
+  acknowledged: boolean;
   age: string;
 }
 
@@ -245,7 +418,8 @@ export interface DatabaseDashboardAlertSummaryMetric {
 
 export class DatabaseDashboardCriticalAlertViewData {
   constructor() { }
-  id: string;
+  uuid: string;
+  id: number;
   deviceName: string;
   severity: string;
   description: string;

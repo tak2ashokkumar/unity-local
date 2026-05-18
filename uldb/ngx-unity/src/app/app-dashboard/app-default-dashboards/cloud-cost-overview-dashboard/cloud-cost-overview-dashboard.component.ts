@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -271,7 +272,7 @@ export class CloudCostOverviewDashboardComponent implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 
 }

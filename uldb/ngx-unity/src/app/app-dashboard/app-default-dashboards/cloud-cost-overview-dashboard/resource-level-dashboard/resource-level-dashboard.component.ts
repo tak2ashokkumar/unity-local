@@ -8,6 +8,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../../app-default-dashboards.service';
 import { takeUntil } from 'rxjs/operators';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -247,6 +248,6 @@ export class ResourceLevelDashboardComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 }

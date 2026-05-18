@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
 import { takeUntil } from 'rxjs/operators';
@@ -246,7 +247,7 @@ export class OrchestrationOverviewDashboardComponent implements OnInit, OnDestro
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 
 }

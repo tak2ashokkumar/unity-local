@@ -5,6 +5,7 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { DatacenterCabinetsFast, DatacenterFast } from 'src/app/shared/SharedEntityTypes/datacenter.type';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
@@ -153,7 +154,7 @@ export class IotDevicesSummaryDashboardComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 
   getStatusByGroup() {

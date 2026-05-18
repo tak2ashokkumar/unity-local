@@ -254,17 +254,15 @@ export class AppPersonaDashboardViewComponent implements OnInit, OnDestroy {
     if (!dashboard?.uuid) {
       return;
     }
-
-    this.router.navigate(['/app-dashboard', 'my-dashboards', dashboard.uuid, 'edit']);
+    this.router.navigate([dashboard.uuid, 'edit'], { relativeTo: this.route });
   }
 
-  goToList() {
+  goBack() {
     if (this.collectionId) {
-      this.router.navigate(['/app-dashboard', 'collections', this.collectionId]);
+      this.router.navigate(['../../'], { relativeTo: this.route });
       return;
     }
-
-    this.router.navigate(['/app-dashboard', 'my-dashboards']);
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   onDeviceSelect(device: MetricesMappingViewData) {

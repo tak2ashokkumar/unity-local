@@ -14,6 +14,9 @@ import {
   DatabaseDashboardVersionItem
 } from './database-dashboard.type';
 
+export const PROGRESSBARCOLORS = ['#e54b4b', '#f5a623', '#2f80d1', '#5c8f1f'];
+export const DBDASHBOARDCOLORS = ['#f5a623','#2F8BD7','#5B9E29','#D03533','#26A69A','#9B59B6','#B7D99A','#FFD099','#9BC9F0','#F5A3A3']
+
 export const DATABASE_DASHBOARD_ALL_SELECTED_VALUE = 'all';
 
 export const DATABASE_DASHBOARD_DATABASE_OPTIONS: DatabaseDashboardFilterOption[] = [
@@ -53,11 +56,11 @@ export const DATABASE_DASHBOARD_ENVIRONMENT_COUNTS: DatabaseDashboardBarItem[] =
 ];
 
 export const DATABASE_DASHBOARD_TAGS: DatabaseDashboardTagItem[] = [
-  { name: 'ERP', count: '312', textColor: '#e24f5d', backgroundColor: '#fde8ea' },
-  { name: 'CRM', count: '241', textColor: '#b77721', backgroundColor: '#fff0d8' },
-  { name: 'Analytics', count: '198', textColor: '#2c76c4', backgroundColor: '#e8f2ff' },
-  { name: 'DevOps', count: '144', textColor: '#008f68', backgroundColor: '#dff6ed' },
-  { name: 'Other', count: '353', textColor: '#6f7782', backgroundColor: '#eceff2' }
+  { name: 'ERP', count: 312, textColor: '#e24f5d', backgroundColor: '#fde8ea' },
+  { name: 'CRM', count: 241, textColor: '#b77721', backgroundColor: '#fff0d8' },
+  { name: 'Analytics', count: 198, textColor: '#2c76c4', backgroundColor: '#e8f2ff' },
+  { name: 'DevOps', count: 144, textColor: '#008f68', backgroundColor: '#dff6ed' },
+  { name: 'Other', count: 353, textColor: '#6f7782', backgroundColor: '#eceff2' }
 ];
 
 export const DATABASE_DASHBOARD_VERSIONS: DatabaseDashboardVersionItem[] = [
@@ -355,18 +358,327 @@ export const DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG: DatabaseDashboardAlertSumm
   { key: 'high_alerts', label: 'High Alerts', value: '67', tone: 'warning' },
   { key: 'open_itsm_tickets', label: 'Open ITSM Tickets', value: '14', tone: 'primary' },
   { key: 'automation_success_pct', label: 'Automation Success', value: '91', tone: 'success', suffix: '%' },
-  { key: 'avg_mttr', label: 'Avg MTTR', value: '3.2', tone: 'muted', suffix: 'h' }
+  // { key: 'avg_mttr', label: 'Avg MTTR', value: '3.2', tone: 'muted', suffix: 'h' }
 ];
 
 export const DATABASE_DASHBOARD_CRITICAL_ALERTS: DatabaseDashboardCriticalAlertViewData[] = [
-  { id: '1744', deviceName: 'UL_Switch_Disk', severity: 'Critical', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'Yes', duration: '34s' },
-  { id: '1746', deviceName: 'UL_Switch_Test', severity: 'Warning', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'No', duration: '36s' },
-  { id: '2319', deviceName: 'UL_Firewall_Test', severity: 'Critical', description: 'High bandwidth usage...', source: 'Unity', acknowledged: 'No', duration: '39s' },
-  { id: '6664', deviceName: 'UL_Switch_AT', severity: 'Info', description: 'Device has been repla...', source: 'Zabbix', acknowledged: 'Yes', duration: '01m' },
-  { id: '9956', deviceName: 'UL_LoadBalancer_09', severity: 'Warning', description: 'System name has bee...', source: 'Nagios', acknowledged: 'No', duration: '02m 44s' },
-  { id: '1470', deviceName: 'UL_Router_AT', severity: 'Info', description: 'Device has been repla...', source: 'Unity', acknowledged: 'Yes', duration: '08m 56s' },
-  { id: '7452', deviceName: 'UL_LoadBalancer_04', severity: 'Critical', description: 'Interface Link down...', source: 'Nagios', acknowledged: 'Yes', duration: '10m 15s' },
-  { id: '2354', deviceName: 'UL_Switch_BT', severity: 'Info', description: 'Interface : High error...', source: 'Unity', acknowledged: 'No', duration: '20m 13s' },
-  { id: '0996', deviceName: 'UL_Firewall_007', severity: 'Critical', description: 'Unavailable by ICMP...', source: 'Nagios', acknowledged: 'No', duration: '01h 09m' },
-  { id: '0994', deviceName: 'UL_Firewall_007', severity: 'Warning', description: 'Unavailable by ICMP...', source: 'Zabbix', acknowledged: 'Yes', duration: '01h 09m' }
+  { uuid: '2', id: 1744, deviceName: 'UL_Switch_Disk', severity: 'Critical', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'Yes', duration: '34s' },
+  { uuid: '2', id: 1746, deviceName: 'UL_Switch_Test', severity: 'Warning', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'No', duration: '36s' },
+  { uuid: '2', id: 2319, deviceName: 'UL_Firewall_Test', severity: 'Critical', description: 'High bandwidth usage...', source: 'Unity', acknowledged: 'No', duration: '39s' },
+  { uuid: '2', id: 6664, deviceName: 'UL_Switch_AT', severity: 'Info', description: 'Device has been repla...', source: 'Zabbix', acknowledged: 'Yes', duration: '01m' },
+  { uuid: '2', id: 9956, deviceName: 'UL_LoadBalancer_09', severity: 'Warning', description: 'System name has bee...', source: 'Nagios', acknowledged: 'No', duration: '02m 44s' },
+  { uuid: '2', id: 1470, deviceName: 'UL_Router_AT', severity: 'Info', description: 'Device has been repla...', source: 'Unity', acknowledged: 'Yes', duration: '08m 56s' },
+  { uuid: '2', id: 7452, deviceName: 'UL_LoadBalancer_04', severity: 'Critical', description: 'Interface Link down...', source: 'Nagios', acknowledged: 'Yes', duration: '10m 15s' },
+  { uuid: '2', id: 2354, deviceName: 'UL_Switch_BT', severity: 'Info', description: 'Interface : High error...', source: 'Unity', acknowledged: 'No', duration: '20m 13s' },
+  { uuid: '2', id: 996, deviceName: 'UL_Firewall_007', severity: 'Critical', description: 'Unavailable by ICMP...', source: 'Nagios', acknowledged: 'No', duration: '01h 09m' },
+  { uuid: '2', id: 994, deviceName: 'UL_Firewall_007', severity: 'Warning', description: 'Unavailable by ICMP...', source: 'Zabbix', acknowledged: 'Yes', duration: '01h 09m' }
 ];
+
+
+// Single api const for testing
+export const INVENTORY_RESP = {
+  "total_databases": 42,
+  "by_category": [
+    { "category": "RDBMS", "count": 20, "percentage": 64.26 },
+    { "category": "NoSql", "count": 8, "percentage": 25.26 },
+    { "category": "Cloud DB", "count": 8, "percentage": 25.40 },
+  ],
+  "by_type": [
+    { "db_type": "MySQL", "on_count": 20, "off_count": 10, "percentage": 42.86 },
+    { "db_type": "PostgreSQL", "on_count": 0, "off_count": 19, "percentage": 28.57 },
+    { "db_type": "MSSQL", "on_count": 11, "off_count": 5, "percentage": 19.05 },
+    { "db_type": "Oracle", "on_count": 4, "off_count": 4, "percentage": 10.52 }
+  ],
+  "status": {
+    "active": 38,
+    "inactive": 4
+  },
+  "by_environment": [
+    { "environment": "Production", "count": 20, "percentage": 47.62 },
+    { "environment": "Development", "count": 14, "percentage": 33.33 },
+    { "environment": "Test", "count": 8, "percentage": 19.05 }
+  ],
+  "by_version": [
+    { "version": "8.0.32", "count": 10, "percentage": 23.81 },
+    { "version": "14.5", "count": 8, "percentage": 19.05 },
+    { "version": "Unknown", "count": 4, "percentage": 9.52 }
+  ],
+  "by_tags": [
+    { "tag": "critical", "count": 15, "percentage": 35.71 },
+    { "tag": "Untagged", "count": 10, "percentage": 23.81 }
+  ]
+}
+
+export const TOPUTIL_RESP = [
+  // {
+  //   "host_id": 10084,
+  //   "name": "prod-mysql-01",
+  //   "CPU Usage (System %)": 34.5,
+  //   "Memory Used (%)": 71.2,
+  //   "Disk Usage (%)": 58.4,
+  //   "Disk Read Ops": 120.3,
+  //   "Disk Write Ops": 85.1,
+  //   "System Uptime (seconds)": 1209600
+  // },
+  // {
+  //   "host_id": 10085,
+  //   "name": "prod-postgres-01",
+  //   "CPU Usage (System %)": 61.8,
+  //   "Memory Used (%)": 83.4,
+  //   "Disk Usage (%)": 74.1,
+  //   "Disk Read Ops": 240.7,
+  //   "Disk Write Ops": 198.3,
+  //   "System Uptime (seconds)": 864000
+  // },
+  {
+    name: 'Cisco 1',
+    host_id: 1,
+    disk_read_ops: 120,
+    disk_write_ops: 10012,
+    cpu_usage_system_percent: 24,
+    cpu_usage_user_percent: 45,
+    memory_used_percent: 24,
+    stroage_capacity: '256GB',
+    stroage_used: 128,
+    stroage_free_percent: 50,
+    disk_usage_percent: 68,
+    system_uptime_seconds: 264585453
+  },
+  {
+    name: 'Cisco 2',
+    host_id: 2,
+    cpu_usage_system_percent: 80,
+    cpu_usage_user_percent: 34,
+    memory_used_percent: 50,
+    stroage_capacity: '1024GB',
+    stroage_used: 400,
+    stroage_free_percent: 40,
+    disk_usage_percent: 48,
+    disk_read_ops: 12000,
+    disk_write_ops: 5012,
+    system_uptime_seconds: 26485453
+  }
+]
+
+export const TOPQUERY_RESP = {
+  "top_response_time": [
+    { "host_id": 10091, "name": "prod-oracle-01", "db_type": "Oracle", "response_time_ms": 842.500 },
+    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "response_time_ms": 530.120 },
+    { "host_id": 10085, "name": "prod-postgres-01", "db_type": "PostgreSQL", "response_time_ms": 310.000 }
+  ],
+  "top_latency": [
+    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "response_time_ms": 12.450 },
+    { "host_id": 10085, "name": "prod-postgres-01", "db_type": "PostgreSQL", "response_time_ms": 8.200 }
+  ],
+  "top_connections": [
+    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "active_connections": 312.0 },
+    { "host_id": 10086, "name": "prod-mssql-01", "db_type": "MSSQL", "active_connections": 198.0 }
+  ],
+  "top_errors_deadlocks": [
+    { "host_id": 10086, "name": "prod-mssql-01", "db_type": "MSSQL", "deadlock_count": 14.0 },
+    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "deadlock_count": 7.0 }
+  ],
+
+  "top_throughput": [
+    {
+      "host_id": 10085, "name": "prod-postgres-01", "db_type": "PostgreSQL", "transactions_per_sec": 4820.0, "trend": [
+        { "date": "2026-05-02", "value": 1200 },
+        { "date": "2026-05-03", "value": 1800 },
+        { "date": "2026-05-04", "value": 3100 },
+        { "date": "2026-05-05", "value": 1400 },
+        { "date": "2026-05-06", "value": 1900 },
+        { "date": "2026-05-07", "value": 2600 },
+        { "date": "2026-05-08", "value": 2400 }
+      ]
+    }
+  ],
+  "top_cache_hit_ratio": [
+    { "host_id": 10088, "name": "dev-mysql-02", "db_type": "MySQL", "hit_ratio_pct": 61.3 },
+    { "host_id": 10086, "name": "prod-mssql-01", "db_type": "MSSQL", "hit_ratio_pct": 74.8 }
+  ]
+}
+
+export const CAPACITY_RESP = {
+  "summary_stats": {
+    "total_db_size_gb": 3840.50,
+    "total_free_space_gb": 1240.75,
+    "avg_used_percentage": 67.72
+  },
+  "top_servers": [
+    {
+      "name": "prod-oracle-01",
+      "used_percentage": 91.40,
+      "free_gb": 18.60,
+      "db_size_gb": 214.00,
+      "log_size_gb": 32.10,
+      "log_growth_gb_per_day": 1.2400
+    },
+    {
+      "name": 'DB-SRV-01',
+      "used_percentage": 94,
+      "free_gb": 28,
+      "db_size_gb": 412,
+      "log_size_gb": 60,
+      "log_growth_gb_per_day": 3.2
+    },
+    {
+      "name": 'DB-SRV-02',
+      "used_percentage": 87,
+      "free_gb": 65,
+      "db_size_gb": 380,
+      "log_size_gb": 55,
+      "log_growth_gb_per_day": 2.8
+    },
+    {
+      "name": 'APP-SRV-03',
+      "used_percentage": 82,
+      "free_gb": 90,
+      "db_size_gb": 290,
+      "log_size_gb": 120,
+      "log_growth_gb_per_day": 5.1
+    },
+    {
+      "name": 'WEB-SRV-01',
+      "used_percentage": 78,
+      "free_gb": 110,
+      "db_size_gb": 210,
+      "log_size_gb": 180,
+      "log_growth_gb_per_day": 7.4
+    },
+    {
+      "name": 'LOG-SRV-01',
+      "used_percentage": 76,
+      "free_gb": 120,
+      "db_size_gb": 45,
+      "log_size_gb": 435,
+      "log_growth_gb_per_day": 12.6
+    },
+    {
+      "name": 'BACKUP-01',
+      "used_percentage": 71,
+      "free_gb": 580,
+      "db_size_gb": 920,
+      "log_size_gb": 500,
+      "log_growth_gb_per_day": 1.9
+    }
+  ],
+  "top_tablespace_filesystem_usage": [
+    {
+      "name": "prod-mssql-01",
+      "disk_used_pct": 88.30,
+      "disk_free_gb": 42.10,
+      "disk_total_gb": 360.00
+    }
+  ],
+  "storage_growth_trend": [],
+  "archive_log_growth_trend": [
+    {
+      "name": "prod-oracle-01",
+      "trend": [
+        { "date": "2026-05-02", "log_growth_gb": 1.1200 },
+        { "date": "2026-05-03", "log_growth_gb": 1.0800 },
+        { "date": "2026-05-04", "log_growth_gb": 1.3100 },
+        { "date": "2026-05-05", "log_growth_gb": 1.2400 },
+        { "date": "2026-05-06", "log_growth_gb": 1.1900 },
+        { "date": "2026-05-07", "log_growth_gb": 1.2600 },
+        { "date": "2026-05-08", "log_growth_gb": 1.2400 }
+      ]
+    }
+  ],
+  "log_growth_rate": [
+    { "name": "prod-oracle-01", "log_growth_gb_per_day": 1.2400 },
+    { "name": "prod-mssql-01", "log_growth_gb_per_day": 0.8100 }
+  ],
+  "log_size_by_server": [
+    { "name": "prod-oracle-01", "log_size_gb": 32.10 },
+    { "name": "prod-mssql-01", "log_size_gb": 21.40 }
+  ],
+  "db_size_by_server": [
+    { "name": "prod-oracle-01", "db_size_gb": 214.00 },
+    { "name": "prod-mysql-01", "db_size_gb": 180.50 }
+  ],
+  "disk_utilization": [
+    {
+      "name": "prod-mssql-01",
+      "disk_used_pct": 88.30,
+      "disk_free_gb": 42.10,
+      "disk_total_gb": 360.00
+    }
+  ],
+}
+
+export const HEALTHGROWTH_RESP = {
+  "summary": {
+    "online": 28,
+    "degraded": 4,
+    "unreachable": 2,
+    "maintenance": 3,
+    "inactive": 5,
+    "total": 42
+  },
+  "servers": [
+    { "name": "dev-mysql-02", "status": "inactive", "cpu_pct": 40.40 },
+    { "name": "prod-mssql-01", "status": "maintenance", "cpu_pct": 58.40 },
+    { "name": "prod-mysql-01", "status": "online", "cpu_pct": 60.40 },
+    { "name": "prod-oracle-01", "status": "degraded", "cpu_pct": 88.40 },
+    { "name": "prod-postgres-01", "status": "unreachable", "cpu_pct": 91.40 }
+  ],
+  "replication_sync": {
+    "summary": {
+      "sync_healthy": 18,
+      "lag_over_30s": 3,
+      "deadlocks": 2,
+      "errors_per_second": 1,
+      "connection_errors": 2,
+      "no_replication": 16
+    },
+    "servers": [
+      { "name": "prod-mysql-01", "replication_status": "sync_healthy", "lag_sec": 1.4 },
+      { "name": "prod-mysql-02", "replication_status": "lag_over_30s", "lag_sec": 84.2 },
+      { "name": "prod-mssql-01", "replication_status": "deadlocks", "deadlock_count": 14 },
+      { "name": "prod-oracle-01", "replication_status": "errors_per_second", "errors_per_sec": 3.20 },
+      { "name": "prod-postgres-01", "replication_status": "connection_errors", "connection_errors": 5 },
+      { "name": "dev-mysql-02", "replication_status": "no_replication" }
+    ]
+  }
+}
+
+export const ALERTS_RESP = {
+  "summary": {
+    "critical_alerts": 7,
+    "high_alerts": 12,
+    "open_itsm_tickets": 5,
+    "automation_success_pct": 83.33,
+    "automation_total_runs": 18
+  },
+  "critical_alerts": [
+    {
+      "uuid": "1dd9a17f-5ac8-4634-8860-3dba06aa85d4",
+      "id": 481928,
+      "device_name": "prod-oracle-01",
+      "description": "ORA-00600: internal error code, argume...",
+      "event_count": 34,
+      "acknowledged": false,
+      "age": "2d 4h"
+    },
+    {
+      "uuid": "4819",
+      "id": 4819,
+      "device_name": "prod-mssql-01",
+      "description": "SQL Server service stopped unexpectedl...",
+      "event_count": 12,
+      "acknowledged": true,
+      "age": "5h 20m"
+    }
+  ],
+  "high_alerts": [
+    {
+      "id": "4830",
+      "device_name": "prod-mysql-01",
+      "description": "High memory usage detected on database...",
+      "event_count": 8,
+      "acknowledged": false,
+      "age": "47m"
+    }
+  ]
+}

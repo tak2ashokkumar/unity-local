@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { CustomDeviceGraphRange, DateRange, DeviceInterfaceDetailsViewData, DeviceInterfaceRecentAlertsViewData, InterfaceDetailsDashboardService, NetworkInterfaceDetailsGraphViewdata } from './interface-details-dashboard.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -151,6 +152,6 @@ export class InterfaceDetailsDashboardComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['../../../../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route, ['../../../../']);
   }
 }

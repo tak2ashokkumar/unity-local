@@ -10,7 +10,7 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { PRIVATE_CLOUD_ALERT_TREND_STACK_GROUPS, PRIVATE_CLOUD_TICKETS_TOTAL, VmDensityPerHostChartColors } from './private-cloud-compute-dashboard.const';
-import { AlertsSeverityItem, CapacityAndGrowthDataType, CapacityTrendAndForecastItem, CloudTypeDistributionItem, ClusterCapacityUtilTrendData, EnvironmentCriticalityItem, ExecutiveSummaryItem, ExecutiveSummaryWidgetType, FiltersCriteriaType, IdleDevices, IdleDurationDistributionItem, InfrahealthstatusDataType, OrphanedCategory, OrphanedResourcesResponse, PerformanceHotspots, PerformanceWorkloadDataType, PowerActivityStateItem, PrivateCloudAlertSideCard, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudStatusTone, PrivateCloudTicketDonutItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, PrivateCloudUtilizationViewRow, ProvisioningStatus, RecentAlerts, RecentAlertsItem, Top10ClustersByVMsData, TopHeaderDataType, VmCountByOSTypeItem, VmDensityPerHostItem } from './private-cloud-compute-dashboard.type';
+import { AlertsSeverityItem, CapacityAndGrowthDataType, CapacityTrendAndForecastItem, CloudTypeDistributionItem, ClusterCapacityUtilTrendData, EnvironmentCriticalityItem, ExecutiveSummaryItem, ExecutiveSummaryWidgetType, FiltersCriteriaType, IdleDevices, IdleDurationDistributionItem, InfrahealthstatusDataType, OrphanedCategory, OrphanedResourcesResponse, PerformanceHotspots, PerformanceWorkloadDataType, PowerActivityStateItem, PrivateCloudAlertSideCard, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudStatusTone, PrivateCloudTicketDonutItem, PrivateCloudUtilization, PrivateCloudUtilizationRow, PrivateCloudUtilizationViewRow, ProvisioningStatus, RecentAlerts, RecentAlertsItem, Top10ClustersByVMsData, TopHeaderDataType, TopHostUtilizationItem, VmCountByOSTypeItem, } from './private-cloud-compute-dashboard.type';
 
 
 @Injectable()
@@ -130,58 +130,51 @@ export class PrivateCloudComputeDashboardService {
   }
 
   convertToCloudTypeChartData(data: CloudTypeDistributionItem[]) {
-    if (!data || !data.length) { return; }
-    let view: UnityChartDetails = new UnityChartDetails();
+    if (!data || !data.length) {
+      return;
+    }
+    const view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getDefaultPieChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
-
+    const colors = [
+      '#3d8be8',
+      '#1fa36b',
+      '#8b7cf6',
+      '#f0a52b'
+    ];
     view.options = {
       ...view.options,
-
-
       tooltip: {
         trigger: 'item',
         formatter: (params: any) => {
           return `${params.name}<br/>${params.value}% (${params.data.count})`;
         }
       },
-
       legend: {
-        bottom: 20,
-        left: 'center',
-        width: '90%',
-        icon: 'circle',
-        itemWidth: 10,
-        itemHeight: 10,
-        itemGap: 12,
-        textStyle: {
-          color: '#8a8a8a',
-          fontSize: 11
-        },
-        formatter: (name: string) => {
-          const item = data.find(d => d.type === name);
-          return item ? `${name} ${item.percentage}%` : name;
-        }
+        show: false
       },
-
       series: [
         {
           name: 'Cloud Type',
           type: 'pie',
           radius: ['45%', '78%'],
-          center: ['50%', '48%'],
-          bottom: 40,
-
-          label: { show: false },
-          labelLine: { show: false },
-
-          data: data.map((item) => ({
+          center: ['50%', '42%'],
+          label: {
+            show: false
+          },
+          labelLine: {
+            show: false
+          },
+          data: data.map((item, index) => ({
             value: item.percentage,
             name: item.type,
-            count: item.count
+            count: item.count,
+            color: colors[index % colors.length],
+            itemStyle: {
+              color: colors[index % colors.length]
+            }
           })),
-
           itemStyle: {
             borderColor: '#ffffff',
             borderWidth: 2
@@ -192,82 +185,91 @@ export class PrivateCloudComputeDashboardService {
 
     return view;
   }
-
   convertToPowerActivityChartData(data: PowerActivityStateItem[]) {
-    if (!data || !data.length) { return; }
-    let view: UnityChartDetails = new UnityChartDetails();
+    if (!data || !data.length) {
+      return;
+    }
+    const view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.BAR;
     view.options = this.chartConfigSvc.getDefaultVerticalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
-
+    const formattedData = data.map(item => {
+      const isOn = item.state === 'Powered On';
+      return {
+        ...item,
+        label: isOn ? 'On' : 'Off',
+        color: isOn
+          ? '#6aa11f'
+          : '#e44c4c'
+      };
+    });
     view.options = {
       ...view.options,
       grid: {
-        left: 50,
-        right: 20,
+        left: 45,
+        right: 15,
         top: 20,
         bottom: 40
       },
-
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => {
+          const item = formattedData[params.dataIndex];
+          return `
+          ${item.state}<br/>
+          Count: ${item.count}
+        `;
+        }
+      },
+      legend: {
+        show: false
+      },
       xAxis: {
         type: 'category',
-        data: data.map(d => d.state),
+        data: formattedData.map(d => d.label),
         axisLine: {
-          lineStyle: { color: '#9ca3af' }
+          lineStyle: {
+            color: '#9ca3af'
+          }
         },
-        axisTick: { show: false },
+        axisTick: {
+          show: true
+        },
         axisLabel: {
           color: '#6b7280',
           fontSize: 12
         }
       },
-
       yAxis: {
         type: 'value',
         min: 0,
-        // max: 3800, // to match visual scale in your image
         splitNumber: 4,
-        axisLine: { show: false },
-        axisTick: { show: false },
+        axisLine: {
+          show: true
+        },
+        axisTick: {
+          show: true
+        },
         axisLabel: {
-          color: '#6b7280'
+          color: '#9ca3af',
+          fontSize: 11
         },
         splitLine: {
           show: false
         }
       },
-
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => {
-          const item = data[params.dataIndex];
-          return `
-        ${item.state}<br/>
-        Count: ${item.count}<br/>
-        ${item.percentage}%
-      `;
-        }
-      },
-
       series: [
         {
           type: 'bar',
-          barWidth: 50,
-          data: data.map((item) => {
-            let color = '#ccc';
-
-            if (item.state === 'Powered Off') color = '#5c8f1f'; // green
-            else if (item.state === 'Active') color = '#3a8dde'; // blue
-            else if (item.state === 'Idle') color = '#f5a623'; // orange
-
-            return {
-              value: item.count,
-              itemStyle: {
-                color,
-                borderRadius: [6, 6, 0, 0]
-              }
-            };
-          })
+          barWidth: 52,
+          data: formattedData.map(item => ({
+            value: item.count,
+            color: item.color,
+            itemStyle: {
+              color: item.color,
+              borderRadius: [6, 6, 0, 0]
+            }
+          }))
         }
       ]
     };
@@ -352,11 +354,11 @@ export class PrivateCloudComputeDashboardService {
       ...view.options,
 
       grid: {
-        left: 85,
-        right: 55,
+        left: 100,
+        right: 20,
         top: 0,
-        bottom: 25,
-        containLabel: true
+        bottom: 10,
+        containLabel: false
       },
 
       xAxis: {
@@ -462,84 +464,243 @@ export class PrivateCloudComputeDashboardService {
   getCapacityGrowthWidgetData(filters: FiltersCriteriaType): Observable<CapacityAndGrowthDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<CapacityAndGrowthDataType>('/customer/widgets/capacity_growth_insights/', { params });
+    // return of({
+    //   "capacityTrendAndForecast": [
+    //     {
+    //       "count": 37,
+    //       "isForecast": false,
+    //       "month": "Jun"
+    //     },
+    //     {
+    //       "count": 37,
+    //       "isForecast": false,
+    //       "month": "Jul"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Aug"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Sep"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Oct"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Nov"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Dec"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Jan"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Feb"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Mar"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "Apr"
+    //     },
+    //     {
+    //       "count": 47,
+    //       "isForecast": false,
+    //       "month": "May"
+    //     },
+    //     {
+    //       "count": 48,
+    //       "isForecast": true,
+    //       "month": "Jun"
+    //     },
+    //     {
+    //       "count": 49,
+    //       "isForecast": true,
+    //       "month": "Jul"
+    //     },
+    //     {
+    //       "count": 50,
+    //       "isForecast": true,
+    //       "month": "Aug"
+    //     },
+    //     {
+    //       "count": 51,
+    //       "isForecast": true,
+    //       "month": "Sep"
+    //     },
+    //     {
+    //       "count": 52,
+    //       "isForecast": true,
+    //       "month": "Oct"
+    //     },
+    //     {
+    //       "count": 53,
+    //       "isForecast": true,
+    //       "month": "Nov"
+    //     }
+    //   ],
+    //   "provisioningStatus": {
+    //     "provisioned": 0,
+    //     "decommissioned": 0
+    //   },
+    //   "topHostUtilization": [{
+    //     "hostName": "ul-sv1-unity-lab-esx01.unitedlayer.com",
+    //     "utilizationPct": 78.45,
+    //     "totalStorageGB": 2400,
+    //     "usedStorageGB": 1882,
+    //     "category": "Optimized"
+    //   },
+    //   {
+    //     "hostName": "ul-sv1-unity-lab-esx02.unitedlayer.com",
+    //     "utilizationPct": 42.18,
+    //     "totalStorageGB": 1800,
+    //     "usedStorageGB": 759,
+    //     "category": "Underutilized"
+    //   },
+    //   {
+    //     "hostName": "ul-sv1-unity-lab-esx03.unitedlayer.com",
+    //     "utilizationPct": 91.72,
+    //     "totalStorageGB": 3200,
+    //     "usedStorageGB": 2935,
+    //     "category": "Critical"
+    //   },
+    //   {
+    //     "hostName": "ul-sv1-unity-lab-esx04.unitedlayer.com",
+    //     "utilizationPct": 63.57,
+    //     "totalStorageGB": 2100,
+    //     "usedStorageGB": 1335,
+    //     "category": "Healthy"
+    //   },
+    //   {
+    //     "hostName": "ul-sv1-unity-lab-esx05.unitedlayer.com",
+    //     "utilizationPct": 27.94,
+    //     "totalStorageGB": 1500,
+    //     "usedStorageGB": 419,
+    //     "category": "Underutilized"
+    //   }]
+    // })
   }
 
-  convertToVmDensityChartDataChartData(data: VmDensityPerHostItem[]) {
-    if (!data || !data.length) { return; }
-    let view: UnityChartDetails = new UnityChartDetails();
-    view.type = UnityChartTypes.BAR;
-    view.options = this.chartConfigSvc.getDefaultVerticalBarChartOptions();
-    view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+  convertToVmDensityHostViewData(
+    data: TopHostUtilizationItem[]
+  ): VmDensityHost {
 
-    view.options = {
-      ...view.options,
-      // title: {
-      //   text: 'VM Density Per Host',
-      //   left: 'center',
-      //   top: 5,
-      //   textStyle: {
-      //     fontSize: 16,
-      //     fontWeight: 500,
-      //     color: '#333'
-      //   }
-      // },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => {
-          return `${params.name}<br/>VM Count: ${params.value}`;
-        }
-      },
+    const view = new VmDensityHost();
 
-      xAxis: {
-        type: 'category',
-        data: data.map(item => item.hostName),
-        axisLine: {
-          lineStyle: { color: '#d1d5db' }
-        },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#8a8a8a',
-          fontSize: 12
-        }
-      },
+    view.desnityHostRows = (data || []).map(item => {
 
-      yAxis: {
-        type: 'value',
-        min: 0,
-        max: 40,
-        interval: 10,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        axisLabel: {
-          color: '#8a8a8a',
-          fontSize: 12
-        },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            color: '#f1f2f4'
-          }
-        }
-      },
+      const row = new DesityHostRows();
 
-      series: [
-        {
-          name: 'VM Count',
-          type: 'bar',
-          barWidth: 52,
-          data: data.map((item, index) => ({
-            value: item.vmCount,
-            itemStyle: {
-              color: VmDensityPerHostChartColors[index % VmDensityPerHostChartColors.length],
-              borderRadius: [4, 4, 0, 0]
-            }
-          }))
-        }
-      ]
-    };
+      row.hostName = item.hostName || 'N/A';
+
+      row.utilizationPct = item.utilizationPct ?? 0;
+
+      row.totalStorageGB = item.totalStorageGB ?? 0;
+
+      row.usedStorageGB = item.usedStorageGB ?? 0;
+
+      row.category = item.category || 'N/A';
+
+      return row;
+    });
 
     return view;
   }
+
+  // convertToVmDensityChartDataChartData(data: VmDensityPerHostItem[]) {
+  //   if (!data || !data.length) { return; }
+  //   let view: UnityChartDetails = new UnityChartDetails();
+  //   view.type = UnityChartTypes.BAR;
+  //   view.options = this.chartConfigSvc.getDefaultVerticalBarChartOptions();
+  //   view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+
+  //   view.options = {
+  //     ...view.options,
+  //     // title: {
+  //     //   text: 'VM Density Per Host',
+  //     //   left: 'center',
+  //     //   top: 5,
+  //     //   textStyle: {
+  //     //     fontSize: 16,
+  //     //     fontWeight: 500,
+  //     //     color: '#333'
+  //     //   }
+  //     // },
+  //     tooltip: {
+  //       trigger: 'item',
+  //       formatter: (params: any) => {
+  //         return `${params.name}<br/>VM Count: ${params.value}`;
+  //       }
+  //     },
+
+  //     xAxis: {
+  //       type: 'category',
+  //       data: data.map(item => item.hostName),
+  //       axisLine: {
+  //         lineStyle: { color: '#d1d5db' }
+  //       },
+  //       axisTick: { show: false },
+  //       axisLabel: {
+  //         color: '#8a8a8a',
+  //         fontSize: 12
+  //       }
+  //     },
+
+  //     yAxis: {
+  //       type: 'value',
+  //       min: 0,
+  //       max: 40,
+  //       interval: 10,
+  //       axisLine: { show: false },
+  //       axisTick: { show: false },
+  //       axisLabel: {
+  //         color: '#8a8a8a',
+  //         fontSize: 12
+  //       },
+  //       splitLine: {
+  //         show: true,
+  //         lineStyle: {
+  //           color: '#f1f2f4'
+  //         }
+  //       }
+  //     },
+
+  //     series: [
+  //       {
+  //         name: 'VM Count',
+  //         type: 'bar',
+  //         barWidth: 52,
+  //         data: data.map((item, index) => ({
+  //           value: item.vmCount,
+  //           itemStyle: {
+  //             color: VmDensityPerHostChartColors[index % VmDensityPerHostChartColors.length],
+  //             borderRadius: [4, 4, 0, 0]
+  //           }
+  //         }))
+  //       }
+  //     ]
+  //   };
+
+  //   return view;
+  // }
 
   convertToVmCapacityChartData(data: CapacityTrendAndForecastItem[]) {
     if (!data || !data.length) { return; }
@@ -662,7 +823,161 @@ export class PrivateCloudComputeDashboardService {
 
   getTop10ClustersByVMsWidgetData(filters: FiltersCriteriaType): Observable<Top10ClustersByVMsData> {
     let params = this.convertFiltersToParams(filters)
-    return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
+    // return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
+    return of({
+      "topClustersByVMCount": [
+        {
+          "clusterName": "UNITY-LAB-CL",
+          "hostCount": 2,
+          "vmCount": 58,
+          "datastoreCount": 4
+        },
+        {
+          "clusterName": "Linux Cluster",
+          "hostCount": 6,
+          "vmCount": 54,
+          "datastoreCount": 9
+        },
+        {
+          "clusterName": "DEFR-PROD01",
+          "hostCount": 0,
+          "vmCount": 0,
+          "datastoreCount": 0
+        },
+        {
+          "clusterName": "DEFR-MGMT",
+          "hostCount": 0,
+          "vmCount": 0,
+          "datastoreCount": 0
+        },
+        {
+          "clusterName": "DEFR-DMZ01",
+          "hostCount": 0,
+          "vmCount": 0,
+          "datastoreCount": 0
+        },
+        {
+          "clusterName": "DEFR-PROD02",
+          "hostCount": 0,
+          "vmCount": 0,
+          "datastoreCount": 0
+        }
+      ],
+      "filters": {
+        "platforms": [
+          {
+            "value": "Custom",
+            "label": "Custom"
+          },
+          {
+            "value": "VMware",
+            "label": "VMware vCenter"
+          },
+          {
+            "value": "Hyperv",
+            "label": "Hyperv"
+          },
+          {
+            "value": "Nutanix",
+            "label": "Nutanix"
+          },
+          {
+            "value": "ESXi",
+            "label": "ESXi"
+          },
+          {
+            "value": "vCloud Director",
+            "label": "VMware vCloud"
+          },
+          {
+            "value": "United Private Cloud vCenter",
+            "label": "VMware vCenter"
+          },
+          {
+            "value": "Custom",
+            "label": "Custom"
+          },
+          {
+            "value": "Custom",
+            "label": "Custom"
+          },
+          {
+            "value": "VMware",
+            "label": "VMware vCenter"
+          }
+        ],
+        "accounts": [
+          {
+            "value": "d408e6b1-85cc-4897-81c4-71f57bb8075c",
+            "label": "Custom DC3"
+          },
+          {
+            "value": "4455bf34-7e33-49a2-9da0-e35208096013",
+            "label": "1.DemoVcenter - GlobalVCS-Lab"
+          },
+          {
+            "value": "86992fee-b969-446d-a78d-15cc3aa9fc5e",
+            "label": "hyperV"
+          },
+          {
+            "value": "f83bed82-17e7-4b4f-99ba-acfdf02cd4fc",
+            "label": "Nutanix"
+          },
+          {
+            "value": "4948ec33-22e2-4585-b4f7-2261dec4da1e",
+            "label": "esxi pvt cloud"
+          },
+          {
+            "value": "bf1e9659-8e80-4770-bfb3-ecc210affbce",
+            "label": "3.VMware vCloud"
+          },
+          {
+            "value": "2fa55012-d137-495f-8462-01d27125ae4a",
+            "label": "United cloud"
+          },
+          {
+            "value": "dceeea62-ff44-4e17-bcac-2aafb962ec72",
+            "label": "testing_cloud"
+          },
+          {
+            "value": "e6e751ed-6e55-4022-8dc0-884cc35e148d",
+            "label": "TestVM"
+          },
+          {
+            "value": "15d3e4d7-d1b6-4ac2-89b7-5343b35fbfa4",
+            "label": "Vmwaretesting"
+          }
+        ],
+        "environments": [
+          {
+            "value": "Production",
+            "label": "Production"
+          },
+          {
+            "value": "Development",
+            "label": "Development"
+          },
+          {
+            "value": "Test",
+            "label": "Test"
+          },
+          {
+            "value": "None",
+            "label": "None"
+          }
+        ],
+        "datacenters": [
+          {
+            "value": "DC3",
+            "label": "DC3"
+          },
+          {
+            "value": "DC1",
+            "label": "DC1"
+          }
+        ]
+      }
+    })
   }
 
 
@@ -685,6 +1000,8 @@ export class PrivateCloudComputeDashboardService {
     view.type = UnityChartTypes.BAR;
     view.options = this.chartConfigSvc.getDefaultVerticalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    const maxValue = Math.max(...data.map(x => x.value));
+
 
     view.options = {
       ...view.options,
@@ -704,17 +1021,28 @@ export class PrivateCloudComputeDashboardService {
         axisTick: { show: false },
         axisLabel: {
           color: '#8a8a8a',
-          fontSize: 12
+          fontSize: 11,
+          interval: 0,
+
+          formatter: (value: string) => {
+            return value.length > 8
+              ? value.substring(0, 8) + '...'
+              : value;
+          }
         }
       },
 
       yAxis: {
         type: 'value',
         min: 0,
-        max: 40,
-        interval: 10,
-        axisLine: { show: false },
-        axisTick: { show: false },
+        max: Math.ceil(maxValue * 1.2),
+        interval: Math.ceil((maxValue * 1.2) / 4),
+        axisLine: {
+          show: false
+        },
+        axisTick: {
+          show: false
+        },
         axisLabel: {
           color: '#8a8a8a',
           fontSize: 12
@@ -731,7 +1059,8 @@ export class PrivateCloudComputeDashboardService {
         {
           name: 'VM Count',
           type: 'bar',
-          barWidth: 52,
+          barWidth: 20,
+          barCategoryGap: '30%',
           data: data.map((item, index) => ({
             value: item.value,
           }))
@@ -1305,7 +1634,8 @@ export class PrivateCloudComputeDashboardService {
 
       v.source = item?.source || 'N/A';
       v.acknowledged = item?.acknowledged || 'N/A';
-      // v.duration = item?.duration || 'N/A';
+      v.duration = item?.duration || 'N/A';
+      v.uuid = item?.uuid
 
       return v;
     });
@@ -1601,11 +1931,12 @@ export class TopCriticalAlertsViewData {
 }
 
 export class TopCriticalAlertsList {
+  uuid: string;
   status: string;
   deviceName: string;
   severity: string;
   source: string;
-  dateTime: string;
+  duration: string;
   acknowledged: string;
   id: number;
   description: string;
@@ -1762,6 +2093,19 @@ export class IdleDevicesDistribution {
 export class DistributionRowData {
   duration: string;
   percent: number;
+}
+
+export class VmDensityHost {
+  loader: string = 'VmDensityHostLoader';
+  desnityHostRows: DesityHostRows[];
+}
+
+export class DesityHostRows {
+  hostName: string;
+  utilizationPct: number;
+  totalStorageGB: number;
+  usedStorageGB: number;
+  category: string;
 }
 
 

@@ -114,20 +114,33 @@
             </div>
             <div class="row justify-content-around mt-3">
                 <div class="col-3 px-1">
+
                     <div class="text-center p-2">
                         Cloud type distribution
                     </div>
+
                     <div class="card-body position-relative">
                         <app-spinner [name]="'CloudTypeLoader'"></app-spinner>
                         <ng-container *ngIf="executiveSummaryWidgetData?.cloudTypeChartData">
                             <div echarts [options]="executiveSummaryWidgetData?.cloudTypeChartData?.options"
                                 [defaultHeight]="200" style="width: 100%; height:250px;">
                             </div>
+                            <div class="cloud-legend-wrapper">
+                                <div class="cloud-legend-item"
+                                    *ngFor="let item of executiveSummaryWidgetData?.cloudTypeChartData?.options?.series[0]?.data">
+                                    <div class="d-flex align-items-center">
+                                        <span class="cloud-legend-dot" [style.background]="item.color">
+                                        </span>
+                                        <span class="cloud-legend-text">
+                                            {{item.name}} {{item.value}}%
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </ng-container>
                         <div *ngIf="!executiveSummaryWidgetData.cloudTypeChartData"
                             class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
-                            No data
-                            available.
+                            No data available.
                         </div>
                     </div>
                 </div>
@@ -136,16 +149,32 @@
                         Power & activity state
                     </div>
                     <div class="card-body position-relative">
-                        <app-spinner [name]="executiveSummaryWidgetData.powerActivityLoader"></app-spinner>
+                        <app-spinner [name]="executiveSummaryWidgetData.powerActivityLoader">
+                        </app-spinner>
                         <ng-container *ngIf="executiveSummaryWidgetData?.powerActivityChartData">
                             <div echarts [options]="executiveSummaryWidgetData?.powerActivityChartData?.options"
                                 [defaultHeight]="200" style="width: 100%; height:250px;">
                             </div>
+                            <div class="power-legend-wrapper">
+                                <div class="power-legend-item">
+                                    <span class="power-legend-dot" style="background: #6aa11f;">
+                                    </span>
+                                    <span class="power-legend-text">
+                                        On
+                                    </span>
+                                </div>
+                                <div class="power-legend-item">
+                                    <span class="power-legend-dot" style="background: #e44c4c;">
+                                    </span>
+                                    <span class="power-legend-text">
+                                        Off
+                                    </span>
+                                </div>
+                            </div>
                         </ng-container>
                         <div *ngIf="!executiveSummaryWidgetData.powerActivityChartData"
                             class="d-flex justify-content-center align-items-center" style="width: 100%; height:250px;">
-                            No data
-                            available.
+                            No data available.
                         </div>
                     </div>
                 </div>
@@ -227,13 +256,84 @@
                         VM Density Per Host
                     </div>
                     <div class="card-body">
-                        <app-spinner [name]="capacityAndGrowthInsightsWidgetData.vmDensityLoader"></app-spinner>
-                        <ng-container *ngIf="capacityAndGrowthInsightsWidgetData?.vmDensityChartData">
-                            <div echarts [options]="capacityAndGrowthInsightsWidgetData?.vmDensityChartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height: 200px;">
+                        <app-spinner [name]="densityHostVm.loader"></app-spinner>
+                        <div *ngIf="densityHostVm?.desnityHostRows?.length">
+                            <div class="distribution-header d-flex  font-weight-600 mb-2 border-bottom">
+                                <div class="distribution-label text-secondary font-500 " style="max-width: 180px;">
+                                    Host
+                                </div>
+                                <div class="distribution-progress text-secondary font-500 ">
+                                    Utilization
+                                </div>
                             </div>
-                        </ng-container>
-                        <div *ngIf="!capacityAndGrowthInsightsWidgetData.vmDensityChartData"
+                            <div class="distribution-row border-bottom"
+                                *ngFor="let row of densityHostVm?.desnityHostRows; let i = index">
+                                <div class="distribution-label text-truncate" style="max-width: 180px;"
+                                    [tooltip]="row.hostName">
+
+                                    {{row.hostName}}
+
+                                </div>
+                                <div class="distribution-progress">
+                                    <div class="progress-track-xl">
+                                        <div class="progress-fill distribution-fill"
+                                            [ngClass]="getUtilizationClass(row.utilizationPct)"
+                                            [style.width.%]="row.utilizationPct">
+                                            <span class="distribution-inside-value">
+                                                {{row.utilizationPct}}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="storage-meta">
+                                        <span>Total: {{row.totalStorageGB}} GB</span>
+                                        <span>Used: {{row.usedStorageGB}} GB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="utilization-legend-wrapper mt-3">
+
+                                <div class="utilization-legend-item">
+
+                                    <span class="utilization-legend-dot bg-success"></span>
+
+                                    <span class="utilization-legend-text">
+                                        Optimal (50%-70%)
+                                    </span>
+
+                                </div>
+
+                                <div class="utilization-legend-item">
+
+                                    <span class="utilization-legend-dot bg-danger"></span>
+
+                                    <span class="utilization-legend-text">
+                                        Critical (>85%)
+                                    </span>
+
+                                </div>
+
+                                <div class="utilization-legend-item">
+
+                                    <span class="utilization-legend-dot bg-warning"></span>
+
+                                    <span class="utilization-legend-text">
+                                        Warning (71%-85%)
+                                    </span>
+
+                                </div>
+
+                                <div class="utilization-legend-item">
+
+                                    <span class="utilization-legend-dot bg-primary"></span>
+
+                                    <span class="utilization-legend-text">
+                                        Underutilized (<49%) </span>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div *ngIf="!densityHostVm?.desnityHostRows?.length"
                             class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 200px;">No
                             data
@@ -612,7 +712,7 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let device of idleDevicesRow?.devicesRow; trackBy: trackByIndex">
-                                <td class="text-primary">{{device.deviceName}}</td>
+                                <td>{{device.deviceName}}</td>
                                 <td>{{device.resourceType}}</td>
                                 <td>
                                     <div class="progress-track">
@@ -755,7 +855,7 @@
     </div>
 </div>
 
-<div class="row mx-1">
+<div class="row mx-1 pt-2 pb-4">
     <div class="col-12">
         <div class=" bg-transparent font-500 font-lg py-2">
             Recent Alerts
@@ -787,17 +887,20 @@
                             <th>Description</th>
                             <th>Source</th>
                             <th>Acknowledged</th>
+                            <th>Duration</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let alert of criticalAlerts.alertList; trackBy: trackByIndex">
-                            <td><button type="button" class="btn btn-link p-0 table-link">{{alert.id}}</button>
+                        <tr *ngFor="let alert of criticalAlerts.alertList; let i = index;">
+                            <td><button type="button" (click)="viewAlertDetails(i)"
+                                    class="btn btn-link p-0 table-link">{{alert.id}}</button>
                             </td>
                             <td>{{alert.deviceName}}</td>
                             <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td>
                             <td>{{alert.description}}</td>
                             <td>{{alert.source}}</td>
                             <td>{{alert.acknowledged}}</td>
+                            <td>{{alert.duration}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -808,3 +911,5 @@
         </div>
     </div>
 </div>
+
+<aiml-alert-details></aiml-alert-details>

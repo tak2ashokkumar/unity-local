@@ -8,6 +8,7 @@ import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.service';
 import { takeUntil } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -414,6 +415,6 @@ export class NetworkDevicesOverviewDashboardComponent implements OnInit, OnDestr
   }
 
   goBack() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    goBackFromDefaultDashboard(this.router, this.route);
   }
 }

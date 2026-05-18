@@ -54,7 +54,7 @@ export class AppCollectionDashboardViewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.selectedDashboard = null;
+    this.selectedDashboard = null; 
     this.spinner.start('main');
     forkJoin({
       collection: this.svc.getCollection(this.collectionId),

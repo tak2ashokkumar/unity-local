@@ -1,3 +1,84 @@
+.cloud-legend-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: -10px;
+}
+
+.cloud-legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #7d7d7d;
+}
+
+.cloud-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  display: inline-block;
+}
+
+.cloud-legend-text {
+  white-space: nowrap;
+}
+
+.power-legend-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-top: -8px;
+}
+
+.power-legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #7d7d7d;
+}
+
+.power-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  display: inline-block;
+}
+
+.power-legend-text {
+  white-space: nowrap;
+}
+
+.utilization-legend-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.utilization-legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.utilization-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  display: inline-block;
+}
+
+.utilization-legend-text {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+
+
 .distribution-row {
   display: flex;
   align-items: center;
