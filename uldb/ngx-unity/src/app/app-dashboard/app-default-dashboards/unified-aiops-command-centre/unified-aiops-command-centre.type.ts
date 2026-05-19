@@ -92,24 +92,280 @@ export interface UnifiedAiopsTableRow {
   status?: UnifiedAiopsTone;
 }
 
-export interface UnifiedAiopsAlertRow {
+export interface UnifiedAiopsOrphanedDeviceResponseItem {
+  name?: string;
+  device_name?: string;
+  instance_name?: string;
+  status?: string;
+  lastSeen?: string;
+  last_seen?: string;
+  datacenter?: string;
+  datacenter_name?: string;
+  cloud?: string;
+  provider?: string;
+  platform?: string;
+  account?: string;
+}
+
+export interface UnifiedAiopsOrphanedDevicesResponse {
+  count?: string | number;
+  results?: UnifiedAiopsOrphanedDeviceResponseItem[];
+  orphanedDeviceList?: UnifiedAiopsOrphanedDeviceResponseItem[];
+  data?: UnifiedAiopsOrphanedDeviceResponseItem[];
+  items?: UnifiedAiopsOrphanedDeviceResponseItem[];
+  totalOrphaned?: string | number;
+}
+
+export interface UnifiedAiopsOrphanedDeviceRow {
+  name: string;
+  status: string;
+  lastSeen: string;
+  datacenter: string;
+}
+
+export interface UnifiedAiopsOrphanedCategoryResponseItem {
+  category?: string;
+  name?: string;
+  label?: string;
+  display_name?: string;
+  type?: string;
+  resource_type?: string;
+  count?: string | number;
+  value?: string | number;
+  percentage?: string | number;
+  percent?: string | number;
+}
+
+export interface UnifiedAiopsOrphanedDevicesByCategoryResponse {
+  results?: UnifiedAiopsOrphanedCategoryResponseItem[];
+  orphanedByCategory?: UnifiedAiopsOrphanedCategoryResponseItem[];
+  categories?: UnifiedAiopsOrphanedCategoryResponseItem[];
+  by_category?: UnifiedAiopsOrphanedCategoryResponseItem[];
+  data?: UnifiedAiopsOrphanedCategoryResponseItem[];
+  breakdown?: UnifiedAiopsOrphanedCategoryResponseItem[] | Record<string, string | number | UnifiedAiopsOrphanedCategoryResponseItem>;
+  total?: string | number;
+  totalOrphaned?: string | number;
+  total_count?: string | number;
+  totalCount?: string | number;
+}
+
+export type UnifiedAiopsOrphanedDevicesByCategoryApiResponse = UnifiedAiopsOrphanedDevicesByCategoryResponse | UnifiedAiopsOrphanedCategoryResponseItem[];
+
+export interface UnifiedAiopsOrphanedCategoryItem {
+  category: string;
+  count: number;
+  percentage: number;
+  color: string;
+  totalCount?: number;
+}
+
+export interface UnifiedAiopsIdleMetricResponse {
+  used?: string | number;
+  free?: string | number;
+  value?: string | number;
+  percent?: string | number;
+  percentage?: string | number;
+}
+
+export interface UnifiedAiopsIdleDeviceResponseItem {
+  id?: string | number;
+  uuid?: string;
+  device_id?: string;
+  deviceId?: string;
+  device_uuid?: string;
+  deviceUuid?: string;
+  resource_id?: string;
+  resourceId?: string;
+  device_name?: string;
+  deviceName?: string;
+  name?: string;
+  instance_name?: string;
+  resource_type?: string;
+  resourceType?: string;
+  type?: string;
+  provider?: string;
+  platform?: string;
+  cloud_provider?: string;
+  cloudProvider?: string;
+  cloud?: string;
+  cloud_type?: string;
+  cloudType?: string;
+  monitoring_type?: string;
+  monitoringType?: string;
+  monitoring?: {
+    configured?: boolean;
+    enabled?: boolean;
+    observium?: boolean;
+    zabbix?: boolean;
+  };
+  avg_cpu?: UnifiedAiopsIdleMetricResponse;
+  avgCpu?: UnifiedAiopsIdleMetricResponse;
+  avgCPU?: UnifiedAiopsIdleMetricResponse;
+  cpu?: UnifiedAiopsIdleMetricResponse;
+  cpu_usage?: UnifiedAiopsIdleMetricResponse;
+  average_cpu?: UnifiedAiopsIdleMetricResponse;
+  avg_cpu_percent?: string | number;
+  avgCpuPercent?: string | number;
+  avg_cpu_percentage?: string | number;
+  cpu_percent?: string | number;
+  cpuPercentage?: string | number;
+  avg_mem?: UnifiedAiopsIdleMetricResponse;
+  avgMem?: UnifiedAiopsIdleMetricResponse;
+  avg_memory?: UnifiedAiopsIdleMetricResponse;
+  memory?: UnifiedAiopsIdleMetricResponse;
+  memory_usage?: UnifiedAiopsIdleMetricResponse;
+  average_memory?: UnifiedAiopsIdleMetricResponse;
+  avg_mem_percent?: string | number;
+  avgMemPercent?: string | number;
+  avg_mem_percentage?: string | number;
+  memory_percent?: string | number;
+  memoryPercentage?: string | number;
+  network_io?: string | number;
+  networkIO?: string | number;
+  network?: string | number;
+  network_in_out?: string | number;
+  idle_duration?: string | number;
+  idleDuration?: string | number;
+  duration?: string | number;
+  status?: string;
+}
+
+export interface UnifiedAiopsIdleDevicesResponse {
+  count: string | number;
+  results: UnifiedAiopsIdleDeviceResponseItem[];
+}
+
+export interface UnifiedAiopsIdleMetric {
+  used: string;
+  free: string;
+  percent: number;
+  tone: UnifiedAiopsTone;
+}
+
+export interface UnifiedAiopsIdleDeviceRow {
   id: string;
+  uuid: string;
+  deviceId: string;
+  resourceId: string;
   deviceName: string;
-  severity: 'critical' | 'high';
+  resourceType: string;
+  provider: string;
+  cloudType: string;
+  monitoringType: string;
+  monitoring?: {
+    configured?: boolean;
+    enabled?: boolean;
+    observium?: boolean;
+    zabbix?: boolean;
+  };
+  avgCpu: UnifiedAiopsIdleMetric;
+  avgMem: UnifiedAiopsIdleMetric;
+  networkIO: string;
+  idleDuration: string;
+  status: string;
+}
+
+export interface UnifiedAiopsIdleDurationResponseItem {
+  duration?: string;
+  idle_duration?: string;
+  idleDuration?: string;
+  range?: string;
+  name?: string;
+  label?: string;
+  count?: string | number;
+  value?: string | number;
+  total?: string | number;
+  total_count?: string | number;
+  totalCount?: string | number;
+  devices?: string | number;
+  percent?: string | number;
+  percentage?: string | number;
+}
+
+export interface UnifiedAiopsIdleDurationResponse {
+  results?: UnifiedAiopsIdleDurationResponseItem[];
+  data?: UnifiedAiopsIdleDurationResponseItem[] | UnifiedAiopsIdleDurationResponse;
+  summary?: UnifiedAiopsIdleDurationResponseItem[] | Record<string, string | number | UnifiedAiopsIdleDurationResponseItem>;
+  distribution?: UnifiedAiopsIdleDurationResponseItem[];
+  duration_distribution?: UnifiedAiopsIdleDurationResponseItem[];
+  durationDistribution?: UnifiedAiopsIdleDurationResponseItem[];
+  idleDurationDistribution?: UnifiedAiopsIdleDurationResponseItem[];
+  idle_duration_distribution?: UnifiedAiopsIdleDurationResponseItem[];
+  idle_devices_by_duration?: UnifiedAiopsIdleDurationResponseItem[];
+  breakdown?: UnifiedAiopsIdleDurationResponseItem[] | Record<string, string | number | UnifiedAiopsIdleDurationResponseItem>;
+}
+
+export type UnifiedAiopsIdleDurationApiResponse = UnifiedAiopsIdleDurationResponse | UnifiedAiopsIdleDurationResponseItem[];
+
+export interface UnifiedAiopsIdleDurationItem {
+  duration: string;
+  count: number;
+  percent: number;
+  color: string;
+}
+
+export interface UnifiedAiopsRecentAlertsSummary {
+  total?: number;
+  critical?: number;
+  critical_alerts?: number;
+  criticalAlerts?: number;
+  warning?: number;
+  warning_alerts?: number;
+  warningAlerts?: number;
+  information?: number;
+  info?: number;
+  info_alerts?: number;
+  infoAlerts?: number;
+}
+
+export interface UnifiedAiopsRecentAlertResponseItem {
+  id?: string | number;
+  uuid?: string;
+  alert_id?: string | number;
+  alertId?: string | number;
+  alert_uuid?: string;
+  alertUuid?: string;
+  device_name?: string;
+  deviceName?: string;
+  name?: string;
+  severity?: string;
+  status?: string;
+  description?: string;
+  source?: string;
+  acknowledged?: string | boolean;
+  duration?: string;
+}
+
+export interface UnifiedAiopsRecentAlertsResponse {
+  alertSummary?: UnifiedAiopsRecentAlertsSummary;
+  alert_summary?: UnifiedAiopsRecentAlertsSummary;
+  summary?: UnifiedAiopsRecentAlertsSummary;
+  recentAlerts?: UnifiedAiopsRecentAlertResponseItem[];
+  recent_alerts?: UnifiedAiopsRecentAlertResponseItem[];
+  alerts?: UnifiedAiopsRecentAlertResponseItem[];
+  results?: UnifiedAiopsRecentAlertResponseItem[];
+  data?: UnifiedAiopsRecentAlertResponseItem[] | {
+    alertSummary?: UnifiedAiopsRecentAlertsSummary;
+    alert_summary?: UnifiedAiopsRecentAlertsSummary;
+    summary?: UnifiedAiopsRecentAlertsSummary;
+    recentAlerts?: UnifiedAiopsRecentAlertResponseItem[];
+    recent_alerts?: UnifiedAiopsRecentAlertResponseItem[];
+    alerts?: UnifiedAiopsRecentAlertResponseItem[];
+    results?: UnifiedAiopsRecentAlertResponseItem[];
+  };
+}
+
+export type UnifiedAiopsRecentAlertSeverity = 'critical' | 'warning' | 'info' | 'muted';
+
+export interface UnifiedAiopsRecentAlert {
+  id: string;
+  uuid: string;
+  deviceName: string;
+  severity: UnifiedAiopsRecentAlertSeverity;
   description: string;
   source: string;
   acknowledged: string;
   duration: string;
-}
-
-export interface UnifiedAiopsTicketRow {
-  ticketId: string;
-  shortDescription: string;
-  state: string;
-  priority: string;
-  createdOn: string;
-  updatedOn: string;
-  resolution: string;
 }
 
 export interface UnifiedAiopsRemediationMetric {

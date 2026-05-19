@@ -1,26 +1,34 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
 import { EChartsOption } from 'echarts';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { DashboardMapWidgetService, WorldMapWidgetDCMap, WorldMapWidgetViewdata } from 'src/app/app-home/dashboard-map-widget/dashboard-map-widget.service';
+import { WorldMapWidgetDatacenterLocation } from 'src/app/app-home/dashboard-map-widget/map-widget.type';
+import { MapService } from 'src/app/map.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
+import { environment } from 'src/environments/environment';
 import { UnifiedAiopsCommandCentreService } from './unified-aiops-command-centre.service';
 import {
-  UnifiedAiopsAlertRow,
   UnifiedAiopsBusinessService,
   UnifiedAiopsCloudFilterOption,
   UnifiedAiopsCoverageCard,
   UnifiedAiopsDashboardFilterCriteria,
   UnifiedAiopsFilterOption,
+  UnifiedAiopsIdleDeviceRow,
+  UnifiedAiopsIdleDurationItem,
   UnifiedAiopsLegendMetric,
   UnifiedAiopsMetric,
+  UnifiedAiopsOrphanedCategoryItem,
+  UnifiedAiopsOrphanedDeviceRow,
+  UnifiedAiopsRecentAlert,
   UnifiedAiopsRemediationMetric,
   UnifiedAiopsTableRow,
-  UnifiedAiopsTicketRow,
   UnifiedAiopsTone
 } from './unified-aiops-command-centre.type';
 
@@ -28,10 +36,26 @@ import {
   selector: 'unified-aiops-command-centre',
   templateUrl: './unified-aiops-command-centre.component.html',
   styleUrls: ['./unified-aiops-command-centre.component.scss'],
-  providers: [UnifiedAiopsCommandCentreService, DatacenterService]
+  providers: [UnifiedAiopsCommandCentreService, DatacenterService, DashboardMapWidgetService]
 })
 export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
+  private isDestroyed = false;
+  private datacenterGeographyMapElementRef: ElementRef<HTMLElement> | null = null;
+  private datacenterGeographyMap: google.maps.Map | null = null;
+  private datacenterGeographyCluster: MarkerClusterer | null = null;
+  private datacenterGeographyClusterInfoWindow: google.maps.InfoWindow | null = null;
+  private datacenterGeographyClusterListeners: google.maps.MapsEventListener[] = [];
+  private datacenterGeographyInfoWindowListeners: google.maps.MapsEventListener[] = [];
+  private datacenterGeographyInfoWindows: google.maps.InfoWindow[] = [];
+  private datacenterGeographyTilesLoaded: google.maps.MapsEventListener | null = null;
+  private datacenterGeographyMarkers: google.maps.marker.AdvancedMarkerElement[] = [];
+  private datacenterGeographyZIndexMap: { [key: string]: number } = {};
+  private datacenterGeographyOldZIndex: number | null = null;
+  private datacenterGeographyAllLocations: WorldMapWidgetViewdata[] = [];
+  private datacenterGeographiesLoaded = false;
+  private readonly datacenterGeographyInitialZoom = 2.2;
+  private readonly datacenterGeographyInitialCenter = { lat: 25.738611, lng: 0 };
 
   filterForm: FormGroup;
   datacenterOptions: UnifiedAiopsFilterOption[] = [];
@@ -48,6 +72,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   publicCloudCoverage: UnifiedAiopsCoverageCard[] = [];
   privateCloudCoverageTotal = '0';
   publicCloudCoverageTotal = '0';
+  datacenterGeographiesMapAvailable = false;
+  datacenterGeographyViewData: WorldMapWidgetViewdata[] = [];
+  datacenterGeographyDcMap: WorldMapWidgetDCMap = {};
   datacenterInfrastructureMetrics: UnifiedAiopsMetric[] = [];
   kubernetesMetrics: UnifiedAiopsMetric[] = [];
   aiGpuMetrics: UnifiedAiopsMetric[] = [];
@@ -66,10 +93,22 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   alertResponseMetrics: UnifiedAiopsMetric[] = [];
   alertSourceSankeyOptions: EChartsOption = {};
   alertLifecycleSankeyOptions: EChartsOption = {};
-  criticalAlerts: UnifiedAiopsAlertRow[] = [];
-  ticketPriorityOptions: EChartsOption = {};
-  ticketStatusOptions: EChartsOption = {};
-  tickets: UnifiedAiopsTicketRow[] = [];
+  orphanedDevices: UnifiedAiopsOrphanedDeviceRow[] = [];
+  orphanedDevicesTotal = 0;
+  orphanedDevicesPageNo = 1;
+  orphanedDevicesPageSize = 10;
+  orphanedByCategory: UnifiedAiopsOrphanedCategoryItem[] = [];
+  orphanedByCategoryOptions: EChartsOption = {};
+  orphanedByCategoryHasData = false;
+  idleDevices: UnifiedAiopsIdleDeviceRow[] = [];
+  idleDevicesTotal = 0;
+  idleDevicesPageNo = 1;
+  idleDevicesPageSize = 10;
+  idleDurationRows: UnifiedAiopsIdleDurationItem[] = [];
+  idleDurationOptions: EChartsOption = {};
+  idleDurationHasData = false;
+  recentAlertSummaryMetrics: UnifiedAiopsMetric[] = [];
+  recentAlerts: UnifiedAiopsRecentAlert[] = [];
   remediationDonutOptions: EChartsOption = {};
   remediationActionsOptions: EChartsOption = {};
   remediationSummary: UnifiedAiopsMetric[] = [];
@@ -85,6 +124,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     geoDistribution: 'unifiedAiopsGeoDistributionLoader',
     privateCloudCoverage: 'unifiedAiopsPrivateCloudCoverageLoader',
     publicCloudCoverage: 'unifiedAiopsPublicCloudCoverageLoader',
+    datacenterGeographies: 'unifiedAiopsDatacenterGeographiesLoader',
     datacenterInfrastructure: 'unifiedAiopsDatacenterInfrastructureLoader',
     kubernetes: 'unifiedAiopsKubernetesLoader',
     aiGpu: 'unifiedAiopsAiGpuLoader',
@@ -103,10 +143,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     alertResponse: 'unifiedAiopsAlertResponseLoader',
     alertSourceSankey: 'unifiedAiopsAlertSourceSankeyLoader',
     alertLifecycleSankey: 'unifiedAiopsAlertLifecycleSankeyLoader',
-    criticalAlerts: 'unifiedAiopsCriticalAlertsLoader',
-    ticketPriority: 'unifiedAiopsTicketPriorityLoader',
-    ticketStatus: 'unifiedAiopsTicketStatusLoader',
-    tickets: 'unifiedAiopsTicketsLoader',
+    orphanedDevices: 'unifiedAiopsOrphanedDevicesLoader',
+    orphanedDevicesByCategory: 'unifiedAiopsOrphanedDevicesByCategoryLoader',
+    idleDevices: 'unifiedAiopsIdleDevicesLoader',
+    idleDuration: 'unifiedAiopsIdleDurationLoader',
+    recentAlertSummary: 'unifiedAiopsRecentAlertSummaryLoader',
+    recentAlerts: 'unifiedAiopsRecentAlertsLoader',
     remediationDonut: 'unifiedAiopsRemediationDonutLoader',
     remediationActions: 'unifiedAiopsRemediationActionsLoader',
     remediationSummary: 'unifiedAiopsRemediationSummaryLoader',
@@ -138,15 +180,28 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   };
 
   constructor(private svc: UnifiedAiopsCommandCentreService,
+    private dashboardMapWidgetService: DashboardMapWidgetService,
+    private mapSvc: MapService,
     private router: Router,
     private route: ActivatedRoute,
+    private ngZone: NgZone,
     private spinnerService: AppSpinnerService) { }
+
+  @ViewChild('datacenterGeographyMap')
+  set datacenterGeographyMapElement(element: ElementRef<HTMLElement> | undefined) {
+    this.datacenterGeographyMapElementRef = element || null;
+    if (element) {
+      this.initializeDatacenterGeographyMap().then(() => this.addDatacenterGeographyMarkers());
+    }
+  }
 
   ngOnInit(): void {
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
   }
 
   ngOnDestroy(): void {
+    this.isDestroyed = true;
+    this.cleanupDatacenterGeographyMap();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
   }
@@ -198,6 +253,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.filterForm = null;
     this.datacenterOptions = [];
     this.cloudOptions = [];
+    this.datacenterGeographiesLoaded = false;
+    this.datacenterGeographiesMapAvailable = false;
+    this.datacenterGeographyAllLocations = [];
+    this.datacenterGeographyViewData = [];
+    this.datacenterGeographyDcMap = {};
+    this.cleanupDatacenterGeographyMap();
   }
 
   /** Reads selected option values from a filter form control. */
@@ -265,34 +326,36 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.getSummaryMetrics(filterFormOutput);
       this.getDiscoveryOptions(filterFormOutput);
       this.getAlertSegregation(filterFormOutput);
-      // Backlog widgets for the next sprint. Uncomment these calls with their HTML blocks when implementation resumes.
-      // this.getBusinessServices(filterFormOutput);
+      this.getBusinessServices(filterFormOutput);
       this.getEmployeeMetrics(filterFormOutput);
       this.getGeoDistribution(filterFormOutput);
       this.getPrivateCloudCoverage(filterFormOutput);
       this.getPublicCloudCoverage(filterFormOutput);
+      this.getDatacenterGeographies(filterFormOutput);
       this.getDatacenterInfrastructure(filterFormOutput);
       this.getKubernetesMetrics(filterFormOutput);
       this.getAiGpuMetrics(filterFormOutput);
-      // this.getApplicationRows(filterFormOutput);
-      // this.getServiceRows(filterFormOutput);
+      this.getApplicationRows(filterFormOutput);
+      this.getServiceRows(filterFormOutput);
       this.getDatabaseRows(filterFormOutput);
       this.getOsRows(filterFormOutput);
-      // this.getBandwidthBar(filterFormOutput);
-      // this.getBandwidthLine(filterFormOutput);
-      // this.getPlatformPerformance(filterFormOutput);
-      // this.getPerformanceMetrics(filterFormOutput);
+      this.getBandwidthBar(filterFormOutput);
+      this.getBandwidthLine(filterFormOutput);
+      this.getPlatformPerformance(filterFormOutput);
+      this.getPerformanceMetrics(filterFormOutput);
       this.getDeviceAvailability(filterFormOutput);
       this.getAvailabilityCategory(filterFormOutput);
       this.getAlertTrend(filterFormOutput);
-      // this.getAlertReductionMetrics(filterFormOutput);
-      // this.getAlertResponseMetrics(filterFormOutput);
-      // this.getAlertSourceSankey(filterFormOutput);
-      // this.getAlertLifecycleSankey(filterFormOutput);
-      this.getCriticalAlerts(filterFormOutput);
-      this.getTicketPriority(filterFormOutput);
-      this.getTicketStatus(filterFormOutput);
-      this.getTickets(filterFormOutput);
+      this.getAlertReductionMetrics(filterFormOutput);
+      this.getAlertResponseMetrics(filterFormOutput);
+      this.getAlertSourceSankey(filterFormOutput);
+      this.getAlertLifecycleSankey(filterFormOutput);
+      this.getOrphanedDevices(filterFormOutput);
+      this.getOrphanedDevicesByCategory(filterFormOutput);
+      this.getIdleDevices(filterFormOutput);
+      this.getIdleDevicesByDuration(filterFormOutput);
+      this.getRecentAlertSummaryMetrics(filterFormOutput);
+      this.getRecentAlerts(filterFormOutput);
       this.getRemediationDonut(filterFormOutput);
       this.getRemediationActions(filterFormOutput);
       this.getRemediationSummary(filterFormOutput);
@@ -382,6 +445,269 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.publicCloudCoverage = [];
       this.publicCloudCoverageTotal = '0';
     });
+  }
+
+  getDatacenterGeographies(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    if (this.datacenterGeographiesLoaded) {
+      this.applyDatacenterGeographyFilter(filterFormOutput);
+      return;
+    }
+
+    this.datacenterGeographyViewData = [];
+    this.datacenterGeographyDcMap = {};
+    this.clearDatacenterGeographyMarkers();
+    this.spinnerService.start(this.loaderNames.datacenterGeographies);
+
+    this.mapSvc.loadMap().then(() => {
+      if (this.isDestroyed) {
+        this.spinnerService.stop(this.loaderNames.datacenterGeographies);
+        return;
+      }
+
+      this.datacenterGeographiesMapAvailable = this.mapSvc.isAvailable();
+      if (!this.datacenterGeographiesMapAvailable) {
+        this.datacenterGeographiesLoaded = true;
+        this.spinnerService.stop(this.loaderNames.datacenterGeographies);
+        return;
+      }
+
+      this.dashboardMapWidgetService.getDatacenterSatus().pipe(
+        takeUntil(this.ngUnsubscribe),
+        tap(res => this.setDatacenterGeographyData(res, filterFormOutput)),
+        switchMap(initialRes => this.dashboardMapWidgetService.syncDatacenterSatus().pipe(
+          switchMap(() => this.dashboardMapWidgetService.getDatacenterSatus()),
+          catchError(() => of(initialRes))
+        )),
+        finalize(() => setTimeout(() => this.spinnerService.stop(this.loaderNames.datacenterGeographies), 0))
+      ).subscribe(res => {
+        this.setDatacenterGeographyData(res, filterFormOutput);
+      }, () => {
+        this.datacenterGeographiesLoaded = true;
+        this.datacenterGeographyAllLocations = [];
+        this.applyDatacenterGeographyFilter(filterFormOutput);
+      });
+    });
+  }
+
+  private setDatacenterGeographyData(res: WorldMapWidgetDatacenterLocation[], filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.datacenterGeographiesLoaded = true;
+    this.datacenterGeographyAllLocations = this.dashboardMapWidgetService.convertToViewdata(res || []);
+    this.applyDatacenterGeographyFilter(filterFormOutput);
+  }
+
+  private applyDatacenterGeographyFilter(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    const selectedDatacenterIds = filterFormOutput?.datacenters || [];
+    const selectedSet = new Set(selectedDatacenterIds);
+    const showAllDatacenters = this.isAllDatacenterFilterSelected(selectedDatacenterIds);
+    const hasFilterMatches = this.hasDatacenterGeographyFilterMatches(selectedSet);
+
+    if (!selectedDatacenterIds.length) {
+      this.datacenterGeographyViewData = [];
+    } else if (showAllDatacenters || (this.datacenterGeographyAllLocations.length && !hasFilterMatches)) {
+      this.datacenterGeographyViewData = this.datacenterGeographyAllLocations;
+    } else {
+      this.datacenterGeographyViewData = (this.datacenterGeographyAllLocations || [])
+        .map(location => {
+          const datacenters = (location.datacenters || []).filter(dc => selectedSet.has(dc.uuid));
+          return { ...location, datacenters } as WorldMapWidgetViewdata;
+        })
+        .filter(location => !!location.datacenters.length);
+    }
+
+    this.datacenterGeographyDcMap = this.datacenterGeographyViewData.reduce((result: WorldMapWidgetDCMap, location) => {
+      result[this.getDatacenterGeographyLocationKey(location)] = (location.datacenters || []).map(dc => dc.name);
+      return result;
+    }, {});
+
+    if (this.datacenterGeographyViewData.length) {
+      this.initializeDatacenterGeographyMap().then(() => this.addDatacenterGeographyMarkers());
+    } else {
+      this.cleanupDatacenterGeographyMap();
+    }
+  }
+
+  private isAllDatacenterFilterSelected(selectedDatacenterIds: string[]): boolean {
+    const availableDatacenterIds = (this.datacenterOptions || [])
+      .map(option => option?.value)
+      .filter((value: string | undefined) => !!value) as string[];
+
+    return !!availableDatacenterIds.length
+      && availableDatacenterIds.every(value => selectedDatacenterIds.includes(value));
+  }
+
+  private hasDatacenterGeographyFilterMatches(selectedSet: Set<string>): boolean {
+    return (this.datacenterGeographyAllLocations || []).some(location =>
+      (location.datacenters || []).some(dc => selectedSet.has(dc.uuid))
+    );
+  }
+
+  private async initializeDatacenterGeographyMap() {
+    if (this.datacenterGeographyMap || !this.datacenterGeographyMapElementRef || !this.datacenterGeographiesMapAvailable) {
+      return;
+    }
+
+    const { Map } = await this.mapSvc.importMapsLibrary();
+    if (this.isDestroyed || !this.datacenterGeographyMapElementRef) {
+      return;
+    }
+
+    this.ngZone.runOutsideAngular(() => {
+      const map = new Map(this.datacenterGeographyMapElementRef.nativeElement, {
+        center: this.datacenterGeographyInitialCenter,
+        zoom: this.datacenterGeographyInitialZoom,
+        minZoom: 2.2,
+        mapTypeControl: false,
+        streetViewControl: false,
+        rotateControl: false,
+        fullscreenControl: false,
+        mapId: environment.gmId
+      });
+      this.datacenterGeographyMap = map;
+      this.datacenterGeographyClusterInfoWindow = new google.maps.InfoWindow();
+      this.datacenterGeographyTilesLoaded = map.addListener('tilesloaded', () => {
+        this.addDatacenterGeographyMarkers();
+        this.datacenterGeographyTilesLoaded?.remove();
+        this.datacenterGeographyTilesLoaded = null;
+      });
+    });
+  }
+
+  private async addDatacenterGeographyMarkers() {
+    if (!this.datacenterGeographyMap || !this.datacenterGeographyViewData.length) {
+      return;
+    }
+
+    this.clearDatacenterGeographyMarkers();
+    const { AdvancedMarkerElement } = await this.mapSvc.importMarkerLibrary();
+    if (this.isDestroyed || !this.datacenterGeographyMap) {
+      return;
+    }
+
+    this.ngZone.runOutsideAngular(() => {
+      const map = this.datacenterGeographyMap;
+      if (!map) {
+        return;
+      }
+
+      this.datacenterGeographyViewData.forEach(location => {
+        const position = this.getDatacenterGeographyPosition(location);
+        if (!position) {
+          return;
+        }
+
+        const marker = new AdvancedMarkerElement({
+          position,
+          map,
+          title: location.location,
+          content: this.mapSvc.createMarkerContent(location)
+        });
+        (marker as any).unityLocationKey = this.getDatacenterGeographyLocationKey(location);
+
+        const infoWindow = new google.maps.InfoWindow({
+          content: this.dashboardMapWidgetService.createInfoWindowContent(location),
+          position
+        });
+        infoWindow.open({
+          map,
+          anchor: marker
+        });
+
+        this.datacenterGeographyInfoWindows.push(infoWindow);
+        this.datacenterGeographyMarkers.push(marker);
+        this.datacenterGeographyInfoWindowListeners.push(infoWindow.addListener('domready', () => this.bindDatacenterGeographyPopover(infoWindow)));
+      });
+
+      this.datacenterGeographyCluster = new MarkerClusterer({
+        map,
+        markers: this.datacenterGeographyMarkers as any
+      });
+
+      this.datacenterGeographyClusterListeners.push(
+        this.datacenterGeographyCluster.addListener('mouseover', (cluster: any) => this.openDatacenterGeographyClusterPopover(cluster)),
+        this.datacenterGeographyCluster.addListener('mouseout', () => this.datacenterGeographyClusterInfoWindow?.close()),
+        this.datacenterGeographyCluster.addListener('click', () => this.datacenterGeographyClusterInfoWindow?.close())
+      );
+    });
+  }
+
+  private openDatacenterGeographyClusterPopover(cluster: any) {
+    if (!this.datacenterGeographyClusterInfoWindow || !this.datacenterGeographyMap) {
+      return;
+    }
+
+    let content = '<div style="font-weight:500;">Available Datacenters</div><br>';
+    (cluster.markers || []).forEach((marker: any) => {
+      const datacenters = this.datacenterGeographyDcMap[marker.unityLocationKey] || [];
+      datacenters.forEach(datacenter => {
+        content = `${content}<span>${datacenter}</span><br>`;
+      });
+    });
+
+    this.datacenterGeographyClusterInfoWindow.setContent(content);
+    this.datacenterGeographyClusterInfoWindow.setPosition(cluster.position || cluster.getCenter?.());
+    this.datacenterGeographyClusterInfoWindow.open(this.datacenterGeographyMap);
+  }
+
+  private bindDatacenterGeographyPopover(infoWindow: google.maps.InfoWindow) {
+    const position = infoWindow.getPosition();
+    if (!position) {
+      return;
+    }
+
+    const id = `${position.lat()}_${position.lng()}`;
+    const contentElement = document.getElementById(id);
+    const infoWindowShell = contentElement?.closest('.gm-style-iw-a')?.parentElement as HTMLElement;
+    if (infoWindowShell) {
+      this.datacenterGeographyZIndexMap[id] = Number.parseInt(infoWindowShell.style.getPropertyValue('z-index'), 10) || 0;
+    }
+
+    contentElement?.addEventListener('mouseover', () => {
+      const high = Math.max(...Object.keys(this.datacenterGeographyZIndexMap).map(key => this.datacenterGeographyZIndexMap[key]), 0);
+      this.datacenterGeographyOldZIndex = this.datacenterGeographyZIndexMap[id] || 0;
+      infoWindow.setZIndex(high + 1);
+    });
+
+    contentElement?.addEventListener('mouseout', () => {
+      infoWindow.setZIndex(this.datacenterGeographyOldZIndex || 0);
+      this.datacenterGeographyOldZIndex = null;
+    });
+  }
+
+  private getDatacenterGeographyPosition(location: WorldMapWidgetViewdata): google.maps.LatLngLiteral | null {
+    const lat = Number(location.lat);
+    const lng = Number(location.long);
+    if (!isFinite(lat) || !isFinite(lng)) {
+      return null;
+    }
+    return { lat, lng };
+  }
+
+  private getDatacenterGeographyLocationKey(location: WorldMapWidgetViewdata): string {
+    return `${location.lat}_${location.long}`;
+  }
+
+  private clearDatacenterGeographyMarkers() {
+    this.datacenterGeographyClusterListeners.forEach(listener => listener.remove());
+    this.datacenterGeographyClusterListeners = [];
+    this.datacenterGeographyInfoWindowListeners.forEach(listener => listener.remove());
+    this.datacenterGeographyInfoWindowListeners = [];
+    this.datacenterGeographyInfoWindows.forEach(infoWindow => infoWindow.close());
+    this.datacenterGeographyInfoWindows = [];
+    this.datacenterGeographyMarkers.forEach(marker => marker.map = null);
+    this.datacenterGeographyMarkers = [];
+    this.datacenterGeographyZIndexMap = {};
+    this.datacenterGeographyCluster?.clearMarkers();
+    this.datacenterGeographyCluster = null;
+    this.datacenterGeographyClusterInfoWindow?.close();
+  }
+
+  private cleanupDatacenterGeographyMap() {
+    this.clearDatacenterGeographyMarkers();
+    this.datacenterGeographyTilesLoaded?.remove();
+    this.datacenterGeographyTilesLoaded = null;
+    this.datacenterGeographyMapElementRef = null;
+    this.datacenterGeographyMap = null;
+    this.datacenterGeographyClusterInfoWindow = null;
   }
 
   getDatacenterInfrastructure(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -546,39 +872,103 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     });
   }
 
-  getCriticalAlerts(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.criticalAlerts = [];
-    this.loadWidget(this.loaderNames.criticalAlerts, this.svc.getCriticalAlerts(filterFormOutput), res => {
-      this.criticalAlerts = this.svc.convertToCriticalAlertsViewData(res);
+  getOrphanedDevices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.orphanedDevices = [];
+    this.orphanedDevicesTotal = 0;
+    this.loadWidget(this.loaderNames.orphanedDevices, this.svc.getOrphanedDevices(filterFormOutput, this.orphanedDevicesPageNo, this.orphanedDevicesPageSize), res => {
+      this.orphanedDevices = this.svc.convertToOrphanedDevicesViewData(res);
+      this.orphanedDevicesTotal = this.svc.convertToOrphanedDevicesTotal(res);
     }, () => {
-      this.criticalAlerts = [];
+      this.orphanedDevices = [];
+      this.orphanedDevicesTotal = 0;
     });
   }
 
-  getTicketPriority(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.ticketPriorityOptions = {};
-    this.loadWidget(this.loaderNames.ticketPriority, this.svc.getTicketPriority(filterFormOutput), res => {
-      this.ticketPriorityOptions = this.svc.convertToTicketPriorityOptions(res);
+  getOrphanedDevicesByCategory(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.orphanedByCategory = [];
+    this.orphanedByCategoryOptions = {};
+    this.orphanedByCategoryHasData = false;
+    this.loadWidget(this.loaderNames.orphanedDevicesByCategory, this.svc.getOrphanedDevicesByCategory(filterFormOutput), res => {
+      this.orphanedByCategory = this.svc.convertToOrphanedByCategoryViewData(res);
+      this.orphanedByCategoryHasData = this.svc.hasOrphanedByCategoryData(this.orphanedByCategory);
+      this.orphanedByCategoryOptions = this.orphanedByCategoryHasData ? this.svc.convertToOrphanedByCategoryOptions(this.orphanedByCategory) : {};
     }, () => {
-      this.ticketPriorityOptions = {};
+      this.orphanedByCategory = [];
+      this.orphanedByCategoryOptions = {};
+      this.orphanedByCategoryHasData = false;
     });
   }
 
-  getTicketStatus(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.ticketStatusOptions = {};
-    this.loadWidget(this.loaderNames.ticketStatus, this.svc.getTicketStatus(filterFormOutput), res => {
-      this.ticketStatusOptions = this.svc.convertToTicketStatusOptions(res);
+  orphanedDevicesPageChange(pageNo: number) {
+    if (this.orphanedDevicesPageNo === pageNo) {
+      return;
+    }
+    this.orphanedDevicesPageNo = pageNo;
+    this.getOrphanedDevices(this.getFilterFormOutput());
+  }
+
+  orphanedDevicesPageSizeChange(event: Event) {
+    this.orphanedDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
+    this.orphanedDevicesPageNo = 1;
+    this.getOrphanedDevices(this.getFilterFormOutput());
+  }
+
+  getIdleDevices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.idleDevices = [];
+    this.idleDevicesTotal = 0;
+    this.loadWidget(this.loaderNames.idleDevices, this.svc.getIdleDevices(filterFormOutput, this.idleDevicesPageNo, this.idleDevicesPageSize), res => {
+      this.idleDevices = this.svc.convertToIdleDevicesViewData(res);
+      this.idleDevicesTotal = this.svc.convertToIdleDevicesTotal(res);
     }, () => {
-      this.ticketStatusOptions = {};
+      this.idleDevices = [];
+      this.idleDevicesTotal = 0;
     });
   }
 
-  getTickets(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.tickets = [];
-    this.loadWidget(this.loaderNames.tickets, this.svc.getTickets(filterFormOutput), res => {
-      this.tickets = this.svc.convertToTicketsViewData(res);
+  getIdleDevicesByDuration(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.idleDurationRows = [];
+    this.idleDurationOptions = {};
+    this.idleDurationHasData = false;
+    this.loadWidget(this.loaderNames.idleDuration, this.svc.getIdleDevicesByDuration(filterFormOutput), res => {
+      this.idleDurationRows = this.svc.convertToIdleDurationViewData(res);
+      this.idleDurationHasData = this.svc.hasIdleDurationData(this.idleDurationRows);
+      this.idleDurationOptions = this.idleDurationHasData ? this.svc.convertToIdleDurationOptions(this.idleDurationRows) : {};
     }, () => {
-      this.tickets = [];
+      this.idleDurationRows = [];
+      this.idleDurationOptions = {};
+      this.idleDurationHasData = false;
+    });
+  }
+
+  idleDevicesPageChange(pageNo: number) {
+    if (this.idleDevicesPageNo === pageNo) {
+      return;
+    }
+    this.idleDevicesPageNo = pageNo;
+    this.getIdleDevices(this.getFilterFormOutput());
+  }
+
+  idleDevicesPageSizeChange(event: Event) {
+    this.idleDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
+    this.idleDevicesPageNo = 1;
+    this.getIdleDevices(this.getFilterFormOutput());
+  }
+
+  getRecentAlertSummaryMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.recentAlertSummaryMetrics = [];
+    this.loadWidget(this.loaderNames.recentAlertSummary, this.svc.getRecentAlertSummaryMetrics(filterFormOutput), res => {
+      this.recentAlertSummaryMetrics = this.svc.convertToMetricsViewData(res);
+    }, () => {
+      this.recentAlertSummaryMetrics = [];
+    });
+  }
+
+  getRecentAlerts(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.recentAlerts = [];
+    this.loadWidget(this.loaderNames.recentAlerts, this.svc.getRecentAlerts(filterFormOutput), res => {
+      this.recentAlerts = this.svc.convertToRecentAlertsViewData(res);
+    }, () => {
+      this.recentAlerts = [];
     });
   }
 
@@ -630,6 +1020,67 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       case 'info': return 'fa-info-circle';
       default: return 'fa-minus-circle';
     }
+  }
+
+  getRecentAlertSeverityTone(severity: string): UnifiedAiopsTone {
+    switch (severity) {
+      case 'critical': return 'danger';
+      case 'warning': return 'warning';
+      case 'info': return 'info';
+      default: return 'muted';
+    }
+  }
+
+  getIdleStatusIconClass(status: string): string {
+    switch ((status || '').toLowerCase()) {
+      case 'success':
+      case 'healthy':
+      case 'ok':
+      case 'up':
+        return 'fas fa-check-circle text-success font-xs-sm';
+      case 'warning':
+      case 'warn':
+      case 'unknown':
+        return 'fas fa-exclamation-circle text-warning font-xs-sm';
+      case 'error':
+      case 'critical':
+      case 'down':
+      case 'failed':
+        return 'fas fa-exclamation-triangle text-danger font-xs-sm';
+      default:
+        return 'fas fa-question-circle text-muted font-xs-sm';
+    }
+  }
+
+  hasChartData(options: EChartsOption): boolean {
+    const chartOptions = options as any;
+    if (!chartOptions || !Object.keys(chartOptions).length) {
+      return false;
+    }
+
+    if (this.hasSeriesData(chartOptions.series)) {
+      return true;
+    }
+
+    const graphic = chartOptions.graphic;
+    if (Array.isArray(graphic)) {
+      return !!graphic.length;
+    }
+    return !!graphic && !!Object.keys(graphic).length;
+  }
+
+  private hasSeriesData(series: any): boolean {
+    const seriesItems = Array.isArray(series) ? series : series ? [series] : [];
+    return seriesItems.some(item => {
+      if (!item) {
+        return false;
+      }
+      const data = item.data;
+      if (Array.isArray(data)) {
+        return !!data.length;
+      }
+      return !!data && typeof data === 'object' && !!Object.keys(data).length;
+    });
   }
 
   trackByIndex(index: number): number {

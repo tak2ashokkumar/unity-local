@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { EChartsOption } from 'echarts';
+import * as moment from 'moment';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, shareReplay } from 'rxjs/operators';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
@@ -27,30 +28,55 @@ import {
   UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT,
   UNIFIED_AIOPS_EXECUTIVE_SUMMARY_METRIC_CONFIG,
   UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT,
+  UNIFIED_AIOPS_IDLE_DEVICES_BY_DURATION_ENDPOINT,
+  UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT,
+  UNIFIED_AIOPS_IDLE_DURATION_COLORS,
   UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT,
   UNIFIED_AIOPS_KUBERNETES_METRIC_CONFIG,
   UNIFIED_AIOPS_OBSERVABILITY_SUMMARY_ENDPOINT,
   UNIFIED_AIOPS_OS_MONITORING_ENDPOINT,
+  UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS,
+  UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
+  UNIFIED_AIOPS_ORPHANED_DEVICES_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT,
   UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT,
   UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT,
+  UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT
 } from './unified-aiops-command-centre.const';
 import {
-  UnifiedAiopsAlertRow,
   UnifiedAiopsBusinessService,
   UnifiedAiopsCloudFilterOption,
   UnifiedAiopsCoverageCard,
   UnifiedAiopsDashboardFilterCriteria,
   UnifiedAiopsFilterOption,
   UnifiedAiopsHeatmapGroup,
+  UnifiedAiopsIdleDeviceRow,
+  UnifiedAiopsIdleDevicesResponse,
+  UnifiedAiopsIdleDurationApiResponse,
+  UnifiedAiopsIdleDurationItem,
+  UnifiedAiopsIdleDurationResponse,
+  UnifiedAiopsIdleDurationResponseItem,
+  UnifiedAiopsIdleMetric,
+  UnifiedAiopsIdleMetricResponse,
   UnifiedAiopsLegendMetric,
   UnifiedAiopsMetric,
+  UnifiedAiopsOrphanedCategoryItem,
+  UnifiedAiopsOrphanedCategoryResponseItem,
+  UnifiedAiopsOrphanedDeviceResponseItem,
+  UnifiedAiopsOrphanedDeviceRow,
+  UnifiedAiopsOrphanedDevicesByCategoryApiResponse,
+  UnifiedAiopsOrphanedDevicesByCategoryResponse,
+  UnifiedAiopsOrphanedDevicesResponse,
+  UnifiedAiopsRecentAlert,
+  UnifiedAiopsRecentAlertResponseItem,
+  UnifiedAiopsRecentAlertsResponse,
+  UnifiedAiopsRecentAlertsSummary,
+  UnifiedAiopsRecentAlertSeverity,
   UnifiedAiopsRemediationMetric,
   UnifiedAiopsStackItem,
   UnifiedAiopsTableRow,
-  UnifiedAiopsTicketRow,
   UnifiedAiopsTone
 } from './unified-aiops-command-centre.type';
 
@@ -309,16 +335,17 @@ export class UnifiedAiopsCommandCentreService {
       color: colors,
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: {
-        bottom: 0,
+        bottom: 4,
+        itemGap: 18,
         itemWidth: 10,
         itemHeight: 7,
         textStyle: { color: '#627283', fontSize: 10 }
       },
-      grid: { left: 108, right: 22, top: 16, bottom: 32 },
+      grid: { left: 108, right: 22, top: 16, bottom: 56 },
       xAxis: {
         type: 'value',
         max: axisMax,
-        axisLabel: { color: '#758394', fontSize: 9 },
+        axisLabel: { color: '#758394', fontSize: 9, margin: 12 },
         splitLine: { lineStyle: { color: '#edf0f2' } }
       },
       yAxis: {
@@ -864,7 +891,7 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   private getStatusSummaryMetrics(response: any,
-    metricConfig: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; suffix?: string; threshold?: 'utilization' | 'warning' }>,
+    metricConfig: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; aggregateKeys?: string[]; suffix?: string; threshold?: 'utilization' | 'warning' }>,
     payloadKeys: string[]): UnifiedAiopsMetric[] {
     const payload = this.getMetricPayload(response, payloadKeys);
 
@@ -874,7 +901,7 @@ export class UnifiedAiopsCommandCentreService {
 
     const usedKeys = new Set<string>();
     const configuredMetrics = (metricConfig || []).reduce((metrics: UnifiedAiopsMetric[], config) => {
-      const value = this.getConfiguredMetricValue(payload, config.keys, usedKeys);
+      const value = this.getConfiguredMetricValue(payload, config, usedKeys);
       if (value !== undefined && value !== null) {
         metrics.push(this.getStatusSummaryMetric(config.label, value, config));
       }
@@ -888,16 +915,57 @@ export class UnifiedAiopsCommandCentreService {
     return [...configuredMetrics, ...additionalMetrics];
   }
 
-  private getConfiguredMetricValue(payload: any, keys: string[], usedKeys: Set<string>): any {
+  private getConfiguredMetricValue(payload: any,
+    config: { keys: string[]; aggregateKeys?: string[] },
+    usedKeys: Set<string>): any {
     const normalizedPayload = this.getNormalizedPayload(payload || {});
-    for (const key of keys || []) {
+    const directKeys = config.keys || [];
+    const aggregateKeys = config.aggregateKeys || [];
+    for (const key of directKeys) {
       const normalizedKey = this.normalizeKey(key);
       if (normalizedPayload[normalizedKey] !== undefined && normalizedPayload[normalizedKey] !== null) {
-        usedKeys.add(normalizedKey);
+        this.markMetricKeysUsed([...directKeys, ...aggregateKeys], usedKeys);
         return normalizedPayload[normalizedKey];
       }
     }
+
+    const aggregatedValue = this.getAggregatedMetricValue(normalizedPayload, aggregateKeys);
+    if (aggregatedValue) {
+      this.markMetricKeysUsed([...directKeys, ...aggregateKeys], usedKeys);
+      return aggregatedValue;
+    }
+
     return undefined;
+  }
+
+  private getAggregatedMetricValue(normalizedPayload: { [key: string]: any }, keys: string[]): any {
+    const values = (keys || [])
+      .map(key => normalizedPayload[this.normalizeKey(key)])
+      .filter(value => value !== undefined && value !== null);
+
+    if (!values.length) {
+      return undefined;
+    }
+
+    return values.reduce((result: { total: number; up: number; down: number; unknown: number }, value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const flatPayload = this.flattenPayload(value);
+        const up = this.getNumberFromPayload(flatPayload, ['up', 'online', 'healthy', 'active']);
+        const down = this.getNumberFromPayload(flatPayload, ['down', 'offline', 'unhealthy', 'critical']);
+        const unknown = this.getNumberFromPayload(flatPayload, ['unknown', 'unknowns', 'warning']);
+        result.up += up;
+        result.down += down;
+        result.unknown += unknown;
+        result.total += this.getNumberFromPayload(flatPayload, ['total', 'count', 'value'], up + down + unknown);
+      } else {
+        result.total += this.getNumberValue(value);
+      }
+      return result;
+    }, { total: 0, up: 0, down: 0, unknown: 0 });
+  }
+
+  private markMetricKeysUsed(keys: string[], usedKeys: Set<string>) {
+    (keys || []).forEach(key => usedKeys.add(this.normalizeKey(key)));
   }
 
   private getStatusSummaryMetric(label: string,
@@ -1317,6 +1385,472 @@ export class UnifiedAiopsCommandCentreService {
    */
 
   /*
+   * -----Start----- Orphaned Devices Widgets Related -------------------
+   */
+  getOrphanedDevices(criteria?: UnifiedAiopsDashboardFilterCriteria, page = 1, pageSize = 10): Observable<UnifiedAiopsOrphanedDevicesResponse> {
+    let params = this.getWidgetFilterParams(criteria);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
+    return this.http.get<UnifiedAiopsOrphanedDevicesResponse>(UNIFIED_AIOPS_ORPHANED_DEVICES_ENDPOINT, { params });
+  }
+
+  getOrphanedDevicesByCategory(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsOrphanedDevicesByCategoryApiResponse> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT, criteria);
+  }
+
+  convertToOrphanedDevicesViewData(data: UnifiedAiopsOrphanedDevicesResponse): UnifiedAiopsOrphanedDeviceRow[] {
+    return this.getOrphanedDeviceResults(data).map(item => ({
+      name: this.getFirstOrphanedValue(item.name, item.device_name, item.instance_name),
+      status: this.getFirstOrphanedValue(item.status),
+      lastSeen: this.formatOrphanedDate(this.getFirstOrphanedValue(item.lastSeen, item.last_seen)),
+      datacenter: this.getFirstOrphanedValue(item.datacenter, item.datacenter_name, item.cloud, item.provider, item.platform, item.account)
+    }));
+  }
+
+  convertToOrphanedDevicesTotal(data: UnifiedAiopsOrphanedDevicesResponse): number {
+    return Number(data?.count || data?.totalOrphaned || this.getOrphanedDeviceResults(data).length || 0);
+  }
+
+  convertToOrphanedByCategoryViewData(data: UnifiedAiopsOrphanedDevicesByCategoryApiResponse): UnifiedAiopsOrphanedCategoryItem[] {
+    const categoryData = this.getOrphanedCategoryResults(data);
+    const total = this.getOrphanedByCategoryTotal(data, categoryData);
+    const categoryTotal = (categoryData || []).reduce((sum, item) => sum + this.getOrphanedCategoryCount(item), 0);
+    return categoryData.filter(item => this.getOrphanedCategoryCount(item) > 0).map((item, index) => {
+      const count = this.getOrphanedCategoryCount(item);
+      return {
+        category: this.formatOrphanedCategoryLabel(this.getFirstOrphanedValue(item.category, item.name, item.label, item.display_name, item.type, item.resource_type)),
+        count,
+        percentage: this.getOrphanedCategoryPercentage(item, count, categoryTotal),
+        color: UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS[index % UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS.length],
+        totalCount: total
+      };
+    });
+  }
+
+  convertToOrphanedByCategoryOptions(data: UnifiedAiopsOrphanedCategoryItem[]): EChartsOption {
+    const total = Number(data?.[0]?.totalCount || 0) || (data || []).reduce((sum, item) => sum + Number(item.count || 0), 0);
+    return {
+      color: (data || []).map(item => item.color),
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: any) => `${params.name}<br/>Count: ${params.data.count}<br/>${params.data.percentage}%`
+      },
+      legend: {
+        show: false
+      },
+      graphic: [
+        {
+          type: 'text',
+          left: 'center',
+          top: 'center',
+          style: {
+            text: this.formatNumber(total),
+            fill: '#222222',
+            fontSize: 28,
+            fontWeight: 700
+          }
+        }
+      ],
+      series: [
+        {
+          name: 'Orphaned by Category',
+          type: 'pie',
+          radius: ['46%', '76%'],
+          center: ['50%', '48%'],
+          avoidLabelOverlap: true,
+          label: { show: false },
+          labelLine: { show: false },
+          data: (data || []).map(item => ({
+            value: item.count,
+            name: item.category,
+            category: item.category,
+            count: item.count,
+            percentage: item.percentage,
+            itemStyle: { color: item.color }
+          })),
+          itemStyle: {
+            borderColor: '#ffffff',
+            borderWidth: 6
+          }
+        }
+      ]
+    };
+  }
+
+  hasOrphanedByCategoryData(data: UnifiedAiopsOrphanedCategoryItem[]): boolean {
+    return (data || []).some(item => Number(item.count || 0) > 0);
+  }
+
+  private getOrphanedDeviceResults(data: UnifiedAiopsOrphanedDevicesResponse): UnifiedAiopsOrphanedDeviceResponseItem[] {
+    return data?.results || data?.orphanedDeviceList || data?.data || data?.items || [];
+  }
+
+  private getOrphanedCategoryResults(data: UnifiedAiopsOrphanedDevicesByCategoryApiResponse): UnifiedAiopsOrphanedCategoryResponseItem[] {
+    if (Array.isArray(data)) {
+      return data;
+    }
+    const categoryData = data?.breakdown || data?.results || data?.orphanedByCategory || data?.categories || data?.by_category || data?.data;
+    if (Array.isArray(categoryData)) {
+      return categoryData;
+    }
+    if (categoryData) {
+      return this.convertOrphanedCategoryRecordToItems(categoryData as unknown as UnifiedAiopsOrphanedDevicesByCategoryResponse);
+    }
+    return this.convertOrphanedCategoryRecordToItems(data);
+  }
+
+  private convertOrphanedCategoryRecordToItems(data: UnifiedAiopsOrphanedDevicesByCategoryResponse): UnifiedAiopsOrphanedCategoryResponseItem[] {
+    const record = data as unknown as Record<string, string | number | UnifiedAiopsOrphanedCategoryResponseItem>;
+    return Object.keys(data || {}).filter(key => !['total', 'totalOrphaned', 'total_count', 'totalCount', 'count', 'breakdown'].includes(key)).map(key => {
+      const value = record[key];
+      if (value && typeof value === 'object') {
+        return {
+          ...value,
+          category: value.category || key
+        };
+      }
+      return {
+        category: key,
+        count: Number(value || 0)
+      };
+    });
+  }
+
+  private getOrphanedByCategoryTotal(data: UnifiedAiopsOrphanedDevicesByCategoryApiResponse, categoryData: UnifiedAiopsOrphanedCategoryResponseItem[]): number {
+    if (!Array.isArray(data)) {
+      const total = Number(data?.total || data?.totalOrphaned || data?.total_count || data?.totalCount || 0);
+      if (total) {
+        return total;
+      }
+    }
+    return (categoryData || []).reduce((sum, item) => sum + this.getOrphanedCategoryCount(item), 0);
+  }
+
+  private getOrphanedCategoryCount(item: UnifiedAiopsOrphanedCategoryResponseItem): number {
+    return Number(item?.count || item?.value || 0);
+  }
+
+  private getOrphanedCategoryPercentage(item: UnifiedAiopsOrphanedCategoryResponseItem, count: number, total: number): number {
+    const apiPercentage = Number(String(item.percentage || item.percent || 0).replace('%', ''));
+    if (apiPercentage) {
+      return Math.round(apiPercentage);
+    }
+    return total ? Math.round((count / total) * 100) : 0;
+  }
+
+  private getFirstOrphanedValue(...values: Array<string | number | undefined | null>): string {
+    const value = values.find(item => item !== undefined && item !== null && item !== '');
+    return value === undefined || value === null ? '' : String(value);
+  }
+
+  private formatOrphanedCategoryLabel(value: string): string {
+    if (!value) {
+      return '';
+    }
+    const labels: Record<string, string> = {
+      vm: 'VM Instances',
+      vms: 'VM Instances',
+      vm_instances: 'VM Instances',
+      virtual_machine: 'VM Instances',
+      virtual_machines: 'VM Instances',
+      bare_metal: 'Bare Metal',
+      baremetal: 'Bare Metal',
+      gpu: 'GPUs',
+      gpus: 'GPUs',
+      storage: 'Storage Volumes',
+      storage_volume: 'Storage Volumes',
+      storage_volumes: 'Storage Volumes',
+      network: 'Network Devices',
+      network_device: 'Network Devices',
+      network_devices: 'Network Devices'
+    };
+    const normalizedValue = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+    return labels[normalizedValue] || value.replace(/_/g, ' ').replace(/\b\w/g, match => match.toUpperCase());
+  }
+
+  private formatOrphanedDate(value: string): string {
+    if (!value) {
+      return '';
+    }
+    const date = moment(value, [
+      moment.ISO_8601,
+      'DD MMM YYYY HH:mm',
+      'D MMM YYYY HH:mm',
+      'DD MMMM YYYY HH:mm',
+      'D MMMM YYYY HH:mm',
+      'DD MMM YYYY hh:mm A',
+      'D MMM YYYY hh:mm A',
+      'DD MMMM YYYY hh:mm A',
+      'D MMMM YYYY hh:mm A',
+      'YYYY-MM-DD HH:mm:ss',
+      'YYYY-MM-DD HH:mm',
+      'DD/MM/YYYY HH:mm',
+      'MM/DD/YYYY HH:mm'
+    ], true);
+    return date.isValid() ? date.format('DD MMM YYYY HH:mm') : value;
+  }
+  /*
+   * ******End ****** Orphaned Devices Widgets Related ********************
+   */
+
+  /*
+   * -----Start----- Idle Devices Widgets Related -------------------
+   */
+  getIdleDevices(criteria?: UnifiedAiopsDashboardFilterCriteria, page = 1, pageSize = 10): Observable<UnifiedAiopsIdleDevicesResponse> {
+    let params = this.getWidgetFilterParams(criteria);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
+    return this.http.get<UnifiedAiopsIdleDevicesResponse>(UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT, { params });
+  }
+
+  getIdleDevicesByDuration(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsIdleDurationApiResponse> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_IDLE_DEVICES_BY_DURATION_ENDPOINT, criteria);
+  }
+
+  convertToIdleDevicesViewData(data: UnifiedAiopsIdleDevicesResponse): UnifiedAiopsIdleDeviceRow[] {
+    return (data?.results || []).map(item => {
+      const row = item as Record<string, any>;
+      return {
+        id: this.getFirstIdleValue(row.id),
+        uuid: this.getFirstIdleValue(row.uuid, row.id),
+        deviceId: this.getFirstIdleValue(row.device_id, row.deviceId, row.device_uuid, row.deviceUuid, row.uuid, row.id),
+        resourceId: this.getFirstIdleValue(row.resource_id, row.resourceId, row.uuid, row.id),
+        deviceName: this.getFirstIdleValue(row.device_name, row.deviceName, row.name, row.instance_name),
+        resourceType: this.getFirstIdleValue(row.resource_type, row.resourceType, row.type),
+        provider: this.getFirstIdleValue(row.provider, row.platform, row.cloud_provider, row.cloudProvider, row.cloud, row.cloud_type, row.cloudType),
+        cloudType: this.getFirstIdleValue(row.cloud_type, row.cloudType, row.cloud, row.provider, row.platform),
+        monitoringType: this.getFirstIdleValue(row.monitoring_type, row.monitoringType),
+        monitoring: row.monitoring,
+        avgCpu: this.convertToIdleMetric(
+          this.getFirstIdleObject(row.avg_cpu, row.avgCpu, row.avgCPU, row.cpu, row.cpu_usage, row.average_cpu),
+          this.getFirstIdleScalar(row.avg_cpu_percent, row.avgCpuPercent, row.avg_cpu_percentage, row.cpu_percent, row.cpuPercentage, row.avg_cpu, row.avgCpu, row.avgCPU, row.cpu, row.cpu_usage, row.average_cpu)
+        ),
+        avgMem: this.convertToIdleMetric(
+          this.getFirstIdleObject(row.avg_mem, row.avgMem, row.avg_memory, row.memory, row.memory_usage, row.average_memory),
+          this.getFirstIdleScalar(row.avg_mem_percent, row.avgMemPercent, row.avg_mem_percentage, row.memory_percent, row.memoryPercentage, row.avg_mem, row.avgMem, row.avg_memory, row.memory, row.memory_usage, row.average_memory)
+        ),
+        networkIO: this.getFirstIdleValue(row.network_io, row.networkIO, row.network, row.network_in_out),
+        idleDuration: this.getFirstIdleValue(row.idle_duration, row.idleDuration, row.duration),
+        status: this.getFirstIdleValue(row.status)
+      };
+    });
+  }
+
+  convertToIdleDevicesTotal(data: UnifiedAiopsIdleDevicesResponse): number {
+    return Number(data?.count || 0);
+  }
+
+  convertToIdleDurationViewData(data: UnifiedAiopsIdleDurationApiResponse): UnifiedAiopsIdleDurationItem[] {
+    const durationData = this.sortIdleDurationBuckets(this.getIdleDurationResults(data));
+    const maxCount = Math.max(...durationData.map(item => this.getIdleDurationCount(item)), 0);
+    return durationData.filter(item => this.getIdleDurationCount(item) > 0).map((item, index) => {
+      const count = this.getIdleDurationCount(item);
+      const duration = this.getIdleDurationLabel(item);
+      return {
+        duration,
+        count,
+        percent: maxCount ? Math.round((count / maxCount) * 100) : 0,
+        color: UNIFIED_AIOPS_IDLE_DURATION_COLORS[index % UNIFIED_AIOPS_IDLE_DURATION_COLORS.length]
+      };
+    });
+  }
+
+  convertToIdleDurationOptions(data: UnifiedAiopsIdleDurationItem[]): EChartsOption {
+    return {
+      color: (data || []).map(item => item.color),
+      tooltip: {
+        trigger: 'item',
+        formatter: '{b}: {c}'
+      },
+      legend: {
+        show: false
+      },
+      series: [
+        {
+          name: 'Idle Duration Distribution',
+          type: 'pie',
+          radius: ['48%', '78%'],
+          center: ['50%', '50%'],
+          avoidLabelOverlap: false,
+          label: { show: false },
+          labelLine: { show: false },
+          data: (data || []).map(item => ({
+            value: item.count,
+            name: item.duration,
+            itemStyle: { color: item.color }
+          })),
+          itemStyle: {
+            borderColor: '#ffffff',
+            borderWidth: 8
+          }
+        }
+      ]
+    };
+  }
+
+  hasIdleDurationData(data: UnifiedAiopsIdleDurationItem[]): boolean {
+    return (data || []).some(item => Number(item.count || 0) > 0);
+  }
+
+  private convertToIdleMetric(metric?: UnifiedAiopsIdleMetricResponse, percentValue?: string | number): UnifiedAiopsIdleMetric {
+    const usedValue = metric?.used ?? metric?.value;
+    const freeValue = metric?.free;
+    const explicitPercent = this.getNumericIdleValue(metric?.percent || metric?.percentage || percentValue);
+    const freePercent = this.getNumericIdleValue(freeValue);
+    const usedPercent = explicitPercent || (freePercent ? 100 - freePercent : this.getNumericIdleValue(usedValue));
+    const percent = Math.max(Math.min(Number(usedPercent || 0), 100), 0);
+    return {
+      used: this.getFirstIdleValue(usedValue, percent),
+      free: this.getFirstIdleValue(freeValue, `${Math.max(100 - percent, 0)}%`),
+      percent,
+      tone: this.getProgressTone(percent)
+    };
+  }
+
+  private getIdleDurationResults(data: UnifiedAiopsIdleDurationApiResponse): UnifiedAiopsIdleDurationResponseItem[] {
+    return this.getIdleDurationResultsFromValue(data);
+  }
+
+  private getIdleDurationResultsFromValue(value: any): UnifiedAiopsIdleDurationResponseItem[] {
+    if (!value) {
+      return [];
+    }
+    if (Array.isArray(value)) {
+      return value.filter(item => this.isIdleDurationBucketItem(item));
+    }
+
+    const record = value as Record<string, any>;
+    const containerKeys = [
+      'idleDurationDistribution',
+      'idle_duration_distribution',
+      'durationDistribution',
+      'duration_distribution',
+      'idle_devices_by_duration',
+      'summary',
+      'distribution',
+      'breakdown',
+      'results'
+    ];
+
+    for (const key of containerKeys) {
+      const rows = this.getIdleDurationResultsFromValue(record[key]);
+      if (rows.length) {
+        return rows;
+      }
+    }
+
+    const nestedRows = this.getIdleDurationResultsFromValue(record.data);
+    if (nestedRows.length) {
+      return nestedRows;
+    }
+
+    return this.convertIdleDurationRecordToItems(value as UnifiedAiopsIdleDurationResponse);
+  }
+
+  private convertIdleDurationRecordToItems(data: UnifiedAiopsIdleDurationResponse): UnifiedAiopsIdleDurationResponseItem[] {
+    const record = data as unknown as Record<string, string | number | UnifiedAiopsIdleDurationResponseItem>;
+    return Object.keys(data || {}).reduce((items: UnifiedAiopsIdleDurationResponseItem[], key) => {
+      if (this.isIdleDurationMetadataKey(key)) {
+        return items;
+      }
+      const value = record[key];
+      if (value && typeof value === 'object') {
+        const item = {
+          ...value,
+          duration: value.duration || value.idle_duration || value.idleDuration || value.range || value.name || value.label || key
+        };
+        if (this.isIdleDurationBucketItem(item)) {
+          items.push(item);
+        }
+        return items;
+      }
+      if (this.isIdleDurationBucketKey(key)) {
+        items.push({
+          duration: key,
+          count: Number(value || 0)
+        });
+      }
+      return items;
+    }, []);
+  }
+
+  private getIdleDurationCount(item: UnifiedAiopsIdleDurationResponseItem): number {
+    return Number(item?.count || item?.value || item?.total || item?.total_count || item?.totalCount || item?.devices || item?.percent || item?.percentage || 0);
+  }
+
+  private getIdleDurationLabel(item: UnifiedAiopsIdleDurationResponseItem): string {
+    return this.getFirstIdleValue(item.duration, item.idle_duration, item.idleDuration, item.range, item.name, item.label);
+  }
+
+  private sortIdleDurationBuckets(items: UnifiedAiopsIdleDurationResponseItem[]): UnifiedAiopsIdleDurationResponseItem[] {
+    return [...(items || [])].sort((first, second) => {
+      return this.getIdleDurationSortValue(this.getIdleDurationLabel(first)) - this.getIdleDurationSortValue(this.getIdleDurationLabel(second));
+    });
+  }
+
+  private getIdleDurationSortValue(label: string): number {
+    const normalizedLabel = String(label || '').toLowerCase().replace(/\s+/g, '');
+    if (normalizedLabel.startsWith('0-7')) {
+      return 0;
+    }
+    if (normalizedLabel.startsWith('7-15')) {
+      return 1;
+    }
+    if (normalizedLabel.startsWith('15-30')) {
+      return 2;
+    }
+    if (normalizedLabel.startsWith('30+')) {
+      return 3;
+    }
+    const firstNumber = normalizedLabel.match(/^\d+/);
+    return firstNumber ? Number(firstNumber[0]) : 999;
+  }
+
+  private isIdleDurationBucketItem(item: UnifiedAiopsIdleDurationResponseItem): boolean {
+    return !!item && this.getIdleDurationCount(item) > 0 && this.isIdleDurationBucketKey(this.getIdleDurationLabel(item));
+  }
+
+  private isIdleDurationMetadataKey(key: string): boolean {
+    return ['total_idle_count', 'total_count', 'totalCount', 'total', 'count'].includes(key);
+  }
+
+  private isIdleDurationBucketKey(key: string): boolean {
+    const normalizedKey = String(key || '').toLowerCase().replace(/_/g, ' ').trim();
+    return !!normalizedKey && !this.isIdleDurationMetadataKey(key) && (
+      normalizedKey.includes('day') ||
+      /^\d+\s*[-+]\s*\d*/.test(normalizedKey) ||
+      /^\d+\+/.test(normalizedKey)
+    );
+  }
+
+  private getFirstIdleObject(...values: any[]): UnifiedAiopsIdleMetricResponse | undefined {
+    return values.find(value => value && typeof value === 'object');
+  }
+
+  private getFirstIdleScalar(...values: any[]): string | number {
+    const value = values.find(item => item !== undefined && item !== null && item !== '' && typeof item !== 'object');
+    return value === undefined || value === null ? '' : value;
+  }
+
+  private getFirstIdleValue(...values: Array<string | number | undefined | null>): string {
+    const value = values.find(item => item !== undefined && item !== null && item !== '');
+    return value === undefined || value === null ? '' : String(value);
+  }
+
+  private getProgressTone(percent: number): UnifiedAiopsTone {
+    return percent < 65 ? 'success' : percent < 85 ? 'warning' : 'danger';
+  }
+
+  private getNumericIdleValue(value: string | number | undefined | null): number {
+    return Number(String(value ?? '').replace(/[^0-9.-]/g, '')) || 0;
+  }
+  /*
+   * ******End ****** Idle Devices Widgets Related ********************
+   */
+
+  /*
    * -----Start----- Alerts Widget Related -------------------
    */
   getAlertReductionMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
@@ -1605,75 +2139,116 @@ export class UnifiedAiopsCommandCentreService {
    */
 
   /*
-   * -----Start----- Top 10 Critical Alerts Widget Related -------------------
+   * -----Start----- Recent Alerts Widget Related -------------------
    */
-  getCriticalAlerts(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsAlertRow[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsAlertRow>(res, ['critical_alerts', 'top_critical_alerts', 'top_alerts']))
+  getRecentAlertSummaryMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT, criteria).pipe(
+      map(res => this.buildRecentAlertSummaryMetrics(res))
     );
   }
 
-  convertToCriticalAlertsViewData(data: UnifiedAiopsAlertRow[]): UnifiedAiopsAlertRow[] {
+  getRecentAlerts(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsRecentAlert[]> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT, criteria).pipe(
+      map(res => this.getRecentAlertRows(res).map(item => this.getRecentAlertViewData(item)))
+    );
+  }
+
+  convertToRecentAlertsViewData(data: UnifiedAiopsRecentAlert[]): UnifiedAiopsRecentAlert[] {
     return data || [];
   }
+
+  private buildRecentAlertSummaryMetrics(data: UnifiedAiopsRecentAlertsResponse): UnifiedAiopsMetric[] {
+    const summary = this.getRecentAlertSummary(data);
+    return [
+      {
+        label: 'Critical Alerts',
+        value: this.formatNumber(this.getRecentAlertSummaryValue(summary, ['critical_alerts', 'criticalAlerts', 'critical'])),
+        tone: 'danger'
+      },
+      {
+        label: 'Warning Alerts',
+        value: this.formatNumber(this.getRecentAlertSummaryValue(summary, ['warning_alerts', 'warningAlerts', 'warning'])),
+        tone: 'warning'
+      },
+      {
+        label: 'Info Alerts',
+        value: this.formatNumber(this.getRecentAlertSummaryValue(summary, ['info_alerts', 'infoAlerts', 'information', 'info'])),
+        tone: 'primary'
+      }
+    ];
+  }
+
+  private getRecentAlertSummary(data: UnifiedAiopsRecentAlertsResponse): UnifiedAiopsRecentAlertsSummary {
+    const nestedData = data?.data && !Array.isArray(data.data) ? data.data : null;
+    return data?.alertSummary || data?.alert_summary || data?.summary ||
+      nestedData?.alertSummary || nestedData?.alert_summary || nestedData?.summary || {};
+  }
+
+  private getRecentAlertSummaryValue(summary: UnifiedAiopsRecentAlertsSummary, keys: Array<keyof UnifiedAiopsRecentAlertsSummary>): number {
+    const value = keys.map(key => summary?.[key]).find(item => item !== undefined && item !== null);
+    return this.getNumberValue(value);
+  }
+
+  private getRecentAlertRows(data: UnifiedAiopsRecentAlertsResponse): UnifiedAiopsRecentAlertResponseItem[] {
+    if (Array.isArray(data?.data)) {
+      return data.data;
+    }
+    const nestedData = data?.data && !Array.isArray(data.data) ? data.data : null;
+    return data?.recentAlerts || data?.recent_alerts || data?.alerts || data?.results ||
+      nestedData?.recentAlerts || nestedData?.recent_alerts || nestedData?.alerts || nestedData?.results || [];
+  }
+
+  private getRecentAlertViewData(item: UnifiedAiopsRecentAlertResponseItem): UnifiedAiopsRecentAlert {
+    return {
+      id: this.getFirstRecentAlertValue(item.id, item.alert_id, item.alertId, item.uuid, item.alert_uuid, item.alertUuid),
+      uuid: this.getFirstRecentAlertValue(item.uuid, item.alert_uuid, item.alertUuid, item.id, item.alert_id, item.alertId),
+      deviceName: this.getFirstRecentAlertValue(item.device_name, item.deviceName, item.name),
+      severity: this.getRecentAlertSeverity(this.getFirstRecentAlertValue(item.severity, item.status)),
+      description: this.getFirstRecentAlertValue(item.description),
+      source: this.getFirstRecentAlertValue(item.source),
+      acknowledged: this.formatRecentAlertAcknowledged(item.acknowledged),
+      duration: this.getFirstRecentAlertValue(item.duration)
+    };
+  }
+
+  private getFirstRecentAlertValue(...values: Array<string | number | undefined | null>): string {
+    const value = values.find(item => item !== undefined && item !== null && item !== '');
+    return value === undefined || value === null ? '' : String(value);
+  }
+
+  private getRecentAlertSeverity(value: string): UnifiedAiopsRecentAlertSeverity {
+    switch ((value || '').toLowerCase()) {
+      case 'critical':
+      case 'error':
+        return 'critical';
+      case 'warning':
+      case 'warn':
+      case 'high':
+        return 'warning';
+      case 'info':
+      case 'information':
+      case 'informative':
+        return 'info';
+      default:
+        return 'muted';
+    }
+  }
+
+  private formatRecentAlertAcknowledged(value: string | boolean | undefined): string {
+    if (typeof value === 'boolean') {
+      return value ? 'Yes' : 'No';
+    }
+    const normalizedValue = String(value || '').toLowerCase();
+    if (normalizedValue === 'true') {
+      return 'Yes';
+    }
+    if (normalizedValue === 'false') {
+      return 'No';
+    }
+    return String(value || '');
+  }
   /*
-   * ******End ****** Top 10 Critical Alerts Widget Related ********************
-   */
-
-  /*
-   * -----Start----- ITSM Tickets Widget Related -------------------
-   */
-  getTicketPriority(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['ticket_priority', 'ticket_priority_chart', 'tickets_by_priority']))
-    );
-  }
-
-  convertToTicketPriorityOptions(data: EChartsOption): EChartsOption {
-    return data || {};
-  }
-
-  private getTicketPriorityOptions(): EChartsOption {
-    return this.getDonutOptions([
-      { name: '2 - High', value: 2, color: '#ff5252' },
-      { name: '4 - Low', value: 4, color: '#6695ff' },
-      { name: '3 - Moderate', value: 170, color: '#aaf25f' },
-      { name: '1 - Critical', value: 24, color: '#ff62c7' },
-      { name: '5 - Planning', value: 15, color: '#80e5d1' }
-    ], ['2 - High', '4 - Low', '3 - Moderate', '1 - Critical', '5 - Planning'], ['#ff5252', '#6695ff', '#aaf25f', '#ff62c7', '#80e5d1']);
-  }
-
-  getTicketStatus(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['ticket_status', 'ticket_status_chart', 'tickets_by_status']))
-    );
-  }
-
-  convertToTicketStatusOptions(data: EChartsOption): EChartsOption {
-    return data || {};
-  }
-
-  private getTicketStatusOptions(): EChartsOption {
-    return this.getDonutOptions([
-      { name: 'Closed', value: 58, color: '#f85fc0' },
-      { name: 'New', value: 20, color: '#d8ed4c' },
-      { name: 'Assess', value: 12, color: '#81e2f2' },
-      { name: 'Resolved', value: 18, color: '#84d65a' },
-      { name: 'In Progress', value: 8, color: '#8678ff' }
-    ], ['Closed', 'New', 'Assess', 'Resolved', 'In Progress'], ['#f85fc0', '#d8ed4c', '#81e2f2', '#84d65a', '#8678ff']);
-  }
-
-  getTickets(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsTicketRow[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsTicketRow>(res, ['tickets', 'itsm_tickets', 'ticket_rows']))
-    );
-  }
-
-  convertToTicketsViewData(data: UnifiedAiopsTicketRow[]): UnifiedAiopsTicketRow[] {
-    return data || [];
-  }
-  /*
-   * ******End ****** ITSM Tickets Widget Related ********************
+   * ******End ****** Recent Alerts Widget Related ********************
    */
 
   /*

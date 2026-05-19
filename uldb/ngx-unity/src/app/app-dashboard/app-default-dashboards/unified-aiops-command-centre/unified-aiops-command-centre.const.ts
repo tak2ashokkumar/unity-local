@@ -1,6 +1,5 @@
 import { environment } from 'src/environments/environment';
 import {
-  UnifiedAiopsAlertRow,
   UnifiedAiopsAlertSource,
   UnifiedAiopsBusinessService,
   UnifiedAiopsCoverageCard,
@@ -11,32 +10,36 @@ import {
   UnifiedAiopsRemediationMetric,
   UnifiedAiopsStackItem,
   UnifiedAiopsTableRow,
-  UnifiedAiopsTicketRow,
   UnifiedAiopsTone
 } from './unified-aiops-command-centre.type';
 
 export const UNIFIED_AIOPS_ALL_SELECTED_VALUE = 'all';
 
-export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/widgets/unified-aiops/executive-monitoring-summary/';
-export const UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT = '/customer/widgets/unified-aiops/discovery-vs-monitoring/';
-export const UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT = '/customer/widgets/unified-aiops/alert-segregation-by-type/';
-export const UNIFIED_AIOPS_BUSINESS_SERVICES_ENDPOINT = '/customer/widgets/unified-aiops/business-services/';
-export const UNIFIED_AIOPS_APPLICATION_SERVICES_ALERTS_ENDPOINT = '/customer/widgets/unified-aiops/application-services-alerts/';
-export const UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT = '/customer/widgets/unified-aiops/geo-distribution-global-ops/';
-export const UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/widgets/unified-aiops/private-cloud-infra-coverage/';
-export const UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/widgets/unified-aiops/public-cloud-infra-coverage/';
-export const UNIFIED_AIOPS_DATACENTER_GEOGRAPHY_ENDPOINT = '/customer/widgets/unified-aiops/datacenter-geography/';
-export const UNIFIED_AIOPS_DATACENTER_INFRA_ENDPOINT = '/customer/widgets/unified-aiops/datacenter-infra/';
-export const UNIFIED_AIOPS_CONTAINER_SUMMARY_ENDPOINT = '/customer/widgets/unified-aiops/container-summary/';
-export const UNIFIED_AIOPS_OBSERVABILITY_SUMMARY_ENDPOINT = '/customer/widgets/unified-aiops/observability-summary/';
-export const UNIFIED_AIOPS_APPLICATION_OVERVIEW_ENDPOINT = '/customer/widgets/unified-aiops/application-overview/';
-export const UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT = '/customer/widgets/unified-aiops/services-overview/';
-export const UNIFIED_AIOPS_DATABASE_MONITORING_ENDPOINT = '/customer/widgets/unified-aiops/database-monitoring/';
-export const UNIFIED_AIOPS_OS_MONITORING_ENDPOINT = '/customer/widgets/unified-aiops/os-monitoring/';
-export const UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT = '/customer/widgets/unified-aiops/infra-platform-performance/';
-export const UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT = '/customer/widgets/unified-aiops/analytics-health-charts/';
-export const UNIFIED_AIOPS_ALERTS_ENDPOINT = '/customer/widgets/unified-aiops/alerts/';
-export const UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT = '/customer/widgets/unified-aiops/auto-remediation-summary/';
+export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/executive-monitoring-summary/';
+export const UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/discovery-vs-monitoring/';
+export const UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT = '/customer/aiops-dashboard/alert-segregation-by-type/';
+export const UNIFIED_AIOPS_BUSINESS_SERVICES_ENDPOINT = '/customer/aiops-dashboard/business-services/';
+export const UNIFIED_AIOPS_APPLICATION_SERVICES_ALERTS_ENDPOINT = '/customer/aiops-dashboard/application-services-alerts/';
+export const UNIFIED_AIOPS_GEO_DISTRIBUTION_GLOBAL_OPS_ENDPOINT = '/customer/aiops-dashboard/geo-distribution-global-ops/';
+export const UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/private-cloud-infra-coverage/';
+export const UNIFIED_AIOPS_PUBLIC_CLOUD_INFRA_COVERAGE_ENDPOINT = '/customer/aiops-dashboard/public-cloud-infra-coverage/';
+export const UNIFIED_AIOPS_DATACENTER_GEOGRAPHY_ENDPOINT = '/customer/aiops-dashboard/datacenter-geography/';
+export const UNIFIED_AIOPS_DATACENTER_INFRA_ENDPOINT = '/customer/aiops-dashboard/datacenter-infra/';
+export const UNIFIED_AIOPS_CONTAINER_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/container-summary/';
+export const UNIFIED_AIOPS_OBSERVABILITY_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/observability-summary/';
+export const UNIFIED_AIOPS_APPLICATION_OVERVIEW_ENDPOINT = '/customer/aiops-dashboard/application-overview/';
+export const UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT = '/customer/aiops-dashboard/services-overview/';
+export const UNIFIED_AIOPS_DATABASE_MONITORING_ENDPOINT = '/customer/aiops-dashboard/database-monitoring/';
+export const UNIFIED_AIOPS_OS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/os-monitoring/';
+export const UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT = '/customer/aiops-dashboard/infra-platform-performance/';
+export const UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT = '/customer/aiops-dashboard/analytics-health-charts/';
+export const UNIFIED_AIOPS_ALERTS_ENDPOINT = '/customer/aiops-dashboard/alerts/';
+export const UNIFIED_AIOPS_ORPHANED_DEVICES_ENDPOINT = '/customer/aiops-dashboard/orphaned-devices/';
+export const UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT = '/customer/aiops-dashboard/orphaned-devices-by-category/';
+export const UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT = '/customer/aiops-dashboard/idle-devices/';
+export const UNIFIED_AIOPS_IDLE_DEVICES_BY_DURATION_ENDPOINT = '/customer/aiops-dashboard/idle-devices-by-duration/';
+export const UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT = '/customer/aiops-dashboard/recent-alerts/';
+export const UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/auto-remediation-summary/';
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT = '/customer/private_cloud_fast/';
 export const UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT = '/customer/public_cloud_fast/';
 
@@ -127,12 +130,11 @@ export const UNIFIED_AIOPS_EMPLOYEE_METRIC_CONFIG: Array<{ label: string; tone?:
   { label: 'Critical', tone: 'danger', keys: ['critical', 'total_critical', 'totalCritical', 'critical_count', 'criticalCount'] }
 ];
 
-export const UNIFIED_AIOPS_DATACENTER_INFRA_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[] }> = [
-  { label: 'Compute', tone: 'primary', keys: ['compute', 'bare_metal', 'bareMetal', 'bare_metal_servers'] },
-  { label: 'Switches', tone: 'primary', keys: ['switch', 'switches'] },
-  { label: 'Firewalls', tone: 'primary', keys: ['firewall', 'firewalls'] },
+export const UNIFIED_AIOPS_DATACENTER_INFRA_METRIC_CONFIG: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; aggregateKeys?: string[] }> = [
+  { label: 'Bare Metal Servers', tone: 'primary', keys: ['bare_metal_servers', 'bareMetalServers', 'bare_metal', 'bareMetal', 'compute'] },
+  { label: 'Network Devices', tone: 'primary', keys: ['network_devices', 'networkDevices', 'network'], aggregateKeys: ['switch', 'switches', 'firewall', 'firewalls'] },
   { label: 'Load Balancer', tone: 'primary', keys: ['load_balancer', 'loadBalancer'] },
-  { label: 'Storage Units', tone: 'primary', keys: ['storage', 'storage_units', 'storageUnits'] },
+  { label: 'Storage Units', tone: 'primary', keys: ['storage_units', 'storageUnits', 'storage'] },
   { label: 'PDU/Power', tone: 'primary', keys: ['pdu_power', 'pduPower', 'power'] },
   { label: 'URLs Monitored', tone: 'primary', keys: ['urls_monitored', 'urlsMonitored', 'url'] },
   { label: 'MAC Devices', tone: 'primary', keys: ['mac_devices', 'macDevices'] }
@@ -350,6 +352,24 @@ export const UNIFIED_AIOPS_AI_GPU_METRICS: UnifiedAiopsMetric[] = [
   { label: 'VDB Query Lat.', value: '12ms', tone: 'primary' }
 ];
 
+export const UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS = [
+  '#6b7ff5',
+  '#6ccf91',
+  '#ffb04b',
+  '#16c7d9',
+  '#8b7cf6',
+  '#f06a6a',
+  '#46a3f3',
+  '#9aa6b2'
+];
+
+export const UNIFIED_AIOPS_IDLE_DURATION_COLORS = [
+  '#13bd77',
+  '#ff8a00',
+  '#d63b3b',
+  '#ff9aa2'
+];
+
 export const UNIFIED_AIOPS_APPLICATION_ROWS: UnifiedAiopsTableRow[] = [
   { name: 'Astronomy Shop', throughput: '0.01', availability: 'N/A', responseTime: '0', status: 'success' },
   { name: 'Easy Trade', throughput: '0.13', availability: 'N/A', responseTime: '0', status: 'warning' },
@@ -441,29 +461,6 @@ export const UNIFIED_AIOPS_ALERT_SOURCES: UnifiedAiopsAlertSource[] = [
     logoHeight: 24,
     color: '#0cb674'
   }
-];
-
-export const UNIFIED_AIOPS_CRITICAL_ALERTS: UnifiedAiopsAlertRow[] = [
-  { id: '1744', deviceName: 'UL_Switch_Disk', severity: 'critical', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'Yes', duration: '34s' },
-  { id: '1746', deviceName: 'UL_Switch_Test', severity: 'critical', description: 'Ethernet has changed...', source: 'Unity', acknowledged: 'No', duration: '36s' },
-  { id: '2319', deviceName: 'UL_Firewall_Test', severity: 'critical', description: 'High bandwidth usage...', source: 'Unity', acknowledged: 'No', duration: '39s' },
-  { id: '6644', deviceName: 'UL_Switch_AT', severity: 'high', description: 'Device has been repla...', source: 'Zabbix', acknowledged: 'Yes', duration: '01m' },
-  { id: '9956', deviceName: 'UL_LoadBalancer_09', severity: 'high', description: 'System name has bee...', source: 'Nagios', acknowledged: 'No', duration: '02m 44s' },
-  { id: '1470', deviceName: 'UL_Router_AT', severity: 'high', description: 'Device has been repla...', source: 'Unity', acknowledged: 'Yes', duration: '08m 56s' },
-  { id: '7452', deviceName: 'UL_LoadBalancer_04', severity: 'critical', description: 'Interface Link down...', source: 'Nagios', acknowledged: 'Yes', duration: '10m 15s' },
-  { id: '2354', deviceName: 'UL_Switch_BT', severity: 'high', description: 'Interface : High error...', source: 'Unity', acknowledged: 'No', duration: '20m 13s' },
-  { id: '0996', deviceName: 'UL_Firewall_007', severity: 'critical', description: 'Unavailable by ICMP...', source: 'Nagios', acknowledged: 'No', duration: '01h 09m' },
-  { id: '0994', deviceName: 'UL_Firewall_007', severity: 'critical', description: 'Unavailable by ICMP...', source: 'Zabbix', acknowledged: 'Yes', duration: '01h 09m' }
-];
-
-export const UNIFIED_AIOPS_TICKETS: UnifiedAiopsTicketRow[] = [
-  { ticketId: 'INC1803932', shortDescription: 'AWS RDS: Failed to get events data...', state: 'Closed', priority: '3 - Moderate', createdOn: 'Apr 08, 2026, 23:53:28', updatedOn: 'Apr 10, 2026, 18:30:45', resolution: 'Closed' },
-  { ticketId: 'INC1803538', shortDescription: 'AWS ELB ALB: Too many HTTP 5XX ...', state: 'Resolved', priority: '3 - Moderate', createdOn: 'Apr 07, 2026, 19:05:30', updatedOn: 'Apr 07, 2026, 19:31:27', resolution: 'Resolved' },
-  { ticketId: 'INC1804591', shortDescription: 'Failed to get alarms data for amplif...', state: 'Closed', priority: '3 - Moderate', createdOn: 'Apr 10, 2026, 17:58:35', updatedOn: 'Apr 11, 2026, 18:36:56', resolution: 'Closed' },
-  { ticketId: 'INC1804291', shortDescription: 'Failed to get alarms data for cmspr...', state: 'Closed', priority: '3 - Moderate', createdOn: 'Apr 09, 2026, 19:16:31', updatedOn: 'Apr 11, 2026, 18:03:02', resolution: 'Closed' },
-  { ticketId: 'INC1803986', shortDescription: 'AWS S3: Failed to get metrics data ...', state: 'Closed', priority: '3 - Moderate', createdOn: 'Apr 09, 2026, 00:03:39', updatedOn: 'Apr 10, 2026, 18:31:36', resolution: 'Closed' },
-  { ticketId: 'INC1804224', shortDescription: 'AWS ELB ALB: Too many HTTP 5XX ...', state: 'Resolved', priority: '3 - Moderate', createdOn: 'Apr 09, 2026, 15:34:31', updatedOn: 'Apr 09, 2026, 15:36:46', resolution: 'Resolved' },
-  { ticketId: 'INC1802897', shortDescription: '1.3.6.1.4.1.9.9.187.0.1 is critical', state: 'In Progress', priority: '1 - Critical', createdOn: 'Apr 01, 2026, 5:48:07', updatedOn: 'Apr 02, 2026, 18:30:10', resolution: 'In Progress' }
 ];
 
 export const UNIFIED_AIOPS_REMEDIATION_SUMMARY: UnifiedAiopsMetric[] = [
