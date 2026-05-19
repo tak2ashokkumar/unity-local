@@ -7,6 +7,7 @@ import { CollectionDashboardPayload, CollectionDetailResponse, DashboardItem } f
 @Injectable()
 export class AppDashboardCollectionsViewService {
   private readonly collectionEndpoint = '/customer/collections/';
+  private readonly defaultDashboardImageBasePath = 'static/assets/images/default_dashboard_full_Images/';
 
   constructor(private http: HttpClient) { }
 
@@ -16,21 +17,24 @@ export class AppDashboardCollectionsViewService {
 
   getDefaultDashboards(): Observable<DashboardItem[]> {
     return this.http.get<any[]>(`/customer/dashboards/?type=preset&page_size=0`).pipe(
-      map(res => (res || []).map((d: any) => ({
-        id: d.id,
-        uuid: d.uuid,
-        name: d.name,
-        source: 'default' as const,
-        checked: false,
-        image_url: d.image_url,
-        description: d.description,
-        type: d.type,
-        status: d.status,
-        created_at: d.created_at,
-        updated_at: d.updated_at,
-        created_by: d.created_by,
-        defaultDashboardRoute: this.getDefaultDashboardRouteSegment(d.name)
-      })))
+      map(res => (res || []).map((d: any) => {
+        const defaultDashboardRoute = this.getDefaultDashboardRouteSegment(d.name);
+        return {
+          id: d.id,
+          uuid: d.uuid,
+          name: d.name,
+          source: 'default' as const,
+          checked: false,
+          image_url: d.image_url || this.getDefaultDashboardImageUrl(defaultDashboardRoute),
+          description: d.description,
+          type: d.type,
+          status: d.status,
+          created_at: d.created_at,
+          updated_at: d.updated_at,
+          created_by: d.created_by,
+          defaultDashboardRoute
+        };
+      }))
     );
   }
 
@@ -147,7 +151,7 @@ export class AppDashboardCollectionsViewService {
       .map(value => value.toString());
   }
 
-  getDefaultDashboardRouteSegment(name: string): string {
+  getDefaultDashboardRouteSegment(name: string): string | undefined {
     switch ((name || '').trim().toLowerCase()) {
       case 'infrastructure overview':
         return 'infrastructure';
@@ -172,6 +176,36 @@ export class AppDashboardCollectionsViewService {
       case 'unified aiops command centre':
       case 'unified aiops command centre dashboard':
         return 'unified-aiops-command-centre';
+    }
+  }
+
+  private getDefaultDashboardImageUrl(defaultDashboardRoute: string | undefined): string | undefined {
+    const imageName = this.getDefaultDashboardImageName(defaultDashboardRoute);
+    return imageName ? `${this.defaultDashboardImageBasePath}${imageName}` : undefined;
+  }
+
+  private getDefaultDashboardImageName(defaultDashboardRoute: string | undefined): string | undefined {
+    switch (defaultDashboardRoute) {
+      case 'application':
+        return 'application-default-main-section-fullpage.png';
+      case 'cloud-cost':
+        return 'cloud-cost-main-section-fullpage.png';
+      case 'database':
+        return 'database-main-section-fullpage.png';
+      case 'infrastructure':
+        return 'infrastructure-main-section-fullpage.png';
+      case 'iot-devices':
+        return 'iot-devices-main-section-fullpage.png';
+      case 'network-devices':
+        return 'network-devices-main-section-fullpage.png';
+      case 'orchestration':
+        return 'play-orchestration-main-section-fullpage.png';
+      case 'private-cloud-compute':
+        return 'private-cloud-compute-main-section-fullpage.png';
+      case 'public-cloud-compute':
+        return 'public-cloud-compute-main-section-fullpage.png';
+      case 'unified-aiops-command-centre':
+        return 'unified-aiops-command-centre-main-section-fullpage.png';
     }
   }
 }
