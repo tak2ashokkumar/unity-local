@@ -94,7 +94,7 @@ import { AppSecToDaysPipe } from 'src/app/app-filters/pipes';
       provide: DateAdapter,
       useFactory: adapterFactory
     }),
-    ModalModule.forRoot(),
+    // ModalModule.forRoot(),
     CollapseModule.forRoot(),
     DragDropModule,
     InfiniteScrollModule,

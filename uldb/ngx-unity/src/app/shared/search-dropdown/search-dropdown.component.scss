@@ -155,3 +155,12 @@
 .class-invalid {
   border: 1px solid #cc0000 !important;
 }
+
+.text-truncate {
+  display: inline-block;
+  max-width: 95%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}

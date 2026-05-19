@@ -187,6 +187,20 @@
   }
 }
 
+@media(min-width: 992px) {
+  .sidebar-lg-show.sidebar-minimized.unity-chatbot-open {
+    .notification-content {
+      width: calc(100% - 470px) !important;  // Minimized Sidebar(50px) + Unity Chatbot(420px) = 470px
+    }
+  }
+
+  .sidebar-lg-show.sidebar-minimized.unity-chatbot-open.modal-open {
+    .notification-content {
+      width: calc(100% - 50px) !important;  // Minimized Sidebar(50px) 
+    }
+  }
+}
+
 .tooltip.static {
   z-index: 1040 !important;
 }

@@ -1,3 +1,9 @@
+.chatbot-expanded-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+}
+
 .chatbot-button {
   position: fixed;
   bottom: 20px;
@@ -37,6 +43,54 @@
 .chatbot-pop-up.open {
   transform: scale(1);
   opacity: 1;
+}
+
+#chatbotPopUp {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--unity-chatbot-panel-width, 420px);
+  height: 100vh;
+  margin: 0 !important;
+  border-left: 1px solid #dfe8ed;
+  background: #f1fbfc;
+  box-shadow: -12px 0 28px rgba(31, 43, 55, 0.16);
+  opacity: 1;
+  transform: translateX(100%);
+  transform-origin: center right;
+  transition: transform 0.18s ease-out;
+  will-change: transform;
+  contain: layout paint;
+  pointer-events: none;
+}
+
+#chatbotPopUp.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+#chatbotPopUp>.card {
+  height: 100%;
+  max-height: none !important;
+  border: 0;
+  border-radius: 0;
+}
+
+#chatbotPopUp.expanded {
+  top: 2rem;
+  right: 50%;
+  bottom: auto;
+  width: calc(100vw - 3rem);
+  max-width: 1280px;
+  height: calc(100vh - 4rem);
+  border: 1px solid #dfe8ed;
+  border-radius: 0.6rem;
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.32);
+  transform: translateX(50%);
+}
+
+#chatbotPopUp.expanded>.card {
+  border-radius: 0.6rem;
 }
 
 .chatbot-pop-up .card {
@@ -503,4 +557,19 @@ b {
   color: #378ad8;
   background-color: #d8ecff;
   border-radius: 0.25rem !important;
+}
+
+.expanded-suggested-action {
+  background-color: transparent;
+  color: #378ad8;
+  cursor: pointer;
+  border: 1px solid #378ad8;
+  border-radius: 0.95rem !important;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.expanded-suggested-action:hover {
+  color: white;
+  background-color: #378ad8;
 }

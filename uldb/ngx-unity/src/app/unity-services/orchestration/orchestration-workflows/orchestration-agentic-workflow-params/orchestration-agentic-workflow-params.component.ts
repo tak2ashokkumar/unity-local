@@ -1181,6 +1181,12 @@ export class OrchestrationAgenticWorkflowParamsComponent implements OnInit {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(
         res => {
+          if (type === nodeTypes.UpdateITSMTicket && res?.fields?.length) {
+            res.fields = res.fields.filter(
+              (field: any) => field.field_type !== 'COMMENTS'
+            );
+          }
+
           this.processResponse(res, uuid, this.nodeData.node_type, form);
           this.spinner.stop('main');
         },

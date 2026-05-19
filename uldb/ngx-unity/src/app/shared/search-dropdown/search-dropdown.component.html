@@ -2,7 +2,7 @@
     <button class="dropbtn form-control" (click)="toggleDrop($event)" [ngClass]="{ 'class-invalid': hasError }">
         <ng-container *ngIf="selectedValue;else staticVal">
             <!-- <img src="{{selectedValue?.image}}" width="20" height="15"> -->
-            <span class="text-dark">{{selectedValue?.[displayField] || selectedValue}}</span>
+            <span class="text-dark text-truncate">{{selectedValue?.[displayField] || selectedValue}}</span>
         </ng-container>
         <ng-template #staticVal>
             Select {{defaultLabel}}

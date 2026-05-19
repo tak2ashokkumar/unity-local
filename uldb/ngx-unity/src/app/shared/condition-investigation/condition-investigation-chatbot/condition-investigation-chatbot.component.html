@@ -18,7 +18,7 @@
                             style="max-width: 100%;">
                             <ng-container *ngIf="chat.type == 'text'">
                                 <div class="message-box bot-message">
-                                    <markdown [data]="chat.message"></markdown>
+                                    <markdown (click)="onMarkdownClick($event)" [data]="chat.message"></markdown>
                                     <ng-container *ngIf="chat.actions?.length && chat.showAction">
                                         <div class="mt-2 font-500">Recommended Actions:</div>
                                         <div class="d-flex flex-wrap mt-2">
@@ -159,3 +159,26 @@
         </div>
     </div>
 </div>
+
+<ng-template #executeCommand>
+    <div class="card mb-0">
+        <div class="card-header font-500">
+            Confirm Command Execution
+            <div class="card-header-actions">
+                <a class="card-header-action btn-close" (click)="confirmExecutionModalRef.hide()">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div>Do you want to Execute this Command ?</div>
+            <div class="font-500 mt-2">{{command}}</div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
+            <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
+                type="button">No</button>
+        </div>
+    </div>
+</ng-template>

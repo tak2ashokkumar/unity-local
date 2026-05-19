@@ -21,6 +21,7 @@ export interface WSOption {
     rows?: number;
     cols?: number;
     conversation_id: string;
+    tab_type?: string;
     collector_uuid?: string;
 }
 
@@ -40,6 +41,9 @@ export class WSSHClient {
 
     private messageEvent = new Subject<any>();
     onMessage: Observable<any> = this.messageEvent.asObservable();
+
+    private pendingMessages: string[] = [];
+    private pendingResize: string | null = null;
 
     private _commandSent = false;
 
@@ -76,6 +80,13 @@ export class WSSHClient {
             return;
         }
         this.connection.onopen = (evt: Event) => {
+            while (this.pendingMessages.length) {
+                this.connection.send(this.pendingMessages.shift());
+            }
+            if (this.pendingResize) {
+                this.connection.send(this.pendingResize);
+                this.pendingResize = null;
+            }
             this.openEvent.next();
         };
 
@@ -92,6 +103,10 @@ export class WSSHClient {
                 }
             }
         };
+
+        window.addEventListener('beforeunload', () => {
+            this.close();
+        });
 
         this.connection.onclose = (evt: CloseEvent) => {
             this.closeEvent.next(evt.reason);
@@ -127,11 +142,17 @@ export class WSSHClient {
             password: this.wsOptions.password,
             conversation_id: this.wsOptions.conversation_id,
             collector_uuid: this.wsOptions.collector_uuid,
+            tab_type: this.wsOptions['tab_type']
         }));
     }
 
     sendResizeData(data: any) {
-        this.connection.send(JSON.stringify({ tp: 'resize', data: data }));
+        const payload = JSON.stringify({ tp: 'resize', data: data });
+        if (this.connection.readyState === WebSocket.OPEN) {
+            this.connection.send(payload);
+        } else {
+            this.pendingResize = payload;
+        }
     }
 
     // sendClientData(data: any) {
@@ -139,12 +160,20 @@ export class WSSHClient {
     // }
 
     sendClientData(data: any) {
-        this.connection.send(JSON.stringify({
+        const payload = JSON.stringify({
             type: 'input',
             data: data,
             conversation_id: this.wsOptions.conversation_id,
             collector_uuid: this.wsOptions.collector_uuid,
-        }));
+            tab_type: this.wsOptions['tab_type']
+        });
+        if (this.connection.readyState === WebSocket.OPEN) {
+            this.connection.send(payload);
+        } else if (this.connection.readyState === WebSocket.CONNECTING) {
+            this.pendingMessages.push(payload);
+        } else {
+            console.warn('WebSocket not available:', this.connection.readyState);
+        }
     }
 
     close() {

@@ -1,7 +1,6 @@
 <div class="row mx-1 my-2">
     <div class="col-12 float-right">
-        <data-refresh-btn [page]="currentCriteria.pageNo"
-        (refresh)="refreshData($event)"></data-refresh-btn>
+        <data-refresh-btn [page]="currentCriteria.pageNo" (refresh)="refreshData($event)"></data-refresh-btn>
     </div>
 </div>
 <div class="row mx-1 my-2">
@@ -133,34 +132,28 @@
             <div class="card-body py-2">
                 <div class="row d-flex justify-content-between pb-2 mx-0">
                     <div class="col-12 p-0 d-flex justify-content-between align-items-center pb-2 mx-0">
-                        <table-search-box (searched)="onSearched($event)"></table-search-box>
-                        <div class="d-flex w-50 justify-content-end">
-                            <div class="w-25">
-                                <multiselect-dropdown class="form-control mx-2 p-0" [options]="modules"
-                                    [settings]="moduleListSettings"
-                                    [(ngModel)]="currentCriteria.multiValueParam.module" [texts]="moduleSelectionTexts"
-                                    (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
-                            </div>
-                            <div class="mx-2">
-                                <select class="form-control mx-1" type="text"
-                                    [(ngModel)]="currentCriteria.params[0].reaction" (ngModelChange)="onFilterChange()">
-                                    <option [value]="null">Select Reaction</option>
-                                    <option [value]="'like'">Like</option>
-                                    <option [value]="'dislike'">Dislike</option>
-                                </select>
-                            </div>
-                            <div class="mx-2">
-                                <select class="form-control" type="text" [(ngModel)]="currentCriteria.params[0].status"
-                                    (ngModelChange)="onFilterChange()">
-                                    <option [value]="null">Select Status</option>
-                                    <option [value]="'success'">Success</option>
-                                    <option [value]="'failed'">Failed</option>
-                                </select>
-                            </div>
-                            <div>
-                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
-                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
-                            </div>
+                        <div class="w-17">
+                            <table-search-box (searched)="onSearched($event)"></table-search-box>
+                        </div>
+                        <div class="d-flex w-83 justify-content-end align-items-center">
+                            <multiselect-dropdown class="form-control w-15 mx-2 p-0" [options]="modules"
+                                [settings]="moduleListSettings" [(ngModel)]="currentCriteria.multiValueParam.module"
+                                [texts]="moduleSelectionTexts"
+                                (dropdownClosed)="onFilterChange()"></multiselect-dropdown>
+                            <select class="form-control w-15 mr-2" type="text"
+                                [(ngModel)]="currentCriteria.params[0].reaction" (ngModelChange)="onFilterChange()">
+                                <option [value]="null">Select Reaction</option>
+                                <option [value]="'like'">Like</option>
+                                <option [value]="'dislike'">Dislike</option>
+                            </select>
+                            <select class="form-control w-15 mr-2" type="text" [(ngModel)]="currentCriteria.params[0].status"
+                                (ngModelChange)="onFilterChange()">
+                                <option [value]="null">Select Status</option>
+                                <option [value]="'success'">Success</option>
+                                <option [value]="'failed'">Failed</option>
+                            </select>
+                            <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                (pageSizeChange)="pageSizeChange($event)"></table-page-size>
                         </div>
                     </div>
                     <table class="table table-sm text-left">
@@ -269,7 +262,7 @@
                         <div class="text-muted">Like/Dislike :</div>
                         <div class="ml-1">
                             <ng-container *ngIf="queryDetailsViewData.userReactionIcon; else noReaction">
-                                <i [ngClass]="queryDetailsViewData.userReactionIcon" ></i>
+                                <i [ngClass]="queryDetailsViewData.userReactionIcon"></i>
                             </ng-container>
                             <ng-template #noReaction>
                                 <span class="text-muted">---</span>

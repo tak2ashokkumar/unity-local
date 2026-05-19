@@ -74,6 +74,7 @@ export class ZabbixBmsDetailsService {
       'dns_name': [d.server.dns_name, [NoWhitespaceValidator]],
       'management_ip': [d.server.management_ip, [NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
       'domain': [d.server.domain, [NoWhitespaceValidator]],
+      'os_category': [d.os_category, [NoWhitespaceValidator]],
       'environment': [d.server.environment, [NoWhitespaceValidator]],
       'availability_status': [d.server.status, []],
       'serial_number': [d.server.serial_number, [NoWhitespaceValidator]],

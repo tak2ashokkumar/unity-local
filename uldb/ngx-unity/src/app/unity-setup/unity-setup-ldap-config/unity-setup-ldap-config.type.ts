@@ -6,6 +6,7 @@ export interface LDAPConfigType {
     dc: string;
     uuid: string;
     ldap_port: number;
+    collector: number;
     schedule_meta: UnityScheduleType;
 }
 

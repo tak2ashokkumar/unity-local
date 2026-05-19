@@ -86,33 +86,38 @@
                                         </div>
                                     </div>
                                     <div class="p-0 event-name mr-auto text-truncate">
-                                        <h6 class="mb-0 text-truncate">{{view.description}}</h6>
-                                        <div class="d-inline-flex">
+                                        <h6 class="mb-0 text-truncate" [tooltip]="view.description" container="body">
+                                            {{view.description}}</h6>
+                                        <div class="d-inline-flex w-100">
                                             <div class="p-0">
                                                 <span class="font-sm-xs text-muted">ID: </span>
                                                 <span class="font-sm-xs text-muted">{{view.id}}</span>
                                             </div>
-                                            <div class="border-left ml-2 pl-2">
-                                                <span class="font-sm-xs font-500"
-                                                    [ngClass]="[view.statusTextColor, 'text-capitalize']">{{view.conditionStatus}}</span>
+                                            <div class="border-left ml-2 pl-2 text-truncate w-50">
+                                                <span class="font-sm-xs font-500" container="body"
+                                                    [ngClass]="[view.statusTextColor, 'text-capitalize']"
+                                                    [tooltip]="view.conditionStatus">{{view.conditionStatus}}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="p-0 event-duration">
-                                        <span class="font-xs-sm font-500 text-truncate">
+                                        <span class="font-xs-sm font-500 d-inline-block w-100 text-truncate"
+                                            [tooltip]="view.conditionDuration" container="body">
                                             <i class="fas fa-history mr-1"></i>{{view.conditionDuration}}
                                         </span>
                                     </div>
                                 </div>
                                 <div class="d-flex">
                                     <span class="font-sm-xs text-muted">Hosts:&nbsp;</span>
-                                    <span class="font-sm-xs font-500 text-truncate w-65">{{view.hosts}}</span>
+                                    <span class="font-sm-xs font-500 text-truncate w-65" container="body"
+                                        [tooltip]="view.hosts">{{view.hosts}}</span>
                                     <div class="source-count d-inline-flex justify-content-center align-items-center font-xs font-500"
                                         *ngIf="view.conditionHostsRemaining">+{{view.conditionHostsRemaining}}
                                     </div>
                                 </div>
-                                <div class="d-flex">
-                                    <span class="font-sm-xs text-muted">Source Account:&nbsp;</span>
+                                <div class="d-flex w-100">
+                                    <span class="font-sm-xs text-muted"><span class="text-truncate w-34"
+                                            container="body">Source Account</span>:&nbsp;</span>
                                     <span
                                         class="font-sm-xs font-500 text-truncate w-65 text-capitalize">{{view.conditionSource}}</span>
                                     <div class="source-count d-inline-flex justify-content-center align-items-center font-xs font-500"
@@ -859,7 +864,8 @@
         <div class="d-flex justify-content-center align-items-center mb-3"
             *ngIf="aiRemediationViewData?.recommendedWorkflowFromUnityAI?.workflowName">
             <button class="btn btn-pill btn-warning btn-sm ml-2"
-                (click)="goToExecuteWorkflow(aiRemediationViewData?.recommendedWorkflowFromUnityAI)"> Execute Workflow
+                (click)="goToExecuteWorkflow(aiRemediationViewData?.recommendedWorkflowFromUnityAI)" accessControl
+                moduleName="DevOps Automation" accessType="Execute Workflow" elementType="btn"> Execute Workflow
             </button>
         </div>
 

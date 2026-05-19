@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Directive, ElementRef, HostBinding, HostListener, Inject, Injectable, Input, OnInit, Renderer2 } from '@angular/core';
+import { UnityChatbotService } from '../unity-chatbot/unity-chatbot.service';
 
 const SIDEBAR_CSS_CLASSES: string[] = [
     'sidebar-show',
@@ -62,15 +63,19 @@ export class SidebarMinimizeDirective {
     constructor(
         @Inject(DOCUMENT) private readonly document: Document,
         private renderer: Renderer2,
+        private chatbotService: UnityChatbotService
     ) { }
 
     @HostListener('click', ['$event'])
     toggleOpen($event: Event): void {
         $event.preventDefault();
         const body = this.document.body;
-        body.classList.contains('sidebar-minimized')
-            ? this.renderer.removeClass(body, 'sidebar-minimized')
-            : this.renderer.addClass(body, 'sidebar-minimized');
+        if (body.classList.contains('sidebar-minimized')) {
+            this.renderer.removeClass(body, 'sidebar-minimized');
+            this.chatbotService.onSidebarExpand();
+        } else {
+            this.renderer.addClass(body, 'sidebar-minimized');
+        }
     }
 }
 

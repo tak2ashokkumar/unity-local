@@ -40,7 +40,8 @@ export interface Hypervisor extends SNMPCrudType {
     username?: string;
     datacenter: DatacenterInDevice;
     dns_name: string;
-    domain:string;
+    domain: string;
+    os_category: string;
     discovery_method: string;
     first_discovered: string;
     environment: string;

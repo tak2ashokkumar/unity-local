@@ -75,3 +75,50 @@ ul li:last-child {
     height: 1.5rem !important;
     width: 1.5rem !important;
 }
+
+.task-summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+
+.task-widget-card-body {
+    padding: 0.5rem !important;
+}
+
+.task-summary-col {
+    min-width: 0;
+}
+
+.task-summary-total {
+    width: 12%;
+}
+
+.task-summary-type {
+    width: 38%;
+}
+
+.task-summary-target {
+    width: 26%;
+}
+
+.task-summary-status {
+    width: 24%;
+}
+
+
+.task-summary-inline {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.task-type-item {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    margin-right: 0.5rem;
+}

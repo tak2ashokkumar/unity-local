@@ -39,7 +39,7 @@
         <label class="font-col-form-label" for="collectorid">Collector<em>*</em></label>
         <select id="collectoruuid" class="form-control" formControlName="uuid"
           [class.is-invalid]="formErrors.collector.uuid">
-          <option value="''" disabled>Select Collector</option>
+          <option value="" disabled>Select Collector</option>
           <option *ngFor="let collector of collectors" [value]="collector.uuid">
             {{collector.name}}
           </option>
@@ -48,7 +48,6 @@
           {{formErrors.collector.uuid}}
         </div>
       </div>
-
       <div class="text-danger">{{formErrors.invalidCred}}</div>
 
     </form>

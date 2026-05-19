@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { AfterViewChecked, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import moment from 'moment';
@@ -26,7 +26,9 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   private annoucedNgUnsubscribe = new Subject();
 
   isOpen: boolean = false;
+  isExpanded: boolean = false;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+  @Output() chatbotStateChange = new EventEmitter<{ isOpen: boolean; isExpanded: boolean }>();
 
   imageURL: string = `${environment.assetsUrl}external-brand/logos/Chatbot_Logo.svg`
   form: FormGroup; botResponseId
@@ -40,7 +42,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   currentRouteUrl: string = ''
   showCommonQueries: boolean = true;
   commonQueries: string[] = [];
-  zIndex: string = '2155';
+  zIndex: string = '100';
   isHovered: boolean = false;
   activeModule: UntiyChatBotExploreMenu;
   feedbackForm: FormGroup;
@@ -72,6 +74,18 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   @ViewChild('fileInput') fileInput: ElementRef;
   fileUploadLoader: boolean = false;
   attachedFiles: ChatDocument[] = [];
+  get chatbotZIndex(): string {
+    if (this.isExpanded) {
+      return '3001';
+    }
+    return this.isOpen ? '100' : this.zIndex;
+  }
+
+  get backdropZIndex(): string {
+    const zIndexNumber = Number(this.chatbotZIndex);
+    return Number.isNaN(zIndexNumber) ? '3000' : `${zIndexNumber - 1}`;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -95,7 +109,7 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
         this.insights = [];
         this.showInsightsButton = this.hasInsights();
         const popUpElement = document.getElementById('insightsPopUp');
-        popUpElement.classList.remove("open");
+        popUpElement?.classList.remove("open");
       }
       const buttonElement = document.getElementById('chatbotButton');
       const insightsbuttonElement = document.getElementById('insightsButton');
@@ -114,8 +128,14 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     this.service.onChatTrigger$.subscribe(val => {
       if (val) {
         this.manageTabs(this.tabs[1]);
-        this.togglePopUp();
+        if (!this.isOpen) {
+          this.openChatbot();
+        }
       }
+    })
+    this.service.sidebarExpanded$.subscribe(res => {
+      console.log("toggle", this.isOpen)
+      this.isOpen && this.togglePopUp();
     })
   }
 
@@ -404,28 +424,59 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   togglePopUp() {
-    this.isOpen = !this.isOpen
-    const popUpElement = document.getElementById('chatbotPopUp');
+    this.isOpen ? this.closeChatbot() : this.openChatbot();
+  }
+
+  openChatbot() {
+    this.isOpen = true;
+    this.isExpanded = false;
     const buttonElement = document.getElementById('chatbotButton');
     const insightsbuttonElement = document.getElementById('insightsButton');
-    if (this.isOpen) {
+
+    if (!this.llmModels.length) {
       this.getAIModels();
-      if (this.selectedTab === 'Assistant' && this.modules.length) {
-        this.findCurrentModule();
-      }
-      popUpElement?.classList.add("open");
-      buttonElement?.classList.add("hidden");
-      insightsbuttonElement?.classList.add("hidden");
-    } else {
-      if (this.selectedTab === 'Assistant') {
-        this.modules.forEach(m => m.isActive = false);
-        const defQ = document.getElementById('defaultQueries');
-        defQ && (defQ.style.maxHeight = `0px`);
-      }
-      popUpElement?.classList.remove("open");
-      buttonElement?.classList.remove("hidden");
-      insightsbuttonElement?.classList.remove("hidden");
     }
+    if (this.selectedTab === 'Assistant' && this.modules.length) {
+      this.findCurrentModule();
+    }
+    buttonElement?.classList.add("hidden");
+    insightsbuttonElement?.classList.add("hidden");
+    this.emitChatbotState();
+  }
+
+  closeChatbot() {
+    this.isOpen = false;
+    this.isExpanded = false;
+    const buttonElement = document.getElementById('chatbotButton');
+    const insightsbuttonElement = document.getElementById('insightsButton');
+
+    if (this.selectedTab === 'Assistant') {
+      this.modules.forEach(m => m.isActive = false);
+      const defQ = document.getElementById('defaultQueries');
+      defQ && (defQ.style.maxHeight = `0px`);
+    }
+
+    buttonElement?.classList.remove("hidden");
+    insightsbuttonElement?.classList.remove("hidden");
+    this.emitChatbotState();
+  }
+
+  expandChatbot() {
+    if (!this.isOpen) {
+      return;
+    }
+    this.isExpanded = true;
+    this.emitChatbotState();
+  }
+
+  minimizeExpandedChatbot() {
+    this.isExpanded = false;
+    this.emitChatbotState();
+    this.expandDefaultQueries();
+  }
+
+  private emitChatbotState() {
+    this.chatbotStateChange.emit({ isOpen: this.isOpen, isExpanded: this.isExpanded });
   }
 
   findCurrentModule() {
@@ -610,13 +661,13 @@ export class UnityChatbotComponent implements OnInit, OnDestroy, AfterViewChecke
     const buttonElement = document.getElementById('chatbotButton');
     const insightsbuttonElement = document.getElementById('insightsButton');
     if (this.isInsightsOpen) {
-      popUpElement.classList.add("open");
-      buttonElement.classList.add("hidden");
-      insightsbuttonElement.classList.add("hidden");
+      popUpElement?.classList.add("open");
+      buttonElement?.classList.add("hidden");
+      insightsbuttonElement?.classList.add("hidden");
     } else {
-      popUpElement.classList.remove("open");
-      buttonElement.classList.remove("hidden");
-      insightsbuttonElement.classList.remove("hidden");
+      popUpElement?.classList.remove("open");
+      buttonElement?.classList.remove("hidden");
+      insightsbuttonElement?.classList.remove("hidden");
     }
   }
 

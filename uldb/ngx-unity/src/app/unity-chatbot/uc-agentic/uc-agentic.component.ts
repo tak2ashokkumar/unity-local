@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { ChatHistoryData, UcAgenticService, WorkflowType } from './uc-agentic.service';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -34,6 +34,11 @@ export class UcAgenticComponent implements OnInit {
     apiUrl: ''
   }
   moduleSpinner: boolean = false;
+  @Input() isExpanded: boolean = false;
+  @Input() tabs: any[] = [];
+  @Input() selectedTab: string = '';
+
+  @Output() tabChanged = new EventEmitter<any>();
 
   constructor(
     private svc: UcAgenticService,

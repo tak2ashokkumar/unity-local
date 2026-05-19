@@ -13,7 +13,7 @@
             </div>
             <div class="card-body p-2">
                 <div class="row d-flex justify-content-between">
-                    <div class="col-7">
+                    <div class="col">
                         <div class="card">
                             <div class="card-body py-2">
                                 <div class="row">
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-2 pl-0">
+                    <div class="col-3 pl-0">
                         <div class="card">
                             <div class="card-body py-2">
                                 <div class="row">
@@ -99,16 +99,21 @@
                             <div class="card-body py-2">
                                 <div class="row">
                                     <div class="col d-flex justify-content-around">
-                                        <div>
-                                            <div class="text-truncate font-sm">Highest Host</div>
-                                            <div class="text-primary font-lg-xl font-500">
-                                                {{clusterSummary?.highest_count?.highest_host[0] || 'NA'}}</div>
+                                        <div class="w-48">
+                                            <div class="text-truncate font-sm" tooltip="Highest Host">Highest Host
+                                            </div>
+                                            <div class="text-primary font-lg-xl font-500 text-truncate"
+                                                [tooltip]="clusterSummary?.highest_count?.highest_host?.[0] || 'NA'">
+                                                {{clusterSummary?.highest_count?.highest_host?.[0] || 'NA'}}</div>
                                         </div>
-                                        <div class="my-2 border border-secondary"></div>
-                                        <div>
-                                            <div class="text-truncate font-sm">Maximum Usage</div>
-                                            <div class="text-primary font-lg-xl font-500">
-                                                {{clusterSummary?.usage?.maximum_cpu_usage[0] || 'NA'}}</div>
+                                        <div class="my-2 border border-secondary mx-2"></div>
+                                        <div class="w-48">
+                                            <div class="text-truncate font-sm" tooltip="Maximum Usage">
+                                                Maximum Usage
+                                            </div>
+                                            <div class="text-primary font-lg-xl font-500 text-truncate"
+                                                [tooltip]="clusterSummary?.usage?.maximum_cpu_usage?.[0] || 'NA'">
+                                                {{clusterSummary?.usage?.maximum_cpu_usage?.[0] || 'NA'}}</div>
                                         </div>
                                     </div>
                                 </div>

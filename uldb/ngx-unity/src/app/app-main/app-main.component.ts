@@ -20,11 +20,21 @@ import { PermissionService } from '../shared/unity-rbac-permissions/unity-rbac-p
 })
 export class AppMainComponent implements OnInit, OnDestroy {
   private readonly ngUnsubscribe = new Subject<void>();
+  private readonly sidebarMinimizedClass = 'sidebar-minimized';
+  private readonly brandMinimizedClass = 'brand-minimized';
+  private readonly chatbotOpenClass = 'unity-chatbot-open';
+  private readonly chatbotExpandedClass = 'unity-chatbot-expanded';
+  private sidebarWasMinimizedBeforeChat = false;
+  private brandWasMinimizedBeforeChat = false;
+  private chatbotChangedSidebar = false;
   assetsUrl: string = environment.assetsUrl;
   unityLogo: string = this.assetsUrl + 'brand/Unityone-AI.png';
   public navItems: UnityNavData[] = [];
   public sidebarMinimized = true;
   public sidebarHidden = false;
+  public unityChatbotOpen = false;
+  public unityChatbotExpanded = false;
+  public modalOpen = false;
   private changes: MutationObserver;
   public element: HTMLElement;
   mainWidth = 0;
@@ -33,7 +43,8 @@ export class AppMainComponent implements OnInit, OnDestroy {
   isPlayground: boolean;
 
   public trialPopupOpen = false;
-  constructor(private reportService: ReportAnIssueService,
+  constructor(private appMainSvc: AppMainService,
+    private reportService: ReportAnIssueService,
     private searchService: AppSearchService,
     public user: UserInfoService,
     public appService: AppLevelService,
@@ -41,7 +52,8 @@ export class AppMainComponent implements OnInit, OnDestroy {
     public mapService: MapService,
     private terminalService: FloatingTerminalService,
     private mainService: AppMainService,
-    @Inject(DOCUMENT) private readonly document: Document) { }
+    @Inject(DOCUMENT) private readonly document: Document) {
+  }
 
   ngOnInit() {
     // Nav items and custom tenant logo
@@ -58,7 +70,12 @@ export class AppMainComponent implements OnInit, OnDestroy {
       const body = this.document.body;
       this.sidebarMinimized = body.classList.contains('sidebar-minimized');
       this.sidebarHidden = !body.classList.contains('sidebar-lg-show');
-      this.mainWidth = this.sidebarHidden ? 0 : this.sidebarMinimized ? 50 : 225;
+      this.unityChatbotOpen = body.classList.contains('unity-chatbot-open');
+      this.modalOpen = body.classList.contains('modal-open');
+      const isChatbotActive = this.unityChatbotOpen && !this.modalOpen;
+      const chatbotWidth = isChatbotActive ? 420 : 0;
+      this.mainWidth = this.sidebarHidden ? 0 : this.sidebarMinimized ? 50 + chatbotWidth : 225;
+      this.appMainSvc.sidebarChanges(chatbotWidth);
     });
     this.changes.observe(this.element, {
       attributes: true,
@@ -78,6 +95,8 @@ export class AppMainComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearChatbotShellState();
+    this.restoreSidebarAfterChatbot();
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
     this.changes.disconnect();
@@ -110,5 +129,60 @@ export class AppMainComponent implements OnInit, OnDestroy {
 
   openFreeTrial() {
     window.open('https://unityone.ai/free-trial/', '_blank');
+  }
+
+  onChatbotStateChange(state: { isOpen: boolean; isExpanded: boolean }): void {
+    this.applyChatbotShellState(state);
+
+    if (state.isOpen) {
+      this.minimizeSidebarForChatbot();
+    } else {
+      this.restoreSidebarAfterChatbot();
+    }
+  }
+
+  private applyChatbotShellState(state: { isOpen: boolean; isExpanded: boolean }): void {
+    const body = this.document.body;
+    body.classList.toggle(this.chatbotOpenClass, state.isOpen);
+    body.classList.toggle(this.chatbotExpandedClass, state.isOpen && state.isExpanded);
+  }
+
+  private clearChatbotShellState(): void {
+    const body = this.document.body;
+    body.classList.remove(this.chatbotOpenClass);
+    body.classList.remove(this.chatbotExpandedClass);
+  }
+
+  private minimizeSidebarForChatbot(): void {
+    if (this.chatbotChangedSidebar) {
+      return;
+    }
+    const body = this.document.body;
+    this.sidebarWasMinimizedBeforeChat = body.classList.contains(this.sidebarMinimizedClass);
+    this.brandWasMinimizedBeforeChat = body.classList.contains(this.brandMinimizedClass);
+    this.chatbotChangedSidebar = true;
+
+    if (!this.sidebarWasMinimizedBeforeChat) {
+      body.classList.add(this.sidebarMinimizedClass);
+    }
+    if (!this.brandWasMinimizedBeforeChat) {
+      body.classList.add(this.brandMinimizedClass);
+    }
+  }
+
+  private restoreSidebarAfterChatbot(): void {
+    if (!this.chatbotChangedSidebar) {
+      return;
+    }
+    const body = this.document.body;
+    if (!this.sidebarWasMinimizedBeforeChat) {
+      body.classList.remove(this.sidebarMinimizedClass);
+    }
+    if (!this.brandWasMinimizedBeforeChat) {
+      body.classList.remove(this.brandMinimizedClass);
+    }
+    this.sidebarWasMinimizedBeforeChat = false;
+    this.brandWasMinimizedBeforeChat = false;
+    this.chatbotChangedSidebar = false;
   }
 }

@@ -9,6 +9,7 @@ export interface BMServer {
     bm_controller: Bm_controller;
     observium_status: number;
     uuid: string;
+    os_category: string;
     created_at: string;
     updated_at: string;
     management_ip: string;

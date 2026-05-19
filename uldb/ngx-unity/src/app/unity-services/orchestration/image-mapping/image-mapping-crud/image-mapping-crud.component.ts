@@ -113,6 +113,9 @@ export class ImageMappingCrudComponent implements OnInit, OnDestroy {
     this.formErrors = this.svc.resetFormErrors();
     this.formValidationMessages = this.svc.formValidationMessages;
     if (this.imageMapId) {
+      this.selectedOsType = this.mappingData.os_type;
+      this.selectedOsName = this.mappingData.os_name;
+      this.selectedOsVersion = this.mappingData.os_version;
       this.osNames = Array.from(new Set(this.OSInfoList.filter(item => item.os_type === this.form.get('os_type').value).map(item => item.os_name)));
       this.osVersions = Array.from(new Set(this.OSInfoList.filter(item => item.os_type === this.mappingData.os_type && item.os_name === this.mappingData.os_name).map(item => item.os_version)));
       this.osEditions = Array.from(new Set(this.OSInfoList.filter(item => item.os_type === this.mappingData.os_type && item.os_name === this.mappingData.os_name && item.os_version === this.mappingData.os_version).map(item => item.os_edition)));

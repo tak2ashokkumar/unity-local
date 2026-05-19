@@ -10,6 +10,7 @@ import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.servic
 import { ChartNames, ExecutionsOverviewViewData, ExecutionsSummaryViewData, OrchestrationSummaryService, RecentFailureViewModel, TaskWidgetViewData, UpccomingExecutionViewModel, WorkflowWidgetViewData } from './orchestration-summary.service';
 import { UnityChatbotService } from 'src/app/unity-chatbot/unity-chatbot.service';
 import { UserInfoService } from 'src/app/shared/user-info.service';
+import { AppMainService } from 'src/app/app-main/app-main.service';
 
 @Component({
   selector: 'orchestration-summary',
@@ -34,7 +35,8 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private aiService: UnityChatbotService,
-    private userInfoService: UserInfoService) {
+    private userInfoService: UserInfoService,
+    private appService: AppMainService,) {
   }
 
   ngOnInit(): void {
@@ -213,8 +215,14 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
   }
 
   execute(data: any) {
+    console.log(data, "data")
     if (data.type == "Task") {
       this.router.navigate(['tasks', data.taskOrWorkflowId, data.targetType, 'execute'], { relativeTo: this.route.parent });
+    } else if (data.triggerType && data.triggerType !== 'chat-trigger') {
+      this.router.navigate(['workflows', data.taskOrWorkflowId, data.triggerType], { relativeTo: this.route.parent });
+    } else if (data.triggerType === 'chat-trigger') {
+      this.aiService.onChatTrigger$.next(true);
+      this.appService.$assistantData.next({ sourceName: 'workflow', apiUrl: `/rest/orchestration/agentic_workflow/${data.uuid}/chat/`, entityId: data.uuid, entity: data.name });
     } else {
       this.router.navigate(['workflows', data.taskOrWorkflowId, 'execute'], { relativeTo: this.route.parent });
     }
@@ -223,6 +231,8 @@ export class OrchestrationSummaryComponent implements OnInit, OnDestroy {
   schedule(data: UpccomingExecutionViewModel) {
     if (data.type == "Task") {
       this.router.navigate(['tasks', data.taskOrWorkflowId, data.targetType, 'scheduleTasks'], { relativeTo: this.route.parent });
+    } else if (data.triggerType) {
+      this.router.navigate(['workflows', data.taskOrWorkflowId, data.triggerType], { relativeTo: this.route.parent });
     } else {
       this.router.navigate(['workflows', data.taskOrWorkflowId, data.targetType, 'scheduleWorkflow'], { relativeTo: this.route.parent });
     }

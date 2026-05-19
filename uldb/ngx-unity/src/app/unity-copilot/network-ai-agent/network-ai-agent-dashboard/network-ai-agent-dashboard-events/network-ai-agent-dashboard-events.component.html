@@ -4,7 +4,7 @@
             <span class="badge badge-pill badge-secondary">{{count}}</span>
             <span class="ml-1">Events</span>
         </div>
-        <div class="col-8 d-flex justify-content-center align-items-center">
+        <div class="col-7 d-flex justify-content-center align-items-center">
             <form *ngIf="filterForm" [formGroup]="filterForm" class="row w-100">
                 <div class="col-3 pr-0">
                     <div class="input-group">
@@ -17,7 +17,7 @@
                             id="search_key" placeholder="Enter Keyword">
                     </div>
                 </div>
-                <div class="col-4 form-group mb-0 pr-0">
+                <div class="col-3 form-group mb-0 pr-0">
                     <multiselect-dropdown [options]="deviceTypes" [settings]="deviceTypeSettings"
                         class="form-control w-100 p-0" style="height:auto;"
                         formControlName="device_type"></multiselect-dropdown>

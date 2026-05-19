@@ -1940,11 +1940,11 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
 
 
   getDetailsOfSelectedSourceTask(node: NodeDataModel, nodeId?: any) {
-    const isToolId = typeof nodeId === 'string' ? true : false;
+    const isToolId = typeof nodeId === 'string';
     const lastToolId = this.getLatestNodeIdForAITools();
 
     if (isToolId && this.workFlowData) {
-      nodeId = lastToolId ? `tool-${lastToolId + 1}` : `tool-${nodeId}`;
+      nodeId = lastToolId ? `tool-${lastToolId + 1}` : nodeId;
     }
 
     this.spinner.start('main');
@@ -2003,10 +2003,10 @@ export class OrchestrationAgenticWorkflowContainerComponent implements OnInit {
   }
 
   saveWorkFlow() {
-    const hasNodeErrors  = this.nodeDetailsArr?.some(node => this.hasAnyErrors(node.formErrors)) ?? false;
-    const hasToolErrors = this.toolsArr?.some(group => group?.data?.some(tool => tool?.hasErrors )) ?? false;
+    const hasNodeErrors = this.nodeDetailsArr?.some(node => this.hasAnyErrors(node.formErrors)) ?? false;
+    const hasToolErrors = this.toolsArr?.some(group => group?.data?.some(tool => tool?.hasErrors)) ?? false;
     console.log(this.toolsArr, "Tools Arr")
-    if (hasNodeErrors  || hasToolErrors) {
+    if (hasNodeErrors || hasToolErrors) {
       this.notification.error(new Notification('Workflow cannot be saved due to configuration errors in one or more nodes.'));
       return
     }

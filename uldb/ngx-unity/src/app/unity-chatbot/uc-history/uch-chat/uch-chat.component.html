@@ -1,9 +1,13 @@
 <div class="custom-gradient-bg d-flex flex-column overflow-hidden pb-0 pt-1 px-1 border-top"
     style="height: calc(100%);">
-    <div class="d-flex align-items-center m-2">
-        <button class="action-icons action-icon-small fa fa-arrow-left" container="body" tooltip="Back"
-            (click)="backToHistoryList()"></button>
-        <h6 class="ml-2 mb-1">History Chat</h6>
+    <div class="row mx-0">
+        <div [ngClass]="isExpanded ? 'col-8 offset-2 p-0' : 'col-12 p-0'">
+            <div class="d-flex align-items-center m-2">
+                <button class="action-icons action-icon-small fa fa-arrow-left" container="body" tooltip="Back"
+                    (click)="backToHistoryList()"></button>
+                <h6 class="ml-2 mb-1">History Chat</h6>
+            </div>
+        </div>
     </div>
     <div #messagesContainer class="d-flex flex-column justify-content-between h-100 overflow-hidden scroll-container">
         <ng-container *ngIf="!chatHistoryData?.length">
@@ -12,7 +16,9 @@
                 <span class="ml-2 ">Loading</span>
             </div>
         </ng-container>
-        <div #chatContainer class="h-100 w-100" style="overflow-y: auto; overflow-x: hidden;" (scroll)="onScroll()">
+        <div #chatContainer class="h-100 w-100" [style.padding-left]="isExpanded ? '16.66%' : '0'"
+            [style.padding-right]="isExpanded ? '16.66%' : '0'" style="overflow-y: auto; overflow-x: hidden;"
+            (scroll)="onScroll()">
             <div *ngFor="let chat of chatHistoryData; let i = index; trackBy: trackByMessage"
                 class="d-flex flex-column w-100" style="max-width: 100%;">
                 <div *ngIf="chat.user == 'bot'" class="d-flex flex-column justify-content-start mb-1 w-100"
@@ -83,7 +89,8 @@
                 </div>
             </div>
         </virtual-scroller> -->
-        <form *ngIf="form" [formGroup]="form" class="w-100 mt-auto p-2">
+        <form *ngIf="form" [formGroup]="form" class="w-100 mt-auto"
+            [style.padding]="isExpanded ? '0.5rem 16.66%' : '0.5rem'">
             <div class="round-edge bg-white w-100 form-wrapper">
                 <div *ngIf="attachedFiles.length" class="d-flex flex-wrap align-items mt-2 mx-1">
                     <div class="m-1 file-name border" *ngFor="let file of attachedFiles">

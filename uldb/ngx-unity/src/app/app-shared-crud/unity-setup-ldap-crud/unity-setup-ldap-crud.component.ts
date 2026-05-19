@@ -3,7 +3,7 @@ import { UnitySetupLdapCrudService } from './unity-setup-ldap-crud.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
-import { takeUntil } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -11,6 +11,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { UnityScheduleService } from '../../shared/unity-schedule/unity-schedule.service';
 import { LDAPConfigType } from 'src/app/unity-setup/unity-setup-ldap-config/unity-setup-ldap-config.type';
+import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
 @Component({
   selector: 'unity-setup-ldap-crud',
@@ -28,6 +29,7 @@ export class UnitySetupLdapCrudComponent implements OnInit, OnDestroy {
   credentialFormErrors: any;
   credentialFormValidationMessages: any;
   credentialFormData: any;
+  collectors: DeviceDiscoveryAgentConfigurationType[] = [];
 
   activeForm: string = 'credentialForm';
   nonFieldErr: string = '';
@@ -47,6 +49,7 @@ export class UnitySetupLdapCrudComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinner.start('main');
+    this.getCollectors()
     if (this.ldapConfigId) {
       this.getLDAPConfigDetails();
     } else {
@@ -58,6 +61,15 @@ export class UnitySetupLdapCrudComponent implements OnInit, OnDestroy {
     this.spinner.stop('main');
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+  }
+
+  getCollectors() {
+    this.crudSvc.getCollectors()
+      .pipe(takeUntil(this.ngUnsubscribe), map((collectors: any) =>
+        collectors.filter(collector => collector.deployment_status === 1)
+      )).subscribe(filteredCollectors => {
+        this.collectors = filteredCollectors;
+      });
   }
 
   getLDAPConfigDetails() {

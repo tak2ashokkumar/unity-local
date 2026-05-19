@@ -510,12 +510,13 @@
                                                             {{template.name}}
                                                         </option>
                                                     </select>
-                                                    <div class="invalid-feedback" *ngIf="formErrors?.inputs[i]?.template">
+                                                    <div class="invalid-feedback"
+                                                        *ngIf="formErrors?.inputs[i]?.template">
                                                         {{formErrors?.inputs[i]?.template}}
                                                     </div>
                                                 </div>
                                                 <div class="col-2"
-                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Input Template' && attributeList[i]?.length > 0">
+                                                    *ngIf="form.controls.inputs.controls[i].get('param_type').value == 'Input Template' && form.controls.inputs.controls[i].get('template').value  && attributeList[i]?.length > 0">
                                                     <select class="form-control text-dark" type="text"
                                                         formControlName="attribute"
                                                         [class.is-invalid]="formErrors?.inputs[i]?.attribute">

@@ -1,7 +1,8 @@
 <div class="row">
     <div class="col-12 p-0">
-        <div class="row mt--3">
-            <div class="col-2 pr-1">
+        <div class="summary-row">
+
+            <div class="summary-col summary-col-total pl-0 pr-1">
                 <div class="card mb-0 equalize-card">
                     <div class="card-body py-2 my-1">
                         <div class="card-title mb-0">Total Workflow</div>
@@ -9,70 +10,89 @@
                     </div>
                 </div>
             </div>
-            <div class="col-3 px-1">
+
+            <div class="summary-col summary-col-execution px-1">
                 <div class="card mb-0 equalize-card">
                     <div class="card-body py-2 my-1">
                         <div class="card-title mb-0">Execution Status</div>
-                        <div class="row">
-                            <div class="col-12 d-flex flex-column">
-                                <div class="row m-0 p-0">
-                                    <div class="col-4 m-0 p-0"
-                                        *ngFor="let statusItem of summaryViewData?.executionStatus; let i = index">
-                                        <span class="text-muted text-sm mr-2" [tooltip]="statusItem.tooltipMessage">
-                                            <i [class]="statusItem.statusIcon"></i>
-                                        </span>
-                                        <span class="text-primary mr-2 text-value-sm pointer-link">{{ statusItem.count
-                                            }}</span>
-                                    </div>
-                                </div>
+
+                        <div class="summary-inline">
+                            <div class="summary-status-item"
+                                *ngFor="let statusItem of summaryViewData?.executionStatus; let i = index">
+
+                                <span class="text-muted text-sm mr-2" [tooltip]="statusItem.tooltipMessage">
+                                    <i [class]="statusItem.statusIcon"></i>
+                                </span>
+
+                                <span class="text-primary mr-2 text-value-sm pointer-link">
+                                    {{ statusItem.count }}
+                                </span>
+
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
-            <div class="col-2 px-1">
+
+            <div class="summary-col summary-col-status px-1">
                 <div class="card mb-0 equalize-card">
                     <div class="card-body py-2 my-1">
                         <div class="card-title mb-0">Status</div>
-                        <div class="row">
-                            <div class="col-12 d-flex flex-column">
-                                <div class="row m-0 p-0">
-                                    <span class="m-0 p-0"
-                                        *ngFor="let statusItem of summaryViewData?.status; let i=index">
-                                        <span class="text-muted text-sm">{{statusItem?.name}}
-                                            : </span>
-                                        <span class="text-primary text-value-sm pointer-link">{{
-                                            statusItem.count}}</span>
-                                        <span *ngIf="i !== last" class="mx-1 my-1 border border-secondary"></span>
-                                    </span>
-                                </div>
-                            </div>
+
+                        <div class="summary-inline">
+                            <span class="summary-wrap-item"
+                                *ngFor="let statusItem of summaryViewData?.status; let i=index">
+
+                                <span class="text-muted text-sm">
+                                    {{statusItem?.name}} :
+                                </span>
+
+                                <span class="text-primary text-value-sm pointer-link">
+                                    {{ statusItem.count}}
+                                </span>
+
+                                <span *ngIf="i !== last" class="mx-1 my-1 border border-secondary">
+                                </span>
+
+                            </span>
                         </div>
+
                     </div>
                 </div>
             </div>
-            <div class="col-5 pl-1">
+
+            <div class="summary-col summary-col-category pl-1 pr-0">
                 <div class="card mb-0 equalize-card">
                     <div class="card-body py-2 my-1">
                         <div class="card-title mb-0">Category</div>
-                        <div class="row">
-                            <div class="col-12 d-flex flex-column">
-                                <div class="row m-0 p-0">
-                                    <span class="m-0 p-0" *ngFor="let c of summaryViewData?.categories; let i = index">
-                                        <span class="text-muted text-sm mr-1">{{ c?.categoryName }}: </span>
-                                        <span class="text-primary mr-3 text-value-sm pointer-link">{{ c?.count}}</span>
-                                    </span>
-                                    <span class="m-0 p-0" *ngIf="!summaryViewData?.categories?.length">
-                                        <span class="text-muted font-lg-xl mr-1">NA</span>
-                                    </span>
-                                </div>
-                            </div>
+
+                        <div class="summary-inline">
+
+                            <span class="summary-wrap-item"
+                                *ngFor="let c of summaryViewData?.categories; let i = index">
+
+                                <span class="text-muted text-sm mr-1">
+                                    {{ c?.categoryName }}:
+                                </span>
+
+                                <span class="text-primary mr-3 text-value-sm pointer-link">
+                                    {{ c?.count}}
+                                </span>
+
+                            </span>
+
+                            <span *ngIf="!summaryViewData?.categories?.length">
+                                <span class="text-muted font-lg-xl mr-1">NA</span>
+                            </span>
+
                         </div>
+
                     </div>
                 </div>
             </div>
-        </div>
 
+        </div>
         <div class="card mt-2">
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-2">
                 <div class="d-flex justify-content-center align-items-center font-500">
@@ -156,8 +176,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let view of viewData; let i = index;" setTableColumnWidth truncateText>
-                            <td class="tdw-20">
+                        <tr *ngFor="let view of viewData; let i = index;" truncateText>
+                            <td class="tdw-25">
                                 <div class="text-truncate" [tooltip]="view.name">
                                     <img [src]="agenticIcon" *ngIf="view.is_agentic" alt="Workflow Icon" class="mr-2"
                                         style="width: 20px; height: 20px; object-fit: contain;" />
@@ -166,12 +186,12 @@
                                     <span class="text-truncate">{{ view.name }}</span>
                                 </div>
                             </td>
-                            <td class="tdw-10">
+                            <td class="tdw-15">
                                 <div class="text-truncate" [tooltip]="view.categoryName">
                                     {{view.categoryName}}
                                 </div>
                             </td>
-                            <td class="tdw-10">
+                            <td class="tdw-15">
                                 <div class="text-truncate" [tooltip]="view.categoryName">
                                     {{view.trigger_type}}
                                 </div>
@@ -181,12 +201,12 @@
                                     {{view.totalTask}}
                                 </div>
                             </td>
-                            <td class="tdw-15">
+                            <td class="tdw-20">
                                 <div class="text-truncate" [tooltip]="view.createdAt">
                                     {{view.createdAt}}
                                 </div>
                             </td>
-                            <td class="tdw-20 text-center">
+                            <td class="status-toggle-column text-center">
                                 <div class="d-inline-block" style="vertical-align: middle !important;" accessControl
                                     moduleName="DevOps Automation" accessType="Manage Workflow" elementType="div">
                                     <ul class="d-flex px-0 mb-0 ml-5">

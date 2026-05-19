@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConditionInvestigationNewTerminalService {
   private conversationId: string;
+  private pendingTabType: 'sameTab' | 'newTab' = 'sameTab';
+  private backendTabId: string | null = null;
 
   private openModalSource = new Subject<void>();
   openModal$ = this.openModalSource.asObservable();
@@ -15,6 +17,9 @@ export class ConditionInvestigationNewTerminalService {
 
   private conversationIdSource = new Subject<string>();
   conversationId$ = this.conversationIdSource.asObservable();
+
+  private backendTabIdSource = new BehaviorSubject<string | null>(null);
+  backendTabId$ = this.backendTabIdSource.asObservable();
 
   constructor() { }
 
@@ -33,5 +38,22 @@ export class ConditionInvestigationNewTerminalService {
 
   getConversationId(): string {
     return this.conversationId;
+  }
+
+  setPendingTabType(type: 'sameTab' | 'newTab') {
+    this.pendingTabType = type;
+  }
+
+  getPendingTabType(): 'sameTab' | 'newTab' {
+    return this.pendingTabType;
+  }
+
+  setBackendTabId(tabId: string | null) {
+    this.backendTabId = tabId;
+    this.backendTabIdSource.next(tabId); //emit to subscribers
+  }
+
+  getBackendTabId(): string | null {
+    return this.backendTabId;
   }
 }

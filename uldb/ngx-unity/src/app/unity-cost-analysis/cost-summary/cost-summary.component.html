@@ -296,12 +296,12 @@
                             <div class="col pb-3" *ngIf="trailingTwelveMonthsViewData?.topUsageByCloudType">
                                 <span class="font-lg font-500">Top Usage By Cloud Type</span>
                                 <div class="align-items-center justify-content-between row pt-1">
-                                    <div class="col">
+                                    <div class="col-5">
                                         <img class="trailing-cloud-img"
                                             [src]="trailingTwelveMonthsViewData?.topUsageByCloudType?.cloudImg"
                                             [alt]="trailingTwelveMonthsViewData?.topUsageByCloudType?.cloudType" />
                                     </div>
-                                    <div class="col-4 align-items-center d-flex font-lg">
+                                    <div class="col-auto align-items-center d-flex font-lg">
                                         <span
                                             class="px-2 text-primary">${{trailingTwelveMonthsViewData?.topUsageByCloudType?.totalCost}}</span>
                                         <!-- <p class="font-md m-0"
@@ -320,12 +320,12 @@
                             <div class="col pb-3" *ngIf="trailingTwelveMonthsViewData?.topUsageByCloudAccount">
                                 <span class="font-lg font-500">Top Usage By Cloud</span>
                                 <div class="align-items-center justify-content-between row pt-1">
-                                    <div class="col">
+                                    <div class="col-5">
                                         <img class="trailing-cloud-img"
                                             [src]="trailingTwelveMonthsViewData?.topUsageByCloudAccount?.cloudImg"
                                             [alt]="trailingTwelveMonthsViewData?.topUsageByCloudAccount?.cloudType" />
                                     </div>
-                                    <div class="col-4 align-items-center d-flex font-lg">
+                                    <div class="col-auto align-items-center d-flex font-lg">
                                         <span
                                             class="px-2 text-primary">${{trailingTwelveMonthsViewData?.topUsageByCloudAccount?.totalCost}}</span>
                                         <!-- <p class="font-md m-0"
@@ -347,12 +347,12 @@
                             <div class="col pb-3" *ngIf="trailingTwelveMonthsViewData?.topUsageByService">
                                 <span class="font-lg font-500">Top Usage By Service</span>
                                 <div class="align-items-center justify-content-between row pt-1">
-                                    <div class="col">
+                                    <div class="col-5">
                                         <img class="trailing-cloud-img"
                                             [src]="trailingTwelveMonthsViewData?.topUsageByService?.cloudImg"
                                             [alt]="trailingTwelveMonthsViewData?.topUsageByService?.cloudType" />
                                     </div>
-                                    <div class="col-4 align-items-center d-flex font-lg">
+                                    <div class="col-auto align-items-center d-flex font-lg">
                                         <span
                                             class="px-2 text-primary">${{trailingTwelveMonthsViewData?.topUsageByService?.totalCost}}</span>
                                         <!-- <p class="font-md m-0"

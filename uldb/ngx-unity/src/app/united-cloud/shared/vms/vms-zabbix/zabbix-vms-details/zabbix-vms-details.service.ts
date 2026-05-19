@@ -80,6 +80,7 @@ export class ZabbixVmsDetailsService {
     let form = this.builder.group({
       'name': [{ value: d.name, disabled: true }, [Validators.required, NoWhitespaceValidator]],
       'dns_name': [d.dns_name, [NoWhitespaceValidator]],
+      'os_category': [d.os_category, [NoWhitespaceValidator]],
       // 'ip_address': [d.ip_address, [NoWhitespaceValidator, RxwebValidators.ip({ version: IpVersion.AnyOne })]],
       'domain': [d.domain, [NoWhitespaceValidator]],
       'environment': [d.environment, [NoWhitespaceValidator]],
@@ -108,7 +109,7 @@ export class ZabbixVmsDetailsService {
       'uptime': [{ value: d.uptime, disabled: true }, [NoWhitespaceValidator]],
       'last_rebooted': [{ value: d.last_rebooted, disabled: true }, [NoWhitespaceValidator]],
       'description': [d.description, [NoWhitespaceValidator]],
-      'note': [d.note, [NoWhitespaceValidator]],      
+      'note': [d.note, [NoWhitespaceValidator]],
       'life_cycle_stage': [d.life_cycle_stage ? d.life_cycle_stage : 'Operational', [NoWhitespaceValidator]],
       'life_cycle_stage_status': [d.life_cycle_stage_status ? d.life_cycle_stage_status : 'In Use', [NoWhitespaceValidator]]
     })

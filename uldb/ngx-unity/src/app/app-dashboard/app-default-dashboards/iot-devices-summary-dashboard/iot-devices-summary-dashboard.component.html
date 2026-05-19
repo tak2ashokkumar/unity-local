@@ -29,7 +29,7 @@
         <div class="col-3 pr-0">
             <ng-container *ngTemplateOutlet="statusByGroupWidgetRef"></ng-container>
         </div>
-        <div class="col pl-2">
+        <div class="col-9 pl-2">
             <ng-container *ngTemplateOutlet="smartPDUsWidgetRef"></ng-container>
         </div>
     </div>
@@ -39,10 +39,10 @@
         </div>
     </div>
     <div class="row mx-0 my-2">
-        <div class="col pr-1">
+        <div class="col-6">
             <ng-container *ngTemplateOutlet="humidityWidgetRef"></ng-container>
         </div>
-        <div class="col pl-1">
+        <div class="col-6 pl-0">
             <ng-container *ngTemplateOutlet="airflowWidgetRef"></ng-container>
         </div>
     </div>
@@ -308,22 +308,22 @@
             <table class="table table-sm font-sm text-left mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th>Name</th>
-                        <th>Current Phase Load (A)</th>
-                        <th>Voltage (V)</th>
-                        <th>Power (W)</th>
+                        <th class="w-25">Name</th>
+                        <th class="w-25">Current Phase Load (A)</th>
+                        <th class="w-20">Voltage (V)</th>
+                        <th class="w-20">Power (W)</th>
                         <!-- <th>Outlet Status</th> -->
-                        <th>Status</th>
+                        <th class="w-10">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let view of smartPDUsViewData" truncateText>
-                        <td class="text-primary tdw-30">
+                        <td class="text-primary tdw-25">
                             <button class="btn btn-link text-decoration-none p-0 table-column-btn font-500"
                                 type="button" [tooltip]="view.name"
                                 (click)="goToDeviceDetails(view)">{{view.name}}</button>
                         </td>
-                        <td class="tdw-20">
+                        <td class="tdw-25">
                             <div [tooltip]="view.current">{{view.current}}</div>
                         </td>
                         <td class="tdw-20">

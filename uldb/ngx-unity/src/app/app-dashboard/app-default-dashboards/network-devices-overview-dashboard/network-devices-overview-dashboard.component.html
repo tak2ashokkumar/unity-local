@@ -300,7 +300,7 @@
                             </td>
                             <td class="text-center tdw-10">
                                 <span class="font-500"
-                                    [ngClass]="getPercentageClass(view.lastValue)">{{view.lastValue}}%</span>
+                                    [ngClass]="getPercentageClass(view.lastValue)" [tooltip]="view.lastValue + '%'">{{view.lastValue}}%</span>
                             </td>
                         </tr>
                     </tbody>
@@ -355,7 +355,7 @@
                             </td>
                             <td class="text-center tdw-10">
                                 <span class="font-500"
-                                    [ngClass]="getPercentageClass(view.lastValue)">{{view.lastValue}}%</span>
+                                    [ngClass]="getPercentageClass(view.lastValue)" [tooltip]="view.lastValue + '%'">{{view.lastValue}}%</span>
                             </td>
                         </tr>
                     </tbody>

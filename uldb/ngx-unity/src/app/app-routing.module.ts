@@ -228,12 +228,12 @@ export const routes: Routes = [
     ]
   },
   {
-    path: 'unityterminal',
-    component: AppTermialViewComponent
-  },
-  {
     path: 'terminal-new-tab',
     component: ConditionInvestigationTerminalNewTabComponent
+  },
+  {
+    path: 'unityterminal',
+    component: AppTermialViewComponent
   },
 ];
 

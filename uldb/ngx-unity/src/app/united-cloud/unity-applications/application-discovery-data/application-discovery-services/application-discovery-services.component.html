@@ -33,7 +33,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let view of viewData" setTableColumnWidth truncateText>
+                        <tr *ngFor="let view of viewData" setTableColumnWidth>
                             <td>
                                 <div [tooltip]="view.name" class="text-primary btn-link text-decoration-none pointer-link" (click)="goToDetails(view)">{{view.name}}</div>
                             </td>

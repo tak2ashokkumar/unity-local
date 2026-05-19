@@ -26,6 +26,39 @@
   padding-bottom: 1.5rem;
 }
 
+$unity-chatbot-panel-width: 420px;
+
+@media (min-width: 992px) {
+  body.unity-chatbot-open {
+    --unity-chatbot-panel-width: #{$unity-chatbot-panel-width};
+    overflow: hidden;
+  }
+
+  body.unity-chatbot-open .app-header.navbar {
+    right: var(--unity-chatbot-panel-width);
+    width: calc(100% - var(--unity-chatbot-panel-width)) !important;
+    transition: none !important;
+  }
+
+  body.unity-chatbot-open .app-body {
+    overflow: hidden;
+  }
+
+  body.unity-chatbot-open .app-body>.main {
+    height: calc(100vh - #{$navbar-height}) !important;
+    min-height: calc(100vh - #{$navbar-height}) !important;
+    margin-right: var(--unity-chatbot-panel-width) !important;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    // scrollbar-gutter: stable;
+    transition: none !important;
+  }
+
+  body.unity-chatbot-expanded .app-body>.main {
+    overflow: hidden !important;
+  }
+}
+
 .equalize-card {
   height: 100%;
   margin-bottom: 0;
@@ -866,7 +899,7 @@ td a.table-column-btn {
   overflow: hidden;
 }
 
-.custom-tooltip-hide {
+.custom-tooltip-hide{
   .tooltip .tooltip-inner {
     display: none;
   }

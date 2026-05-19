@@ -34,7 +34,7 @@ export class PrivateCloudComputeDashboardService {
 
   private appendMultiValueParam(params: HttpParams, key: string, values?: string[]): HttpParams {
     (values || []).forEach(value => {
-      if (value) {
+      if (value && value !== 'All') {
         params = params.append(key, value);
       }
     });
@@ -101,12 +101,17 @@ export class PrivateCloudComputeDashboardService {
     // })
   }
 
-  buildFilterForm(platforms?: string[], datacenters?: string[], environments?: string[], accounts?: string[]): FormGroup {
+  buildFilterForm(
+    platforms: string[] = ['All'],
+    datacenters: string[] = ['All'],
+    environments: string[] = ['All'],
+    accounts: string[] = ['All']
+  ): FormGroup {
     return this.builder.group({
-      platforms: [platforms || []],
-      datacenters: [datacenters || []],
-      environments: [environments || []],
-      accounts: [accounts || []]
+      platforms: [platforms],
+      datacenters: [datacenters],
+      environments: [environments],
+      accounts: [accounts]
     });
   }
 
@@ -355,7 +360,7 @@ export class PrivateCloudComputeDashboardService {
 
       grid: {
         left: 100,
-        right: 20,
+        right: 40,
         top: 0,
         bottom: 10,
         containLabel: false
@@ -464,161 +469,19 @@ export class PrivateCloudComputeDashboardService {
   getCapacityGrowthWidgetData(filters: FiltersCriteriaType): Observable<CapacityAndGrowthDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<CapacityAndGrowthDataType>('/customer/widgets/capacity_growth_insights/', { params });
-    // return of({
-    //   "capacityTrendAndForecast": [
-    //     {
-    //       "count": 37,
-    //       "isForecast": false,
-    //       "month": "Jun"
-    //     },
-    //     {
-    //       "count": 37,
-    //       "isForecast": false,
-    //       "month": "Jul"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Aug"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Sep"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Oct"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Nov"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Dec"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Jan"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Feb"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Mar"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "Apr"
-    //     },
-    //     {
-    //       "count": 47,
-    //       "isForecast": false,
-    //       "month": "May"
-    //     },
-    //     {
-    //       "count": 48,
-    //       "isForecast": true,
-    //       "month": "Jun"
-    //     },
-    //     {
-    //       "count": 49,
-    //       "isForecast": true,
-    //       "month": "Jul"
-    //     },
-    //     {
-    //       "count": 50,
-    //       "isForecast": true,
-    //       "month": "Aug"
-    //     },
-    //     {
-    //       "count": 51,
-    //       "isForecast": true,
-    //       "month": "Sep"
-    //     },
-    //     {
-    //       "count": 52,
-    //       "isForecast": true,
-    //       "month": "Oct"
-    //     },
-    //     {
-    //       "count": 53,
-    //       "isForecast": true,
-    //       "month": "Nov"
-    //     }
-    //   ],
-    //   "provisioningStatus": {
-    //     "provisioned": 0,
-    //     "decommissioned": 0
-    //   },
-    //   "topHostUtilization": [{
-    //     "hostName": "ul-sv1-unity-lab-esx01.unitedlayer.com",
-    //     "utilizationPct": 78.45,
-    //     "totalStorageGB": 2400,
-    //     "usedStorageGB": 1882,
-    //     "category": "Optimized"
-    //   },
-    //   {
-    //     "hostName": "ul-sv1-unity-lab-esx02.unitedlayer.com",
-    //     "utilizationPct": 42.18,
-    //     "totalStorageGB": 1800,
-    //     "usedStorageGB": 759,
-    //     "category": "Underutilized"
-    //   },
-    //   {
-    //     "hostName": "ul-sv1-unity-lab-esx03.unitedlayer.com",
-    //     "utilizationPct": 91.72,
-    //     "totalStorageGB": 3200,
-    //     "usedStorageGB": 2935,
-    //     "category": "Critical"
-    //   },
-    //   {
-    //     "hostName": "ul-sv1-unity-lab-esx04.unitedlayer.com",
-    //     "utilizationPct": 63.57,
-    //     "totalStorageGB": 2100,
-    //     "usedStorageGB": 1335,
-    //     "category": "Healthy"
-    //   },
-    //   {
-    //     "hostName": "ul-sv1-unity-lab-esx05.unitedlayer.com",
-    //     "utilizationPct": 27.94,
-    //     "totalStorageGB": 1500,
-    //     "usedStorageGB": 419,
-    //     "category": "Underutilized"
-    //   }]
-    // })
+
   }
 
-  convertToVmDensityHostViewData(
-    data: TopHostUtilizationItem[]
-  ): VmDensityHost {
+  convertToVmDensityHostViewData(data: TopHostUtilizationItem[]): VmDensityHost {
 
     const view = new VmDensityHost();
-
     view.desnityHostRows = (data || []).map(item => {
-
       const row = new DesityHostRows();
-
       row.hostName = item.hostName || 'N/A';
-
       row.utilizationPct = item.utilizationPct ?? 0;
-
       row.totalStorageGB = item.totalStorageGB ?? 0;
-
       row.usedStorageGB = item.usedStorageGB ?? 0;
-
       row.category = item.category || 'N/A';
-
       return row;
     });
 
@@ -823,161 +686,8 @@ export class PrivateCloudComputeDashboardService {
 
   getTop10ClustersByVMsWidgetData(filters: FiltersCriteriaType): Observable<Top10ClustersByVMsData> {
     let params = this.convertFiltersToParams(filters)
-    // return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
-    return of({
-      "topClustersByVMCount": [
-        {
-          "clusterName": "UNITY-LAB-CL",
-          "hostCount": 2,
-          "vmCount": 58,
-          "datastoreCount": 4
-        },
-        {
-          "clusterName": "Linux Cluster",
-          "hostCount": 6,
-          "vmCount": 54,
-          "datastoreCount": 9
-        },
-        {
-          "clusterName": "DEFR-PROD01",
-          "hostCount": 0,
-          "vmCount": 0,
-          "datastoreCount": 0
-        },
-        {
-          "clusterName": "DEFR-MGMT",
-          "hostCount": 0,
-          "vmCount": 0,
-          "datastoreCount": 0
-        },
-        {
-          "clusterName": "DEFR-DMZ01",
-          "hostCount": 0,
-          "vmCount": 0,
-          "datastoreCount": 0
-        },
-        {
-          "clusterName": "DEFR-PROD02",
-          "hostCount": 0,
-          "vmCount": 0,
-          "datastoreCount": 0
-        }
-      ],
-      "filters": {
-        "platforms": [
-          {
-            "value": "Custom",
-            "label": "Custom"
-          },
-          {
-            "value": "VMware",
-            "label": "VMware vCenter"
-          },
-          {
-            "value": "Hyperv",
-            "label": "Hyperv"
-          },
-          {
-            "value": "Nutanix",
-            "label": "Nutanix"
-          },
-          {
-            "value": "ESXi",
-            "label": "ESXi"
-          },
-          {
-            "value": "vCloud Director",
-            "label": "VMware vCloud"
-          },
-          {
-            "value": "United Private Cloud vCenter",
-            "label": "VMware vCenter"
-          },
-          {
-            "value": "Custom",
-            "label": "Custom"
-          },
-          {
-            "value": "Custom",
-            "label": "Custom"
-          },
-          {
-            "value": "VMware",
-            "label": "VMware vCenter"
-          }
-        ],
-        "accounts": [
-          {
-            "value": "d408e6b1-85cc-4897-81c4-71f57bb8075c",
-            "label": "Custom DC3"
-          },
-          {
-            "value": "4455bf34-7e33-49a2-9da0-e35208096013",
-            "label": "1.DemoVcenter - GlobalVCS-Lab"
-          },
-          {
-            "value": "86992fee-b969-446d-a78d-15cc3aa9fc5e",
-            "label": "hyperV"
-          },
-          {
-            "value": "f83bed82-17e7-4b4f-99ba-acfdf02cd4fc",
-            "label": "Nutanix"
-          },
-          {
-            "value": "4948ec33-22e2-4585-b4f7-2261dec4da1e",
-            "label": "esxi pvt cloud"
-          },
-          {
-            "value": "bf1e9659-8e80-4770-bfb3-ecc210affbce",
-            "label": "3.VMware vCloud"
-          },
-          {
-            "value": "2fa55012-d137-495f-8462-01d27125ae4a",
-            "label": "United cloud"
-          },
-          {
-            "value": "dceeea62-ff44-4e17-bcac-2aafb962ec72",
-            "label": "testing_cloud"
-          },
-          {
-            "value": "e6e751ed-6e55-4022-8dc0-884cc35e148d",
-            "label": "TestVM"
-          },
-          {
-            "value": "15d3e4d7-d1b6-4ac2-89b7-5343b35fbfa4",
-            "label": "Vmwaretesting"
-          }
-        ],
-        "environments": [
-          {
-            "value": "Production",
-            "label": "Production"
-          },
-          {
-            "value": "Development",
-            "label": "Development"
-          },
-          {
-            "value": "Test",
-            "label": "Test"
-          },
-          {
-            "value": "None",
-            "label": "None"
-          }
-        ],
-        "datacenters": [
-          {
-            "value": "DC3",
-            "label": "DC3"
-          },
-          {
-            "value": "DC1",
-            "label": "DC1"
-          }
-        ]
-      }
-    })
+    return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
+
   }
 
 
@@ -1192,6 +902,7 @@ export class PrivateCloudComputeDashboardService {
   getUtilizationRows(filters?: any): Observable<PerformanceHotspots> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<PerformanceHotspots>('/customer/widgets/performance_hotspots/', { params });
+
 
   }
 
@@ -2107,5 +1818,4 @@ export class DesityHostRows {
   usedStorageGB: number;
   category: string;
 }
-
 

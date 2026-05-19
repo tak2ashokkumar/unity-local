@@ -351,19 +351,18 @@ export class UnitySetupNotificationGroupCrudComponent implements OnInit, OnDestr
     this.createForm.get('mode').valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((val: string) => {
       if (val.includes('email') || val.includes('sms')) {
         // if (val ==='email' || val === 'sms') {
+        if (this.createForm.get('webhook_url')) {
+          this.createForm.removeControl('webhook_url');
+        }
         this.createForm.addControl('users', new FormControl('', [Validators.required, EmailValidator]));
         this.createForm.get('users').updateValueAndValidity();
       }
       if (val.includes('ms_teams')) {
-        // if (val === 'ms_teams') {
-        this.createForm.removeControl('webhook_url');
-        if (!this.createForm.get('users')) {
-          this.createForm.addControl('users', new FormControl('', [Validators.required, EmailValidator])
-          );
+        this.selectedUsers = [];
+        if (this.createForm.get('users')) {
+          this.createForm.get('users').reset();
+          this.createForm.removeControl('users');
         }
-      }
-      if (val.includes('ms_teams')) {
-        this.createForm.removeControl('users');
         this.createForm.addControl('webhook_url', new FormControl('', [Validators.required, NoWhitespaceValidator]));
         this.createForm.get('webhook_url').updateValueAndValidity();
       }

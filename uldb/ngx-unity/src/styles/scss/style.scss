@@ -206,3 +206,14 @@ body.no-scroll::-webkit-scrollbar {
 body.no-scroll {
   -ms-overflow-style: none;
 }
+
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body main.no-main-content-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Internet explorer and Edge */
+body main.no-main-content-scroll {
+  -ms-overflow-style: none;
+}

@@ -89,7 +89,7 @@ export const MY_NATIVE_FORMATS = {
       provide: DateAdapter,
       useFactory: adapterFactory
     }),
-    ModalModule.forRoot(),
+    // ModalModule.forRoot(),
     CollapseModule.forRoot(),
     DragDropModule,
     InfiniteScrollModule,

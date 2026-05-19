@@ -21,6 +21,8 @@ export interface WSOption {
     rows?: number;
     cols?: number;
     conversation_id: string;
+    tab_type?: string;
+    collector_uuid?: string;
 }
 
 export class WSSHClient {
@@ -86,11 +88,15 @@ export class WSSHClient {
                 const raw = localStorage.getItem('terminal_command');
                 if (raw) {
 
-                    this.sendClientData(raw + '\n');
+                    this.sendClientData(raw);
                     localStorage.removeItem('terminal_command');
                 }
             }
         };
+
+        window.addEventListener('beforeunload', () => {
+            this.close();
+        });
 
         this.connection.onclose = (evt: CloseEvent) => {
             this.closeEvent.next(evt.reason);
@@ -124,7 +130,9 @@ export class WSSHClient {
             port: this.wsOptions.port,
             username: this.wsOptions.username,
             password: this.wsOptions.password,
-            conversation_id: this.wsOptions.conversation_id
+            conversation_id: this.wsOptions.conversation_id,
+            collector_uuid: this.wsOptions.collector_uuid,
+            tab_type: this.wsOptions['tab_type']
         }));
     }
 
@@ -140,7 +148,8 @@ export class WSSHClient {
         this.connection.send(JSON.stringify({
             type: 'input',
             data: data,
-            conversation_id: this.wsOptions.conversation_id
+            conversation_id: this.wsOptions.conversation_id,
+            tab_type: this.wsOptions['tab_type']
         }));
     }
 

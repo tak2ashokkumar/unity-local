@@ -21,6 +21,8 @@ import { DEVICE_WEB_ACCESS_SUBJECT, SWITCH_TICKET_METADATA } from 'src/app/share
 import { AppLevelService } from 'src/app/app-level.service';
 import { ConsoleAccessInput } from 'src/app/shared/check-auth/check-auth.service';
 import { NaciNewTerminalService } from './naci-new-terminal/naci-new-terminal.service';
+import { NaciFloatingTerminalService } from './naci-floating-terminal/naci-floating-terminal.service';
+import { TerminalWindowRegistryService } from './naci-new-terminal/terminal-window-registry.service';
 
 @Component({
   selector: 'network-agent-condition-investigation',
@@ -48,6 +50,8 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
 
   chatResponse: any;
   chatResponseHistoryData: any[] = [];
+  private registryChannel = new BroadcastChannel('terminal-tabs');
+  lastOpenedWindow: any;
 
   @ViewChild('chatResponsHistoryScrollContainer') chatResponsHistoryScrollContainer: ElementRef;
   @ViewChildren('chatResponseHistory') chatResponseHistory: QueryList<ElementRef>;
@@ -90,13 +94,26 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
     private ticketService: SharedCreateTicketService,
     private termService: FloatingTerminalService,
     private appService: AppLevelService,
-    private newTerminalService: NaciNewTerminalService) {
+    private newTerminalService: NaciNewTerminalService,
+    private floatingTerminalService: NaciFloatingTerminalService,
+    private windowRegistry: TerminalWindowRegistryService,) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.conditionId = params.get('conditionId');
       this.conditionUuid = params.get('conditionUuid');
     });
     this.activityCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.promptCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
+    this.registryChannel.onmessage = (e) => {
+      console.log('registryChannel onmessage:', e.data);
+      if (e.data.type === 'REGISTER') {
+        console.log('REGISTER received from tab:', e.data.tabId);
+        if (this.lastOpenedWindow) {
+          this.windowRegistry.register(e.data.tabId, this.lastOpenedWindow);
+          this.lastOpenedWindow = null;
+        }
+        this.registryChannel.postMessage({ type: 'REGISTER_ACK', tabId: e.data.tabId });
+      }
+    };
   }
 
   ngOnInit(): void {
@@ -460,6 +477,7 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
   }
 
   consoleSameTab(view: any) {
+    this.newTerminalService.setBackendTabId(null);
     this.newTerminalService.openTerminal();
   }
 
@@ -475,10 +493,317 @@ export class NetworkAgentConditionInvestigationComponent implements OnInit, Afte
 
   }
 
-  confirmExecuteModal() {
+  // confirmExecuteModal(tabType: string) {
+  //   this.confirmExecutionModalRef.hide();
+  //   localStorage.setItem('terminal_command', this.command);
+  //   if (tabType == 'sameTab') {
+  //     this.newTerminalService.openTerminal();
+  //   } else {
+  //     window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+  //   }
+  // }
+
+  // confirmExecuteModal(tabType: string) {
+  //   this.confirmExecutionModalRef.hide();
+
+  //   const runningTabId = this.floatingTerminalService.getRunningTab();
+  //   const recentTabId = this.floatingTerminalService.getRecentTab();
+
+  //   console.log(runningTabId,'runningTabId',recentTabId,'recentTabId');
+
+  //   if (tabType === 'sameTab' && recentTabId && !runningTabId) {
+  //     const executed = this.floatingTerminalService.executeInTerminal(
+  //       recentTabId,
+  //       this.command
+  //     );
+
+  //     if (executed) {
+  //       console.log('executed return');
+  //       return;
+  //     }
+  //   }
+
+  //   localStorage.setItem('terminal_command', this.command);
+
+  //   if (tabType === 'sameTab') {
+  //     this.newTerminalService.openTerminal();
+  //   } else {
+  //     if (runningTabId) {
+  //       window.open(
+  //         `/main#/terminal-new-tab?conversationId=${this.conversationId}`,
+  //         '_blank'
+  //       );
+  //     } else if (recentTabId) {
+  //       const executed = this.floatingTerminalService.executeInTerminal(
+  //         recentTabId,
+  //         this.command
+  //       );
+  //       if (executed) return;
+  //       this.newTerminalService.openTerminal();
+  //     } else {
+  //       window.open(
+  //         `/main#/terminal-new-tab?conversationId=${this.conversationId}`,
+  //         '_blank'
+  //       );
+  //     }
+  //   }
+  // }
+
+  // confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
+  //   this.confirmExecutionModalRef.hide();
+  //   const tabParam = tabType === 'sameTab' ? 'same' : 'new';
+  //   this.svc.getTab(tabParam, this.conversationId).subscribe((res: any) => {
+  //     const backendTabId = res?.tab_id;
+  //     if (backendTabId) {
+  //       const exists = this.floatingTerminalService.hasTerminal(backendTabId);
+  //       if (exists) {
+  //         const executed = this.floatingTerminalService.executeInTerminal(backendTabId,this.command,tabType);
+  //         this.floatingTerminalService.switchToTab(backendTabId);
+  //         return;
+  //       }
+  //       console.log('TabId exists but not found locally, fallback to new');
+  //     }
+  //     localStorage.setItem('terminal_command', this.command);
+  //     this.newTerminalService.setPendingTabType(tabType);
+  //     if (tabType === 'sameTab') {
+  //       this.newTerminalService.openTerminal();
+  //     } else {
+  //       window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+  //     }
+  //   });
+  // }
+
+  // confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
+  //   this.confirmExecutionModalRef.hide();
+  //   const channel = new BroadcastChannel('terminal-tabs');
+  //   const tabParam = tabType === 'sameTab' ? 'same' : 'new';
+  //   this.svc.getTab(tabParam, this.conversationId).subscribe((res: any) => {
+  //     console.log('api res ', res);
+  //     const backendTabId = res?.tab_id;
+  //     this.newTerminalService.setBackendTabId(backendTabId || null);
+  //     // CASE 1: backend says reuse existing tab
+  //     if (backendTabId) {
+  //       const exists = this.floatingTerminalService.hasTerminal(backendTabId);
+  //       console.log('1');
+  //       // already open locally → reuse + switch
+  //       if (exists) {
+  //         this.floatingTerminalService.executeInTerminal(backendTabId, this.command, tabType);
+  //         this.floatingTerminalService.switchToTab(backendTabId);
+  //         console.log('2');
+  //         return;
+  //       }
+  //       // NOT open locally → recreate using SAME tabId (CRITICAL FIX)
+  //       localStorage.setItem('terminal_command', this.command);
+  //       this.newTerminalService.setPendingTabType(tabType);
+  //       this.newTerminalService.setConversationId(this.conversationId);
+  //       if (tabType === 'sameTab') {
+  //         console.log('3');
+  //         this.newTerminalService.openTerminal();
+  //       } else {
+  //         console.log('4');
+
+  //         channel.postMessage({
+  //           type: 'FOCUS_AND_EXECUTE',
+  //           tabId: backendTabId,
+  //           command: this.command
+  //         });
+
+  //         // Give it a moment, if no PONG → open fresh window
+  //         let ponged = false;
+  //         channel.onmessage = (event) => {
+  //           if (event.data.type === 'PONG' && event.data.tabId === backendTabId) {
+  //             ponged = true;
+  //           }
+  //         };
+
+  //         setTimeout(() => {
+  //           if (!ponged) {
+  //             const newWin = window.open(
+  //               `/main#/terminal-new-tab?conversationId=${this.conversationId}&tabId=${backendTabId}`,
+  //               '_blank'
+  //             );
+  //             if (newWin) this.windowRegistry.register(backendTabId, newWin);
+  //           }
+  //         }, 500);
+  //         // setTimeout(() => {
+  //         //   channel.postMessage({
+  //         //     type: 'PING',
+  //         //     tabId: backendTabId
+  //         //   });
+  //         // }, 100);
+  //         return;
+  //       }
+  //       return;
+  //     }
+  //     localStorage.setItem('terminal_command', this.command);
+  //     this.newTerminalService.setPendingTabType(tabType);
+  //     this.newTerminalService.setConversationId(this.conversationId);
+  //     if (tabType === 'sameTab') {
+  //       console.log('5');
+  //       this.newTerminalService.openTerminal();
+  //     } else {
+  //       console.log('6');
+  //       window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+  //       const tabKey = backendTabId || `new-${this.conversationId}`;
+  //       const focused = this.windowRegistry.focus(tabKey);
+  //       if (focused) {
+  //         return;
+  //       }
+  //       const newWin = window.open(
+  //         `/main#/terminal-new-tab?conversationId=${this.conversationId}&tabId=${backendTabId || ''}`,
+  //         '_blank'
+  //       );
+  //       if (newWin) {
+  //         this.windowRegistry.register(tabKey, newWin);
+  //       }
+  //     }
+  //   });
+  // }
+
+  // confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
+  //   this.confirmExecutionModalRef.hide();
+  //   const channel = new BroadcastChannel('terminal-tabs');
+  //   const tabParam = tabType === 'sameTab' ? 'same' : 'new';
+  //   this.svc.getTab(tabParam, this.conversationId).subscribe((res: any) => {
+  //     console.log('api res ', res);
+  //     const backendTabId = res?.tab_id;
+  //     this.newTerminalService.setBackendTabId(backendTabId || null);
+  //     // CASE 1: backend says reuse existing tab
+  //     if (backendTabId) {
+  //       if (tabType === 'sameTab') {
+  //         const exists = this.floatingTerminalService.hasTerminal(backendTabId);
+  //         if (exists) {
+  //           this.floatingTerminalService.executeInTerminal(backendTabId, this.command, tabType);
+  //           this.floatingTerminalService.switchToTab(backendTabId);
+  //           return;
+  //         }
+  //         localStorage.setItem('terminal_command', this.command);
+  //         this.newTerminalService.setPendingTabType(tabType);
+  //         this.newTerminalService.setConversationId(this.conversationId);
+  //         this.newTerminalService.openTerminal();
+  //         return;
+  //       } else {
+  //         // newTab: just focus the existing window
+  //         console.log(this.windowRegistry, 'before checking for same tabId ');
+  //         console.log(backendTabId, ' bc tab id before focusing');
+  //         this.windowRegistry.focus(backendTabId);
+  //         localStorage.setItem('terminal_command', this.command);
+  //         let ponged = false;
+  //         channel.onmessage = (e) => {
+  //           console.log(e, ' event');
+  //           if (e.data.type === 'PONG' && e.data.tabId === backendTabId) ponged = true;
+  //         };
+  //         channel.postMessage({ type: 'PING', tabId: backendTabId });
+
+  //         setTimeout(() => {
+  //           if (!ponged) {
+  //             console.log(backendTabId, ' bctab id ponged');
+  //             const newWin = window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}&tabId=${backendTabId}`,
+  //               '_blank');
+  //             if (newWin) this.windowRegistry.register(backendTabId, newWin);
+  //           }
+  //         }, 500);
+
+  //         // window was closed, reopen it
+  //         // const newWin = window.open(
+  //         //   `/main#/terminal-new-tab?conversationId=${this.conversationId}&tabId=${backendTabId}`,
+  //         //   '_blank'
+  //         // );
+  //         // console.log(backendTabId, ' bactabid ', newWin, 'new window');
+  //         // if (newWin) this.windowRegistry.register(backendTabId, newWin);
+  //         // console.log(this.windowRegistry, ' window registery after registering tabs');
+  //         return;
+  //       }
+  //     }
+  //     localStorage.setItem('terminal_command', this.command);
+  //     this.newTerminalService.setPendingTabType(tabType);
+  //     this.newTerminalService.setConversationId(this.conversationId);
+  //     if (tabType === 'sameTab') {
+  //       console.log('5');
+  //       this.newTerminalService.openTerminal();
+  //     } else {
+  //       console.log('6');
+  //       window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+  //       const tabKey = backendTabId || `new-${this.conversationId}`;
+  //       const focused = this.windowRegistry.focus(tabKey);
+  //       if (focused) {
+  //         return;
+  //       }
+  //       const newWin = window.open(
+  //         `/main#/terminal-new-tab?conversationId=${this.conversationId}&tabId=${backendTabId || ''}`,
+  //         '_blank'
+  //       );
+  //       // if (newWin) {
+  //       //   this.windowRegistry.register(tabKey, newWin);
+  //       // }
+  //       this.lastOpenedWindow = newWin;
+  //     }
+  //   });
+  // }
+
+  confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
     this.confirmExecutionModalRef.hide();
-    localStorage.setItem('terminal_command', this.command);
-    window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+
+    const tabParam = tabType === 'sameTab' ? 'same' : 'new';
+
+    this.svc.getTab(tabParam, this.conversationId).subscribe((res: any) => {
+      console.log('api res ', res);
+
+      const backendTabId = res?.tab_id;
+      this.newTerminalService.setBackendTabId(backendTabId || null);
+
+      // CASE 1: backend returned an existing free tab
+      if (backendTabId) {
+
+        if (tabType === 'sameTab') {
+          const exists = this.floatingTerminalService.hasTerminal(backendTabId);
+          if (exists) {
+            this.floatingTerminalService.executeInTerminal(backendTabId, this.command, tabType);
+            this.floatingTerminalService.switchToTab(backendTabId);
+            return;
+          }
+
+          localStorage.setItem('terminal_command', this.command);
+          this.newTerminalService.setPendingTabType(tabType);
+          this.newTerminalService.setConversationId(this.conversationId);
+          this.newTerminalService.openTerminal();
+          return;
+
+        } else {
+          // ✅ Backend guarantees this tab is alive and free
+          // Just focus it and execute the command — no PING needed
+          console.log('=== focusing existing tab:', backendTabId);
+          localStorage.setItem('terminal_command', this.command);
+
+          const focused = this.windowRegistry.focus(backendTabId);
+          console.log('=== window focus result:', focused);
+
+          // Post PING so the existing tab executes the command
+          this.registryChannel.postMessage({ type: 'PING', tabId: backendTabId });
+          return;
+        }
+      }
+
+      // CASE 2: backend returned {} — no free tab, open a fresh one
+      localStorage.setItem('terminal_command', this.command);
+      this.newTerminalService.setPendingTabType(tabType);
+      this.newTerminalService.setConversationId(this.conversationId);
+
+      if (tabType === 'sameTab') {
+        console.log('=== opening sameTab terminal');
+        this.newTerminalService.openTerminal();
+
+      } else {
+        console.log('=== opening fresh new tab');
+        const newWin = window.open(
+          `/main#/terminal-new-tab?conversationId=${this.conversationId}`,
+          '_blank'
+        );
+        if (newWin) {
+          this.lastOpenedWindow = newWin;
+        }
+      }
+    });
   }
 
 }

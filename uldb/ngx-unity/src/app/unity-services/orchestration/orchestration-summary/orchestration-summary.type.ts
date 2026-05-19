@@ -149,6 +149,7 @@ export interface OrchestrationRecentFailureExecutionsType {
   target_type: string;
   is_advanced: boolean;
   is_agentic: boolean;
+  trigger_type: string;
 }
 
 export interface OrchestrationUpcomingExecutionsType {
@@ -162,5 +163,6 @@ export interface OrchestrationUpcomingExecutionsType {
   type: string;
   target: string;
   target_type: string;
+  trigger_type: string;
 }
 

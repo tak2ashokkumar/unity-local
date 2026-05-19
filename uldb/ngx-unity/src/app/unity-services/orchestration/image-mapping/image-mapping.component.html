@@ -20,22 +20,18 @@
         <div class="row d-flex justify-content-between pb-2 mx-0">
           <div class="col-12 p-0 mb-2">
             <div class="d-flex justify-content-between align-items-center w-100">
-              <div class="w-80">
-                <div class="w-20">
-                  <table-search-box [searchValue]="currentCriteria.searchValue"
-                    (searched)="onSearched($event)"></table-search-box>
-                </div>
+              <div class="w-15">
+                <table-search-box [searchValue]="currentCriteria.searchValue"
+                  (searched)="onSearched($event)"></table-search-box>
               </div>
-              <div class="w-20">
-                <form *ngIf="columnForm" class="col-12" [formGroup]="columnForm">
+              <div class="w-80 d-flex justify-content-end align-items-center">
+                <form *ngIf="columnForm" class="w-21 mr-4" [formGroup]="columnForm">
                   <div class="form-group mb-0">
                     <multiselect-dropdown class="form-control p-0" style="height:auto;" formControlName="columns"
                       [options]="tableColumns" [settings]="columnSelectionSettings" [texts]="columnSelectionTexts"
                       (dropdownClosed)="columnChange()"></multiselect-dropdown>
                   </div>
                 </form>
-              </div>
-              <div class="w-10">
                 <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
                   (pageSizeChange)="pageSizeChange($event)"></table-page-size>
               </div>

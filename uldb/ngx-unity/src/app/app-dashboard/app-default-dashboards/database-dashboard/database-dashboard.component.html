@@ -98,6 +98,10 @@
                                     {{tag.name}} {{tag.count}}
                                 </span>
                             </div>
+                            <div *ngIf="!tags?.length"
+                                class="d-flex justify-content-center align-items-center p-2"
+                                style="width: 100%;">No data
+                            </div>
                         </div>
                     </div>
                     <div class="inventory-widget version-widget">
@@ -106,6 +110,9 @@
                         <div class="version-row" *ngFor="let version of databaseVersions; trackBy: trackByIndex">
                             <span>{{version.name}}</span>
                             <strong>{{version.count}}</strong>
+                        </div>
+                        <div *ngIf="!databaseVersions?.length" class="d-flex justify-content-center align-items-center"
+                            style="width: 100%; height: 150px;">No data
                         </div>
                     </div>
                 </div>
@@ -396,35 +403,35 @@
                                 <span class="health-dot" [ngClass]="'tone-success'"></span>
                                 Available / online
                             </span>
-                            <strong [ngClass]="'tone-success'">{{databaseAvailabilityStatus?.online}}</strong>
+                            <strong [ngClass]="'tone-success'">{{databaseAvailabilityStatus?.online || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-warning'"></span>
                                 Degraded performance
                             </span>
-                            <strong [ngClass]="'tone-warning'">{{databaseAvailabilityStatus?.degraded}}</strong>
+                            <strong [ngClass]="'tone-warning'">{{databaseAvailabilityStatus?.degraded || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-danger'"></span>
                                 Unreachable / down
                             </span>
-                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.unreachable}}</strong>
+                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.unreachable || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-danger'"></span>
                                 Maintenance mode
                             </span>
-                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.maintenance}}</strong>
+                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.maintenance || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-danger'"></span>
                                 Inactive / dormant
                             </span>
-                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.inactive}}</strong>
+                            <strong [ngClass]="'tone-danger'">{{databaseAvailabilityStatus?.inactive || 0}}</strong>
                         </div>
                     </div>
                     <div class="col-4 health-group px-3 py-2">
@@ -435,35 +442,35 @@
                                 <span class="health-dot" [ngClass]="'tone-success'"></span>
                                 Sync healthy
                             </span>
-                            <strong [ngClass]="'tone-success'">{{replicationSync?.syncHealthy}}</strong>
+                            <strong [ngClass]="'tone-success'">{{replicationSync?.syncHealthy || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-warning'"></span>
                                 Lag >30s
                             </span>
-                            <strong [ngClass]="'tone-warning'">{{replicationSync?.lagOver30s}}</strong>
+                            <strong [ngClass]="'tone-warning'">{{replicationSync?.lagOver30s || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-danger'"></span>
                                 Deadlocks
                             </span>
-                            <strong [ngClass]="'tone-danger'">{{replicationSync?.deadlocks}}</strong>
+                            <strong [ngClass]="'tone-danger'">{{replicationSync?.deadlocks || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-success'"></span>
                                 Errors per second
                             </span>
-                            <strong [ngClass]="'tone-success'">{{replicationSync?.errorsPerSecond}}</strong>
+                            <strong [ngClass]="'tone-success'">{{replicationSync?.errorsPerSecond || 0}}</strong>
                         </div>
                         <div class="health-row">
                             <span>
                                 <span class="health-dot" [ngClass]="'tone-success'"></span>
                                 Connection Errors
                             </span>
-                            <strong [ngClass]="'tone-success'">{{replicationSync?.connectionErrors}}</strong>
+                            <strong [ngClass]="'tone-success'">{{replicationSync?.connectionErrors || 0}}</strong>
                         </div>
                     </div>
                 </div>

@@ -417,8 +417,22 @@
   }
 }
 
-
 .form-wrapper {
   border: 1px solid #c8ced3 !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.tab-icon {
+  background-color: #e4e7ea;
+  color: #73818f;
+}
+
+.tab-icon.active {
+  background-color: #cef1e2;
+  color: #28a745;
+}
+
+.tab-icon:focus {
+  outline: none;
+  box-shadow: none;
 }

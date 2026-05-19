@@ -53,7 +53,8 @@
                 </div>
             </div>
             <div class="d-flex justify-content-end align-items-center">
-                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()" [tooltip]="'Go Back'" container="body">
+                <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
+                    [tooltip]="'Go Back'" container="body">
                     <i class="fa fa-arrow-left"></i>
                 </button>
                 <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
@@ -299,14 +300,16 @@
                             <div class="col pb-3" *ngIf="trailingTwelveMonthsViewData?.topUsageByCloudType">
                                 <span class="font-lg font-500">Top Usage By Cloud Type</span>
                                 <div class="align-items-center justify-content-between row pt-1">
-                                    <div class="col">
+                                    <div class="col-5">
                                         <img class="trailing-cloud-img"
                                             [src]="trailingTwelveMonthsViewData?.topUsageByCloudType?.cloudImg"
                                             [alt]="trailingTwelveMonthsViewData?.topUsageByCloudType?.cloudType" />
                                     </div>
-                                    <div class="col-4 align-items-center d-flex font-lg">
-                                        <span
-                                            class="px-2 text-primary">${{trailingTwelveMonthsViewData?.topUsageByCloudType?.totalCost}}</span>
+                                    <div class="col-auto font-lg">
+                                        <span class="px-2 text-primary">
+                                            ${{trailingTwelveMonthsViewData?.topUsageByCloudType?.totalCost}}
+                                        </span>
+                                        <!-- <span [tooltip]="'$'+'1'">$1</span> -->
                                         <!-- <p class="font-md m-0"
                                             [ngClass]="trailingTwelveMonthsViewData?.topUsageByCloudType?.usagePercentage>0 ? 'text-danger':'text-success'">
                                             <i class="px-1"
@@ -323,14 +326,15 @@
                             <div class="col pb-3" *ngIf="trailingTwelveMonthsViewData?.topUsageByCloudAccount">
                                 <span class="font-lg font-500">Top Usage By Cloud</span>
                                 <div class="align-items-center justify-content-between row pt-1">
-                                    <div class="col">
+                                    <div class="col-5">
                                         <img class="trailing-cloud-img"
                                             [src]="trailingTwelveMonthsViewData?.topUsageByCloudAccount?.cloudImg"
                                             [alt]="trailingTwelveMonthsViewData?.topUsageByCloudAccount?.cloudType" />
                                     </div>
-                                    <div class="col-4 align-items-center d-flex font-lg">
-                                        <span
-                                            class="px-2 text-primary">${{trailingTwelveMonthsViewData?.topUsageByCloudAccount?.totalCost}}</span>
+                                    <div class="col-auto align-items-center d-flex font-lg">
+                                        <span class="px-2 text-primary">
+                                            ${{trailingTwelveMonthsViewData?.topUsageByCloudAccount?.totalCost}}
+                                        </span>
                                         <!-- <p class="font-md m-0"
                                             [ngClass]="trailingTwelveMonthsViewData?.topUsageByCloudAccount?.usagePercentage>0?'text-danger':'text-success'">
                                             <i class="px-1"
@@ -350,14 +354,15 @@
                             <div class="col pb-3" *ngIf="trailingTwelveMonthsViewData?.topUsageByService">
                                 <span class="font-lg font-500">Top Usage By Service</span>
                                 <div class="align-items-center justify-content-between row pt-1">
-                                    <div class="col">
+                                    <div class="col-5">
                                         <img class="trailing-cloud-img"
                                             [src]="trailingTwelveMonthsViewData?.topUsageByService?.cloudImg"
                                             [alt]="trailingTwelveMonthsViewData?.topUsageByService?.cloudType" />
                                     </div>
-                                    <div class="col-4 align-items-center d-flex font-lg">
-                                        <span
-                                            class="px-2 text-primary">${{trailingTwelveMonthsViewData?.topUsageByService?.totalCost}}</span>
+                                    <div class="col-auto d-flex align-items-center font-lg">
+                                        <span class="px-2 text-primary">
+                                            ${{trailingTwelveMonthsViewData?.topUsageByService?.totalCost}}
+                                        </span>
                                         <!-- <p class="font-md m-0"
                                             [ngClass]="trailingTwelveMonthsViewData?.topUsageByService?.usagePercentage>0?'text-danger':'text-success'">
                                             <i class="px-1"
@@ -471,7 +476,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="tdw-10">
+                                    <td class="tdw-12">
                                         <div [tooltip]="view.monthToDateCost">{{view.monthToDateCost}}
                                         </div>
                                     </td>
@@ -479,7 +484,7 @@
                                         <div [tooltip]="view.estimateCost">{{view.estimateCost}}
                                         </div>
                                     </td>
-                                    <td class="tdw-10 text-primary pointer-link">
+                                    <td class="tdw-7 text-primary pointer-link">
                                         <div [tooltip]="view.totalResources" (click)="redirectWithFilters(view)">
                                             {{view.totalResources}} </div>
                                     </td>

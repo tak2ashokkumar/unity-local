@@ -8,7 +8,14 @@ export class AppMainService {
 
   $assistantData = new Subject<ChatbotDataType>();
 
+  private sidebarAnnouncedSource = new Subject<number>();
+  sidebarAnnounced$ = this.sidebarAnnouncedSource.asObservable();
+
   constructor() { }
+
+  sidebarChanges(chatbotWidth: number) {
+    this.sidebarAnnouncedSource.next(chatbotWidth);
+  }
 
 }
 

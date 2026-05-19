@@ -47,6 +47,10 @@ export class ConditionInvestigationService {
     return this.http.get<ConditionDetailsType>(GET_AIOPS_CONDITION_BY_ID(conditionUuid));
   }
 
+  getTab(tab: 'same' | 'new',conversationId: string) {
+    return this.http.get(`/mcp/cli_audit_logs/get_free_sessions/?conversation_id=${conversationId}&tab_type=${tab}`);
+  }
+
   convertToConditionDetailsViewdata(data: ConditionDetailsType): ConditionDetailsViewData {
     let viewdata: ConditionDetailsViewData = new ConditionDetailsViewData();
     viewdata.id = data.id;

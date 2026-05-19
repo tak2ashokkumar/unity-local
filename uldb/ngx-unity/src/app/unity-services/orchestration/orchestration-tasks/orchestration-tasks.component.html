@@ -1,77 +1,70 @@
 <div class="row mt--3" *ngIf="listSummaryViewData && viewData">
-  <div class="col-12">
-    <div class="row">
-      <div class="col-2 pl-0 pr-1">
-        <div class="card mb-0">
-          <div class="card-body py-2 my-1">
-            <div class="card-title mb-0">Total Task</div>
-            <span class="text-primary text-value-sm">{{listSummaryViewData?.totalTask}}</span>
-          </div>
+  <div class="task-summary-row">
+    <div class="task-summary-col task-summary-total pl-0 pr-1">
+      <div class="card mb-0 equalize-card">
+        <div class="card-body task-widget-card-body py-2 my-1">
+          <div class="card-title mb-0">Total Task</div>
+          <span class="text-primary text-value-sm">{{listSummaryViewData?.totalTask}}</span>
         </div>
       </div>
-      <div class="col-4 px-1">
-        <div class="card mb-0">
-          <div class="card-body py-2 my-1">
-            <div class="card-title mb-0">Type</div>
-            <div class="row">
-              <div class="col-12">
-                <div class="row m-0 p-0">
-                  <span class="col-2 m-0 p-0 align-items-center" style="height: 26px;"
-                    *ngFor="let type of listSummaryViewData?.byType; let i=index">
-                    <span class="mr-1" [tooltip]="type.tooltipMessage"><img class="mt--1" [src]="type?.image" alt=""
-                        style="height:20px"></span>
-                    <span class="text-primary mr-2 text-value-sm pointer-link">{{type?.count}}</span>
-                    <span class="border border-secondary mb-5 mr-2"
-                      *ngIf="i !== listSummaryViewData?.byType.length-1"></span>
-                  </span>
-                </div>
-              </div>
-            </div>
+    </div>
+
+    <div class="task-summary-col task-summary-type px-1">
+      <div class="card mb-0 equalize-card">
+        <div class="card-body task-widget-card-body py-2 my-1">
+          <div class="card-title mb-0">Type</div>
+
+          <div class="task-summary-inline">
+            <span class="task-type-item m-0 p-0 align-items-center" style="height: 26px;"
+              *ngFor="let type of listSummaryViewData?.byType; let i=index">
+              <span class="mr-1" [tooltip]="type.tooltipMessage">
+                <img class="mt--1" [src]="type?.image" alt="" style="height:20px">
+              </span>
+              <span class="text-primary mr-2 text-value-sm pointer-link">{{type?.count}}</span>
+              <span class="border border-secondary mb-5 mr-2" *ngIf="i !== listSummaryViewData?.byType.length-1"></span>
+            </span>
           </div>
+
         </div>
       </div>
-      <div class="col-3 px-1">
-        <div class="card mb-0">
-          <div class="card-body py-2 my-1">
-            <div class="card-title mb-0">Target Type</div>
-            <div class="row">
-              <div class="col-12 d-flex flex-column">
-                <div>
-                  <span class="text-muted text-sm mr-2">Cloud:</span>
-                  <span
-                    class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.targetType?.Cloud}}</span>
-                  <span class="border border-secondary mb-5 mr-2"></span>
-                  <span class="text-muted text-sm mr-2">Host:</span>
-                  <span
-                    class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.targetType?.Host}}</span>
-                  <span class="border border-secondary mb-5 mr-2"></span>
-                  <span class="text-muted text-sm mr-2">Local:</span>
-                  <span
-                    class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.targetType?.Local}}</span>
-                </div>
-              </div>
-            </div>
+    </div>
+
+    <div class="task-summary-col task-summary-target px-1">
+      <div class="card mb-0 equalize-card">
+        <div class="card-body task-widget-card-body py-2 my-1">
+          <div class="card-title mb-0">Target Type</div>
+
+          <div class="task-summary-inline">
+            <span class="text-muted text-sm mr-2">Cloud:</span>
+            <span class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.targetType?.Cloud}}</span>
+            <span class="border border-secondary mb-5 mr-2"></span>
+
+            <span class="text-muted text-sm mr-2">Host:</span>
+            <span class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.targetType?.Host}}</span>
+            <span class="border border-secondary mb-5 mr-2"></span>
+
+            <span class="text-muted text-sm mr-2">Local:</span>
+            <span class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.targetType?.Local}}</span>
           </div>
+
         </div>
       </div>
-      <div class="col-3 pl-1 pr-0">
-        <div class="card mb-0">
-          <div class="card-body py-2 my-1">
-            <div class="card-title mb-0">Status</div>
-            <div class="row">
-              <div class="col-12 d-flex flex-column">
-                <div>
-                  <span class="text-muted text-sm mr-2">Enabled:</span>
-                  <span
-                    class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.status?.Enabled}}</span>
-                  <span class="border border-secondary mb-5 mr-2"></span>
-                  <span class="text-muted text-sm mr-2">Disabled:</span>
-                  <span
-                    class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.status?.Disabled}}</span>
-                </div>
-              </div>
-            </div>
+    </div>
+
+    <div class="task-summary-col task-summary-status pl-1 pr-0">
+      <div class="card mb-0 equalize-card">
+        <div class="card-body task-widget-card-body py-2 my-1">
+          <div class="card-title mb-0">Status</div>
+
+          <div class="task-summary-inline">
+            <span class="text-muted text-sm mr-2">Enabled:</span>
+            <span class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.status?.Enabled}}</span>
+            <span class="border border-secondary mb-5 mr-2"></span>
+
+            <span class="text-muted text-sm mr-2">Disabled:</span>
+            <span class="text-primary mr-2 text-value-sm pointer-link">{{listSummaryViewData?.status?.Disabled}}</span>
           </div>
+
         </div>
       </div>
     </div>
@@ -201,7 +194,7 @@
                   <td class="tdw-5"><img [src]="view.image" alt="" [tooltip]="view.tooltipMessage"></td>
                   <td [tooltip]="view.sourceName" class="tdw-20 text-truncate">{{view.sourceName}}</td>
                   <td [tooltip]="view.targetType" class="tdw-10 text-truncate">{{view.targetType}}</td> -->
-                  <td class="tdw-15">
+                  <td class="status-toggle-column">
                     <div class="d-inline-block" accessControl moduleName="DevOps Automation" accessType="Manage Tasks"
                       elementType="div">
                       <ul class="d-flex px-0 mb-0 ml-4">

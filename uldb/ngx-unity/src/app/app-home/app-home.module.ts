@@ -86,7 +86,7 @@ import { PublicCloudComponent } from './infra-as-a-service/public-cloud/public-c
       provide: DateAdapter,
       useFactory: adapterFactory
     }),
-    ModalModule.forRoot(),
+    // ModalModule.forRoot(),
     CollapseModule.forRoot(),
     DragDropModule,
     InfiniteScrollModule,

@@ -9,6 +9,8 @@ import { UserInfoService } from '../../user-info.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupportedLLMConfigData } from '../../SharedEntityTypes/ai-chatbot/llm-model.type';
 import { takeUntil } from 'rxjs/operators';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ConditionInvestigationNewTerminalService } from '../condition-investigation-new-terminal/condition-investigation-new-terminal.service';
 
 @Component({
   selector: 'condition-investigation-chatbot',
@@ -34,6 +36,11 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   conversationId: string = null;
   title: string;
 
+  command: string = '';
+
+  @ViewChild('executeCommand') executeCommand: ElementRef;
+  confirmExecutionModalRef: BsModalRef;
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
@@ -44,7 +51,9 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
   constructor(private service: ConditionInvestigationChatbotService,
     private userInfoService: UserInfoService,
     private router: Router,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private modalService: BsModalService,
+    private newTerminalService: ConditionInvestigationNewTerminalService) {
     this.route.queryParams.subscribe(params => {
       console.log(params);
       this.conversationId = params['conversation_id'] || null;
@@ -408,5 +417,25 @@ export class ConditionInvestigationChatbotComponent implements OnInit, OnDestroy
     this.ngUnsubscribe.complete();
     this.ngUnsubscribe = new Subject();
     this.shouldScroll = false;
+  }
+
+  onMarkdownClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const codeEl = target.closest('code');
+    if (codeEl) {
+      this.command = codeEl.textContent?.trim();
+      if (this.command) {
+        this.confirmExecutionModalRef = this.modalService.show(this.executeCommand, Object.assign({}, { class: '', keyboard: true, ignoreBackdropClick: true }));
+      }
+    }
+  }
+
+  confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
+    this.confirmExecutionModalRef.hide();
+    localStorage.setItem('terminal_command', this.command);
+    this.newTerminalService.setPendingTabType(tabType);
+    this.newTerminalService.setConversationId(this.conversationId);
+    this.newTerminalService.setBackendTabId(null);
+    this.newTerminalService.openTerminal();
   }
 }

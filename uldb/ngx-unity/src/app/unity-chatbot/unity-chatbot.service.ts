@@ -15,11 +15,16 @@ export class UnityChatbotService {
   onFilterChangeSource = new Subject<{ from: string, to: string }>();
   onFilterChangeAnnounced$ = this.onFilterChangeSource.asObservable();
   onChatTrigger$ = new BehaviorSubject<Boolean>(false);
+  private sidebarExpanded = new Subject<void>();
+  sidebarExpanded$ = this.sidebarExpanded.asObservable();
 
   constructor(private builder: FormBuilder,
     private http: HttpClient) { }
 
-  // get enhanced llm object
+  onSidebarExpand() {
+    this.sidebarExpanded.next();
+  }
+
   getSupportedLLMModelList(): Observable<SupportedLLMConfigData[]> {
     return this.http.get<SupportedLLMConfig>(`/mcp/get-supported-llm-configs/`).pipe(
       map((res: SupportedLLMConfig) => {
@@ -130,7 +135,7 @@ export class UnityChatbotService {
   }
 
   getDocuments(conversationId: string): Observable<ChatDocuments> {
-    const data = { conversation_id: conversationId};
+    const data = { conversation_id: conversationId };
     return this.http.post<ChatDocuments>('mcp/get_conversation_document_ids/', data)
   }
 

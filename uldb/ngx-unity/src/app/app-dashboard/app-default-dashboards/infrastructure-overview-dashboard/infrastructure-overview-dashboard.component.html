@@ -522,11 +522,11 @@
                     <thead class="bg-light">
                         <tr>
                             <th class="w-10">ID</th>
-                            <th class="w-20">Device Name</th>
+                            <th class="w-18">Device Name</th>
                             <th class="w-10 text-center">Severity</th>
                             <th class="w-20">Description</th>
                             <th class="w-10">Source</th>
-                            <th class="w-15">Acknowledged</th>
+                            <th class="w-17">Acknowledged</th>
                             <th class="w-15">Duration</th>
                             <th style="width:17px" *ngIf="hasScroll"></th>
                         </tr>
@@ -538,7 +538,7 @@
                                     type="button" [tooltip]="view.id"
                                     (click)="viewAlertDetails(view.uuid)">{{view.id}}</button>
                             </td>
-                            <td class="tdw-20">
+                            <td class="tdw-18">
                                 <div [tooltip]="view.deviceName">{{view.deviceName}}</div>
                             </td>
                             <td class="w-10 text-center">
@@ -552,7 +552,7 @@
                             <td class="tdw-10">
                                 <div [tooltip]="view.source">{{view.source}}</div>
                             </td>
-                            <td class="tdw-15">
+                            <td class="tdw-17">
                                 <div [tooltip]="view.acknowledged">{{view.acknowledged}}</div>
                             </td>
                             <td class="tdw-15">
@@ -648,8 +648,8 @@
     <div class="col-3 pr-0">
         <div class="card round-edge equalize-card">
             <app-spinner [name]="'InfrastructureRawEventsLoader'"></app-spinner>
-            <div class="card-body d-flex flex-column justify-content-between">
-                <div class="card round-edge mb-0">
+            <div class="card-body d-flex flex-column">
+                <div class="card round-edge mb-3">
                     <div class="card-body d-flex flex-column p-2">
                         <div class="d-flex justify-content-between">
                             <div class="ml-1">
@@ -674,7 +674,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card round-edge mb-0">
+                <div class="card round-edge mb-3">
                     <div class="card-body d-flex flex-column  p-2">
                         <div class="d-flex justify-content-between">
                             <div class="ml-1">
@@ -803,7 +803,8 @@
                                     (click)="goToGraphDetails(view.host, 'CPU utilization', view.monitoring)"
                                     accessControl moduleName="Monitoring" accessType="View Monitoring"
                                     elementType="div"><span class="font-500"
-                                        [ngClass]="getPercentageClass(view.lastValue)">{{view.lastValue}}%</span></button>
+                                        [ngClass]="getPercentageClass(view.lastValue)"
+                                        [tooltip]="view.lastValue + '%'">{{view.lastValue}}%</span></button>
                             </td>
                         </tr>
                         <tr colspan="3" *ngIf="!cpuUtilizationViewData?.length"
@@ -859,7 +860,7 @@
                                     (click)="goToGraphDetails(view.host, 'I/O: Memory utilization', view.monitoring)"
                                     accessControl moduleName="Monitoring" accessType="View Monitoring"
                                     elementType="div"><span class="font-500"
-                                        [ngClass]="getPercentageClass(view.lastValue)">{{view.lastValue}}%</span></button>
+                                        [ngClass]="getPercentageClass(view.lastValue)" [tooltip]="view.lastValue + '%'">{{view.lastValue}}%</span></button>
                             </td>
                         </tr>
                         <tr colspan="3" *ngIf="!ramUtilizationViewData?.length"

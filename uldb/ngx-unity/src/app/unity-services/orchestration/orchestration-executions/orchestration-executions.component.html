@@ -1,90 +1,148 @@
 <div class="row mt--3" *ngIf="listSummaryViewData && tableData">
-  <div class="col-12 p-0">
-    <div class="row">
-      <div class="col-2 pr-1">
-        <div class="card mb-0">
-          <div class="card-body py-2 my-1">
-            <div class="card-title mb-0 pt">Execution</div>
-            <div class="row pb">
-              <div class="col-12 d-flex flex-column">
-                <div class="row m-0 p-0">
-                  <div class="col-4 m-0 p-0" *ngFor="let val of listSummaryViewData?.total">
-                    <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage"></span>
-                    <span class="text-primary text-value-xs">{{val.count}}</span>
-                  </div>
-                </div>
+  <div class="execution-summary-row">
+
+    <!-- Execution -->
+    <div class="execution-summary-col execution-col-total pr-1">
+      <div class="card mb-0 equalize-card">
+        <div class="card-body execution-card-body py-2 my-1">
+
+          <div class="card-title mb-0">Execution</div>
+
+          <div class="pb">
+            <div class="summary-inline">
+
+              <div class="summary-icon-item" *ngFor="let val of listSummaryViewData?.total">
+
+                <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage">
+                </span>
+
+                <span class="text-primary text-value-xs">
+                  {{val.count}}
+                </span>
+
               </div>
+
             </div>
           </div>
-        </div>
-      </div>
-      <div class="col-4 px-1">
-        <div class="card mb-0">
-          <div class="card-body py-2 my-1">
-            <div class="card-title mb-0">Type</div>
-            <div class="row">
-              <div class="col-5 d-flex flex-column">
-                <div class="text-muted text-xs mr-2">Task</div>
-                <div class="row ml-0">
-                  <div class="col-4 p-0" *ngFor="let val of listSummaryViewData?.type?.task">
-                    <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage"></span>
-                    <span class="text-primary text-value-xs">{{val.count}}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="col-2 mt-2">
-                <span class="border border-secondary mx-2 py-3"></span>
-              </div>
-              <div class="col-5 d-flex flex-column">
-                <div class="text-muted text-xs mr-2">Workflow</div>
-                <div class="row m-0">
-                  <div class="col-4 p-0" *ngFor="let val of listSummaryViewData?.type?.workflow">
-                    <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage"></span>
-                    <span class="text-primary text-value-xs">{{val.count}}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 pl-1">
-        <div class="card mb-0">
-          <div class="card-body py-2 my-1">
-            <div class="card-title mb-0">Category</div>
-            <div class="row">
-              <div class="col-12 d-flex flex-column">
-                <div class="row m-0">
-                  <div class="col-4 p-0" *ngFor="let cat of listSummaryViewData?.categories;let i=index">
-                    <div class="row">
-                      <div class="col-10">
-                        <div class="row">
-                          <div class="col-12 text-muted text-value-xs mr-2">{{cat.category}}</div>
-                          <div class="col-4 pr-0" *ngFor="let stat of cat.status">
-                            <span class="fa mr-1" [tooltip]="" [ngClass]="stat.icon"
-                              [tooltip]="stat.tooltipMessage"></span>
-                            <span class="text-primary text-value-xs">{{stat.count}}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-2 my-2" *ngIf="i<2">
-                        <span class="border border-secondary ml-2 my-5 py-2"></span>
-                      </div>
-                      <span *ngIf="i>=2 && listSummaryViewData?.remainingCategories?.length"
-                        class="badge users-count mt-3 text-primary" [popover]="popTemplate" container="body"
-                        [outsideClick]="true">{{listSummaryViewData?.remainingCategories?.length}}</span>
-                    </div>
-                  </div>
-                  <!-- <span *ngIf="listSummaryViewData?.remainingCategories?.length"
-                    class="badge users-count mt-3 text-primary" [popover]="popTemplate" container="body"
-                    [outsideClick]="true">{{listSummaryViewData?.remainingCategories?.length}}</span> -->
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
+
+    <!-- Type -->
+    <div class="execution-summary-col execution-col-type px-1">
+      <div class="card mb-0 equalize-card">
+        <div class="card-body execution-card-body py-2 my-1">
+
+          <div class="card-title mb-0">Type</div>
+
+          <div class="type-container">
+
+            <!-- Task -->
+            <div class="type-section">
+              <div class="text-muted text-xs mr-2">Task</div>
+
+              <div class="summary-inline">
+
+                <div class="summary-icon-item" *ngFor="let val of listSummaryViewData?.type?.task">
+
+                  <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage">
+                  </span>
+
+                  <span class="text-primary text-value-xs">
+                    {{val.count}}
+                  </span>
+
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="type-divider">
+              <span class="border border-secondary"></span>
+            </div>
+
+            <!-- Workflow -->
+            <div class="type-section">
+              <div class="text-muted text-xs mr-2">Workflow</div>
+
+              <div class="summary-inline">
+
+                <div class="summary-icon-item" *ngFor="let val of listSummaryViewData?.type?.workflow">
+
+                  <span class="fa mr-1" [tooltip]="" [ngClass]="val.icon" [tooltip]="val.tooltipMessage">
+                  </span>
+
+                  <span class="text-primary text-value-xs">
+                    {{val.count}}
+                  </span>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="execution-summary-col execution-col-category pl-1">
+      <div class="card mb-0 equalize-card">
+        <div class="card-bod execution-card-body py-2 my-1">
+
+          <div class="card-title mb-0">Category</div>
+
+          <div class="category-container">
+
+            <div class="category-item" *ngFor="let cat of listSummaryViewData?.categories;let i=index">
+
+              <div class="category-content">
+
+                <div class="text-muted text-value-xs mr-2">
+                  {{cat.category}}
+                </div>
+
+                <div class="summary-inline">
+
+                  <div class="summary-icon-item" *ngFor="let stat of cat.status">
+
+                    <span class="fa mr-1" [tooltip]="" [ngClass]="stat.icon" [tooltip]="stat.tooltipMessage">
+                    </span>
+
+                    <span class="text-primary text-value-xs">
+                      {{stat.count}}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="category-divider" *ngIf="i<2">
+                <span class="border border-secondary"></span>
+              </div>
+
+              <span *ngIf="i>=2 && listSummaryViewData?.remainingCategories?.length"
+                class="badge users-count mt-3 text-primary" [popover]="popTemplate" container="body"
+                [outsideClick]="true">
+
+                {{listSummaryViewData?.remainingCategories?.length}}
+
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
   <div class="col-12 mt-2 p-0">
     <div class="card">
@@ -104,7 +162,8 @@
           </div>
           <div>
             <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
-              (pageSizeChange)="pageSizeChange($event)" [isAllEnabled]="isPageSizeAll" [isLargeSize]="true"></table-page-size>
+              (pageSizeChange)="pageSizeChange($event)" [isAllEnabled]="isPageSizeAll"
+              [isLargeSize]="true"></table-page-size>
           </div>
         </div>
         <table class="table table-sm text-left" sortableTable (sorted)="onSorted($event)">

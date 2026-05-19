@@ -247,7 +247,7 @@
                                                     *ngIf="plannerFormErrors.power[i].entity_type">
                                                     {{plannerFormErrors.power[i].entity_type}}</div>
                                             </div>
-                                            <div class="col-3 form-group mr-3">
+                                            <div class="col-2 form-group mr-3">
                                                 <label for="unit_cost">Unit Cost<em>*</em></label>
                                                 <i class="fa fa-info-circle text-muted ml-2" container="body"
                                                     containerClass="info-multi-line" [tooltip]="'Cost per month'"></i>
@@ -274,7 +274,7 @@
                                                     </label>
                                                 </div>
                                             </div>
-                                            <ngContainer class="col-3 form-group pl-1"
+                                            <ngContainer class="col-2 form-group pl-1"
                                                 *ngIf="plannerForm.get('power').controls[i].get('pdu_redundant_flag').value">
                                                 <label for="unit_cost">Unit Cost</label>
                                                 <i class="fa fa-info-circle text-muted ml-2" container="body"
@@ -293,7 +293,7 @@
                                                     *ngIf="plannerFormErrors.power[i].pdu_redundant_cost">
                                                     {{plannerFormErrors.power[i].pdu_redundant_cost}}</div>
                                             </ngContainer>
-                                            <div class="col-1 form-group mt-4">
+                                            <div class="col-2 form-group mt-4">
                                                 <span class="form-control border-0 p-0">
                                                     <button tooltip="Remove Condition"
                                                         *ngIf="plannerForm.controls.power.controls.length > 1"

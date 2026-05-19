@@ -20,6 +20,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntil } from 'rxjs/operators';
 import { NetworkAgentsChatResponseType } from './condition-investigation-chatbot/condition-investigation-chatbot.type';
 import { ConditionInvestigationNewTerminalService } from './condition-investigation-new-terminal/condition-investigation-new-terminal.service';
+import { ConditionInvestigationFloatingTerminalService } from './condition-investigation-floating-terminal/condition-investigation-floating-terminal.service';
+import { ConditionInvestigationTerminalWindowRegistryService } from './condition-investigation-new-terminal/condition-investigation-terminal-window-registry.service';
 
 @Component({
   selector: 'condition-investigation',
@@ -46,6 +48,11 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
 
   chatResponse: any;
   chatResponseHistoryData: any[] = [];
+
+  private registryChannel = new BroadcastChannel('terminal-tabs');
+  lastOpenedWindow: any;
+
+  isTerminalReady = false;
 
   @ViewChild('chatResponsHistoryScrollContainer') chatResponsHistoryScrollContainer: ElementRef;
   @ViewChildren('chatResponseHistory') chatResponseHistory: QueryList<ElementRef>;
@@ -87,13 +94,24 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     private ticketService: SharedCreateTicketService,
     private termService: FloatingTerminalService,
     private appService: AppLevelService,
-    private newTerminalService: ConditionInvestigationNewTerminalService) {
+    private newTerminalService: ConditionInvestigationNewTerminalService,
+    private floatingTerminalService: ConditionInvestigationFloatingTerminalService,
+    private windowRegistry: ConditionInvestigationTerminalWindowRegistryService,) {
     this.route.paramMap.pipe(takeUntil(this.ngUnsubscribe)).subscribe((params: ParamMap) => {
       this.conditionId = params.get('conditionId');
       this.conditionUuid = params.get('conditionUuid');
     });
     this.activityCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
     this.promptCurrentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE };
+    this.registryChannel.onmessage = (e) => {
+      if (e.data.type === 'REGISTER') {
+        if (this.lastOpenedWindow) {
+          this.windowRegistry.register(e.data.tabId, this.lastOpenedWindow);
+          this.lastOpenedWindow = null;
+        }
+        this.registryChannel.postMessage({ type: 'REGISTER_ACK', tabId: e.data.tabId });
+      }
+    };
   }
 
   ngOnInit(): void {
@@ -323,6 +341,7 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
     }
     // if (res == null || res?.answer?.phase == 'General') { return; }
     if (res == null) { return; }
+    this.isTerminalReady = true;
     if (res?.meta?.filters_used?.conversation_id) {
       this.conversationId = res?.meta?.filters_used?.conversation_id;
       this.newTerminalService.setConversationId(res?.meta?.filters_used?.conversation_id);
@@ -453,10 +472,18 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
   }
 
   consoleNewTab(view: any) {
-    window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+    if (!this.isTerminalReady) return;
+    this.newTerminalService.setBackendTabId(null);
+    this.newTerminalService.setPendingTabType('newTab');
+    this.newTerminalService.setConversationId(this.conversationId);
+    this.newTerminalService.openTerminal();
   }
 
   consoleSameTab(view: any) {
+    if (!this.isTerminalReady) return;
+    this.newTerminalService.setBackendTabId(null);
+    this.newTerminalService.setPendingTabType('sameTab');
+    this.newTerminalService.setConversationId(this.conversationId);
     this.newTerminalService.openTerminal();
   }
 
@@ -472,10 +499,70 @@ export class ConditionInvestigationComponent implements OnInit, OnDestroy {
 
   }
 
-  confirmExecuteModal() {
+  // confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
+  //   this.confirmExecutionModalRef.hide();
+
+  //   const tabParam = tabType === 'sameTab' ? 'same' : 'new';
+
+  //   this.svc.getTab(tabParam, this.conversationId).subscribe((res: any) => {
+
+  //     const backendTabId = res?.tab_id;
+  //     this.newTerminalService.setBackendTabId(backendTabId || null);
+  //     localStorage.setItem('terminal_command', this.command);
+  //     // CASE 1: backend returned an existing free tab
+  //     if (backendTabId) {
+
+  //       if (tabType === 'sameTab') {
+  //         const exists = this.floatingTerminalService.hasTerminal(backendTabId);
+  //         if (exists) {
+  //           this.newTerminalService.openTerminal();
+  //           // this.floatingTerminalService.executeInTerminal(backendTabId, this.command, tabType);
+  //           // this.floatingTerminalService.switchToTab(backendTabId);
+  //           return;
+  //         }
+  //         this.newTerminalService.setPendingTabType(tabType);
+  //         this.newTerminalService.setConversationId(this.conversationId);
+  //         this.newTerminalService.openTerminal();
+  //         return;
+
+  //       } else {
+  //         //  Backend guarantees this tab is alive and free
+  //         // Just focus it and execute the command — no PING needed
+
+  //         const focused = this.windowRegistry.focus(backendTabId);
+
+  //         // Post PING so the existing tab executes the command
+  //         this.registryChannel.postMessage({ type: 'PING', tabId: backendTabId });
+  //         return;
+  //       }
+  //     }
+
+  //     // CASE 2: backend returned {} — no free tab, open a fresh one
+  //     this.newTerminalService.setPendingTabType(tabType);
+  //     this.newTerminalService.setConversationId(this.conversationId);
+
+  //     if (tabType === 'sameTab') {
+  //       this.newTerminalService.openTerminal();
+
+  //     } else {
+  //       const newWin = window.open(
+  //         `/main#/terminal-new-tab?conversationId=${this.conversationId}`,
+  //         '_blank'
+  //       );
+  //       if (newWin) {
+  //         this.lastOpenedWindow = newWin;
+  //       }
+  //     }
+  //   });
+  // }
+
+  confirmExecuteModal(tabType: 'sameTab' | 'newTab') {
     this.confirmExecutionModalRef.hide();
     localStorage.setItem('terminal_command', this.command);
-    window.open(`/main#/terminal-new-tab?conversationId=${this.conversationId}`, '_blank');
+    this.newTerminalService.setPendingTabType(tabType);
+    this.newTerminalService.setConversationId(this.conversationId);
+    this.newTerminalService.setBackendTabId(null);
+    this.newTerminalService.openTerminal();
   }
 
 }

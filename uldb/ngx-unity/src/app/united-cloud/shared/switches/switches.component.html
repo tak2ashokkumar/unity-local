@@ -56,8 +56,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let view of viewData" setTableColumnWidth truncateText>
-              <td class="tdw-2">
+            <tr *ngFor="let view of viewData" setTableColumnWidth>
+              <td class="checkbox-column">
                 <span class="bg-white mr-1 text-primary" (click)="$event.stopPropagation();select(view);" accessControl
                   moduleName="Datacenter" [modulePermissions]="view.applicableModulePermissions">
                   <i [ngClass]="view.isSelected? 'fas fa-check-square': 'far fa-square'"></i>

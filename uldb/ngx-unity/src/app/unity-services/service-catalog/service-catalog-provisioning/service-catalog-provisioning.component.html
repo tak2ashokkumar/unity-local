@@ -110,7 +110,7 @@
             <div *ngIf="viewData" class="row mx-0">
                 <ng-container *ngFor="let view of viewData; let i = index;">
                     <div class="col-4" [ngClass]="getClass(i)">
-                        <div class="card mb-2 rounded">
+                        <div class="card mb-2 rounded" style="min-height: 239px;">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div class="font-lg">{{view.name}}</div>
                                 <div class="text-muted font-sm">{{view.catalogType}}</div>

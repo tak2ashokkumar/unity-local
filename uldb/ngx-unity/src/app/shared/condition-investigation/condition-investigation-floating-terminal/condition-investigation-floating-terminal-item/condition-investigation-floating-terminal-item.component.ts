@@ -18,6 +18,8 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
   termInput: { input: any, auth: AuthType };
   @Input()
   index: number;
+  isRunning: boolean = false;
+  @Input() tabType: 'sameTab' | 'newTab';
 
   input: any;
   auth: AuthType;
@@ -50,6 +52,7 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
   ngOnDestroy() {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+    this.termService.unregisterTerminal(this.input.tabId);
     this.term.dispose();
     this.wsClient.close();
   }
@@ -60,8 +63,10 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
     this.term.loadAddon(this.fitAddon);
     this.term.open(document.getElementById('term-' + this.index));
     this.fitAddon.fit();
-    let obj = Object.assign({ hostname: this.auth.host, port: this.auth.port, password: this.auth.password, username: this.auth.username,collector_uuid: this.auth.collector_uuid, conversation_id: this.auth.conversation_id, uuid: this.input.deviceId, org_id: this.auth.org_id, agent_id: this.auth.agent_id, pkey: this.auth.pkey }, this.getRowsCols());
+    let obj = Object.assign({ hostname: this.auth.host, port: this.auth.port, collector_uuid: this.auth.collector_uuid, password: this.auth.password, username: this.auth.username, conversation_id: this.auth.conversation_id, uuid: this.input.tabId, tab_type: this.auth.tab_type, org_id: this.auth.org_id, agent_id: this.auth.agent_id, pkey: this.auth.pkey }, this.getRowsCols());
     this.wsClient = new WSSHClient(obj);
+    this.termService.registerTerminal(this.input.tabId, this.wsClient, this.tabType);
+    this.termService.setTabRunning(this.input.tabId, false);
     this.term.write(`Connecting to ${this.input.deviceName}...`);
     this.wsClient.connect();
     this.subscribeToEvent();
@@ -75,13 +80,22 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
       this.term.onData((data: any) => {
         this.sendDataToClient(data);
       });
-      // this.term.on('paste', (data) => {
-      //   this.sendDataToClient(data);
-      // });
     });
 
     this.wsClient.onMessage.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.term.write(res);
+
+      // VERY IMPORTANT: detect command start
+      if (!this.isRunning && this.wsClient['_commandSent']) {
+        this.isRunning = true;
+        this.termService.setTabRunning(this.input.tabId, true);
+      }
+
+      // detect command end (basic heuristic)
+      if (this.wsClient.isShellReady(res)) {
+        this.isRunning = false;
+        this.termService.setTabRunning(this.input.tabId, false);
+      }
     });
 
     this.wsClient.onClose.pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {

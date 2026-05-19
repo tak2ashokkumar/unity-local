@@ -137,6 +137,7 @@ export interface VirtualMachineDetails {
     monitoring: vmMonitoring;
     cloud: vmCloud;
     management_ip: string;
+    os_category: string;
     mgmt_ip_address: string;
     failed_alerts_count: number;
     datacenter: string;

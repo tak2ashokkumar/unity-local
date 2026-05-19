@@ -487,7 +487,9 @@
             <div class="font-500 mt-2">{{command}}</div>
         </div>
         <div class="card-footer">
-            <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmExecuteModal()">Yes</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('sameTab')">Yes, Manage in Same tab</button>
+            <button class="btn btn-sm btn-success btn-outline pull-right ml-1" type="button" (click)="confirmExecuteModal('newTab')"> Yes, Manage in New tab</button>
+            <!-- <button class="btn btn-sm btn-success pull-right ml-1" type="button" (click)="confirmExecuteModal()">Yes</button> -->
             <button class="btn btn-sm btn-danger pull-right" (click)="confirmExecutionModalRef.hide()"
                 type="button">No</button>
         </div>

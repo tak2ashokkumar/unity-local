@@ -67,6 +67,7 @@ export class UchChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   attachedFiles: ChatDocument[] = [];
   fileUploadErrorMessage: string = '';
 
+  @Input() isExpanded : boolean;
   constructor(private service: UchChatService,
     private userService: UserInfoService,
     private router: Router) {

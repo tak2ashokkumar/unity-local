@@ -1,10 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { ADD_LDAP_CONFIG, EDIT_LDAP_CONFIG, GET_LDAP_CONFIG_DETAILS_BY_ID } from 'src/app/shared/api-endpoint.const';
+import { ADD_LDAP_CONFIG, EDIT_LDAP_CONFIG, GET_AGENT_CONFIGURATIONS, GET_LDAP_CONFIG_DETAILS_BY_ID } from 'src/app/shared/api-endpoint.const';
 import { NoWhitespaceValidator } from 'src/app/shared/app-utility/app-utility.service';
 import { LDAPConfigFormDataType, LDAPConfigType } from 'src/app/unity-setup/unity-setup-ldap-config/unity-setup-ldap-config.type';
+import { DeviceDiscoveryAgentConfigurationType } from 'src/app/unity-setup/unity-setup-on-boarding/advanced-discovery-connectivity/agent-config.type';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,11 @@ export class UnitySetupLdapCrudService {
     return this.http.get<LDAPConfigType>(GET_LDAP_CONFIG_DETAILS_BY_ID(ldapConfigId));
   }
 
+  getCollectors() {
+    const params = new HttpParams().set('page_size', '0');
+    return this.http.get<DeviceDiscoveryAgentConfigurationType[]>(GET_AGENT_CONFIGURATIONS(), { params: params });
+  }
+
   buildCredentialForm(ldapConfigData: LDAPConfigType): FormGroup {
     if (ldapConfigData) {
       return this.builder.group({
@@ -25,7 +31,9 @@ export class UnitySetupLdapCrudService {
         'username': [ldapConfigData.username, [Validators.required, NoWhitespaceValidator]],
         'password': ['', [Validators.required, NoWhitespaceValidator]],
         'dc': [ldapConfigData.dc, [Validators.required, NoWhitespaceValidator]],
-        'ldap_port': [ldapConfigData.ldap_port, [Validators.required, NoWhitespaceValidator]]
+        'ldap_port': [ldapConfigData.ldap_port, [Validators.required, NoWhitespaceValidator]],
+        'collector': [ldapConfigData.collector, [Validators.required, NoWhitespaceValidator]]
+
       });
     } else {
       return this.builder.group({
@@ -33,7 +41,9 @@ export class UnitySetupLdapCrudService {
         'username': ['', [Validators.required, NoWhitespaceValidator]],
         'password': ['', [Validators.required, NoWhitespaceValidator]],
         'dc': ['', [Validators.required, NoWhitespaceValidator]],
-        'ldap_port': ['', [Validators.required, NoWhitespaceValidator]]
+        'ldap_port': ['', [Validators.required, NoWhitespaceValidator]],
+        'collector': ['', [Validators.required, NoWhitespaceValidator]]
+
       });
     }
   }
@@ -44,7 +54,8 @@ export class UnitySetupLdapCrudService {
       'username': '',
       'password': '',
       'dc': '',
-      'ldap_port': ''
+      'ldap_port': '',
+      'collector': '',
     };
     return credentialFormErrors;
   }
@@ -64,6 +75,9 @@ export class UnitySetupLdapCrudService {
     },
     'ldap_port': {
       'required': 'LDAP Port is required'
+    },
+    'collector': {
+      'required': 'Collector is required'
     }
   }
 

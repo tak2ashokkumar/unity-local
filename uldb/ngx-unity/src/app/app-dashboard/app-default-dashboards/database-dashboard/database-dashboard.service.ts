@@ -183,9 +183,6 @@ export class DatabaseDashboardService {
   }
 
   convertToSummaryViewData(data: InventoryWidgetType): DatabaseDashboardMetric[] {
-    if (!data) {
-      return
-    }
     return [
       {
         label: 'Total DB instances',
@@ -612,11 +609,10 @@ export class DatabaseDashboardService {
   }
 
   convertToCapacityMetricsViewData(data: DBDashboardSummaryStats): DatabaseDashboardCapacityMetric[] {
-    if (!data) { return; }
     return [
-      { label: 'Total DB Size', value: `${data.total_db_size_gb} GB`, helper: 'Database Storage' },
-      { label: 'Total Free Space', value: `${data.total_free_space_gb} GB`, helper: 'Combined Free Capacity' },
-      { label: 'Avg Storage Used', value: `${data.avg_used_percentage}%`, helper: 'Across 10 Servers' }
+      { label: 'Total DB Size', value: `${data?.total_db_size_gb ? data.total_db_size_gb : 0} GB`, helper: 'Database Storage' },
+      { label: 'Total Free Space', value: `${data?.total_free_space_gb ? data.total_free_space_gb : 0} GB`, helper: 'Combined Free Capacity' },
+      { label: 'Avg Storage Used', value: `${data?.avg_used_percentage ? data.avg_used_percentage : 0}%`, helper: 'Across 10 Servers' }
     ];
   }
 

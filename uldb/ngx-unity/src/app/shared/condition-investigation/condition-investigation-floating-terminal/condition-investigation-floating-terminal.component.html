@@ -38,7 +38,7 @@
         </scrollable-tab>
         <div class="terminal-container pl-3 pr-3">
             <div *ngFor="let term of terms; let i = index;" [ngClass]="{'d-none':activeIndex!=i}">
-                <condition-investigation-floating-terminal-item [termInput]="term"
+                <condition-investigation-floating-terminal-item [termInput]="term" [tabType]="'sameTab'"
                     [index]="i"></condition-investigation-floating-terminal-item>
             </div>
         </div>

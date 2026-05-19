@@ -894,9 +894,22 @@ export class OrchestrationSummaryService {
       rf.targetType = val.target_type;
       rf.isAdvanced = val.is_advanced;
       rf.isAgentic = val.is_agentic;
+      rf.triggerType = this.formatTriggerType(val.trigger_type);
       viewData.push(rf);
     });
     return viewData;
+  }
+
+  formatTriggerType(triggerType: string): string {
+    const triggerTypeMap = {
+      'Manual Trigger': 'manual-trigger',
+      'Schedule Trigger': 'schedule-trigger',
+      'AIML Event Trigger': 'aiml-trigger',
+      'ITSM Event Trigger': 'itsm-trigger',
+      'Chat Trigger': 'chat-trigger'
+    };
+
+    return triggerTypeMap[triggerType] || '';
   }
 
   getUpcomingExecutionData(): Observable<OrchestrationUpcomingExecutionsType[]> {
@@ -916,6 +929,7 @@ export class OrchestrationSummaryService {
       ue.taskOrWorkflowId = val.template_id;
       ue.type = val.type;
       ue.targetType = val.target_type;
+      ue.triggerType = this.formatTriggerType(val.trigger_type);
       viewData.push(ue);
     });
     return viewData;
@@ -1029,6 +1043,7 @@ export class RecentFailureViewModel {
   targetType: string;
   isAdvanced: boolean;
   isAgentic: boolean;
+  triggerType: string;
 }
 
 export class UpccomingExecutionViewModel {
@@ -1041,6 +1056,7 @@ export class UpccomingExecutionViewModel {
   taskOrWorkflowId: string;
   type: string;
   targetType: string;
+  triggerType: string;
 }
 
 export enum PlaybookName {

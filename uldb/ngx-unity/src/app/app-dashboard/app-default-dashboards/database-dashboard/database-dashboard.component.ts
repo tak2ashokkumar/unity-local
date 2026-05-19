@@ -292,7 +292,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          console.log("inventory resp,", res)
+          // console.log("inventory resp,", res)
           this.summaryMetrics = this.svc.convertToSummaryViewData(res);
           this.cloudTypeDistributionOptions = this.svc.convertToCloudTypeDistributionOptions(res.by_category);
           this.dbCountByPlatformOptions = this.svc.convertToPlatformCountOptions(res.by_type);
@@ -326,7 +326,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          console.log("top 10 util resp,", res)
+          // console.log("top 10 util resp,", res)
           this.utilizationRows = this.svc.convertToUtilizationRowsViewData(res);
         }
         this.spinnerService.stop(this.loaderNames.performancWorkloadUtilization);
@@ -355,7 +355,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          console.log("top 10 query resp,", res)
+          // console.log("top 10 query resp,", res)
           this.queryResponseOptions = this.svc.convertToQueryResponseOptions(res.top_response_time);
           this.queryLatencyOptions = this.svc.convertToQueryLatencyOptions(res.top_latency);
           this.activeSessionsOptions = this.svc.convertToActiveSessionsOptions(res.top_connections);
@@ -405,7 +405,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          console.log("capacity growth insights,", res)
+          // console.log("capacity growth insights,", res)
           this.capacityMetrics = this.svc.convertToCapacityMetricsViewData(res.summary_stats);
           this.storageRows = this.svc.convertToStorageRowsViewData(res.top_servers);
           this.tablespaceUsageOptions = this.svc.convertToTablespaceUsageOptions(res.top_tablespace_filesystem_usage);
@@ -447,7 +447,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          console.log("health overview,", res);
+          // console.log("health overview,", res);
           this.databaseAvailabilityStatus = this.svc.convertTodatabaseAvailabilityStatus(res.summary);
           this.replicationSync = this.svc.convertToReplicationSync(res.replication_sync);
         }
@@ -468,7 +468,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          console.log("alerts and events resp,", res)
+          // console.log("alerts and events resp,", res)
           this.alertSummaryMetrics = this.svc.convertToAlertSummaryViewData(res.summary);
           this.criticalAlerts = this.svc.convertToCriticalAlertsTableData(res.critical_alerts);
         }

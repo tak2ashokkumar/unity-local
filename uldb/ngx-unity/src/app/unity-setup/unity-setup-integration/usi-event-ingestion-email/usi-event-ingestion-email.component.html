@@ -27,13 +27,13 @@
                                 <search-box [searchValue]="currentCriteria.searchValue"
                                     (searched)="onSearched($event)"></search-box>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center w-30">
-                                <multiselect-dropdown class="form-control p-0 w-35" style="height:auto;"
+                            <div class="d-flex justify-content-end align-items-center w-80">
+                                <multiselect-dropdown class="form-control mr-2 p-0 w-15" style="height:auto;"
                                     [options]="accountTypesList" [settings]="accountTypeSettings"
                                     [texts]="accountTypeTexts" (dropdownClosed)="onFilterChange()"
                                     [(ngModel)]="currentCriteria.multiValueParam.account_type"></multiselect-dropdown>
 
-                                <multiselect-dropdown class="form-control p-0 w-35" style="height:auto;"
+                                <multiselect-dropdown class="form-control mr-2 p-0 w-15" style="height:auto;"
                                     [options]="statusList" [settings]="statusSettings" [texts]="statusTypeTexts"
                                     (dropdownClosed)="onFilterChange()"
                                     [(ngModel)]="currentCriteria.multiValueParam.status"></multiselect-dropdown>

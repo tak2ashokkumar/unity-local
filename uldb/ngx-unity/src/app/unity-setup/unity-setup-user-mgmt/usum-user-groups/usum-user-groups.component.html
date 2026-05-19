@@ -49,18 +49,26 @@
                                 <div [tooltip]="view.description">{{view.description}}</div>
                             </td>
                             <td class="tdw-10">
-                                <span [tooltip]="view.user">{{view.user}}</span>
-                                <span *ngIf="view.usersBadgeCount"
-                                    class="badge bg-secondary group-count rounded-3 w-auto ml-1 pointer-link"
-                                    [popover]="popUsersTemplate" container="body" (click)="showUsers(view)"
-                                    [outsideClick]="true">+{{view.usersBadgeCount}}</span>
+                                <div class="has-sub d-flex align-items-center">
+                                    <div class="tdsw-85">
+                                        <div [tooltip]="view.user">{{view.user}}</div>
+                                    </div>
+                                    <span *ngIf="view.usersBadgeCount"
+                                        class="badge bg-secondary group-count rounded-3 w-auto ml-1 pointer-link"
+                                        [popover]="popUsersTemplate" container="body" (click)="showUsers(view)"
+                                        [outsideClick]="true">+{{view.usersBadgeCount}}</span>
+                                </div>
                             </td>
                             <td class="tdw-10">
-                                <span [tooltip]="view.userRoleName">{{view.userRoleName}}</span>
-                                <span *ngIf="view.userRolesBadgeCount"
-                                    class="badge bg-secondary group-count rounded-3 w-auto ml-1 pointer-link"
-                                    [popover]="popUserRolesTemplate" container="body" (click)="showUserRoles(view)"
-                                    [outsideClick]="true">+{{view.userRolesBadgeCount}}</span>
+                                <div class="has-sub d-flex align-items-center">
+                                    <div class="tdsw-85">
+                                        <div [tooltip]="view.userRoleName">{{view.userRoleName}}</div>
+                                    </div>
+                                    <span *ngIf="view.userRolesBadgeCount"
+                                        class="badge bg-secondary group-count rounded-3 w-auto ml-1 pointer-link"
+                                        [popover]="popUserRolesTemplate" container="body" (click)="showUserRoles(view)"
+                                        [outsideClick]="true">+{{view.userRolesBadgeCount}}</span>
+                                </div>
                             </td>
                             <td class="tdw-15">
                                 <div [tooltip]="view.createdOn">{{view.createdOn}}</div>

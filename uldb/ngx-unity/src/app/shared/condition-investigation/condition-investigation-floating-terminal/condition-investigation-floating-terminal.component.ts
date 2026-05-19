@@ -16,7 +16,7 @@ import { ResizeEvent } from 'angular-resizable-element';
 })
 export class ConditionInvestigationFloatingTerminalComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
-  terms: { input: any, auth: AuthType }[] = [];
+  terms: { tabId: string, input: any, auth: AuthType }[] = [];
   activeIndex: number;
   show = false;
   autoRefresh = false;
@@ -27,7 +27,7 @@ export class ConditionInvestigationFloatingTerminalComponent implements OnInit, 
     this.newTerminalService.terminalData$
       .subscribe((data: any) => {
         const { input, auth } = data;
-        this.terms.push({ input, auth });
+        this.terms.push({ tabId: input.tabId, input, auth });
         this.activeIndex = this.terms.length - 1;
         this.show = true;
         setTimeout(() => {
@@ -38,7 +38,10 @@ export class ConditionInvestigationFloatingTerminalComponent implements OnInit, 
       });
   }
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.termService.switchTab$.subscribe(tabId => {
+      this.switchToTabById(tabId);
+    });
   }
 
   ngOnDestroy() {
@@ -96,7 +99,7 @@ export class ConditionInvestigationFloatingTerminalComponent implements OnInit, 
 
   getDetails(input: any) {
     this.spinner.start('main');
-    this.termService.getDetails(input.deviceType, input.deviceId)
+    this.termService.getDetails(input.deviceType, input.tabId)
       .pipe(takeUntil(this.ngUnsubscribe)).subscribe(
         (res: any) => {
           input.managementIp = res;
@@ -111,7 +114,7 @@ export class ConditionInvestigationFloatingTerminalComponent implements OnInit, 
   }
 
   openTerminalDirect(input, auth) {
-    this.terms.push({ input, auth });
+    this.terms.push({ tabId: input.tabId, input, auth });
     this.activeIndex = this.terms.length - 1;
     this.show = true;
   }
@@ -169,11 +172,23 @@ export class ConditionInvestigationFloatingTerminalComponent implements OnInit, 
   goTo(i: number) {
     this.activeIndex = i;
     this.publishActiveIndex();
+    const tabId = this.terms[i]?.input?.tabId;
+    if (tabId) {
+      this.termService.setTabRunning(tabId, false); // update lastUsed
+    }
+  }
+
+  switchToTabById(tabId: string) {
+    const index = this.terms.findIndex(t => t.tabId === tabId);
+
+    if (index !== -1) {
+      this.goTo(index);
+    }
   }
 
   private publishActiveIndex() {
     if (this.terms.length) {
-      this.termService.tabChanged(this.terms[this.activeIndex].input.deviceId, this.terms[this.activeIndex].input.deviceType);
+      this.termService.tabChanged(this.terms[this.activeIndex].input.tabId, this.terms[this.activeIndex].input.deviceType);
     } else {
       this.termService.tabChanged(null, null);
     }

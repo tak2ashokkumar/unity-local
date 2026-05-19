@@ -51,6 +51,10 @@ export class NetworkAgentConditionInvestigationService {
     return this.http.get<NetworkAgentConditionDetails>(GET_AIOPS_CONDITION_BY_ID(conditionUuid));
   }
 
+  getTab(tab: 'same' | 'new',conversationId: string) {
+    return this.http.get(`/mcp/cli_audit_logs/get_free_sessions/?conversation_id=${conversationId}&tab_type=${tab}`);
+  }
+
   convertToConditionDetailsViewdata(data: NetworkAgentConditionDetails): NetworkAgentConditionDetailsViewData {
     let viewdata: NetworkAgentConditionDetailsViewData = new NetworkAgentConditionDetailsViewData();
     viewdata.id = data.id;

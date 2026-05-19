@@ -57,7 +57,7 @@
         <table class="table table-sm text-left">
             <thead class="bg-light">
                 <tr>
-                    <th class="text-primary text-center pl-3 w-4" scope="col"
+                    <th class="text-primary text-center pl-3" style="width:21px;" scope="col"
                         (click)="$event.stopPropagation();selectAll()" style="font-size:1rem" accessControl
                         moduleName="Network Configuration" accessType="Manage Network Configuration"
                         elementType="div-hide">
@@ -75,12 +75,13 @@
             <tbody>
                 <tr *ngFor="let view of deviceList; let i = index" truncateText>
                     <ng-container [formGroup]="view.form" *ngIf="view.form">
-                        <td class="text-primary pl-1 text-center tdw-4" (click)="$event.stopPropagation();select(view)"
-                            style="font-size:1rem" accessControl moduleName="Network Configuration"
-                            accessType="Manage Network Configuration" elementType="div-hide">
+                        <td class="text-primary pl-1 text-center checkbox-column"
+                            (click)="$event.stopPropagation();select(view)" style="font-size:1rem" accessControl
+                            moduleName="Network Configuration" accessType="Manage Network Configuration"
+                            elementType="div-hide">
                             <i class="far" [ngClass]="view.isSelected? 'fa-check-square':'fa-square'"></i>
                         </td>
-                        <td class="tdw-14">
+                        <td class="tdw-11">
                             <div [tooltip]="view.name">{{view.name}}</div>
                         </td>
                         <td calss="tdw-10">{{view.deviceTypeDisplayName}}</td>

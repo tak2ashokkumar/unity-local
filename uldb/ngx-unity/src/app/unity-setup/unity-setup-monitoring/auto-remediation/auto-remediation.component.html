@@ -4,7 +4,7 @@
             <div class="col-2 p-1">
                 <div class="card round-edge mb-0 equalize-card" style="height: 102px;">
                     <div class="card-body py-2 my-1">
-                        <div class="card-title mb-2 mt-2 font-lg">Total Remediation Task</div>
+                        <div class="card-title mb-2 mt-2 font-lg text-truncate" tooltip="Total Remediation">Total Remediation Task</div>
                         <span class="text-primary text-value">{{viewDataSummary.total}}</span>
                     </div>
                 </div>
@@ -112,14 +112,12 @@
         <div class="card-body py-2">
             <div class="col-12 p-0 mb-2">
                 <div class="d-flex justify-content-between align-items-center w-100">
-                    <div class="w-80">
-                        <div class="w-20">
-                            <table-search-box [searchValue]="currentCriteria.searchValue"
-                                (searched)="onSearched($event)"></table-search-box>
-                        </div>
+                    <div class="w-15">
+                        <table-search-box [searchValue]="currentCriteria.searchValue"
+                            (searched)="onSearched($event)"></table-search-box>
                     </div>
-                    <div class="w-20">
-                        <form *ngIf="columnForm" class="col-12" [formGroup]="columnForm">
+                    <div class="d-flex justify-content-end align-items-center w-80">
+                        <form *ngIf="columnForm" class="w-22 mr-4" [formGroup]="columnForm">
                             <div class="form-group mb-0">
                                 <multiselect-dropdown class="form-control p-0" style="height:auto;"
                                     formControlName="columns" [options]="tableColumns"
@@ -127,8 +125,6 @@
                                     (dropdownClosed)="columnChange()"></multiselect-dropdown>
                             </div>
                         </form>
-                    </div>
-                    <div class="w-10">
                         <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
                             (pageSizeChange)="pageSizeChange($event)"></table-page-size>
                     </div>
@@ -196,7 +192,7 @@
                                 </ul>
                             </div>
                         </td>
-                        <td class="tdw-10 action-icons-column">
+                        <td class="action-icons-column">
                             <button class="action-icons mb-0 fas fa-history font-sm ml-1" tooltip="History"
                                 (click)="viewHistory(view)"></button>
                             <button class="action-icons mb-0 fas fa-pencil-alt font-sm ml-1" tooltip="Edit"
