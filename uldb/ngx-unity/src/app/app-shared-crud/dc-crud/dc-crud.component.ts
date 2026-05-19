@@ -79,14 +79,21 @@ export class DcCrudComponent implements OnInit, OnDestroy {
   }
 
   initLocation() {
-    if (this.isOnline) {
-      this.mapSvc.loadMap().then(() => {
+    this.isOnline = navigator.onLine;
+    if (navigator.onLine) {
+      this.mapSvc.importPlacesLibrary().then((placesLibrary) => {
+        if (!placesLibrary) {
+          this.useOfflineLocationFlow();
+          return;
+        }
+        this.isOnline = true;
         const input = document.getElementById('location') as HTMLInputElement;
         if (!input) return;
-        let autocomplete = new google.maps.places.Autocomplete(input, { types: [] });
+        let autocomplete = new placesLibrary.Autocomplete(input, { types: [] });
         autocomplete.setFields(['geometry', 'formatted_address']);
         autocomplete.addListener('place_changed', () => {
           let place = autocomplete.getPlace();
+          if (!place?.geometry?.location) return;
           this.datacenterForm.get('searchlocation').setValue(place.formatted_address);
           this.datacenterForm.get('location').setValue(place.formatted_address);
           this.datacenterForm.get('lat').setValue(place.geometry.location.lat());
@@ -94,8 +101,13 @@ export class DcCrudComponent implements OnInit, OnDestroy {
         });
       });
     } else {
-      this.crudService.getOfflineLocations().pipe(takeUntil(this.ngUnsubscribe)).subscribe();
+      this.useOfflineLocationFlow();
     }
+  }
+
+  private useOfflineLocationFlow() {
+    this.isOnline = false;
+    this.crudService.getOfflineLocations().pipe(takeUntil(this.ngUnsubscribe)).subscribe();
   }
 
   onLocationInput(value: string) {

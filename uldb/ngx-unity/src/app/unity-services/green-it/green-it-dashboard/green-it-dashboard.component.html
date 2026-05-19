@@ -98,7 +98,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-6" *ngIf="!mapService.mapHidden">
+            <div class="col-6" *ngIf="mapService.shouldShowMapWidgets()">
                 <div class="card mb-0 equalize-card">
                     <div class="card-body p-1">
                         <sustainability-map></sustainability-map>

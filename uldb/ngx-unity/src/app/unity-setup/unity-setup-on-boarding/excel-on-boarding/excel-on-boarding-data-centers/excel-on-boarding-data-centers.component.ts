@@ -9,6 +9,7 @@ import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { ExcelOnBoardingNextPrevService } from '../excel-on-boarding-next-prev/excel-on-boarding-next-prev.service';
 import { ExcelOnBoardingDataCentersService, ExcelOnBoardingDCViewdata } from './excel-on-boarding-data-centers.service';
+import { MapService } from 'src/app/map.service';
 
 @Component({
   selector: 'excel-on-boarding-data-centers',
@@ -27,7 +28,8 @@ export class ExcelOnBoardingDataCentersComponent implements OnInit, OnDestroy {
     private notification: AppNotificationService,
     private nxtPrvSvc: ExcelOnBoardingNextPrevService,
     private storage: StorageService,
-    private xlSvc: ExcelOnBoardingDataCentersService) {
+    private xlSvc: ExcelOnBoardingDataCentersService,
+    private mapSvc: MapService) {
     this.nxtPrvSvc.excelSaveCurrentAnnounced$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
       this.saveToTemp();
     });
@@ -62,12 +64,22 @@ export class ExcelOnBoardingDataCentersComponent implements OnInit, OnDestroy {
     });
   }
 
-  initLocation() {
+  async initLocation() {
+    if (!navigator.onLine) {
+      return;
+    }
+    const placesLibrary = await this.mapSvc.importPlacesLibrary();
+    if (!placesLibrary) {
+      return;
+    }
     this.viewData.forEach((dc, i) => {
-      let autocomplete = new google.maps.places.Autocomplete(document.getElementById(`${i}-searchlocation`) as HTMLInputElement, { types: [] });
+      const input = document.getElementById(`${i}-searchlocation`) as HTMLInputElement;
+      if (!input) return;
+      let autocomplete = new placesLibrary.Autocomplete(input, { types: [] });
       autocomplete.setFields(['geometry', 'formatted_address']);
       autocomplete.addListener('place_changed', (d) => {
         let place = autocomplete.getPlace();
+        if (!place?.geometry?.location) return;
         dc.form.get('searchlocation').setValue(place.formatted_address);
         dc.form.get(`location`).setValue(place.formatted_address);
         dc.form.get('lat').setValue(place.geometry.location.lat());

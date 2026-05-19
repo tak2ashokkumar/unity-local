@@ -1,3 +1,5 @@
+/// <reference types="google.maps" />
+
 import { Component, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Subject } from 'rxjs';
@@ -71,7 +73,13 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
     });
   }
 
-  drawMap() {
+  async drawMap() {
+    const mapsLibrary = await this.mapSvc.importMapsLibrary();
+    if (!mapsLibrary) {
+      this.isMapAvailable = false;
+      return;
+    }
+    const { Map } = mapsLibrary;
     this.ngZone.runOutsideAngular(() => {
       const mapProperties = {
         center: this.INIT_CENTER,
@@ -85,7 +93,7 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
         fullscreenControl: false,
         controlSize: 30,
       };
-      this.map = new google.maps.Map(this.mapElement.nativeElement, mapProperties);
+      this.map = new Map(this.mapElement.nativeElement, mapProperties);
       this.initialZoom = this.map.getZoom();
       this.addResetZoomControl();
 
@@ -172,12 +180,15 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
     });
   }
 
-  addMarkers(dcs: DatacenterInRegion[]) {
+  async addMarkers(dcs: DatacenterInRegion[]) {
+    const markerLibrary = await this.mapSvc.importMarkerLibrary();
+    if (!markerLibrary) return;
+    const { AdvancedMarkerElement } = markerLibrary;
     let bounds = new google.maps.LatLngBounds();
 
     dcs.map((dc, i) => {
       const ll = new google.maps.LatLng(dc.lat, dc.long);
-      const marker = new google.maps.marker.AdvancedMarkerElement({
+      const marker = new AdvancedMarkerElement({
         position: ll,
         map: this.map,
         title: dc.location,

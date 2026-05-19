@@ -24,7 +24,11 @@
     "strict": false,
     "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": false,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": [
+      "google.maps",
+      "node"
+    ]
   },
   "angularCompilerOptions": {
     "enableIvy": true,

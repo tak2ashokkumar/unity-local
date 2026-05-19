@@ -1,3 +1,5 @@
+/// <reference types="google.maps" />
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
@@ -91,7 +93,7 @@ export class SustainabilityMapService {
         dataSum += element.value;
         let view = new SustainabilityMapViewdata();
         view.region = key;
-        view.location = new google.maps.LatLng(element.lat, element.long)
+        view.location = { lat: element.lat, lng: element.long };
         view.co2 = element.value;
         view.datacenters = element.datacenters;
         arr.push(view);
@@ -123,7 +125,7 @@ export class SustainabilityMapService {
 export class SustainabilityMapViewdata {
   constructor() { }
   region: string;
-  location: google.maps.LatLng;
+  location: google.maps.LatLngLiteral;
   co2: number;
   percent: number;
   datacenters: DatacenterInRegion[];
@@ -158,7 +160,7 @@ export class SustainabilityMapDatacenterCluster {
 }
 
 export interface UnitySustainabilityCO2Overlay extends google.maps.OverlayView {
-  bound: google.maps.LatLng;
+  bound: google.maps.LatLngLiteral;
   hide(): void;
   show(): void;
   toggle(): void;
@@ -170,9 +172,9 @@ export interface UnitySustainabilityCO2Overlay extends google.maps.OverlayView {
  * The class definition is inside this function to avoid evaluating
  * `google.maps.OverlayView` at module load time (before Maps API loads).
  */
-export function createCO2Overlay(bound: google.maps.LatLng, percent: number): UnitySustainabilityCO2Overlay {
+export function createCO2Overlay(bound: google.maps.LatLngLiteral, percent: number): UnitySustainabilityCO2Overlay {
   const Overlay = class extends google.maps.OverlayView {
-    bound: google.maps.LatLng;
+    bound: google.maps.LatLngLiteral;
     private percent: number;
     private div?: HTMLElement;
     private circleSize = 50;

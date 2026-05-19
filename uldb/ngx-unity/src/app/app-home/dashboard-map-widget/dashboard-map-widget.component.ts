@@ -1,3 +1,5 @@
+/// <reference types="google.maps" />
+
 import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { Subject } from 'rxjs';
@@ -105,7 +107,13 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
     if (!this.mapElement?.nativeElement) {
       return;
     }
-    const { Map } = await this.mapSvc.importMapsLibrary();
+    const mapsLibrary = await this.mapSvc.importMapsLibrary();
+    if (!mapsLibrary) {
+      this.isMapAvailable = false;
+      this.spinner.stop('dashboard_map_widget');
+      return;
+    }
+    const { Map } = mapsLibrary;
     this.ngZone.runOutsideAngular(() => {
       const mapProperties = {
         center: this.INIT_CENTER,
@@ -173,7 +181,9 @@ export class DashboardMapWidgetComponent implements OnInit, AfterViewInit, OnDes
       this.cluster = null;
     }
 
-    const { AdvancedMarkerElement } = await this.mapSvc.importMarkerLibrary();
+    const markerLibrary = await this.mapSvc.importMarkerLibrary();
+    if (!markerLibrary) return;
+    const { AdvancedMarkerElement } = markerLibrary;
     this.viewdata.map((loc, i) => {
       // const ll = new google.maps.LatLng(loc.lat, loc.long);
       const ll = { lat: Number(loc.lat), lng: Number(loc.long) };

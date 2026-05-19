@@ -48,7 +48,8 @@ export class AppHomeComponent implements OnInit {
   }
 
   showDCMapWidget(): boolean {
-    return this.user.isDashboardOnlyUser ? true : (this.datacenterPermissionSet.view && !this.mapService.mapHidden);
+    return this.mapService.shouldShowMapWidgets()
+      && (this.user.isDashboardOnlyUser ? true : this.datacenterPermissionSet.view);
   }
 
   showInfraAsServiceWidget(): boolean {

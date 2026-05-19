@@ -155,16 +155,18 @@
             <div class="dashboard-empty-state" *ngIf="!publicCloudCoverage.length">No public cloud coverage data available.</div>
         </div>
 
-        <div class="section-title mt-3">Data Center Geographies</div>
-        <div class="dashboard-card datacenter-geography-card">
-            <app-spinner [name]="loaderNames.datacenterGeographies" [width]="0"></app-spinner>
-            <div #datacenterGeographyMap class="datacenter-geography-map"
-                *ngIf="datacenterGeographiesMapAvailable && datacenterGeographyViewData.length"></div>
-            <div class="dashboard-empty-state datacenter-geography-empty"
-                *ngIf="!datacenterGeographiesMapAvailable || !datacenterGeographyViewData.length">
-                {{ datacenterGeographiesMapAvailable ? 'No datacenter geography data available.' : 'Data Center Geographies map is unavailable.' }}
+        <ng-container *ngIf="mapSvc.shouldShowMapWidgets()">
+            <div class="section-title mt-3">Data Center Geographies</div>
+            <div class="dashboard-card datacenter-geography-card">
+                <app-spinner [name]="loaderNames.datacenterGeographies" [width]="0"></app-spinner>
+                <div #datacenterGeographyMap class="datacenter-geography-map"
+                    *ngIf="datacenterGeographiesMapAvailable && datacenterGeographyViewData.length"></div>
+                <div class="dashboard-empty-state datacenter-geography-empty"
+                    *ngIf="!datacenterGeographiesMapAvailable || !datacenterGeographyViewData.length">
+                    {{ datacenterGeographiesMapAvailable ? 'No datacenter geography data available.' : 'Data Center Geographies map is unavailable.' }}
+                </div>
             </div>
-        </div>
+        </ng-container>
 
         <div class="section-title mt-3">Data Center Infrastructure</div>
         <div class="dashboard-card metric-strip datacenter-infra-strip">

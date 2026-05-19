@@ -1,3 +1,5 @@
+/// <reference types="google.maps" />
+
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -184,7 +186,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   constructor(private svc: UnifiedAiopsCommandCentreService,
     private dashboardMapWidgetService: DashboardMapWidgetService,
-    private mapSvc: MapService,
+    public mapSvc: MapService,
     private router: Router,
     private route: ActivatedRoute,
     private ngZone: NgZone,
@@ -199,6 +201,20 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.mapSvc.mapVisibilityChanged$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(showMaps => {
+        this.datacenterGeographiesLoaded = false;
+        if (showMaps && this.hasFilterFormData()) {
+          this.getDatacenterGeographies(this.getFilterFormOutput());
+        } else {
+          this.datacenterGeographiesMapAvailable = false;
+          this.datacenterGeographyAllLocations = [];
+          this.datacenterGeographyViewData = [];
+          this.datacenterGeographyDcMap = {};
+          this.cleanupDatacenterGeographyMap();
+        }
+      });
     setTimeout(() => this.loadFilterOptionsAndDashboard(), 0);
   }
 
@@ -451,6 +467,16 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   getDatacenterGeographies(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    if (!this.mapSvc.shouldShowMapWidgets()) {
+      this.datacenterGeographiesLoaded = false;
+      this.datacenterGeographiesMapAvailable = false;
+      this.datacenterGeographyAllLocations = [];
+      this.datacenterGeographyViewData = [];
+      this.datacenterGeographyDcMap = {};
+      this.cleanupDatacenterGeographyMap();
+      return;
+    }
+
     if (this.datacenterGeographiesLoaded) {
       this.applyDatacenterGeographyFilter(filterFormOutput);
       return;
@@ -549,7 +575,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const { Map } = await this.mapSvc.importMapsLibrary();
+    const mapsLibrary = await this.mapSvc.importMapsLibrary();
+    if (!mapsLibrary) {
+      this.datacenterGeographiesMapAvailable = false;
+      return;
+    }
+    const { Map } = mapsLibrary;
     if (this.isDestroyed || !this.datacenterGeographyMapElementRef) {
       return;
     }
@@ -581,7 +612,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     }
 
     this.clearDatacenterGeographyMarkers();
-    const { AdvancedMarkerElement } = await this.mapSvc.importMarkerLibrary();
+    const markerLibrary = await this.mapSvc.importMarkerLibrary();
+    if (!markerLibrary) return;
+    const { AdvancedMarkerElement } = markerLibrary;
     if (this.isDestroyed || !this.datacenterGeographyMap) {
       return;
     }
