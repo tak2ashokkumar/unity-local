@@ -34,10 +34,11 @@ export const UNIFIED_AIOPS_OS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/o
 export const UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT = '/customer/aiops-dashboard/infra-platform-performance/';
 export const UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT = '/customer/aiops-dashboard/analytics-health-charts/';
 export const UNIFIED_AIOPS_ALERTS_ENDPOINT = '/customer/aiops-dashboard/alerts/';
+export const UNIFIED_AIOPS_PARENT_APPLICATIONS_ENDPOINT = '/apm/monitoring/parent_app_list/';
 export const UNIFIED_AIOPS_ORPHANED_DEVICES_ENDPOINT = '/customer/aiops-dashboard/orphaned-devices/';
-export const UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT = '/customer/aiops-dashboard/orphaned-devices-by-category/';
-export const UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT = '/customer/aiops-dashboard/idle-devices/';
-export const UNIFIED_AIOPS_IDLE_DEVICES_BY_DURATION_ENDPOINT = '/customer/aiops-dashboard/idle-devices-by-duration/';
+export const UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT = '/customer/aiops-dashboard/orphaned-devices-summary/';
+export const UNIFIED_AIOPS_IDLE_DEVICES_ENDPOINT = '/customer/aiops-dashboard/idle-device-analysis/';
+export const UNIFIED_AIOPS_IDLE_DEVICES_BY_DURATION_ENDPOINT = '/customer/aiops-dashboard/idle-duration-distribution/';
 export const UNIFIED_AIOPS_RECENT_ALERTS_ENDPOINT = '/customer/aiops-dashboard/recent-alerts/';
 export const UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/auto-remediation-summary/';
 export const UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT = '/customer/private_cloud_fast/';
@@ -368,22 +369,6 @@ export const UNIFIED_AIOPS_IDLE_DURATION_COLORS = [
   '#ff8a00',
   '#d63b3b',
   '#ff9aa2'
-];
-
-export const UNIFIED_AIOPS_APPLICATION_ROWS: UnifiedAiopsTableRow[] = [
-  { name: 'Astronomy Shop', throughput: '0.01', availability: 'N/A', responseTime: '0', status: 'success' },
-  { name: 'Easy Trade', throughput: '0.13', availability: 'N/A', responseTime: '0', status: 'warning' },
-  { name: 'Bank of Anthos', throughput: '0.01', availability: 'N/A', responseTime: '0', status: 'danger' },
-  { name: 'Flask', throughput: '0.13', availability: 'N/A', responseTime: '0', status: 'success' },
-  { name: 'Nginx', throughput: '0.01', availability: 'N/A', responseTime: '0', status: 'success' }
-];
-
-export const UNIFIED_AIOPS_SERVICE_ROWS: UnifiedAiopsTableRow[] = [
-  { name: 'Shipping', throughput: '0.01', availability: 'N/A', responseTime: '0', status: 'success' },
-  { name: 'Product-Catalog', throughput: '0.13', availability: 'N/A', responseTime: '0', status: 'warning' },
-  { name: 'Accounting', throughput: '0.01', availability: 'N/A', responseTime: '0', status: 'danger' },
-  { name: 'Recommendation', throughput: '0.13', availability: 'N/A', responseTime: '0', status: 'success' },
-  { name: 'Checkout', throughput: '0.01', availability: 'N/A', responseTime: '0', status: 'success' }
 ];
 
 export const UNIFIED_AIOPS_DATABASE_ROWS: UnifiedAiopsTableRow[] = [

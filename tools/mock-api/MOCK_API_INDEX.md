@@ -143,6 +143,9 @@ File: `customer\aiops-dashboard\database-monitoring.json`
 ### /customer/aiops-dashboard/datacenter-infra
 File: `customer\aiops-dashboard\datacenter-infra.json`
 
+### /customer/aiops-dashboard/datacenter-geography
+File: `customer\aiops-dashboard\datacenter-geography.json`
+
 ### /customer/aiops-dashboard/discovery-vs-monitoring
 File: `customer\aiops-dashboard\discovery-vs-monitoring.json`
 
@@ -155,8 +158,20 @@ File: `customer\aiops-dashboard\geo-distribution-global-ops.json`
 ### /customer/aiops-dashboard/infra-platform-performance
 File: `customer\aiops-dashboard\infra-platform-performance.json`
 
+### /customer/aiops-dashboard/idle-device-analysis
+File: `customer\aiops-dashboard\idle-device-analysis.json`
+
+### /customer/aiops-dashboard/idle-duration-distribution
+File: `customer\aiops-dashboard\idle-duration-distribution.json`
+
 ### /customer/aiops-dashboard/observability-summary
 File: `customer\aiops-dashboard\observability-summary.json`
+
+### /customer/aiops-dashboard/orphaned-devices
+File: `customer\aiops-dashboard\orphaned-devices.json`
+
+### /customer/aiops-dashboard/orphaned-devices-summary
+File: `customer\aiops-dashboard\orphaned-devices-summary.json`
 
 ### /customer/aiops-dashboard/os-monitoring
 File: `customer\aiops-dashboard\os-monitoring.json`
@@ -166,6 +181,9 @@ File: `customer\aiops-dashboard\private-cloud-infra-coverage.json`
 
 ### /customer/aiops-dashboard/public-cloud-infra-coverage
 File: `customer\aiops-dashboard\public-cloud-infra-coverage.json`
+
+### /customer/aiops-dashboard/recent-alerts
+File: `customer\aiops-dashboard\recent-alerts.json`
 
 ### /customer/aiops-dashboard/services-overview
 File: `customer\aiops-dashboard\services-overview.json`
@@ -1414,4 +1432,3 @@ File: `ssr\auto_remediation\list_summary.json`
 
 ### /ssr/auto_remediation
 File: `ssr\auto_remediation.json`
-

@@ -1,0 +1,80 @@
+[
+  {
+    "lat": 37.7749,
+    "long": -122.4194,
+    "location": "San Francisco, United States",
+    "loc_status": "up",
+    "datacenters": [
+      {
+        "name": "SF10 Production DC",
+        "uuid": "dc909583-c6cc-4dba-aadf-899df20f50fe",
+        "status": [
+          {
+            "category": "Compute",
+            "status": "up"
+          },
+          {
+            "category": "Network",
+            "status": "up"
+          },
+          {
+            "category": "Storage",
+            "status": "partially-up"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "lat": 51.5074,
+    "long": -0.1278,
+    "location": "London, United Kingdom",
+    "loc_status": "partially-up",
+    "datacenters": [
+      {
+        "name": "London Edge DC",
+        "uuid": "8af731de-0f8d-4f89-90b1-5ad2c9f42472",
+        "status": [
+          {
+            "category": "Compute",
+            "status": "up"
+          },
+          {
+            "category": "Network",
+            "status": "partially-up"
+          },
+          {
+            "category": "Storage",
+            "status": "up"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "lat": 1.3521,
+    "long": 103.8198,
+    "location": "Singapore",
+    "loc_status": "up",
+    "datacenters": [
+      {
+        "name": "Singapore Cloud Hub",
+        "uuid": "c97d2abd-3f6b-49c8-a9ef-5a5c87a88c42",
+        "status": [
+          {
+            "category": "Compute",
+            "status": "up"
+          },
+          {
+            "category": "Network",
+            "status": "up"
+          },
+          {
+            "category": "Storage",
+            "status": "up"
+          }
+        ]
+      }
+    ]
+  }
+]

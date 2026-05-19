@@ -38,6 +38,7 @@ import {
   UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS,
   UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
   UNIFIED_AIOPS_ORPHANED_DEVICES_ENDPOINT,
+  UNIFIED_AIOPS_PARENT_APPLICATIONS_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT,
   UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT,
@@ -1026,18 +1027,131 @@ export class UnifiedAiopsCommandCentreService {
    */
   getApplicationRows(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsTableRow[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_APPLICATION_OVERVIEW_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsTableRow>(res, ['applications', 'rows', 'application_overview']))
+      map(res => this.getArrayPayload<any>(res, ['applications', 'rows', 'application_overview']).map(row => this.getApplicationOverviewRow(row)))
     );
   }
 
-  getServiceRows(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsTableRow[]> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsTableRow>(res, ['services', 'rows', 'services_overview']))
+  getServiceApplicationOptions(): Observable<UnifiedAiopsFilterOption[]> {
+    return this.http.get<any>(UNIFIED_AIOPS_PARENT_APPLICATIONS_ENDPOINT, {
+      params: new HttpParams().set('page_size', '0')
+    }).pipe(
+      map(res => this.getArrayFromPayload<any>(res)
+        .filter(app => app && app.id !== undefined && app.id !== null)
+        .map(app => ({
+          value: String(app.id),
+          label: this.getApplicationDisplayName(app.name || app.application_name || app.applicationName)
+        })))
+    );
+  }
+
+  getServiceRows(criteria?: UnifiedAiopsDashboardFilterCriteria, applicationId?: string): Observable<UnifiedAiopsTableRow[]> {
+    let params = this.getWidgetFilterParams(criteria);
+    if (applicationId) {
+      params = params.set('application_id', applicationId);
+    }
+    const cacheKey = `${UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT}?${params.toString()}`;
+    if (!this.widgetResponseCache.has(cacheKey)) {
+      const request$ = this.http.get<any>(UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT, { params }).pipe(
+        shareReplay(1),
+        finalize(() => this.widgetResponseCache.delete(cacheKey))
+      );
+      this.widgetResponseCache.set(cacheKey, request$);
+    }
+    return (this.widgetResponseCache.get(cacheKey) as Observable<any>).pipe(
+      map(res => this.getArrayPayload<any>(res, ['services', 'rows', 'services_overview']).map(row => this.getServiceOverviewRow(row)))
     );
   }
 
   convertToTableRowsViewData(data: UnifiedAiopsTableRow[]): UnifiedAiopsTableRow[] {
     return data || [];
+  }
+
+  private getApplicationOverviewRow(row: any): UnifiedAiopsTableRow {
+    return {
+      name: this.getApplicationDisplayName(this.getFirstDefinedValue(row?.name, row?.application_name, row?.applicationName)),
+      throughput: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.avg_throughput_rps, row?.avgThroughputRps, row?.throughput)),
+      availability: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.avg_availability_pct, row?.avgAvailabilityPct, row?.availability)),
+      responseTime: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.avg_response_time_ms, row?.avgResponseTimeMs, row?.responseTime)),
+      status: this.getApplicationStatusTone(row?.status)
+    };
+  }
+
+  private getApplicationDisplayName(value: any): string {
+    const name = String(value || '').trim();
+    if (!name) {
+      return 'NA';
+    }
+    return name
+      .replace(/[_-]+/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .map((word, index) => {
+        const lowerWord = word.toLowerCase();
+        return index > 0 && ['a', 'an', 'and', 'of', 'the'].includes(lowerWord)
+          ? lowerWord
+          : lowerWord.replace(/^\w/, letter => letter.toUpperCase());
+      })
+      .join(' ');
+  }
+
+  private getApplicationMetricValue(value: any): string {
+    if (value === undefined || value === null || value === '') {
+      return 'NA';
+    }
+    return this.formatNumber(value);
+  }
+
+  private getApplicationStatusTone(status: any): UnifiedAiopsTone {
+    switch (String(status || '').toLowerCase()) {
+      case 'healthy':
+      case 'up':
+      case 'ok':
+      case 'success':
+      case '1':
+        return 'success';
+      case 'warning':
+      case 'degraded':
+      case 'unknown':
+      case '2':
+        return 'warning';
+      case 'critical':
+      case 'down':
+      case 'error':
+      case 'danger':
+      case '3':
+        return 'danger';
+      default:
+        return 'muted';
+    }
+  }
+
+  private getFirstDefinedValue(...values: any[]): any {
+    return values.find(value => value !== undefined && value !== null && value !== '');
+  }
+
+  private getServiceOverviewRow(row: any): UnifiedAiopsTableRow {
+    return {
+      name: this.getServiceDisplayName(this.getFirstDefinedValue(row?.name, row?.service_name, row?.serviceName)),
+      throughput: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.throughput_rps, row?.throughputRps, row?.avg_throughput_rps, row?.throughput)),
+      availability: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.availability_pct, row?.availabilityPct, row?.avg_availability_pct, row?.availability)),
+      responseTime: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.response_time_ms, row?.responseTimeMs, row?.avg_response_time_ms, row?.responseTime)),
+      status: this.getApplicationStatusTone(this.getFirstDefinedValue(row?.status, row?.status_code, row?.statusCode))
+    };
+  }
+
+  private getServiceDisplayName(value: any): string {
+    const name = String(value || '').trim();
+    if (!name) {
+      return 'NA';
+    }
+    return name
+      .replace(/_/g, ' ')
+      .split(' ')
+      .filter(Boolean)
+      .map(word => word.split('-')
+        .map(part => part ? part.charAt(0).toUpperCase() + part.slice(1) : part)
+        .join('-'))
+      .join(' ');
   }
   /*
    * ******End ****** Application and Services Overview Widgets Related ********************

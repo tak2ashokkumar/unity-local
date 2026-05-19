@@ -217,10 +217,17 @@
         </div>
 
             <div class="two-column-grid mt-3">
-                <div class="dashboard-card table-card">
+                <div class="dashboard-card table-card application-overview-card">
                     <app-spinner [name]="loaderNames.applications" [width]="0"></app-spinner>
                     <div class="card-title-row">Application Overview</div>
-                    <table class="dashboard-table compact-table">
+                    <table class="dashboard-table compact-table application-overview-table">
+                        <colgroup>
+                            <col class="application-name-col">
+                            <col class="application-throughput-col">
+                            <col class="application-availability-col">
+                            <col class="application-response-col">
+                            <col class="application-status-col">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -244,18 +251,27 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="dashboard-card table-card">
+                <div class="dashboard-card table-card services-overview-card">
                     <app-spinner [name]="loaderNames.services" [width]="0"></app-spinner>
+                    <app-spinner [name]="loaderNames.serviceApplications" [width]="0"></app-spinner>
                     <div class="card-title-row service-title-row">
                         <span>Services Overview</span>
                         <div class="mini-filter">
-                            <label>Application</label>
-                            <select class="form-control form-control-sm">
-                                <option>Astronomy Shop</option>
+                            <select class="form-control form-control-sm" [value]="selectedServiceApplicationId"
+                                (change)="onServiceApplicationChange($event)" [disabled]="!serviceApplicationOptions.length">
+                                <option *ngFor="let app of serviceApplicationOptions; trackBy: trackByIndex" [value]="app.value">{{app.label}}</option>
+                                <option *ngIf="!serviceApplicationOptions.length" value="">No applications</option>
                             </select>
                         </div>
                     </div>
-                    <table class="dashboard-table compact-table">
+                    <table class="dashboard-table compact-table services-overview-table">
+                        <colgroup>
+                            <col class="service-name-col">
+                            <col class="service-throughput-col">
+                            <col class="service-availability-col">
+                            <col class="service-response-col">
+                            <col class="service-status-col">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Service Name</th>

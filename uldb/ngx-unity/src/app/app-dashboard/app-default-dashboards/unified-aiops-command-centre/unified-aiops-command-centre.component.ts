@@ -79,6 +79,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   kubernetesMetrics: UnifiedAiopsMetric[] = [];
   aiGpuMetrics: UnifiedAiopsMetric[] = [];
   applicationRows: UnifiedAiopsTableRow[] = [];
+  serviceApplicationOptions: UnifiedAiopsFilterOption[] = [];
+  selectedServiceApplicationId = '';
   serviceRows: UnifiedAiopsTableRow[] = [];
   databaseRows: UnifiedAiopsTableRow[] = [];
   osRows: UnifiedAiopsTableRow[] = [];
@@ -129,6 +131,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     kubernetes: 'unifiedAiopsKubernetesLoader',
     aiGpu: 'unifiedAiopsAiGpuLoader',
     applications: 'unifiedAiopsApplicationsLoader',
+    serviceApplications: 'unifiedAiopsServiceApplicationsLoader',
     services: 'unifiedAiopsServicesLoader',
     databases: 'unifiedAiopsDatabasesLoader',
     os: 'unifiedAiopsOsLoader',
@@ -336,7 +339,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.getKubernetesMetrics(filterFormOutput);
       this.getAiGpuMetrics(filterFormOutput);
       this.getApplicationRows(filterFormOutput);
-      this.getServiceRows(filterFormOutput);
+      this.getServiceApplicationOptions(filterFormOutput);
       this.getDatabaseRows(filterFormOutput);
       this.getOsRows(filterFormOutput);
       this.getBandwidthBar(filterFormOutput);
@@ -746,9 +749,32 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     });
   }
 
+  getServiceApplicationOptions(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.loadWidget(this.loaderNames.serviceApplications, this.svc.getServiceApplicationOptions(), res => {
+      this.serviceApplicationOptions = res || [];
+      if (!this.serviceApplicationOptions.some(option => option.value === this.selectedServiceApplicationId)) {
+        this.selectedServiceApplicationId = this.serviceApplicationOptions[0]?.value || '';
+      }
+      this.getServiceRows(filterFormOutput);
+    }, () => {
+      this.serviceApplicationOptions = [];
+      this.selectedServiceApplicationId = '';
+      this.serviceRows = [];
+    });
+  }
+
+  onServiceApplicationChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    this.selectedServiceApplicationId = target?.value || '';
+    this.getServiceRows(this.getFilterFormOutput());
+  }
+
   getServiceRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.serviceRows = [];
-    this.loadWidget(this.loaderNames.services, this.svc.getServiceRows(filterFormOutput), res => {
+    if (!this.selectedServiceApplicationId) {
+      return;
+    }
+    this.loadWidget(this.loaderNames.services, this.svc.getServiceRows(filterFormOutput, this.selectedServiceApplicationId), res => {
       this.serviceRows = this.svc.convertToTableRowsViewData(res);
     }, () => {
       this.serviceRows = [];
