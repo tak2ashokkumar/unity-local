@@ -581,6 +581,9 @@ File: `customer\public-cloud-widgets\orphaned_devices.json`
 ### /customer/public-cloud-widgets/orphaned_devices_by_category
 File: `customer\public-cloud-widgets\orphaned_devices_by_category.json`
 
+### /customer/public-cloud-widgets/public_cloud_filters
+File: `customer\public-cloud-widgets\public_cloud_filters.json`
+
 ### /customer/public-cloud-widgets/recent_alerts
 File: `customer\public-cloud-widgets\recent_alerts.json`
 

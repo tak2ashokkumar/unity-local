@@ -1,4 +1,4 @@
-export type PublicCloudPlatform = 'aws' | 'azure' | 'gcp' | 'oracle';
+export type PublicCloudPlatform = 'aws' | 'azure' | 'gcp' | 'oracle' | 'oci';
 export type PublicCloudStatusTone = 'primary' | 'success' | 'warning' | 'danger' | 'muted';
 
 export interface PublicCloudFilterOption {
@@ -7,18 +7,36 @@ export interface PublicCloudFilterOption {
 }
 
 export interface PublicCloudRegionOption extends PublicCloudFilterOption {
-  platforms: PublicCloudPlatform[];
+  platforms?: PublicCloudPlatform[];
 }
 
 export interface PublicCloudAccountOption extends PublicCloudFilterOption {
   platform: PublicCloudPlatform;
-  region: string;
+  region?: string;
 }
 
 export interface PublicCloudDashboardFilterCriteria {
   platforms: string[];
   regions: string[];
   accounts: string[];
+}
+
+export interface PublicCloudFilterAccountResponseItem {
+  cloud_type?: string;
+  uuid?: string;
+  name?: string;
+}
+
+export interface PublicCloudFiltersResponse {
+  platform?: string[];
+  region?: string[];
+  account?: PublicCloudFilterAccountResponseItem[];
+}
+
+export interface PublicCloudDashboardFilterOptions {
+  platforms: PublicCloudFilterOption[];
+  regions: PublicCloudRegionOption[];
+  accounts: PublicCloudAccountOption[];
 }
 
 export interface PublicCloudSummaryMetric {
@@ -46,6 +64,7 @@ export interface PublicCloudInventoryTagResponse {
 export interface PublicCloudProviderDistributionItem {
   key: PublicCloudProviderDistributionKey;
   name: string;
+  count: number;
   value: number;
   color: string;
 }

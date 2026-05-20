@@ -4,7 +4,7 @@
             <div class="dashboard-title">Public Cloud Compute Dashboard</div>
             <div class="dashboard-subtitle">Refreshed: Today 10:00 IST | Scope: {{scopeText}}</div>
         </div>
-        <div class="dashboard-filters filter-loading-surface" *ngIf="!filterForm">
+        <div class="dashboard-filters filter-loading-surface" *ngIf="!filterForm && !filtersUnavailable">
             <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
         </div>
         <form class="dashboard-filters" *ngIf="filterForm" [formGroup]="filterForm">
@@ -48,7 +48,9 @@
         </form>
     </div>
 
-    <div class="dashboard-content" *ngIf="filterForm">
+    <div class="dashboard-no-data-state" *ngIf="filtersUnavailable">No data available</div>
+
+    <div class="dashboard-content" *ngIf="filterForm && !filtersUnavailable">
         <div class="section-title">Executive Summary / Cloud Inventory</div>
         <div class="dashboard-card inventory-card">
             <div class="summary-metrics">
@@ -80,12 +82,13 @@
                     <div class="tags-panel">
                         <app-spinner [name]="loaderNames.tags" [width]="0"></app-spinner>
                         <div class="tags-title">Tags</div>
-                        <div class="tag-list">
+                        <div class="tag-list" *ngIf="tags.length">
                             <span class="tag-chip" *ngFor="let tag of tags; trackBy: trackByIndex"
                                 [style.color]="tag.textColor" [style.background]="tag.backgroundColor">
                                 {{tag.name}} {{tag.count}}
                             </span>
                         </div>
+                        <div class="tags-empty-state" *ngIf="!tags.length">No tags associated</div>
                     </div>
                 </div>
             </div>
@@ -120,7 +123,7 @@
                 </div>
                 <div class="orphaned-table-wrap">
                     <app-spinner [name]="loaderNames.orphanedDevices" [width]="0"></app-spinner>
-                    <table class="table table-sm orphaned-table mb-0">
+                    <table class="table table-sm orphaned-table mb-0" *ngIf="orphanedDevices.length">
                         <colgroup>
                             <col class="orphaned-name-col">
                             <col class="orphaned-status-col">
@@ -144,10 +147,10 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="text-center text-muted compact-empty-state" *ngIf="!orphanedDevices.length">No orphaned devices to
+                    <div class="text-center text-muted orphaned-list-empty-state" *ngIf="!orphanedDevices.length">No orphaned devices to
                         display.</div>
                 </div>
-                <div class="orphaned-pagination-row">
+                <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
                     <div class="orphaned-page-size">
                         <span>Show</span>
                         <select class="form-control form-control-sm" [value]="orphanedDevicesPageSize"
@@ -198,7 +201,7 @@
                 </div>
                 <div class="idle-table-wrap">
                     <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
-                    <table class="table table-sm idle-devices-table mb-0">
+                    <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
                         <colgroup>
                             <col class="idle-device-name-col">
                             <col class="idle-resource-col">
@@ -251,9 +254,9 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="text-center text-muted compact-empty-state" *ngIf="!idleDevices.length">No idle devices to display.</div>
+                    <div class="text-center text-muted idle-list-empty-state" *ngIf="!idleDevices.length">No idle devices to display.</div>
                 </div>
-                <div class="idle-pagination-row">
+                <div class="idle-pagination-row" *ngIf="idleDevices.length">
                     <div class="idle-page-size">
                         <span>Show</span>
                         <select class="form-control form-control-sm" [value]="idleDevicesPageSize"
@@ -290,7 +293,7 @@
                         </div>
                         <div echarts [options]="idleDurationOptions" class="idle-duration-chart"></div>
                     </div>
-                    <div class="orphaned-category-empty" *ngIf="!idleDurationHasData">No idle duration data to display.</div>
+                    <div class="idle-duration-empty-state" *ngIf="!idleDurationHasData">No idle duration data to display.</div>
                 </div>
             </div>
         </div>
@@ -333,7 +336,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="text-center text-muted compact-empty-state" *ngIf="!recentAlerts.length">No recent alerts to display.</div>
+                <div class="text-center text-muted recent-alerts-empty-state" *ngIf="!recentAlerts.length">No recent alerts to display.</div>
             </div>
         </div>
 

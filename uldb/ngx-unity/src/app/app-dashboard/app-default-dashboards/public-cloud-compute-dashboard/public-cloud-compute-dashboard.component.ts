@@ -16,6 +16,7 @@ import {
   PublicCloudComputeBreakdownProvider,
   PublicCloudComputeBreakdownStat,
   PublicCloudDashboardFilterCriteria,
+  PublicCloudDashboardFilterOptions,
   PublicCloudFilterOption,
   PublicCloudIdleDeviceRow,
   PublicCloudIdleDurationItem,
@@ -39,6 +40,7 @@ import {
 export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
   private filterFormUnsubscribe = new Subject<void>();
+  private allAccountOptions: PublicCloudAccountOption[] = [];
   private readonly linkRoutes = {
     publicCloud: ['/unitycloud/publiccloud'],
     devices: ['/unitycloud/devices'],
@@ -67,6 +69,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   platformOptions: PublicCloudFilterOption[] = [];
   regionOptions: PublicCloudRegionOption[] = [];
   accountOptions: PublicCloudAccountOption[] = [];
+  filtersUnavailable = false;
 
   summaryMetrics: PublicCloudSummaryMetric[] = [];
   providerDistribution: PublicCloudProviderDistributionItem[] = [];
@@ -158,48 +161,52 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.loadFilterOptionsAndDashboard();
   }
 
-  /** Reloads all filter options and recreates the filter form only after platform, region, and account data is ready. */
+  /** Reloads all filter options and recreates the filter form before widgets are refreshed. */
   refreshFilters() {
     this.loadFilterOptionsAndDashboard();
   }
 
-  /** Loads platform options first, then continues the dependent filter-loading chain. */
+  /** Loads filter options first, then creates the filter form and starts widget loading. */
   loadFilterOptionsAndDashboard() {
     this.resetFilterState();
     this.spinnerService.start(this.loaderNames.filters);
-    this.svc.getPlatforms().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.platformOptions = res || [];
-      this.loadInitialRegions();
+    this.svc.getFilterOptions().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+      this.applyFilterOptionsAndDashboard(res);
     }, () => {
-      this.stopFilterLoader();
+      this.showDashboardNoDataState();
     });
   }
 
-  /** Loads region options from the selected-by-default platform values during initial filter setup. */
-  private loadInitialRegions() {
-    const platformValues = this.getValuesFromOptions(this.platformOptions);
-    this.svc.getRegions(platformValues).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.regionOptions = res || [];
-      this.loadInitialAccounts(platformValues);
-    }, () => {
-      this.regionOptions = [];
-      this.accountOptions = [];
-      this.stopFilterLoader();
-    });
+  /** Applies loaded filter options, creates default selections, and starts dashboard loading. */
+  private applyFilterOptionsAndDashboard(filterOptions: PublicCloudDashboardFilterOptions) {
+    if (!this.hasUsableFilterOptions(filterOptions)) {
+      this.showDashboardNoDataState();
+      return;
+    }
+    this.platformOptions = filterOptions?.platforms || [];
+    this.regionOptions = filterOptions?.regions || [];
+    this.allAccountOptions = filterOptions?.accounts || [];
+    this.accountOptions = this.svc.filterAccountsForSelection(
+      this.allAccountOptions,
+      this.getValuesFromOptions(this.platformOptions),
+      this.getValuesFromOptions(this.regionOptions)
+    );
+    this.buildFilterForm();
+    this.stopFilterLoader();
+    this.loadData();
   }
 
-  /** Loads account options from the selected-by-default platform and region values, then creates the filter form. */
-  private loadInitialAccounts(platformValues: string[]) {
-    const regionValues = this.getValuesFromOptions(this.regionOptions);
-    this.svc.getAccounts(platformValues, regionValues).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.accountOptions = res || [];
-      this.buildFilterForm();
-      this.stopFilterLoader();
-      this.loadData();
-    }, () => {
-      this.accountOptions = [];
-      this.stopFilterLoader();
-    });
+  /** Confirms the filter API returned enough option data to drive widget requests. */
+  private hasUsableFilterOptions(filterOptions: PublicCloudDashboardFilterOptions): boolean {
+    return !!filterOptions?.platforms?.length && !!filterOptions?.regions?.length;
+  }
+
+  /** Shows the dashboard-level empty state when filters cannot be loaded from the API. */
+  private showDashboardNoDataState() {
+    this.filtersUnavailable = true;
+    this.filterForm = null;
+    this.clearDashboardViewData();
+    this.stopFilterLoader();
   }
 
   /** Wires dependent filter changes without reloading widgets until the filter button is clicked. */
@@ -221,32 +228,15 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   /** Refreshes region options for the current platform selections and keeps still-valid region selections. */
   private loadRegionOptionsForForm() {
-    this.svc.getRegions(this.getSelectedValues('platforms')).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
-      this.regionOptions = res || [];
-      this.patchSelectedOptions('regions', this.regionOptions);
-      this.loadAccountOptionsForForm();
-    }, () => {
-      this.regionOptions = [];
-      this.accountOptions = [];
-      this.setControlValue('regions', []);
-      this.setControlValue('accounts', []);
-      this.stopFilterLoader();
-    });
+    this.patchSelectedOptions('regions', this.regionOptions);
+    this.loadAccountOptionsForForm();
   }
 
   /** Refreshes account options for the current platform and region selections and keeps still-valid account selections. */
   private loadAccountOptionsForForm() {
-    this.svc.getAccounts(this.getSelectedValues('platforms'), this.getSelectedValues('regions'))
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        this.accountOptions = res || [];
-        this.patchSelectedOptions('accounts', this.accountOptions);
-        this.stopFilterLoader();
-      }, () => {
-        this.accountOptions = [];
-        this.setControlValue('accounts', []);
-        this.stopFilterLoader();
-      });
+    this.accountOptions = this.svc.filterAccountsForSelection(this.allAccountOptions, this.getSelectedValues('platforms'), this.getSelectedValues('regions'));
+    this.patchSelectedOptions('accounts', this.accountOptions);
+    this.stopFilterLoader();
   }
 
   /** Creates the filter form with all currently loaded filter options selected by default. */
@@ -265,6 +255,8 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.platformOptions = [];
     this.regionOptions = [];
     this.accountOptions = [];
+    this.allAccountOptions = [];
+    this.filtersUnavailable = false;
   }
 
   /** Keeps current selections when still available; if none remain, dependent options default to all available options. */
@@ -307,7 +299,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   /** Confirms the filter form exists and has loaded option data before widget APIs are called. */
   private hasFilterFormData(): boolean {
-    return !!this.filterForm && !!this.platformOptions.length && !!this.regionOptions.length && !!this.accountOptions.length;
+    return !!this.filterForm;
   }
 
   /** Stops the top filter loader in the next tick so synchronous static responses still render the loader correctly. */
@@ -318,6 +310,9 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   /** Builds the visible scope text from the current filter form selections. */
   get scopeText(): string {
     if (!this.filterForm) {
+      if (this.filtersUnavailable) {
+        return 'No data available';
+      }
       return 'Loading filters';
     }
     return `${this.getSelectedLabel(this.platformOptions, this.getSelectedValues('platforms'), 'All providers', 'providers', 'No providers')} | ${this.getSelectedLabel(this.regionOptions, this.getSelectedValues('regions'), 'All regions', 'regions', 'No regions')} | ${this.getSelectedLabel(this.accountOptions, this.getSelectedValues('accounts'), 'All accounts', 'accounts', 'No accounts')}`;
@@ -523,6 +518,22 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private clearRecentAlertsViewData() {
     this.recentAlertSummaryMetrics = [];
     this.recentAlerts = [];
+  }
+
+  private clearDashboardViewData() {
+    this.clearInventorySummaryViewData();
+    this.computeBreakdown = [];
+    this.orphanedDevices = [];
+    this.orphanedDevicesTotal = 0;
+    this.orphanedByCategory = [];
+    this.orphanedByCategoryOptions = {};
+    this.orphanedByCategoryHasData = false;
+    this.idleDevices = [];
+    this.idleDevicesTotal = 0;
+    this.idleDurationRows = [];
+    this.idleDurationOptions = {};
+    this.idleDurationHasData = false;
+    this.clearRecentAlertsViewData();
   }
 
   getStatusClass(tone?: string): string {

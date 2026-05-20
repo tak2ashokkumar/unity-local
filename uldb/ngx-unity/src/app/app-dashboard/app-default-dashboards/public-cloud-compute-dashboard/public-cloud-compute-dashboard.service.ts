@@ -3,13 +3,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { EChartsOption } from 'echarts';
 import * as moment from 'moment';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
-  PUBLIC_CLOUD_ACCOUNT_OPTIONS,
   PUBLIC_CLOUD_ALL_SELECTED_VALUE,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_PROVIDER_CONFIG,
   PUBLIC_CLOUD_COMPUTE_BREAKDOWN_STAT_CONFIG,
+  PUBLIC_CLOUD_FILTERS_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT,
   PUBLIC_CLOUD_IDLE_DURATION_COLORS,
@@ -17,10 +18,8 @@ import {
   PUBLIC_CLOUD_ORPHANED_CATEGORY_COLORS,
   PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
   PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT,
-  PUBLIC_CLOUD_PLATFORM_OPTIONS,
   PUBLIC_CLOUD_PROVIDER_DISTRIBUTION_CONFIG,
   PUBLIC_CLOUD_RECENT_ALERTS_ENDPOINT,
-  PUBLIC_CLOUD_REGION_OPTIONS,
   PUBLIC_CLOUD_SUMMARY_METRIC_CONFIG,
   PUBLIC_CLOUD_TAG_STYLE_CONFIG
 } from './public-cloud-compute-dashboard.const';
@@ -30,7 +29,10 @@ import {
   PublicCloudComputeBreakdownProvider,
   PublicCloudComputeBreakdownProviderKey,
   PublicCloudDashboardFilterCriteria,
+  PublicCloudDashboardFilterOptions,
   PublicCloudFilterOption,
+  PublicCloudFiltersResponse,
+  PublicCloudFilterAccountResponseItem,
   PublicCloudComputeBreakdownResponse,
   PublicCloudIdleDeviceRow,
   PublicCloudIdleDevicesResponse,
@@ -79,46 +81,84 @@ export class PublicCloudComputeDashboardService {
     });
   }
 
-  getPlatformOptions(): PublicCloudFilterOption[] {
-    return PUBLIC_CLOUD_PLATFORM_OPTIONS.filter(option => option.value !== PUBLIC_CLOUD_ALL_SELECTED_VALUE);
+  getFilterOptions(): Observable<PublicCloudDashboardFilterOptions> {
+    return this.http.get<PublicCloudFiltersResponse>(PUBLIC_CLOUD_FILTERS_ENDPOINT)
+      .pipe(map(res => this.convertToFilterOptions(res)));
   }
 
-  getPlatforms(): Observable<PublicCloudFilterOption[]> {
-    return of(this.getPlatformOptions());
-  }
-
-  getRegions(platforms: string[]): Observable<PublicCloudRegionOption[]> {
-    return of(this.getRegionsForPlatforms(platforms));
-  }
-
-  getAccounts(platforms: string[], regions: string[]): Observable<PublicCloudAccountOption[]> {
-    return of(this.getAccountsForSelection(platforms, regions));
-  }
-
-  getRegionsForPlatforms(platforms?: string[]): PublicCloudRegionOption[] {
-    if (!platforms) {
-      return PUBLIC_CLOUD_REGION_OPTIONS;
-    }
-    const selectedPlatforms = this.getSelectedPlatforms(platforms);
-    if (!selectedPlatforms.length) {
-      return [];
-    }
-    return PUBLIC_CLOUD_REGION_OPTIONS.filter(region =>
-      region.platforms.some(platform => selectedPlatforms.includes(platform))
-    );
-  }
-
-  getAccountsForSelection(platforms?: string[], regions?: string[]): PublicCloudAccountOption[] {
+  filterAccountsForSelection(accounts: PublicCloudAccountOption[], platforms?: string[], regions?: string[]): PublicCloudAccountOption[] {
     const selectedPlatforms = platforms ? this.getSelectedPlatforms(platforms) : [];
     const selectedRegions = regions ? this.getSelectedValues(regions) : [];
     if ((platforms && !selectedPlatforms.length) || (regions && !selectedRegions.length)) {
       return [];
     }
-    return PUBLIC_CLOUD_ACCOUNT_OPTIONS.filter(account => {
-      const matchesPlatform = !selectedPlatforms.length || selectedPlatforms.includes(account.platform);
-      const matchesRegion = !selectedRegions.length || selectedRegions.includes(account.region);
+    return (accounts || []).filter(account => {
+      const matchesPlatform = !selectedPlatforms.length || selectedPlatforms.includes(this.normalizePlatformValue(account.platform) as PublicCloudPlatform);
+      const matchesRegion = !selectedRegions.length || !account.region || selectedRegions.includes(account.region);
       return matchesPlatform && matchesRegion;
     });
+  }
+
+  private convertToFilterOptions(data: PublicCloudFiltersResponse): PublicCloudDashboardFilterOptions {
+    return {
+      platforms: this.convertPlatformValuesToOptions(data?.platform),
+      regions: this.convertRegionValuesToOptions(data?.region),
+      accounts: this.convertAccountValuesToOptions(data?.account)
+    };
+  }
+
+  private convertPlatformValuesToOptions(values?: string[]): PublicCloudFilterOption[] {
+    return (values || [])
+      .map(value => this.normalizePlatformValue(value))
+      .filter((value, index, list) => !!value && list.indexOf(value) === index)
+      .map(value => ({
+        value,
+        label: this.formatPlatformLabel(value)
+      }));
+  }
+
+  private convertRegionValuesToOptions(values?: string[]): PublicCloudRegionOption[] {
+    return (values || [])
+      .filter((value, index, list) => !!value && list.indexOf(value) === index)
+      .map(value => ({
+        value,
+        label: this.formatRegionLabel(value)
+      }));
+  }
+
+  private convertAccountValuesToOptions(values?: PublicCloudFilterAccountResponseItem[]): PublicCloudAccountOption[] {
+    return (values || []).reduce((options: PublicCloudAccountOption[], item) => {
+      const uuid = item?.uuid;
+      const platform = this.normalizePlatformValue(item?.cloud_type);
+      if (uuid && platform) {
+        options.push({
+          value: uuid,
+          label: item.name || uuid,
+          platform: platform as PublicCloudPlatform
+        });
+      }
+      return options;
+    }, []);
+  }
+
+  private normalizePlatformValue(value?: string): string {
+    const normalizedValue = String(value || '').toLowerCase().trim();
+    return normalizedValue === 'oracle' ? 'oci' : normalizedValue;
+  }
+
+  private formatPlatformLabel(value: string): string {
+    const labels: Record<string, string> = {
+      aws: 'AWS',
+      azure: 'Azure',
+      gcp: 'GCP',
+      oci: 'OCI',
+      oracle: 'OCI'
+    };
+    return labels[this.normalizePlatformValue(value)] || this.formatRegionLabel(value);
+  }
+
+  private formatRegionLabel(value: string): string {
+    return String(value || '').replace(/[_-]+/g, ' ').replace(/\b\w/g, match => match.toUpperCase());
   }
 
   private getSelectedValues(values: string[]): string[] {
@@ -126,7 +166,7 @@ export class PublicCloudComputeDashboardService {
   }
 
   private getSelectedPlatforms(values: string[]): PublicCloudPlatform[] {
-    return this.getSelectedValues(values) as PublicCloudPlatform[];
+    return this.getSelectedValues(values).map(value => this.normalizePlatformValue(value)) as PublicCloudPlatform[];
   }
 
   private convertFiltersToApiParams(criteria?: PublicCloudDashboardFilterCriteria): HttpParams {
@@ -147,7 +187,7 @@ export class PublicCloudComputeDashboardService {
   }
 
   private getApiPlatformValues(values?: string[]): string[] {
-    return this.getSelectedValues(values || []).map(value => value === 'oracle' ? 'oci' : value);
+    return this.getSelectedValues(values || []).map(value => this.normalizePlatformValue(value));
   }
   /*
    * ******End ****** Filters Related ********************
@@ -177,6 +217,7 @@ export class PublicCloudComputeDashboardService {
       return {
         key,
         name: config.name,
+        count: this.getProviderDistributionCount(data, key),
         value: this.getProviderDistributionPercentage(data, key),
         color: config.color
       };
@@ -192,7 +233,7 @@ export class PublicCloudComputeDashboardService {
       color: items.map(item => item.color),
       tooltip: {
         trigger: 'item',
-        formatter: '{b}: {d}%'
+        formatter: (params: any) => `${params.name}: ${params.data.count || 0} (${params.data.percentage || 0}%)`
       },
       legend: {
         show: false
@@ -206,14 +247,21 @@ export class PublicCloudComputeDashboardService {
           label: { show: false },
           labelLine: { show: false },
           data: items.map(item => ({
-            name: `${item.name} ${item.value}%`,
+            name: item.name,
             key: item.key,
             value: item.value,
+            count: item.count,
+            percentage: item.value,
             itemStyle: { color: item.color }
           }))
         }
       ]
     };
+  }
+
+  private getProviderDistributionCount(data: PublicCloudInventorySummaryResponse, key: PublicCloudProviderDistributionKey): number {
+    const count = Number(data?.distribution?.[key] || 0);
+    return isNaN(count) ? 0 : count;
   }
 
   convertToTagsViewData(data: PublicCloudInventorySummaryResponse): PublicCloudTagItem[] {
@@ -285,7 +333,11 @@ export class PublicCloudComputeDashboardService {
 
   private getComputeBreakdownProviderKeys(criteria?: PublicCloudDashboardFilterCriteria): PublicCloudComputeBreakdownProviderKey[] {
     return this.getSelectedValues(criteria?.platforms || []).map(platform => {
-      return platform === 'gcp' ? 'google_cloud' : platform;
+      const normalizedPlatform = this.normalizePlatformValue(platform);
+      if (normalizedPlatform === 'gcp') {
+        return 'google_cloud';
+      }
+      return normalizedPlatform === 'oci' ? 'oracle' : normalizedPlatform;
     }) as PublicCloudComputeBreakdownProviderKey[];
   }
 
@@ -370,7 +422,8 @@ export class PublicCloudComputeDashboardService {
         {
           name: 'Orphaned by Category',
           type: 'pie',
-          radius: ['46%', '76%'],
+          roseType: 'radius',
+          radius: ['34%', '82%'],
           center: ['50%', '48%'],
           avoidLabelOverlap: true,
           label: { show: false },
@@ -384,8 +437,7 @@ export class PublicCloudComputeDashboardService {
             itemStyle: { color: item.color }
           })),
           itemStyle: {
-            borderColor: '#ffffff',
-            borderWidth: 6
+            borderWidth: 0
           }
         }
       ]
@@ -587,7 +639,8 @@ export class PublicCloudComputeDashboardService {
         {
           name: 'Idle Duration Distribution',
           type: 'pie',
-          radius: ['48%', '78%'],
+          roseType: 'radius',
+          radius: ['34%', '82%'],
           center: ['50%', '50%'],
           avoidLabelOverlap: false,
           label: { show: false },
@@ -598,8 +651,7 @@ export class PublicCloudComputeDashboardService {
             itemStyle: { color: item.color }
           })),
           itemStyle: {
-            borderColor: '#ffffff',
-            borderWidth: 8
+            borderWidth: 0
           }
         }
       ]
