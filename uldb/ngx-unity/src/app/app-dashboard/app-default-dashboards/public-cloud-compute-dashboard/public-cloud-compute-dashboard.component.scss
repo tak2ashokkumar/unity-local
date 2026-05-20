@@ -31,6 +31,35 @@
   line-height: 14px;
 }
 
+.scope-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.scope-separator {
+  margin: 0 3px;
+}
+
+.scope-more-count {
+  color: #1f7ed0;
+  cursor: default;
+  font-weight: 600;
+}
+
+.scope-popover-list {
+  max-width: 240px;
+  max-height: 180px;
+  overflow-y: auto;
+  color: #202a33;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.scope-popover-item+.scope-popover-item {
+  margin-top: 4px;
+}
+
 .dashboard-filters {
   display: flex;
   align-items: flex-end;

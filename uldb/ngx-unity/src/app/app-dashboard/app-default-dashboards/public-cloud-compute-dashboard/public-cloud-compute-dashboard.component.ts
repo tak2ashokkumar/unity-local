@@ -31,6 +31,11 @@ import {
   PublicCloudTagItem
 } from './public-cloud-compute-dashboard.type';
 
+interface PublicCloudFilterScopeSummary {
+  primaryLabel: string;
+  remainingLabels: string[];
+}
+
 @Component({
   selector: 'public-cloud-compute-dashboard',
   templateUrl: './public-cloud-compute-dashboard.component.html',
@@ -70,6 +75,12 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   regionOptions: PublicCloudRegionOption[] = [];
   accountOptions: PublicCloudAccountOption[] = [];
   filtersUnavailable = false;
+  refreshedText = '';
+  appliedFilterCriteria: PublicCloudDashboardFilterCriteria = {
+    platforms: [],
+    regions: [],
+    accounts: []
+  };
 
   summaryMetrics: PublicCloudSummaryMetric[] = [];
   providerDistribution: PublicCloudProviderDistributionItem[] = [];
@@ -153,6 +164,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   applyFilters() {
     this.orphanedDevicesPageNo = 1;
     this.idleDevicesPageNo = 1;
+    this.updateAppliedFilterCriteria();
     this.loadData();
   }
 
@@ -169,6 +181,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   /** Loads filter options first, then creates the filter form and starts widget loading. */
   loadFilterOptionsAndDashboard() {
     this.resetFilterState();
+    this.refreshedText = this.getCurrentRefreshedText();
     this.spinnerService.start(this.loaderNames.filters);
     this.svc.getFilterOptions().pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.applyFilterOptionsAndDashboard(res);
@@ -192,6 +205,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.getValuesFromOptions(this.regionOptions)
     );
     this.buildFilterForm();
+    this.updateAppliedFilterCriteria();
     this.stopFilterLoader();
     this.loadData();
   }
@@ -257,6 +271,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.accountOptions = [];
     this.allAccountOptions = [];
     this.filtersUnavailable = false;
+    this.appliedFilterCriteria = {
+      platforms: [],
+      regions: [],
+      accounts: []
+    };
   }
 
   /** Keeps current selections when still available; if none remain, dependent options default to all available options. */
@@ -297,6 +316,11 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     };
   }
 
+  /** Stores the filter set currently driving the rendered widget data. */
+  private updateAppliedFilterCriteria() {
+    this.appliedFilterCriteria = this.getFilterFormOutput();
+  }
+
   /** Confirms the filter form exists and has loaded option data before widget APIs are called. */
   private hasFilterFormData(): boolean {
     return !!this.filterForm;
@@ -307,29 +331,39 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     setTimeout(() => this.spinnerService.stop(this.loaderNames.filters), 0);
   }
 
-  /** Builds the visible scope text from the current filter form selections. */
-  get scopeText(): string {
-    if (!this.filterForm) {
-      if (this.filtersUnavailable) {
-        return 'No data available';
-      }
-      return 'Loading filters';
-    }
-    return `${this.getSelectedLabel(this.platformOptions, this.getSelectedValues('platforms'), 'All providers', 'providers', 'No providers')} | ${this.getSelectedLabel(this.regionOptions, this.getSelectedValues('regions'), 'All regions', 'regions', 'No regions')} | ${this.getSelectedLabel(this.accountOptions, this.getSelectedValues('accounts'), 'All accounts', 'accounts', 'No accounts')}`;
+  get platformScopeSummary(): PublicCloudFilterScopeSummary {
+    return this.getScopeSummary(this.platformOptions, this.appliedFilterCriteria.platforms, 'No providers');
   }
 
-  /** Converts selected values into a compact filter label for the header scope text. */
-  getSelectedLabel(options: PublicCloudFilterOption[], selectedValues: string[], allLabel: string, pluralLabel: string, emptyLabel: string): string {
-    if (!selectedValues.length) {
-      return emptyLabel;
+  get regionScopeSummary(): PublicCloudFilterScopeSummary {
+    return this.getScopeSummary(this.regionOptions, this.appliedFilterCriteria.regions, 'No regions');
+  }
+
+  get accountScopeSummary(): PublicCloudFilterScopeSummary {
+    return this.getScopeSummary(this.allAccountOptions, this.appliedFilterCriteria.accounts, 'No accounts');
+  }
+
+  private getScopeSummary(options: PublicCloudFilterOption[], selectedValues: string[], emptyLabel: string): PublicCloudFilterScopeSummary {
+    const labels = (selectedValues || [])
+      .map(value => options?.find(option => option.value === value)?.label || value)
+      .filter(label => !!label);
+    if (!labels.length) {
+      return {
+        primaryLabel: emptyLabel,
+        remainingLabels: []
+      };
     }
-    if (options?.length && selectedValues.length === options.length) {
-      return allLabel;
-    }
-    if (selectedValues.length === 1) {
-      return options?.find(option => option.value === selectedValues[0])?.label || allLabel;
-    }
-    return `${selectedValues.length} ${pluralLabel}`;
+    return {
+      primaryLabel: labels[0],
+      remainingLabels: labels.slice(1)
+    };
+  }
+
+  private getCurrentRefreshedText(): string {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `Today ${hours}:${minutes} IST`;
   }
 
   /** Loads all dashboard widgets only after the filter form exists and has loaded filter data. */
@@ -337,7 +371,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     if (!this.hasFilterFormData()) {
       return;
     }
-    const filterFormOutput = this.getFilterFormOutput();
+    const filterFormOutput = this.appliedFilterCriteria;
     setTimeout(() => {
       this.getInventorySummary(filterFormOutput);
       this.getComputeBreakdown(filterFormOutput);
@@ -434,13 +468,13 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.orphanedDevicesPageNo = pageNo;
-    this.getOrphanedDevices(this.getFilterFormOutput());
+    this.getOrphanedDevices(this.appliedFilterCriteria);
   }
 
   orphanedDevicesPageSizeChange(event: Event) {
     this.orphanedDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
     this.orphanedDevicesPageNo = 1;
-    this.getOrphanedDevices(this.getFilterFormOutput());
+    this.getOrphanedDevices(this.appliedFilterCriteria);
   }
 
   getIdleDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
@@ -475,13 +509,13 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.idleDevicesPageNo = pageNo;
-    this.getIdleDevices(this.getFilterFormOutput());
+    this.getIdleDevices(this.appliedFilterCriteria);
   }
 
   idleDevicesPageSizeChange(event: Event) {
     this.idleDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
     this.idleDevicesPageNo = 1;
-    this.getIdleDevices(this.getFilterFormOutput());
+    this.getIdleDevices(this.appliedFilterCriteria);
   }
 
   getRecentAlerts(filterFormOutput: PublicCloudDashboardFilterCriteria) {

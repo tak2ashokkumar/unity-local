@@ -1,5 +1,6 @@
 /// <reference types="google.maps" />
 
+import { Location } from '@angular/common';
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,6 +12,7 @@ import { catchError, finalize, switchMap, takeUntil, tap } from 'rxjs/operators'
 import { DashboardMapWidgetService, WorldMapWidgetDCMap, WorldMapWidgetViewdata } from 'src/app/app-home/dashboard-map-widget/dashboard-map-widget.service';
 import { WorldMapWidgetDatacenterLocation } from 'src/app/app-home/dashboard-map-widget/map-widget.type';
 import { MapService } from 'src/app/map.service';
+import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
@@ -33,6 +35,11 @@ import {
   UnifiedAiopsTableRow,
   UnifiedAiopsTone
 } from './unified-aiops-command-centre.type';
+
+interface UnifiedAiopsFilterScopeSummary {
+  primaryLabel: string;
+  remainingLabels: string[];
+}
 
 @Component({
   selector: 'unified-aiops-command-centre',
@@ -58,10 +65,51 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private datacenterGeographiesLoaded = false;
   private readonly datacenterGeographyInitialZoom = 2.2;
   private readonly datacenterGeographyInitialCenter = { lat: 25.738611, lng: 0 };
+  private readonly linkRoutes = {
+    infrastructure: ['/app-dashboard/default/infrastructure'],
+    privateCloudCompute: ['/app-dashboard/default/private-cloud-compute'],
+    publicCloudCompute: ['/app-dashboard/default/public-cloud-compute'],
+    applicationDashboard: ['/app-dashboard/default/application'],
+    databaseDashboard: ['/app-dashboard/default/database'],
+    devices: ['/unitycloud/devices'],
+    vmAll: ['/unitycloud/devices/vms/allvms'],
+    vmProvider: {
+      aws: ['/unitycloud/devices/vms/aws'],
+      azure: ['/unitycloud/devices/vms/azure'],
+      gcp: ['/unitycloud/devices/vms/gcp'],
+      oracle: ['/unitycloud/devices/vms/oracle']
+    },
+    hypervisors: ['/unitycloud/devices/hypervisors'],
+    kubernetes: ['/unitycloud/devices/kubernetes'],
+    bmservers: ['/unitycloud/devices/bmservers'],
+    storage: ['/unitycloud/devices/storagedevices'],
+    databases: ['/unitycloud/devices/databases'],
+    switches: ['/unitycloud/devices/switches'],
+    firewalls: ['/unitycloud/devices/firewalls'],
+    loadbalancers: ['/unitycloud/devices/loadbalancers'],
+    datacenter: ['/unitycloud/datacenter'],
+    pccloud: ['/unitycloud/pccloud'],
+    publicCloudProvider: {
+      aws: ['/unitycloud/publiccloud/aws'],
+      azure: ['/unitycloud/publiccloud/azure'],
+      gcp: ['/unitycloud/publiccloud/gcp'],
+      oracle: ['/unitycloud/publiccloud/oracle']
+    },
+    businessService: ['/unitycloud/business-service'],
+    applications: ['/unitycloud/applications'],
+    alerts: ['/services/aiml-event-mgmt/alerts'],
+    gpu: ['/services/ai-observability/gpu/summary'],
+    autoRemediation: ['/setup/monitoring/auto-remediation']
+  };
 
   filterForm: FormGroup;
   datacenterOptions: UnifiedAiopsFilterOption[] = [];
   cloudOptions: UnifiedAiopsCloudFilterOption[] = [];
+  refreshedText = '';
+  appliedFilterCriteria: UnifiedAiopsDashboardFilterCriteria = {
+    datacenters: [],
+    clouds: []
+  };
 
   summaryMetrics: UnifiedAiopsMetric[] = [];
   discoveryOptions: EChartsOption = {};
@@ -188,9 +236,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     private dashboardMapWidgetService: DashboardMapWidgetService,
     public mapSvc: MapService,
     private router: Router,
+    private location: Location,
     private route: ActivatedRoute,
     private ngZone: NgZone,
-    private spinnerService: AppSpinnerService) { }
+    private spinnerService: AppSpinnerService,
+    private alertDetailSvc: AimlAlertDetailsService) { }
 
   @ViewChild('datacenterGeographyMap')
   set datacenterGeographyMapElement(element: ElementRef<HTMLElement> | undefined) {
@@ -206,7 +256,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       .subscribe(showMaps => {
         this.datacenterGeographiesLoaded = false;
         if (showMaps && this.hasFilterFormData()) {
-          this.getDatacenterGeographies(this.getFilterFormOutput());
+          this.getDatacenterGeographies(this.appliedFilterCriteria);
         } else {
           this.datacenterGeographiesMapAvailable = false;
           this.datacenterGeographyAllLocations = [];
@@ -227,6 +277,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   /** Applies the current filter form output to every Unified AIOps widget request. */
   applyFilters() {
+    this.orphanedDevicesPageNo = 1;
+    this.idleDevicesPageNo = 1;
+    this.updateAppliedFilterCriteria();
     this.loadData();
   }
 
@@ -243,6 +296,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   /** Loads datacenter options first, then creates the filter form and starts widget loading. */
   loadFilterOptionsAndDashboard() {
     this.resetFilterState();
+    this.refreshedText = this.getCurrentRefreshedText();
     this.spinnerService.start(this.loaderNames.filters);
     forkJoin({
       datacenters: this.svc.getDatacenters().pipe(catchError(() => of(this.svc.getFallbackDatacenters()))),
@@ -251,12 +305,14 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.datacenterOptions = res.datacenters || [];
       this.cloudOptions = res.clouds || [];
       this.buildFilterForm();
+      this.updateAppliedFilterCriteria();
       this.stopFilterLoader();
       this.loadData();
     }, () => {
       this.datacenterOptions = this.svc.getFallbackDatacenters();
       this.cloudOptions = [];
       this.buildFilterForm();
+      this.updateAppliedFilterCriteria();
       this.stopFilterLoader();
       this.loadData();
     });
@@ -270,8 +326,14 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   /** Clears existing filter form/options so a fresh filter loading sequence can run. */
   private resetFilterState() {
     this.filterForm = null;
+    this.orphanedDevicesPageNo = 1;
+    this.idleDevicesPageNo = 1;
     this.datacenterOptions = [];
     this.cloudOptions = [];
+    this.appliedFilterCriteria = {
+      datacenters: [],
+      clouds: []
+    };
     this.datacenterGeographiesLoaded = false;
     this.datacenterGeographiesMapAvailable = false;
     this.datacenterGeographyAllLocations = [];
@@ -301,6 +363,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     };
   }
 
+  /** Stores the filter set currently driving the rendered widget data. */
+  private updateAppliedFilterCriteria() {
+    this.appliedFilterCriteria = this.getFilterFormOutput();
+  }
+
   /** Confirms the filter form exists and has loaded option data before widget APIs are called. */
   private hasFilterFormData(): boolean {
     return !!this.filterForm;
@@ -311,28 +378,35 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     setTimeout(() => this.spinnerService.stop(this.loaderNames.filters), 0);
   }
 
-  /** Builds the visible scope text from the current datacenter filter selections. */
-  get scopeText(): string {
-    if (!this.filterForm) {
-      return 'Loading filters';
-    }
-    const datacenterScope = this.getSelectedLabel(this.datacenterOptions, this.getSelectedValues('datacenters'), 'All datacenters', 'datacenters', 'No datacenters');
-    const cloudScope = this.getSelectedLabel(this.cloudOptions, this.getSelectedValues('clouds'), 'All clouds', 'clouds', 'No clouds');
-    return `${datacenterScope} | ${cloudScope}`;
+  get datacenterScopeSummary(): UnifiedAiopsFilterScopeSummary {
+    return this.getScopeSummary(this.datacenterOptions, this.appliedFilterCriteria.datacenters, 'No datacenters');
   }
 
-  /** Converts selected values into a compact filter label for the header scope text. */
-  getSelectedLabel(options: UnifiedAiopsFilterOption[], selectedValues: string[], allLabel: string, pluralLabel: string, emptyLabel: string): string {
-    if (!selectedValues.length) {
-      return emptyLabel;
+  get cloudScopeSummary(): UnifiedAiopsFilterScopeSummary {
+    return this.getScopeSummary(this.cloudOptions, this.appliedFilterCriteria.clouds, 'No clouds');
+  }
+
+  private getScopeSummary(options: UnifiedAiopsFilterOption[], selectedValues: string[], emptyLabel: string): UnifiedAiopsFilterScopeSummary {
+    const labels = (selectedValues || [])
+      .map(value => options?.find(option => option.value === value)?.label || value)
+      .filter(label => !!label);
+    if (!labels.length) {
+      return {
+        primaryLabel: emptyLabel,
+        remainingLabels: []
+      };
     }
-    if (options?.length && selectedValues.length === options.length) {
-      return allLabel;
-    }
-    if (selectedValues.length === 1) {
-      return options?.find(option => option.value === selectedValues[0])?.label || allLabel;
-    }
-    return `${selectedValues.length} ${pluralLabel}`;
+    return {
+      primaryLabel: labels[0],
+      remainingLabels: labels.slice(1)
+    };
+  }
+
+  private getCurrentRefreshedText(): string {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `Today ${hours}:${minutes} IST`;
   }
 
   /** Loads all dashboard widgets only after the filter form exists and has loaded filter data. */
@@ -340,7 +414,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     if (!this.hasFilterFormData()) {
       return;
     }
-    const filterFormOutput = this.getFilterFormOutput();
+    const filterFormOutput = this.appliedFilterCriteria;
     setTimeout(() => {
       this.getSummaryMetrics(filterFormOutput);
       this.getDiscoveryOptions(filterFormOutput);
@@ -651,6 +725,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
         this.datacenterGeographyInfoWindows.push(infoWindow);
         this.datacenterGeographyMarkers.push(marker);
         this.datacenterGeographyInfoWindowListeners.push(infoWindow.addListener('domready', () => this.bindDatacenterGeographyPopover(infoWindow)));
+        this.datacenterGeographyClusterListeners.push(marker.addListener('click', () => {
+          this.ngZone.run(() => this.openDatacenterGeography(location));
+        }));
       });
 
       this.datacenterGeographyCluster = new MarkerClusterer({
@@ -696,6 +773,16 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     if (infoWindowShell) {
       this.datacenterGeographyZIndexMap[id] = Number.parseInt(infoWindowShell.style.getPropertyValue('z-index'), 10) || 0;
     }
+
+    contentElement?.querySelectorAll<HTMLAnchorElement>('a[href]').forEach(anchor => {
+      anchor.addEventListener('click', event => {
+        event.preventDefault();
+        const datacenterId = anchor.getAttribute('href')?.match(/datacenter\/([^/?#]+)/)?.[1];
+        this.ngZone.run(() => {
+          this.openRouteInNewTab(datacenterId ? ['/unitycloud/datacenter', datacenterId] : this.linkRoutes.datacenter);
+        });
+      });
+    });
 
     contentElement?.addEventListener('mouseover', () => {
       const high = Math.max(...Object.keys(this.datacenterGeographyZIndexMap).map(key => this.datacenterGeographyZIndexMap[key]), 0);
@@ -799,7 +886,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   onServiceApplicationChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     this.selectedServiceApplicationId = target?.value || '';
-    this.getServiceRows(this.getFilterFormOutput());
+    this.getServiceRows(this.appliedFilterCriteria);
   }
 
   getServiceRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -963,13 +1050,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     this.orphanedDevicesPageNo = pageNo;
-    this.getOrphanedDevices(this.getFilterFormOutput());
+    this.getOrphanedDevices(this.appliedFilterCriteria);
   }
 
   orphanedDevicesPageSizeChange(event: Event) {
     this.orphanedDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
     this.orphanedDevicesPageNo = 1;
-    this.getOrphanedDevices(this.getFilterFormOutput());
+    this.getOrphanedDevices(this.appliedFilterCriteria);
   }
 
   getIdleDevices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1004,13 +1091,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     this.idleDevicesPageNo = pageNo;
-    this.getIdleDevices(this.getFilterFormOutput());
+    this.getIdleDevices(this.appliedFilterCriteria);
   }
 
   idleDevicesPageSizeChange(event: Event) {
     this.idleDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
     this.idleDevicesPageNo = 1;
-    this.getIdleDevices(this.getFilterFormOutput());
+    this.getIdleDevices(this.appliedFilterCriteria);
   }
 
   getRecentAlertSummaryMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1142,6 +1229,190 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     });
   }
 
+  openSummaryMetric(metric: UnifiedAiopsMetric) {
+    this.openRouteInNewTab(this.getSummaryMetricRoute(metric?.label));
+  }
+
+  openDeviceDiscovery() {
+    this.openRouteInNewTab(this.linkRoutes.devices);
+  }
+
+  onDiscoveryChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openRouteInNewTab(this.getCategoryRoute(this.getChartParamLabel(params)));
+    });
+  }
+
+  openAlerts() {
+    this.openRouteInNewTab(this.linkRoutes.alerts);
+  }
+
+  onAlertSegregationChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openAlerts());
+  }
+
+  openBusinessServices() {
+    this.openRouteInNewTab(this.linkRoutes.businessService);
+  }
+
+  openBusinessService(row: UnifiedAiopsBusinessService) {
+    const serviceId = row?.id;
+    this.openRouteInNewTab(serviceId ? ['/unitycloud/business-service', serviceId, 'summary'] : this.linkRoutes.businessService);
+  }
+
+  openEmployeeExperience() {
+    this.openRouteInNewTab(this.linkRoutes.applicationDashboard);
+  }
+
+  openDatacenters() {
+    this.openRouteInNewTab(this.linkRoutes.datacenter);
+  }
+
+  onGeoDistributionChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openDatacenters());
+  }
+
+  openPrivateCloudCoverage(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }) {
+    this.openRouteInNewTab(this.getPrivateCoverageRoute(provider, row));
+  }
+
+  openPublicCloudCoverage(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }) {
+    this.openRouteInNewTab(this.getPublicCoverageRoute(provider, row));
+  }
+
+  openDatacenterGeography(location: WorldMapWidgetViewdata) {
+    const datacenters = location?.datacenters || [];
+    const datacenterId = datacenters.length === 1 ? datacenters[0]?.uuid : '';
+    this.openRouteInNewTab(datacenterId ? ['/unitycloud/datacenter', datacenterId] : this.linkRoutes.datacenter);
+  }
+
+  openDatacenterInfrastructure(metric: UnifiedAiopsMetric) {
+    this.openRouteInNewTab(this.getDatacenterInfrastructureRoute(metric?.label));
+  }
+
+  openKubernetesMetrics() {
+    this.openRouteInNewTab(this.linkRoutes.kubernetes);
+  }
+
+  openAiGpuMetrics() {
+    this.openRouteInNewTab(this.linkRoutes.gpu);
+  }
+
+  openApplicationDashboard() {
+    this.openRouteInNewTab(this.linkRoutes.applicationDashboard);
+  }
+
+  openApplicationRow(row: UnifiedAiopsTableRow) {
+    const applicationId = row?.applicationId || row?.id || row?.uuid;
+    this.openRouteInNewTab(applicationId ? ['/unitycloud/applications', applicationId, 'services'] : this.linkRoutes.applications);
+  }
+
+  openServicesOverview() {
+    this.openRouteInNewTab(this.selectedServiceApplicationId
+      ? ['/unitycloud/applications', this.selectedServiceApplicationId, 'services']
+      : this.linkRoutes.applications);
+  }
+
+  openServiceRow(row: UnifiedAiopsTableRow) {
+    const applicationId = row?.applicationId || this.selectedServiceApplicationId;
+    const serviceId = row?.id || row?.uuid;
+    if (applicationId && serviceId) {
+      this.openRouteInNewTab(['/unitycloud/applications', applicationId, 'services', serviceId, 'details']);
+      return;
+    }
+    this.openRouteInNewTab(applicationId ? ['/unitycloud/applications', applicationId, 'services'] : this.linkRoutes.applications);
+  }
+
+  openDatabaseMonitoring() {
+    this.openRouteInNewTab(this.linkRoutes.databaseDashboard);
+  }
+
+  openOsMonitoring() {
+    this.openRouteInNewTab(this.linkRoutes.devices);
+  }
+
+  openInfrastructurePerformance() {
+    this.openRouteInNewTab(this.linkRoutes.infrastructure);
+  }
+
+  onBandwidthChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openInfrastructurePerformance());
+  }
+
+  onPlatformPerformanceChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      const providerRoute = this.getProviderRoute(this.getChartParamLabel(params), false);
+      this.openRouteInNewTab(providerRoute || this.linkRoutes.infrastructure);
+    });
+  }
+
+  onDeviceAvailabilityChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openRouteInNewTab(this.linkRoutes.devices));
+  }
+
+  onAvailabilityCategoryChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openRouteInNewTab(this.getCategoryRoute(this.getChartParamLabel(params)));
+    });
+  }
+
+  onAlertTrendChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openAlerts());
+  }
+
+  onAlertSankeyChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openAlerts());
+  }
+
+  openOrphanedDevices() {
+    this.openRouteInNewTab(this.linkRoutes.devices);
+  }
+
+  openOrphanedDevice(device: UnifiedAiopsOrphanedDeviceRow) {
+    this.openRouteInNewTab(this.getDeviceRoute(device, device?.name || device?.resourceType));
+  }
+
+  openOrphanedCategory(item: UnifiedAiopsOrphanedCategoryItem) {
+    this.openRouteInNewTab(this.getCategoryRoute(item?.category));
+  }
+
+  onOrphanedCategoryChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openRouteInNewTab(this.getCategoryRoute(params?.data?.category || this.getChartParamLabel(params)));
+    });
+  }
+
+  openIdleDevices() {
+    this.openRouteInNewTab(this.linkRoutes.devices);
+  }
+
+  openIdleDevice(device: UnifiedAiopsIdleDeviceRow) {
+    this.openRouteInNewTab(this.getDeviceRoute(device, device?.deviceName || device?.resourceType));
+  }
+
+  onIdleDurationChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openIdleDevices());
+  }
+
+  openRecentAlerts() {
+    this.openAlerts();
+  }
+
+  showAlertDetails(alert: UnifiedAiopsRecentAlert) {
+    const alertId = alert?.uuid || alert?.id;
+    if (alertId) {
+      this.alertDetailSvc.showAlertDetails(alertId);
+    }
+  }
+
+  openAutoRemediation() {
+    this.openRouteInNewTab(this.linkRoutes.autoRemediation);
+  }
+
+  onRemediationChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => this.openAutoRemediation());
+  }
+
   trackByIndex(index: number): number {
     return index;
   }
@@ -1152,6 +1423,270 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   goBack() {
     goBackFromDefaultDashboard(this.router, this.route);
+  }
+
+  private openRouteInNewTab(commands: any[]) {
+    const routeUrl = this.router.serializeUrl(this.router.createUrlTree(commands));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  private bindChartClick(chartInstance: any, handler: (params: any) => void) {
+    if (!chartInstance?.on) {
+      return;
+    }
+    if (chartInstance.off) {
+      chartInstance.off('click');
+    }
+    chartInstance.on('click', handler);
+  }
+
+  private getSummaryMetricRoute(label: string | undefined): any[] {
+    const value = this.normalizeLinkText(label);
+    if (value.includes('public_cloud')) {
+      return this.linkRoutes.publicCloudCompute;
+    }
+    if (value.includes('private_cloud')) {
+      return this.linkRoutes.privateCloudCompute;
+    }
+    if (this.isVmResource(value)) {
+      return this.linkRoutes.vmAll;
+    }
+    if (value.includes('device') || value.includes('resource')) {
+      return this.linkRoutes.devices;
+    }
+    return this.linkRoutes.infrastructure;
+  }
+
+  private getPrivateCoverageRoute(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): any[] {
+    const rowLabel = this.normalizeLinkText(row?.label);
+    const providerLabel = this.normalizeLinkText(provider?.title);
+    if (this.isVmResource(rowLabel)) {
+      return this.linkRoutes.vmAll;
+    }
+    if (rowLabel.includes('hypervisor')) {
+      return this.linkRoutes.hypervisors;
+    }
+    if (rowLabel.includes('database') || rowLabel.includes('db')) {
+      return this.linkRoutes.databaseDashboard;
+    }
+    if (rowLabel) {
+      return this.getCategoryRoute(rowLabel, providerLabel);
+    }
+    return providerLabel ? this.linkRoutes.pccloud : this.linkRoutes.privateCloudCompute;
+  }
+
+  private getPublicCoverageRoute(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): any[] {
+    const providerKey = this.getProviderKey(provider?.title);
+    const rowLabel = this.normalizeLinkText(row?.label);
+    if (this.isVmResource(rowLabel)) {
+      return this.getProviderVmRoute(providerKey);
+    }
+    if (this.isStorageResource(rowLabel)) {
+      return this.linkRoutes.storage;
+    }
+    if (this.isKubernetesResource(rowLabel)) {
+      return this.linkRoutes.kubernetes;
+    }
+    return this.getProviderRoute(providerKey) || this.linkRoutes.publicCloudCompute;
+  }
+
+  private getDatacenterInfrastructureRoute(label: string | undefined): any[] {
+    const value = this.normalizeLinkText(label);
+    if (value.includes('bare_metal') || value.includes('baremetal') || value.includes('server')) {
+      return this.linkRoutes.bmservers;
+    }
+    if (value.includes('switch')) {
+      return this.linkRoutes.switches;
+    }
+    if (value.includes('firewall')) {
+      return this.linkRoutes.firewalls;
+    }
+    if (value.includes('load_balancer') || value.includes('loadbalancer')) {
+      return this.linkRoutes.loadbalancers;
+    }
+    if (this.isStorageResource(value)) {
+      return this.linkRoutes.storage;
+    }
+    if (value.includes('database') || value.includes('db')) {
+      return this.linkRoutes.databases;
+    }
+    if (this.isKubernetesResource(value)) {
+      return this.linkRoutes.kubernetes;
+    }
+    if (value.includes('device')) {
+      return this.linkRoutes.devices;
+    }
+    return this.linkRoutes.infrastructure;
+  }
+
+  private getCategoryRoute(value: string | undefined, provider?: string | undefined): any[] {
+    const normalizedValue = this.normalizeLinkText(value);
+    const providerKey = this.getProviderKey(provider);
+    if (this.isVmResource(normalizedValue)) {
+      return providerKey ? this.getProviderVmRoute(providerKey) : this.linkRoutes.vmAll;
+    }
+    if (this.isKubernetesResource(normalizedValue)) {
+      return this.linkRoutes.kubernetes;
+    }
+    if (this.isStorageResource(normalizedValue)) {
+      return this.linkRoutes.storage;
+    }
+    if (normalizedValue.includes('bare_metal') || normalizedValue.includes('baremetal')) {
+      return this.linkRoutes.bmservers;
+    }
+    if (this.isGpuResource(normalizedValue)) {
+      return this.linkRoutes.gpu;
+    }
+    if (normalizedValue.includes('database') || normalizedValue.includes('db')) {
+      return this.linkRoutes.databases;
+    }
+    if (normalizedValue.includes('switch')) {
+      return this.linkRoutes.switches;
+    }
+    if (normalizedValue.includes('firewall')) {
+      return this.linkRoutes.firewalls;
+    }
+    if (normalizedValue.includes('load_balancer') || normalizedValue.includes('loadbalancer')) {
+      return this.linkRoutes.loadbalancers;
+    }
+    if (normalizedValue.includes('network')) {
+      return this.linkRoutes.switches;
+    }
+    if (normalizedValue.includes('hypervisor')) {
+      return this.linkRoutes.hypervisors;
+    }
+    return this.getProviderRoute(normalizedValue, false) || this.linkRoutes.devices;
+  }
+
+  private getDeviceRoute(device: UnifiedAiopsOrphanedDeviceRow | UnifiedAiopsIdleDeviceRow, fallbackLabel?: string): any[] {
+    const deviceId = this.getDeviceId(device);
+    const resourceType = this.normalizeLinkText((device as any)?.resourceType || fallbackLabel);
+    const monitoringRoute = this.getMonitoringRouteSegment(device);
+    if (this.isStorageResource(resourceType)) {
+      if (deviceId && monitoringRoute) {
+        return monitoringRoute === 'zbx'
+          ? ['/unitycloud/devices/storagedevices', deviceId, 'zbx', 'details']
+          : ['/unitycloud/devices/storagedevices', deviceId, 'obs', 'overview'];
+      }
+      return this.linkRoutes.storage;
+    }
+    if (this.isGpuResource(resourceType)) {
+      return this.linkRoutes.gpu;
+    }
+    if (resourceType.includes('bare_metal') || resourceType.includes('baremetal')) {
+      if (deviceId && monitoringRoute) {
+        return ['/unitycloud/devices/bmservers', deviceId, monitoringRoute];
+      }
+      return this.linkRoutes.bmservers;
+    }
+    if (this.isVmResource(resourceType)) {
+      const provider = this.getDeviceProvider(device);
+      if (deviceId && monitoringRoute && provider === 'custom') {
+        return monitoringRoute === 'zbx'
+          ? ['/unitycloud/devices/vms/custom', deviceId, 'zbx', 'details']
+          : ['/unitycloud/devices/vms/custom', deviceId, 'obs', 'overview'];
+      }
+      return this.getProviderVmRoute(provider);
+    }
+    return this.getCategoryRoute(resourceType || fallbackLabel);
+  }
+
+  private getProviderRoute(value: string | undefined, withFallback = true): any[] | null {
+    switch (this.getProviderKey(value)) {
+      case 'aws':
+        return this.linkRoutes.publicCloudProvider.aws;
+      case 'azure':
+        return this.linkRoutes.publicCloudProvider.azure;
+      case 'gcp':
+        return this.linkRoutes.publicCloudProvider.gcp;
+      case 'oci':
+      case 'oracle':
+        return this.linkRoutes.publicCloudProvider.oracle;
+      default:
+        return withFallback ? this.linkRoutes.publicCloudCompute : null;
+    }
+  }
+
+  private getProviderVmRoute(value: string | undefined): any[] {
+    switch (this.getProviderKey(value)) {
+      case 'aws':
+        return this.linkRoutes.vmProvider.aws;
+      case 'azure':
+        return this.linkRoutes.vmProvider.azure;
+      case 'gcp':
+        return this.linkRoutes.vmProvider.gcp;
+      case 'oci':
+      case 'oracle':
+        return this.linkRoutes.vmProvider.oracle;
+      default:
+        return this.linkRoutes.vmAll;
+    }
+  }
+
+  private getProviderKey(value: string | undefined): string {
+    const normalizedValue = this.normalizeLinkText(value);
+    if (normalizedValue.includes('aws') || normalizedValue.includes('amazon')) {
+      return 'aws';
+    }
+    if (normalizedValue.includes('azure') || normalizedValue.includes('microsoft')) {
+      return 'azure';
+    }
+    if (normalizedValue.includes('gcp') || normalizedValue.includes('google')) {
+      return 'gcp';
+    }
+    if (normalizedValue.includes('oci') || normalizedValue.includes('oracle')) {
+      return 'oracle';
+    }
+    if (normalizedValue.includes('custom')) {
+      return 'custom';
+    }
+    return normalizedValue;
+  }
+
+  private getChartParamLabel(params: any): string {
+    return params?.data?.category || params?.data?.label || params?.data?.name || params?.name || params?.seriesName || '';
+  }
+
+  private getDeviceId(device: any): string {
+    return device?.deviceId || device?.resourceId || device?.uuid || device?.id || '';
+  }
+
+  private getDeviceProvider(device: any): string {
+    return this.getProviderKey([device?.provider, device?.cloudType, device?.resourceType, device?.name, device?.deviceName]
+      .filter(value => !!value)
+      .join(' '));
+  }
+
+  private getMonitoringRouteSegment(device: any): 'obs' | 'zbx' | null {
+    const monitoringType = this.normalizeLinkText(device?.monitoringType);
+    if (device?.monitoring?.zabbix || monitoringType.includes('zabbix') || monitoringType.includes('zbx')) {
+      return 'zbx';
+    }
+    if (device?.monitoring?.observium || monitoringType.includes('observium') || monitoringType.includes('obs')) {
+      return 'obs';
+    }
+    return null;
+  }
+
+  private isVmResource(value: string): boolean {
+    return value.includes('vm') || value.includes('virtual_machine') || value.includes('instance');
+  }
+
+  private isStorageResource(value: string): boolean {
+    return value.includes('storage') || value.includes('volume') || value.includes('disk');
+  }
+
+  private isKubernetesResource(value: string): boolean {
+    return value.includes('kubernetes') || value.includes('k8s') || value.includes('container') || value.includes('pod');
+  }
+
+  private isGpuResource(value: string): boolean {
+    return value.includes('gpu');
+  }
+
+  private normalizeLinkText(value: string | undefined): string {
+    return String(value || '').toLowerCase().replace(/[\s-]+/g, '_');
   }
 
   private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {

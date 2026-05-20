@@ -408,7 +408,10 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   convertToBusinessServicesViewData(data: UnifiedAiopsBusinessService[]): UnifiedAiopsBusinessService[] {
-    return data || [];
+    return (data || []).map((service: any) => ({
+      ...service,
+      id: this.getIdValue(service?.id, service?.uuid, service?.business_id, service?.businessId, service?.service_id, service?.serviceId)
+    }));
   }
   /*
    * ******End ****** Business Services Widget Related ********************
@@ -1068,6 +1071,9 @@ export class UnifiedAiopsCommandCentreService {
 
   private getApplicationOverviewRow(row: any): UnifiedAiopsTableRow {
     return {
+      id: this.getIdValue(row?.id, row?.uuid, row?.application_id, row?.applicationId, row?.app_id, row?.appId),
+      uuid: this.getIdValue(row?.uuid, row?.id),
+      applicationId: this.getIdValue(row?.application_id, row?.applicationId, row?.app_id, row?.appId, row?.id, row?.uuid),
       name: this.getApplicationDisplayName(this.getFirstDefinedValue(row?.name, row?.application_name, row?.applicationName)),
       throughput: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.avg_throughput_rps, row?.avgThroughputRps, row?.throughput)),
       availability: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.avg_availability_pct, row?.avgAvailabilityPct, row?.availability)),
@@ -1129,8 +1135,16 @@ export class UnifiedAiopsCommandCentreService {
     return values.find(value => value !== undefined && value !== null && value !== '');
   }
 
+  private getIdValue(...values: any[]): string {
+    const value = this.getFirstDefinedValue(...values);
+    return value === undefined || value === null ? '' : String(value);
+  }
+
   private getServiceOverviewRow(row: any): UnifiedAiopsTableRow {
     return {
+      id: this.getIdValue(row?.id, row?.uuid, row?.service_id, row?.serviceId, row?.service_uuid, row?.serviceUuid),
+      uuid: this.getIdValue(row?.uuid, row?.service_uuid, row?.serviceUuid, row?.id),
+      applicationId: this.getIdValue(row?.application_id, row?.applicationId, row?.app_id, row?.appId),
       name: this.getServiceDisplayName(this.getFirstDefinedValue(row?.name, row?.service_name, row?.serviceName)),
       throughput: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.throughput_rps, row?.throughputRps, row?.avg_throughput_rps, row?.throughput)),
       availability: this.getApplicationMetricValue(this.getFirstDefinedValue(row?.availability_pct, row?.availabilityPct, row?.avg_availability_pct, row?.availability)),
@@ -1515,7 +1529,16 @@ export class UnifiedAiopsCommandCentreService {
 
   convertToOrphanedDevicesViewData(data: UnifiedAiopsOrphanedDevicesResponse): UnifiedAiopsOrphanedDeviceRow[] {
     return this.getOrphanedDeviceResults(data).map(item => ({
-      name: this.getFirstOrphanedValue(item.name, item.device_name, item.instance_name),
+      id: this.getFirstOrphanedValue(item.id, item.uuid, item.device_id, item.deviceId, item.device_uuid, item.deviceUuid),
+      uuid: this.getFirstOrphanedValue(item.uuid, item.id, item.device_uuid, item.deviceUuid),
+      deviceId: this.getFirstOrphanedValue(item.device_id, item.deviceId, item.device_uuid, item.deviceUuid, item.id, item.uuid),
+      resourceId: this.getFirstOrphanedValue(item.resource_id, item.resourceId, item.device_id, item.deviceId, item.id, item.uuid),
+      resourceType: this.getFirstOrphanedValue(item.resource_type, item.resourceType, item.type),
+      provider: this.getFirstOrphanedValue(item.provider, item.platform, item.cloud_provider, item.cloudProvider, item.cloud),
+      cloudType: this.getFirstOrphanedValue(item.cloud_type, item.cloudType, item.platform, item.provider, item.cloud_provider, item.cloudProvider),
+      monitoringType: this.getFirstOrphanedValue(item.monitoring_type, item.monitoringType),
+      monitoring: item.monitoring,
+      name: this.getFirstOrphanedValue(item.name, item.device_name, item.deviceName, item.instance_name, item.instanceName),
       status: this.getFirstOrphanedValue(item.status),
       lastSeen: this.formatOrphanedDate(this.getFirstOrphanedValue(item.lastSeen, item.last_seen)),
       datacenter: this.getFirstOrphanedValue(item.datacenter, item.datacenter_name, item.cloud, item.provider, item.platform, item.account)
@@ -1570,7 +1593,8 @@ export class UnifiedAiopsCommandCentreService {
         {
           name: 'Orphaned by Category',
           type: 'pie',
-          radius: ['46%', '76%'],
+          roseType: 'radius',
+          radius: ['34%', '82%'],
           center: ['50%', '48%'],
           avoidLabelOverlap: true,
           label: { show: false },
@@ -1584,8 +1608,7 @@ export class UnifiedAiopsCommandCentreService {
             itemStyle: { color: item.color }
           })),
           itemStyle: {
-            borderColor: '#ffffff',
-            borderWidth: 6
+            borderWidth: 0
           }
         }
       ]
@@ -1785,7 +1808,8 @@ export class UnifiedAiopsCommandCentreService {
         {
           name: 'Idle Duration Distribution',
           type: 'pie',
-          radius: ['48%', '78%'],
+          roseType: 'radius',
+          radius: ['34%', '82%'],
           center: ['50%', '50%'],
           avoidLabelOverlap: false,
           label: { show: false },
@@ -1796,8 +1820,7 @@ export class UnifiedAiopsCommandCentreService {
             itemStyle: { color: item.color }
           })),
           itemStyle: {
-            borderColor: '#ffffff',
-            borderWidth: 8
+            borderWidth: 0
           }
         }
       ]

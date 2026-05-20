@@ -62,6 +62,7 @@ export interface UnifiedAiopsLegendMetric {
 }
 
 export interface UnifiedAiopsBusinessService {
+  id?: string;
   serviceName: string;
   status: UnifiedAiopsTone;
   uptime: string;
@@ -82,6 +83,9 @@ export interface UnifiedAiopsCoverageRow {
 }
 
 export interface UnifiedAiopsTableRow {
+  id?: string;
+  uuid?: string;
+  applicationId?: string;
   name: string;
   throughput?: string;
   availability?: string;
@@ -93,9 +97,22 @@ export interface UnifiedAiopsTableRow {
 }
 
 export interface UnifiedAiopsOrphanedDeviceResponseItem {
+  id?: string | number;
+  uuid?: string;
+  device_id?: string;
+  deviceId?: string;
+  device_uuid?: string;
+  deviceUuid?: string;
+  resource_id?: string;
+  resourceId?: string;
   name?: string;
   device_name?: string;
+  deviceName?: string;
   instance_name?: string;
+  instanceName?: string;
+  resource_type?: string;
+  resourceType?: string;
+  type?: string;
   status?: string;
   lastSeen?: string;
   last_seen?: string;
@@ -104,6 +121,18 @@ export interface UnifiedAiopsOrphanedDeviceResponseItem {
   cloud?: string;
   provider?: string;
   platform?: string;
+  cloud_provider?: string;
+  cloudProvider?: string;
+  cloud_type?: string;
+  cloudType?: string;
+  monitoring_type?: string;
+  monitoringType?: string;
+  monitoring?: {
+    configured?: boolean;
+    enabled?: boolean;
+    observium?: boolean;
+    zabbix?: boolean;
+  };
   account?: string;
 }
 
@@ -117,6 +146,20 @@ export interface UnifiedAiopsOrphanedDevicesResponse {
 }
 
 export interface UnifiedAiopsOrphanedDeviceRow {
+  id?: string;
+  uuid?: string;
+  deviceId?: string;
+  resourceId?: string;
+  resourceType?: string;
+  provider?: string;
+  cloudType?: string;
+  monitoringType?: string;
+  monitoring?: {
+    configured?: boolean;
+    enabled?: boolean;
+    observium?: boolean;
+    zabbix?: boolean;
+  };
   name: string;
   status: string;
   lastSeen: string;

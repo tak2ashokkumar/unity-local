@@ -2,7 +2,17 @@
     <div class="dashboard-topbar">
         <div>
             <div class="dashboard-title">Public Cloud Compute Dashboard</div>
-            <div class="dashboard-subtitle">Refreshed: Today 10:00 IST | Scope: {{scopeText}}</div>
+            <div class="dashboard-subtitle">
+                Refreshed: {{refreshedText || 'Loading'}} | Scope:
+                <ng-container *ngIf="filterForm && !filtersUnavailable; else pendingScope">
+                    <ng-container *ngTemplateOutlet="filterScopeSummaryTmpl; context: { summary: platformScopeSummary }"></ng-container>
+                    <span class="scope-separator">|</span>
+                    <ng-container *ngTemplateOutlet="filterScopeSummaryTmpl; context: { summary: regionScopeSummary }"></ng-container>
+                    <span class="scope-separator">|</span>
+                    <ng-container *ngTemplateOutlet="filterScopeSummaryTmpl; context: { summary: accountScopeSummary }"></ng-container>
+                </ng-container>
+                <ng-template #pendingScope>{{filtersUnavailable ? 'No data available' : 'Loading filters'}}</ng-template>
+            </div>
         </div>
         <div class="dashboard-filters filter-loading-surface" *ngIf="!filterForm && !filtersUnavailable">
             <app-spinner [name]="loaderNames.filters" [width]="0"></app-spinner>
@@ -47,6 +57,23 @@
             </div>
         </form>
     </div>
+
+    <ng-template #filterScopeSummaryTmpl let-summary="summary">
+        <span class="scope-summary">
+            <span>{{summary.primaryLabel}}</span>
+            <span class="scope-more-count" *ngIf="summary.remainingLabels.length"
+                [popover]="scopePopoverTmpl" [popoverContext]="{ labels: summary.remainingLabels }"
+                triggers="mouseenter:mouseleave" placement="bottom" container="body">
+                +{{summary.remainingLabels.length}}
+            </span>
+        </span>
+    </ng-template>
+
+    <ng-template #scopePopoverTmpl let-labels="labels">
+        <div class="scope-popover-list">
+            <div class="scope-popover-item" *ngFor="let label of labels; trackBy: trackByIndex">{{label}}</div>
+        </div>
+    </ng-template>
 
     <div class="dashboard-no-data-state" *ngIf="filtersUnavailable">No data available</div>
 
