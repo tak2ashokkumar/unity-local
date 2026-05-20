@@ -67,9 +67,9 @@
     position: relative;
     border: 1px solid #c8d2dc;
     background:
-        linear-gradient(rgba(55, 138, 216, 0.24), rgba(55, 138, 216, 0.76)),
+        linear-gradient(rgba(55, 138, 216, 0.08), rgba(55, 138, 216, 0.48)),
         repeating-linear-gradient(90deg, #eef3f7 0 48px, #dfe7ee 48px 50px);
-    background-position: center;
+    background-position: top center;
     background-size: cover;
     cursor: pointer;
 }
@@ -160,6 +160,10 @@
     color: #73818f;
     background: #fff;
     cursor: pointer;
+
+    &.is-invalid {
+        border-color: #f86c6b;
+    }
 }
 
 .collection-file-input {

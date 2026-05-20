@@ -20,24 +20,17 @@
 
                     <div class="card-body pt-0">
                         <div class="row my-2 align-items-center">
-                            <div class="col-3">
-                                <search-box (searched)="onSearched($event)"></search-box>
-                            </div>
-                            <div class="col-9">
-                                <div class="row justify-content-end align-items-center">
-                                    <div class="mx-2">
-                                        <table-page-size [currentPageSize]="currentCriteria.pageSize"
-                                            [totalCount]="count"
-                                            (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                            <div class="col-12">
+                                <div class="d-flex align-items-center w-50">
+                                    <div class="w-50">
+                                        <search-box (searched)="onSearched($event)"></search-box>
                                     </div>
-                                    <div class="mx-2">
-                                        <select class="form-control form-control-sm status-filter"
-                                            [(ngModel)]="selectedStatusFilter" (change)="onStatusFilterChange()">
-                                            <option *ngFor="let opt of statusOptions" [value]="opt.value">
-                                                {{opt.label}}
-                                            </option>
-                                        </select>
-                                    </div>
+                                    <select class="form-control w-40 ml-2"
+                                        [(ngModel)]="selectedStatusFilter" (change)="onStatusFilterChange()">
+                                        <option *ngFor="let opt of statusOptions" [value]="opt.value">
+                                            {{opt.label}}
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -124,15 +117,23 @@
                             </tbody>
                         </table>
 
-                        <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
-                            [totalCount]="count">
-                        </table-entries>
-                        <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
-                            [pageSize]="currentCriteria.pageSize" [totalCount]="count"
-                            (pageChange)="pageChange($event)">
-                        </table-pager>
                         <div *ngIf="!viewData.length" class="d-flex py-4 justify-content-center align-items-center">
                             No Collections available.
+                        </div>
+                        <div class="collection-list-footer d-flex justify-content-between align-items-center mt-2">
+                            <div class="d-flex align-items-center">
+                                <table-page-size [currentPageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                    (pageSizeChange)="pageSizeChange($event)"></table-page-size>
+                                <div class="collection-table-entries ml-3">
+                                    <table-entries [pageNo]="currentCriteria.pageNo" [pageSize]="currentCriteria.pageSize"
+                                        [totalCount]="count">
+                                    </table-entries>
+                                </div>
+                            </div>
+                            <table-pager *ngIf="viewData.length" [pageNo]="currentCriteria.pageNo"
+                                [pageSize]="currentCriteria.pageSize" [totalCount]="count"
+                                (pageChange)="pageChange($event)">
+                            </table-pager>
                         </div>
                     </div>
                 </div>

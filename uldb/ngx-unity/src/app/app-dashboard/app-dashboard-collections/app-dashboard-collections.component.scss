@@ -34,8 +34,17 @@
   }
 }
 
-.status-filter {
-  min-width: 130px;
+.collection-list-footer {
+  min-height: 38px;
+}
+
+.collection-table-entries {
+  display: flex;
+  align-items: center;
+
+  ::ng-deep span {
+    margin-bottom: 0 !important;
+  }
 }
 
 .collection-dashboard-modal {

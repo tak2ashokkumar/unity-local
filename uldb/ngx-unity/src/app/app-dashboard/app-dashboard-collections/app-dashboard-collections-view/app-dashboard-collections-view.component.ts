@@ -32,6 +32,7 @@ export class AppDashboardCollectionsViewComponent implements OnInit, OnDestroy {
   selectedSearch = '';
   dashboardName = '';
   dashboardImageName = '';
+  dashboardImageError = '';
   selectedDashboard: DashboardItem | null = null;
   selectedDashboardImage: File | null = null;
 
@@ -201,6 +202,7 @@ export class AppDashboardCollectionsViewComponent implements OnInit, OnDestroy {
     this.selectedDashboard = dashboard;
     this.dashboardName = dashboard.name;
     this.dashboardImageName = '';
+    this.dashboardImageError = '';
     this.selectedDashboardImage = null;
     if (this.dashboardImageInput) {
       this.dashboardImageInput.nativeElement.value = '';
@@ -217,10 +219,16 @@ export class AppDashboardCollectionsViewComponent implements OnInit, OnDestroy {
     }
     this.selectedDashboardImage = file;
     this.dashboardImageName = file.name;
+    this.dashboardImageError = '';
   }
 
   updateDashboardImage() {
     if (!this.selectedDashboard) {
+      return;
+    }
+
+    if (!this.selectedDashboardImage) {
+      this.dashboardImageError = 'Thumbnail image is required.';
       return;
     }
 

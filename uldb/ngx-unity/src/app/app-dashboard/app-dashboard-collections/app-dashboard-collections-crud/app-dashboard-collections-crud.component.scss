@@ -34,10 +34,73 @@
     font-weight: 400;
     line-height: 1.2;
     text-align: right;
+
+    em {
+        color: #f86c6b;
+        font-style: normal;
+    }
 }
 
 .ccc-dashboard-label {
     padding-top: 8px;
+}
+
+.ccc-access-scope-box {
+    flex: 1;
+    max-width: 760px;
+    padding: 10px 12px 8px;
+    border: 1px solid #c8d2dc;
+    border-radius: 4px;
+
+    &.is-invalid {
+        border-color: #f86c6b;
+
+        .ccc-access-scope-hint {
+            color: #f86c6b;
+        }
+    }
+
+    ::ng-deep multiselect-dropdown.is-invalid {
+        border-color: #f86c6b;
+
+        .dropdown > button {
+            border-color: #f86c6b !important;
+        }
+    }
+}
+
+.ccc-access-scope-fields {
+    display: flex;
+    align-items: center;
+}
+
+.ccc-access-scope-field {
+    display: flex;
+    align-items: center;
+
+    & + .ccc-access-scope-field {
+        margin-left: 28px;
+    }
+
+    .ccc-multiselect {
+        width: 250px;
+        max-width: 250px;
+    }
+}
+
+.ccc-inline-label {
+    margin: 0 8px 0 0;
+    color: #73818f;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.ccc-access-scope-hint {
+    margin-top: 8px;
+    color: #73818f;
+    font-size: 12px;
+    line-height: 1.2;
 }
 
 .ccc-name-field {
@@ -281,6 +344,20 @@
     .ccc-description-field,
     .ccc-select-field {
         max-width: calc(100% - 170px);
+    }
+
+    .ccc-access-scope-box {
+        max-width: calc(100% - 170px);
+    }
+
+    .ccc-access-scope-fields {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ccc-access-scope-field + .ccc-access-scope-field {
+        margin-top: 8px;
+        margin-left: 0;
     }
 
     .ccc-dashboard-panels {

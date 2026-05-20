@@ -34,28 +34,27 @@
                 </div>
             </div>
 
-            <!-- Groups -->
+            <!-- Access Scope -->
             <div class="ccc-form-row">
-                <label class="ccc-form-label">Groups :</label>
-                <div class="ccc-select-field">
-                    <multiselect-dropdown [options]="groups" [settings]="multiselectSettings" [texts]="multiselectTexts"
-                        class="form-control p-0 ccc-multiselect" formControlName="groups"
-                        [class.is-invalid]="formErrors.access_scope">
-                    </multiselect-dropdown>
-                </div>
-            </div>
-
-            <!-- Roles -->
-            <div class="ccc-form-row">
-                <label class="ccc-form-label">Roles :</label>
-                <div class="ccc-select-field">
-                    <multiselect-dropdown [options]="roles" [settings]="multiselectSettings" [texts]="multiselectTexts"
-                        class="form-control p-0 ccc-multiselect" formControlName="roles"
-                        [class.is-invalid]="formErrors.access_scope">
-                    </multiselect-dropdown>
-                    <div class="invalid-feedback d-block" *ngIf="formErrors.access_scope">
-                        {{formErrors.access_scope}}
+                <label class="ccc-form-label">Access Scope<em>* </em> :</label>
+                <div class="ccc-access-scope-box" [class.is-invalid]="formErrors.access_scope">
+                    <div class="ccc-access-scope-fields">
+                        <div class="ccc-access-scope-field">
+                            <label class="ccc-inline-label">Roles :</label>
+                            <multiselect-dropdown [options]="roles" [settings]="multiselectSettings"
+                                [texts]="multiselectTexts" class="form-control p-0 ccc-multiselect"
+                                formControlName="roles" [class.is-invalid]="formErrors.access_scope">
+                            </multiselect-dropdown>
+                        </div>
+                        <div class="ccc-access-scope-field">
+                            <label class="ccc-inline-label">Groups :</label>
+                            <multiselect-dropdown [options]="groups" [settings]="multiselectSettings"
+                                [texts]="multiselectTexts" class="form-control p-0 ccc-multiselect"
+                                formControlName="groups" [class.is-invalid]="formErrors.access_scope">
+                            </multiselect-dropdown>
+                        </div>
                     </div>
+                    <div class="ccc-access-scope-hint">Select at least one Group or Role.</div>
                 </div>
             </div>
 
@@ -86,7 +85,7 @@
 
             <!-- Select Dashboards section -->
             <div class="ccc-dashboard-row">
-                <label class="ccc-form-label ccc-dashboard-label">Select Dashboards</label>
+                <label class="ccc-form-label ccc-dashboard-label">Select Dashboards<em>* </em></label>
                 <div class="ccc-dashboard-selector">
                     <div class="d-flex align-items-start ccc-dashboard-panels">
 
