@@ -14,6 +14,11 @@ import {
 } from './unified-aiops-command-centre.type';
 
 export const UNIFIED_AIOPS_ALL_SELECTED_VALUE = 'all';
+export const UNIFIED_AIOPS_ALERT_SEVERITY_COLORS = {
+  critical: '#cc0000',
+  warning: '#ff8800',
+  info: '#378ad8'
+};
 
 export const UNIFIED_AIOPS_EXECUTIVE_MONITORING_SUMMARY_ENDPOINT = '/customer/aiops-dashboard/executive-monitoring-summary/';
 export const UNIFIED_AIOPS_DISCOVERY_VS_MONITORING_ENDPOINT = '/customer/aiops-dashboard/discovery-vs-monitoring/';
@@ -89,7 +94,7 @@ export const UNIFIED_AIOPS_DISCOVERY_ITEMS: UnifiedAiopsStackItem[] = [
 export const UNIFIED_AIOPS_ALERT_LEGEND: UnifiedAiopsLegendMetric[] = [
   { icon: 'fa-exclamation-triangle', value: '14', tone: 'danger' },
   { icon: 'fa-exclamation-circle', value: '35', tone: 'warning' },
-  { icon: 'fa-info-circle', value: '59', tone: 'primary' }
+  { icon: 'fa-info-circle', value: '59', tone: 'info' }
 ];
 
 export const UNIFIED_AIOPS_ALERT_SEGREGATION_ITEMS: UnifiedAiopsStackItem[] = [

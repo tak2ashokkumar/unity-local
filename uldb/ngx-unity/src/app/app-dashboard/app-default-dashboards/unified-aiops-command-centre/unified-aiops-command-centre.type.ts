@@ -65,6 +65,7 @@ export interface UnifiedAiopsBusinessService {
   id?: string;
   serviceName: string;
   status: UnifiedAiopsTone;
+  statusLabel?: string;
   uptime: string;
   degraded: string;
   alerts: string;
@@ -415,4 +416,9 @@ export interface UnifiedAiopsRemediationMetric {
   label: string;
   value: string;
   tone?: UnifiedAiopsTone;
+}
+
+export interface UnifiedAiopsRemediationActionItem {
+  name: string;
+  count: number;
 }

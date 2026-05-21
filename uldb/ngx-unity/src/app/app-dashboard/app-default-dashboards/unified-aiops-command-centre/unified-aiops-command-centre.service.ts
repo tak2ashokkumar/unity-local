@@ -9,6 +9,7 @@ import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.se
 import { DataCenterTabs } from 'src/app/united-cloud/datacenter/tabs';
 import {
   UNIFIED_AIOPS_ALERTS_ENDPOINT,
+  UNIFIED_AIOPS_ALERT_SEVERITY_COLORS,
   UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT,
   UNIFIED_AIOPS_ALERT_SOURCES,
   UNIFIED_AIOPS_AI_GPU_METRIC_CONFIG,
@@ -75,6 +76,7 @@ import {
   UnifiedAiopsRecentAlertsResponse,
   UnifiedAiopsRecentAlertsSummary,
   UnifiedAiopsRecentAlertSeverity,
+  UnifiedAiopsRemediationActionItem,
   UnifiedAiopsRemediationMetric,
   UnifiedAiopsStackItem,
   UnifiedAiopsTableRow,
@@ -267,7 +269,11 @@ export class UnifiedAiopsCommandCentreService {
     return this.getStackedBarOptions(
       items,
       ['Critical', 'Warning', 'Info'],
-      ['#5572c6', '#92cf75', '#ffc95d'],
+      [
+        UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical,
+        UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.warning,
+        UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.info
+      ],
       22
     );
   }
@@ -285,7 +291,7 @@ export class UnifiedAiopsCommandCentreService {
     return [
       { icon: 'fa-exclamation-triangle', value: this.formatNumber(this.getNumberFromPayload(summary, ['critical', 'critical_alerts'], totals.critical)), tone: 'danger' },
       { icon: 'fa-exclamation-circle', value: this.formatNumber(this.getNumberFromPayload(summary, ['warning', 'warnings', 'warning_alerts'], totals.warning)), tone: 'warning' },
-      { icon: 'fa-info-circle', value: this.formatNumber(this.getNumberFromPayload(summary, ['info', 'informative', 'information', 'info_alerts'], totals.info)), tone: 'primary' }
+      { icon: 'fa-info-circle', value: this.formatNumber(this.getNumberFromPayload(summary, ['info', 'informative', 'information', 'info_alerts'], totals.info)), tone: 'info' }
     ];
   }
 
@@ -408,10 +414,86 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   convertToBusinessServicesViewData(data: UnifiedAiopsBusinessService[]): UnifiedAiopsBusinessService[] {
-    return (data || []).map((service: any) => ({
+    return (data || []).map((service: any) => this.getBusinessServiceViewData(service));
+  }
+
+  private getBusinessServiceViewData(service: any): UnifiedAiopsBusinessService {
+    const flatService = this.flattenPayload(service || {});
+    const uptimePercent = this.getOptionalNumberValue(this.getFirstDefinedValue(service?.uptime_pct, service?.uptimePct));
+    const criticalAlerts = this.getNumberFromPayload(flatService, ['critical_alerts', 'criticalAlerts', 'critical']);
+    const warningAlerts = this.getNumberFromPayload(flatService, ['warning_alerts', 'warningAlerts', 'warning']);
+    const infoAlerts = this.getNumberFromPayload(flatService, ['info_alerts', 'infoAlerts', 'information', 'info']);
+    const totalAlerts = this.getFirstDefinedValue(service?.alerts, service?.total_alerts, service?.totalAlerts);
+
+    return {
       ...service,
-      id: this.getIdValue(service?.id, service?.uuid, service?.business_id, service?.businessId, service?.service_id, service?.serviceId)
-    }));
+      id: this.getIdValue(service?.id, service?.uuid, service?.business_id, service?.businessId, service?.service_id, service?.serviceId),
+      serviceName: this.getBusinessServiceName(service),
+      status: this.getBusinessServiceStatusTone(service?.status),
+      statusLabel: this.getBusinessServiceStatusLabel(service?.status),
+      uptime: this.getBusinessServiceUptime(service, uptimePercent),
+      degraded: this.getBusinessServiceDegraded(service, uptimePercent),
+      alerts: totalAlerts !== undefined ? this.formatNumber(totalAlerts) : this.formatNumber(criticalAlerts + warningAlerts + infoAlerts),
+      alertTone: this.getBusinessServiceAlertTone(criticalAlerts, warningAlerts, infoAlerts)
+    };
+  }
+
+  private getBusinessServiceName(service: any): string {
+    return String(this.getFirstDefinedValue(service?.serviceName, service?.service_name, service?.name, service?.label, '-'));
+  }
+
+  private getBusinessServiceStatusTone(status: any): UnifiedAiopsTone {
+    switch (String(status || '').toLowerCase()) {
+      case 'healthy':
+      case 'up':
+      case 'ok':
+      case 'success':
+        return 'success';
+      case 'warning':
+      case 'degraded':
+        return 'warning';
+      case 'critical':
+      case 'down':
+      case 'failed':
+      case 'error':
+        return 'danger';
+      default:
+        return 'muted';
+    }
+  }
+
+  private getBusinessServiceStatusLabel(status: any): string {
+    const value = this.getFirstDefinedValue(status);
+    return value === undefined ? 'Unknown' : this.getReadableStackLabel(String(value));
+  }
+
+  private getBusinessServiceUptime(service: any, uptimePercent: number | null): string {
+    const uptime = this.getFirstDefinedValue(service?.uptime);
+    if (uptime !== undefined) {
+      return String(uptime);
+    }
+    return uptimePercent !== null ? this.formatPercentage(uptimePercent) : 'NA';
+  }
+
+  private getBusinessServiceDegraded(service: any, uptimePercent: number | null): string {
+    const degraded = this.getFirstDefinedValue(service?.degraded);
+    if (degraded !== undefined) {
+      return String(degraded);
+    }
+    return this.formatPercentage(Math.max(100 - (uptimePercent || 0), 0));
+  }
+
+  private getBusinessServiceAlertTone(criticalAlerts: number, warningAlerts: number, infoAlerts: number): UnifiedAiopsTone {
+    if (criticalAlerts > 0) {
+      return 'danger';
+    }
+    if (warningAlerts > 0) {
+      return 'warning';
+    }
+    if (infoAlerts > 0) {
+      return 'info';
+    }
+    return 'success';
   }
   /*
    * ******End ****** Business Services Widget Related ********************
@@ -1403,7 +1485,7 @@ export class UnifiedAiopsCommandCentreService {
     const unknown = this.getNumberFromPayload(flatPayload, ['unknown', 'unknowns']);
     const availability = [
       { name: `Up ${this.formatPercentage(up)}`, value: up, color: '#1f7f43' },
-      { name: `Down ${this.formatPercentage(down)}`, value: down, color: '#b91515' },
+      { name: `Down ${this.formatPercentage(down)}`, value: down, color: UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical },
       { name: `Unknown ${this.formatPercentage(unknown)}`, value: unknown, color: '#a96a12' }
     ];
 
@@ -1460,7 +1542,7 @@ export class UnifiedAiopsCommandCentreService {
     const unknownData = categories.map(category => this.getNumberFromPayload(this.flattenPayload(payload[category] || {}), ['unknown', 'unknowns']));
 
     return {
-      color: ['#1f7f43', '#b91515', '#3f4a54'],
+      color: ['#1f7f43', UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical, '#3f4a54'],
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: { top: 2, left: 'center', itemWidth: 12, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' } },
       grid: { left: 38, right: 14, top: 40, bottom: 32 },
@@ -1495,7 +1577,11 @@ export class UnifiedAiopsCommandCentreService {
     const maxValue = Math.max(...criticalData, ...highData, ...mediumData, 0);
 
     return {
-      color: ['#b91515', '#a9650c', '#265f99'],
+      color: [
+        UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical,
+        UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.warning,
+        UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.info
+      ],
       tooltip: { trigger: 'axis' },
       legend: { bottom: 0, left: 18, itemWidth: 10, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' } },
       grid: { left: 42, right: 14, top: 18, bottom: 34 },
@@ -1503,8 +1589,8 @@ export class UnifiedAiopsCommandCentreService {
       yAxis: { type: 'value', max: Math.max(10, Math.ceil(maxValue * 1.1)), axisLabel: { fontSize: 10, color: '#758394' }, splitLine: { lineStyle: { color: '#e4e9ee' } } },
       series: [
         { name: 'Critical', type: 'line', data: criticalData, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 3 } },
-        { name: 'High', type: 'line', data: highData, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 3 } },
-        { name: 'Medium', type: 'line', data: mediumData, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 3 } }
+        { name: 'Warning', type: 'line', data: highData, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 3 } },
+        { name: 'Info', type: 'line', data: mediumData, smooth: true, symbol: 'circle', symbolSize: 5, lineStyle: { width: 3 } }
       ]
     };
   }
@@ -2310,7 +2396,7 @@ export class UnifiedAiopsCommandCentreService {
       {
         label: 'Info Alerts',
         value: this.formatNumber(this.getRecentAlertSummaryValue(summary, ['info_alerts', 'infoAlerts', 'information', 'info'])),
-        tone: 'primary'
+        tone: 'info'
       }
     ];
   }
@@ -2391,66 +2477,149 @@ export class UnifiedAiopsCommandCentreService {
   /*
    * -----Start----- Auto-Remediation Summary Widget Related -------------------
    */
-  getRemediationDonut(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
+  getRemediationDonut(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<{ [key: string]: any }> {
     return this.getWidgetResponse(UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['donut', 'remediation_donut', 'summary_donut']))
+      map(res => this.getRemediationSummaryPayload(res))
     );
   }
 
-  convertToRemediationDonutOptions(data: EChartsOption): EChartsOption {
-    return data || {};
+  convertToRemediationDonutOptions(data: { [key: string]: any }): EChartsOption {
+    return this.getRemediationDonutOptions(data);
   }
 
-  private getRemediationDonutOptions(): EChartsOption {
+  private getRemediationDonutOptions(summary: { [key: string]: any }): EChartsOption {
+    const successPercent = this.getNumberFromPayload(summary, ['success_percent', 'successPercent', 'runbook_success', 'runbookSuccess']);
+    const failedPercent = this.getNumberFromPayload(summary, ['failed_percent', 'failedPercent', 'failure_percent', 'failurePercent']);
+    if (!successPercent && !failedPercent) {
+      return {};
+    }
     return this.getDonutOptions([
-      { name: 'Successful 91%', value: 91, color: '#5b9f1f' },
-      { name: 'Failed 9%', value: 9, color: '#e64a4a' }
+      { name: 'Successful', value: successPercent, color: '#5b9f1f' },
+      { name: 'Failed', value: failedPercent, color: '#e64a4a' }
     ], [], ['#5b9f1f', '#e64a4a'], false);
   }
 
-  getRemediationActions(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
+  getRemediationActions(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsRemediationActionItem[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['actions', 'remediation_actions', 'top_actions']))
+      map(res => this.getRemediationActionItems(res))
     );
   }
 
-  convertToRemediationActionsOptions(data: EChartsOption): EChartsOption {
-    return data || {};
+  convertToRemediationActionsOptions(data: UnifiedAiopsRemediationActionItem[]): EChartsOption {
+    return this.getRemediationActionsOptions(data || []);
   }
 
-  private getRemediationActionsOptions(): EChartsOption {
-    const names = ['Restart service', 'Scale out ASG', 'Revoke SG rule', 'Snapshot cleanup', 'Disk resize'];
-    const values = [412, 338, 261, 204, 138];
+  private getRemediationActionsOptions(items: UnifiedAiopsRemediationActionItem[]): EChartsOption {
+    const colors = ['#2f80dd', '#2f80dd', '#f5a623', '#5b9f1f', '#5b9f1f'];
+    const topItems = (items || []).filter(item => item.count > 0).slice(0, 5);
+    if (!topItems.length) {
+      return {};
+    }
     return {
-      grid: { left: 100, right: 36, top: 8, bottom: 18 },
+      color: colors,
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' }
+      },
+      grid: { left: 150, right: 44, top: 8, bottom: 4 },
       xAxis: { type: 'value', show: false },
-      yAxis: { type: 'category', data: names.reverse(), axisLabel: { color: '#1f2a34', fontSize: 11 }, axisTick: { show: false }, axisLine: { show: false } },
+      yAxis: {
+        type: 'category',
+        inverse: true,
+        data: topItems.map(item => item.name),
+        axisLabel: {
+          color: '#1f2a34',
+          fontSize: 10,
+          formatter: (value: string) => String(value || '').length > 28 ? `${String(value).slice(0, 27)}...` : value
+        },
+        axisTick: { show: false },
+        axisLine: { show: false }
+      },
       series: [{
         type: 'bar',
-        data: values.reverse().map((value, index) => ({
-          value,
+        data: topItems.map((item, index) => ({
+          value: item.count,
+          name: item.name,
           label: { show: true, position: 'right', color: '#1f2a34', fontSize: 10 },
-          itemStyle: { color: ['#5b9f1f', '#5b9f1f', '#f5a623', '#2f80ed', '#2f80ed'][index] }
+          itemStyle: { color: colors[index] }
         })),
-        barWidth: 12
+        barWidth: 7
       }]
     };
   }
 
   getRemediationSummary(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsMetric>(res, ['summary', 'summary_metrics', 'remediation_summary']))
+      map(res => this.getRemediationSummaryMetrics(res))
     );
   }
 
   getRemediationMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsRemediationMetric[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_AUTO_REMEDIATION_SUMMARY_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsRemediationMetric>(res, ['metrics', 'remediation_metrics']))
+      map(res => this.getRemediationMetricCards(res))
     );
   }
 
   convertToRemediationMetricsViewData(data: UnifiedAiopsRemediationMetric[]): UnifiedAiopsRemediationMetric[] {
     return data || [];
+  }
+
+  private getRemediationSummaryPayload(response: any): { [key: string]: any } {
+    return this.flattenPayload(this.getMetricPayload(response, ['summary', 'summary_metrics', 'remediation_summary']));
+  }
+
+  private getRemediationSummaryMetrics(response: any): UnifiedAiopsMetric[] {
+    const summary = this.getRemediationSummaryPayload(response);
+    const totalRuns = this.getNumberFromPayload(summary, ['total_runs', 'totalRuns']);
+    const successPercent = this.getNumberFromPayload(summary, ['success_percent', 'successPercent', 'runbook_success', 'runbookSuccess']);
+    const failedPercent = this.getNumberFromPayload(summary, ['failed_percent', 'failedPercent', 'failure_percent', 'failurePercent']);
+    const avgDuration = this.getFirstMetricValue(summary, ['avg_duration', 'avgDuration', 'avg_mttr', 'avgMttr']);
+    if (!totalRuns && !successPercent && !failedPercent && !avgDuration) {
+      return [];
+    }
+    return [
+      { label: 'Successful', value: this.formatPercentage(successPercent), tone: 'success' },
+      { label: 'Failed', value: this.formatPercentage(failedPercent), tone: 'danger' },
+      { label: 'Total runs', value: this.formatNumber(totalRuns) },
+      { label: 'Avg duration', value: String(avgDuration || '0') }
+    ];
+  }
+
+  private getRemediationMetricCards(response: any): UnifiedAiopsRemediationMetric[] {
+    const summary = this.getRemediationSummaryPayload(response);
+    const totalRuns = this.getNumberFromPayload(summary, ['total_runs', 'totalRuns']);
+    const successPercent = this.getNumberFromPayload(summary, ['success_percent', 'successPercent', 'runbook_success', 'runbookSuccess']);
+    const failedPercent = this.getNumberFromPayload(summary, ['failed_percent', 'failedPercent', 'failure_percent', 'failurePercent']);
+    const avgDuration = this.getFirstMetricValue(summary, ['avg_mttr', 'avgMttr', 'avg_duration', 'avgDuration']);
+    const autoRemediations = this.getNumberFromPayload(summary, ['auto_remediations', 'autoRemediations']);
+    const runbookFailures = this.getNumberFromPayload(
+      summary,
+      ['runbook_failures', 'runbookFailures', 'failed_runs', 'failedRuns', 'failure_count', 'failureCount'],
+      totalRuns && failedPercent ? Math.round(totalRuns * failedPercent / 100) : 0
+    );
+    if (!autoRemediations && !successPercent && !avgDuration && !runbookFailures) {
+      return [];
+    }
+    return [
+      { label: 'Auto-Remediations', value: this.formatNumber(autoRemediations), tone: 'success' },
+      { label: 'Runbook Success', value: this.formatPercentage(successPercent), tone: 'success' },
+      { label: 'Avg MTTR', value: String(avgDuration || '0'), tone: 'success' },
+      { label: 'Runbook Failures', value: this.formatNumber(runbookFailures), tone: 'danger' }
+    ];
+  }
+
+  private getRemediationActionItems(response: any): UnifiedAiopsRemediationActionItem[] {
+    return this.getArrayPayload<any>(response, ['top_auto_remediations', 'topAutoRemediations', 'actions', 'remediation_actions', 'top_actions'])
+      .map(item => ({
+        name: this.getRemediationActionName(item),
+        count: this.getNumberFromPayload(this.flattenPayload(item || {}), ['count', 'value', 'total', 'runs'])
+      }))
+      .filter(item => !!item.name && item.count > 0)
+      .sort((firstItem, secondItem) => secondItem.count - firstItem.count);
+  }
+
+  private getRemediationActionName(item: any): string {
+    return String(item?.name || item?.label || item?.action || item?.remediation_name || item?.remediationName || '').trim();
   }
   /*
    * ******End ****** Auto-Remediation Summary Widget Related ********************
@@ -2539,6 +2708,15 @@ export class UnifiedAiopsCommandCentreService {
     const normalizedValue = typeof value === 'string' ? value.replace(/,/g, '') : value;
     const numericValue = Number(normalizedValue);
     return isNaN(numericValue) ? fallback : numericValue;
+  }
+
+  private getOptionalNumberValue(value: any): number | null {
+    if (value === undefined || value === null || value === '') {
+      return null;
+    }
+    const normalizedValue = typeof value === 'string' ? value.replace(/,/g, '') : value;
+    const numericValue = Number(normalizedValue);
+    return isNaN(numericValue) ? null : numericValue;
   }
 
   private getNormalizedPayload(payload: { [key: string]: any }): { [key: string]: any } {

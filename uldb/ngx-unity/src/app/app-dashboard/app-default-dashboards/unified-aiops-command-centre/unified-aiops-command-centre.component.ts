@@ -66,11 +66,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private readonly datacenterGeographyInitialZoom = 2.2;
   private readonly datacenterGeographyInitialCenter = { lat: 25.738611, lng: 0 };
   private readonly linkRoutes = {
-    infrastructure: ['/app-dashboard/default/infrastructure'],
-    privateCloudCompute: ['/app-dashboard/default/private-cloud-compute'],
-    publicCloudCompute: ['/app-dashboard/default/public-cloud-compute'],
-    applicationDashboard: ['/app-dashboard/default/application'],
-    databaseDashboard: ['/app-dashboard/default/database'],
     devices: ['/unitycloud/devices'],
     vmAll: ['/unitycloud/devices/vms/allvms'],
     vmProvider: {
@@ -95,6 +90,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       gcp: ['/unitycloud/publiccloud/gcp'],
       oracle: ['/unitycloud/publiccloud/oracle']
     },
+    publicCloud: ['/unitycloud/publiccloud'],
     businessService: ['/unitycloud/business-service'],
     applications: ['/unitycloud/applications'],
     alerts: ['/services/aiml-event-mgmt/alerts'],
@@ -1233,6 +1229,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.openRouteInNewTab(this.getSummaryMetricRoute(metric?.label));
   }
 
+  canOpenSummaryMetric(metric: UnifiedAiopsMetric): boolean {
+    return !!this.getSummaryMetricRoute(metric?.label);
+  }
+
   openDeviceDiscovery() {
     this.openRouteInNewTab(this.linkRoutes.devices);
   }
@@ -1257,11 +1257,15 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   openBusinessService(row: UnifiedAiopsBusinessService) {
     const serviceId = row?.id;
-    this.openRouteInNewTab(serviceId ? ['/unitycloud/business-service', serviceId, 'summary'] : this.linkRoutes.businessService);
+    this.openRouteInNewTab(serviceId ? ['/unitycloud/business-service', serviceId, 'summary'] : null);
+  }
+
+  canOpenBusinessService(row: UnifiedAiopsBusinessService): boolean {
+    return !!row?.id;
   }
 
   openEmployeeExperience() {
-    this.openRouteInNewTab(this.linkRoutes.applicationDashboard);
+    this.openRouteInNewTab(this.linkRoutes.applications);
   }
 
   openDatacenters() {
@@ -1280,14 +1284,26 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.openRouteInNewTab(this.getPublicCoverageRoute(provider, row));
   }
 
+  canOpenPrivateCloudCoverage(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): boolean {
+    return !!this.getPrivateCoverageRoute(provider, row);
+  }
+
+  canOpenPublicCloudCoverage(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): boolean {
+    return !!this.getPublicCoverageRoute(provider, row);
+  }
+
   openDatacenterGeography(location: WorldMapWidgetViewdata) {
     const datacenters = location?.datacenters || [];
     const datacenterId = datacenters.length === 1 ? datacenters[0]?.uuid : '';
-    this.openRouteInNewTab(datacenterId ? ['/unitycloud/datacenter', datacenterId] : this.linkRoutes.datacenter);
+    this.openRouteInNewTab(datacenterId ? ['/unitycloud/datacenter', datacenterId] : null);
   }
 
   openDatacenterInfrastructure(metric: UnifiedAiopsMetric) {
     this.openRouteInNewTab(this.getDatacenterInfrastructureRoute(metric?.label));
+  }
+
+  canOpenDatacenterInfrastructure(metric: UnifiedAiopsMetric): boolean {
+    return !!this.getDatacenterInfrastructureRoute(metric?.label);
   }
 
   openKubernetesMetrics() {
@@ -1299,12 +1315,16 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   openApplicationDashboard() {
-    this.openRouteInNewTab(this.linkRoutes.applicationDashboard);
+    this.openRouteInNewTab(this.linkRoutes.applications);
   }
 
   openApplicationRow(row: UnifiedAiopsTableRow) {
     const applicationId = row?.applicationId || row?.id || row?.uuid;
-    this.openRouteInNewTab(applicationId ? ['/unitycloud/applications', applicationId, 'services'] : this.linkRoutes.applications);
+    this.openRouteInNewTab(applicationId ? ['/unitycloud/applications', applicationId, 'services'] : null);
+  }
+
+  canOpenApplicationRow(row: UnifiedAiopsTableRow): boolean {
+    return !!(row?.applicationId || row?.id || row?.uuid);
   }
 
   openServicesOverview() {
@@ -1320,34 +1340,22 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.openRouteInNewTab(['/unitycloud/applications', applicationId, 'services', serviceId, 'details']);
       return;
     }
-    this.openRouteInNewTab(applicationId ? ['/unitycloud/applications', applicationId, 'services'] : this.linkRoutes.applications);
+    this.openRouteInNewTab(applicationId ? ['/unitycloud/applications', applicationId, 'services'] : null);
+  }
+
+  canOpenServiceRow(row: UnifiedAiopsTableRow): boolean {
+    return !!(row?.id || row?.uuid || row?.applicationId || this.selectedServiceApplicationId);
   }
 
   openDatabaseMonitoring() {
-    this.openRouteInNewTab(this.linkRoutes.databaseDashboard);
-  }
-
-  openOsMonitoring() {
-    this.openRouteInNewTab(this.linkRoutes.devices);
-  }
-
-  openInfrastructurePerformance() {
-    this.openRouteInNewTab(this.linkRoutes.infrastructure);
-  }
-
-  onBandwidthChartInit(chartInstance: any) {
-    this.bindChartClick(chartInstance, () => this.openInfrastructurePerformance());
+    this.openRouteInNewTab(this.linkRoutes.databases);
   }
 
   onPlatformPerformanceChartInit(chartInstance: any) {
     this.bindChartClick(chartInstance, params => {
       const providerRoute = this.getProviderRoute(this.getChartParamLabel(params), false);
-      this.openRouteInNewTab(providerRoute || this.linkRoutes.infrastructure);
+      this.openRouteInNewTab(providerRoute);
     });
-  }
-
-  onDeviceAvailabilityChartInit(chartInstance: any) {
-    this.bindChartClick(chartInstance, () => this.openRouteInNewTab(this.linkRoutes.devices));
   }
 
   onAvailabilityCategoryChartInit(chartInstance: any) {
@@ -1362,36 +1370,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   onAlertSankeyChartInit(chartInstance: any) {
     this.bindChartClick(chartInstance, () => this.openAlerts());
-  }
-
-  openOrphanedDevices() {
-    this.openRouteInNewTab(this.linkRoutes.devices);
-  }
-
-  openOrphanedDevice(device: UnifiedAiopsOrphanedDeviceRow) {
-    this.openRouteInNewTab(this.getDeviceRoute(device, device?.name || device?.resourceType));
-  }
-
-  openOrphanedCategory(item: UnifiedAiopsOrphanedCategoryItem) {
-    this.openRouteInNewTab(this.getCategoryRoute(item?.category));
-  }
-
-  onOrphanedCategoryChartInit(chartInstance: any) {
-    this.bindChartClick(chartInstance, params => {
-      this.openRouteInNewTab(this.getCategoryRoute(params?.data?.category || this.getChartParamLabel(params)));
-    });
-  }
-
-  openIdleDevices() {
-    this.openRouteInNewTab(this.linkRoutes.devices);
-  }
-
-  openIdleDevice(device: UnifiedAiopsIdleDeviceRow) {
-    this.openRouteInNewTab(this.getDeviceRoute(device, device?.deviceName || device?.resourceType));
-  }
-
-  onIdleDurationChartInit(chartInstance: any) {
-    this.bindChartClick(chartInstance, () => this.openIdleDevices());
   }
 
   openRecentAlerts() {
@@ -1425,7 +1403,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     goBackFromDefaultDashboard(this.router, this.route);
   }
 
-  private openRouteInNewTab(commands: any[]) {
+  private openRouteInNewTab(commands: any[] | null) {
+    if (!commands?.length) {
+      return;
+    }
     const routeUrl = this.router.serializeUrl(this.router.createUrlTree(commands));
     const externalUrl = this.location.prepareExternalUrl(routeUrl);
     window.open(externalUrl, '_blank', 'noopener');
@@ -1441,13 +1422,13 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     chartInstance.on('click', handler);
   }
 
-  private getSummaryMetricRoute(label: string | undefined): any[] {
+  private getSummaryMetricRoute(label: string | undefined): any[] | null {
     const value = this.normalizeLinkText(label);
     if (value.includes('public_cloud')) {
-      return this.linkRoutes.publicCloudCompute;
+      return this.linkRoutes.publicCloud;
     }
     if (value.includes('private_cloud')) {
-      return this.linkRoutes.privateCloudCompute;
+      return this.linkRoutes.pccloud;
     }
     if (this.isVmResource(value)) {
       return this.linkRoutes.vmAll;
@@ -1455,10 +1436,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     if (value.includes('device') || value.includes('resource')) {
       return this.linkRoutes.devices;
     }
-    return this.linkRoutes.infrastructure;
+    return null;
   }
 
-  private getPrivateCoverageRoute(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): any[] {
+  private getPrivateCoverageRoute(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): any[] | null {
     const rowLabel = this.normalizeLinkText(row?.label);
     const providerLabel = this.normalizeLinkText(provider?.title);
     if (this.isVmResource(rowLabel)) {
@@ -1468,15 +1449,15 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return this.linkRoutes.hypervisors;
     }
     if (rowLabel.includes('database') || rowLabel.includes('db')) {
-      return this.linkRoutes.databaseDashboard;
+      return this.linkRoutes.databases;
     }
     if (rowLabel) {
       return this.getCategoryRoute(rowLabel, providerLabel);
     }
-    return providerLabel ? this.linkRoutes.pccloud : this.linkRoutes.privateCloudCompute;
+    return providerLabel ? this.linkRoutes.pccloud : null;
   }
 
-  private getPublicCoverageRoute(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): any[] {
+  private getPublicCoverageRoute(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }): any[] | null {
     const providerKey = this.getProviderKey(provider?.title);
     const rowLabel = this.normalizeLinkText(row?.label);
     if (this.isVmResource(rowLabel)) {
@@ -1488,10 +1469,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     if (this.isKubernetesResource(rowLabel)) {
       return this.linkRoutes.kubernetes;
     }
-    return this.getProviderRoute(providerKey) || this.linkRoutes.publicCloudCompute;
+    return rowLabel ? null : this.getProviderRoute(providerKey, false);
   }
 
-  private getDatacenterInfrastructureRoute(label: string | undefined): any[] {
+  private getDatacenterInfrastructureRoute(label: string | undefined): any[] | null {
     const value = this.normalizeLinkText(label);
     if (value.includes('bare_metal') || value.includes('baremetal') || value.includes('server')) {
       return this.linkRoutes.bmservers;
@@ -1517,10 +1498,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     if (value.includes('device')) {
       return this.linkRoutes.devices;
     }
-    return this.linkRoutes.infrastructure;
+    return null;
   }
 
-  private getCategoryRoute(value: string | undefined, provider?: string | undefined): any[] {
+  private getCategoryRoute(value: string | undefined, provider?: string | undefined): any[] | null {
     const normalizedValue = this.normalizeLinkText(value);
     const providerKey = this.getProviderKey(provider);
     if (this.isVmResource(normalizedValue)) {
@@ -1556,40 +1537,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     if (normalizedValue.includes('hypervisor')) {
       return this.linkRoutes.hypervisors;
     }
-    return this.getProviderRoute(normalizedValue, false) || this.linkRoutes.devices;
-  }
-
-  private getDeviceRoute(device: UnifiedAiopsOrphanedDeviceRow | UnifiedAiopsIdleDeviceRow, fallbackLabel?: string): any[] {
-    const deviceId = this.getDeviceId(device);
-    const resourceType = this.normalizeLinkText((device as any)?.resourceType || fallbackLabel);
-    const monitoringRoute = this.getMonitoringRouteSegment(device);
-    if (this.isStorageResource(resourceType)) {
-      if (deviceId && monitoringRoute) {
-        return monitoringRoute === 'zbx'
-          ? ['/unitycloud/devices/storagedevices', deviceId, 'zbx', 'details']
-          : ['/unitycloud/devices/storagedevices', deviceId, 'obs', 'overview'];
-      }
-      return this.linkRoutes.storage;
-    }
-    if (this.isGpuResource(resourceType)) {
-      return this.linkRoutes.gpu;
-    }
-    if (resourceType.includes('bare_metal') || resourceType.includes('baremetal')) {
-      if (deviceId && monitoringRoute) {
-        return ['/unitycloud/devices/bmservers', deviceId, monitoringRoute];
-      }
-      return this.linkRoutes.bmservers;
-    }
-    if (this.isVmResource(resourceType)) {
-      const provider = this.getDeviceProvider(device);
-      if (deviceId && monitoringRoute && provider === 'custom') {
-        return monitoringRoute === 'zbx'
-          ? ['/unitycloud/devices/vms/custom', deviceId, 'zbx', 'details']
-          : ['/unitycloud/devices/vms/custom', deviceId, 'obs', 'overview'];
-      }
-      return this.getProviderVmRoute(provider);
-    }
-    return this.getCategoryRoute(resourceType || fallbackLabel);
+    return this.getProviderRoute(normalizedValue, false);
   }
 
   private getProviderRoute(value: string | undefined, withFallback = true): any[] | null {
@@ -1604,11 +1552,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       case 'oracle':
         return this.linkRoutes.publicCloudProvider.oracle;
       default:
-        return withFallback ? this.linkRoutes.publicCloudCompute : null;
+        return withFallback ? this.linkRoutes.publicCloud : null;
     }
   }
 
-  private getProviderVmRoute(value: string | undefined): any[] {
+  private getProviderVmRoute(value: string | undefined): any[] | null {
     switch (this.getProviderKey(value)) {
       case 'aws':
         return this.linkRoutes.vmProvider.aws;
@@ -1620,7 +1568,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       case 'oracle':
         return this.linkRoutes.vmProvider.oracle;
       default:
-        return this.linkRoutes.vmAll;
+        return value ? null : this.linkRoutes.vmAll;
     }
   }
 
@@ -1646,27 +1594,6 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   private getChartParamLabel(params: any): string {
     return params?.data?.category || params?.data?.label || params?.data?.name || params?.name || params?.seriesName || '';
-  }
-
-  private getDeviceId(device: any): string {
-    return device?.deviceId || device?.resourceId || device?.uuid || device?.id || '';
-  }
-
-  private getDeviceProvider(device: any): string {
-    return this.getProviderKey([device?.provider, device?.cloudType, device?.resourceType, device?.name, device?.deviceName]
-      .filter(value => !!value)
-      .join(' '));
-  }
-
-  private getMonitoringRouteSegment(device: any): 'obs' | 'zbx' | null {
-    const monitoringType = this.normalizeLinkText(device?.monitoringType);
-    if (device?.monitoring?.zabbix || monitoringType.includes('zabbix') || monitoringType.includes('zbx')) {
-      return 'zbx';
-    }
-    if (device?.monitoring?.observium || monitoringType.includes('observium') || monitoringType.includes('obs')) {
-      return 'obs';
-    }
-    return null;
   }
 
   private isVmResource(value: string): boolean {
