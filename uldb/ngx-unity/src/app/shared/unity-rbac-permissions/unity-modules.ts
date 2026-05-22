@@ -9,6 +9,7 @@ export enum UnityModules {
     PUBLIC_CLOUD = 'Public Cloud',
     DATACENTER = 'Datacenter',
     SERVICES = 'Services',
+    BUSINESS_SERVICES = 'Business Services',
     UNITY_CONNECT = 'UnityConnect',
 
     AIML_EVENT_MANAGEMENT = 'AIML Event Management',

@@ -743,7 +743,7 @@ const UNITED_CLOUD_NAV_ITEMS = (svc: PermissionService, orgName: string) => {
             url: '/unitycloud/business-service',
             icon: 'fa fas fa-business-time',
             attributes: {
-                module: UnityModules.SERVICES,
+                module: UnityModules.BUSINESS_SERVICES,
                 access: 'View'
             }
         },

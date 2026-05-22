@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { BusinessServicesService, BusinessViewData } from './business-services.service';
+import { UnityBusinessServicesService, BusinessViewData } from './unity-business-services.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -11,12 +11,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 
 @Component({
-  selector: 'business-services',
-  templateUrl: './business-services.component.html',
-  styleUrls: ['./business-services.component.scss'],
-  providers: [BusinessServicesService]
+  selector: 'unity-business-services',
+  templateUrl: './unity-business-services.component.html',
+  styleUrls: ['./unity-business-services.component.scss'],
+  providers: [UnityBusinessServicesService]
 })
-export class BusinessServicesComponent implements OnInit {
+export class UnityBusinessServicesComponent implements OnInit {
 
   currentCriteria: SearchCriteria;
   viewData: BusinessViewData[] = [];
@@ -36,7 +36,7 @@ export class BusinessServicesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private notification: AppNotificationService,
-    private svc: BusinessServicesService,
+    private svc: UnityBusinessServicesService,
     private modalService: BsModalService,) {
     this.currentCriteria = { sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ is_active: '' }] };
   }

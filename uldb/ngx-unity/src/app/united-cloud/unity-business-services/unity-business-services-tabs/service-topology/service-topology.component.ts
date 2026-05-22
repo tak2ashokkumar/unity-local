@@ -8,7 +8,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { StatusSummary } from 'src/app/shared/SharedEntityTypes/network-topology.type';
-import { BUCostCenterApplications, BULicenceCostCenter, BusinessUnits } from '../../../business-services.type';
+import { BUCostCenterApplications, BULicenceCostCenter, BusinessUnits } from '../../unity-business-services.type';
 import { ServiceTopologyService, UnityTopologyViewType } from './service-topology.service';
 
 @Component({

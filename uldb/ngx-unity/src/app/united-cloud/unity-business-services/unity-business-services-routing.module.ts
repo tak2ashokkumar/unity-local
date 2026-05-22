@@ -1,17 +1,17 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-import { BusinessServicesComponent } from "./business-services/business-services.component";
-import { BusinessServicesCrudComponent } from "./business-services/business-services-crud/business-services-crud.component";
-import { ServiceTopologyComponent } from "./business-services/business-service-tabs/service-topology/service-topology.component";
-import { BusinessServiceTabsComponent } from "./business-services/business-service-tabs/business-service-tabs.component";
-import { BusinessServiceSummaryComponent } from "./business-services/business-service-tabs/business-service-summary/business-service-summary.component";
-import { BusinessServiceCostInsightsComponent } from "./business-services/business-service-tabs/business-service-cost-insights/business-service-cost-insights.component";
-// import { ServiceTopologyComponent } from "./business-services/service-topology/service-topology.component";
+import { UnityBusinessServicesComponent } from "./unity-business-services.component";
+import { UnityBusinessServicesCrudComponent } from "./unity-business-services-crud/unity-business-services-crud.component";
+import { ServiceTopologyComponent } from "./unity-business-services-tabs/service-topology/service-topology.component";
+import { UnityBusinessServicesTabsComponent } from "./unity-business-services-tabs/unity-business-services-tabs.component";
+import { BusinessServiceSummaryComponent } from "./unity-business-services-tabs/business-service-summary/business-service-summary.component";
+import { BusinessServiceCostInsightsComponent } from "./unity-business-services-tabs/business-service-cost-insights/business-service-cost-insights.component";
+import { UnityBusinessServicesManageGuard } from "./unity-business-services-manage.guard";
 
 const routes: Routes = [
     {
         path: 'business-service',
-        component: BusinessServicesComponent,
+        component: UnityBusinessServicesComponent,
         data: {
             breadcrumb: {
                 title: 'Business Services',
@@ -21,7 +21,8 @@ const routes: Routes = [
     },
     {
         path: 'business-service/create',
-        component: BusinessServicesCrudComponent,
+        component: UnityBusinessServicesCrudComponent,
+        canActivate: [UnityBusinessServicesManageGuard],
         data: {
             breadcrumb: {
                 title: 'Create Business Service',
@@ -31,7 +32,8 @@ const routes: Routes = [
     },
     {
         path: 'business-service/:serviceId/edit',
-        component: BusinessServicesCrudComponent,
+        component: UnityBusinessServicesCrudComponent,
+        canActivate: [UnityBusinessServicesManageGuard],
         data: {
             breadcrumb: {
                 title: 'Update Business Service',
@@ -41,7 +43,7 @@ const routes: Routes = [
     },
     {
         path: 'business-service/:businessId',
-        component: BusinessServiceTabsComponent,
+        component: UnityBusinessServicesTabsComponent,
         data: {
             breadcrumb: {
                 title: 'Business Service',
@@ -87,4 +89,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule]
 })
-export class BusinessServiceRoutingModule { }
+export class UnityBusinessServicesRoutingModule { }

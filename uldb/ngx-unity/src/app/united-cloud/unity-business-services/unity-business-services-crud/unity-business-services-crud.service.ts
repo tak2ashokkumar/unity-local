@@ -2,12 +2,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { forkJoin, Observable, of } from 'rxjs';
-import { BusinessServiceData, BusinessServiceType, LicenseCostCenterType, NgSelectDropdownType, RBACGroupType } from '../business-services.type';
+import { BusinessServiceData, BusinessServiceType, LicenseCostCenterType, NgSelectDropdownType, RBACGroupType } from '../unity-business-services.type';
 import { catchError } from 'rxjs/operators';
 import { DropdownViewType } from 'src/app/unity-setup/unity-setup-finops/unity-setup-finops.type';
 
 @Injectable()
-export class BusinessServicesCrudService {
+export class UnityBusinessServicesCrudService {
 
   constructor(private http: HttpClient, private builder: FormBuilder) { }
 

@@ -4,11 +4,11 @@ import { Subscription } from 'rxjs';
 import { TabData } from 'src/app/shared/tabdata';
 
 @Component({
-  selector: 'business-service-tabs',
-  templateUrl: './business-service-tabs.component.html',
-  styleUrls: ['./business-service-tabs.component.scss']
+  selector: 'unity-business-services-tabs',
+  templateUrl: './unity-business-services-tabs.component.html',
+  styleUrls: ['./unity-business-services-tabs.component.scss']
 })
-export class BusinessServiceTabsComponent implements OnInit {
+export class UnityBusinessServicesTabsComponent implements OnInit {
   tabItems: TabData[];
   subscr: Subscription;
   businessId: String;

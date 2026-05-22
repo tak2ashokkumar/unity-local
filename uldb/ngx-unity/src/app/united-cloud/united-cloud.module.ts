@@ -13,7 +13,7 @@ import { UnityconnectModule } from './unityconnect/unityconnect.module';
 import { EchartsxModule } from 'echarts-for-angular';
 import { ChartsModule } from 'ng2-charts';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
-import { BusinessServiceModule } from './business-service/business-service.module';
+import { UnityBusinessServicesModule } from './unity-business-services/unity-business-services.module';
 import { UnityApplicationsModule } from './unity-applications/unity-applications.module';
 
 
@@ -35,7 +35,7 @@ import { UnityApplicationsModule } from './unity-applications/unity-applications
     EchartsxModule,
     ChartsModule,
     NgxGraphModule,
-    BusinessServiceModule
+    UnityBusinessServicesModule
   ],
   providers: [],
   exports: [

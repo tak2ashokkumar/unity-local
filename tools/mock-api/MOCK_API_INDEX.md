@@ -599,6 +599,9 @@ File: `customer\rbac\entity_groups.json`
 ### /customer/rbac/permission_sets
 File: `customer\rbac\permission_sets.json`
 
+### /customer/rbac/permissions/permission_modules
+File: `customer\rbac\permissions\permission_modules.json`
+
 ### /customer/rbac/roles
 File: `customer\rbac\roles.json`
 

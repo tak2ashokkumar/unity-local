@@ -8,7 +8,7 @@ import { AppUtilityService, DateRange, PlatFormMapping, ServerSidePlatFormMappin
 import { CustomDateRangeType } from 'src/app/shared/SharedEntityTypes/unity-utils.type';
 import { UnityChartConfigService, UnityChartDetails, UnityChartTypes } from 'src/app/shared/unity-chart-config.service';
 import { PCFastData } from 'src/app/app-home/infra-as-a-service/private-cloud/pc-fast.type';
-import { BUCostCenterApplications, BUCostCenterApplicationSummary, BULicenceCostCenter, BusinessUnits } from '../../../business-services.type';
+import { BUCostCenterApplications, BUCostCenterApplicationSummary, BULicenceCostCenter, BusinessUnits } from '../../unity-business-services.type';
 
 @Injectable()
 export class BusinessServiceSummaryService {

@@ -12,11 +12,15 @@
 - Avoid adding new shared helpers unless reused in multiple places.
 - Prefer template changes only when needed.
 - Keep service API mappings close to existing service style.
+- Consider existing naming conventions while adding new varibales / methods / functions / constants / enums.
+- OnDestroy support variable should always be ngUnsubscribe. Don't take it as destroy$ or any other.
 
 ## SCSS
-- Mostly follow 
+- Mostly use bootstrap suported css unless it is explicitly needed.
+- For paddings, margins, widths, colors - use existing patterns.
+- Tyy to availd writing new css until & unless explicitly needed.
 - Do not redesign UI unless requested.
-- Prefer scoped class changes.
+- Use existing global classes as priority and if explicitly needed prefer scoped class changes.
 - Avoid global style changes unless necessary.
 - Keep spacing values simple and easy to tweak.
 

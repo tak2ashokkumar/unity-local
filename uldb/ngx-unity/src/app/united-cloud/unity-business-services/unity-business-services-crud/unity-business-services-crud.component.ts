@@ -10,16 +10,16 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { NgSelectDropdownType } from '../business-services.type';
-import { APP_ENV, APPLICATION_TYPE_CHOICES, BUSINESS_CRITICALITY, BusinessServicesCrudService, CLOUD_TYPES, DEPLOYMENT_MODEL } from './business-services-crud.service';
+import { NgSelectDropdownType } from '../unity-business-services.type';
+import { APP_ENV, APPLICATION_TYPE_CHOICES, BUSINESS_CRITICALITY, UnityBusinessServicesCrudService, CLOUD_TYPES, DEPLOYMENT_MODEL } from './unity-business-services-crud.service';
 
 @Component({
-  selector: 'business-services-crud',
-  templateUrl: './business-services-crud.component.html',
-  styleUrls: ['./business-services-crud.component.scss'],
-  providers: [BusinessServicesCrudService]
+  selector: 'unity-business-services-crud',
+  templateUrl: './unity-business-services-crud.component.html',
+  styleUrls: ['./unity-business-services-crud.component.scss'],
+  providers: [UnityBusinessServicesCrudService]
 })
-export class BusinessServicesCrudComponent implements OnInit {
+export class UnityBusinessServicesCrudComponent implements OnInit {
   private ngUnsubscribe = new Subject();
   serviceId: string = ''
   actionMessage: 'Create' | 'Update';
@@ -66,7 +66,7 @@ export class BusinessServicesCrudComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
     private router: Router,
-    private svc: BusinessServicesCrudService,
+    private svc: UnityBusinessServicesCrudService,
     private spinner: AppSpinnerService,
     private modalService: BsModalService,
     private utilityService: AppUtilityService,

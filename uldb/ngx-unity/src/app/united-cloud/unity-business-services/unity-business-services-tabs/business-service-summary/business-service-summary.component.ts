@@ -9,7 +9,7 @@ import { AppNotificationService } from 'src/app/shared/app-notification/app-noti
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { PlatFormMapping } from 'src/app/shared/app-utility/app-utility.service';
-import { BUCostCenterApplications, BUCostCenterApplicationSummary, BULicenceCostCenter, BusinessUnits } from '../../../business-services.type';
+import { BUCostCenterApplications, BUCostCenterApplicationSummary, BULicenceCostCenter, BusinessUnits } from '../../unity-business-services.type';
 import { ApplicationOverviewViewData, BusinessServiceSummaryService, ComponentsOverviewViewData, DatabaseOverviewViewData, DropDownsViewData, DurationDropdownViewData, HostOverviewViewData, ProcessOverviewViewData, ServicesOverviewViewData } from './business-service-summary.service';
 
 @Component({

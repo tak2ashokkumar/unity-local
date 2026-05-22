@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
-import { BUCostCenterApplications, BULicenceCostCenter, BusinessUnits } from '../../../business-services.type';
+import { BUCostCenterApplications, BULicenceCostCenter, BusinessUnits } from '../../unity-business-services.type';
 
 @Injectable({
   providedIn: 'root'

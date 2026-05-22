@@ -5,10 +5,10 @@ import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.servic
 import { PaginatedResult } from 'src/app/shared/SharedEntityTypes/paginated.type';
 import { SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { TableApiServiceService } from 'src/app/shared/table-functionality/table-api-service.service';
-import { BusinessServiceListItem } from './business-services.type';
+import { BusinessServiceListItem } from './unity-business-services.type';
 
 @Injectable()
-export class BusinessServicesService {
+export class UnityBusinessServicesService {
 
   constructor(private tableService: TableApiServiceService,
     private http: HttpClient,
@@ -28,10 +28,10 @@ export class BusinessServicesService {
 
   convertToViewData(data: BusinessServiceListItem[]): BusinessViewData[] {
     return data.map(item => {
-      const licenseCenters = [...new Set(item.license_cost_centers.map((l: any) => l.license_centre))];
-      const applications = [...new Set(item.license_cost_centers.map((l: any) => l.app_name))];
-      const applicationTypes = [...new Set(item.license_cost_centers.map((l: any) => this.utilSvc.toTitleCase(l.type_of_app)))];
-      const businessCriticalities = [...new Set(item.license_cost_centers.map((l: any) => this.utilSvc.toTitleCase(l.business_criticality)))];
+      const licenseCenters: string[] = [...new Set<string>(item.license_cost_centers.map(l => l.license_centre))];
+      const applications: string[] = [...new Set<string>(item.license_cost_centers.map(l => l.app_name))];
+      const applicationTypes: string[] = [...new Set<string>(item.license_cost_centers.map(l => this.utilSvc.toTitleCase(l.type_of_app)))];
+      const businessCriticalities: string[] = [...new Set<string>(item.license_cost_centers.map(l => this.utilSvc.toTitleCase(l.business_criticality)))];
 
 
 
