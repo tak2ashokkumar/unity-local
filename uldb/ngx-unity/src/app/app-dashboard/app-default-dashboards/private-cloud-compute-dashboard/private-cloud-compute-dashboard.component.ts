@@ -27,6 +27,7 @@ import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, 
 export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   private filterFormUnsubscribe = new Subject<void>();
+  readonly compactBarLabelThreshold = 10;
 
   filterForm: FormGroup;
   platformOptions: labelAndValueType[] = [];
@@ -44,13 +45,13 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     isSimpleArray: false,
     lableToDisplay: 'label',
     keyToSelect: 'value',
-    // enableSearch: true,
+    enableSearch: true,
     checkedStyle: 'fontawesome',
     buttonClasses: 'btn btn-default btn-block',
     dynamicTitleMaxItems: 2,
     displayAllSelectedText: true,
-    // showCheckAll: true,
-    // showUncheckAll: true,
+    showCheckAll: true,
+    showUncheckAll: true,
     selectAsObject: false,
     maxHeight: '240px'
 
@@ -154,13 +155,13 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     };
   }
 
+
+
+
   ngOnInit(): void {
     this.getHeaderInfo();
-    this.getFilterDropdowns();
     this.buildFilterForm();
-    setTimeout(() => {
-      this.loadWidgets();
-    });
+    this.getFilterDropdowns();
   }
 
   ngOnDestroy(): void {
@@ -196,10 +197,12 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
           this.eventClouds = res.eventClouds ? res.eventClouds : [];
           this.eventDatacenters = res.eventDatacenters ? res.eventDatacenters : [];
           this.timeRanges = res.timeRanges ? res.timeRanges : [];
-
+          this.initializeDefaultFilterSelections();
+          this.loadWidgets();
         }
       }, (_err: HttpErrorResponse) => {
         this.notification.error(new Notification('Failed to get filter dropdown values data. Try again later'));
+        this.loadWidgets();
       });
   }
 
@@ -207,6 +210,21 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     this.filterFormUnsubscribe.next();
     this.filterForm = this.svc.buildFilterForm();
     this.watchFilterChanges();
+  }
+
+  private initializeDefaultFilterSelections() {
+    this.filterForm.patchValue({
+      platforms: this.getSelectedFilterValues(this.platformOptions),
+      datacenters: this.getSelectedFilterValues(this.datacenterOptions),
+      environments: this.getSelectedFilterValues(this.environmentOptions),
+      accounts: this.getSelectedFilterValues(this.accountOptions)
+    }, { emitEvent: false });
+  }
+
+  private getSelectedFilterValues(options: labelAndValueType[]): string[] {
+    return (options || [])
+      .map(option => option?.value)
+      .filter((value): value is string => !!value);
   }
 
   private watchFilterChanges() {
@@ -485,9 +503,9 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
-          this.diskLatencyWidgetData.chartData = this.svc.convertTodiskLatencyChartData(res);
-          this.cpuReadyWidgetData.chartData = this.svc.convertToCpuReadyChartData(res);
-          this.swapBalloonMemoryWidgetData.chartData = this.svc.convertToSwapBalloonMemoryChartData(res);
+          this.diskLatencyWidgetData.chartData = this.svc.convertTodiskLatencyChartData(res.diskLatencyTop10);
+          this.cpuReadyWidgetData.chartData = this.svc.convertToCpuReadyChartData(res.cpuReadyWaitTop10);
+          this.swapBalloonMemoryWidgetData.chartData = this.svc.convertToSwapBalloonMemoryChartData(res.swapBalloonMemoryTop10);
         }
         this.spinner.stop(this.diskLatencyWidgetData.loader);
         this.spinner.stop(this.cpuReadyWidgetData.loader);
@@ -579,6 +597,17 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     return value < 65 ? 'bg-success' : value >= 65 && value < 85 ? 'bg-warning' : 'bg-danger';
   }
 
+  shouldShowBarLabelInside(value: number): boolean {
+    return value > this.compactBarLabelThreshold;
+  }
+
+  getBarLabelOffset(value: number): string {
+    if (value <= 0) {
+      return '8px';
+    }
+
+    return `calc(${Math.min(value, 100)}% + 6px)`;
+  }
 
   getStatusClass(tone?: string): string {
     return `tone-${tone || 'muted'}`;

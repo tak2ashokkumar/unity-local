@@ -33,8 +33,8 @@ export interface DatabaseDashboardBarItem {
 
 export interface DatabaseDashboardStackedBarItem {
   name: string;
-  onCount: number;
-  offCount: number;
+  active: number;
+  inactive: number;
   color?: string;
   percentage?: string;
 }
@@ -129,8 +129,8 @@ export interface InventoryWidgetByCategoryType {
 }
 export interface InventoryWidgetByPlatformType {
   db_type: string;
-  on_count: number;
-  off_count: number;
+  active: number;
+  inactive: number;
   percentage: number;
 }
 export interface InventoryWidgetSummaryStatus {

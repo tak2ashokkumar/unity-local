@@ -54,7 +54,7 @@ export class MapService {
   }
 
   showToggle(): boolean {
-    return !environment.production;
+    return !environment.production;;
   }
 
   toggleWorldMap(): void {

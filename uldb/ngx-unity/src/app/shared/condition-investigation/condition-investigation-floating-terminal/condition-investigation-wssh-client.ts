@@ -23,6 +23,7 @@ export interface WSOption {
     conversation_id: string;
     tab_type?: string;
     collector_uuid?: string;
+    user_id?: string;
 }
 
 export class WSSHClient {
@@ -142,7 +143,9 @@ export class WSSHClient {
             password: this.wsOptions.password,
             conversation_id: this.wsOptions.conversation_id,
             collector_uuid: this.wsOptions.collector_uuid,
-            tab_type: this.wsOptions['tab_type']
+            tab_type: this.wsOptions['tab_type'],
+            org_id: this.wsOptions.org_id,
+            user_id: this.wsOptions.user_id
         }));
     }
 

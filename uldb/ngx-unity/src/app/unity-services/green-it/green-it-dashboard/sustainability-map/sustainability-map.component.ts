@@ -188,7 +188,7 @@ export class SustainabilityMapComponent implements OnInit, OnDestroy {
 
     dcs.map((dc, i) => {
       const ll = new google.maps.LatLng(dc.lat, dc.long);
-      const marker = new AdvancedMarkerElement({
+      const marker = new google.maps.marker.AdvancedMarkerElement({
         position: ll,
         map: this.map,
         title: dc.location,

@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MapService } from 'src/app/map.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -9,7 +10,6 @@ import { StorageService, StorageType } from 'src/app/shared/app-storage/storage.
 import { AppUtilityService } from 'src/app/shared/app-utility/app-utility.service';
 import { ExcelOnBoardingNextPrevService } from '../excel-on-boarding-next-prev/excel-on-boarding-next-prev.service';
 import { ExcelOnBoardingDataCentersService, ExcelOnBoardingDCViewdata } from './excel-on-boarding-data-centers.service';
-import { MapService } from 'src/app/map.service';
 
 @Component({
   selector: 'excel-on-boarding-data-centers',

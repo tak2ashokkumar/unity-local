@@ -63,7 +63,7 @@ export class ConditionInvestigationFloatingTerminalItemComponent implements OnIn
     this.term.loadAddon(this.fitAddon);
     this.term.open(document.getElementById('term-' + this.index));
     this.fitAddon.fit();
-    let obj = Object.assign({ hostname: this.auth.host, port: this.auth.port, collector_uuid: this.auth.collector_uuid, password: this.auth.password, username: this.auth.username, conversation_id: this.auth.conversation_id, uuid: this.input.tabId, tab_type: this.auth.tab_type, org_id: this.auth.org_id, agent_id: this.auth.agent_id, pkey: this.auth.pkey }, this.getRowsCols());
+    let obj = Object.assign({ hostname: this.auth.host, port: this.auth.port, collector_uuid: this.auth.collector_uuid, password: this.auth.password, username: this.auth.username, conversation_id: this.auth.conversation_id, uuid: this.input.tabId, tab_type: this.auth.tab_type, org_id: this.auth.org_id, user_id: this.auth.user_id, agent_id: this.auth.agent_id, pkey: this.auth.pkey }, this.getRowsCols());
     this.wsClient = new WSSHClient(obj);
     this.termService.registerTerminal(this.input.tabId, this.wsClient, this.tabType);
     this.termService.setTabRunning(this.input.tabId, false);

@@ -384,10 +384,10 @@ export const INVENTORY_RESP = {
     { "category": "Cloud DB", "count": 8, "percentage": 25.40 },
   ],
   "by_type": [
-    { "db_type": "MySQL", "on_count": 20, "off_count": 10, "percentage": 42.86 },
-    { "db_type": "PostgreSQL", "on_count": 0, "off_count": 19, "percentage": 28.57 },
-    { "db_type": "MSSQL", "on_count": 11, "off_count": 5, "percentage": 19.05 },
-    { "db_type": "Oracle", "on_count": 4, "off_count": 4, "percentage": 10.52 }
+    { "db_type": "MySQL", "active": 20, "inactive": 10, "percentage": 42.86 },
+    { "db_type": "PostgreSQL", "active": 0, "inactive": 19, "percentage": 28.57 },
+    { "db_type": "MSSQL", "active": 11, "inactive": 5, "percentage": 19.05 },
+    { "db_type": "Oracle", "active": 4, "inactive": 4, "percentage": 10.52 }
   ],
   "status": {
     "active": 38,

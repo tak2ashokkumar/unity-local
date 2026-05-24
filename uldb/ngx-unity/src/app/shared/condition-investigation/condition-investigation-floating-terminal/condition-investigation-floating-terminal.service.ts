@@ -145,4 +145,5 @@ export interface AuthType {
   conversation_id: string;
   tab_type?: string;
   collector_uuid: string;
+  user_id?: string;
 }

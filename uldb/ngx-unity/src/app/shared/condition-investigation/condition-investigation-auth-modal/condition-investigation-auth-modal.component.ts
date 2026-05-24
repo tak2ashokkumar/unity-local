@@ -9,6 +9,7 @@ import { GET_AGENT_CONFIGURATIONS } from '../../api-endpoint.const';
 import { ConditionInvestigationFloatingTerminalService } from '../condition-investigation-floating-terminal/condition-investigation-floating-terminal.service';
 import { ConditionInvestigationAuthModalService } from './condition-investigation-auth-modal.service';
 import { ConditionInvestigationTerminalWindowRegistryService } from '../condition-investigation-new-terminal/condition-investigation-terminal-window-registry.service';
+import { UserInfoService } from '../../user-info.service';
 
 @Component({
   selector: 'condition-investigation-auth-modal',
@@ -36,7 +37,8 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
     private terminalService: ConditionInvestigationNewTerminalService,
     private floatingTerminalService: ConditionInvestigationFloatingTerminalService,
     private svc: ConditionInvestigationAuthModalService,
-    private windowRegistry: ConditionInvestigationTerminalWindowRegistryService
+    private windowRegistry: ConditionInvestigationTerminalWindowRegistryService,
+    private userInfoService: UserInfoService,
   ) { }
 
   ngOnInit(): void {
@@ -234,7 +236,9 @@ export class ConditionInvestigationAuthModalComponent implements OnInit, OnDestr
       password: payload.password,
       conversation_id: conversationId,
       tab_type: pendingType === 'sameTab' ? 'same' : 'new',
-      collector_uuid: payload.collector.uuid
+      collector_uuid: payload.collector.uuid,
+      org_id: this.userInfoService.userOrgId,
+      user_id: `${this.userInfoService.userDetails.id}`,
     };
 
     this.modalRef.hide();

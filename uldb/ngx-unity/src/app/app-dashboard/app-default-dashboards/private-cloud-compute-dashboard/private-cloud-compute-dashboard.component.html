@@ -259,10 +259,10 @@
                         <app-spinner [name]="densityHostVm.loader"></app-spinner>
                         <div *ngIf="densityHostVm?.desnityHostRows?.length">
                             <div class="distribution-header d-flex  font-weight-600 mb-2 border-bottom">
-                                <div class="distribution-label text-secondary font-500 " style="max-width: 180px;">
+                                <div class="distribution-label text-dark font-weight-bold " style="max-width: 180px;">
                                     Host
                                 </div>
-                                <div class="distribution-progress text-secondary font-500 ">
+                                <div class="distribution-progress text-dark font-weight-bold ">
                                     Utilization
                                 </div>
                             </div>
@@ -279,10 +279,16 @@
                                         <div class="progress-fill distribution-fill"
                                             [ngClass]="getUtilizationClass(row.utilizationPct)"
                                             [style.width.%]="row.utilizationPct">
-                                            <span class="distribution-inside-value">
+                                            <span *ngIf="shouldShowBarLabelInside(row.utilizationPct)"
+                                                class="distribution-inside-value">
                                                 {{row.utilizationPct}}%
                                             </span>
                                         </div>
+                                        <span *ngIf="!shouldShowBarLabelInside(row.utilizationPct)"
+                                            class="distribution-track-value"
+                                            [style.left]="getBarLabelOffset(row.utilizationPct)">
+                                            {{row.utilizationPct}}%
+                                        </span>
                                     </div>
                                     <div class="storage-meta">
                                         <span>Total: {{row.totalStorageGB}} GB</span>
@@ -326,8 +332,7 @@
 
                                     <span class="utilization-legend-dot bg-primary"></span>
 
-                                    <span class="utilization-legend-text">
-                                        Underutilized (<49%) </span>
+                                    <span class="utilization-legend-text">Underutilized (<49%) </span>
 
                                 </div>
 
@@ -443,7 +448,7 @@
                             <span class="px-2">PSU normal</span>
                         </div>
                         <span
-                            class="badge bg-success-subtle text-success rounded-pill px-2">{{infrastructureHealthWidgetData?.psuNormal}}</span>
+                            class="badge bg-success-subtle text-success rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.psuNormal}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -451,7 +456,7 @@
                             <span class="px-2">PSU degraded</span>
                         </div>
                         <span
-                            class="badge bg-warning-subtle text-warning rounded-pill px-2">{{infrastructureHealthWidgetData?.psuDegraded}}</span>
+                            class="badge bg-warning-subtle text-warning rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.psuDegraded}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center">
@@ -459,7 +464,7 @@
                             <span class="px-2">PSU failed</span>
                         </div>
                         <span
-                            class="badge bg-danger-subtle text-danger rounded-pill px-2">{{infrastructureHealthWidgetData?.psuFailed}}</span>
+                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.psuFailed}}</span>
                     </div>
                 </div>
                 <!-- Host Health Status -->
@@ -471,7 +476,7 @@
                             <span class="px-2">Healthy</span>
                         </div>
                         <span
-                            class="badge bg-success-subtle text-success rounded-pill px-2">{{infrastructureHealthWidgetData?.healthy}}</span>
+                            class="badge bg-success-subtle text-success rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.healthy}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -479,7 +484,7 @@
                             <span class="px-2">Warning</span>
                         </div>
                         <span
-                            class="badge bg-warning-subtle text-warning rounded-pill px-2">{{infrastructureHealthWidgetData?.warning}}</span>
+                            class="badge bg-warning-subtle text-warning rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.warning}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -487,7 +492,7 @@
                             <span class="px-2">Critical</span>
                         </div>
                         <span
-                            class="badge bg-danger-subtle text-danger rounded-pill px-2">{{infrastructureHealthWidgetData?.critical}}</span>
+                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.critical}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center">
@@ -495,7 +500,7 @@
                             <span class="px-2">Maintenance</span>
                         </div>
                         <span
-                            class="badge bg-secondary-subtle text-secondary rounded-pill px-2">{{infrastructureHealthWidgetData?.maintenance}}</span>
+                            class="badge bg-secondary-subtle text-secondary rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.maintenance}}</span>
                     </div>
                 </div>
                 <!-- Fan / Temperature Sensors -->
@@ -507,7 +512,7 @@
                             <span class="px-2">Temp normal (&lt;60°C)</span>
                         </div>
                         <span
-                            class="badge bg-success-subtle text-success rounded-pill px-2">{{infrastructureHealthWidgetData?.tempNormal}}</span>
+                            class="badge bg-success-subtle text-success rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.tempNormal}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -515,7 +520,7 @@
                             <span class="px-2">Temp Warning</span>l
                         </div>
                         <span
-                            class="badge bg-warning-subtle text-warning rounded-pill px-2">{{infrastructureHealthWidgetData?.tempWarning}}</span>
+                            class="badge bg-warning-subtle text-warning rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.tempWarning}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
@@ -523,7 +528,7 @@
                             <span class="px-2">Temp Critical</span>
                         </div>
                         <span
-                            class="badge bg-danger-subtle text-danger rounded-pill px-2">{{infrastructureHealthWidgetData?.tempCritical}}</span>
+                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.tempCritical}}</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center">
@@ -531,7 +536,7 @@
                             <span class="px-2">Fan Failed</span>
                         </div>
                         <span
-                            class="badge bg-danger-subtle text-danger rounded-pill px-2">{{infrastructureHealthWidgetData?.fanFailed}}</span>
+                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.fanFailed}}</span>
                     </div>
                 </div>
             </div>
@@ -544,7 +549,7 @@
 <div class="row mx-1 py-4">
     <div class="col-12">
         <div class=" bg-transparent font-500 font-lg py-2">
-            Performance Hotspots
+            Performance Hotspots-Top 10 Private Cloud VM's
         </div>
         <div class="card round-edge equalize-card mb-3 p-4 position-relative">
             <app-spinner [name]="utilizationRows.loader" [width]="0"></app-spinner>
@@ -565,7 +570,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of utilizationRows?.utilRow; trackBy: trackByIndex">
-                                    <td><button type="button" class="btn btn-link p-0 table-link">{{row.name}}</button>
+                                    <td>{{row.name}}
                                     </td>
                                     <td>
                                         <div class="sparkline-cell">
@@ -624,16 +629,16 @@
             Performance / Workload insights
         </div>
         <div class="card round-edge equalize-card mb-3 p-4 position-relative">
-            <div class="row">
+            <div class="row workload-chart-row">
                 <div class="col-4">
                     <div class="text-center p-2">
                         Top 10 - Disk Latency (Ms)
                     </div>
-                    <div class="card-body position-relative">
+                    <div class="card-body position-relative workload-chart-body">
                         <app-spinner [name]="diskLatencyWidgetData.loader"></app-spinner>
                         <ng-container *ngIf="diskLatencyWidgetData?.chartData">
-                            <div echarts [options]="diskLatencyWidgetData?.chartData?.options" [defaultHeight]="200"
-                                style="width: 100%; height: 200px;">
+                            <div class="workload-chart" echarts [options]="diskLatencyWidgetData?.chartData?.options"
+                                [defaultHeight]="200" style="width: 100%; height: 200px;">
                             </div>
                         </ng-container>
                         <div *ngIf="!diskLatencyWidgetData.chartData"
@@ -648,11 +653,11 @@
                     <div class="text-center p-2">
                         Top 10 - CPU Ready / Wait Time VMs (%)
                     </div>
-                    <div class="card-body position-relative">
+                    <div class="card-body position-relative workload-chart-body">
                         <app-spinner [name]="cpuReadyWidgetData.loader"></app-spinner>
                         <ng-container *ngIf="cpuReadyWidgetData?.chartData">
-                            <div echarts [options]="cpuReadyWidgetData?.chartData?.options" [defaultHeight]="200"
-                                style="width: 100%; height: 200px;">
+                            <div class="workload-chart" echarts [options]="cpuReadyWidgetData?.chartData?.options"
+                                [defaultHeight]="200" style="width: 100%; height: 200px;">
                             </div>
                         </ng-container>
                         <div *ngIf="!cpuReadyWidgetData.chartData"
@@ -666,11 +671,12 @@
                     <div class="text-center p-2">
                         Top 10 - Swap Balloon Memory (GB)
                     </div>
-                    <div class="card-body position-relative">
+                    <div class="card-body position-relative workload-chart-body">
                         <app-spinner [name]="swapBalloonMemoryWidgetData.loader"></app-spinner>
                         <ng-container *ngIf="swapBalloonMemoryWidgetData?.chartData">
-                            <div echarts [options]="swapBalloonMemoryWidgetData?.chartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height: 200px;">
+                            <div class="workload-chart" echarts
+                                [options]="swapBalloonMemoryWidgetData?.chartData?.options" [defaultHeight]="200"
+                                style="width: 100%; height: 200px;">
                             </div>
                         </ng-container>
                         <div *ngIf="!swapBalloonMemoryWidgetData.chartData"
@@ -763,10 +769,14 @@
                         <div class="progress-track-xl">
                             <div class="progress-fill distribution-fill" [ngClass]="getDistributionClass(i)"
                                 [style.width.%]="row.percent">
-                                <span class="distribution-inside-value">
+                                <span *ngIf="shouldShowBarLabelInside(row.percent)" class="distribution-inside-value">
                                     {{row.percent}}
                                 </span>
                             </div>
+                            <span *ngIf="!shouldShowBarLabelInside(row.percent)" class="distribution-track-value"
+                                [style.left]="getBarLabelOffset(row.percent)">
+                                {{row.percent}}
+                            </span>
                         </div>
                     </div>
                     <div class="distribution-value">
@@ -810,7 +820,8 @@
                         <tbody>
                             <tr *ngFor="let device of orphanedDeviceListViewData.orphanList; trackBy: trackByIndex">
                                 <td>{{device.name}}</td>
-                                <td> <i [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
+                                <td [tooltip]="device.status"> <i
+                                        [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
                                 <td>{{device.lastSeen}}</td>
                                 <td>{{device.datacenter}}</td>
                             </tr>

@@ -2,10 +2,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { CO2_EMITTED_BY_REGION, LOCATION_STATUS } from 'src/app/shared/api-endpoint.const';
-import { WorldMapWidgetViewdata } from 'src/app/app-home/dashboard-map-widget/dashboard-map-widget.service';
-import { WorldMapWidgetDatacenterLocation } from 'src/app/app-home/dashboard-map-widget/map-widget.type';
+import { CO2_EMITTED_BY_REGION } from 'src/app/shared/api-endpoint.const';
 
 @Injectable()
 export class SustainabilityMapService {
@@ -94,6 +91,7 @@ export class SustainabilityMapService {
         let view = new SustainabilityMapViewdata();
         view.region = key;
         view.location = { lat: element.lat, lng: element.long };
+
         view.co2 = element.value;
         view.datacenters = element.datacenters;
         arr.push(view);

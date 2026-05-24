@@ -102,10 +102,10 @@ export class PrivateCloudComputeDashboardService {
   }
 
   buildFilterForm(
-    platforms: string[] = ['All'],
-    datacenters: string[] = ['All'],
-    environments: string[] = ['All'],
-    accounts: string[] = ['All']
+    platforms: string[] = [],
+    datacenters: string[] = [],
+    environments: string[] = [],
+    accounts: string[] = []
   ): FormGroup {
     return this.builder.group({
       platforms: [platforms],
@@ -146,7 +146,28 @@ export class PrivateCloudComputeDashboardService {
       '#3d8be8',
       '#1fa36b',
       '#8b7cf6',
-      '#f0a52b'
+      '#f0a52b',
+      '#ef4444',
+      '#14b8a6',
+      '#f97316',
+      '#6366f1',
+      '#84cc16',
+      '#ec4899',
+      '#06b6d4',
+      '#eab308',
+      '#22c55e',
+      '#a855f7',
+      '#f43f5e',
+      '#0ea5e9',
+      '#f59e0b',
+      '#10b981',
+      '#8b5cf6',
+      '#d946ef',
+      '#2dd4bf',
+      '#fb7185',
+      '#4f46e5',
+      '#65a30d',
+      '#0891b2'
     ];
     view.options = {
       ...view.options,
@@ -470,6 +491,7 @@ export class PrivateCloudComputeDashboardService {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<CapacityAndGrowthDataType>('/customer/widgets/capacity_growth_insights/', { params });
 
+
   }
 
   convertToVmDensityHostViewData(data: TopHostUtilizationItem[]): VmDensityHost {
@@ -478,10 +500,10 @@ export class PrivateCloudComputeDashboardService {
     view.desnityHostRows = (data || []).map(item => {
       const row = new DesityHostRows();
       row.hostName = item.hostName || 'N/A';
-      row.utilizationPct = item.utilizationPct ?? 0;
-      row.totalStorageGB = item.totalStorageGB ?? 0;
-      row.usedStorageGB = item.usedStorageGB ?? 0;
-      row.category = item.category || 'N/A';
+      row.utilizationPct = item.utilizationPercentage ?? 0;
+      row.totalStorageGB = item.totalCapacity ?? 0;
+      row.usedStorageGB = item.usedCapacity ?? 0;
+      row.category = item.utilizationStatus || 'N/A';
       return row;
     });
 
@@ -1004,73 +1026,7 @@ export class PrivateCloudComputeDashboardService {
   getIdleDevicesData(filters?: any): Observable<IdleDevices> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<IdleDevices>('/customer/widgets/idle_devices_analysis/', { params });
-    // return of({
-    //   "idleDeviceList": [
-    //     {
-    //       "deviceName": "unity-lab-Win-vm3",
-    //       "resourceType": "VM",
-    //       "avgCpu": {
-    //         "used": 25,
-    //         "free": 75
-    //       },
-    //       "avgMem": {
-    //         "used": 3.98,
-    //         "free": 96.02
-    //       },
-    //       "networkIO": "N/A",
-    //       "idleDuration": "158 days",
-    //       "status": "error"
-    //     },
-    //     {
-    //       "deviceName": "unity-lab-lnx-ubuntu-vm3",
-    //       "resourceType": "VM",
-    //       "avgCpu": {
-    //         "used": 15,
-    //         "free": 85
-    //       },
-    //       "avgMem": {
-    //         "used": 35.99,
-    //         "free": 64.01
-    //       },
-    //       "networkIO": "N/A",
-    //       "idleDuration": "158 days",
-    //       "status": "error"
-    //     },
-    //     {
-    //       "deviceName": "unity-lab-Win-vm4",
-    //       "resourceType": "VM",
-    //       "avgCpu": {
-    //         "used": 25,
-    //         "free": 75
-    //       },
-    //       "avgMem": {
-    //         "used": 10.99,
-    //         "free": 89.01
-    //       },
-    //       "networkIO": "N/A",
-    //       "idleDuration": "158 days",
-    //       "status": "error"
-    //     }
-    //   ],
-    //   "idleDurationDistribution": [
-    //     {
-    //       "duration": "0-7 days",
-    //       "count": 20
-    //     },
-    //     {
-    //       "duration": "7-15 days",
-    //       "count": 30
-    //     },
-    //     {
-    //       "duration": "15-30 days",
-    //       "count": 40
-    //     },
-    //     {
-    //       "duration": "30+ days",
-    //       "count": 10
-    //     }
-    //   ]
-    // })
+
   }
 
   convertToDeviceIdleViewData(data: IdleDevices): IdleDevicesViewData {
@@ -1191,11 +1147,19 @@ export class PrivateCloudComputeDashboardService {
   getPerformanceWorkloadWidgetData(filters: FiltersCriteriaType): Observable<PerformanceWorkloadDataType> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<PerformanceWorkloadDataType>('/customer/widgets/performance_workload_insights/', { params });
+
   }
 
   createProgressBarChart(title: string, data: any[], maxValue?: number): EChartsOption {
 
     const max = maxValue || Math.max(...data.map(d => d.value));
+    const truncateVmName = (name: string) => {
+      if (!name) {
+        return '';
+      }
+
+      return name.length > 5 ? `${name.slice(0, 5)}....` : name;
+    };
 
     const getColor = (value: number) => {
       const percent = (value / max) * 100;
@@ -1206,6 +1170,13 @@ export class PrivateCloudComputeDashboardService {
     };
 
     return {
+      grid: {
+        left: 52,
+        right: 24,
+        top: 12,
+        bottom: 12,
+        containLabel: true
+      },
       // title: {
       //   text: title,
       //   left: 'center',
@@ -1229,7 +1200,8 @@ export class PrivateCloudComputeDashboardService {
         axisTick: { show: false },
         axisLabel: {
           color: '#6b7280',
-          fontSize: 12
+          fontSize: 12,
+          formatter: (value: string) => truncateVmName(value)
         }
       },
       tooltip: {
@@ -1818,4 +1790,3 @@ export class DesityHostRows {
   usedStorageGB: number;
   category: string;
 }
-

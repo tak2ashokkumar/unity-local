@@ -7,13 +7,13 @@ import {
   PublicCloudTagItem
 } from './public-cloud-compute-dashboard.type';
 
-export const PUBLIC_CLOUD_INVENTORY_SUMMARY_ENDPOINT = '/customer/public-cloud-widgets/inventory_summary';
-export const PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT = '/customer/public-cloud-widgets/compute_breakdown';
-export const PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT = '/customer/public-cloud-widgets/orphaned_devices';
-export const PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT = '/customer/public-cloud-widgets/orphaned_devices_by_category';
-export const PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT = '/customer/public-cloud-widgets/idle_devices';
-export const PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT = '/customer/public-cloud-widgets/idle_devices_by_duration';
-export const PUBLIC_CLOUD_RECENT_ALERTS_ENDPOINT = '/customer/public-cloud-widgets/recent_alerts';
+export const PUBLIC_CLOUD_INVENTORY_SUMMARY_ENDPOINT = '/customer/public-cloud-widgets/inventory_summary/';
+export const PUBLIC_CLOUD_COMPUTE_BREAKDOWN_ENDPOINT = '/customer/public-cloud-widgets/compute_breakdown/';
+export const PUBLIC_CLOUD_ORPHANED_DEVICES_ENDPOINT = '/customer/public-cloud-widgets/orphaned_devices/';
+export const PUBLIC_CLOUD_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT = '/customer/public-cloud-widgets/orphaned_devices_by_category/';
+export const PUBLIC_CLOUD_IDLE_DEVICES_ENDPOINT = '/customer/public-cloud-widgets/idle_devices/';
+export const PUBLIC_CLOUD_IDLE_DEVICES_BY_DURATION_ENDPOINT = '/customer/public-cloud-widgets/idle_devices_by_duration/';
+export const PUBLIC_CLOUD_RECENT_ALERTS_ENDPOINT = '/customer/public-cloud-widgets/recent_alerts/';
 export const PUBLIC_CLOUD_FILTERS_ENDPOINT = '/customer/public-cloud-widgets/public_cloud_filters/';
 export const PUBLIC_CLOUD_ALL_SELECTED_VALUE = 'all';
 

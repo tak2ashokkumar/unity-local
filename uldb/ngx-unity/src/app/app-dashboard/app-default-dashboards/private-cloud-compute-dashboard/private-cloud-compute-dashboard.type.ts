@@ -95,10 +95,10 @@ export interface CapacityAndGrowthDataType {
 }
 export interface TopHostUtilizationItem {
   hostName: string;
-  utilizationPct: number;
-  totalStorageGB: number;
-  usedStorageGB: number;
-  category: string;
+  utilizationPercentage: number;
+  totalCapacity: number;
+  usedCapacity: number;
+  utilizationStatus: string;
 }
 export interface CapacityTrendAndForecastItem {
   month: string;

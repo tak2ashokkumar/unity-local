@@ -171,8 +171,6 @@ export class PublicCloudComputeDashboardService {
 
   private convertFiltersToApiParams(criteria?: PublicCloudDashboardFilterCriteria): HttpParams {
     let params: HttpParams = new HttpParams();
-    params = this.appendMultiValueParam(params, 'platform', this.getApiPlatformValues(criteria?.platforms));
-    params = this.appendMultiValueParam(params, 'region', criteria?.regions);
     params = this.appendMultiValueParam(params, 'account', criteria?.accounts);
     return params;
   }
@@ -186,9 +184,6 @@ export class PublicCloudComputeDashboardService {
     return params;
   }
 
-  private getApiPlatformValues(values?: string[]): string[] {
-    return this.getSelectedValues(values || []).map(value => this.normalizePlatformValue(value));
-  }
   /*
    * ******End ****** Filters Related ********************
    */

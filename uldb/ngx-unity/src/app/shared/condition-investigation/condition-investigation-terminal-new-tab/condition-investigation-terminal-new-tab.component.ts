@@ -43,20 +43,14 @@ export class ConditionInvestigationTerminalNewTabComponent implements OnInit {
     if (conversationId) this.terminalService.setConversationId(conversationId);
 
     this.terminalService.setPendingTabType('newTab');
-
-    // ✅ read from localStorage and open terminal directly
     const savedInput = localStorage.getItem('new_tab_input');
     const savedAuth = localStorage.getItem('new_tab_auth');
-
-    console.log('savedInput:', savedInput);
-    console.log('savedAuth:', savedAuth);
 
     if (savedInput && savedAuth) {
       const input = JSON.parse(savedInput);
       const auth = JSON.parse(savedAuth);
       localStorage.removeItem('new_tab_input');
       localStorage.removeItem('new_tab_auth');
-      // ✅ directly set terminalData — no need to go through service
       this.terminalData = { input, auth };
     }
 

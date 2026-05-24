@@ -264,8 +264,8 @@ export class DatabaseDashboardService {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
       name: d.db_type,
-      onCount: d.on_count,
-      offCount: d.off_count,
+      active: d.active,
+      inactive: d.inactive,
       percentage: d.percentage.toFixed(0)
     }));
     return this.getPlatformCountOptions(graphData || []);
@@ -273,8 +273,8 @@ export class DatabaseDashboardService {
 
   private getPlatformCountOptions(items: DatabaseDashboardStackedBarItem[]): EChartsOption {
     const xAxisData = items.map((item: DatabaseDashboardStackedBarItem) => item.name);
-    const onCounts = items.map((item: DatabaseDashboardStackedBarItem) => item.onCount);
-    const offCounts = items.map((item: DatabaseDashboardStackedBarItem) => item.offCount);
+    const onCounts = items.map((item: DatabaseDashboardStackedBarItem) => item.active);
+    const offCounts = items.map((item: DatabaseDashboardStackedBarItem) => item.inactive);
     return {
       animation: false,
       // grid: { top: '5%', right: '5%', bottom: '5%', left: '10%', containLabel: true },
@@ -377,6 +377,14 @@ export class DatabaseDashboardService {
     return {
       animation: false,
       grid: { top: 8, right: 35, bottom: 12, left: 85 },
+      tooltip: {
+        trigger: 'item',
+        // formatter: '{b}: {d}%',
+        formatter: (params: any) => {
+          const item = items.find((x: any) => x.name === params.name);
+          return `${params.name}: ${params.value} (${item.label}%)`;
+        }
+      },
       xAxis: { type: 'value', show: false, max: maxValue },
       yAxis: {
         type: 'category',
@@ -401,7 +409,7 @@ export class DatabaseDashboardService {
           label: {
             show: true,
             position: 'right',
-            formatter: (params: any) => items[params.dataIndex].label,
+            formatter: (params: any) => items[params.dataIndex].value.toString(),
             color: '#44515f',
             fontSize: 10
           },
@@ -409,7 +417,7 @@ export class DatabaseDashboardService {
             borderRadius: 4,
             color: (params: any) => items[params.dataIndex].color
           },
-          data: items.map(item => item.value)
+          data: items.map(item => item.label)
         }
       ]
     };
@@ -767,9 +775,9 @@ export class DatabaseDashboardService {
       uuid: alert.uuid,
       id: alert.id,
       deviceName: alert.device_name,
-      severity: alert.severity === 'critical' ? 'critical' : 'warning',
-      severityClass: alert.severity == 'critical' ? 'text-danger' : alert.severity == 'warning' ? 'text-warning' : 'text-primary',
-      severityIcon: alert.severity == 'critical' ? 'fa-exclamation-circle text-danger' : alert.severity == 'warning' ? 'fa-exclamation-circle text-warning' : 'fa-info-circle text-primary',
+      severity: alert.severity === 'Critical' ? 'Critical' : 'Warning',
+      severityClass: alert.severity == 'Critical' ? 'text-danger' : alert.severity == 'Warning' ? 'text-warning' : 'text-primary',
+      severityIcon: alert.severity == 'Critical' ? 'fa-exclamation-circle text-danger' : alert.severity == 'Warning' ? 'fa-exclamation-circle text-warning' : 'fa-info-circle text-primary',
       description: alert.description,
       source: alert.source,
       acknowledged: alert.acknowledged ? 'Yes' : 'No',
