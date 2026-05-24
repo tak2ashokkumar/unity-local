@@ -1,9 +1,22 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
+
+const { createTask, getTask } = require("./utils/taskManager");
+
+function generateUUID() {
+  const b = crypto.randomBytes(16);
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = b.toString('hex');
+  return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
+}
 
 const app = express();
 const PORT = 3001;
+
+app.use(express.json());
 
 const baseDir = path.join(__dirname);
 const celeryDir = path.join(__dirname, "celery");
@@ -53,7 +66,41 @@ if (fs.existsSync(celeryDir)) {
   });
 }
 
+app.get("/task/:id/", (req, res) => {
+  res.json(getTask(req.params.id));
+});
+
 app.use((req, res) => {
+
+  if (req.method === "DELETE") {
+    return res.status(204).send();
+  }
+
+  if (req.method === "POST") {
+    if (/\/execute\/?$|\/sync\/?$|\/migrate\/?$|\/run\/?$/i.test(req.path)) {
+      return res.json({ task_id: createTask() });
+    }
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    return res.status(201).json({ id: Date.now(), uuid: generateUUID(), ...body });
+  }
+
+  if (req.method === "PATCH" || req.method === "PUT") {
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const patchPath = req.path
+      .replace(/^\/+/g, "")
+      .replace(/\/+$/, "")
+      .replace(/\/+/g, "/");
+    const patchFilePath = path.join(baseDir, patchPath + ".json");
+    if (fs.existsSync(patchFilePath)) {
+      try {
+        const existing = JSON.parse(fs.readFileSync(patchFilePath, "utf8"));
+        return res.json({ ...(typeof existing === "object" && !Array.isArray(existing) ? existing : {}), ...body });
+      } catch {
+        return res.json(body);
+      }
+    }
+    return res.json(body);
+  }
 
   const normalizedUrlPath = req.path
     .replace(/^\/+/g, "")
