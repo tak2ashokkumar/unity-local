@@ -80,7 +80,7 @@
                         aria-hidden="true"></i> Logout</a>
                 <a class="dropdown-item text-danger" (click)="stopImpersonating()" *ngIf="user.isImpersonated"><i
                         class="fa fa-lock" aria-hidden="true"></i> Stop Impersonating</a>
-                <a class="dropdown-item text-danger" (click)="mapService.toggleWorldMap()"
+                <a class="dropdown-item text-warning" (click)="mapService.toggleWorldMap()"
                     *ngIf="mapService.showToggle()">
                     <i class="fas fa-map-marked-alt" aria-hidden="true"></i> {{mapService.action}}</a>
             </div>

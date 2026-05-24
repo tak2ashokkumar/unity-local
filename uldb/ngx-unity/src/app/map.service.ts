@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
 })
 export class MapService {
 
-  private readonly mapWidgetStorageKey = 'unityone_map_widgets_enabled';
   private readonly scriptLoadTimeout = 10000;
   private loadPromise?: Promise<boolean>;
   private loaded = false;
@@ -21,7 +20,6 @@ export class MapService {
   mapVisibilityChanged$ = this.mapVisibilityChangedSource.asObservable();
 
   constructor(private zone: NgZone) {
-    this.restoreMapWidgetPreference();
     this.syncMapHidden();
 
     window.addEventListener('offline', () => {
@@ -52,11 +50,11 @@ export class MapService {
   }
 
   get action(): string {
-    return this.mapHidden ? 'Enable' : 'Disable';
+    return this.mapHidden ? 'Enable Maps' : 'Disable Maps';
   }
 
   showToggle(): boolean {
-    return true;
+    return !environment.production;
   }
 
   toggleWorldMap(): void {
@@ -70,13 +68,11 @@ export class MapService {
     }
     this.mapWidgetsEnabled = true;
     this.googleUnavailable = false;
-    this.saveMapWidgetPreference();
     this.syncMapHidden();
   }
 
   disableMaps(): void {
     this.mapWidgetsEnabled = false;
-    this.saveMapWidgetPreference();
     this.syncMapHidden();
   }
 
@@ -213,19 +209,6 @@ export class MapService {
     this.googleUnavailable = true;
     this.loaded = false;
     this.syncMapHidden();
-  }
-
-  private restoreMapWidgetPreference(): void {
-    const saved = localStorage.getItem(this.mapWidgetStorageKey);
-    if (saved === 'true') {
-      this.mapWidgetsEnabled = true;
-    } else if (saved === 'false') {
-      this.mapWidgetsEnabled = false;
-    }
-  }
-
-  private saveMapWidgetPreference(): void {
-    localStorage.setItem(this.mapWidgetStorageKey, `${this.mapWidgetsEnabled}`);
   }
 
   private syncMapHidden(): void {
