@@ -41,6 +41,48 @@ interface UnifiedAiopsFilterScopeSummary {
   remainingLabels: string[];
 }
 
+interface UnifiedAiopsWidgetLoadingState {
+  summaryMetrics: boolean;
+  discovery: boolean;
+  alertSegregationLegend: boolean;
+  alertSegregation: boolean;
+  businessServices: boolean;
+  employeeExperience: boolean;
+  geoDistribution: boolean;
+  privateCloudCoverage: boolean;
+  publicCloudCoverage: boolean;
+  datacenterGeographies: boolean;
+  datacenterInfrastructure: boolean;
+  kubernetes: boolean;
+  aiGpu: boolean;
+  applications: boolean;
+  serviceApplications: boolean;
+  services: boolean;
+  databases: boolean;
+  os: boolean;
+  bandwidthBar: boolean;
+  bandwidthLine: boolean;
+  platformPerformance: boolean;
+  performanceMetrics: boolean;
+  deviceAvailability: boolean;
+  availabilityCategory: boolean;
+  alertTrend: boolean;
+  alertReduction: boolean;
+  alertResponse: boolean;
+  alertSourceSankey: boolean;
+  alertLifecycleSankey: boolean;
+  orphanedDevices: boolean;
+  orphanedByCategory: boolean;
+  idleDevices: boolean;
+  idleDuration: boolean;
+  recentAlertSummary: boolean;
+  recentAlerts: boolean;
+  remediationDonut: boolean;
+  remediationActions: boolean;
+  remediationSummary: boolean;
+  remediationMetrics: boolean;
+}
+
 @Component({
   selector: 'unified-aiops-command-centre',
   templateUrl: './unified-aiops-command-centre.component.html',
@@ -50,6 +92,7 @@ interface UnifiedAiopsFilterScopeSummary {
 export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
   private isDestroyed = false;
+  private readonly recentAlertsDisplayLimit = 10;
   private datacenterGeographyMapElementRef: ElementRef<HTMLElement> | null = null;
   private datacenterGeographyMap: google.maps.Map | null = null;
   private datacenterGeographyCluster: MarkerClusterer | null = null;
@@ -65,6 +108,47 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   private datacenterGeographiesLoaded = false;
   private readonly datacenterGeographyInitialZoom = 2.2;
   private readonly datacenterGeographyInitialCenter = { lat: 25.738611, lng: 0 };
+  private readonly widgetLoadingKeys: Array<keyof UnifiedAiopsWidgetLoadingState> = [
+    'summaryMetrics',
+    'discovery',
+    'alertSegregationLegend',
+    'alertSegregation',
+    'businessServices',
+    'employeeExperience',
+    'geoDistribution',
+    'privateCloudCoverage',
+    'publicCloudCoverage',
+    'datacenterGeographies',
+    'datacenterInfrastructure',
+    'kubernetes',
+    'aiGpu',
+    'applications',
+    'serviceApplications',
+    'services',
+    'databases',
+    'os',
+    'bandwidthBar',
+    'bandwidthLine',
+    'platformPerformance',
+    'performanceMetrics',
+    'deviceAvailability',
+    'availabilityCategory',
+    'alertTrend',
+    'alertReduction',
+    'alertResponse',
+    'alertSourceSankey',
+    'alertLifecycleSankey',
+    'orphanedDevices',
+    'orphanedByCategory',
+    'idleDevices',
+    'idleDuration',
+    'recentAlertSummary',
+    'recentAlerts',
+    'remediationDonut',
+    'remediationActions',
+    'remediationSummary',
+    'remediationMetrics'
+  ];
   private readonly linkRoutes = {
     devices: ['/unitycloud/devices'],
     vmAll: ['/unitycloud/devices/vms/allvms'],
@@ -161,6 +245,47 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   remediationActionsOptions: EChartsOption = {};
   remediationSummary: UnifiedAiopsMetric[] = [];
   remediationMetrics: UnifiedAiopsRemediationMetric[] = [];
+  widgetLoading: UnifiedAiopsWidgetLoadingState = {
+    summaryMetrics: false,
+    discovery: false,
+    alertSegregationLegend: false,
+    alertSegregation: false,
+    businessServices: false,
+    employeeExperience: false,
+    geoDistribution: false,
+    privateCloudCoverage: false,
+    publicCloudCoverage: false,
+    datacenterGeographies: false,
+    datacenterInfrastructure: false,
+    kubernetes: false,
+    aiGpu: false,
+    applications: false,
+    serviceApplications: false,
+    services: false,
+    databases: false,
+    os: false,
+    bandwidthBar: false,
+    bandwidthLine: false,
+    platformPerformance: false,
+    performanceMetrics: false,
+    deviceAvailability: false,
+    availabilityCategory: false,
+    alertTrend: false,
+    alertReduction: false,
+    alertResponse: false,
+    alertSourceSankey: false,
+    alertLifecycleSankey: false,
+    orphanedDevices: false,
+    orphanedByCategory: false,
+    idleDevices: false,
+    idleDuration: false,
+    recentAlertSummary: false,
+    recentAlerts: false,
+    remediationDonut: false,
+    remediationActions: false,
+    remediationSummary: false,
+    remediationMetrics: false
+  };
 
   loaderNames = {
     filters: 'unifiedAiopsFiltersLoader',
@@ -411,6 +536,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       return;
     }
     const filterFormOutput = this.appliedFilterCriteria;
+    this.startWidgetLoadingState();
     setTimeout(() => {
       this.getSummaryMetrics(filterFormOutput);
       this.getDiscoveryOptions(filterFormOutput);
@@ -458,7 +584,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.summaryMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.summaryMetrics = [];
-    });
+    }, 'summaryMetrics');
   }
 
   getDiscoveryOptions(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -467,7 +593,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.discoveryOptions = this.svc.convertToDiscoveryOptions(res);
     }, () => {
       this.discoveryOptions = {};
-    });
+    }, 'discovery');
   }
 
   getAlertSegregation(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -477,12 +603,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertSegregationLegend = this.svc.convertToLegendMetricsViewData(res);
     }, () => {
       this.alertSegregationLegend = [];
-    });
+    }, 'alertSegregationLegend');
     this.loadWidget(this.loaderNames.alertSegregation, this.svc.getAlertSegregationItems(filterFormOutput), res => {
       this.alertSegregationOptions = this.svc.convertToAlertSegregationOptions(res);
     }, () => {
       this.alertSegregationOptions = {};
-    });
+    }, 'alertSegregation');
   }
 
   getBusinessServices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -491,7 +617,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.businessServices = this.svc.convertToBusinessServicesViewData(res);
     }, () => {
       this.businessServices = [];
-    });
+    }, 'businessServices');
   }
 
   getEmployeeMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -500,7 +626,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.employeeMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.employeeMetrics = [];
-    });
+    }, 'employeeExperience');
   }
 
   getGeoDistribution(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -509,7 +635,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.geoHeatmapOptions = this.svc.convertToGeoHeatmapOptions(res);
     }, () => {
       this.geoHeatmapOptions = {};
-    });
+    }, 'geoDistribution');
   }
 
   getPrivateCloudCoverage(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -521,7 +647,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     }, () => {
       this.privateCloudCoverage = [];
       this.privateCloudCoverageTotal = '0';
-    });
+    }, 'privateCloudCoverage');
   }
 
   getPublicCloudCoverage(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -533,11 +659,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     }, () => {
       this.publicCloudCoverage = [];
       this.publicCloudCoverageTotal = '0';
-    });
+    }, 'publicCloudCoverage');
   }
 
   getDatacenterGeographies(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     if (!this.mapSvc.shouldShowMapWidgets()) {
+      this.widgetLoading.datacenterGeographies = false;
       this.datacenterGeographiesLoaded = false;
       this.datacenterGeographiesMapAvailable = false;
       this.datacenterGeographyAllLocations = [];
@@ -549,9 +676,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
     if (this.datacenterGeographiesLoaded) {
       this.applyDatacenterGeographyFilter(filterFormOutput);
+      this.widgetLoading.datacenterGeographies = false;
       return;
     }
 
+    this.widgetLoading.datacenterGeographies = true;
     this.datacenterGeographyViewData = [];
     this.datacenterGeographyDcMap = {};
     this.clearDatacenterGeographyMarkers();
@@ -559,6 +688,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
     this.mapSvc.loadMap().then(() => {
       if (this.isDestroyed) {
+        this.widgetLoading.datacenterGeographies = false;
         this.spinnerService.stop(this.loaderNames.datacenterGeographies);
         return;
       }
@@ -566,6 +696,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.datacenterGeographiesMapAvailable = this.mapSvc.isAvailable();
       if (!this.datacenterGeographiesMapAvailable) {
         this.datacenterGeographiesLoaded = true;
+        this.widgetLoading.datacenterGeographies = false;
         this.spinnerService.stop(this.loaderNames.datacenterGeographies);
         return;
       }
@@ -577,7 +708,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
           switchMap(() => this.dashboardMapWidgetService.getDatacenterSatus()),
           catchError(() => of(initialRes))
         )),
-        finalize(() => setTimeout(() => this.spinnerService.stop(this.loaderNames.datacenterGeographies), 0))
+        finalize(() => {
+          this.widgetLoading.datacenterGeographies = false;
+          setTimeout(() => this.spinnerService.stop(this.loaderNames.datacenterGeographies), 0);
+        })
       ).subscribe(res => {
         this.setDatacenterGeographyData(res, filterFormOutput);
       }, () => {
@@ -835,7 +969,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.datacenterInfrastructureMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.datacenterInfrastructureMetrics = [];
-    });
+    }, 'datacenterInfrastructure');
   }
 
   getKubernetesMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -844,7 +978,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.kubernetesMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.kubernetesMetrics = [];
-    });
+    }, 'kubernetes');
   }
 
   getAiGpuMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -853,7 +987,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.aiGpuMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.aiGpuMetrics = [];
-    });
+    }, 'aiGpu');
   }
 
   getApplicationRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -862,10 +996,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.applicationRows = this.svc.convertToTableRowsViewData(res);
     }, () => {
       this.applicationRows = [];
-    });
+    }, 'applications');
   }
 
   getServiceApplicationOptions(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
+    this.serviceApplicationOptions = [];
+    this.serviceRows = [];
     this.loadWidget(this.loaderNames.serviceApplications, this.svc.getServiceApplicationOptions(), res => {
       this.serviceApplicationOptions = res || [];
       if (!this.serviceApplicationOptions.some(option => option.value === this.selectedServiceApplicationId)) {
@@ -876,7 +1012,8 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.serviceApplicationOptions = [];
       this.selectedServiceApplicationId = '';
       this.serviceRows = [];
-    });
+      this.widgetLoading.services = false;
+    }, 'serviceApplications');
   }
 
   onServiceApplicationChange(event: Event) {
@@ -888,13 +1025,14 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   getServiceRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.serviceRows = [];
     if (!this.selectedServiceApplicationId) {
+      this.widgetLoading.services = false;
       return;
     }
     this.loadWidget(this.loaderNames.services, this.svc.getServiceRows(filterFormOutput, this.selectedServiceApplicationId), res => {
       this.serviceRows = this.svc.convertToTableRowsViewData(res);
     }, () => {
       this.serviceRows = [];
-    });
+    }, 'services');
   }
 
   getDatabaseRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -903,7 +1041,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.databaseRows = this.svc.convertToTableRowsViewData(res);
     }, () => {
       this.databaseRows = [];
-    });
+    }, 'databases');
   }
 
   getOsRows(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -912,7 +1050,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.osRows = this.svc.convertToTableRowsViewData(res);
     }, () => {
       this.osRows = [];
-    });
+    }, 'os');
   }
 
   getBandwidthBar(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -921,7 +1059,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.bandwidthBarOptions = this.svc.convertToBandwidthBarOptions(res);
     }, () => {
       this.bandwidthBarOptions = {};
-    });
+    }, 'bandwidthBar');
   }
 
   getBandwidthLine(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -930,7 +1068,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.bandwidthLineOptions = this.svc.convertToBandwidthLineOptions(res);
     }, () => {
       this.bandwidthLineOptions = {};
-    });
+    }, 'bandwidthLine');
   }
 
   getPlatformPerformance(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -939,7 +1077,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.platformPerformanceOptions = this.svc.convertToPlatformPerformanceOptions(res);
     }, () => {
       this.platformPerformanceOptions = {};
-    });
+    }, 'platformPerformance');
   }
 
   getPerformanceMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -948,7 +1086,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.performanceMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.performanceMetrics = [];
-    });
+    }, 'performanceMetrics');
   }
 
   getDeviceAvailability(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -957,7 +1095,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.deviceAvailabilityOptions = this.svc.convertToDeviceAvailabilityOptions(res);
     }, () => {
       this.deviceAvailabilityOptions = {};
-    });
+    }, 'deviceAvailability');
   }
 
   getAvailabilityCategory(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -966,7 +1104,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.availabilityCategoryOptions = this.svc.convertToAvailabilityCategoryOptions(res);
     }, () => {
       this.availabilityCategoryOptions = {};
-    });
+    }, 'availabilityCategory');
   }
 
   getAlertTrend(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -975,7 +1113,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertTrendOptions = this.svc.convertToAlertTrendOptions(res);
     }, () => {
       this.alertTrendOptions = {};
-    });
+    }, 'alertTrend');
   }
 
   getAlertReductionMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -984,7 +1122,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertReductionMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.alertReductionMetrics = [];
-    });
+    }, 'alertReduction');
   }
 
   getAlertResponseMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -993,7 +1131,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertResponseMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.alertResponseMetrics = [];
-    });
+    }, 'alertResponse');
   }
 
   getAlertSourceSankey(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1002,7 +1140,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertSourceSankeyOptions = this.svc.convertToAlertSourceSankeyOptions(res);
     }, () => {
       this.alertSourceSankeyOptions = {};
-    });
+    }, 'alertSourceSankey');
   }
 
   getAlertLifecycleSankey(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1011,7 +1149,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.alertLifecycleSankeyOptions = this.svc.convertToAlertLifecycleSankeyOptions(res);
     }, () => {
       this.alertLifecycleSankeyOptions = {};
-    });
+    }, 'alertLifecycleSankey');
   }
 
   getOrphanedDevices(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1023,7 +1161,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     }, () => {
       this.orphanedDevices = [];
       this.orphanedDevicesTotal = 0;
-    });
+    }, 'orphanedDevices');
   }
 
   getOrphanedDevicesByCategory(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1038,7 +1176,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.orphanedByCategory = [];
       this.orphanedByCategoryOptions = {};
       this.orphanedByCategoryHasData = false;
-    });
+    }, 'orphanedByCategory');
   }
 
   orphanedDevicesPageChange(pageNo: number) {
@@ -1064,7 +1202,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     }, () => {
       this.idleDevices = [];
       this.idleDevicesTotal = 0;
-    });
+    }, 'idleDevices');
   }
 
   getIdleDevicesByDuration(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1079,7 +1217,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.idleDurationRows = [];
       this.idleDurationOptions = {};
       this.idleDurationHasData = false;
-    });
+    }, 'idleDuration');
   }
 
   idleDevicesPageChange(pageNo: number) {
@@ -1102,16 +1240,16 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.recentAlertSummaryMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.recentAlertSummaryMetrics = [];
-    });
+    }, 'recentAlertSummary');
   }
 
   getRecentAlerts(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.recentAlerts = [];
     this.loadWidget(this.loaderNames.recentAlerts, this.svc.getRecentAlerts(filterFormOutput), res => {
-      this.recentAlerts = this.svc.convertToRecentAlertsViewData(res);
+      this.recentAlerts = this.svc.convertToRecentAlertsViewData(res).slice(0, this.recentAlertsDisplayLimit);
     }, () => {
       this.recentAlerts = [];
-    });
+    }, 'recentAlerts');
   }
 
   getRemediationDonut(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1120,7 +1258,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.remediationDonutOptions = this.svc.convertToRemediationDonutOptions(res);
     }, () => {
       this.remediationDonutOptions = {};
-    });
+    }, 'remediationDonut');
   }
 
   getRemediationActions(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1129,7 +1267,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.remediationActionsOptions = this.svc.convertToRemediationActionsOptions(res);
     }, () => {
       this.remediationActionsOptions = {};
-    });
+    }, 'remediationActions');
   }
 
   getRemediationSummary(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1138,7 +1276,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.remediationSummary = this.svc.convertToMetricsViewData(res);
     }, () => {
       this.remediationSummary = [];
-    });
+    }, 'remediationSummary');
   }
 
   getRemediationMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
@@ -1147,7 +1285,239 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.remediationMetrics = this.svc.convertToRemediationMetricsViewData(res);
     }, () => {
       this.remediationMetrics = [];
-    });
+    }, 'remediationMetrics');
+  }
+
+  private startWidgetLoadingState() {
+    this.widgetLoadingKeys.forEach(key => this.widgetLoading[key] = true);
+  }
+
+  get hasSummaryMetrics(): boolean {
+    return this.widgetLoading.summaryMetrics || this.hasMetricValues(this.summaryMetrics);
+  }
+
+  get hasDiscovery(): boolean {
+    return this.widgetLoading.discovery || this.hasChartData(this.discoveryOptions);
+  }
+
+  get hasAlertSegregation(): boolean {
+    return this.widgetLoading.alertSegregationLegend ||
+      this.widgetLoading.alertSegregation ||
+      this.hasLegendMetricValues(this.alertSegregationLegend) ||
+      this.hasChartData(this.alertSegregationOptions);
+  }
+
+  get hasBusinessServices(): boolean {
+    return this.widgetLoading.businessServices || !!this.businessServices?.length;
+  }
+
+  get hasEmployeeMetrics(): boolean {
+    return this.widgetLoading.employeeExperience || this.hasMetricValues(this.employeeMetrics);
+  }
+
+  get hasGeoDistribution(): boolean {
+    return this.widgetLoading.geoDistribution || this.hasChartData(this.geoHeatmapOptions);
+  }
+
+  get hasPrivateCloudCoverage(): boolean {
+    return this.widgetLoading.privateCloudCoverage || this.hasCoverageValues(this.privateCloudCoverage);
+  }
+
+  get hasPublicCloudCoverage(): boolean {
+    return this.widgetLoading.publicCloudCoverage || this.hasCoverageValues(this.publicCloudCoverage);
+  }
+
+  get hasDatacenterGeographies(): boolean {
+    return this.widgetLoading.datacenterGeographies ||
+      (this.mapSvc.shouldShowMapWidgets() && this.datacenterGeographiesMapAvailable && !!this.datacenterGeographyViewData?.length);
+  }
+
+  get hasDatacenterInfrastructure(): boolean {
+    return this.widgetLoading.datacenterInfrastructure || this.hasMetricValues(this.datacenterInfrastructureMetrics);
+  }
+
+  get hasKubernetesMetrics(): boolean {
+    return this.widgetLoading.kubernetes || this.hasMetricValues(this.kubernetesMetrics);
+  }
+
+  get hasAiGpuMetrics(): boolean {
+    return this.widgetLoading.aiGpu || this.hasMetricValues(this.aiGpuMetrics);
+  }
+
+  get hasApplicationRows(): boolean {
+    return this.widgetLoading.applications || !!this.applicationRows?.length;
+  }
+
+  get hasServiceRows(): boolean {
+    return this.widgetLoading.serviceApplications || this.widgetLoading.services || !!this.serviceRows?.length;
+  }
+
+  get hasDatabaseRows(): boolean {
+    return this.widgetLoading.databases || !!this.databaseRows?.length;
+  }
+
+  get hasOsRows(): boolean {
+    return this.widgetLoading.os || !!this.osRows?.length;
+  }
+
+  get hasApplicationServiceSection(): boolean {
+    return this.hasApplicationRows || this.hasServiceRows;
+  }
+
+  get hasMonitoringTableSection(): boolean {
+    return this.hasDatabaseRows || this.hasOsRows;
+  }
+
+  get hasBandwidthBar(): boolean {
+    return this.widgetLoading.bandwidthBar || this.hasChartData(this.bandwidthBarOptions);
+  }
+
+  get hasBandwidthLine(): boolean {
+    return this.widgetLoading.bandwidthLine || this.hasChartData(this.bandwidthLineOptions);
+  }
+
+  get hasPlatformPerformance(): boolean {
+    return this.widgetLoading.platformPerformance || this.hasChartData(this.platformPerformanceOptions);
+  }
+
+  get hasPerformanceMetrics(): boolean {
+    return this.widgetLoading.performanceMetrics || this.hasMetricValues(this.performanceMetrics);
+  }
+
+  get hasPerformanceSection(): boolean {
+    return this.hasBandwidthBar || this.hasBandwidthLine || this.hasPlatformPerformance || this.hasPerformanceMetrics;
+  }
+
+  get hasDeviceAvailability(): boolean {
+    return this.widgetLoading.deviceAvailability || this.hasChartData(this.deviceAvailabilityOptions);
+  }
+
+  get hasAvailabilityCategory(): boolean {
+    return this.widgetLoading.availabilityCategory || this.hasChartData(this.availabilityCategoryOptions);
+  }
+
+  get hasAlertTrend(): boolean {
+    return this.widgetLoading.alertTrend || this.hasChartData(this.alertTrendOptions);
+  }
+
+  get hasAnalyticsSection(): boolean {
+    return this.hasDeviceAvailability || this.hasAvailabilityCategory || this.hasAlertTrend;
+  }
+
+  get hasAlertMetrics(): boolean {
+    return this.widgetLoading.alertReduction ||
+      this.widgetLoading.alertResponse ||
+      this.hasMetricValues(this.alertReductionMetrics) ||
+      this.hasMetricValues(this.alertResponseMetrics);
+  }
+
+  get hasAlertSourceSankey(): boolean {
+    return this.widgetLoading.alertSourceSankey || this.hasChartData(this.alertSourceSankeyOptions);
+  }
+
+  get hasAlertLifecycleSankey(): boolean {
+    return this.widgetLoading.alertLifecycleSankey || this.hasChartData(this.alertLifecycleSankeyOptions);
+  }
+
+  get hasAlertsSection(): boolean {
+    return this.hasAlertMetrics || this.hasAlertSourceSankey || this.hasAlertLifecycleSankey;
+  }
+
+  get hasOrphanedDevices(): boolean {
+    return this.widgetLoading.orphanedDevices || !!this.orphanedDevices?.length;
+  }
+
+  get hasOrphanedByCategory(): boolean {
+    return this.widgetLoading.orphanedByCategory || this.orphanedByCategoryHasData;
+  }
+
+  get hasIdleDevices(): boolean {
+    return this.widgetLoading.idleDevices || !!this.idleDevices?.length;
+  }
+
+  get hasIdleDuration(): boolean {
+    return this.widgetLoading.idleDuration || this.idleDurationHasData;
+  }
+
+  get hasRecentAlertSummary(): boolean {
+    return this.widgetLoading.recentAlertSummary || this.hasMetricValues(this.recentAlertSummaryMetrics);
+  }
+
+  get hasRecentAlerts(): boolean {
+    return this.widgetLoading.recentAlerts || !!this.recentAlerts?.length;
+  }
+
+  get hasRecentAlertsSection(): boolean {
+    return this.hasRecentAlertSummary || this.hasRecentAlerts;
+  }
+
+  get hasRemediationDonut(): boolean {
+    return this.widgetLoading.remediationDonut || this.hasChartData(this.remediationDonutOptions);
+  }
+
+  get hasRemediationActions(): boolean {
+    return this.widgetLoading.remediationActions || this.hasChartData(this.remediationActionsOptions);
+  }
+
+  get hasRemediationSummary(): boolean {
+    return this.widgetLoading.remediationSummary || this.hasMetricValues(this.remediationSummary);
+  }
+
+  get hasRemediationMetrics(): boolean {
+    return this.widgetLoading.remediationMetrics || this.hasMetricValues(this.remediationMetrics);
+  }
+
+  get hasRemediationSection(): boolean {
+    return this.hasRemediationDonut || this.hasRemediationActions || this.hasRemediationSummary || this.hasRemediationMetrics;
+  }
+
+  get hasAnyDashboardWidget(): boolean {
+    return this.hasSummaryMetrics ||
+      this.hasDiscovery ||
+      this.hasAlertSegregation ||
+      this.hasBusinessServices ||
+      this.hasEmployeeMetrics ||
+      this.hasGeoDistribution ||
+      this.hasPrivateCloudCoverage ||
+      this.hasPublicCloudCoverage ||
+      this.hasDatacenterGeographies ||
+      this.hasDatacenterInfrastructure ||
+      this.hasKubernetesMetrics ||
+      this.hasAiGpuMetrics ||
+      this.hasApplicationRows ||
+      this.hasServiceRows ||
+      this.hasDatabaseRows ||
+      this.hasOsRows ||
+      this.hasPerformanceSection ||
+      this.hasAnalyticsSection ||
+      this.hasAlertsSection ||
+      this.hasOrphanedDevices ||
+      this.hasOrphanedByCategory ||
+      this.hasIdleDevices ||
+      this.hasIdleDuration ||
+      this.hasRecentAlertsSection ||
+      this.hasRemediationSection;
+  }
+
+  private hasMetricValues(metrics: Array<{ value?: string | number; up?: string | number; down?: string | number; unknown?: string | number }>): boolean {
+    return (metrics || []).some(metric =>
+      this.getNumericValue(metric?.value) > 0 ||
+      this.getNumericValue(metric?.up) > 0 ||
+      this.getNumericValue(metric?.down) > 0 ||
+      this.getNumericValue(metric?.unknown) > 0
+    );
+  }
+
+  private hasLegendMetricValues(metrics: Array<{ value?: string | number }>): boolean {
+    return (metrics || []).some(metric => this.getNumericValue(metric?.value) > 0);
+  }
+
+  private hasCoverageValues(cards: UnifiedAiopsCoverageCard[]): boolean {
+    return (cards || []).some(card => (card.rows || []).some(row => this.getNumericValue(row?.value) > 0));
+  }
+
+  private getNumericValue(value: string | number | undefined | null): number {
+    return Number(String(value || '').replace(/[^0-9.-]/g, '')) || 0;
   }
 
   getToneClass(tone?: UnifiedAiopsTone): string {
@@ -1217,12 +1587,42 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       if (!item) {
         return false;
       }
+      if (this.hasChartDataValue(item.links) || this.hasChartDataValue(item.edges)) {
+        return true;
+      }
       const data = item.data;
       if (Array.isArray(data)) {
-        return !!data.length;
+        return data.some(dataItem => this.hasChartDataValue(dataItem));
       }
-      return !!data && typeof data === 'object' && !!Object.keys(data).length;
+      return this.hasChartDataValue(data);
     });
+  }
+
+  private hasChartDataValue(data: any): boolean {
+    if (data === null || data === undefined) {
+      return false;
+    }
+    if (typeof data === 'number') {
+      return data > 0;
+    }
+    if (typeof data === 'string') {
+      return false;
+    }
+    if (Array.isArray(data)) {
+      return data.some(item => this.hasChartDataValue(item));
+    }
+    if (typeof data === 'object') {
+      if (this.getNumericValue(data.value) > 0 || this.getNumericValue(data.count) > 0) {
+        return true;
+      }
+      if (Array.isArray(data.source) && Array.isArray(data.target)) {
+        return true;
+      }
+      return Object.keys(data)
+        .filter(key => !['name', 'itemStyle', 'label', 'lineStyle', 'emphasis', 'tooltip', 'symbol', 'symbolSize'].includes(key))
+        .some(key => this.hasChartDataValue(data[key]));
+    }
+    return false;
   }
 
   openSummaryMetric(metric: UnifiedAiopsMetric) {
@@ -1616,11 +2016,25 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     return String(value || '').toLowerCase().replace(/[\s-]+/g, '_');
   }
 
-  private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {
+  private loadWidget<T>(
+    loaderName: string,
+    request: Observable<T>,
+    onSuccess: (res: T) => void,
+    onError: () => void,
+    loadingKey?: keyof UnifiedAiopsWidgetLoadingState
+  ) {
+    if (loadingKey) {
+      this.widgetLoading[loadingKey] = true;
+    }
     this.spinnerService.start(loaderName);
     request.pipe(
       takeUntil(this.ngUnsubscribe),
-      finalize(() => setTimeout(() => this.spinnerService.stop(loaderName), 0))
+      finalize(() => {
+        if (loadingKey) {
+          this.widgetLoading[loadingKey] = false;
+        }
+        setTimeout(() => this.spinnerService.stop(loaderName), 0);
+      })
     ).subscribe(res => {
       onSuccess(res);
     }, () => {

@@ -402,6 +402,11 @@ button.legend-link {
   gap: 12px;
 }
 
+.orphaned-widgets-grid.single-widget-grid,
+.idle-widgets-grid.single-widget-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .orphaned-device-card,
 .orphaned-category-card,
 .idle-device-card,

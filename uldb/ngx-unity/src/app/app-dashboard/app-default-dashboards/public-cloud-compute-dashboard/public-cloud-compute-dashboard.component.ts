@@ -36,6 +36,16 @@ interface PublicCloudFilterScopeSummary {
   remainingLabels: string[];
 }
 
+interface PublicCloudWidgetLoadingState {
+  inventorySummary: boolean;
+  computeBreakdown: boolean;
+  orphanedDevices: boolean;
+  orphanedByCategory: boolean;
+  idleDevices: boolean;
+  idleDuration: boolean;
+  recentAlerts: boolean;
+}
+
 @Component({
   selector: 'public-cloud-compute-dashboard',
   templateUrl: './public-cloud-compute-dashboard.component.html',
@@ -46,6 +56,15 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject<void>();
   private filterFormUnsubscribe = new Subject<void>();
   private allAccountOptions: PublicCloudAccountOption[] = [];
+  private readonly widgetLoadingKeys: Array<keyof PublicCloudWidgetLoadingState> = [
+    'inventorySummary',
+    'computeBreakdown',
+    'orphanedDevices',
+    'orphanedByCategory',
+    'idleDevices',
+    'idleDuration',
+    'recentAlerts'
+  ];
   private readonly linkRoutes = {
     publicCloud: ['/unitycloud/publiccloud'],
     devices: ['/unitycloud/devices'],
@@ -103,6 +122,15 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   idleDurationHasData = false;
   recentAlertSummaryMetrics: PublicCloudAlertSummaryMetric[] = [];
   recentAlerts: PublicCloudRecentAlert[] = [];
+  widgetLoading: PublicCloudWidgetLoadingState = {
+    inventorySummary: false,
+    computeBreakdown: false,
+    orphanedDevices: false,
+    orphanedByCategory: false,
+    idleDevices: false,
+    idleDuration: false,
+    recentAlerts: false
+  };
 
   loaderNames = {
     filters: 'publicCloudFiltersLoader',
@@ -220,6 +248,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.filtersUnavailable = true;
     this.filterForm = null;
     this.clearDashboardViewData();
+    this.clearWidgetLoadingState();
     this.stopFilterLoader();
   }
 
@@ -372,6 +401,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     const filterFormOutput = this.appliedFilterCriteria;
+    this.startWidgetLoadingState();
     setTimeout(() => {
       this.getInventorySummary(filterFormOutput);
       this.getComputeBreakdown(filterFormOutput);
@@ -388,10 +418,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.providerDistribution = [];
     this.providerDistributionOptions = {};
     this.tags = [];
+    this.widgetLoading.inventorySummary = true;
     this.startInventorySummaryLoaders();
     this.svc.getInventorySummary(filterFormOutput).pipe(
       takeUntil(this.ngUnsubscribe),
-      finalize(() => this.stopInventorySummaryLoaders())
+      finalize(() => {
+        this.widgetLoading.inventorySummary = false;
+        this.stopInventorySummaryLoaders();
+      })
     ).subscribe(res => {
       this.summaryMetrics = this.svc.convertToSummaryMetricsViewData(res);
       this.providerDistribution = this.svc.convertToProviderDistributionViewData(res);
@@ -429,29 +463,32 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
 
   getComputeBreakdown(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.computeBreakdown = [];
+    this.widgetLoading.computeBreakdown = true;
     this.loadWidget(this.loaderNames.computeBreakdown, this.svc.getComputeBreakdown(filterFormOutput), res => {
       this.computeBreakdown = this.svc.convertToComputeBreakdownViewData(res, filterFormOutput);
     }, () => {
       this.computeBreakdown = [];
-    });
+    }, () => this.widgetLoading.computeBreakdown = false);
   }
 
   getOrphanedDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.orphanedDevices = [];
     this.orphanedDevicesTotal = 0;
+    this.widgetLoading.orphanedDevices = true;
     this.loadWidget(this.loaderNames.orphanedDevices, this.svc.getOrphanedDevices(filterFormOutput, this.orphanedDevicesPageNo, this.orphanedDevicesPageSize), res => {
       this.orphanedDevices = this.svc.convertToOrphanedDevicesViewData(res);
       this.orphanedDevicesTotal = this.svc.convertToOrphanedDevicesTotal(res);
     }, () => {
       this.orphanedDevices = [];
       this.orphanedDevicesTotal = 0;
-    });
+    }, () => this.widgetLoading.orphanedDevices = false);
   }
 
   getOrphanedDevicesByCategory(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.orphanedByCategory = [];
     this.orphanedByCategoryOptions = {};
     this.orphanedByCategoryHasData = false;
+    this.widgetLoading.orphanedByCategory = true;
     this.loadWidget(this.loaderNames.orphanedDevicesByCategory, this.svc.getOrphanedDevicesByCategory(filterFormOutput), res => {
       this.orphanedByCategory = this.svc.convertToOrphanedByCategoryViewData(res);
       this.orphanedByCategoryOptions = this.svc.convertToOrphanedByCategoryOptions(this.orphanedByCategory);
@@ -460,7 +497,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.orphanedByCategory = [];
       this.orphanedByCategoryOptions = {};
       this.orphanedByCategoryHasData = false;
-    });
+    }, () => this.widgetLoading.orphanedByCategory = false);
   }
 
   orphanedDevicesPageChange(pageNo: number) {
@@ -480,19 +517,21 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   getIdleDevices(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.idleDevices = [];
     this.idleDevicesTotal = 0;
+    this.widgetLoading.idleDevices = true;
     this.loadWidget(this.loaderNames.idleDevices, this.svc.getIdleDevices(filterFormOutput, this.idleDevicesPageNo, this.idleDevicesPageSize), res => {
       this.idleDevices = this.svc.convertToIdleDevicesViewData(res);
       this.idleDevicesTotal = this.svc.convertToIdleDevicesTotal(res);
     }, () => {
       this.idleDevices = [];
       this.idleDevicesTotal = 0;
-    });
+    }, () => this.widgetLoading.idleDevices = false);
   }
 
   getIdleDevicesByDuration(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.idleDurationRows = [];
     this.idleDurationOptions = {};
     this.idleDurationHasData = false;
+    this.widgetLoading.idleDuration = true;
     this.loadWidget(this.loaderNames.idleDuration, this.svc.getIdleDevicesByDuration(filterFormOutput), res => {
       this.idleDurationRows = this.svc.convertToIdleDurationViewData(res);
       this.idleDurationHasData = this.svc.hasIdleDurationData(this.idleDurationRows);
@@ -501,7 +540,7 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
       this.idleDurationRows = [];
       this.idleDurationOptions = {};
       this.idleDurationHasData = false;
-    });
+    }, () => this.widgetLoading.idleDuration = false);
   }
 
   idleDevicesPageChange(pageNo: number) {
@@ -521,10 +560,14 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
   getRecentAlerts(filterFormOutput: PublicCloudDashboardFilterCriteria) {
     this.recentAlertSummaryMetrics = [];
     this.recentAlerts = [];
+    this.widgetLoading.recentAlerts = true;
     this.startRecentAlertsLoaders();
     this.svc.getRecentAlerts(filterFormOutput).pipe(
       takeUntil(this.ngUnsubscribe),
-      finalize(() => this.stopRecentAlertsLoaders())
+      finalize(() => {
+        this.widgetLoading.recentAlerts = false;
+        this.stopRecentAlertsLoaders();
+      })
     ).subscribe(res => {
       this.recentAlertSummaryMetrics = this.svc.convertToRecentAlertSummaryMetricsViewData(res);
       this.recentAlerts = this.svc.convertToRecentAlertsViewData(res);
@@ -568,6 +611,79 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     this.idleDurationOptions = {};
     this.idleDurationHasData = false;
     this.clearRecentAlertsViewData();
+  }
+
+  private startWidgetLoadingState() {
+    this.widgetLoadingKeys.forEach(key => this.widgetLoading[key] = true);
+  }
+
+  private clearWidgetLoadingState() {
+    this.widgetLoadingKeys.forEach(key => this.widgetLoading[key] = false);
+  }
+
+  get hasSummaryMetrics(): boolean {
+    return this.widgetLoading.inventorySummary || this.hasMetricValues(this.summaryMetrics);
+  }
+
+  get hasProviderDistribution(): boolean {
+    return this.widgetLoading.inventorySummary || (this.providerDistribution || []).some(provider => Number(provider?.count || 0) > 0 || Number(provider?.value || 0) > 0);
+  }
+
+  get hasTags(): boolean {
+    return this.widgetLoading.inventorySummary || !!this.tags?.length;
+  }
+
+  get hasComputeBreakdown(): boolean {
+    return this.widgetLoading.computeBreakdown || !!this.computeBreakdown?.length;
+  }
+
+  get hasOrphanedDevices(): boolean {
+    return this.widgetLoading.orphanedDevices || !!this.orphanedDevices?.length;
+  }
+
+  get hasOrphanedByCategory(): boolean {
+    return this.widgetLoading.orphanedByCategory || this.orphanedByCategoryHasData;
+  }
+
+  get hasIdleDevices(): boolean {
+    return this.widgetLoading.idleDevices || !!this.idleDevices?.length;
+  }
+
+  get hasIdleDuration(): boolean {
+    return this.widgetLoading.idleDuration || this.idleDurationHasData;
+  }
+
+  get hasRecentAlerts(): boolean {
+    return this.widgetLoading.recentAlerts || !!this.recentAlerts?.length;
+  }
+
+  get hasRecentAlertSummary(): boolean {
+    return this.widgetLoading.recentAlerts || this.hasMetricValues(this.recentAlertSummaryMetrics);
+  }
+
+  get hasAnyDashboardWidget(): boolean {
+    return this.hasSummaryMetrics ||
+      this.hasProviderDistribution ||
+      this.hasTags ||
+      this.hasComputeBreakdown ||
+      this.hasOrphanedDevices ||
+      this.hasOrphanedByCategory ||
+      this.hasIdleDevices ||
+      this.hasIdleDuration ||
+      this.hasRecentAlerts ||
+      this.hasRecentAlertSummary;
+  }
+
+  get hasInventoryWidgets(): boolean {
+    return this.hasSummaryMetrics || this.hasProviderDistribution || this.hasTags;
+  }
+
+  private hasMetricValues(metrics: Array<{ value?: string | number }>): boolean {
+    return (metrics || []).some(metric => this.getNumericValue(metric?.value) > 0);
+  }
+
+  private getNumericValue(value: string | number | undefined | null): number {
+    return Number(String(value || '').replace(/[^0-9.-]/g, '')) || 0;
   }
 
   getStatusClass(tone?: string): string {
@@ -836,11 +952,16 @@ export class PublicCloudComputeDashboardComponent implements OnInit, OnDestroy {
     return String(value || '').toLowerCase().replace(/[\s-]+/g, '_');
   }
 
-  private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {
+  private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void, onFinalize?: () => void) {
     this.spinnerService.start(loaderName);
     request.pipe(
       takeUntil(this.ngUnsubscribe),
-      finalize(() => setTimeout(() => this.spinnerService.stop(loaderName), 0))
+      finalize(() => {
+        if (onFinalize) {
+          onFinalize();
+        }
+        setTimeout(() => this.spinnerService.stop(loaderName), 0);
+      })
     ).subscribe(res => {
       onSuccess(res);
     }, () => {

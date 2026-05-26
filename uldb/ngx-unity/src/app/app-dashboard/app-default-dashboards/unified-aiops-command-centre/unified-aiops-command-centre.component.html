@@ -67,8 +67,10 @@
     </ng-template>
 
     <div class="dashboard-content" *ngIf="filterForm">
-        <div class="section-title">Executive Monitoring Summary</div>
-        <div class="dashboard-card summary-card">
+        <div class="dashboard-no-data-state" *ngIf="!hasAnyDashboardWidget">No data available</div>
+        <ng-container *ngIf="hasAnyDashboardWidget">
+        <div class="section-title" *ngIf="hasSummaryMetrics">Executive Monitoring Summary</div>
+        <div class="dashboard-card summary-card" *ngIf="hasSummaryMetrics">
             <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
             <div class="summary-metric" *ngFor="let metric of summaryMetrics; trackBy: trackByIndex"
                 [ngClass]="{'linked-widget': canOpenSummaryMetric(metric)}"
@@ -77,21 +79,20 @@
                 <div class="metric-label">{{metric.label}}</div>
                 <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
             </div>
-            <div class="dashboard-empty-state" *ngIf="!summaryMetrics.length">No executive summary data available.</div>
         </div>
 
-        <div class="two-column-grid mt-3">
-            <div>
+        <div class="two-column-grid mt-3" *ngIf="hasDiscovery || hasAlertSegregation"
+            [ngClass]="{'single-widget-grid': !(hasDiscovery && hasAlertSegregation)}">
+            <div *ngIf="hasDiscovery">
                 <div class="section-title linked-widget-title" (click)="openDeviceDiscovery()" [tooltip]="'Open linked page'"
                     container="body">Device Discovery vs Monitoring Enablement</div>
                 <div class="dashboard-card chart-card">
                     <app-spinner [name]="loaderNames.discovery" [width]="0"></app-spinner>
                     <div echarts [options]="discoveryOptions" (chartInit)="onDiscoveryChartInit($event)"
                         class="top-chart linked-chart" *ngIf="hasChartData(discoveryOptions)"></div>
-                    <div class="dashboard-empty-state top-chart" *ngIf="!hasChartData(discoveryOptions)">No discovery data available.</div>
                 </div>
             </div>
-            <div>
+            <div *ngIf="hasAlertSegregation">
                 <div class="section-title title-with-icons">
                     <span class="linked-widget-title" (click)="openAlerts()" [tooltip]="'Open linked page'"
                         container="body">Alert Segregation by Type</span>
@@ -107,16 +108,15 @@
                     <app-spinner [name]="loaderNames.alertSegregation" [width]="0"></app-spinner>
                     <div echarts [options]="alertSegregationOptions" (chartInit)="onAlertSegregationChartInit($event)"
                         class="top-chart linked-chart" *ngIf="hasChartData(alertSegregationOptions)"></div>
-                    <div class="dashboard-empty-state top-chart" *ngIf="!hasChartData(alertSegregationOptions)">No alert segregation data available.</div>
                 </div>
             </div>
         </div>
 
-            <div class="section-title mt-3 linked-widget-title" (click)="openBusinessServices()"
+            <div class="section-title mt-3 linked-widget-title" *ngIf="hasBusinessServices" (click)="openBusinessServices()"
                 [tooltip]="'Open linked page'" container="body">Business Services</div>
-            <div class="dashboard-card table-card">
+            <div class="dashboard-card table-card" *ngIf="hasBusinessServices">
                 <app-spinner [name]="loaderNames.businessServices" [width]="0"></app-spinner>
-                <table class="dashboard-table business-table">
+                <table class="dashboard-table business-table" *ngIf="businessServices.length">
                     <thead>
                         <tr>
                             <th>Service Name</th>
@@ -142,15 +142,13 @@
                             <td>{{row.degraded}}</td>
                             <td><span class="count-chip" [ngClass]="getToneClass(row.alertTone)">{{row.alerts}}</span></td>
                         </tr>
-                        <tr *ngIf="!businessServices.length">
-                            <td colspan="5" class="empty-table-cell">No business services available.</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
 
-        <div class="two-column-grid mt-3">
-            <div>
+        <div class="two-column-grid mt-3" *ngIf="hasEmployeeMetrics || hasGeoDistribution"
+            [ngClass]="{'single-widget-grid': !(hasEmployeeMetrics && hasGeoDistribution)}">
+            <div *ngIf="hasEmployeeMetrics">
                 <div class="section-title linked-widget-title" (click)="openEmployeeExperience()"
                     [tooltip]="'Open linked page'" container="body">Employee / Digital Experience</div>
                 <div class="dashboard-card employee-card">
@@ -160,24 +158,22 @@
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                     </div>
-                    <div class="dashboard-empty-state" *ngIf="!employeeMetrics.length">No employee experience data available.</div>
                 </div>
             </div>
-            <div>
+            <div *ngIf="hasGeoDistribution">
                 <div class="section-title linked-widget-title" (click)="openDatacenters()" [tooltip]="'Open linked page'"
                     container="body">Geo Distribution / Global Operations</div>
                 <div class="dashboard-card geo-card">
                     <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
                     <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
                         class="geo-chart linked-chart" *ngIf="hasChartData(geoHeatmapOptions)"></div>
-                    <div class="dashboard-empty-state geo-chart" *ngIf="!hasChartData(geoHeatmapOptions)">No geo distribution data available.</div>
                 </div>
             </div>
         </div>
 
-        <div class="section-title mt-3">Private Cloud Infrastructure Coverage - {{privateCloudCoverageTotal}} Resources
+        <div class="section-title mt-3" *ngIf="hasPrivateCloudCoverage">Private Cloud Infrastructure Coverage - {{privateCloudCoverageTotal}} Resources
         </div>
-        <div class="coverage-grid private-grid">
+        <div class="coverage-grid private-grid" *ngIf="hasPrivateCloudCoverage">
             <app-spinner [name]="loaderNames.privateCloudCoverage" [width]="0"></app-spinner>
             <div class="coverage-card" *ngFor="let provider of privateCloudCoverage; trackBy: trackByIndex">
                 <div class="coverage-title linked-widget" (click)="openPrivateCloudCoverage(provider)"
@@ -190,12 +186,11 @@
                     <strong>{{row.value}}</strong>
                 </div>
             </div>
-            <div class="dashboard-empty-state" *ngIf="!privateCloudCoverage.length">No private cloud coverage data available.</div>
         </div>
 
-        <div class="section-title mt-3">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources
+        <div class="section-title mt-3" *ngIf="hasPublicCloudCoverage">Public Cloud Infrastructure Coverage - {{publicCloudCoverageTotal}} Resources
         </div>
-        <div class="coverage-grid public-grid">
+        <div class="coverage-grid public-grid" *ngIf="hasPublicCloudCoverage">
             <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
             <div class="coverage-card" *ngFor="let provider of publicCloudCoverage; trackBy: trackByIndex">
                 <div class="coverage-title" [ngClass]="{'linked-widget': canOpenPublicCloudCoverage(provider)}"
@@ -209,25 +204,20 @@
                     <strong>{{row.value}}</strong>
                 </div>
             </div>
-            <div class="dashboard-empty-state" *ngIf="!publicCloudCoverage.length">No public cloud coverage data available.</div>
         </div>
 
-        <ng-container *ngIf="mapSvc.shouldShowMapWidgets()">
+        <ng-container *ngIf="mapSvc.shouldShowMapWidgets() && hasDatacenterGeographies">
             <div class="section-title mt-3 linked-widget-title" (click)="openDatacenters()"
                 [tooltip]="'Open linked page'" container="body">Data Center Geographies</div>
             <div class="dashboard-card datacenter-geography-card">
                 <app-spinner [name]="loaderNames.datacenterGeographies" [width]="0"></app-spinner>
                 <div #datacenterGeographyMap class="datacenter-geography-map"
                     *ngIf="datacenterGeographiesMapAvailable && datacenterGeographyViewData.length"></div>
-                <div class="dashboard-empty-state datacenter-geography-empty"
-                    *ngIf="!datacenterGeographiesMapAvailable || !datacenterGeographyViewData.length">
-                    {{ datacenterGeographiesMapAvailable ? 'No datacenter geography data available.' : 'Data Center Geographies map is unavailable.' }}
-                </div>
             </div>
         </ng-container>
 
-        <div class="section-title mt-3">Data Center Infrastructure</div>
-        <div class="dashboard-card metric-strip datacenter-infra-strip">
+        <div class="section-title mt-3" *ngIf="hasDatacenterInfrastructure">Data Center Infrastructure</div>
+        <div class="dashboard-card metric-strip datacenter-infra-strip" *ngIf="hasDatacenterInfrastructure">
             <app-spinner [name]="loaderNames.datacenterInfrastructure" [width]="0"></app-spinner>
             <div class="strip-metric" *ngFor="let metric of datacenterInfrastructureMetrics; trackBy: trackByIndex"
                 [ngClass]="{'linked-widget': canOpenDatacenterInfrastructure(metric)}"
@@ -241,11 +231,11 @@
                     <span class="unknown"><i class="fa fa-info-circle"></i> {{metric.unknown}}</span>
                 </div>
             </div>
-            <div class="dashboard-empty-state" *ngIf="!datacenterInfrastructureMetrics.length">No data center infrastructure data available.</div>
         </div>
 
-        <div class="two-column-grid mt-3">
-            <div>
+        <div class="two-column-grid mt-3" *ngIf="hasKubernetesMetrics || hasAiGpuMetrics"
+            [ngClass]="{'single-widget-grid': !(hasKubernetesMetrics && hasAiGpuMetrics)}">
+            <div *ngIf="hasKubernetesMetrics">
                 <div class="section-title compact-row-title linked-widget-title" (click)="openKubernetesMetrics()"
                     [tooltip]="'Open linked page'" container="body">Kubernetes / Container</div>
                 <div class="dashboard-card compact-metric-grid kubernetes-grid">
@@ -260,10 +250,9 @@
                             <span class="unknown"><i class="fa fa-info-circle"></i> {{metric.unknown}}</span>
                         </div>
                     </div>
-                    <div class="dashboard-empty-state" *ngIf="!kubernetesMetrics.length">No Kubernetes data available.</div>
                 </div>
             </div>
-            <div>
+            <div *ngIf="hasAiGpuMetrics">
                 <div class="section-title compact-row-title linked-widget-title" (click)="openAiGpuMetrics()"
                     [tooltip]="'Open linked page'" container="body">AI / GPU / LLM</div>
                 <div class="dashboard-card compact-metric-grid ai-grid">
@@ -278,51 +267,50 @@
                             <span class="unknown"><i class="fa fa-info-circle"></i> {{metric.unknown}}</span>
                         </div>
                     </div>
-                    <div class="dashboard-empty-state" *ngIf="!aiGpuMetrics.length">No AI/GPU data available.</div>
                 </div>
             </div>
         </div>
 
-            <div class="two-column-grid mt-3">
-                <div class="dashboard-card table-card application-overview-card">
+            <div class="two-column-grid mt-3" *ngIf="hasApplicationServiceSection"
+                [ngClass]="{'single-widget-grid': !(hasApplicationRows && hasServiceRows)}">
+                <div class="dashboard-card table-card application-overview-card" *ngIf="hasApplicationRows">
                     <app-spinner [name]="loaderNames.applications" [width]="0"></app-spinner>
                     <div class="card-title-row linked-widget-title" (click)="openApplicationDashboard()"
                         [tooltip]="'Open linked page'" container="body">Application Overview</div>
-                    <table class="dashboard-table compact-table application-overview-table">
-                        <colgroup>
-                            <col class="application-name-col">
-                            <col class="application-throughput-col">
-                            <col class="application-availability-col">
-                            <col class="application-response-col">
-                            <col class="application-status-col">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Avg Throughput (rps)</th>
-                                <th>Avg Availability(%)</th>
-                                <th>Avg Response Time (ms)</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let row of applicationRows; trackBy: trackByIndex"
-                                [ngClass]="{'linked-row': canOpenApplicationRow(row)}"
-                                (click)="openApplicationRow(row)"
-                                [tooltip]="canOpenApplicationRow(row) ? 'Open linked page' : ''" container="body">
-                                <td>{{row.name}}</td>
-                                <td>{{row.throughput}}</td>
-                                <td>{{row.availability}}</td>
-                                <td>{{row.responseTime}}</td>
-                                <td><i class="fa status-icon" [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
-                            </tr>
-                            <tr *ngIf="!applicationRows.length">
-                                <td colspan="5" class="empty-table-cell">No applications found.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="monitoring-table-scroll">
+                        <table class="dashboard-table compact-table application-overview-table" *ngIf="applicationRows.length">
+                            <colgroup>
+                                <col class="application-name-col">
+                                <col class="application-throughput-col">
+                                <col class="application-availability-col">
+                                <col class="application-response-col">
+                                <col class="application-status-col">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Avg Throughput (rps)</th>
+                                    <th>Avg Availability(%)</th>
+                                    <th>Avg Response Time (ms)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of applicationRows; trackBy: trackByIndex"
+                                    [ngClass]="{'linked-row': canOpenApplicationRow(row)}"
+                                    (click)="openApplicationRow(row)"
+                                    [tooltip]="canOpenApplicationRow(row) ? 'Open linked page' : ''" container="body">
+                                    <td>{{row.name}}</td>
+                                    <td>{{row.throughput}}</td>
+                                    <td>{{row.availability}}</td>
+                                    <td>{{row.responseTime}}</td>
+                                    <td><i class="fa status-icon" [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="dashboard-card table-card services-overview-card">
+                <div class="dashboard-card table-card services-overview-card" *ngIf="hasServiceRows">
                     <app-spinner [name]="loaderNames.services" [width]="0"></app-spinner>
                     <app-spinner [name]="loaderNames.serviceApplications" [width]="0"></app-spinner>
                     <div class="card-title-row service-title-row">
@@ -332,53 +320,52 @@
                             <select class="form-control form-control-sm" [value]="selectedServiceApplicationId"
                                 (change)="onServiceApplicationChange($event)" [disabled]="!serviceApplicationOptions.length">
                                 <option *ngFor="let app of serviceApplicationOptions; trackBy: trackByIndex" [value]="app.value">{{app.label}}</option>
-                                <option *ngIf="!serviceApplicationOptions.length" value="">No applications</option>
                             </select>
                         </div>
                     </div>
-                    <table class="dashboard-table compact-table services-overview-table">
-                        <colgroup>
-                            <col class="service-name-col">
-                            <col class="service-throughput-col">
-                            <col class="service-availability-col">
-                            <col class="service-response-col">
-                            <col class="service-status-col">
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th>Service Name</th>
-                                <th>Throughput (rps)</th>
-                                <th>Availability (%)</th>
-                                <th>Response Time (ms)</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let row of serviceRows; trackBy: trackByIndex"
-                                [ngClass]="{'linked-row': canOpenServiceRow(row)}"
-                                (click)="openServiceRow(row)"
-                                [tooltip]="canOpenServiceRow(row) ? 'Open linked page' : ''" container="body">
-                                <td>{{row.name}}</td>
-                                <td>{{row.throughput}}</td>
-                                <td>{{row.availability}}</td>
-                                <td>{{row.responseTime}}</td>
-                                <td><i class="fa status-icon" [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
-                            </tr>
-                            <tr *ngIf="!serviceRows.length">
-                                <td colspan="5" class="empty-table-cell">No services found.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="monitoring-table-scroll">
+                        <table class="dashboard-table compact-table services-overview-table" *ngIf="serviceRows.length">
+                            <colgroup>
+                                <col class="service-name-col">
+                                <col class="service-throughput-col">
+                                <col class="service-availability-col">
+                                <col class="service-response-col">
+                                <col class="service-status-col">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>Service Name</th>
+                                    <th>Throughput (rps)</th>
+                                    <th>Availability (%)</th>
+                                    <th>Response Time (ms)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let row of serviceRows; trackBy: trackByIndex"
+                                    [ngClass]="{'linked-row': canOpenServiceRow(row)}"
+                                    (click)="openServiceRow(row)"
+                                    [tooltip]="canOpenServiceRow(row) ? 'Open linked page' : ''" container="body">
+                                    <td>{{row.name}}</td>
+                                    <td>{{row.throughput}}</td>
+                                    <td>{{row.availability}}</td>
+                                    <td>{{row.responseTime}}</td>
+                                    <td><i class="fa status-icon" [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-        <div class="two-column-grid mt-2">
-            <div class="dashboard-card table-card monitoring-table-card">
+        <div class="two-column-grid mt-2" *ngIf="hasMonitoringTableSection"
+            [ngClass]="{'single-widget-grid': !(hasDatabaseRows && hasOsRows)}">
+            <div class="dashboard-card table-card monitoring-table-card" *ngIf="hasDatabaseRows">
                 <app-spinner [name]="loaderNames.databases" [width]="0"></app-spinner>
                 <div class="card-title-row linked-widget-title" (click)="openDatabaseMonitoring()"
                     [tooltip]="'Open linked page'" container="body">Database Monitoring</div>
                 <div class="monitoring-table-scroll">
-                    <table class="dashboard-table compact-table">
+                    <table class="dashboard-table compact-table" *ngIf="databaseRows.length">
                         <thead>
                             <tr>
                                 <th>Database Type</th>
@@ -396,18 +383,15 @@
                                         [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
                                 <td>{{row.queries}}</td>
                             </tr>
-                            <tr *ngIf="!databaseRows.length">
-                                <td colspan="4" class="empty-table-cell">No databases found.</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="dashboard-card table-card monitoring-table-card">
+            <div class="dashboard-card table-card monitoring-table-card" *ngIf="hasOsRows">
                 <app-spinner [name]="loaderNames.os" [width]="0"></app-spinner>
                 <div class="card-title-row">OS Monitoring</div>
                 <div class="monitoring-table-scroll">
-                    <table class="dashboard-table compact-table">
+                    <table class="dashboard-table compact-table" *ngIf="osRows.length">
                         <thead>
                             <tr>
                                 <th>Database Type</th>
@@ -421,79 +405,69 @@
                                 <td>{{row.count}}</td>
                                 <td>{{row.eolDate}}</td>
                             </tr>
-                            <tr *ngIf="!osRows.length">
-                                <td colspan="3" class="empty-table-cell">No operating systems found.</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-            <div class="dashboard-card performance-card mt-3">
+            <div class="dashboard-card performance-card mt-3" *ngIf="hasPerformanceSection">
                 <app-spinner [name]="loaderNames.bandwidthBar" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.bandwidthLine" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.platformPerformance" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.performanceMetrics" [width]="0"></app-spinner>
                 <div class="card-title-row">Infrastructure / Platform Performance</div>
-                <div class="performance-chart-grid">
-                    <div class="inner-chart-card">
+                <div class="performance-chart-grid adaptive-widget-grid" *ngIf="hasBandwidthBar || hasBandwidthLine || hasPlatformPerformance">
+                    <div class="inner-chart-card" *ngIf="hasBandwidthBar">
                         <div class="chart-title">Avg Network Bandwidth Usage (%)</div>
                         <div echarts [options]="bandwidthBarOptions"
                             class="small-chart" *ngIf="hasChartData(bandwidthBarOptions)"></div>
-                        <div class="dashboard-empty-state small-chart" *ngIf="!hasChartData(bandwidthBarOptions)">No bandwidth usage data available.</div>
                     </div>
-                    <div class="inner-chart-card">
+                    <div class="inner-chart-card" *ngIf="hasBandwidthLine">
                         <div class="chart-title">Avg Network Bandwidth Usage (%)</div>
                         <div echarts [options]="bandwidthLineOptions"
                             class="small-chart" *ngIf="hasChartData(bandwidthLineOptions)"></div>
-                        <div class="dashboard-empty-state small-chart" *ngIf="!hasChartData(bandwidthLineOptions)">No bandwidth trend data available.</div>
                     </div>
-                    <div class="inner-chart-card">
+                    <div class="inner-chart-card" *ngIf="hasPlatformPerformance">
                         <div class="chart-title">Infrastructure / Platform Performance</div>
                         <div echarts [options]="platformPerformanceOptions" (chartInit)="onPlatformPerformanceChartInit($event)"
                             class="small-chart" *ngIf="hasChartData(platformPerformanceOptions)"></div>
-                        <div class="dashboard-empty-state small-chart" *ngIf="!hasChartData(platformPerformanceOptions)">No platform performance data available.</div>
                     </div>
                 </div>
-                <div class="performance-metrics">
+                <div class="performance-metrics" *ngIf="hasPerformanceMetrics">
                     <div class="summary-metric" *ngFor="let metric of performanceMetrics; trackBy: trackByIndex">
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                     </div>
-                    <div class="dashboard-empty-state" *ngIf="!performanceMetrics.length">No performance metrics available.</div>
                 </div>
             </div>
 
-        <div class="section-title mt-3">Analytics &amp; Health Charts</div>
-        <div class="analytics-grid">
-            <div class="dashboard-card analytics-card">
+        <div class="section-title mt-3" *ngIf="hasAnalyticsSection">Analytics &amp; Health Charts</div>
+        <div class="analytics-grid adaptive-widget-grid" *ngIf="hasAnalyticsSection">
+            <div class="dashboard-card analytics-card" *ngIf="hasDeviceAvailability">
                 <app-spinner [name]="loaderNames.deviceAvailability" [width]="0"></app-spinner>
                 <div class="chart-title">Device Availability</div>
                 <div echarts [options]="deviceAvailabilityOptions"
                     class="analytics-chart" *ngIf="hasChartData(deviceAvailabilityOptions)"></div>
-                <div class="dashboard-empty-state analytics-chart" *ngIf="!hasChartData(deviceAvailabilityOptions)">No device availability data available.</div>
             </div>
-            <div class="dashboard-card analytics-card">
+            <div class="dashboard-card analytics-card" *ngIf="hasAvailabilityCategory">
                 <app-spinner [name]="loaderNames.availabilityCategory" [width]="0"></app-spinner>
                 <div class="chart-title">Availability By Category %</div>
                 <div echarts [options]="availabilityCategoryOptions" (chartInit)="onAvailabilityCategoryChartInit($event)"
                     class="analytics-chart linked-chart" *ngIf="hasChartData(availabilityCategoryOptions)"></div>
-                <div class="dashboard-empty-state analytics-chart" *ngIf="!hasChartData(availabilityCategoryOptions)">No availability category data available.</div>
             </div>
-            <div class="dashboard-card analytics-card">
+            <div class="dashboard-card analytics-card" *ngIf="hasAlertTrend">
                 <app-spinner [name]="loaderNames.alertTrend" [width]="0"></app-spinner>
                 <div class="chart-title linked-widget-title" (click)="openAlerts()" [tooltip]="'Open linked page'"
                     container="body">Alert Trend -- 7 Days</div>
                 <div echarts [options]="alertTrendOptions" (chartInit)="onAlertTrendChartInit($event)"
                     class="analytics-chart linked-chart" *ngIf="hasChartData(alertTrendOptions)"></div>
-                <div class="dashboard-empty-state analytics-chart" *ngIf="!hasChartData(alertTrendOptions)">No alert trend data available.</div>
             </div>
         </div>
 
-            <div class="section-title mt-3 linked-widget-title" (click)="openAlerts()" [tooltip]="'Open linked page'"
+            <div class="section-title mt-3 linked-widget-title" *ngIf="hasAlertsSection" (click)="openAlerts()" [tooltip]="'Open linked page'"
                 container="body">Alerts</div>
-            <div class="dashboard-card alerts-card">
+            <div class="dashboard-card alerts-card" *ngIf="hasAlertsSection">
                 <app-spinner [name]="loaderNames.alertReduction" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.alertResponse" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.alertSourceSankey" [width]="0"></app-spinner>
@@ -537,23 +511,22 @@
                         <div class="metric-value tone-primary">{{metric.value}}</div>
                     </div>
                 </div>
-                <div class="dashboard-empty-state alert-metrics-empty" *ngIf="!alertReductionMetrics.length && !alertResponseMetrics.length">No alert metrics available.</div>
-                <div class="sankey-grid">
-                    <div>
+                <div class="sankey-grid" *ngIf="hasAlertSourceSankey || hasAlertLifecycleSankey"
+                    [ngClass]="{'single-widget-grid': !(hasAlertSourceSankey && hasAlertLifecycleSankey)}">
+                    <div *ngIf="hasAlertSourceSankey">
                         <div echarts [options]="alertSourceSankeyOptions" (chartInit)="onAlertSankeyChartInit($event)"
                             class="sankey-chart linked-chart" *ngIf="hasChartData(alertSourceSankeyOptions)"></div>
-                        <div class="dashboard-empty-state sankey-chart" *ngIf="!hasChartData(alertSourceSankeyOptions)">No alert source data available.</div>
                     </div>
-                    <div>
+                    <div *ngIf="hasAlertLifecycleSankey">
                         <div echarts [options]="alertLifecycleSankeyOptions" (chartInit)="onAlertSankeyChartInit($event)"
                             class="sankey-chart linked-chart" *ngIf="hasChartData(alertLifecycleSankeyOptions)"></div>
-                        <div class="dashboard-empty-state sankey-chart" *ngIf="!hasChartData(alertLifecycleSankeyOptions)">No alert lifecycle data available.</div>
                     </div>
                 </div>
             </div>
 
-        <div class="orphaned-widgets-grid mt-3">
-            <div class="dashboard-card orphaned-device-card">
+        <div class="orphaned-widgets-grid mt-3" *ngIf="hasOrphanedDevices || hasOrphanedByCategory"
+            [ngClass]="{'single-widget-grid': !(hasOrphanedDevices && hasOrphanedByCategory)}">
+            <div class="dashboard-card orphaned-device-card" *ngIf="hasOrphanedDevices">
                 <div class="orphaned-widget-header">
                     <div class="subsection-title mb-0">
                         <span class="badge badge-secondary orphaned-count-badge">{{orphanedDevicesTotal}}</span>
@@ -586,7 +559,6 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="text-center text-muted orphaned-list-empty-state" *ngIf="!orphanedDevices.length">No orphaned devices to display.</div>
                 </div>
                 <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
                     <div class="orphaned-page-size">
@@ -604,7 +576,7 @@
                 </div>
             </div>
 
-            <div class="dashboard-card orphaned-category-card">
+            <div class="dashboard-card orphaned-category-card" *ngIf="hasOrphanedByCategory">
                 <div class="orphaned-widget-header">
                     <div class="subsection-title mb-0">Orphaned by Category</div>
                 </div>
@@ -613,7 +585,6 @@
                     <div echarts [options]="orphanedByCategoryOptions"
                         class="orphaned-category-chart"
                         *ngIf="orphanedByCategoryHasData"></div>
-                    <div class="orphaned-category-empty" *ngIf="!orphanedByCategoryHasData">No orphaned category data to display.</div>
                     <div class="orphaned-category-legend" *ngIf="orphanedByCategoryHasData">
                         <div class="orphaned-category-legend-item"
                             *ngFor="let item of orphanedByCategory; trackBy: trackByIndex">
@@ -626,8 +597,9 @@
             </div>
         </div>
 
-        <div class="idle-widgets-grid mt-3">
-            <div class="dashboard-card idle-device-card">
+        <div class="idle-widgets-grid mt-3" *ngIf="hasIdleDevices || hasIdleDuration"
+            [ngClass]="{'single-widget-grid': !(hasIdleDevices && hasIdleDuration)}">
+            <div class="dashboard-card idle-device-card" *ngIf="hasIdleDevices">
                 <div class="orphaned-widget-header">
                     <div class="subsection-title mb-0">
                         <span class="badge badge-secondary orphaned-count-badge">{{idleDevicesTotal}}</span>
@@ -687,7 +659,6 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="text-center text-muted idle-list-empty-state" *ngIf="!idleDevices.length">No idle devices to display.</div>
                 </div>
                 <div class="idle-pagination-row" *ngIf="idleDevices.length">
                     <div class="idle-page-size">
@@ -705,7 +676,7 @@
                 </div>
             </div>
 
-            <div class="dashboard-card idle-duration-card">
+            <div class="dashboard-card idle-duration-card" *ngIf="hasIdleDuration">
                 <div class="orphaned-widget-header">
                     <div class="subsection-title mb-0">Idle duration distribution</div>
                 </div>
@@ -727,17 +698,16 @@
                         <div echarts [options]="idleDurationOptions"
                             class="idle-duration-chart"></div>
                     </div>
-                    <div class="dashboard-empty-state idle-duration-empty" *ngIf="!idleDurationHasData">No idle duration data to display.</div>
                 </div>
             </div>
         </div>
 
-        <div class="section-title mt-3 linked-widget-title" (click)="openRecentAlerts()" [tooltip]="'Open linked page'"
+        <div class="section-title mt-3 linked-widget-title" *ngIf="hasRecentAlertsSection" (click)="openRecentAlerts()" [tooltip]="'Open linked page'"
             container="body">Recent Alerts</div>
-        <div class="dashboard-card recent-alerts-card">
+        <div class="dashboard-card recent-alerts-card" *ngIf="hasRecentAlertsSection">
             <app-spinner [name]="loaderNames.recentAlertSummary" [width]="0"></app-spinner>
             <app-spinner [name]="loaderNames.recentAlerts" [width]="0"></app-spinner>
-            <div class="recent-alert-summary">
+            <div class="recent-alert-summary" *ngIf="hasRecentAlertSummary">
                 <div class="recent-alert-summary-metric linked-widget"
                     *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex"
                     (click)="openRecentAlerts()" [tooltip]="'Open linked page'" container="body">
@@ -745,8 +715,8 @@
                     <strong [ngClass]="getToneClass(metric.tone)">{{metric.value}}</strong>
                 </div>
             </div>
-            <div class="recent-alert-table-wrap">
-                <table class="dashboard-table recent-alert-table">
+            <div class="recent-alert-table-wrap" *ngIf="hasRecentAlerts">
+                <table class="dashboard-table recent-alert-table" *ngIf="recentAlerts.length">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -771,28 +741,25 @@
                             <td>{{alert.acknowledged}}</td>
                             <td>{{alert.duration}}</td>
                         </tr>
-                        <tr *ngIf="!recentAlerts.length">
-                            <td colspan="7" class="empty-table-cell">No recent alerts to display.</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <div class="section-title mt-3 linked-widget-title" (click)="openAutoRemediation()"
+        <div class="section-title mt-3 linked-widget-title" *ngIf="hasRemediationSection" (click)="openAutoRemediation()"
             [tooltip]="'Open linked page'" container="body">Auto-Remediation Summary</div>
-        <div class="dashboard-card remediation-card">
+        <div class="dashboard-card remediation-card adaptive-widget-grid" *ngIf="hasRemediationSection">
             <app-spinner [name]="loaderNames.remediationDonut" [width]="0"></app-spinner>
             <app-spinner [name]="loaderNames.remediationActions" [width]="0"></app-spinner>
             <app-spinner [name]="loaderNames.remediationSummary" [width]="0"></app-spinner>
             <app-spinner [name]="loaderNames.remediationMetrics" [width]="0"></app-spinner>
-            <div class="remediation-left">
-                <div class="remediation-donut-wrap">
+            <div class="remediation-left" *ngIf="hasRemediationDonut || hasRemediationSummary"
+                [ngClass]="{'single-widget-grid': !(hasRemediationDonut && hasRemediationSummary)}">
+                <div class="remediation-donut-wrap" *ngIf="hasRemediationDonut">
                     <div echarts [options]="remediationDonutOptions" (chartInit)="onRemediationChartInit($event)"
                         class="remediation-donut linked-chart" *ngIf="hasChartData(remediationDonutOptions)"></div>
-                    <div class="dashboard-empty-state remediation-donut-empty" *ngIf="!hasChartData(remediationDonutOptions)">No remediation summary chart available.</div>
                 </div>
-                <div class="remediation-summary" *ngIf="remediationSummary.length">
+                <div class="remediation-summary" *ngIf="hasRemediationSummary">
                     <div class="remediation-legend">
                         <span class="remediation-legend-item linked-widget" *ngFor="let metric of remediationSummary | slice:0:2; trackBy: trackByIndex"
                             (click)="openAutoRemediation()" [tooltip]="'Open linked page'" container="body">
@@ -808,23 +775,22 @@
                         <span *ngIf="remediationSummary[3] as durationMetric">{{durationMetric.label}}: {{durationMetric.value}}</span>
                     </div>
                 </div>
-                <div class="dashboard-empty-state remediation-summary-empty" *ngIf="!remediationSummary.length">No remediation summary available.</div>
             </div>
-            <div class="remediation-actions">
+            <div class="remediation-actions" *ngIf="hasRemediationActions">
                 <div class="chart-title linked-widget-title" (click)="openAutoRemediation()"
                     [tooltip]="'Open linked page'" container="body">Top Auto-Remediation Actions</div>
                 <div echarts [options]="remediationActionsOptions" (chartInit)="onRemediationChartInit($event)"
                     class="remediation-chart linked-chart" *ngIf="hasChartData(remediationActionsOptions)"></div>
-                <div class="dashboard-empty-state remediation-chart" *ngIf="!hasChartData(remediationActionsOptions)">No remediation action data available.</div>
             </div>
-            <div class="remediation-metric-card">
+            <div class="remediation-metric-card" *ngIf="hasRemediationMetrics">
                 <div class="remediation-metric linked-widget" *ngFor="let metric of remediationMetrics; trackBy: trackByIndex"
                     (click)="openAutoRemediation()" [tooltip]="'Open linked page'" container="body">
                     <div class="metric-label">{{metric.label}}</div>
                     <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                 </div>
-                <div class="dashboard-empty-state" *ngIf="!remediationMetrics.length">No remediation metrics available.</div>
             </div>
         </div>
+        </ng-container>
     </div>
 </div>
+<aiml-alert-details></aiml-alert-details>

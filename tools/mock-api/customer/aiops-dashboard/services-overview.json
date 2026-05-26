@@ -1,47 +1,122 @@
 [
-  {
-    "status": "healthy",
-    "response_time_ms": 0,
-    "name": "Shipping",
-    "throughput_rps": 0.01,
-    "availability_pct": null,
-    "id": 1,
-    "application_id": 7
-  },
-  {
-    "status": "unknown",
-    "response_time_ms": 0,
-    "name": "Product-Catalog",
-    "throughput_rps": 0.13,
-    "availability_pct": null,
-    "id": 2,
-    "application_id": 7
-  },
-  {
-    "status": "critical",
-    "response_time_ms": 0,
-    "name": "Accounting",
-    "throughput_rps": 0.01,
-    "availability_pct": null,
-    "id": 3,
-    "application_id": 7
-  },
-  {
-    "status": "ok",
-    "response_time_ms": 0,
-    "name": "Recommendation",
-    "throughput_rps": 0.13,
-    "availability_pct": null,
-    "id": 4,
-    "application_id": 7
-  },
-  {
-    "status": "up",
-    "response_time_ms": 0,
-    "name": "Checkout",
-    "throughput_rps": 0.01,
-    "availability_pct": null,
-    "id": 5,
-    "application_id": 7
-  }
+    {
+        "status": "unknown",
+        "name": "payment",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 200,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "kafka",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 207,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "shipping",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 205,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "accounting",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 192,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "ad",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 193,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "product-catalog",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 201,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "product-reviews",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 202,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "checkout",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 195,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "quote",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 203,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "recommendation",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 204,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "currency",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 196,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "email",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 197,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "fraud-detection",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 198,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "load-generator",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 199,
+        "response_time_ms": null
+    },
+    {
+        "status": "unknown",
+        "name": "cart",
+        "throughput_rps": null,
+        "availability_pct": null,
+        "id": 194,
+        "response_time_ms": null
+    }
 ]

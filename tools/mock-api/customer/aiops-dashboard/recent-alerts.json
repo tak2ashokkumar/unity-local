@@ -1,99 +1,509 @@
 {
-  "alert_summary": {
-    "critical_alerts": 24,
-    "warning_alerts": 67,
-    "info_alerts": 79
-  },
-  "alerts": [
-    {
-      "id": "1744",
-      "device_name": "UL_Switch_Disk",
-      "severity": "critical",
-      "description": "Ethernet has changed...",
-      "source": "Unity",
-      "acknowledged": true,
-      "duration": "34s"
+    "severity_summary": {
+        "critical": 235201,
+        "warning": 235201,
+        "info": 235201
     },
-    {
-      "id": "1746",
-      "device_name": "UL_Switch_Test",
-      "severity": "critical",
-      "description": "Ethernet has changed...",
-      "source": "Unity",
-      "acknowledged": false,
-      "duration": "36s"
-    },
-    {
-      "id": "2319",
-      "device_name": "UL_Firewall_Test",
-      "severity": "critical",
-      "description": "High bandwidth usag...",
-      "source": "Unity",
-      "acknowledged": false,
-      "duration": "39s"
-    },
-    {
-      "id": "6644",
-      "device_name": "UL_Switch_AT",
-      "severity": "warning",
-      "description": "Device has been repla...",
-      "source": "Zabbix",
-      "acknowledged": true,
-      "duration": "01m"
-    },
-    {
-      "id": "9956",
-      "device_name": "UL_LoadBalancer_09",
-      "severity": "warning",
-      "description": "System name has bee...",
-      "source": "Nagios",
-      "acknowledged": false,
-      "duration": "02m 44s"
-    },
-    {
-      "id": "1470",
-      "device_name": "UL_Router_AT",
-      "severity": "warning",
-      "description": "Device has been repla...",
-      "source": "Unity",
-      "acknowledged": true,
-      "duration": "08m 56s"
-    },
-    {
-      "id": "7452",
-      "device_name": "UL_LoadBalancer_04",
-      "severity": "critical",
-      "description": "Interface Link down...",
-      "source": "Nagios",
-      "acknowledged": true,
-      "duration": "10m 15s"
-    },
-    {
-      "id": "2354",
-      "device_name": "UL_Switch_BT",
-      "severity": "warning",
-      "description": "Interface : High error...",
-      "source": "Unity",
-      "acknowledged": false,
-      "duration": "20m 13s"
-    },
-    {
-      "id": "0996",
-      "device_name": "UL_Firewall_007",
-      "severity": "critical",
-      "description": "Unavailable by ICMP...",
-      "source": "Nagios",
-      "acknowledged": false,
-      "duration": "01h 09m"
-    },
-    {
-      "id": "0994",
-      "device_name": "UL_Firewall_007",
-      "severity": "critical",
-      "description": "Unavailable by ICMP...",
-      "source": "Zabbix",
-      "acknowledged": true,
-      "duration": "01h 09m"
-    }
-  ]
+    "alerts": [
+        {
+            "id": 1033733,
+            "uuid": "e8fe7d2d-d55d-486c-8e24-bb3236a79f85",
+            "name": "",
+            "severity": null,
+            "description": "",
+            "source": null,
+            "acknowledged": false,
+            "duration": null
+        },
+        {
+            "id": 1033696,
+            "uuid": "de415958-e4fe-4007-a441-391a98d7f968",
+            "name": "",
+            "severity": null,
+            "description": "",
+            "source": null,
+            "acknowledged": false,
+            "duration": null
+        },
+        {
+            "id": 1168107,
+            "uuid": "e9a4e894-db6b-44a5-a951-6dd24e8fa1d5",
+            "name": "genai-genie-documents",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "5m"
+        },
+        {
+            "id": 1168109,
+            "uuid": "2be5ca3d-da46-4593-83bf-2549948a7e09",
+            "name": "testgeneratedcodewithagents",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "5m"
+        },
+        {
+            "id": 1168108,
+            "uuid": "37726d39-bf73-4b15-b6c5-1f66fbdcad17",
+            "name": "monotomicro-assetbucket-bvwqaki7dpoc",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "5m"
+        },
+        {
+            "id": 1168106,
+            "uuid": "8acd123c-4728-46c6-ae53-c4689776397a",
+            "name": "cloudstudio-tf-state",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "6m"
+        },
+        {
+            "id": 1168094,
+            "uuid": "ef42ee4b-a421-47ba-867c-a201b8bef8a7",
+            "name": "aimlnewbucket",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168098,
+            "uuid": "84d905ad-931d-408f-889b-99673c402b8a",
+            "name": "awscostoptapis",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168100,
+            "uuid": "e663110b-7fb2-464d-9876-39bf798c4b72",
+            "name": "code-component-bucket",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168099,
+            "uuid": "d12c4893-8b4a-414a-ac00-a57a88c00cf7",
+            "name": "cdk-hnb659fds-assets-667811466675-us-east-1",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168104,
+            "uuid": "b6676528-3a8d-49f4-b356-a8e4f7a0b7cf",
+            "name": "saraav-nfs-test-001",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168105,
+            "uuid": "66183e5a-5366-4c50-ae47-288c1036356a",
+            "name": "testgeneratedcodewithagents",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168097,
+            "uuid": "d5f7e0e3-6f01-4cc3-9f8c-7f7d80af18e2",
+            "name": "aws-codestar-us-east-2-667811466675-test-app",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168102,
+            "uuid": "b47470c5-0381-4fda-8243-16deac9372af",
+            "name": "monotomicro-uibucket-1xquk7hyjlka",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168096,
+            "uuid": "ba259b6d-4215-409f-aa68-2e26a8e9f231",
+            "name": "aws-codestar-us-east-2-667811466675-devnxttest-pipe",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168101,
+            "uuid": "7cdd4e0f-df18-485b-97c9-653817a91d1b",
+            "name": "monotomicro-assetbucket-bvwqaki7dpoc",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168095,
+            "uuid": "425960ed-6937-43cc-b123-08168f70dd52",
+            "name": "aws-cloudtrail-logs-667811466675-ecs-ctp-prod",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168103,
+            "uuid": "91bf23ca-effc-45bf-9783-78f5909de80d",
+            "name": "s3fromeks",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "7m"
+        },
+        {
+            "id": 1168092,
+            "uuid": "a3b96b7f-b8b5-4128-8a89-29b171be22aa",
+            "name": "shubham-demo-s3-bucket-01",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "8m"
+        },
+        {
+            "id": 1168093,
+            "uuid": "5484d2aa-c20d-490a-8a97-0b9f95183ad0",
+            "name": "xops-frontend-bucket",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "8m"
+        },
+        {
+            "id": 1168088,
+            "uuid": "b7bad75c-12a2-4dbb-8774-501e6551b31d",
+            "name": "cotoolstack-cotool-ujl0k36ypjau",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "8m"
+        },
+        {
+            "id": 1168089,
+            "uuid": "5f81fd3a-c48f-4579-a73e-4a8018a6fc7f",
+            "name": "elasticbeanstalk-us-west-1-667811466675",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "8m"
+        },
+        {
+            "id": 1168087,
+            "uuid": "e36c0f91-78a4-4f97-b25b-8500f82bc053",
+            "name": "cloudmigrationreports-gcp",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "8m"
+        },
+        {
+            "id": 1168090,
+            "uuid": "97a1019f-d021-4618-a146-02c359e743ed",
+            "name": "i-0270488ebdd19d936",
+            "severity": "Warning",
+            "description": "AWS EC2: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "8m"
+        },
+        {
+            "id": 1168091,
+            "uuid": "d8ccd995-1465-4c2c-a9a5-8f0bd1bbb3c7",
+            "name": "SDX-COE-SFRM-LEAF05",
+            "severity": "Warning",
+            "description": "Interface Ethernet1/36(): Link down",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "11m"
+        },
+        {
+            "id": 1168080,
+            "uuid": "b37f909d-de6c-4456-a567-549906c39efa",
+            "name": "i-05b0ff85d8eac4ba9",
+            "severity": "Warning",
+            "description": "AWS EC2: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "12m"
+        },
+        {
+            "id": 1168082,
+            "uuid": "75ab7c42-8fb6-4805-8ec0-9b3bc5c2037b",
+            "name": "multcloudaws",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "12m"
+        },
+        {
+            "id": 1168064,
+            "uuid": "e988d748-aa47-452a-a53a-31e5c486e9c7",
+            "name": "Application-IIS",
+            "severity": "Critical",
+            "description": "synthetic.response.time : Critical : Problem with HTTP response time for Application-IIS(http://172.17.229.18) being monitored from NxtGen-SDX-Discovery-1, the response time is 50 ms which breaches the configured threshold(Critical: >= 50, Warning: >= 30)",
+            "source": "OpsRamp",
+            "acknowledged": false,
+            "duration": "12m"
+        },
+        {
+            "id": 1168081,
+            "uuid": "7faed883-6635-4385-b83a-a0980ba2e998",
+            "name": "i-0efc211e536b36d6e",
+            "severity": "Warning",
+            "description": "AWS EC2: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "13m"
+        },
+        {
+            "id": 1168075,
+            "uuid": "205bfa69-4fff-4b82-b967-5315ce72a562",
+            "name": "cotoolstack-cotool-ujl0k36ypjau",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "13m"
+        },
+        {
+            "id": 1168083,
+            "uuid": "4da1f7fc-0e79-4dac-b5bc-b8ec86ea9f36",
+            "name": "mywintelbucket",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168086,
+            "uuid": "69de0acb-a573-4689-ae17-a855a25db98e",
+            "name": "www.trouvaille.in",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168074,
+            "uuid": "ed0a1d32-aa9f-4327-be64-de3b14ef7314",
+            "name": "cmsprodlbaccesslogs",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168078,
+            "uuid": "464c8e91-7e0b-435f-b949-f0abf327d5fc",
+            "name": "diaass3dataset",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168079,
+            "uuid": "d2fa7722-23b2-4908-abab-123b2023e8ba",
+            "name": "elasticbeanstalk-us-east-1-667811466675",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168073,
+            "uuid": "323b5730-f204-42eb-b9c8-d2bc2ef55108",
+            "name": "aws-codestar-us-east-2-667811466675-aklspring-pipe",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168076,
+            "uuid": "6e9d94db-095f-4e56-807a-50024ab1801b",
+            "name": "ctp-amt",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168084,
+            "uuid": "f85b02ac-510c-419f-8982-edc80ac08e77",
+            "name": "saraav-nfs-test-001",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168085,
+            "uuid": "f72531f0-ba3d-41a3-b27a-3fa33e4f2625",
+            "name": "vphrase",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "14m"
+        },
+        {
+            "id": 1168077,
+            "uuid": "afa3431a-574b-4ed9-b0cc-acebd3ab85f4",
+            "name": "db-E6Y6DUJA3DU3GWEQLMR6HFXCS4",
+            "severity": "Warning",
+            "description": "AWS RDS: Failed to get events data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "15m"
+        },
+        {
+            "id": 1168069,
+            "uuid": "4c1fade3-dbea-40d6-821f-7e596d4e33da",
+            "name": "awscostoptapis",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "16m"
+        },
+        {
+            "id": 1168070,
+            "uuid": "2b014c0a-c924-4771-9930-ec841118d522",
+            "name": "cloudmigrationreports-gcp",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "16m"
+        },
+        {
+            "id": 1168072,
+            "uuid": "c57c5e2b-db41-4470-a8dd-a48afdf4b3ed",
+            "name": "code-component-bucket-2",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "16m"
+        },
+        {
+            "id": 1168071,
+            "uuid": "a102b19c-ad5e-4659-889e-02eb4c54067b",
+            "name": "cmp-pipeline",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "16m"
+        },
+        {
+            "id": 1168068,
+            "uuid": "f3492b39-5a73-48e4-906a-06f8b3137c5f",
+            "name": "vphrase",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "21m"
+        },
+        {
+            "id": 1168066,
+            "uuid": "833709f1-3b47-40eb-8813-8172c88e7924",
+            "name": "aws-codestar-us-east-2-667811466675-test-app",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "21m"
+        },
+        {
+            "id": 1168067,
+            "uuid": "6d184e99-9c81-4cba-ada3-74a0ca1e840e",
+            "name": "cloudstudio-tf-state",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "21m"
+        },
+        {
+            "id": 1168060,
+            "uuid": "c6dfe429-5856-4546-bf7f-177a3a36fee5",
+            "name": "wipro-ai-production",
+            "severity": "Warning",
+            "description": "AWS ECS Cluster: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "21m"
+        },
+        {
+            "id": 1168056,
+            "uuid": "e316ec1a-86a1-46ad-a5ae-619d6e0b8ab0",
+            "name": "aws-codestar-us-east-2-667811466675-devnxttest-pipe",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "22m"
+        },
+        {
+            "id": 1168059,
+            "uuid": "19fb7c48-5749-4b42-9e43-53f43118bda0",
+            "name": "genai-genie-documents",
+            "severity": "Warning",
+            "description": "AWS S3: Failed to get alarms data",
+            "source": "Unity",
+            "acknowledged": false,
+            "duration": "22m"
+        }
+    ]
 }

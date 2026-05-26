@@ -174,6 +174,18 @@
   background: #f4f3ef;
 }
 
+.dashboard-no-data-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+  color: #6c757d;
+  font-size: 14px;
+  text-align: center;
+  background: #f4f3ef;
+}
+
 .section-title {
   color: #1e252c;
   font-size: 16px;
@@ -369,6 +381,13 @@
   gap: 10px;
 }
 
+.two-column-grid.single-widget-grid,
+.orphaned-widgets-grid.single-widget-grid,
+.idle-widgets-grid.single-widget-grid,
+.sankey-grid.single-widget-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .chart-card {
   min-height: 300px;
   padding: 14px 14px 10px;
@@ -401,12 +420,15 @@
   overflow: hidden;
 }
 
+.application-overview-card,
+.services-overview-card,
 .monitoring-table-card {
+  height: 264px;
   min-height: 264px;
 }
 
 .monitoring-table-scroll {
-  max-height: 220px;
+  height: 220px;
   overflow-y: auto;
 }
 
@@ -945,6 +967,10 @@
   padding: 8px 0;
 }
 
+.performance-chart-grid.adaptive-widget-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .inner-chart-card {
   min-height: 164px;
   border: 1px solid #cbd3da;
@@ -975,6 +1001,10 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+}
+
+.analytics-grid.adaptive-widget-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .analytics-card {
@@ -1465,12 +1495,20 @@
   padding: 16px 28px 14px;
 }
 
+.remediation-card.adaptive-widget-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
 .remediation-left {
   display: grid;
   grid-template-columns: 150px minmax(0, 1fr);
   align-items: center;
   gap: 16px;
   min-width: 0;
+}
+
+.remediation-left.single-widget-grid {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .remediation-donut-wrap {
@@ -1627,11 +1665,14 @@
 
   .two-column-grid,
   .performance-chart-grid,
+  .performance-chart-grid.adaptive-widget-grid,
   .analytics-grid,
+  .analytics-grid.adaptive-widget-grid,
   .sankey-grid,
   .orphaned-widgets-grid,
   .idle-widgets-grid,
-  .remediation-card {
+  .remediation-card,
+  .remediation-card.adaptive-widget-grid {
     grid-template-columns: 1fr;
   }
 

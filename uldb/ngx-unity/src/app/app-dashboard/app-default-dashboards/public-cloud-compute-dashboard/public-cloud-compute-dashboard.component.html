@@ -78,9 +78,11 @@
     <div class="dashboard-no-data-state" *ngIf="filtersUnavailable">No data available</div>
 
     <div class="dashboard-content" *ngIf="filterForm && !filtersUnavailable">
-        <div class="section-title">Executive Summary / Cloud Inventory</div>
-        <div class="dashboard-card inventory-card">
-            <div class="summary-metrics">
+        <div class="dashboard-no-data-state" *ngIf="!hasAnyDashboardWidget">No data available</div>
+        <ng-container *ngIf="hasAnyDashboardWidget">
+        <div class="section-title" *ngIf="hasInventoryWidgets">Executive Summary / Cloud Inventory</div>
+        <div class="dashboard-card inventory-card" *ngIf="hasInventoryWidgets">
+            <div class="summary-metrics" *ngIf="hasSummaryMetrics">
                 <app-spinner [name]="loaderNames.summaryMetrics" [width]="0"></app-spinner>
                 <button type="button" class="summary-metric dashboard-link-surface"
                     *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex"
@@ -89,9 +91,9 @@
                     <div class="metric-value" [ngClass]="{'metric-primary': first}">{{metric.value}}</div>
                 </button>
             </div>
-            <div class="inventory-grid">
+            <div class="inventory-grid" *ngIf="hasProviderDistribution || hasTags">
                 <div class="provider-panel">
-                    <div class="provider-distribution-panel">
+                    <div class="provider-distribution-panel" *ngIf="hasProviderDistribution">
                         <app-spinner [name]="loaderNames.providerDistribution" [width]="0"></app-spinner>
                         <div class="widget-title">Cloud Provider Distribution</div>
                         <div echarts [options]="providerDistributionOptions" (chartInit)="onProviderDistributionChartInit($event)"
@@ -106,7 +108,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="tags-panel">
+                    <div class="tags-panel" *ngIf="hasTags">
                         <app-spinner [name]="loaderNames.tags" [width]="0"></app-spinner>
                         <div class="tags-title">Tags</div>
                         <div class="tag-list" *ngIf="tags.length">
@@ -115,16 +117,14 @@
                                 {{tag.name}} {{tag.count}}
                             </span>
                         </div>
-                        <div class="tags-empty-state" *ngIf="!tags.length">No tags associated</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="section-title">Compute Breakdown</div>
-        <div class="dashboard-card compute-card">
+        <div class="section-title" *ngIf="hasComputeBreakdown">Compute Breakdown</div>
+        <div class="dashboard-card compute-card" *ngIf="hasComputeBreakdown">
             <app-spinner [name]="loaderNames.computeBreakdown" [width]="0"></app-spinner>
-            <div class="compute-empty-state" *ngIf="!computeBreakdown.length">No compute data to display.</div>
             <div class="compute-provider" *ngFor="let provider of computeBreakdown; trackBy: trackByIndex">
                 <button type="button" class="provider-brand provider-link" [ngClass]="provider.brandClass"
                     (click)="openComputeProvider(provider)" [tooltip]="'Open linked page'" container="body">
@@ -139,8 +139,9 @@
             </div>
         </div>
 
-        <div class="orphaned-widgets-grid">
-            <div class="dashboard-card orphaned-device-card">
+        <div class="orphaned-widgets-grid" *ngIf="hasOrphanedDevices || hasOrphanedByCategory"
+            [ngClass]="{'single-widget-grid': !(hasOrphanedDevices && hasOrphanedByCategory)}">
+            <div class="dashboard-card orphaned-device-card" *ngIf="hasOrphanedDevices">
                 <div class="orphaned-widget-header">
                     <button type="button" class="subsection-title orphaned-title-link mb-0"
                         (click)="openOrphanedDevices()" [tooltip]="'Open linked page'" container="body">
@@ -174,8 +175,6 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="text-center text-muted orphaned-list-empty-state" *ngIf="!orphanedDevices.length">No orphaned devices to
-                        display.</div>
                 </div>
                 <div class="orphaned-pagination-row" *ngIf="orphanedDevices.length">
                     <div class="orphaned-page-size">
@@ -193,7 +192,7 @@
                 </div>
             </div>
 
-            <div class="dashboard-card orphaned-category-card">
+            <div class="dashboard-card orphaned-category-card" *ngIf="hasOrphanedByCategory">
                 <div class="orphaned-widget-header">
                     <div class="subsection-title mb-0">Orphaned by Category</div>
                 </div>
@@ -202,8 +201,6 @@
                     <div echarts [options]="orphanedByCategoryOptions" (chartInit)="onOrphanedCategoryChartInit($event)"
                         class="orphaned-category-chart chart-click-target"
                         *ngIf="orphanedByCategoryHasData"></div>
-                    <div class="orphaned-category-empty" *ngIf="!orphanedByCategoryHasData">No orphaned category data to
-                        display.</div>
                     <div class="orphaned-category-legend" *ngIf="orphanedByCategoryHasData">
                         <button type="button" class="orphaned-category-legend-item legend-link"
                             *ngFor="let item of orphanedByCategory; trackBy: trackByIndex"
@@ -218,8 +215,9 @@
             </div>
         </div>
 
-        <div class="idle-widgets-grid">
-            <div class="dashboard-card idle-device-card">
+        <div class="idle-widgets-grid" *ngIf="hasIdleDevices || hasIdleDuration"
+            [ngClass]="{'single-widget-grid': !(hasIdleDevices && hasIdleDuration)}">
+            <div class="dashboard-card idle-device-card" *ngIf="hasIdleDevices">
                 <div class="orphaned-widget-header">
                     <div class="subsection-title mb-0">
                         <span class="badge badge-secondary orphaned-count-badge">{{idleDevicesTotal}}</span>
@@ -281,7 +279,6 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="text-center text-muted idle-list-empty-state" *ngIf="!idleDevices.length">No idle devices to display.</div>
                 </div>
                 <div class="idle-pagination-row" *ngIf="idleDevices.length">
                     <div class="idle-page-size">
@@ -299,7 +296,7 @@
                 </div>
             </div>
 
-            <div class="dashboard-card idle-duration-card">
+            <div class="dashboard-card idle-duration-card" *ngIf="hasIdleDuration">
                 <div class="orphaned-widget-header">
                     <div class="subsection-title mb-0">Idle duration distribution</div>
                 </div>
@@ -320,13 +317,12 @@
                         </div>
                         <div echarts [options]="idleDurationOptions" class="idle-duration-chart"></div>
                     </div>
-                    <div class="idle-duration-empty-state" *ngIf="!idleDurationHasData">No idle duration data to display.</div>
                 </div>
             </div>
         </div>
-        <div class="section-title">Recent Alerts</div>
-        <div class="dashboard-card alert-card recent-alerts-card">
-            <div class="alert-summary">
+        <div class="section-title" *ngIf="hasRecentAlertSummary || hasRecentAlerts">Recent Alerts</div>
+        <div class="dashboard-card alert-card recent-alerts-card" *ngIf="hasRecentAlertSummary || hasRecentAlerts">
+            <div class="alert-summary" *ngIf="hasRecentAlertSummary">
                 <app-spinner [name]="loaderNames.recentAlertSummary" [width]="0"></app-spinner>
                 <button type="button" class="alert-summary-metric dashboard-link-surface"
                     *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex"
@@ -336,9 +332,9 @@
                 </button>
             </div>
 
-            <div class="table-responsive">
+            <div class="table-responsive" *ngIf="hasRecentAlerts">
                 <app-spinner [name]="loaderNames.recentAlerts" [width]="0"></app-spinner>
-                <table class="table table-sm alert-table mb-0">
+                <table class="table table-sm alert-table mb-0" *ngIf="recentAlerts.length">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -363,10 +359,10 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class="text-center text-muted recent-alerts-empty-state" *ngIf="!recentAlerts.length">No recent alerts to display.</div>
             </div>
         </div>
 
+        </ng-container>
     </div>
 </div>
 <aiml-alert-details></aiml-alert-details>
