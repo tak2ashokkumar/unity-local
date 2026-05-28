@@ -1642,7 +1642,7 @@ export class UnifiedAiopsCommandCentreService {
     return categoryData.filter(item => this.getOrphanedCategoryCount(item) > 0).map((item, index) => {
       const count = this.getOrphanedCategoryCount(item);
       return {
-        category: this.formatOrphanedCategoryLabel(this.getFirstOrphanedValue(item.category, item.name, item.label, item.display_name, item.type, item.resource_type)),
+        category: this.formatOrphanedCategoryLabel(this.getFirstOrphanedValue(item.group, item.category, item.name, item.label, item.display_name, item.type, item.resource_type)),
         count,
         percentage: this.getOrphanedCategoryPercentage(item, count, categoryTotal),
         color: UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS[index % UNIFIED_AIOPS_ORPHANED_CATEGORY_COLORS.length],
@@ -1652,7 +1652,6 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   convertToOrphanedByCategoryOptions(data: UnifiedAiopsOrphanedCategoryItem[]): EChartsOption {
-    const total = Number(data?.[0]?.totalCount || 0) || (data || []).reduce((sum, item) => sum + Number(item.count || 0), 0);
     return {
       color: (data || []).map(item => item.color),
       tooltip: {
@@ -1662,29 +1661,24 @@ export class UnifiedAiopsCommandCentreService {
       legend: {
         show: false
       },
-      graphic: [
-        {
-          type: 'text',
-          left: 'center',
-          top: 'center',
-          style: {
-            text: this.formatNumber(total),
-            fill: '#222222',
-            fontSize: 28,
-            fontWeight: 700
-          }
-        }
-      ],
       series: [
         {
           name: 'Orphaned by Category',
           type: 'pie',
-          roseType: 'radius',
-          radius: ['34%', '82%'],
+          radius: ['42%', '72%'],
           center: ['50%', '48%'],
           avoidLabelOverlap: true,
-          label: { show: false },
-          labelLine: { show: false },
+          label: {
+            show: true,
+            formatter: (params: any) => `${params.data.count}`,
+            color: '#20272e',
+            fontSize: 13
+          },
+          labelLine: {
+            show: true,
+            length: 18,
+            length2: 14
+          },
           data: (data || []).map(item => ({
             value: item.count,
             name: item.category,
@@ -1713,7 +1707,7 @@ export class UnifiedAiopsCommandCentreService {
     if (Array.isArray(data)) {
       return data;
     }
-    const categoryData = data?.breakdown || data?.results || data?.orphanedByCategory || data?.categories || data?.by_category || data?.data;
+    const categoryData = data?.groups || data?.breakdown || data?.results || data?.orphanedByCategory || data?.categories || data?.by_category || data?.data;
     if (Array.isArray(categoryData)) {
       return categoryData;
     }
@@ -1725,7 +1719,7 @@ export class UnifiedAiopsCommandCentreService {
 
   private convertOrphanedCategoryRecordToItems(data: UnifiedAiopsOrphanedDevicesByCategoryResponse): UnifiedAiopsOrphanedCategoryResponseItem[] {
     const record = data as unknown as Record<string, string | number | UnifiedAiopsOrphanedCategoryResponseItem>;
-    return Object.keys(data || {}).filter(key => !['total', 'totalOrphaned', 'total_count', 'totalCount', 'count', 'breakdown'].includes(key)).map(key => {
+    return Object.keys(data || {}).filter(key => !['total', 'totalOrphaned', 'total_orphaned', 'total_count', 'totalCount', 'count', 'groups', 'breakdown'].includes(key)).map(key => {
       const value = record[key];
       if (value && typeof value === 'object') {
         return {
@@ -1742,7 +1736,7 @@ export class UnifiedAiopsCommandCentreService {
 
   private getOrphanedByCategoryTotal(data: UnifiedAiopsOrphanedDevicesByCategoryApiResponse, categoryData: UnifiedAiopsOrphanedCategoryResponseItem[]): number {
     if (!Array.isArray(data)) {
-      const total = Number(data?.total || data?.totalOrphaned || data?.total_count || data?.totalCount || 0);
+      const total = Number(data?.total || data?.totalOrphaned || data?.total_orphaned || data?.total_count || data?.totalCount || 0);
       if (total) {
         return total;
       }

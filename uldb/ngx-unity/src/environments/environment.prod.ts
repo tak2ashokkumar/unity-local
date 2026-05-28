@@ -8,7 +8,7 @@ export const environment = {
   pollingInterval: 30000,
   gmk: 'AIzaSyAtO2aDDnFIBISFiPOi2-ucP_pB16cJKTU',
   gmId: 'da696c0425f1f845',
-  DISABLE_WORLD_MAP: process.env.DISABLE_WORLD_MAP === 'true' ? true : false,
+  DISABLE_WORLD_MAP: false,
   theme: {
     allowSwitch: false,
     defaultTheme: 'light',

@@ -1,30 +1,30 @@
 {
-  "total_count": 300,
-  "breakdown": [
-    {
-      "category": "VM Instances",
-      "count": 54,
-      "percentage": "38%"
-    },
-    {
-      "category": "Bare Metal",
-      "count": 23,
-      "percentage": "16%"
-    },
-    {
-      "category": "GPUs",
-      "count": 18,
-      "percentage": "13%"
-    },
-    {
-      "category": "Storage Volumes",
-      "count": 31,
-      "percentage": "22%"
-    },
-    {
-      "category": "Network Devices",
-      "count": 16,
-      "percentage": "11%"
-    }
-  ]
+    "total_orphaned": 1409,
+    "groups": [
+        {
+            "group": "Network Devices",
+            "count": 100,
+            "percentage": 0.0
+        },
+        {
+            "group": "Storage",
+            "count": 3,
+            "percentage": 0.0
+        },
+        {
+            "group": "Baremetal Servers",
+            "count": 96,
+            "percentage": 0.0
+        },
+        {
+            "group": "VMs",
+            "count": 1210,
+            "percentage": 0.0
+        },
+        {
+            "group": "GPUs",
+            "count": 0,
+            "percentage": 0.0
+        }
+    ]
 }

@@ -1,6 +1,11 @@
 
 # Project Coding Guidelines
 
+# High Priority
+- Never run any powershell / or any other scripts to capture screen shots
+- This is my company laptop and as per the company rules, Codex / ChatGpt / Claude / Gemini Or any other AI Agent as external agents and the screen captures you do as potencially hacking type. So please don't take screen shots in any circumstances.
+- Also please don't run any scripts to change anything apart from the content inside unity-local folder.
+
 ## General
 - Prefer existing project patterns over new abstractions.
 - Keep changes small and scoped.

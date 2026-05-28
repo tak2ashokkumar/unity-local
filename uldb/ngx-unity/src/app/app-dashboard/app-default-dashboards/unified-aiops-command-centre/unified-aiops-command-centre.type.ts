@@ -168,6 +168,7 @@ export interface UnifiedAiopsOrphanedDeviceRow {
 }
 
 export interface UnifiedAiopsOrphanedCategoryResponseItem {
+  group?: string;
   category?: string;
   name?: string;
   label?: string;
@@ -181,6 +182,7 @@ export interface UnifiedAiopsOrphanedCategoryResponseItem {
 }
 
 export interface UnifiedAiopsOrphanedDevicesByCategoryResponse {
+  groups?: UnifiedAiopsOrphanedCategoryResponseItem[];
   results?: UnifiedAiopsOrphanedCategoryResponseItem[];
   orphanedByCategory?: UnifiedAiopsOrphanedCategoryResponseItem[];
   categories?: UnifiedAiopsOrphanedCategoryResponseItem[];
@@ -189,6 +191,7 @@ export interface UnifiedAiopsOrphanedDevicesByCategoryResponse {
   breakdown?: UnifiedAiopsOrphanedCategoryResponseItem[] | Record<string, string | number | UnifiedAiopsOrphanedCategoryResponseItem>;
   total?: string | number;
   totalOrphaned?: string | number;
+  total_orphaned?: string | number;
   total_count?: string | number;
   totalCount?: string | number;
 }
