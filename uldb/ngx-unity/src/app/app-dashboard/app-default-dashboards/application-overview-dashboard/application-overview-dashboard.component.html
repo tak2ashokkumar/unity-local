@@ -1,8 +1,10 @@
 <div class="card-header bg-white border-bottom-0 py-2 d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center w-60">
         <a class="nav-link tabs-level1-link border-0 text-success">Application Dashboard - </a>
-        <select class="ml-2 form-control w-30" [(ngModel)]="selectedApplication" *ngIf="selectedApplication">
+        <select class="ml-2 form-control w-30" [(ngModel)]="selectedApplication"
+            (ngModelChange)="onApplicationChange($event)" *ngIf="selectedApplication">
             <option value="AstronomyShop">AstronomyShop</option>
+            <option value="BankOfAnthos">Bank of Anthos</option>
             <option value="EasyTrade">EasyTrade</option>
         </select>
     </div>
@@ -29,6 +31,10 @@
         <div *ngSwitchCase="'AstronomyShop'">
             <astronomy-shop-application-dashboard [appId]="applicationId"
                 [filters]="dateDropdownOptions?.formData"></astronomy-shop-application-dashboard>
+        </div>
+        <div *ngSwitchCase="'BankOfAnthos'">
+            <bank-of-anthos-application-dashboard [appId]="applicationId"
+                [filters]="dateDropdownOptions?.formData"></bank-of-anthos-application-dashboard>
         </div>
         <ng-container *ngSwitchCase="'EasyTrade'">
             <easy-trade-application-dashboard [appId]="applicationId"

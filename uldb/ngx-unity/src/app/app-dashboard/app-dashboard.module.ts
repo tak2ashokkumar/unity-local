@@ -24,6 +24,7 @@ import { AppDashboardComponent } from './app-dashboard.component';
 import { AppDefaultDashboardsComponent } from './app-default-dashboards/app-default-dashboards.component';
 import { ApplicationOverviewDashboardComponent } from './app-default-dashboards/application-overview-dashboard/application-overview-dashboard.component';
 import { AstronomyShopApplicationDashboardComponent } from './app-default-dashboards/application-overview-dashboard/astronomy-shop-application-dashboard/astronomy-shop-application-dashboard.component';
+import { BankOfAnthosApplicationDashboardComponent } from './app-default-dashboards/application-overview-dashboard/bank-of-anthos-application-dashboard/bank-of-anthos-application-dashboard.component';
 import { EasyTradeApplicationDashboardComponent } from './app-default-dashboards/application-overview-dashboard/easy-trade-application-dashboard/easy-trade-application-dashboard.component';
 import { ExecutiveAiBusinessSummaryComponent } from './app-default-dashboards/application-overview-dashboard/executive-ai-business-summary/executive-ai-business-summary.component';
 import { CloudCostOverviewDashboardComponent } from './app-default-dashboards/cloud-cost-overview-dashboard/cloud-cost-overview-dashboard.component';
@@ -65,6 +66,7 @@ export const MY_NATIVE_FORMATS = {
     InterfaceDetailsDashboardComponent,
     ApplicationOverviewDashboardComponent,
     AstronomyShopApplicationDashboardComponent,
+    BankOfAnthosApplicationDashboardComponent,
     EasyTradeApplicationDashboardComponent,
     ExecutiveAiBusinessSummaryComponent,
     PrivateCloudComputeDashboardComponent,

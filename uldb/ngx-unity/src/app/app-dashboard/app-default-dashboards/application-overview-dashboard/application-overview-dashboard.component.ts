@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ApplicationOverviewDashboardService, DateDropdownOptionsData } from './application-overview-dashboard.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
@@ -18,12 +18,15 @@ import { StorageService } from 'src/app/shared/app-storage/storage.service';
   providers: [ApplicationOverviewDashboardService]
 })
 
-export class ApplicationOverviewDashboardComponent implements OnInit {
+export class ApplicationOverviewDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   selectedApplication: string = 'AstronomyShop';
   dateDropdownOptions: DateDropdownOptionsData;
   applicationId: number;
   customerId: number;
+  private astronomyShopApplicationId: number;
+  private astronomyShopCustomerId: number;
+  private bankOfAnthosApplicationId: number = 17;
 
   constructor(private svc: ApplicationOverviewDashboardService,
     private spinner: AppSpinnerService,
@@ -41,13 +44,20 @@ export class ApplicationOverviewDashboardComponent implements OnInit {
     }, 0);
   }
 
+  ngOnDestroy() {
+    this.spinner.stop('main');
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
   getAppId() {
     this.svc.getApplications().pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
       if (data?.results?.length) {
         setTimeout(() => {
           let x = data.results.find(app => app.name === "astronomy-shop"); //To fetch the default app id
-          this.applicationId = x.id; //To fetch the default app id  
-          this.customerId = x.customer;
+          this.astronomyShopApplicationId = x?.id; //To fetch the default app id
+          this.astronomyShopCustomerId = x?.customer;
+          this.setSelectedApplicationDetails();
           this.cdr.detectChanges();
         }, 0);
       }
@@ -60,6 +70,22 @@ export class ApplicationOverviewDashboardComponent implements OnInit {
 
   refreshData() {
 
+  }
+
+  onApplicationChange(application: string) {
+    this.selectedApplication = application;
+    this.setSelectedApplicationDetails();
+  }
+
+  setSelectedApplicationDetails() {
+    if (this.selectedApplication === 'BankOfAnthos') {
+      this.applicationId = this.bankOfAnthosApplicationId;
+      this.customerId = this.astronomyShopCustomerId;
+      return;
+    }
+
+    this.applicationId = this.astronomyShopApplicationId;
+    this.customerId = this.astronomyShopCustomerId;
   }
 
   onFilterChange(formData: any) {

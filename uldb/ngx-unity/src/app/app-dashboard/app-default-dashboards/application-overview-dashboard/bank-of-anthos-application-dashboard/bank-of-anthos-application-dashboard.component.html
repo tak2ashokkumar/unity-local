@@ -1,0 +1,183 @@
+<div class="card-body p-2 row">
+
+    <!-- Customer Behavior Insights KPIs -->
+    <div class="col-12 mb-2">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+                <span class="font-lg font-500">Customer Behavior Insights KPISs</span>
+            </div>
+            <div class="card-body px-2 py-2">
+                <div class="row mx-0 align-items-start">
+                    <div class="col-4 px-2">
+                        <app-spinner [name]="sessionToOrderFunnelWidgetViewData?.loader"></app-spinner>
+                        <ng-container *ngIf="sessionToOrderFunnelWidgetViewData?.chartData">
+                            <div echarts [options]="sessionToOrderFunnelWidgetViewData?.chartData?.options"
+                                [extentions]="sessionToOrderFunnelWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300"></div>
+                        </ng-container>
+                        <ng-container *ngIf="!sessionToOrderFunnelWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center" style="height:300px;">
+                                No BoA Sessions data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-4 px-2">
+                        <app-spinner [name]="returningCustomerCategoryWidgetViewData?.loader"></app-spinner>
+                        <ng-container *ngIf="returningCustomerCategoryWidgetViewData?.chartData">
+                            <div echarts [options]="returningCustomerCategoryWidgetViewData?.chartData?.options"
+                                [extentions]="returningCustomerCategoryWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300"></div>
+                        </ng-container>
+                        <ng-container *ngIf="!returningCustomerCategoryWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center" style="height:300px;">
+                                No Error Analysis data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                    <div class="col-4 px-2">
+                        <app-spinner [name]="newCustomersWidgetViewData?.loader"></app-spinner>
+                        <ng-container *ngIf="newCustomersWidgetViewData?.chartData">
+                            <div echarts [options]="newCustomersWidgetViewData?.chartData?.options"
+                                [extentions]="newCustomersWidgetViewData?.chartData?.extensions"
+                                [defaultHeight]="300"></div>
+                        </ng-container>
+                        <ng-container *ngIf="!newCustomersWidgetViewData?.chartData">
+                            <div class="d-flex justify-content-center align-items-center" style="height:300px;">
+                                No Active Users data found.
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversion & Sales Funnel KPIs -->
+    <div class="col-12 mb-2">
+        <div class="card round-edge equalize-card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-2 pl-2">
+                <span class="font-lg font-500">Conversion & Sales Funnel KPIs</span>
+            </div>
+            <div class="card-body px-2 py-2">
+                <div class="row mx-0">
+                    <div class="col-6 px-2">
+                        <div class="card equalize-card border-0">
+                            <app-spinner [name]="checkoutAbondanRateWidgetViewData?.loader"></app-spinner>
+                            <div class="card-body p-0 d-flex flex-column justify-content-around">
+                                <ng-container *ngIf="checkoutAbondanRateWidgetViewData?.chartData">
+                                    <div echarts [options]="checkoutAbondanRateWidgetViewData?.chartData?.options"
+                                        [extentions]="checkoutAbondanRateWidgetViewData?.chartData?.extensions"
+                                        [defaultHeight]="300"></div>
+                                </ng-container>
+                                <ng-container *ngIf="!checkoutAbondanRateWidgetViewData?.chartData">
+                                    <div class="d-flex justify-content-center align-items-center" style="height:300px;">
+                                        No Success rate data found.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 px-2">
+                        <div class="card equalize-card border-0">
+                            <app-spinner [name]="conversionRateWidgetViewData?.loader"></app-spinner>
+                            <div class="card-body p-0 d-flex flex-column justify-content-around">
+                                <ng-container *ngIf="conversionRateWidgetViewData?.chartData">
+                                    <div echarts [options]="conversionRateWidgetViewData?.chartData?.options"
+                                        [extentions]="conversionRateWidgetViewData?.chartData?.extensions"
+                                        [defaultHeight]="300"></div>
+                                </ng-container>
+                                <ng-container *ngIf="!conversionRateWidgetViewData?.chartData">
+                                    <div class="d-flex justify-content-center align-items-center" style="height:300px;">
+                                        No Signup failure rate data found.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance & Reliability KPIs -->
+    <div class="col-12 mb-2">
+        <div class="card round-edge equalize-card p-0">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2">
+                <span class="font-lg font-500">Performance & Reliability KPI's</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <div class="card round-edge equalize-card border-0" style="min-height: 220px;">
+                            <app-spinner [name]="'ApplicationResponseTimeLoader'"></app-spinner>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="applicationResponseTimeViewData">
+                                    <div echarts [options]="applicationResponseTimeViewData.options"
+                                        [extentions]="applicationResponseTimeViewData.extensions"
+                                        [defaultHeight]="260"></div>
+                                </ng-container>
+                                <ng-container *ngIf="!applicationResponseTimeViewData">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        No Data found.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card round-edge equalize-card border-0" style="min-height: 220px;">
+                            <app-spinner [name]="'ErrorRateLoader'"></app-spinner>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="errorRateViewData">
+                                    <div echarts [options]="errorRateViewData.options"
+                                        [extentions]="errorRateViewData.extensions" [defaultHeight]="260"></div>
+                                </ng-container>
+                                <ng-container *ngIf="!errorRateViewData">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        No Data found.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card round-edge equalize-card border-0" style="min-height: 220px;">
+                            <app-spinner [name]="'PyamentFailureRateLoader'"></app-spinner>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="paymentFailureViewData">
+                                    <div echarts [options]="paymentFailureViewData.options"
+                                        [extentions]="paymentFailureViewData.extensions" [defaultHeight]="260"></div>
+                                </ng-container>
+                                <ng-container *ngIf="!paymentFailureViewData">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        No Data found.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <div class="card round-edge equalize-card border-0" style="min-height: 280px;">
+                            <app-spinner [name]="'PaymentGatewayLatencyLoader'"></app-spinner>
+                            <div class="card-body p-0">
+                                <ng-container *ngIf="paymentGatewayLatencyViewData">
+                                    <div echarts [options]="paymentGatewayLatencyViewData.options"
+                                        [extentions]="paymentGatewayLatencyViewData.extensions"
+                                        [defaultHeight]="260"></div>
+                                </ng-container>
+                                <ng-container *ngIf="!paymentGatewayLatencyViewData">
+                                    <div class="d-flex justify-content-center align-items-center h-100">
+                                        No Data found.
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
