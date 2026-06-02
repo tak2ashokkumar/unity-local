@@ -1,3 +1,5 @@
+import { EChartsOption } from 'echarts';
+
 export type UnifiedAiopsTone = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'muted';
 
 export interface UnifiedAiopsFilterOption {
@@ -12,6 +14,8 @@ export interface UnifiedAiopsCloudFilterOption extends UnifiedAiopsFilterOption 
 export interface UnifiedAiopsDashboardFilterCriteria {
   datacenters: string[];
   clouds: string[];
+  availabilityMonitor?: string;
+  availabilityTimeRange?: string;
 }
 
 export interface UnifiedAiopsMetric {
@@ -21,6 +25,7 @@ export interface UnifiedAiopsMetric {
   up?: string;
   down?: string;
   unknown?: string;
+  hasData?: boolean;
 }
 
 export interface UnifiedAiopsStackItem {
@@ -59,6 +64,25 @@ export interface UnifiedAiopsLegendMetric {
   icon: string;
   value: string;
   tone: UnifiedAiopsTone;
+}
+
+export interface UnifiedAiopsAvailabilityCategorySummary {
+  up: string;
+  down: string;
+  unknown: string;
+}
+
+export interface UnifiedAiopsAvailabilityCategoryRow {
+  label: string;
+  upLabel: string;
+  upValue: number;
+  tone: UnifiedAiopsTone;
+}
+
+export interface UnifiedAiopsAvailabilityCategoryViewData {
+  options: EChartsOption;
+  summary: UnifiedAiopsAvailabilityCategorySummary;
+  rows: UnifiedAiopsAvailabilityCategoryRow[];
 }
 
 export interface UnifiedAiopsBusinessService {
@@ -387,6 +411,8 @@ export interface UnifiedAiopsRecentAlertsResponse {
   alertSummary?: UnifiedAiopsRecentAlertsSummary;
   alert_summary?: UnifiedAiopsRecentAlertsSummary;
   summary?: UnifiedAiopsRecentAlertsSummary;
+  severity_summary?: UnifiedAiopsRecentAlertsSummary;
+  severitySummary?: UnifiedAiopsRecentAlertsSummary;
   recentAlerts?: UnifiedAiopsRecentAlertResponseItem[];
   recent_alerts?: UnifiedAiopsRecentAlertResponseItem[];
   alerts?: UnifiedAiopsRecentAlertResponseItem[];
@@ -395,6 +421,8 @@ export interface UnifiedAiopsRecentAlertsResponse {
     alertSummary?: UnifiedAiopsRecentAlertsSummary;
     alert_summary?: UnifiedAiopsRecentAlertsSummary;
     summary?: UnifiedAiopsRecentAlertsSummary;
+    severity_summary?: UnifiedAiopsRecentAlertsSummary;
+    severitySummary?: UnifiedAiopsRecentAlertsSummary;
     recentAlerts?: UnifiedAiopsRecentAlertResponseItem[];
     recent_alerts?: UnifiedAiopsRecentAlertResponseItem[];
     alerts?: UnifiedAiopsRecentAlertResponseItem[];

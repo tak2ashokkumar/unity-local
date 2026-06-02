@@ -1,6 +1,66 @@
 {
-  "count": 0,
-  "next": null,
-  "previous": null,
-  "results": []
+  "summary": {
+    "cumulative_reduction_pct": 100.0,
+    "noise_reduction_pct": 0.0,
+    "correlation_pct": 100.0
+  },
+  "events_per_source": [
+    {
+      "source": "Unity",
+      "count": 645
+    }
+  ],
+  "totals": {
+    "total_events": 645,
+    "total_alerts": 186,
+    "total_deduped_events": 644,
+    "total_suppressed_events": 0
+  },
+  "conditions": {
+    "total": 181,
+    "mtta_minutes": 0.0,
+    "mttr_minutes": 7977.6,
+    "ticket_generated": 95,
+    "ticket_not_generated": 86,
+    "open": {
+      "count": 180,
+      "acknowledged": {
+        "count": 0,
+        "duration": {
+          "lte_5min": 0,
+          "lte_30min": 0,
+          "gt_30min": 0
+        }
+      }
+    },
+    "resolved": {
+      "count": 1,
+      "auto_healed": {
+        "count": 1,
+        "duration": {
+          "lte_5min": 0,
+          "lte_30min": 0,
+          "gt_30min": 1
+        }
+      },
+      "auto_remediation": {
+        "count": 0,
+        "duration": {
+          "lte_5min": 0,
+          "lte_30min": 0,
+          "gt_30min": 0
+        }
+      }
+    }
+  },
+  "view_by": {
+    "type": "source",
+    "breakdown": [
+      {
+        "label": "Unity",
+        "events": 645,
+        "alerts": 186
+      }
+    ]
+  }
 }

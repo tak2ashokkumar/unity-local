@@ -75,7 +75,7 @@
             <div class="summary-metric" *ngFor="let metric of summaryMetrics; trackBy: trackByIndex"
                 [ngClass]="{'linked-widget': canOpenSummaryMetric(metric)}"
                 (click)="openSummaryMetric(metric)"
-                [tooltip]="canOpenSummaryMetric(metric) ? 'Open linked page' : ''" container="body">
+                [tooltip]="canOpenSummaryMetric(metric) ? 'Open linked page' : ''" placement="top" container="body">
                 <div class="metric-label">{{metric.label}}</div>
                 <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
             </div>
@@ -84,8 +84,12 @@
         <div class="two-column-grid mt-3" *ngIf="hasDiscovery || hasAlertSegregation"
             [ngClass]="{'single-widget-grid': !(hasDiscovery && hasAlertSegregation)}">
             <div *ngIf="hasDiscovery">
-                <div class="section-title linked-widget-title" (click)="openDeviceDiscovery()" [tooltip]="'Open linked page'"
-                    container="body">Device Discovery vs Monitoring Enablement</div>
+                <div class="section-title">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openDeviceDiscovery()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Device Discovery vs Monitoring Enablement <i class="fa fa-link"></i>
+                    </button>
+                </div>
                 <div class="dashboard-card chart-card">
                     <app-spinner [name]="loaderNames.discovery" [width]="0"></app-spinner>
                     <div echarts [options]="discoveryOptions" (chartInit)="onDiscoveryChartInit($event)"
@@ -94,12 +98,14 @@
             </div>
             <div *ngIf="hasAlertSegregation">
                 <div class="section-title title-with-icons">
-                    <span class="linked-widget-title" (click)="openAlerts()" [tooltip]="'Open linked page'"
-                        container="body">Alert Segregation by Type</span>
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Alert Segregation by Type <i class="fa fa-link"></i>
+                    </button>
                     <span class="alert-legend-inline" *ngIf="alertSegregationLegend.length">
                         <span class="legend-alert linked-widget" *ngFor="let item of alertSegregationLegend; trackBy: trackByIndex"
                             [ngClass]="getToneClass(item.tone)" (click)="openAlerts()" [tooltip]="'Open linked page'"
-                            container="body">
+                            placement="top" container="body">
                             <i class="fa" [ngClass]="item.icon"></i> {{item.value}}
                         </span>
                     </span>
@@ -112,8 +118,12 @@
             </div>
         </div>
 
-            <div class="section-title mt-3 linked-widget-title" *ngIf="hasBusinessServices" (click)="openBusinessServices()"
-                [tooltip]="'Open linked page'" container="body">Business Services</div>
+            <div class="section-title mt-3" *ngIf="hasBusinessServices">
+                <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                    (click)="openBusinessServices()" [tooltip]="'Open linked page'" placement="top" container="body">
+                    Business Services <i class="fa fa-link"></i>
+                </button>
+            </div>
             <div class="dashboard-card table-card" *ngIf="hasBusinessServices">
                 <app-spinner [name]="loaderNames.businessServices" [width]="0"></app-spinner>
                 <table class="dashboard-table business-table" *ngIf="businessServices.length">
@@ -131,7 +141,7 @@
                             <td>
                                 <button type="button" class="btn btn-link p-0 table-link"
                                     *ngIf="canOpenBusinessService(row); else businessServiceNameText"
-                                    (click)="openBusinessService(row)" [tooltip]="'Open linked page'" container="body">
+                                    (click)="openBusinessService(row)" [tooltip]="'Open linked page'" placement="top" container="body">
                                     {{row.serviceName}}
                                 </button>
                                 <ng-template #businessServiceNameText>{{row.serviceName}}</ng-template>
@@ -149,20 +159,26 @@
         <div class="two-column-grid mt-3" *ngIf="hasEmployeeMetrics || hasGeoDistribution"
             [ngClass]="{'single-widget-grid': !(hasEmployeeMetrics && hasGeoDistribution)}">
             <div *ngIf="hasEmployeeMetrics">
-                <div class="section-title linked-widget-title" (click)="openEmployeeExperience()"
-                    [tooltip]="'Open linked page'" container="body">Employee / Digital Experience</div>
+                <div class="employee-widget-header">
+                    <div class="section-title mb-0">Employee / Digital Experience</div>
+                    <button type="button" class="btn btn-sm employee-view-btn" (click)="openEmployeeExperience()"
+                        [tooltip]="'Open linked page'" placement="top" container="body">View</button>
+                </div>
                 <div class="dashboard-card employee-card">
                     <app-spinner [name]="loaderNames.employeeExperience" [width]="0"></app-spinner>
-                    <div class="employee-metric linked-widget" *ngFor="let metric of employeeMetrics; trackBy: trackByIndex"
-                        (click)="openEmployeeExperience()" [tooltip]="'Open linked page'" container="body">
+                    <div class="employee-metric" *ngFor="let metric of employeeMetrics; trackBy: trackByIndex">
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                     </div>
                 </div>
             </div>
             <div *ngIf="hasGeoDistribution">
-                <div class="section-title linked-widget-title" (click)="openDatacenters()" [tooltip]="'Open linked page'"
-                    container="body">Geo Distribution / Global Operations</div>
+                <div class="section-title">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openPublicCloudGeoDistribution()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Public Cloud Geo Distribution <i class="fa fa-link"></i>
+                    </button>
+                </div>
                 <div class="dashboard-card geo-card">
                     <app-spinner [name]="loaderNames.geoDistribution" [width]="0"></app-spinner>
                     <div echarts [options]="geoHeatmapOptions" (chartInit)="onGeoDistributionChartInit($event)"
@@ -176,13 +192,21 @@
         <div class="coverage-grid private-grid" *ngIf="hasPrivateCloudCoverage">
             <app-spinner [name]="loaderNames.privateCloudCoverage" [width]="0"></app-spinner>
             <div class="coverage-card" *ngFor="let provider of privateCloudCoverage; trackBy: trackByIndex">
-                <div class="coverage-title linked-widget" (click)="openPrivateCloudCoverage(provider)"
-                    [tooltip]="'Open linked page'" container="body">{{provider.title}}</div>
-                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex"
-                    [ngClass]="{'linked-widget': canOpenPrivateCloudCoverage(provider, row)}"
-                    (click)="openPrivateCloudCoverage(provider, row)"
-                    [tooltip]="canOpenPrivateCloudCoverage(provider, row) ? 'Open linked page' : ''" container="body">
-                    <span>{{row.label}}</span>
+                <div class="coverage-title">
+                    <button type="button" class="btn btn-link p-0 coverage-link"
+                        (click)="openPrivateCloudCoverage(provider)" [tooltip]="'Open linked page'" placement="top" container="body">
+                        {{provider.title}}
+                    </button>
+                </div>
+                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
+                    <span>
+                        <button type="button" class="btn btn-link p-0 coverage-link"
+                            *ngIf="canOpenPrivateCloudCoverage(provider, row); else privateCoverageLabelText"
+                            (click)="openPrivateCloudCoverage(provider, row)" [tooltip]="'Open linked page'" placement="top" container="body">
+                            {{row.label}}
+                        </button>
+                        <ng-template #privateCoverageLabelText>{{row.label}}</ng-template>
+                    </span>
                     <strong>{{row.value}}</strong>
                 </div>
             </div>
@@ -193,22 +217,35 @@
         <div class="coverage-grid public-grid" *ngIf="hasPublicCloudCoverage">
             <app-spinner [name]="loaderNames.publicCloudCoverage" [width]="0"></app-spinner>
             <div class="coverage-card" *ngFor="let provider of publicCloudCoverage; trackBy: trackByIndex">
-                <div class="coverage-title" [ngClass]="{'linked-widget': canOpenPublicCloudCoverage(provider)}"
-                    (click)="openPublicCloudCoverage(provider)"
-                    [tooltip]="canOpenPublicCloudCoverage(provider) ? 'Open linked page' : ''" container="body">{{provider.title}}</div>
-                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex"
-                    [ngClass]="{'linked-widget': canOpenPublicCloudCoverage(provider, row)}"
-                    (click)="openPublicCloudCoverage(provider, row)"
-                    [tooltip]="canOpenPublicCloudCoverage(provider, row) ? 'Open linked page' : ''" container="body">
-                    <span>{{row.label}}</span>
+                <div class="coverage-title">
+                    <button type="button" class="btn btn-link p-0 coverage-link"
+                        *ngIf="canOpenPublicCloudCoverage(provider); else publicCoverageTitleText"
+                        (click)="openPublicCloudCoverage(provider)" [tooltip]="'Open linked page'" placement="top" container="body">
+                        {{provider.title}}
+                    </button>
+                    <ng-template #publicCoverageTitleText>{{provider.title}}</ng-template>
+                </div>
+                <div class="coverage-row" *ngFor="let row of provider.rows; trackBy: trackByIndex">
+                    <span>
+                        <button type="button" class="btn btn-link p-0 coverage-link"
+                            *ngIf="canOpenPublicCloudCoverage(provider, row); else publicCoverageLabelText"
+                            (click)="openPublicCloudCoverage(provider, row)" [tooltip]="'Open linked page'" placement="top" container="body">
+                            {{row.label}}
+                        </button>
+                        <ng-template #publicCoverageLabelText>{{row.label}}</ng-template>
+                    </span>
                     <strong>{{row.value}}</strong>
                 </div>
             </div>
         </div>
 
         <ng-container *ngIf="mapSvc.shouldShowMapWidgets() && hasDatacenterGeographies">
-            <div class="section-title mt-3 linked-widget-title" (click)="openDatacenters()"
-                [tooltip]="'Open linked page'" container="body">Data Center Geographies</div>
+            <div class="section-title mt-3">
+                <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                    (click)="openDatacenters()" [tooltip]="'Open linked page'" placement="top" container="body">
+                    Data Center Geographies <i class="fa fa-link"></i>
+                </button>
+            </div>
             <div class="dashboard-card datacenter-geography-card">
                 <app-spinner [name]="loaderNames.datacenterGeographies" [width]="0"></app-spinner>
                 <div #datacenterGeographyMap class="datacenter-geography-map"
@@ -222,7 +259,7 @@
             <div class="strip-metric" *ngFor="let metric of datacenterInfrastructureMetrics; trackBy: trackByIndex"
                 [ngClass]="{'linked-widget': canOpenDatacenterInfrastructure(metric)}"
                 (click)="openDatacenterInfrastructure(metric)"
-                [tooltip]="canOpenDatacenterInfrastructure(metric) ? 'Open linked page' : ''" container="body">
+                [tooltip]="canOpenDatacenterInfrastructure(metric) ? 'Open linked page' : ''" placement="top" container="body">
                 <div class="metric-label">{{metric.label}}</div>
                 <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                 <div class="trend-line" *ngIf="metric.up || metric.down || metric.unknown">
@@ -236,12 +273,16 @@
         <div class="two-column-grid mt-3" *ngIf="hasKubernetesMetrics || hasAiGpuMetrics"
             [ngClass]="{'single-widget-grid': !(hasKubernetesMetrics && hasAiGpuMetrics)}">
             <div *ngIf="hasKubernetesMetrics">
-                <div class="section-title compact-row-title linked-widget-title" (click)="openKubernetesMetrics()"
-                    [tooltip]="'Open linked page'" container="body">Kubernetes / Container</div>
+                <div class="section-title compact-row-title">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openKubernetesMetrics()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Kubernetes / Container <i class="fa fa-link"></i>
+                    </button>
+                </div>
                 <div class="dashboard-card compact-metric-grid kubernetes-grid">
                     <app-spinner [name]="loaderNames.kubernetes" [width]="0"></app-spinner>
                     <div class="compact-metric linked-widget" *ngFor="let metric of kubernetesMetrics; trackBy: trackByIndex"
-                        (click)="openKubernetesMetrics()" [tooltip]="'Open linked page'" container="body">
+                        (click)="openKubernetesMetrics()" [tooltip]="'Open linked page'" placement="top" container="body">
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                         <div class="trend-line" *ngIf="metric.up || metric.down || metric.unknown">
@@ -253,12 +294,16 @@
                 </div>
             </div>
             <div *ngIf="hasAiGpuMetrics">
-                <div class="section-title compact-row-title linked-widget-title" (click)="openAiGpuMetrics()"
-                    [tooltip]="'Open linked page'" container="body">AI / GPU / LLM</div>
+                <div class="section-title compact-row-title">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openAiGpuOverview()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        AI / GPU / LLM <i class="fa fa-link"></i>
+                    </button>
+                </div>
                 <div class="dashboard-card compact-metric-grid ai-grid">
                     <app-spinner [name]="loaderNames.aiGpu" [width]="0"></app-spinner>
                     <div class="compact-metric linked-widget" *ngFor="let metric of aiGpuMetrics; trackBy: trackByIndex"
-                        (click)="openAiGpuMetrics()" [tooltip]="'Open linked page'" container="body">
+                        (click)="openAiGpuMetric(metric)" [tooltip]="'Open linked page'" placement="top" container="body">
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                         <div class="trend-line" *ngIf="metric.up || metric.down || metric.unknown">
@@ -271,12 +316,26 @@
             </div>
         </div>
 
+            <ng-template #applicationServiceStatusLegend>
+                <div class="app-service-status-legend">
+                    <span><i class="fa fa-check-circle status-icon tone-success"></i> Healthy / Up</span>
+                    <span><i class="fa fa-exclamation-circle status-icon tone-warning"></i> Warning / Degraded</span>
+                    <span><i class="fa fa-exclamation-triangle status-icon tone-danger"></i> Critical / Down</span>
+                    <span><i class="fa fa-minus-circle status-icon tone-muted"></i> No Data / Unknown</span>
+                </div>
+            </ng-template>
+
             <div class="two-column-grid mt-3" *ngIf="hasApplicationServiceSection"
                 [ngClass]="{'single-widget-grid': !(hasApplicationRows && hasServiceRows)}">
                 <div class="dashboard-card table-card application-overview-card" *ngIf="hasApplicationRows">
                     <app-spinner [name]="loaderNames.applications" [width]="0"></app-spinner>
-                    <div class="card-title-row linked-widget-title" (click)="openApplicationDashboard()"
-                        [tooltip]="'Open linked page'" container="body">Application Overview</div>
+                    <div class="card-title-row">
+                        <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                            (click)="openApplicationDashboard()" [tooltip]="'Open linked page'" placement="top" container="body">
+                            Application Overview <i class="fa fa-link"></i>
+                        </button>
+                    </div>
+                    <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
                     <div class="monitoring-table-scroll">
                         <table class="dashboard-table compact-table application-overview-table" *ngIf="applicationRows.length">
                             <colgroup>
@@ -296,11 +355,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of applicationRows; trackBy: trackByIndex"
-                                    [ngClass]="{'linked-row': canOpenApplicationRow(row)}"
-                                    (click)="openApplicationRow(row)"
-                                    [tooltip]="canOpenApplicationRow(row) ? 'Open linked page' : ''" container="body">
-                                    <td>{{row.name}}</td>
+                                <tr *ngFor="let row of applicationRows; trackBy: trackByIndex">
+                                    <td>
+                                        <button type="button" class="btn btn-link p-0 table-link"
+                                            *ngIf="canOpenApplicationRow(row); else applicationNameText"
+                                            (click)="openApplicationRow(row)" [tooltip]="'Open linked page'" placement="top" container="body">
+                                            {{row.name}}
+                                        </button>
+                                        <ng-template #applicationNameText>{{row.name}}</ng-template>
+                                    </td>
                                     <td>{{row.throughput}}</td>
                                     <td>{{row.availability}}</td>
                                     <td>{{row.responseTime}}</td>
@@ -314,8 +377,10 @@
                     <app-spinner [name]="loaderNames.services" [width]="0"></app-spinner>
                     <app-spinner [name]="loaderNames.serviceApplications" [width]="0"></app-spinner>
                     <div class="card-title-row service-title-row">
-                        <span class="linked-widget-title" (click)="openServicesOverview()" [tooltip]="'Open linked page'"
-                            container="body">Services Overview</span>
+                        <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                            (click)="openServicesOverview()" [tooltip]="'Open linked page'" placement="top" container="body">
+                            Services Overview <i class="fa fa-link"></i>
+                        </button>
                         <div class="mini-filter">
                             <select class="form-control form-control-sm" [value]="selectedServiceApplicationId"
                                 (change)="onServiceApplicationChange($event)" [disabled]="!serviceApplicationOptions.length">
@@ -323,6 +388,7 @@
                             </select>
                         </div>
                     </div>
+                    <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
                     <div class="monitoring-table-scroll">
                         <table class="dashboard-table compact-table services-overview-table" *ngIf="serviceRows.length">
                             <colgroup>
@@ -342,11 +408,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of serviceRows; trackBy: trackByIndex"
-                                    [ngClass]="{'linked-row': canOpenServiceRow(row)}"
-                                    (click)="openServiceRow(row)"
-                                    [tooltip]="canOpenServiceRow(row) ? 'Open linked page' : ''" container="body">
-                                    <td>{{row.name}}</td>
+                                <tr *ngFor="let row of serviceRows; trackBy: trackByIndex">
+                                    <td>
+                                        <button type="button" class="btn btn-link p-0 table-link"
+                                            *ngIf="canOpenServiceRow(row); else serviceNameText"
+                                            (click)="openServiceRow(row)" [tooltip]="'Open linked page'" placement="top" container="body">
+                                            {{row.name}}
+                                        </button>
+                                        <ng-template #serviceNameText>{{row.name}}</ng-template>
+                                    </td>
                                     <td>{{row.throughput}}</td>
                                     <td>{{row.availability}}</td>
                                     <td>{{row.responseTime}}</td>
@@ -360,10 +430,15 @@
 
         <div class="two-column-grid mt-2" *ngIf="hasMonitoringTableSection"
             [ngClass]="{'single-widget-grid': !(hasDatabaseRows && hasOsRows)}">
-            <div class="dashboard-card table-card monitoring-table-card" *ngIf="hasDatabaseRows">
+            <div class="dashboard-card table-card monitoring-table-card database-monitoring-card" *ngIf="hasDatabaseRows">
                 <app-spinner [name]="loaderNames.databases" [width]="0"></app-spinner>
-                <div class="card-title-row linked-widget-title" (click)="openDatabaseMonitoring()"
-                    [tooltip]="'Open linked page'" container="body">Database Monitoring</div>
+                <div class="card-title-row">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openDatabaseMonitoring()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Database Monitoring <i class="fa fa-link"></i>
+                    </button>
+                </div>
+                <ng-container *ngTemplateOutlet="applicationServiceStatusLegend"></ng-container>
                 <div class="monitoring-table-scroll">
                     <table class="dashboard-table compact-table" *ngIf="databaseRows.length">
                         <thead>
@@ -375,9 +450,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="linked-row" *ngFor="let row of databaseRows; trackBy: trackByIndex"
-                                (click)="openDatabaseMonitoring()" [tooltip]="'Open linked page'" container="body">
-                                <td>{{row.name}}</td>
+                            <tr *ngFor="let row of databaseRows; trackBy: trackByIndex">
+                                <td>
+                                    <button type="button" class="btn btn-link p-0 table-link"
+                                        (click)="openDatabaseMonitoring()" [tooltip]="'Open linked page'" placement="top" container="body">
+                                        {{row.name}}
+                                    </button>
+                                </td>
                                 <td>{{row.count}}</td>
                                 <td><i class="fa status-icon"
                                         [ngClass]="[getStatusIcon(row.status), getToneClass(row.status)]"></i></td>
@@ -387,14 +466,14 @@
                     </table>
                 </div>
             </div>
-            <div class="dashboard-card table-card monitoring-table-card" *ngIf="hasOsRows">
+            <div class="dashboard-card table-card monitoring-table-card os-monitoring-card" *ngIf="hasOsRows">
                 <app-spinner [name]="loaderNames.os" [width]="0"></app-spinner>
                 <div class="card-title-row">OS Monitoring</div>
                 <div class="monitoring-table-scroll">
                     <table class="dashboard-table compact-table" *ngIf="osRows.length">
                         <thead>
                             <tr>
-                                <th>Database Type</th>
+                                <th>OS Type</th>
                                 <th>Count</th>
                                 <th>EOL Date <i class="fa fa-sort"></i></th>
                             </tr>
@@ -417,24 +496,30 @@
                 <app-spinner [name]="loaderNames.platformPerformance" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.performanceMetrics" [width]="0"></app-spinner>
                 <div class="card-title-row">Infrastructure / Platform Performance</div>
-                <div class="performance-chart-grid adaptive-widget-grid" *ngIf="hasBandwidthBar || hasBandwidthLine || hasPlatformPerformance">
-                    <div class="inner-chart-card" *ngIf="hasBandwidthBar">
+                <div class="performance-chart-grid adaptive-widget-grid">
+                    <div class="inner-chart-card">
                         <div class="chart-title">Avg Network Bandwidth Usage (%)</div>
                         <div echarts [options]="bandwidthBarOptions"
                             class="small-chart" *ngIf="hasChartData(bandwidthBarOptions)"></div>
+                        <div class="dashboard-empty-state performance-panel-empty"
+                            *ngIf="!widgetLoading.bandwidthBar && !hasChartData(bandwidthBarOptions)">No data available</div>
                     </div>
-                    <div class="inner-chart-card" *ngIf="hasBandwidthLine">
+                    <div class="inner-chart-card">
                         <div class="chart-title">Avg Network Bandwidth Usage (%)</div>
                         <div echarts [options]="bandwidthLineOptions"
                             class="small-chart" *ngIf="hasChartData(bandwidthLineOptions)"></div>
+                        <div class="dashboard-empty-state performance-panel-empty"
+                            *ngIf="!widgetLoading.bandwidthLine && !hasChartData(bandwidthLineOptions)">No data available</div>
                     </div>
-                    <div class="inner-chart-card" *ngIf="hasPlatformPerformance">
+                    <div class="inner-chart-card">
                         <div class="chart-title">Infrastructure / Platform Performance</div>
                         <div echarts [options]="platformPerformanceOptions" (chartInit)="onPlatformPerformanceChartInit($event)"
                             class="small-chart" *ngIf="hasChartData(platformPerformanceOptions)"></div>
+                        <div class="dashboard-empty-state performance-panel-empty"
+                            *ngIf="!widgetLoading.platformPerformance && !hasChartData(platformPerformanceOptions)">No data available</div>
                     </div>
                 </div>
-                <div class="performance-metrics" *ngIf="hasPerformanceMetrics">
+                <div class="performance-metrics">
                     <div class="summary-metric" *ngFor="let metric of performanceMetrics; trackBy: trackByIndex">
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
@@ -443,30 +528,94 @@
             </div>
 
         <div class="section-title mt-3" *ngIf="hasAnalyticsSection">Analytics &amp; Health Charts</div>
-        <div class="analytics-grid adaptive-widget-grid" *ngIf="hasAnalyticsSection">
-            <div class="dashboard-card analytics-card" *ngIf="hasDeviceAvailability">
-                <app-spinner [name]="loaderNames.deviceAvailability" [width]="0"></app-spinner>
-                <div class="chart-title">Device Availability</div>
-                <div echarts [options]="deviceAvailabilityOptions"
-                    class="analytics-chart" *ngIf="hasChartData(deviceAvailabilityOptions)"></div>
+        <div class="analytics-health-layout" *ngIf="hasAnalyticsSection">
+            <div class="analytics-left-stack">
+                <div class="dashboard-card analytics-card analytics-side-card">
+                    <app-spinner [name]="loaderNames.deviceAvailability" [width]="0"></app-spinner>
+                    <div class="chart-title">Device Availability</div>
+                    <div echarts [options]="deviceAvailabilityOptions" class="analytics-chart"
+                        *ngIf="hasChartData(deviceAvailabilityOptions)"></div>
+                    <div class="dashboard-empty-state" *ngIf="!widgetLoading.deviceAvailability && !hasChartData(deviceAvailabilityOptions)">
+                        No data available
+                    </div>
+                </div>
+                <div class="dashboard-card analytics-card analytics-side-card">
+                    <app-spinner [name]="loaderNames.alertTrend" [width]="0"></app-spinner>
+                    <div class="chart-title">
+                        <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                            (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
+                            Alert Trend - 7 Days <i class="fa fa-link"></i>
+                        </button>
+                    </div>
+                    <div echarts [options]="alertTrendOptions" (chartInit)="onAlertTrendChartInit($event)"
+                        class="analytics-chart linked-chart" *ngIf="hasChartData(alertTrendOptions)"></div>
+                    <div class="dashboard-empty-state" *ngIf="!widgetLoading.alertTrend && !hasChartData(alertTrendOptions)">
+                        No data available
+                    </div>
+                </div>
             </div>
-            <div class="dashboard-card analytics-card" *ngIf="hasAvailabilityCategory">
+            <div class="dashboard-card analytics-card analytics-category-card">
                 <app-spinner [name]="loaderNames.availabilityCategory" [width]="0"></app-spinner>
-                <div class="chart-title">Availability By Category %</div>
-                <div echarts [options]="availabilityCategoryOptions" (chartInit)="onAvailabilityCategoryChartInit($event)"
-                    class="analytics-chart linked-chart" *ngIf="hasChartData(availabilityCategoryOptions)"></div>
-            </div>
-            <div class="dashboard-card analytics-card" *ngIf="hasAlertTrend">
-                <app-spinner [name]="loaderNames.alertTrend" [width]="0"></app-spinner>
-                <div class="chart-title linked-widget-title" (click)="openAlerts()" [tooltip]="'Open linked page'"
-                    container="body">Alert Trend -- 7 Days</div>
-                <div echarts [options]="alertTrendOptions" (chartInit)="onAlertTrendChartInit($event)"
-                    class="analytics-chart linked-chart" *ngIf="hasChartData(alertTrendOptions)"></div>
+                <div class="analytics-category-header">
+                    <div class="chart-title text-left">Availability By Category %</div>
+                    <div class="analytics-control-row">
+                        <div class="analytics-control">
+                            <label>Availability Monitor</label>
+                            <select class="form-control form-control-sm" [value]="selectedAvailabilityMonitor"
+                                (change)="onAvailabilityMonitorChange($event)">
+                                <option *ngFor="let option of availabilityMonitorOptions; trackBy: trackByIndex"
+                                    [value]="option" [selected]="option === selectedAvailabilityMonitor">{{option}}</option>
+                            </select>
+                        </div>
+                        <div class="analytics-control">
+                            <label>Time range</label>
+                            <select class="form-control form-control-sm" [value]="selectedAvailabilityTimeRange"
+                                (change)="onAvailabilityTimeRangeChange($event)">
+                                <option *ngFor="let option of availabilityTimeRangeOptions; trackBy: trackByIndex"
+                                    [value]="option" [selected]="option === selectedAvailabilityTimeRange">{{option}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="availability-kpi-row">
+                    <div class="availability-kpi">
+                        <div class="metric-label">Avg Up</div>
+                        <div class="metric-value tone-success">{{availabilityCategorySummary.up}}</div>
+                    </div>
+                    <div class="availability-kpi">
+                        <div class="metric-label">Avg Down</div>
+                        <div class="metric-value tone-danger">{{availabilityCategorySummary.down}}</div>
+                    </div>
+                    <div class="availability-kpi">
+                        <div class="metric-label">Avg Unknown</div>
+                        <div class="metric-value tone-primary">{{availabilityCategorySummary.unknown}}</div>
+                    </div>
+                </div>
+                <div class="availability-category-body" *ngIf="hasChartData(availabilityCategoryOptions)">
+                    <div echarts [options]="availabilityCategoryOptions" (chartInit)="onAvailabilityCategoryChartInit($event)"
+                        class="availability-category-chart linked-chart"></div>
+                    <div class="availability-category-list">
+                        <div class="availability-category-title">{{availabilityCategoryListTitle}}</div>
+                        <div class="availability-category-row" *ngFor="let row of availabilityCategoryRows; trackBy: trackByIndex">
+                            <span class="availability-category-dot" [ngClass]="getToneClass(row.tone)"></span>
+                            <span class="availability-category-name">{{row.label}}</span>
+                            <span class="availability-category-badge" [ngClass]="getToneClass(row.tone)">{{row.upLabel}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-empty-state analytics-category-empty"
+                    *ngIf="!widgetLoading.availabilityCategory && !hasChartData(availabilityCategoryOptions)">
+                    No data available
+                </div>
             </div>
         </div>
 
-            <div class="section-title mt-3 linked-widget-title" *ngIf="hasAlertsSection" (click)="openAlerts()" [tooltip]="'Open linked page'"
-                container="body">Alerts</div>
+            <div class="section-title mt-3" *ngIf="hasAlertsSection">
+                <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                    (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
+                    Alerts <i class="fa fa-link"></i>
+                </button>
+            </div>
             <div class="dashboard-card alerts-card" *ngIf="hasAlertsSection">
                 <app-spinner [name]="loaderNames.alertReduction" [width]="0"></app-spinner>
                 <app-spinner [name]="loaderNames.alertResponse" [width]="0"></app-spinner>
@@ -500,13 +649,13 @@
                 </div>
                 <div class="alert-metric-row" *ngIf="alertReductionMetrics.length || alertResponseMetrics.length">
                     <div class="summary-metric linked-widget" *ngFor="let metric of alertReductionMetrics; trackBy: trackByIndex"
-                        (click)="openAlerts()" [tooltip]="'Open linked page'" container="body">
+                        (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value tone-primary">{{metric.value}}</div>
                     </div>
                     <span class="metric-spacer"></span>
                     <div class="summary-metric linked-widget" *ngFor="let metric of alertResponseMetrics; trackBy: trackByIndex"
-                        (click)="openAlerts()" [tooltip]="'Open linked page'" container="body">
+                        (click)="openAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
                         <div class="metric-label">{{metric.label}}</div>
                         <div class="metric-value tone-primary">{{metric.value}}</div>
                     </div>
@@ -535,6 +684,20 @@
                 </div>
                 <div class="orphaned-table-wrap">
                     <app-spinner [name]="loaderNames.orphanedDevices" [width]="0"></app-spinner>
+                    <div class="device-status-legend" *ngIf="orphanedDevices.length">
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            Device Is Active / Reachable
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-circle text-warning"></i>
+                            Partially Reachable / Warning State
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-triangle text-danger"></i>
+                            Offline / Critical / Unreachable
+                        </span>
+                    </div>
                     <table class="table table-sm orphaned-table mb-0" *ngIf="orphanedDevices.length">
                         <colgroup>
                             <col class="orphaned-name-col">
@@ -608,6 +771,20 @@
                 </div>
                 <div class="idle-table-wrap">
                     <app-spinner [name]="loaderNames.idleDevices" [width]="0"></app-spinner>
+                    <div class="device-status-legend" *ngIf="idleDevices.length">
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-check-circle text-success"></i>
+                            Active / Reachable
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-circle text-warning"></i>
+                            Partially Reachable / Warning State
+                        </span>
+                        <span class="device-status-legend-item">
+                            <i class="fas fa-exclamation-triangle text-danger"></i>
+                            Offline / Critical / Unreachable
+                        </span>
+                    </div>
                     <table class="table table-sm idle-devices-table mb-0" *ngIf="idleDevices.length">
                         <colgroup>
                             <col class="idle-device-name-col">
@@ -702,15 +879,19 @@
             </div>
         </div>
 
-        <div class="section-title mt-3 linked-widget-title" *ngIf="hasRecentAlertsSection" (click)="openRecentAlerts()" [tooltip]="'Open linked page'"
-            container="body">Recent Alerts</div>
+        <div class="section-title mt-3" *ngIf="hasRecentAlertsSection">
+            <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                (click)="openRecentAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
+                Recent Alerts <i class="fa fa-link"></i>
+            </button>
+        </div>
         <div class="dashboard-card recent-alerts-card" *ngIf="hasRecentAlertsSection">
             <app-spinner [name]="loaderNames.recentAlertSummary" [width]="0"></app-spinner>
             <app-spinner [name]="loaderNames.recentAlerts" [width]="0"></app-spinner>
-            <div class="recent-alert-summary" *ngIf="hasRecentAlertSummary">
+            <div class="recent-alert-summary" *ngIf="hasRecentAlertsSection">
                 <div class="recent-alert-summary-metric linked-widget"
                     *ngFor="let metric of recentAlertSummaryMetrics; trackBy: trackByIndex"
-                    (click)="openRecentAlerts()" [tooltip]="'Open linked page'" container="body">
+                    (click)="openRecentAlerts()" [tooltip]="'Open linked page'" placement="top" container="body">
                     <div>{{metric.label}}</div>
                     <strong [ngClass]="getToneClass(metric.tone)">{{metric.value}}</strong>
                 </div>
@@ -732,7 +913,7 @@
                         <tr *ngFor="let alert of recentAlerts; trackBy: trackByIndex">
                             <td><button type="button" class="btn btn-link p-0 table-link"
                                     (click)="showAlertDetails(alert)" [tooltip]="'Open alert details'"
-                                    container="body">{{alert.id}}</button></td>
+                                    placement="top" container="body">{{alert.id}}</button></td>
                             <td>{{alert.deviceName}}</td>
                             <td><i class="fa fa-exclamation-circle status-icon"
                                     [ngClass]="getToneClass(getRecentAlertSeverityTone(alert.severity))"></i></td>
@@ -746,8 +927,12 @@
             </div>
         </div>
 
-        <div class="section-title mt-3 linked-widget-title" *ngIf="hasRemediationSection" (click)="openAutoRemediation()"
-            [tooltip]="'Open linked page'" container="body">Auto-Remediation Summary</div>
+        <div class="section-title mt-3" *ngIf="hasRemediationSection">
+            <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top" container="body">
+                Auto-Remediation Summary <i class="fa fa-link"></i>
+            </button>
+        </div>
         <div class="dashboard-card remediation-card adaptive-widget-grid" *ngIf="hasRemediationSection">
             <app-spinner [name]="loaderNames.remediationDonut" [width]="0"></app-spinner>
             <app-spinner [name]="loaderNames.remediationActions" [width]="0"></app-spinner>
@@ -762,14 +947,14 @@
                 <div class="remediation-summary" *ngIf="hasRemediationSummary">
                     <div class="remediation-legend">
                         <span class="remediation-legend-item linked-widget" *ngFor="let metric of remediationSummary | slice:0:2; trackBy: trackByIndex"
-                            (click)="openAutoRemediation()" [tooltip]="'Open linked page'" container="body">
+                            (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top" container="body">
                             <span class="remediation-legend-swatch"
                                 [ngClass]="metric.tone === 'danger' ? 'remediation-legend-swatch-danger' : 'remediation-legend-swatch-success'"></span>
                             {{metric.label}} {{metric.value}}
                         </span>
                     </div>
                     <div class="remediation-run-summary linked-widget" (click)="openAutoRemediation()"
-                        [tooltip]="'Open linked page'" container="body">
+                        [tooltip]="'Open linked page'" placement="top" container="body">
                         <span *ngIf="remediationSummary[2] as totalMetric">{{totalMetric.label}}: {{totalMetric.value}}</span>
                         <span class="remediation-summary-separator" *ngIf="remediationSummary[2] && remediationSummary[3]">|</span>
                         <span *ngIf="remediationSummary[3] as durationMetric">{{durationMetric.label}}: {{durationMetric.value}}</span>
@@ -777,14 +962,18 @@
                 </div>
             </div>
             <div class="remediation-actions" *ngIf="hasRemediationActions">
-                <div class="chart-title linked-widget-title" (click)="openAutoRemediation()"
-                    [tooltip]="'Open linked page'" container="body">Top Auto-Remediation Actions</div>
+                <div class="chart-title">
+                    <button type="button" class="btn btn-link p-0 header-link-control linked-widget-title"
+                        (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top" container="body">
+                        Top Auto-Remediation Actions <i class="fa fa-link"></i>
+                    </button>
+                </div>
                 <div echarts [options]="remediationActionsOptions" (chartInit)="onRemediationChartInit($event)"
                     class="remediation-chart linked-chart" *ngIf="hasChartData(remediationActionsOptions)"></div>
             </div>
             <div class="remediation-metric-card" *ngIf="hasRemediationMetrics">
                 <div class="remediation-metric linked-widget" *ngFor="let metric of remediationMetrics; trackBy: trackByIndex"
-                    (click)="openAutoRemediation()" [tooltip]="'Open linked page'" container="body">
+                    (click)="openAutoRemediation()" [tooltip]="'Open linked page'" placement="top" container="body">
                     <div class="metric-label">{{metric.label}}</div>
                     <div class="metric-value" [ngClass]="getToneClass(metric.tone)">{{metric.value}}</div>
                 </div>

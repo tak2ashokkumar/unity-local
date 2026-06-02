@@ -221,18 +221,31 @@
 
 .linked-widget,
 .linked-widget-title,
-.linked-chart,
-.linked-row {
+.linked-chart {
   cursor: pointer;
 }
 
-.linked-row:hover td {
-  background: #f8fbff;
+.header-link-control {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  text-align: left;
+  text-decoration: none;
+  vertical-align: baseline;
+
+  .fa {
+    margin-left: 5px;
+  }
+}
+
+.header-link-control:hover {
+  text-decoration: none;
 }
 
 .linked-widget:hover .metric-value,
 .linked-widget-title:hover,
-.linked-row:hover .table-link {
+.table-link:hover {
   color: #2d86dd;
 }
 
@@ -420,16 +433,60 @@
   overflow: hidden;
 }
 
-.application-overview-card,
-.services-overview-card,
 .monitoring-table-card {
-  height: 264px;
-  min-height: 264px;
+  height: 424px;
+  min-height: 424px;
+}
+
+.application-overview-card,
+.services-overview-card {
+  height: 450px;
+  min-height: 450px;
 }
 
 .monitoring-table-scroll {
   height: 220px;
   overflow-y: auto;
+}
+
+.application-overview-card,
+.services-overview-card {
+  .monitoring-table-scroll {
+    height: 336px;
+  }
+}
+
+.monitoring-table-card {
+  .monitoring-table-scroll {
+    height: 336px;
+  }
+
+  .compact-table {
+    th,
+    td {
+      height: 42px;
+      padding: 6px 10px;
+      font-size: 12px;
+      line-height: 16px;
+    }
+  }
+
+  .status-icon {
+    font-size: 16px;
+  }
+}
+
+.os-monitoring-card {
+  .monitoring-table-scroll {
+    height: 386px;
+  }
+
+  .compact-table {
+    th,
+    td {
+      height: 48px;
+    }
+  }
 }
 
 .dashboard-table {
@@ -477,6 +534,33 @@
     padding: 8px 14px;
     font-size: 15px;
     line-height: 20px;
+  }
+}
+
+.app-service-status-legend {
+  min-height: 50px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  border-top: 1px solid #d8dee3;
+  border-bottom: 1px solid #d8dee3;
+  overflow: hidden;
+  background: #ffffff;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #202a33;
+    font-size: 13px;
+    line-height: 18px;
+    white-space: nowrap;
+  }
+
+  .status-icon {
+    font-size: 18px;
   }
 }
 
@@ -642,6 +726,30 @@
   padding: 22px 18px 18px;
 }
 
+.employee-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.employee-view-btn {
+  min-width: 62px;
+  height: 34px;
+  color: #ffffff;
+  background: #ff7a00;
+  border-color: #ff7a00;
+  font-size: 14px;
+  line-height: 18px;
+
+  &:hover,
+  &:focus {
+    color: #ffffff;
+    background: #e96f00;
+    border-color: #e96f00;
+  }
+}
+
 .employee-card .metric-label {
   font-size: 12px;
   line-height: 16px;
@@ -653,16 +761,15 @@
 }
 
 .geo-card {
-  min-height: 184px;
+  min-height: 260px;
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 14px 16px;
 }
 
 .geo-chart {
-  height: 170px;
+  height: 232px;
   width: 100%;
-  max-width: 680px;
   margin: 0 auto;
 }
 
@@ -736,6 +843,25 @@
     color: #1f2a34;
     font-weight: 500;
     flex: 0 0 auto;
+  }
+}
+
+.coverage-link {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: left;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  vertical-align: baseline;
+
+  &:hover,
+  &:focus {
+    color: #2d86dd;
+    text-decoration: none;
   }
 }
 
@@ -893,16 +1019,17 @@
   justify-content: center;
 }
 
-.compact-metric-grid .compact-metric:nth-child(4n) {
+.compact-metric-grid .compact-metric:nth-of-type(4n) {
   border-right: 0;
 }
 
-.kubernetes-grid .compact-metric:nth-child(5) {
+.kubernetes-grid .compact-metric:nth-of-type(5) {
   grid-column: 2;
 }
 
-.kubernetes-grid .compact-metric:nth-child(6) {
+.kubernetes-grid .compact-metric:nth-of-type(6) {
   grid-column: 3;
+  border-right: 0;
 }
 
 .ai-grid {
@@ -989,6 +1116,11 @@
   height: 132px;
 }
 
+.performance-panel-empty {
+  min-height: 132px;
+  padding: 12px;
+}
+
 .performance-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -997,22 +1129,188 @@
   padding: 10px 0;
 }
 
-.analytics-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.analytics-grid.adaptive-widget-grid {
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
 .analytics-card {
-  padding: 8px 10px 6px;
+  padding: 12px 16px 10px;
+}
+
+.analytics-health-layout .analytics-card {
+  box-sizing: border-box;
 }
 
 .analytics-chart {
-  height: 176px;
+  height: 210px;
+  min-height: 0;
+}
+
+.analytics-health-layout {
+  display: grid;
+  grid-template-columns: 376px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.analytics-health-layout .analytics-left-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 520px;
+}
+
+.analytics-health-layout .analytics-side-card {
+  height: 250px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.analytics-health-layout .analytics-side-card .analytics-chart {
+  flex: 0 0 210px;
+}
+
+.analytics-health-layout .analytics-side-card .dashboard-empty-state {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 8px 12px;
+}
+
+.analytics-health-layout .analytics-category-card {
+  height: 520px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.analytics-category-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.analytics-control-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.analytics-control {
+  width: 138px;
+}
+
+.analytics-control label {
+  display: block;
+  margin-bottom: 3px;
+  color: #20272e;
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.availability-kpi-row {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: 14px 0 16px;
+}
+
+.availability-kpi {
+  min-width: 160px;
+  padding: 0 28px;
+  text-align: center;
+  border-right: 1px solid #cbd3da;
+}
+
+.availability-kpi:last-child {
+  border-right: 0;
+}
+
+.availability-category-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 286px;
+  gap: 18px;
+  align-items: stretch;
+  flex: 0 0 auto;
+}
+
+.availability-category-chart {
+  height: 330px;
+  min-height: 0;
+}
+
+.availability-category-list {
+  padding-top: 4px;
+}
+
+.availability-category-title {
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  color: #20272e;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid #9aa7b3;
+}
+
+.availability-category-row {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 38px;
+  border-bottom: 1px solid #e8edf1;
+}
+
+.availability-category-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+
+  &.tone-success {
+    background: #13bd77;
+  }
+
+  &.tone-warning {
+    background: #ff9999;
+  }
+
+  &.tone-danger {
+    background: #d71920;
+  }
+
+  &.tone-primary,
+  &.tone-muted {
+    background: #2d86dd;
+  }
+}
+
+.availability-category-name {
+  min-width: 0;
+  color: #20272e;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.availability-category-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #eef7df;
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+
+  &.tone-warning {
+    background: #fff0dc;
+  }
+
+  &.tone-danger {
+    background: #fde8e8;
+  }
+}
+
+.analytics-category-empty {
+  flex: 1 1 auto;
 }
 
 .alerts-card {
@@ -1085,6 +1383,31 @@
 
 .orphaned-table-wrap {
   overflow-x: hidden;
+}
+
+.device-status-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  padding: 10px 8px 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #dce2e6;
+  color: #20272e;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.device-status-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+
+  i {
+    font-size: 15px;
+  }
 }
 
 .orphaned-table {
@@ -1666,8 +1989,8 @@
   .two-column-grid,
   .performance-chart-grid,
   .performance-chart-grid.adaptive-widget-grid,
-  .analytics-grid,
-  .analytics-grid.adaptive-widget-grid,
+  .analytics-health-layout,
+  .availability-category-body,
   .sankey-grid,
   .orphaned-widgets-grid,
   .idle-widgets-grid,
@@ -1685,6 +2008,21 @@
   .alert-metric-row {
     padding: 16px;
     flex-wrap: wrap;
+  }
+
+  .analytics-health-layout .analytics-left-stack {
+    height: auto;
+    grid-template-rows: auto;
+  }
+
+  .analytics-health-layout .analytics-category-card,
+  .analytics-health-layout .analytics-side-card {
+    height: auto;
+    min-height: 0;
+  }
+
+  .availability-category-chart {
+    height: 300px;
   }
 
   .datacenter-infra-strip {
@@ -1730,8 +2068,8 @@
     padding: 10px 0;
   }
 
-  .kubernetes-grid .compact-metric:nth-child(5),
-  .kubernetes-grid .compact-metric:nth-child(6) {
+  .kubernetes-grid .compact-metric:nth-of-type(5),
+  .kubernetes-grid .compact-metric:nth-of-type(6) {
     grid-column: auto;
   }
 
@@ -1750,5 +2088,14 @@
 
   .remediation-metric-card {
     grid-template-columns: 1fr;
+  }
+
+  .analytics-category-header,
+  .analytics-control-row {
+    flex-direction: column;
+  }
+
+  .analytics-control {
+    width: 100%;
   }
 }

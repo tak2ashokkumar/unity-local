@@ -1,67 +1,87 @@
 {
-  "count": 120,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "name": "vm-prod-0041",
-      "status": "healthy",
-      "last_seen": "22 May 2025 09:12",
-      "datacenter": "AWS"
-    },
-    {
-      "name": "gpu-node-007",
-      "status": "warning",
-      "last_seen": "05 May 2025 14:55",
-      "datacenter": "Microsoft Azure"
-    },
-    {
-      "name": "stor-vol-0192",
-      "status": "critical",
-      "last_seen": "12 May 2025 22:34",
-      "datacenter": "Google Cloud"
-    },
-    {
-      "name": "bm-server-021",
-      "status": "healthy",
-      "last_seen": "18 May 2025 08:00",
-      "datacenter": "Google Cloud"
-    },
-    {
-      "name": "net-sw-core-04",
-      "status": "healthy",
-      "last_seen": "15 May 2025 16:45",
-      "datacenter": "Microsoft Azure"
-    },
-    {
-      "name": "vm-dev-0093",
-      "status": "warning",
-      "last_seen": "21 May 2025 11:22",
-      "datacenter": "AWS"
-    },
-    {
-      "name": "gpu-cluster-02",
-      "status": "critical",
-      "last_seen": "19 May 2025 19:01",
-      "datacenter": "Meta"
-    },
-    {
-      "name": "stor-nfs-011",
-      "status": "healthy",
-      "last_seen": "10 May 2025 07:45",
-      "datacenter": "Microsoft Azure"
-    },
-    {
-      "name": "stor-nfs-015",
-      "status": "critical",
-      "last_seen": "07 May 2025 08:00",
-      "datacenter": "Google Cloud"
-    },
-    {
-      "name": "stor-nfs-017",
-      "status": "healthy",
-      "last_seen": "14 May 2025 11:22",
-      "datacenter": "AWS"
-    }
-  ]
+    "count": 459,
+    "next": "http://10.192.11.207:8000/customer/aiops-dashboard/orphaned-devices/?cloud_uuids=4455bf34-7e33-49a2-9da0-e35208096013%2Cbf1e9659-8e80-4770-bfb3-ecc210affbce%2Cd408e6b1-85cc-4897-81c4-71f57bb8075c%2C4948ec33-22e2-4585-b4f7-2261dec4da1e%2C86992fee-b969-446d-a78d-15cc3aa9fc5e%2Cd7d6eab9-21ad-491b-844c-cc657ab94f31%2Cf83bed82-17e7-4b4f-99ba-acfdf02cd4fc%2C2d5d48db-9da3-4085-b172-4cf2fa31e592%2Cb0c2edd8-8f97-43eb-814c-567389022f58%2C1516247d-bb14-430f-ad5d-507ffd9676e6%2Cf1968350-48f4-4ef4-a219-18fe770b12d9%2C9d27842d-2d70-4992-91ef-86b2daafc847%2C34f97642-d394-4b55-a54d-2ad081ddf4ab%2Cd84256c0-a4ce-4763-8554-b4b0b4fc0d78%2C6c5cdcc3-bb87-41a3-96e3-4585fd67ca85&dc_uuids=d1c786f1-35d2-4c50-8c77-6e3d38c6fdf2%2C8a00a318-61fc-49bd-983b-f1931324b84e&offset=0&page=2&page_size=10",
+    "previous": null,
+    "results": [
+        {
+            "status": "up",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "alpha-collector-MTPdemo1_New01",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "up",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "ul-test-log-metrics01",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "up",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "A0S2",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "down",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "alpha-collector-MTPdemo1_New",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "down",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "vCLS-ad2ffd29-7579-4a2f-bfdb-5e896066b953",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "up",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "ul-dev-oracle-db1",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "up",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "aiops-2",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "down",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "8.UnityDemo-Monitoring-POC-Agent-VM01",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "down",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "Observium-test-CE",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        },
+        {
+            "status": "up",
+            "datacenter": "DC1",
+            "group": "VMs",
+            "name": "unity-aiops-collector",
+            "last_availability_time": "N/A",
+            "device_type": "VMware VM"
+        }
+    ]
 }

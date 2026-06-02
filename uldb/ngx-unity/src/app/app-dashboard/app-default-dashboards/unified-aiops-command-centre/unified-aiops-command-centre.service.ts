@@ -11,7 +11,6 @@ import {
   UNIFIED_AIOPS_ALERTS_ENDPOINT,
   UNIFIED_AIOPS_ALERT_SEVERITY_COLORS,
   UNIFIED_AIOPS_ALERT_SEGREGATION_BY_TYPE_ENDPOINT,
-  UNIFIED_AIOPS_ALERT_SOURCES,
   UNIFIED_AIOPS_AI_GPU_METRIC_CONFIG,
   UNIFIED_AIOPS_ALL_SELECTED_VALUE,
   UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT,
@@ -40,6 +39,7 @@ import {
   UNIFIED_AIOPS_ORPHANED_DEVICES_BY_CATEGORY_ENDPOINT,
   UNIFIED_AIOPS_ORPHANED_DEVICES_ENDPOINT,
   UNIFIED_AIOPS_PARENT_APPLICATIONS_ENDPOINT,
+  UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG,
   UNIFIED_AIOPS_PRIVATE_CLOUD_FAST_ENDPOINT,
   UNIFIED_AIOPS_PRIVATE_CLOUD_INFRA_COVERAGE_ENDPOINT,
   UNIFIED_AIOPS_PUBLIC_CLOUD_FAST_ENDPOINT,
@@ -48,6 +48,9 @@ import {
   UNIFIED_AIOPS_SERVICES_OVERVIEW_ENDPOINT
 } from './unified-aiops-command-centre.const';
 import {
+  UnifiedAiopsAvailabilityCategoryRow,
+  UnifiedAiopsAvailabilityCategorySummary,
+  UnifiedAiopsAvailabilityCategoryViewData,
   UnifiedAiopsBusinessService,
   UnifiedAiopsCloudFilterOption,
   UnifiedAiopsCoverageCard,
@@ -188,6 +191,9 @@ export class UnifiedAiopsCommandCentreService {
 
   private getExecutiveSummaryMetrics(response: any): UnifiedAiopsMetric[] {
     const payload = this.getMetricPayload(response, ['summary', 'metrics', 'summary_metrics', 'data']);
+    if (!this.hasUsablePayloadValue(payload)) {
+      return [];
+    }
     const flatPayload = this.flattenPayload(payload || response);
 
     return UNIFIED_AIOPS_EXECUTIVE_SUMMARY_METRIC_CONFIG.map(metric => ({
@@ -208,7 +214,7 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   convertToDiscoveryOptions(data: UnifiedAiopsStackItem[]): EChartsOption {
-    return this.getDiscoveryOptions(data || []);
+    return (data || []).length ? this.getDiscoveryOptions(data) : {};
   }
 
   private getDiscoveryOptions(items: UnifiedAiopsStackItem[]): EChartsOption {
@@ -262,11 +268,11 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   convertToAlertSegregationOptions(data: UnifiedAiopsStackItem[]): EChartsOption {
-    return this.getAlertSegregationOptions(data || []);
+    return (data || []).length ? this.getAlertSegregationOptions(data) : {};
   }
 
   private getAlertSegregationOptions(items: UnifiedAiopsStackItem[]): EChartsOption {
-    return this.getStackedBarOptions(
+    return this.getVerticalStackedBarOptions(
       items,
       ['Critical', 'Warning', 'Info'],
       [
@@ -281,6 +287,9 @@ export class UnifiedAiopsCommandCentreService {
   private getAlertSegregationLegendMetrics(response: any): UnifiedAiopsLegendMetric[] {
     const summary = this.flattenPayload(this.getMetricPayload(response, ['legend', 'summary', 'metrics', 'alert_legend']));
     const items = this.getAlertSegregationStackItems(response);
+    if (!items.length && !this.hasUsablePayloadValue(summary)) {
+      return [];
+    }
     const totals = items.reduce((result, item) => {
       result.critical += item.values[0] || 0;
       result.warning += item.values[1] || 0;
@@ -376,6 +385,58 @@ export class UnifiedAiopsCommandCentreService {
         },
         emphasis: { focus: 'series' },
         data: reversedItems.map(item => item.values[index])
+      }))
+    };
+  }
+
+  private getVerticalStackedBarOptions(items: UnifiedAiopsStackItem[], names: string[], colors: string[], max: number): EChartsOption {
+    const viewItems = items || [];
+    const categories = viewItems.map(item => item.name);
+    const axisMax = this.getStackedBarMax(viewItems, max);
+
+    return {
+      color: colors,
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      legend: {
+        bottom: 4,
+        itemGap: 18,
+        itemWidth: 10,
+        itemHeight: 7,
+        textStyle: { color: '#627283', fontSize: 10 }
+      },
+      grid: { left: 44, right: 18, top: 18, bottom: 82 },
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLabel: {
+          color: '#5e6b78',
+          fontSize: 9,
+          interval: 0,
+          rotate: 35
+        },
+        axisTick: { show: false },
+        axisLine: { lineStyle: { color: '#dfe5eb' } }
+      },
+      yAxis: {
+        type: 'value',
+        max: axisMax,
+        axisLabel: { color: '#758394', fontSize: 9 },
+        splitLine: { lineStyle: { color: '#edf0f2' } }
+      },
+      series: names.map((name, index) => ({
+        name,
+        type: 'bar',
+        stack: 'total',
+        barWidth: 24,
+        label: {
+          show: true,
+          position: 'inside',
+          color: '#ffffff',
+          fontSize: 8,
+          formatter: (params: any) => params.value ? params.value : ''
+        },
+        emphasis: { focus: 'series' },
+        data: viewItems.map(item => item.values[index])
       }))
     };
   }
@@ -515,6 +576,9 @@ export class UnifiedAiopsCommandCentreService {
 
   private getEmployeeExperienceMetrics(response: any): UnifiedAiopsMetric[] {
     const payload = this.getMetricPayload(response, ['summary', 'metrics', 'application_services_alerts', 'data']);
+    if (!this.hasUsablePayloadValue(payload)) {
+      return [];
+    }
     const flatPayload = this.flattenPayload(payload || response);
     const warning = this.getNumberFromPayload(flatPayload, ['warnings', 'warning', 'total_warning', 'totalWarning', 'warning_count', 'warningCount']);
     const critical = this.getNumberFromPayload(flatPayload, ['critical', 'total_critical', 'totalCritical', 'critical_count', 'criticalCount']);
@@ -547,7 +611,7 @@ export class UnifiedAiopsCommandCentreService {
   }
 
   convertToGeoHeatmapOptions(data: UnifiedAiopsHeatmapGroup[]): EChartsOption {
-    return this.getGeoHeatmapOptions(data || []);
+    return (data || []).length ? this.getGeoHeatmapOptions(data) : {};
   }
 
   private getGeoHeatmapOptions(groups: UnifiedAiopsHeatmapGroup[]): EChartsOption {
@@ -559,6 +623,7 @@ export class UnifiedAiopsCommandCentreService {
           value: [child.x, child.y, child.width, child.height],
           usage: child.usage,
           color: group.color,
+          textColor: this.getGeoDistributionTextColor(group.color),
           total: child.value,
           information: (child as any).information,
           warning: (child as any).warning,
@@ -597,10 +662,10 @@ export class UnifiedAiopsCommandCentreService {
         }
       },
       grid: {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0
+        top: 12,
+        right: 14,
+        bottom: 12,
+        left: 14
       },
       xAxis: {
         type: 'value',
@@ -640,8 +705,10 @@ export class UnifiedAiopsCommandCentreService {
                   },
                   style: {
                     fill: item.color,
-                    stroke: 'rgba(255, 255, 255, 0.35)',
-                    lineWidth: 1
+                    stroke: '#ffffff',
+                    lineWidth: 2,
+                    shadowBlur: 4,
+                    shadowColor: 'rgba(28, 45, 65, 0.16)'
                   }
                 },
                 {
@@ -651,12 +718,13 @@ export class UnifiedAiopsCommandCentreService {
                     text: this.getGeoCellText(item.name, item.total),
                     x: start[0] + width / 2,
                     y: start[1] + height / 2,
-                    fill: '#26313b',
-                    font: '9px Arial',
+                    fill: item.textColor,
+                    font: '600 12px Arial',
                     textAlign: 'center',
                     textVerticalAlign: 'middle',
                     overflow: 'truncate',
-                    width: Math.max(width - 10, 24)
+                    lineHeight: 17,
+                    width: Math.max(width - 14, 32)
                   }
                 }
               ]
@@ -679,8 +747,8 @@ export class UnifiedAiopsCommandCentreService {
                 text: item.name,
                 x: point[0],
                 y: point[1],
-                fill: '#26313b',
-                font: '8px Arial',
+                fill: '#4b5f73',
+                font: '600 10px Arial',
                 textAlign: 'left',
                 textVerticalAlign: 'top'
               }
@@ -722,7 +790,7 @@ export class UnifiedAiopsCommandCentreService {
                     x: point[0] + 8,
                     y: point[1] - 7,
                     fill: '#53606d',
-                    font: '8px Arial',
+                    font: '10px Arial',
                     textAlign: 'left',
                     textVerticalAlign: 'middle'
                   }
@@ -739,7 +807,7 @@ export class UnifiedAiopsCommandCentreService {
   private getGeoHeatmapGroups(response: any): UnifiedAiopsHeatmapGroup[] {
     const payload = this.getMetricPayload(response, ['groups', 'heatmap', 'geo_distribution', 'geo_heatmap', 'locations', 'results', 'items', 'rows', 'data']);
     const items = this.getGeoDistributionItems(payload || response);
-    const layouts = this.getGeoHeatmapLayouts();
+    const layouts = this.getGeoHeatmapLayouts(items.length);
 
     return items.slice(0, layouts.length).map((item, index) => {
       const layout = layouts[index];
@@ -781,11 +849,24 @@ export class UnifiedAiopsCommandCentreService {
 
         return { name, total, information, warning, critical };
       })
-      .filter(item => item.name && item.total >= 0)
+      .filter(item => item.name && item.total > 0)
       .sort((first, second) => second.total - first.total);
   }
 
-  private getGeoHeatmapLayouts(): Array<{ labelX: number; labelY: number; x: number; y: number; width: number; height: number }> {
+  private getGeoHeatmapLayouts(count: number): Array<{ labelX: number; labelY: number; x: number; y: number; width: number; height: number }> {
+    if (count <= 1) {
+      return [
+        { labelX: 0, labelY: 0, x: 0, y: 12, width: 100, height: 82 }
+      ];
+    }
+
+    if (count === 2) {
+      return [
+        { labelX: 0, labelY: 0, x: 0, y: 12, width: 100, height: 39 },
+        { labelX: 0, labelY: 56, x: 0, y: 64, width: 100, height: 36 }
+      ];
+    }
+
     return [
       { labelX: 0, labelY: 0, x: 0, y: 12, width: 52, height: 44 },
       { labelX: 0, labelY: 58, x: 0, y: 68, width: 52, height: 32 },
@@ -799,6 +880,11 @@ export class UnifiedAiopsCommandCentreService {
   private getGeoDistributionColor(_item: { warning: number; critical: number }, index: number): string {
     const colors = ['#5875c8', '#90cc74', '#ffca4d', '#5875c8', '#ffc64b', '#8ccd72'];
     return colors[index % colors.length];
+  }
+
+  private getGeoDistributionTextColor(color: string): string {
+    const darkTextColors = ['#90cc74', '#ffca4d', '#ffc64b', '#8ccd72'];
+    return darkTextColors.includes(color) ? '#1e2a35' : '#ffffff';
   }
 
   private getShortGeoLabel(label: string): string {
@@ -985,6 +1071,9 @@ export class UnifiedAiopsCommandCentreService {
     metricConfig: Array<{ label: string; tone?: UnifiedAiopsTone; keys: string[]; aggregateKeys?: string[]; suffix?: string; threshold?: 'utilization' | 'warning' }>,
     payloadKeys: string[]): UnifiedAiopsMetric[] {
     const payload = this.getMetricPayload(response, payloadKeys);
+    if (!this.hasUsablePayloadValue(payload)) {
+      return [];
+    }
 
     if (Array.isArray(payload)) {
       return payload.map(metric => this.getStatusSummaryMetric(metric?.label || metric?.name || '', metric, metric));
@@ -1366,7 +1455,18 @@ export class UnifiedAiopsCommandCentreService {
    */
   getBandwidthBar(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
     return this.getWidgetResponse(UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['bandwidth_bar', 'bandwidthBar', 'avg_network_bandwidth_bar']))
+      map(res => {
+        const payloadKeys = [
+          'top_network_bandwidth_usage',
+          'topNetworkBandwidthUsage',
+          'bandwidth_bar',
+          'bandwidthBar',
+          'avg_network_bandwidth_bar'
+        ];
+        const chartPayload = this.getChartPayload(res, payloadKeys);
+        const payload = this.getPayloadByKeys(res, payloadKeys);
+        return this.isEChartsOption(chartPayload) ? chartPayload : this.getBandwidthBarOptions(payload);
+      })
     );
   }
 
@@ -1374,16 +1474,24 @@ export class UnifiedAiopsCommandCentreService {
     return data || {};
   }
 
-  private getBandwidthBarOptions(): EChartsOption {
-    const names = ['prod-db-01', 'ml-gpu-04', 'k8s-node-12', 'app-srv-08', 'es-node-03'];
-    const values = [94, 88, 81, 76, 71];
+  private getBandwidthBarOptions(payload: any): EChartsOption {
+    const items = this.getPerformanceChartItems(payload, true);
+    if (!items.length) {
+      return {};
+    }
+
+    const viewItems = items.slice(0, 8).reverse();
+    const maxValue = Math.max(...viewItems.map(item => item.value), 0);
     return {
       grid: { left: 72, right: 18, top: 12, bottom: 24 },
-      xAxis: { type: 'value', max: 100, axisLabel: { fontSize: 9, color: '#7b8794' }, splitLine: { lineStyle: { color: '#edf0f2' } } },
-      yAxis: { type: 'category', data: names.reverse(), axisLabel: { fontSize: 9, color: '#5f6d7b' }, axisTick: { show: false }, axisLine: { show: false } },
+      xAxis: { type: 'value', max: maxValue <= 100 ? 100 : Math.ceil(maxValue * 1.1), axisLabel: { fontSize: 9, color: '#7b8794' }, splitLine: { lineStyle: { color: '#edf0f2' } } },
+      yAxis: { type: 'category', data: viewItems.map(item => item.name), axisLabel: { fontSize: 9, color: '#5f6d7b' }, axisTick: { show: false }, axisLine: { show: false } },
       series: [{
         type: 'bar',
-        data: values.reverse().map((value, index) => ({ value, itemStyle: { color: ['#2f80ed', '#2f80ed', '#2f80ed', '#e68612', '#e5232b'][index] } })),
+        data: viewItems.map((item, index) => ({
+          value: item.value,
+          itemStyle: { color: ['#2f80ed', '#2f80ed', '#2f80ed', '#e68612', '#e5232b', '#617887', '#00a0df', '#4285f4'][index] }
+        })),
         barWidth: 13
       }]
     };
@@ -1391,7 +1499,18 @@ export class UnifiedAiopsCommandCentreService {
 
   getBandwidthLine(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
     return this.getWidgetResponse(UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['bandwidth_line', 'bandwidthLine', 'avg_network_bandwidth_line']))
+      map(res => {
+        const payloadKeys = [
+          'average_network_bandwidth_usage',
+          'averageNetworkBandwidthUsage',
+          'bandwidth_line',
+          'bandwidthLine',
+          'avg_network_bandwidth_line'
+        ];
+        const chartPayload = this.getChartPayload(res, payloadKeys);
+        const payload = this.getPayloadByKeys(res, payloadKeys);
+        return this.isEChartsOption(chartPayload) ? chartPayload : this.getBandwidthLineOptions(payload);
+      })
     );
   }
 
@@ -1399,15 +1518,20 @@ export class UnifiedAiopsCommandCentreService {
     return data || {};
   }
 
-  private getBandwidthLineOptions(): EChartsOption {
+  private getBandwidthLineOptions(payload: any): EChartsOption {
+    const points = this.getPerformanceLinePoints(payload);
+    if (!points.length) {
+      return {};
+    }
+    const maxValue = Math.max(...points.map(point => point.value), 0);
     return {
       tooltip: { trigger: 'axis' },
       grid: { left: 36, right: 12, top: 14, bottom: 25 },
-      xAxis: { type: 'category', data: ['10:00', '10:10', '10:20', '10:30', '10:40', '10:50', '11:00'], axisLabel: { fontSize: 9, color: '#758394' } },
-      yAxis: { type: 'value', min: 0, max: 45, axisLabel: { fontSize: 9, color: '#758394' }, splitLine: { lineStyle: { color: '#edf0f2' } } },
+      xAxis: { type: 'category', data: points.map(point => point.name), axisLabel: { fontSize: 9, color: '#758394' } },
+      yAxis: { type: 'value', min: 0, max: maxValue <= 100 ? 100 : Math.ceil(maxValue * 1.1), axisLabel: { fontSize: 9, color: '#758394' }, splitLine: { lineStyle: { color: '#edf0f2' } } },
       series: [{
         type: 'line',
-        data: [12, 14, 17, 42, 37, 24, 16],
+        data: points.map(point => point.value),
         smooth: true,
         symbolSize: 5,
         lineStyle: { color: '#2f7bc7', width: 3 },
@@ -1419,7 +1543,12 @@ export class UnifiedAiopsCommandCentreService {
 
   getPlatformPerformance(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
     return this.getWidgetResponse(UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['platform_performance', 'platformPerformance']))
+      map(res => {
+        const payloadKeys = ['platform_performance', 'platformPerformance'];
+        const chartPayload = this.getChartPayload(res, payloadKeys);
+        const payload = this.getPayloadByKeys(res, payloadKeys);
+        return this.isEChartsOption(chartPayload) ? chartPayload : this.getPlatformPerformanceOptions(payload);
+      })
     );
   }
 
@@ -1427,15 +1556,16 @@ export class UnifiedAiopsCommandCentreService {
     return data || {};
   }
 
-  private getPlatformPerformanceOptions(): EChartsOption {
-    const data = [
-      { name: 'VMware 24', value: 24, itemStyle: { color: '#617887' } },
-      { name: 'AWS 22', value: 22, itemStyle: { color: '#ff7f0e' } },
-      { name: 'Azure 18', value: 18, itemStyle: { color: '#00a0df' } },
-      { name: 'GCP 12', value: 12, itemStyle: { color: '#4285f4' } },
-      { name: 'Nutanix 10', value: 10, itemStyle: { color: '#0b56ad' } },
-      { name: 'Other 4', value: 4, itemStyle: { color: '#777777' } }
-    ];
+  private getPlatformPerformanceOptions(payload: any): EChartsOption {
+    const colors = ['#617887', '#ff7f0e', '#00a0df', '#4285f4', '#0b56ad', '#8a8a85', '#6b7ff5', '#16c7d9'];
+    const data = this.getPerformanceChartItems(payload).map((item, index) => ({
+      name: `${item.name} ${this.formatNumber(item.value)}`,
+      value: item.value,
+      itemStyle: { color: colors[index % colors.length] }
+    }));
+    if (!data.length) {
+      return {};
+    }
 
     return {
       tooltip: { trigger: 'item' },
@@ -1460,8 +1590,46 @@ export class UnifiedAiopsCommandCentreService {
 
   getPerformanceMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_INFRA_PLATFORM_PERFORMANCE_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsMetric>(res, ['metrics', 'summary', 'performance_metrics']))
+      map(res => this.getPerformanceMetricStrip(res))
     );
+  }
+
+  getEmptyPerformanceMetrics(): UnifiedAiopsMetric[] {
+    return this.getPerformanceMetricStrip(null);
+  }
+
+  private getPerformanceMetricStrip(response: any): UnifiedAiopsMetric[] {
+    const payload = this.getPayloadByKeys(response, ['metrics', 'summary', 'performance_metrics']);
+    const flatPayload = this.flattenPayload(payload || {});
+    const arrayMetrics = this.getArrayFromPayload<any>(payload);
+
+    return UNIFIED_AIOPS_PERFORMANCE_METRIC_CONFIG.map(metric => {
+      const arrayMetric = this.getPerformanceArrayMetric(arrayMetrics, metric);
+      const value = arrayMetric
+        ? this.getPerformanceMetricValue(arrayMetric)
+        : this.getFirstDefinedPayloadValue(flatPayload, metric.keys);
+      const hasData = value !== undefined && value !== null && value !== '';
+
+      return {
+        label: metric.label,
+        value: hasData ? this.formatSummaryValue(value, metric.suffix) : 'NA',
+        tone: hasData ? (arrayMetric?.tone || metric.tone || 'primary') : 'muted',
+        hasData
+      };
+    });
+  }
+
+  private getPerformanceArrayMetric(metrics: any[], config: { label: string; keys: string[] }): any {
+    const matchingKeys = [config.label, ...(config.keys || [])].map(key => this.normalizeKey(key));
+    return (metrics || []).find(metric => {
+      const label = metric?.label || metric?.name || metric?.key || metric?.title;
+      return label && matchingKeys.includes(this.normalizeKey(label));
+    });
+  }
+
+  private getPerformanceMetricValue(metric: any): any {
+    const flatPayload = this.flattenPayload(metric || {});
+    return this.getFirstDefinedPayloadValue(flatPayload, ['value', 'count', 'total', 'usage', 'usage_percent', 'usagePercent', 'percentage', 'percent', 'avg', 'average']);
   }
   /*
    * ******End ****** Infrastructure / Platform Performance Widget Related ********************
@@ -1483,6 +1651,9 @@ export class UnifiedAiopsCommandCentreService {
     if (this.isEChartsOption(payload)) {
       return payload;
     }
+    if (!this.hasUsablePayloadValue(payload)) {
+      return {};
+    }
 
     const flatPayload = this.flattenPayload(payload || {});
     const up = this.getNumberFromPayload(flatPayload, ['up', 'online', 'healthy']);
@@ -1503,17 +1674,18 @@ export class UnifiedAiopsCommandCentreService {
       legend: {
         bottom: 0,
         left: 'center',
-        itemWidth: 12,
-        itemHeight: 12,
+        itemGap: 8,
+        itemWidth: 10,
+        itemHeight: 10,
         icon: 'rect',
-        textStyle: { color: '#20272e', fontSize: 12 },
+        textStyle: { color: '#20272e', fontSize: 11 },
         data: availability.map(item => item.name)
       },
       series: [{
         name: 'Device Availability',
         type: 'pie',
-        radius: '58%',
-        center: ['50%', '45%'],
+        radius: '54%',
+        center: ['50%', '44%'],
         avoidLabelOverlap: true,
         label: { show: false },
         labelLine: { show: false },
@@ -1526,38 +1698,135 @@ export class UnifiedAiopsCommandCentreService {
     };
   }
 
-  getAvailabilityCategory(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
-    return this.getWidgetResponse(UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT, criteria).pipe(map(res => this.getAvailabilityCategoryOptions(res)));
+  getAvailabilityCategory(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsAvailabilityCategoryViewData> {
+    return this.getWidgetResponse(UNIFIED_AIOPS_ANALYTICS_HEALTH_CHARTS_ENDPOINT, criteria).pipe(map(res => this.getAvailabilityCategoryViewData(res)));
   }
 
-  convertToAvailabilityCategoryOptions(data: EChartsOption): EChartsOption {
-    return data || {};
+  convertToAvailabilityCategoryOptions(data: UnifiedAiopsAvailabilityCategoryViewData | EChartsOption): EChartsOption {
+    return (data as UnifiedAiopsAvailabilityCategoryViewData)?.options || (data as EChartsOption) || {};
   }
 
-  private getAvailabilityCategoryOptions(response: any): EChartsOption {
+  convertToAvailabilityCategorySummary(data: UnifiedAiopsAvailabilityCategoryViewData): UnifiedAiopsAvailabilityCategorySummary {
+    return data?.summary || this.getEmptyAvailabilityCategorySummary();
+  }
+
+  convertToAvailabilityCategoryRows(data: UnifiedAiopsAvailabilityCategoryViewData): UnifiedAiopsAvailabilityCategoryRow[] {
+    return data?.rows || [];
+  }
+
+  private getAvailabilityCategoryViewData(response: any): UnifiedAiopsAvailabilityCategoryViewData {
     const payload = this.getMetricPayload(response, ['availability_by_category', 'availabilityByCategory', 'availability_category']);
     if (this.isEChartsOption(payload)) {
-      return payload;
+      return {
+        options: payload,
+        summary: this.getEmptyAvailabilityCategorySummary(),
+        rows: []
+      };
+    }
+    if (!this.hasUsablePayloadValue(payload)) {
+      return this.getEmptyAvailabilityCategoryViewData();
     }
 
-    const categories = Object.keys(payload || {});
-    const categoryLabels = categories.map(category => this.getReadableAvailabilityCategoryLabel(category));
-    const upData = categories.map(category => this.getNumberFromPayload(this.flattenPayload(payload[category] || {}), ['up', 'online', 'healthy']));
-    const downData = categories.map(category => this.getNumberFromPayload(this.flattenPayload(payload[category] || {}), ['down', 'offline', 'unhealthy']));
-    const unknownData = categories.map(category => this.getNumberFromPayload(this.flattenPayload(payload[category] || {}), ['unknown', 'unknowns']));
+    const items = this.getAvailabilityCategoryItems(payload);
+    if (!items.length) {
+      return this.getEmptyAvailabilityCategoryViewData();
+    }
 
     return {
-      color: ['#1f7f43', UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical, '#3f4a54'],
+      options: this.getAvailabilityCategoryOptions(items),
+      summary: this.getAvailabilityCategorySummary(items),
+      rows: this.getAvailabilityCategoryRows(items)
+    };
+  }
+
+  private getAvailabilityCategoryOptions(items: Array<{ label: string; up: number; down: number; unknown: number }>): EChartsOption {
+    const categoryLabels = items.map(item => item.label);
+
+    return {
+      color: ['#13bd77', UNIFIED_AIOPS_ALERT_SEVERITY_COLORS.critical, '#5f6d7b'],
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: { top: 2, left: 'center', itemWidth: 12, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' } },
-      grid: { left: 38, right: 14, top: 40, bottom: 32 },
-      xAxis: { type: 'category', data: categoryLabels, axisLabel: { fontSize: 10, color: '#5f6d7b', interval: 0, rotate: categoryLabels.length > 6 ? 20 : 0 } },
-      yAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%', fontSize: 10, color: '#758394' }, splitLine: { lineStyle: { color: '#edf0f2' } } },
+      legend: { bottom: 0, left: 'center', itemWidth: 14, itemHeight: 7, textStyle: { fontSize: 11, color: '#20272e' } },
+      grid: { left: 38, right: 12, top: 18, bottom: 44 },
+      xAxis: { type: 'category', data: categoryLabels, axisLabel: { fontSize: 11, color: '#5b6570', interval: 0, rotate: categoryLabels.length > 7 ? 20 : 0 } },
+      yAxis: { type: 'value', max: 100, axisLabel: { fontSize: 11, color: '#5b6570' }, splitLine: { lineStyle: { color: '#d6dce2', type: 'dashed' } } },
       series: [
-        { name: 'UP', type: 'bar', stack: 'availability', data: upData, barWidth: 26 },
-        { name: 'Down', type: 'bar', stack: 'availability', data: downData, barWidth: 26 },
-        { name: 'Unknown', type: 'bar', stack: 'availability', data: unknownData, barWidth: 26 }
+        { name: 'UP', type: 'bar', stack: 'availability', data: items.map(item => item.up), barWidth: 34 },
+        { name: 'Down', type: 'bar', stack: 'availability', data: items.map(item => item.down), barWidth: 34 },
+        { name: 'Unknown', type: 'bar', stack: 'availability', data: items.map(item => item.unknown), barWidth: 34 }
       ]
+    };
+  }
+
+  private getAvailabilityCategoryItems(payload: any): Array<{ label: string; up: number; down: number; unknown: number }> {
+    const entries = Array.isArray(payload)
+      ? payload.map(item => ({
+        key: this.getFirstDefinedValue(item?.category, item?.name, item?.label, item?.type),
+        value: item
+      }))
+      : Object.keys(payload || {}).map(key => ({ key, value: payload[key] }));
+
+    return entries
+      .map(entry => {
+        const flatPayload = this.flattenPayload(entry.value || {});
+        const label = this.getReadableAvailabilityCategoryLabel(String(entry.key || ''));
+        return {
+          label,
+          up: this.getNumberFromPayload(flatPayload, ['up', 'online', 'healthy', 'up_percent', 'upPercent']),
+          down: this.getNumberFromPayload(flatPayload, ['down', 'offline', 'unhealthy', 'down_percent', 'downPercent']),
+          unknown: this.getNumberFromPayload(flatPayload, ['unknown', 'unknowns', 'unknown_percent', 'unknownPercent'])
+        };
+      })
+      .filter(item => !!item.label && (item.up > 0 || item.down > 0 || item.unknown > 0));
+  }
+
+  private getAvailabilityCategorySummary(items: Array<{ up: number; down: number; unknown: number }>): UnifiedAiopsAvailabilityCategorySummary {
+    return {
+      up: this.formatPercentage(this.getAverageValue(items.map(item => item.up))),
+      down: this.formatPercentage(this.getAverageValue(items.map(item => item.down))),
+      unknown: this.formatPercentage(this.getAverageValue(items.map(item => item.unknown)))
+    };
+  }
+
+  private getAvailabilityCategoryRows(items: Array<{ label: string; up: number }>): UnifiedAiopsAvailabilityCategoryRow[] {
+    return items.map(item => ({
+      label: item.label,
+      upValue: item.up,
+      upLabel: `${this.formatPercentage(item.up)} Up`,
+      tone: this.getAvailabilityCategoryTone(item.up)
+    }));
+  }
+
+  private getAvailabilityCategoryTone(upValue: number): UnifiedAiopsTone {
+    if (upValue >= 95) {
+      return 'success';
+    }
+    if (upValue >= 90) {
+      return 'warning';
+    }
+    return 'danger';
+  }
+
+  private getAverageValue(values: number[]): number {
+    const numericValues = (values || []).filter(value => value > 0 || value === 0);
+    if (!numericValues.length) {
+      return 0;
+    }
+    return numericValues.reduce((total, value) => total + value, 0) / numericValues.length;
+  }
+
+  private getEmptyAvailabilityCategorySummary(): UnifiedAiopsAvailabilityCategorySummary {
+    return {
+      up: 'NA',
+      down: 'NA',
+      unknown: 'NA'
+    };
+  }
+
+  private getEmptyAvailabilityCategoryViewData(): UnifiedAiopsAvailabilityCategoryViewData {
+    return {
+      options: {},
+      summary: this.getEmptyAvailabilityCategorySummary(),
+      rows: []
     };
   }
 
@@ -1573,6 +1842,9 @@ export class UnifiedAiopsCommandCentreService {
     const payload = this.getMetricPayload(response, ['alerts_trend', 'alert_trend', 'alertTrend']);
     if (this.isEChartsOption(payload)) {
       return payload;
+    }
+    if (!this.hasUsablePayloadValue(payload)) {
+      return {};
     }
 
     const dates = Object.keys(payload || {}).sort();
@@ -2077,19 +2349,22 @@ export class UnifiedAiopsCommandCentreService {
    */
   getAlertReductionMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsMetric>(res, ['reduction_metrics', 'alert_reduction_metrics']))
+      map(res => this.getAlertReductionMetricsFromPayload(res))
     );
   }
 
   getAlertResponseMetrics(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<UnifiedAiopsMetric[]> {
     return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getArrayPayload<UnifiedAiopsMetric>(res, ['response_metrics', 'alert_response_metrics']))
+      map(res => this.getAlertResponseMetricsFromPayload(res))
     );
   }
 
   getAlertSourceSankey(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
     return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['source_sankey', 'alert_source_sankey']))
+      map(res => {
+        const chartPayload = this.getChartPayload(res, ['source_sankey', 'alert_source_sankey']);
+        return this.isEChartsOption(chartPayload) ? chartPayload : this.getAlertSourceSankeyOptionsFromPayload(res);
+      })
     );
   }
 
@@ -2097,105 +2372,12 @@ export class UnifiedAiopsCommandCentreService {
     return data || {};
   }
 
-  private getAlertSourceSankeyOptions(): EChartsOption {
-    return this.getCustomAlertChartOptions((api: any) => {
-      const scale = this.getAlertChartScale(api, 720, 320);
-      const x = scale.x;
-      const y = scale.y;
-      const elements = [];
-      const sourceY = [44, 96, 148, 200, 252];
-      const sourceX = 180;
-      const eventsX = 276;
-      const branchX = 386;
-      const conditionX = 520;
-      const ticketX = 632;
-      const sourceSliceColors = ['#dcecff', '#fff0cc', '#ffd9de'];
-      const eventsInY = [14, 31, 48, 69, 86, 103, 124, 141, 158, 179, 196, 213, 234, 251, 268];
-      const logoSizes = {
-        UNITYONECLOUD: { width: 20, height: 20, countX: 150 },
-        LogicMonitor: { width: 108, height: 21, countX: 150 },
-        OpsRamp: { width: 90, height: 20, countX: 150 },
-        dynatrace: { width: 108, height: 22, countX: 150 },
-        'new relic': { width: 106, height: 23, countX: 150 }
-      };
-
-      UNIFIED_AIOPS_ALERT_SOURCES.forEach((source, index) => {
-        const centerY = sourceY[index];
-        const logoSize = logoSizes[source.name];
-        elements.push(this.getAlertImage(
-          source.logoPath,
-          x(4),
-          y(centerY - logoSize.height / 2),
-          x(logoSize.width),
-          y(logoSize.height)
-        ));
-        if (source.name === 'UNITYONECLOUD') {
-          elements.push(this.getAlertText(`UNITYONECLOUD (${source.count})`, x(36), y(centerY), {
-            fontSize: 11,
-            vertical: 'middle'
-          }));
-        } else {
-          elements.push(this.getAlertText(`(${source.count})`, x(logoSize.countX), y(centerY), {
-            fontSize: 12,
-            vertical: 'middle'
-          }));
-        }
-        elements.push(this.getAlertNode(x(sourceX), y(centerY - 21), x(4), y(18), '#2d86dd'));
-        elements.push(this.getAlertNode(x(sourceX), y(centerY + 3), x(4), y(18), '#ff7a7a'));
-
-        [0, 1, 2].forEach(sliceIndex => {
-          const targetIndex = index * 3 + sliceIndex;
-          const thickness = sliceIndex === 1 ? 6 : 5;
-          elements.push(this.getAlertFlow(
-            x(sourceX + 4),
-            y(centerY - 20 + sliceIndex * 12),
-            x(eventsX),
-            y(eventsInY[targetIndex]),
-            y(thickness),
-            sourceSliceColors[sliceIndex],
-            0.78
-          ));
-        });
-      });
-
-      elements.push(this.getAlertNode(x(eventsX), y(4), x(11), y(292), '#55bfc6'));
-      elements.push(this.getAlertText('Events 950', x(eventsX + 22), y(156), { fontSize: 15, vertical: 'middle' }));
-
-      elements.push(this.getAlertFlow(x(eventsX + 11), y(18), x(branchX), y(18), y(62), '#d6d1ee', 0.82));
-      elements.push(this.getAlertFlow(x(eventsX + 11), y(76), x(branchX), y(88), y(112), '#ece8f7', 0.9));
-      elements.push(this.getAlertFlow(x(eventsX + 11), y(176), x(branchX), y(206), y(90), '#f4dada', 0.9));
-
-      elements.push(this.getAlertNode(x(branchX), y(8), x(11), y(68), '#6648ad'));
-      elements.push(this.getAlertText('Alerts 142', x(branchX + 27), y(42), { fontSize: 15, vertical: 'middle' }));
-      elements.push(this.getAlertNode(x(branchX), y(88), x(11), y(112), '#b8a9dc'));
-      elements.push(this.getAlertText('Dedupe Events', x(branchX + 27), y(119), { fontSize: 15 }));
-      elements.push(this.getAlertText('305', x(branchX + 70), y(153), { fontSize: 15, align: 'center' }));
-      elements.push(this.getAlertNode(x(branchX), y(210), x(11), y(86), '#e6a0a5'));
-      elements.push(this.getAlertText('Suppressed Events', x(branchX + 27), y(246), { fontSize: 15 }));
-      elements.push(this.getAlertText('503', x(branchX + 70), y(280), { fontSize: 15, align: 'center' }));
-
-      elements.push(this.getAlertFlow(x(branchX + 11), y(18), x(conditionX), y(30), y(54), '#fff0cc', 0.78));
-      elements.push(this.getAlertFlow(x(branchX + 11), y(50), x(conditionX), y(66), y(44), '#f4ccd1', 0.78));
-      elements.push(this.getAlertNode(x(conditionX), y(28), x(10), y(90), '#6f7770'));
-      elements.push(this.getAlertText('Conditions 21', x(conditionX + 15), y(73), { fontSize: 15, vertical: 'middle' }));
-
-      elements.push(this.getAlertFlow(x(conditionX + 10), y(28), x(ticketX), y(18), y(92), '#cdece1', 0.82));
-      elements.push(this.getAlertFlow(x(conditionX + 10), y(84), x(ticketX), y(132), y(86), '#f0cccc', 0.82));
-      elements.push(this.getAlertNode(x(ticketX), y(18), x(10), y(92), '#58c39f'));
-      elements.push(this.getAlertNode(x(ticketX), y(132), x(10), y(86), '#e6a0a5'));
-      elements.push(this.getAlertText('Ticket\nGenerated\n18', x(ticketX + 16), y(60), { fontSize: 14, lineHeight: 17, vertical: 'middle' }));
-      elements.push(this.getAlertText('No Ticket\nGenerated\n3', x(ticketX + 16), y(174), { fontSize: 14, lineHeight: 17, vertical: 'middle' }));
-
-      return {
-        type: 'group',
-        children: elements
-      };
-    });
-  }
-
   getAlertLifecycleSankey(criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<EChartsOption> {
     return this.getWidgetResponse(UNIFIED_AIOPS_ALERTS_ENDPOINT, criteria).pipe(
-      map(res => this.getChartPayload(res, ['lifecycle_sankey', 'alert_lifecycle_sankey']))
+      map(res => {
+        const chartPayload = this.getChartPayload(res, ['lifecycle_sankey', 'alert_lifecycle_sankey']);
+        return this.isEChartsOption(chartPayload) ? chartPayload : this.getAlertLifecycleSankeyOptionsFromPayload(res);
+      })
     );
   }
 
@@ -2203,159 +2385,150 @@ export class UnifiedAiopsCommandCentreService {
     return data || {};
   }
 
-  private getAlertLifecycleSankeyOptions(): EChartsOption {
-    return this.getCustomAlertChartOptions((api: any) => {
-      const scale = this.getAlertChartScale(api, 610, 320);
-      const x = scale.x;
-      const y = scale.y;
-      const elements = [];
-      const sourceX = 18;
-      const stateX = 188;
-      const actionX = 300;
-      const durationX = 452;
-      const terminalGroups = [
-        { y: 18, label: 'Acknowledged\n143' },
-        { y: 126, label: 'Auto Healed\n143' },
-        { y: 234, label: 'Auto\nRemediation\n143' }
-      ];
+  private getAlertReductionMetricsFromPayload(response: any): UnifiedAiopsMetric[] {
+    const metrics = this.getArrayPayload<UnifiedAiopsMetric>(response, ['reduction_metrics', 'alert_reduction_metrics']);
+    if (metrics.length) {
+      return metrics;
+    }
 
-      elements.push(this.getAlertFlow(x(sourceX + 12), y(18), x(stateX), y(20), y(76), '#c9eef2', 0.85));
-      elements.push(this.getAlertFlow(x(sourceX + 12), y(96), x(stateX), y(86), y(214), '#c7e9ee', 0.85));
-      elements.push(this.getAlertNode(x(sourceX), y(18), x(12), y(294), '#58c4cf'));
-      elements.push(this.getAlertText('Condition 164', x(44), y(172), { fontSize: 15, vertical: 'middle' }));
-
-      elements.push(this.getAlertNode(x(stateX), y(18), x(12), y(52), '#6648ad'));
-      elements.push(this.getAlertText('Open\n21', x(stateX + 22), y(44), { fontSize: 15, lineHeight: 18, vertical: 'middle' }));
-      elements.push(this.getAlertNode(x(stateX), y(84), x(12), y(228), '#6648ad'));
-      elements.push(this.getAlertText('Resolved\n143', x(stateX + 22), y(198), { fontSize: 15, lineHeight: 18, vertical: 'middle' }));
-
-      elements.push(this.getAlertFlow(x(stateX + 12), y(22), x(actionX), y(18), y(44), '#d9cdf0', 0.82));
-      elements.push(this.getAlertFlow(x(stateX + 12), y(72), x(actionX), y(62), y(54), '#d7c9ef', 0.82));
-      elements.push(this.getAlertFlow(x(stateX + 12), y(130), x(actionX), y(152), y(64), '#d7c9ef', 0.82));
-      elements.push(this.getAlertFlow(x(stateX + 12), y(210), x(actionX), y(246), y(54), '#d7c9ef', 0.82));
-
-      terminalGroups.forEach((group, index) => {
-        const actionY = group.y;
-        elements.push(this.getAlertNode(x(actionX), y(actionY), x(12), y(84), '#de8fc2'));
-        elements.push(this.getAlertText(group.label, x(actionX + 20), y(actionY + 42), {
-          fontSize: 15,
-          lineHeight: 18,
-          vertical: 'middle'
-        }));
-
-        elements.push(this.getAlertFlow(x(actionX + 12), y(actionY + 2), x(durationX), y(actionY), y(26), '#dff1e8', 0.78));
-        elements.push(this.getAlertFlow(x(actionX + 12), y(actionY + 28), x(durationX), y(actionY + 32), y(27), '#ffe1bc', 0.82));
-        elements.push(this.getAlertFlow(x(actionX + 12), y(actionY + 56), x(durationX), y(actionY + 66), y(18), '#f7c5c6', 0.82));
-        elements.push(this.getAlertNode(x(durationX), y(actionY), x(12), y(26), '#55c49c'));
-        elements.push(this.getAlertNode(x(durationX), y(actionY + 32), x(12), y(27), '#ff9e23'));
-        elements.push(this.getAlertNode(x(durationX), y(actionY + 66), x(12), y(18), '#e00000'));
-        elements.push(this.getAlertText('5 Min : 56', x(durationX + 24), y(actionY + 13), { fontSize: 15, vertical: 'middle' }));
-        elements.push(this.getAlertText('30 Min : 51', x(durationX + 24), y(actionY + 45), { fontSize: 15, vertical: 'middle' }));
-        elements.push(this.getAlertText('> 30 Min : 36', x(durationX + 24), y(actionY + 75), { fontSize: 15, vertical: 'middle' }));
-      });
-
-      return {
-        type: 'group',
-        children: elements
-      };
-    });
-  }
-
-  private getCustomAlertChartOptions(renderItem: (api: any) => any): EChartsOption {
-    return {
-      animation: false,
-      tooltip: { show: false },
-      series: [{
-        type: 'custom',
-        coordinateSystem: 'none',
-        silent: true,
-        renderItem: (_params: any, api: any) => renderItem(api),
-        data: [0]
-      }] as any
-    };
-  }
-
-  private getAlertChartScale(api: any, baseWidth: number, baseHeight: number): any {
-    const width = api.getWidth();
-    const height = api.getHeight();
-
-    return {
-      x: (value: number) => (value / baseWidth) * width,
-      y: (value: number) => (value / baseHeight) * height
-    };
-  }
-
-  private getAlertNode(x: number, y: number, width: number, height: number, color: string): any {
-    return {
-      type: 'rect',
-      z2: 20,
-      shape: { x, y, width, height },
-      style: {
-        fill: color
-      }
-    };
-  }
-
-  private getAlertFlow(x0: number, y0: number, x1: number, y1: number, thickness: number, color: string, opacity: number): any {
-    return {
-      type: 'path',
-      z2: 1,
-      shape: {
-        pathData: this.getAlertFlowPath(x0, y0, x1, y1, thickness)
-      },
-      style: {
-        fill: color,
-        opacity
-      }
-    };
-  }
-
-  private getAlertFlowPath(x0: number, y0: number, x1: number, y1: number, thickness: number): string {
-    const curve = Math.max(24, (x1 - x0) * 0.52);
-    const y0Bottom = y0 + thickness;
-    const y1Bottom = y1 + thickness;
+    const summary = this.flattenPayload(this.getPayloadByKeys(response, ['summary']) || {});
+    const cumulativeReduction = this.getNumberFromPayload(summary, ['cumulative_reduction_pct', 'cumulativeReductionPct']);
+    const noiseReduction = this.getNumberFromPayload(summary, ['noise_reduction_pct', 'noiseReductionPct']);
+    const correlation = this.getNumberFromPayload(summary, ['correlation_pct', 'correlationPct']);
+    if (!cumulativeReduction && !noiseReduction && !correlation) {
+      return [];
+    }
 
     return [
-      `M ${x0} ${y0}`,
-      `C ${x0 + curve} ${y0}, ${x1 - curve} ${y1}, ${x1} ${y1}`,
-      `L ${x1} ${y1Bottom}`,
-      `C ${x1 - curve} ${y1Bottom}, ${x0 + curve} ${y0Bottom}, ${x0} ${y0Bottom}`,
-      'Z'
-    ].join(' ');
+      { label: 'Cumulative Reduction', value: this.formatPercentage(cumulativeReduction), tone: 'primary' },
+      { label: 'Noise Reduction', value: this.formatPercentage(noiseReduction), tone: 'primary' },
+      { label: 'Correlation', value: this.formatPercentage(correlation), tone: 'primary' }
+    ];
   }
 
-  private getAlertText(text: string, x: number, y: number, config: any = {}): any {
+  private getAlertResponseMetricsFromPayload(response: any): UnifiedAiopsMetric[] {
+    const metrics = this.getArrayPayload<UnifiedAiopsMetric>(response, ['response_metrics', 'alert_response_metrics']);
+    if (metrics.length) {
+      return metrics;
+    }
+
+    const conditions = this.flattenPayload(this.getPayloadByKeys(response, ['conditions']) || {});
+    const mttaMinutes = this.getOptionalNumberValue(this.getFirstDefinedPayloadValue(conditions, ['mtta_minutes', 'mttaMinutes']));
+    const mttrMinutes = this.getOptionalNumberValue(this.getFirstDefinedPayloadValue(conditions, ['mttr_minutes', 'mttrMinutes']));
+    if (mttaMinutes === null && mttrMinutes === null) {
+      return [];
+    }
+
+    return [
+      { label: 'MTTA', value: this.formatMinutesDuration(mttaMinutes || 0), tone: 'primary' },
+      { label: 'MTTR', value: this.formatMinutesDuration(mttrMinutes || 0), tone: 'primary' }
+    ];
+  }
+
+  private getAlertSourceSankeyOptionsFromPayload(response: any): EChartsOption {
+    const links: Array<{ source: string; target: string; value: number }> = [];
+    const totals = this.flattenPayload(this.getPayloadByKeys(response, ['totals']) || {});
+    const conditions = this.flattenPayload(this.getPayloadByKeys(response, ['conditions']) || {});
+    const sources = this.getArrayFromPayload<any>(this.getPayloadByKeys(response, ['events_per_source', 'eventsPerSource']));
+    const viewBy = this.getPayloadByKeys(response, ['view_by', 'viewBy']);
+    const sourceBreakdown = this.getArrayFromPayload<any>(viewBy?.breakdown);
+    const sourceItems = sources.length ? sources : sourceBreakdown;
+
+    sourceItems.forEach(item => {
+      const sourceName = String(item?.source || item?.label || item?.name || '').trim();
+      const count = this.getNumberFromPayload(this.flattenPayload(item || {}), ['count', 'events', 'value']);
+      this.addSankeyLink(links, sourceName, 'Events', count);
+    });
+
+    this.addSankeyLink(links, 'Events', 'Alerts', this.getNumberFromPayload(totals, ['total_alerts', 'totalAlerts']));
+    this.addSankeyLink(links, 'Events', 'Dedupe Events', this.getNumberFromPayload(totals, ['total_deduped_events', 'totalDedupedEvents']));
+    this.addSankeyLink(links, 'Events', 'Suppressed Events', this.getNumberFromPayload(totals, ['total_suppressed_events', 'totalSuppressedEvents']));
+    this.addSankeyLink(links, 'Alerts', 'Conditions', this.getNumberFromPayload(conditions, ['total']));
+    this.addSankeyLink(links, 'Conditions', 'Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_generated', 'ticketGenerated']));
+    this.addSankeyLink(links, 'Conditions', 'No Ticket Generated', this.getNumberFromPayload(conditions, ['ticket_not_generated', 'ticketNotGenerated']));
+
+    return this.getSankeyOptions(links);
+  }
+
+  private getAlertLifecycleSankeyOptionsFromPayload(response: any): EChartsOption {
+    const links: Array<{ source: string; target: string; value: number }> = [];
+    const conditions = this.getPayloadByKeys(response, ['conditions']) || {};
+    const flatConditions = this.flattenPayload(conditions || {});
+
+    this.addSankeyLink(links, 'Condition', 'Open', this.getNumberFromPayload(flatConditions, ['open_count', 'open.count']));
+    this.addSankeyLink(links, 'Condition', 'Resolved', this.getNumberFromPayload(flatConditions, ['resolved_count', 'resolved.count']));
+    this.addSankeyLink(links, 'Open', 'Acknowledged', this.getNumberFromPayload(flatConditions, ['open_acknowledged_count', 'open.acknowledged.count']));
+    this.addSankeyLink(links, 'Resolved', 'Auto Healed', this.getNumberFromPayload(flatConditions, ['resolved_auto_healed_count', 'resolved.autoHealed.count']));
+    this.addSankeyLink(links, 'Resolved', 'Auto Remediation', this.getNumberFromPayload(flatConditions, ['resolved_auto_remediation_count', 'resolved.autoRemediation.count']));
+
+    this.addDurationSankeyLinks(links, 'Acknowledged', conditions?.open?.acknowledged?.duration);
+    this.addDurationSankeyLinks(links, 'Auto Healed', conditions?.resolved?.auto_healed?.duration || conditions?.resolved?.autoHealed?.duration);
+    this.addDurationSankeyLinks(links, 'Auto Remediation', conditions?.resolved?.auto_remediation?.duration || conditions?.resolved?.autoRemediation?.duration);
+
+    return this.getSankeyOptions(links);
+  }
+
+  private addDurationSankeyLinks(links: Array<{ source: string; target: string; value: number }>, source: string, duration: any) {
+    const flatDuration = this.flattenPayload(duration || {});
+    this.addSankeyLink(links, source, '5 Min', this.getNumberFromPayload(flatDuration, ['lte_5min', 'lte5min', 'under_5min']));
+    this.addSankeyLink(links, source, '30 Min', this.getNumberFromPayload(flatDuration, ['lte_30min', 'lte30min', 'under_30min']));
+    this.addSankeyLink(links, source, '> 30 Min', this.getNumberFromPayload(flatDuration, ['gt_30min', 'gt30min', 'over_30min']));
+  }
+
+  private addSankeyLink(links: Array<{ source: string; target: string; value: number }>, source: string, target: string, value: number) {
+    if (!source || !target || value <= 0) {
+      return;
+    }
+    links.push({ source, target, value });
+  }
+
+  private getSankeyOptions(links: Array<{ source: string; target: string; value: number }>): EChartsOption {
+    if (!links.length) {
+      return {};
+    }
+    const nodes = Array.from(new Set(links.reduce((result: string[], link) => result.concat(link.source, link.target), [])))
+      .map(name => ({ name }));
+
     return {
-      type: 'text',
-      silent: true,
-      z2: 30,
-      style: {
-        text,
-        x,
-        y,
-        fill: config.color || '#101820',
-        font: `${config.fontWeight || 400} ${config.fontSize || 14}px Arial`,
-        lineHeight: config.lineHeight || 18,
-        textAlign: config.align || 'left',
-        textVerticalAlign: config.vertical || 'top'
-      }
+      tooltip: {
+        trigger: 'item',
+        triggerOn: 'mousemove'
+      },
+      series: [{
+        type: 'sankey',
+        data: nodes,
+        links,
+        left: 8,
+        right: 24,
+        top: 12,
+        bottom: 12,
+        nodeWidth: 10,
+        nodeGap: 14,
+        draggable: false,
+        emphasis: { focus: 'adjacency' },
+        lineStyle: {
+          color: 'gradient',
+          curveness: 0.5,
+          opacity: 0.35
+        },
+        label: {
+          color: '#1f2a34',
+          fontSize: 12
+        }
+      } as any]
     };
   }
 
-  private getAlertImage(image: string, x: number, y: number, width: number, height: number): any {
-    return {
-      type: 'image',
-      silent: true,
-      z2: 30,
-      style: {
-        image,
-        x,
-        y,
-        width,
-        height
-      }
-    };
+  private formatMinutesDuration(minutes: number): string {
+    const totalSeconds = Math.max(0, Math.round(minutes * 60));
+    const minuteValue = Math.floor(totalSeconds / 60);
+    const secondValue = totalSeconds % 60;
+    if (!minuteValue) {
+      return `${secondValue} Sec`;
+    }
+    return `${minuteValue} min ${secondValue} Sec`;
   }
+
   /*
    * ******End ****** Alerts Widget Related ********************
    */
@@ -2379,36 +2552,93 @@ export class UnifiedAiopsCommandCentreService {
     return data || [];
   }
 
+  getEmptyRecentAlertSummaryMetrics(): UnifiedAiopsMetric[] {
+    return this.getRecentAlertSummaryMetricItems(0, 0, 0, false);
+  }
+
   private buildRecentAlertSummaryMetrics(data: UnifiedAiopsRecentAlertsResponse): UnifiedAiopsMetric[] {
     const summary = this.getRecentAlertSummary(data);
-    return [
-      {
-        label: 'Critical Alerts',
-        value: this.formatNumber(this.getRecentAlertSummaryValue(summary, ['critical_alerts', 'criticalAlerts', 'critical'])),
-        tone: 'danger'
-      },
-      {
-        label: 'Warning Alerts',
-        value: this.formatNumber(this.getRecentAlertSummaryValue(summary, ['warning_alerts', 'warningAlerts', 'warning'])),
-        tone: 'warning'
-      },
-      {
-        label: 'Info Alerts',
-        value: this.formatNumber(this.getRecentAlertSummaryValue(summary, ['info_alerts', 'infoAlerts', 'information', 'info'])),
-        tone: 'info'
-      }
-    ];
+    const rows = this.getRecentAlertRows(data);
+    const summaryHasData = this.hasRecentAlertSummaryPayload(summary);
+    if (!summaryHasData && !rows.length) {
+      return this.getEmptyRecentAlertSummaryMetrics();
+    }
+
+    const rowCounts = this.getRecentAlertSeverityCounts(rows);
+    const critical = summaryHasData
+      ? this.getRecentAlertSummaryValue(summary, ['critical_alerts', 'criticalAlerts', 'critical'])
+      : rowCounts.critical;
+    const warning = summaryHasData
+      ? this.getRecentAlertSummaryValue(summary, ['warning_alerts', 'warningAlerts', 'warning'])
+      : rowCounts.warning;
+    const info = summaryHasData
+      ? this.getRecentAlertSummaryValue(summary, ['info_alerts', 'infoAlerts', 'information', 'info'])
+      : rowCounts.info;
+
+    return this.getRecentAlertSummaryMetricItems(critical, warning, info, true);
   }
 
   private getRecentAlertSummary(data: UnifiedAiopsRecentAlertsResponse): UnifiedAiopsRecentAlertsSummary {
     const nestedData = data?.data && !Array.isArray(data.data) ? data.data : null;
-    return data?.alertSummary || data?.alert_summary || data?.summary ||
-      nestedData?.alertSummary || nestedData?.alert_summary || nestedData?.summary || {};
+    return data?.severity_summary || data?.severitySummary || data?.alertSummary || data?.alert_summary || data?.summary ||
+      nestedData?.severity_summary || nestedData?.severitySummary || nestedData?.alertSummary || nestedData?.alert_summary || nestedData?.summary || {};
   }
 
   private getRecentAlertSummaryValue(summary: UnifiedAiopsRecentAlertsSummary, keys: Array<keyof UnifiedAiopsRecentAlertsSummary>): number {
     const value = keys.map(key => summary?.[key]).find(item => item !== undefined && item !== null);
     return this.getNumberValue(value);
+  }
+
+  private getRecentAlertSummaryMetricItems(critical: number, warning: number, info: number, hasData: boolean): UnifiedAiopsMetric[] {
+    return [
+      {
+        label: 'Critical Alerts',
+        value: this.formatNumber(critical),
+        tone: 'danger',
+        hasData
+      },
+      {
+        label: 'Warning Alerts',
+        value: this.formatNumber(warning),
+        tone: 'warning',
+        hasData
+      },
+      {
+        label: 'Info Alerts',
+        value: this.formatNumber(info),
+        tone: 'info',
+        hasData
+      }
+    ];
+  }
+
+  private hasRecentAlertSummaryPayload(summary: UnifiedAiopsRecentAlertsSummary): boolean {
+    return [
+      summary?.critical_alerts,
+      summary?.criticalAlerts,
+      summary?.critical,
+      summary?.warning_alerts,
+      summary?.warningAlerts,
+      summary?.warning,
+      summary?.info_alerts,
+      summary?.infoAlerts,
+      summary?.information,
+      summary?.info
+    ].some(value => value !== undefined && value !== null);
+  }
+
+  private getRecentAlertSeverityCounts(rows: UnifiedAiopsRecentAlertResponseItem[]): { critical: number; warning: number; info: number } {
+    return (rows || []).reduce((counts, row) => {
+      const severity = this.getRecentAlertSeverity(this.getFirstRecentAlertValue(row?.severity, row?.status));
+      if (severity === 'critical') {
+        counts.critical += 1;
+      } else if (severity === 'warning') {
+        counts.warning += 1;
+      } else if (severity === 'info') {
+        counts.info += 1;
+      }
+      return counts;
+    }, { critical: 0, warning: 0, info: 0 });
   }
 
   private getRecentAlertRows(data: UnifiedAiopsRecentAlertsResponse): UnifiedAiopsRecentAlertResponseItem[] {
@@ -2625,10 +2855,17 @@ export class UnifiedAiopsCommandCentreService {
    */
 
   private getWidgetFilterParams(criteria?: UnifiedAiopsDashboardFilterCriteria): HttpParams {
-    return this.getParams({
+    let params = this.getParams({
       dc_uuids: criteria?.datacenters,
       cloud_uuids: criteria?.clouds
     });
+    if (criteria?.availabilityMonitor) {
+      params = params.set('availability_monitor', criteria.availabilityMonitor);
+    }
+    if (criteria?.availabilityTimeRange) {
+      params = params.set('time_range', criteria.availabilityTimeRange);
+    }
+    return params;
   }
 
   private getWidgetResponse(endpoint: string, criteria?: UnifiedAiopsDashboardFilterCriteria): Observable<any> {
@@ -2692,6 +2929,17 @@ export class UnifiedAiopsCommandCentreService {
     return 0;
   }
 
+  private getFirstDefinedPayloadValue(payload: { [key: string]: any }, keys: string[]): any {
+    const normalizedPayload = this.getNormalizedPayload(payload || {});
+    for (const key of keys) {
+      const normalizedKey = this.normalizeKey(key);
+      if (normalizedPayload[normalizedKey] !== undefined && normalizedPayload[normalizedKey] !== null && normalizedPayload[normalizedKey] !== '') {
+        return normalizedPayload[normalizedKey];
+      }
+    }
+    return undefined;
+  }
+
   private getNumberFromPayload(payload: { [key: string]: any }, keys: string[], fallback = 0): number {
     const normalizedPayload = this.getNormalizedPayload(payload || {});
     for (const key of keys) {
@@ -2706,7 +2954,12 @@ export class UnifiedAiopsCommandCentreService {
   private getNumberValue(value: any, fallback = 0): number {
     const normalizedValue = typeof value === 'string' ? value.replace(/,/g, '') : value;
     const numericValue = Number(normalizedValue);
-    return isNaN(numericValue) ? fallback : numericValue;
+    if (!isNaN(numericValue)) {
+      return numericValue;
+    }
+
+    const displayNumericValue = typeof value === 'string' ? Number(value.replace(/[^0-9.-]/g, '')) : NaN;
+    return isNaN(displayNumericValue) ? fallback : displayNumericValue;
   }
 
   private getOptionalNumberValue(value: any): number | null {
@@ -2741,6 +2994,70 @@ export class UnifiedAiopsCommandCentreService {
       return keyedArray;
     }
     return this.getArrayFromPayload<T>(response);
+  }
+
+  private getPerformanceChartItems(payload: any, sortByValue = false): Array<{ name: string; value: number }> {
+    if (this.isEChartsOption(payload)) {
+      return [];
+    }
+
+    if (Array.isArray(payload)) {
+      const items = payload
+        .map((item, index) => this.getPerformanceChartItem(item, String(index + 1)))
+        .filter(item => !!item.name && item.value > 0);
+      return sortByValue ? items.sort((firstItem, secondItem) => secondItem.value - firstItem.value) : items;
+    }
+
+    if (!payload || typeof payload !== 'object') {
+      return [];
+    }
+
+    const items = Object.keys(payload)
+      .map(key => this.getPerformanceChartItem(payload[key], key))
+      .filter(item => !!item.name && item.value > 0);
+    return sortByValue ? items.sort((firstItem, secondItem) => secondItem.value - firstItem.value) : items;
+  }
+
+  private getPerformanceChartItem(item: any, fallbackName: string): { name: string; value: number } {
+    if (Array.isArray(item)) {
+      return {
+        name: this.getReadableStackLabel(String(item[0] || fallbackName)),
+        value: this.getNumberValue(item[1])
+      };
+    }
+
+    if (this.isSimpleMetricValue(item)) {
+      return {
+        name: this.getReadableStackLabel(fallbackName),
+        value: this.getNumberValue(item)
+      };
+    }
+
+    const flatPayload = this.flattenPayload(item || {});
+    return {
+      name: this.getReadableStackLabel(String(item?.name || item?.label || item?.resource || item?.device || item?.host || fallbackName)),
+      value: this.getNumberFromPayload(flatPayload, ['value', 'usage', 'usage_percent', 'usagePercent', 'percentage', 'percent', 'bandwidth', 'avg', 'average', 'count', 'total'])
+    };
+  }
+
+  private getPerformanceLinePoints(payload: any): Array<{ name: string; value: number }> {
+    const source = this.getArrayFromPayload<any>(payload);
+    const points = source.map((item, index) => {
+      if (Array.isArray(item)) {
+        return {
+          name: String(item[0] || index + 1),
+          value: this.getNumberValue(item[1])
+        };
+      }
+
+      const flatPayload = this.flattenPayload(item || {});
+      return {
+        name: String(item?.time || item?.timestamp || item?.date || item?.label || item?.name || index + 1),
+        value: this.getNumberFromPayload(flatPayload, ['value', 'usage', 'usage_percent', 'usagePercent', 'percentage', 'percent', 'bandwidth', 'avg', 'average', 'count', 'total'])
+      };
+    });
+
+    return points.some(point => point.value > 0) ? points : [];
   }
 
   private getChartPayload(response: any, keys: string[]): EChartsOption {
@@ -2796,6 +3113,28 @@ export class UnifiedAiopsCommandCentreService {
   private canConvertObjectToMetrics(payload: any): boolean {
     const keys = Object.keys(payload || {});
     return !!keys.length && keys.every(key => this.isSimpleMetricValue(payload[key]));
+  }
+
+  private hasUsablePayloadValue(payload: any): boolean {
+    if (payload === null || payload === undefined) {
+      return false;
+    }
+    if (typeof payload === 'number') {
+      return payload > 0;
+    }
+    if (typeof payload === 'string') {
+      return this.getNumberValue(payload) > 0;
+    }
+    if (typeof payload === 'boolean') {
+      return payload;
+    }
+    if (Array.isArray(payload)) {
+      return payload.some(item => this.hasUsablePayloadValue(item));
+    }
+    if (typeof payload === 'object') {
+      return Object.keys(payload).some(key => this.hasUsablePayloadValue(payload[key]));
+    }
+    return false;
   }
 
   private isSimpleMetricValue(value: any): boolean {

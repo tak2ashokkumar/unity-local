@@ -1,42 +1,138 @@
-[
-  {
-    "count": 13156,
-    "device_type": "switch"
+{
+  "summary": {
+    "total": 2131,
+    "critical": 900,
+    "warning": 718,
+    "info": 513
   },
-  {
-    "count": 11609,
-    "device_type": "firewall"
-  },
-  {
-    "count": 7995,
-    "device_type": "hypervisor"
-  },
-  {
-    "count": 6421,
-    "device_type": "vm"
-  },
-  {
-    "count": 2538,
-    "device_type": "storage"
-  },
-  {
-    "count": 2331,
-    "device_type": "pdu"
-  },
-  {
-    "count": 141,
-    "device_type": "custom"
-  },
-  {
-    "count": 105,
-    "device_type": "load_balancer"
-  },
-  {
-    "count": 5,
-    "device_type": "Unknown"
-  },
-  {
-    "count": 3,
-    "device_type": "database"
-  }
-]
+  "items": [
+    {
+      "name": "Unknown",
+      "device_type": "Unknown",
+      "critical": 595,
+      "warning": 398,
+      "info": 21,
+      "count": 1014
+    },
+    {
+      "name": "hypervisor",
+      "device_type": "hypervisor",
+      "critical": 37,
+      "warning": 39,
+      "info": 259,
+      "count": 335
+    },
+    {
+      "name": "vmware",
+      "device_type": "vmware",
+      "critical": 3,
+      "warning": 0,
+      "info": 198,
+      "count": 201
+    },
+    {
+      "name": "switch",
+      "device_type": "switch",
+      "critical": 66,
+      "warning": 104,
+      "info": 20,
+      "count": 190
+    },
+    {
+      "name": "firewall",
+      "device_type": "firewall",
+      "critical": 91,
+      "warning": 31,
+      "info": 5,
+      "count": 127
+    },
+    {
+      "name": "vm",
+      "device_type": "vm",
+      "critical": 35,
+      "warning": 54,
+      "info": 0,
+      "count": 89
+    },
+    {
+      "name": "load_balancer",
+      "device_type": "load_balancer",
+      "critical": 29,
+      "warning": 25,
+      "info": 1,
+      "count": 55
+    },
+    {
+      "name": "azure_resource",
+      "device_type": "azure_resource",
+      "critical": 2,
+      "warning": 29,
+      "info": 0,
+      "count": 31
+    },
+    {
+      "name": "baremetal",
+      "device_type": "baremetal",
+      "critical": 8,
+      "warning": 15,
+      "info": 7,
+      "count": 30
+    },
+    {
+      "name": "storage_device",
+      "device_type": "storage_device",
+      "critical": 22,
+      "warning": 2,
+      "info": 0,
+      "count": 24
+    },
+    {
+      "name": "pdu",
+      "device_type": "pdu",
+      "critical": 7,
+      "warning": 11,
+      "info": 0,
+      "count": 18
+    },
+    {
+      "name": "aws_resource",
+      "device_type": "aws_resource",
+      "critical": 0,
+      "warning": 7,
+      "info": 0,
+      "count": 7
+    },
+    {
+      "name": "storage",
+      "device_type": "storage",
+      "critical": 1,
+      "warning": 3,
+      "info": 0,
+      "count": 4
+    },
+    {
+      "name": "custom",
+      "device_type": "custom",
+      "critical": 3,
+      "warning": 0,
+      "info": 0,
+      "count": 3
+    },
+    {
+      "name": "database",
+      "device_type": "database",
+      "critical": 1,
+      "warning": 0,
+      "info": 1,
+      "count": 2
+    },
+    {
+      "name": "Switch",
+      "device_type": "Switch",
+      "critical": 0,
+      "warning": 0,
+      "info": 1,
+      "count": 1
+    }
+  ]
+}

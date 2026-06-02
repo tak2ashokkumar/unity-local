@@ -74,6 +74,12 @@ export class UserInfoService {
     return (<User>this.storage.getByKey('user', StorageType.SESSIONSTORAGE)).org.name;
   }
 
+  get isWiproOrg() {
+    const user = this.userDetails;
+    const orgName = user && user.org ? user.org.name : '';
+    return String(orgName || '').toLowerCase().includes('wipro');
+  }
+
   get selfBrandedOrgName() {
     if (this.userOrg == 'UPC Demo' || this.userOrg == 'United Private Cloud' || this.userOrg == 'UPC') {
       return 'UPC';

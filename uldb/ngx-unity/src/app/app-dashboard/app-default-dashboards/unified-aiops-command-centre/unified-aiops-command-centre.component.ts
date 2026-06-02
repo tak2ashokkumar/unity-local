@@ -15,10 +15,13 @@ import { MapService } from 'src/app/map.service';
 import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multiselect-dropdown/types';
+import { UserInfoService } from 'src/app/shared/user-info.service';
 import { DatacenterService } from 'src/app/united-cloud/datacenter/datacenter.service';
 import { environment } from 'src/environments/environment';
 import { UnifiedAiopsCommandCentreService } from './unified-aiops-command-centre.service';
 import {
+  UnifiedAiopsAvailabilityCategoryRow,
+  UnifiedAiopsAvailabilityCategorySummary,
   UnifiedAiopsBusinessService,
   UnifiedAiopsCloudFilterOption,
   UnifiedAiopsCoverageCard,
@@ -178,14 +181,21 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     businessService: ['/unitycloud/business-service'],
     applications: ['/unitycloud/applications'],
     alerts: ['/services/aiml-event-mgmt/alerts'],
+    aiObservability: ['/services/ai-observability'],
     gpu: ['/services/ai-observability/gpu/summary'],
+    llm: ['/services/ai-observability/llm/summary'],
+    vectorDb: ['/services/ai-observability/vector-db/summary'],
     autoRemediation: ['/setup/monitoring/auto-remediation']
   };
 
   filterForm: FormGroup;
+  readonly availabilityMonitorOptions = ['Datacenter', 'Compute', 'Containers', 'Applications', 'Database', 'Storage'];
+  readonly availabilityTimeRangeOptions = ['1 Hour', '24 Hour', '7 Days', '30 Days', '60 Days', '90 Days'];
   datacenterOptions: UnifiedAiopsFilterOption[] = [];
   cloudOptions: UnifiedAiopsCloudFilterOption[] = [];
   refreshedText = '';
+  selectedAvailabilityMonitor = 'Datacenter';
+  selectedAvailabilityTimeRange = '30 Days';
   appliedFilterCriteria: UnifiedAiopsDashboardFilterCriteria = {
     datacenters: [],
     clouds: []
@@ -220,6 +230,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   performanceMetrics: UnifiedAiopsMetric[] = [];
   deviceAvailabilityOptions: EChartsOption = {};
   availabilityCategoryOptions: EChartsOption = {};
+  availabilityCategorySummary: UnifiedAiopsAvailabilityCategorySummary = {
+    up: 'NA',
+    down: 'NA',
+    unknown: 'NA'
+  };
+  availabilityCategoryRows: UnifiedAiopsAvailabilityCategoryRow[] = [];
   alertTrendOptions: EChartsOption = {};
   alertReductionMetrics: UnifiedAiopsMetric[] = [];
   alertResponseMetrics: UnifiedAiopsMetric[] = [];
@@ -239,7 +255,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   idleDurationRows: UnifiedAiopsIdleDurationItem[] = [];
   idleDurationOptions: EChartsOption = {};
   idleDurationHasData = false;
-  recentAlertSummaryMetrics: UnifiedAiopsMetric[] = [];
+  recentAlertSummaryMetrics: UnifiedAiopsMetric[] = [
+    { label: 'Critical Alerts', value: '0', tone: 'danger', hasData: false },
+    { label: 'Warning Alerts', value: '0', tone: 'warning', hasData: false },
+    { label: 'Info Alerts', value: '0', tone: 'info', hasData: false }
+  ];
   recentAlerts: UnifiedAiopsRecentAlert[] = [];
   remediationDonutOptions: EChartsOption = {};
   remediationActionsOptions: EChartsOption = {};
@@ -361,6 +381,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private ngZone: NgZone,
     private spinnerService: AppSpinnerService,
+    private userInfoService: UserInfoService,
     private alertDetailSvc: AimlAlertDetailsService) { }
 
   @ViewChild('datacenterGeographyMap')
@@ -484,6 +505,14 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     };
   }
 
+  private getAnalyticsFilterCriteria(criteria: UnifiedAiopsDashboardFilterCriteria): UnifiedAiopsDashboardFilterCriteria {
+    return {
+      ...criteria,
+      availabilityMonitor: this.selectedAvailabilityMonitor,
+      availabilityTimeRange: this.selectedAvailabilityTimeRange
+    };
+  }
+
   /** Stores the filter set currently driving the rendered widget data. */
   private updateAppliedFilterCriteria() {
     this.appliedFilterCriteria = this.getFilterFormOutput();
@@ -492,6 +521,26 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   /** Confirms the filter form exists and has loaded option data before widget APIs are called. */
   private hasFilterFormData(): boolean {
     return !!this.filterForm;
+  }
+
+  onAvailabilityMonitorChange(event: Event) {
+    this.selectedAvailabilityMonitor = String((event.target as HTMLSelectElement)?.value || 'Datacenter');
+    this.reloadAnalyticsHealthCharts();
+  }
+
+  onAvailabilityTimeRangeChange(event: Event) {
+    this.selectedAvailabilityTimeRange = String((event.target as HTMLSelectElement)?.value || '30 Days');
+    this.reloadAnalyticsHealthCharts();
+  }
+
+  private reloadAnalyticsHealthCharts() {
+    if (!this.hasFilterFormData()) {
+      return;
+    }
+    const analyticsFilterCriteria = this.getAnalyticsFilterCriteria(this.appliedFilterCriteria);
+    this.getDeviceAvailability(analyticsFilterCriteria);
+    this.getAvailabilityCategory(analyticsFilterCriteria);
+    this.getAlertTrend(analyticsFilterCriteria);
   }
 
   /** Stops the top filter loader in the next tick so synchronous static responses still render the loader correctly. */
@@ -505,6 +554,10 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   get cloudScopeSummary(): UnifiedAiopsFilterScopeSummary {
     return this.getScopeSummary(this.cloudOptions, this.appliedFilterCriteria.clouds, 'No clouds');
+  }
+
+  get availabilityCategoryListTitle(): string {
+    return this.selectedAvailabilityMonitor === 'Datacenter' ? 'Datacentre' : this.selectedAvailabilityMonitor;
   }
 
   private getScopeSummary(options: UnifiedAiopsFilterOption[], selectedValues: string[], emptyLabel: string): UnifiedAiopsFilterScopeSummary {
@@ -530,19 +583,29 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     return `Today ${hours}:${minutes} IST`;
   }
 
+  get showEmployeeExperienceWidget(): boolean {
+    return this.userInfoService.isWiproOrg;
+  }
+
   /** Loads all dashboard widgets only after the filter form exists and has loaded filter data. */
   loadData() {
     if (!this.hasFilterFormData()) {
       return;
     }
     const filterFormOutput = this.appliedFilterCriteria;
+    const analyticsFilterCriteria = this.getAnalyticsFilterCriteria(filterFormOutput);
     this.startWidgetLoadingState();
     setTimeout(() => {
       this.getSummaryMetrics(filterFormOutput);
       this.getDiscoveryOptions(filterFormOutput);
       this.getAlertSegregation(filterFormOutput);
       this.getBusinessServices(filterFormOutput);
-      this.getEmployeeMetrics(filterFormOutput);
+      if (this.showEmployeeExperienceWidget) {
+        this.getEmployeeMetrics(filterFormOutput);
+      } else {
+        this.employeeMetrics = [];
+        this.widgetLoading.employeeExperience = false;
+      }
       this.getGeoDistribution(filterFormOutput);
       this.getPrivateCloudCoverage(filterFormOutput);
       this.getPublicCloudCoverage(filterFormOutput);
@@ -558,9 +621,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
       this.getBandwidthLine(filterFormOutput);
       this.getPlatformPerformance(filterFormOutput);
       this.getPerformanceMetrics(filterFormOutput);
-      this.getDeviceAvailability(filterFormOutput);
-      this.getAvailabilityCategory(filterFormOutput);
-      this.getAlertTrend(filterFormOutput);
+      this.getDeviceAvailability(analyticsFilterCriteria);
+      this.getAvailabilityCategory(analyticsFilterCriteria);
+      this.getAlertTrend(analyticsFilterCriteria);
       this.getAlertReductionMetrics(filterFormOutput);
       this.getAlertResponseMetrics(filterFormOutput);
       this.getAlertSourceSankey(filterFormOutput);
@@ -1081,11 +1144,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   getPerformanceMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.performanceMetrics = [];
+    this.performanceMetrics = this.svc.getEmptyPerformanceMetrics();
     this.loadWidget(this.loaderNames.performanceMetrics, this.svc.getPerformanceMetrics(filterFormOutput), res => {
       this.performanceMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
-      this.performanceMetrics = [];
+      this.performanceMetrics = this.svc.getEmptyPerformanceMetrics();
     }, 'performanceMetrics');
   }
 
@@ -1100,10 +1163,16 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   getAvailabilityCategory(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
     this.availabilityCategoryOptions = {};
+    this.availabilityCategorySummary = this.getEmptyAvailabilityCategorySummary();
+    this.availabilityCategoryRows = [];
     this.loadWidget(this.loaderNames.availabilityCategory, this.svc.getAvailabilityCategory(filterFormOutput), res => {
       this.availabilityCategoryOptions = this.svc.convertToAvailabilityCategoryOptions(res);
+      this.availabilityCategorySummary = this.svc.convertToAvailabilityCategorySummary(res);
+      this.availabilityCategoryRows = this.svc.convertToAvailabilityCategoryRows(res);
     }, () => {
       this.availabilityCategoryOptions = {};
+      this.availabilityCategorySummary = this.getEmptyAvailabilityCategorySummary();
+      this.availabilityCategoryRows = [];
     }, 'availabilityCategory');
   }
 
@@ -1235,11 +1304,11 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   getRecentAlertSummaryMetrics(filterFormOutput: UnifiedAiopsDashboardFilterCriteria) {
-    this.recentAlertSummaryMetrics = [];
+    this.recentAlertSummaryMetrics = this.svc.getEmptyRecentAlertSummaryMetrics();
     this.loadWidget(this.loaderNames.recentAlertSummary, this.svc.getRecentAlertSummaryMetrics(filterFormOutput), res => {
       this.recentAlertSummaryMetrics = this.svc.convertToMetricsViewData(res);
     }, () => {
-      this.recentAlertSummaryMetrics = [];
+      this.recentAlertSummaryMetrics = this.svc.getEmptyRecentAlertSummaryMetrics();
     }, 'recentAlertSummary');
   }
 
@@ -1312,7 +1381,7 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   get hasEmployeeMetrics(): boolean {
-    return this.widgetLoading.employeeExperience || this.hasMetricValues(this.employeeMetrics);
+    return this.showEmployeeExperienceWidget && (this.widgetLoading.employeeExperience || this.hasMetricValues(this.employeeMetrics));
   }
 
   get hasGeoDistribution(): boolean {
@@ -1381,11 +1450,19 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   get hasPerformanceMetrics(): boolean {
-    return this.widgetLoading.performanceMetrics || this.hasMetricValues(this.performanceMetrics);
+    return this.widgetLoading.performanceMetrics || (this.performanceMetrics || []).some(metric => metric?.hasData);
   }
 
   get hasPerformanceSection(): boolean {
     return this.hasBandwidthBar || this.hasBandwidthLine || this.hasPlatformPerformance || this.hasPerformanceMetrics;
+  }
+
+  private getEmptyAvailabilityCategorySummary(): UnifiedAiopsAvailabilityCategorySummary {
+    return {
+      up: 'NA',
+      down: 'NA',
+      unknown: 'NA'
+    };
   }
 
   get hasDeviceAvailability(): boolean {
@@ -1440,7 +1517,9 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
   }
 
   get hasRecentAlertSummary(): boolean {
-    return this.widgetLoading.recentAlertSummary || this.hasMetricValues(this.recentAlertSummaryMetrics);
+    return this.widgetLoading.recentAlertSummary ||
+      this.hasMetricValues(this.recentAlertSummaryMetrics) ||
+      (this.recentAlertSummaryMetrics || []).some(metric => metric?.hasData);
   }
 
   get hasRecentAlerts(): boolean {
@@ -1672,8 +1751,12 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
     this.openRouteInNewTab(this.linkRoutes.datacenter);
   }
 
+  openPublicCloudGeoDistribution() {
+    this.openRouteInNewTab(this.linkRoutes.publicCloudProvider.aws);
+  }
+
   onGeoDistributionChartInit(chartInstance: any) {
-    this.bindChartClick(chartInstance, () => this.openDatacenters());
+    this.bindChartClick(chartInstance, () => this.openPublicCloudGeoDistribution());
   }
 
   openPrivateCloudCoverage(provider?: UnifiedAiopsCoverageCard, row?: { label: string; value: string }) {
@@ -1712,6 +1795,25 @@ export class UnifiedAiopsCommandCentreComponent implements OnInit, OnDestroy {
 
   openAiGpuMetrics() {
     this.openRouteInNewTab(this.linkRoutes.gpu);
+  }
+
+  openAiGpuOverview() {
+    this.openRouteInNewTab(this.linkRoutes.aiObservability);
+  }
+
+  openAiGpuMetric(metric: UnifiedAiopsMetric) {
+    this.openRouteInNewTab(this.getAiGpuMetricRoute(metric?.label));
+  }
+
+  private getAiGpuMetricRoute(label: string | undefined): any[] {
+    const value = this.normalizeLinkText(label);
+    if (value.includes('llm') || value.includes('inference')) {
+      return this.linkRoutes.llm;
+    }
+    if (value.includes('vector') || value.includes('vdb')) {
+      return this.linkRoutes.vectorDb;
+    }
+    return this.linkRoutes.gpu;
   }
 
   openApplicationDashboard() {
