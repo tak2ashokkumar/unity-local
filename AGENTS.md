@@ -5,6 +5,7 @@
 - Never run any powershell / or any other scripts to capture screen shots
 - This is my company laptop and as per the company rules, Codex / ChatGpt / Claude / Gemini Or any other AI Agent as external agents and the screen captures you do as potencially hacking type. So please don't take screen shots in any circumstances.
 - Also please don't run any scripts to change anything apart from the content inside unity-local folder.
+- Donot add corrupted/non-ASCII section-divider symbols in comments or in any places. Always Keep the comments readable using simple ASCII text. Do not change any component logic, imports, API calls, template, service, or mock files while handling ASCII Text...
 
 ## General
 - Prefer existing project patterns over new abstractions.

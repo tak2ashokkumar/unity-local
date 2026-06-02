@@ -39,6 +39,12 @@ export class BankOfAnthosApplicationDashboardService {
 
   //  Common Helpers 
 
+  formatChartLabel(value: string): string {
+    return String(value)
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, char => char.toUpperCase());
+  }
+
   /**
    * Builds `HttpParams` containing only `from` and `to` date strings formatted
    * per `DateRange.format`. Used by most customer-behavior and conversion endpoints.
@@ -220,20 +226,20 @@ export class BankOfAnthosApplicationDashboardService {
       text: 'BoA Sessions', left: '32%', textAlign: 'center',
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
     };
-    view.options.legend = { data: ['Sum of sessions', 'Sum of carts', 'Sum of orders'], bottom: 0 };
+    const colors = ['#03A9F4', '#FF9800', '#3F51B5', '#4CAF50', '#9C27B0', '#607D8B'];
+    const funnelData = Object.entries(graphData)
+      .filter(([, value]) => Number(value) >= 0)
+      .sort(([, leftValue], [, rightValue]) => Number(rightValue) - Number(leftValue))
+      .map(([key, value], index) => ({
+        value: Number(value),
+        actualValue: Number(value),
+        name: this.formatChartLabel(key),
+        itemStyle: { color: colors[index % colors.length] }
+      }));
 
-    // Manually normalize layer widths so each level is always clearly visible:
-    //   Sessions   always 100  (widest, top of funnel)
-    //   Orders     always 10   (fixed floor for the 3rd layer)
-    //   Carts      1520, interpolated by log10(carts/orders):
-    //               small gap between carts & orders  closer to 15
-    //               large gap between carts & orders  closer to 20
-    // minSize is set to '0%' because we control the floor ourselves via the values above.
-    const orderNormValue = 10;
-    const cartToOrderRatio = (graphData.carts > 0 && graphData.orders > 0)
-      ? graphData.carts / graphData.orders : 1;
-    const gapFactor = Math.min(1, Math.log10(Math.max(1, cartToOrderRatio)) / 2);
-    const cartNormValue = Math.round(15 + 5 * gapFactor); // 15 when gap0, up to 20 when gap100
+    if (!funnelData.length) { return; }
+
+    view.options.legend = { data: funnelData.map(item => item.name), bottom: 0 };
 
     view.options.tooltip = {
       trigger: 'item',
@@ -249,11 +255,7 @@ export class BankOfAnthosApplicationDashboardService {
       },
       labelLine: { length: 12, lineStyle: { width: 1, type: 'solid', color: '#999' } },
       itemStyle: { borderColor: '#fff', borderWidth: 1 },
-      data: [
-        { value: 100,            actualValue: graphData.sessions, name: 'Sum of sessions', itemStyle: { color: '#03A9F4' } },
-        { value: cartNormValue,  actualValue: graphData.carts,    name: 'Sum of carts',    itemStyle: { color: '#FF9800' } },
-        { value: orderNormValue, actualValue: graphData.orders,   name: 'Sum of orders',   itemStyle: { color: '#3F51B5' } }
-      ] as any[]
+      data: funnelData as any[]
     }];
     return view;
   }
@@ -268,6 +270,7 @@ export class BankOfAnthosApplicationDashboardService {
     view.type = UnityChartTypes.BAR;
     view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
+    const chartEntries = Object.entries(graphData).map(([key, value]) => ({ name: this.formatChartLabel(key), value: Number(value) }));
     view.options.title = {
       text: 'Error Analysis', left: 'center', top: '0%',
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
@@ -275,13 +278,13 @@ export class BankOfAnthosApplicationDashboardService {
     view.options.grid = { top: '12%', left: '5%', right: '10%', bottom: '8%', containLabel: true };
     view.options.xAxis = { type: 'value', axisLabel: { formatter: (val: number) => val.toLocaleString() } };
     view.options.yAxis = {
-      type: 'category', data: Object.keys(graphData),
+      type: 'category', data: chartEntries.map(item => item.name),
       axisTick: { show: true }, axisLine: { show: true },
       axisLabel: { width: 120, overflow: 'truncate', formatter: (value: string) => value },
       tooltip: { show: true }
     };
     view.options.series = [{
-      name: 'Category', type: 'bar', barMaxWidth: 35, data: Object.values(graphData),
+      name: 'Category', type: 'bar', barMaxWidth: 35, data: chartEntries.map(item => item.value),
       label: { show: true, position: 'right', color: '#333333', fontWeight: 400, formatter: (params: any) => params.value.toLocaleString() },
       itemStyle: {
         color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
@@ -384,21 +387,22 @@ export class BankOfAnthosApplicationDashboardService {
     view.type = UnityChartTypes.BAR;
     view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
-    const yAxisData = Object.keys(graphData);
-    const xAxisData = Object.values(graphData).map(val => parseFloat(val));
+    const chartEntries = Object.entries(graphData).map(([key, value]) => ({ name: this.formatChartLabel(key), value: parseFloat(value as string) }));
+    const yAxisData = chartEntries.map(item => item.name);
+    const xAxisData = chartEntries.map(item => item.value);
     view.options.title = {
       text: 'Success rate', left: 'center', top: '0%',
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
     };
     view.options.grid = { top: '15%', left: '5%', right: '10%', bottom: '15%', containLabel: true };
-    view.options.xAxis = { type: 'value', min: 0, axisLabel: { formatter: (val: number) => val.toLocaleString() } };
+    view.options.xAxis = { type: 'value', min: 0, axisLabel: { formatter: (val: number) => `${val.toLocaleString()}%` } };
     view.options.yAxis = {
       type: 'category', data: yAxisData, axisTick: { show: true }, axisLine: { show: true },
       axisLabel: { width: 120, overflow: 'truncate', formatter: (value: string) => value }, tooltip: { show: true }
     };
     view.options.series = [{
       name: 'Category', type: 'bar', barMaxWidth: 35, data: xAxisData,
-      label: { show: true, position: 'right', color: '#333333', fontWeight: 400, formatter: (params: any) => params.value.toLocaleString() },
+      label: { show: true, position: 'right', color: '#333333', fontWeight: 400, formatter: (params: any) => `${params.value.toLocaleString()}%` },
       itemStyle: {
         color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
           { offset: 0, color: '#0f5359' },
@@ -408,7 +412,7 @@ export class BankOfAnthosApplicationDashboardService {
       barCategoryGap: '40%',
       emphasis: { focus: 'series', itemStyle: { shadowBlur: 8, shadowColor: 'rgba(15,83,89,0.4)' } }
     }];
-    view.options.tooltip = { ...view.options.tooltip, formatter: (params: any) => `${params[0].name} : <strong>${params[0].value.toLocaleString()}</strong>` };
+    view.options.tooltip = { ...view.options.tooltip, formatter: (params: any) => `${params[0].name} : <strong>${params[0].value.toLocaleString()}%</strong>` };
     view.options.legend = { show: false };
     return view;
   }
@@ -491,12 +495,14 @@ export class BankOfAnthosApplicationDashboardService {
    */
   convertToNewVsReturningCustomersChartdata(graphData: any): UnityChartDetails {
     if (Object.keys(graphData).length == 0) { return; }
+    const newCustomers = graphData?.new_customers || [];
+    if (!newCustomers.length) { return; }
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.BAR;
     view.options = this.chartConfigSvc.getDefaultHorizantalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
-    const periods = graphData?.new_customers.map((item: any) => item.period);
-    const newCustomersData = graphData?.new_customers.map((item: any) => item.sum);
+    const periods = newCustomers.map((item: any) => item.period);
+    const newCustomersData = newCustomers.map((item: any) => item.sum);
     view.options.title = {
       text: 'New Customers', left: 'center', top: '0%',
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
@@ -524,21 +530,21 @@ export class BankOfAnthosApplicationDashboardService {
   //  Traffic & Engagement 
 
   /**
-   * GET `/apm/app_list/{appId}/top_categories_by_product_views/`
-   * Returns a map of country names to view counts for the top-viewed product categories.
+   * GET `/apm/app_list/{appId}/boa_user_journey/`
+   * Returns a map of journey labels to counts.
    */
   getCategoriesViewedWidgetViewData(appId: number, selectedDateRangeFormData: DurationDropdownType) {
     const params = this.converteDropdownsDataToApiParamsData(selectedDateRangeFormData);
-    return this.http.get<{ [key: string]: number }>(`/apm/app_list/${appId}/top_categories_by_product_views/`, { params });
+    return this.http.get<{ [key: string]: number }>(`/apm/app_list/${appId}/boa_user_journey/`, { params });
   }
 
   /**
-   * GET `/apm/app_list/{appId}/traffic_source_row_percentage/`
-   * Returns a map of traffic source names to percentage strings (e.g. `"35.2"`).
+   * GET `/apm/app_list/{appId}/boa_traffic_percentages/`
+   * Returns a map of traffic distribution labels to percentage strings (e.g. `"35.2"`).
    */
   getTrafficSourceOverGivenPeriod(appId: number, selectedDateRangeFormData: DurationDropdownType) {
     const params = this.converteDropdownsDataToApiParamsData(selectedDateRangeFormData);
-    return this.http.get<{ [key: string]: string }>(`/apm/app_list/${appId}/traffic_source_row_percentage/`, { params });
+    return this.http.get<{ [key: string]: string }>(`/apm/app_list/${appId}/boa_traffic_percentages/`, { params });
   }
 
   /**
@@ -551,7 +557,7 @@ export class BankOfAnthosApplicationDashboardService {
   }
 
   /**
-   * Converts country  view-count map into a horizontal bar chart ("Top Countries Count").
+   * Converts journey count map into a horizontal bar chart ("User Journey").
    * Uses a dark-teal gradient fill; bar-end labels are shown (previously hidden  now enabled).
    * Y-axis labels truncated at 120 px with tooltip for full names.
    */
@@ -564,7 +570,7 @@ export class BankOfAnthosApplicationDashboardService {
     const yAxisData = Object.keys(graphData);
     const xAxisData = Object.values(graphData);
     view.options.title = {
-      text: 'Top Countries Count', left: 'center', top: '0%',
+      text: 'User Journey', left: 'center', top: '0%',
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
     };
     view.options.grid = { top: '15%', left: '5%', right: '10%', bottom: '15%', containLabel: true };
@@ -591,7 +597,7 @@ export class BankOfAnthosApplicationDashboardService {
   }
 
   /**
-   * Converts traffic-source  percentage map into a donut chart ("Traffic Source Over Given Period").
+   * Converts traffic percentage map into a donut chart ("Traffic distribution").
    * Uses `radius: ['35%', '62%']` for the donut ring; `avoidLabelOverlap` is enabled to prevent
    * label collisions when many small slices are present.
    */
@@ -602,7 +608,7 @@ export class BankOfAnthosApplicationDashboardService {
     view.options = this.chartConfigSvc.getDefaultPieChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
     view.options.title = {
-      text: 'Traffic Source Over Given Period', left: 'center', top: '0%',
+      text: 'Traffic distribution', left: 'center', top: '0%',
       textStyle: { fontFamily: UNITY_FONT_FAMILY(), fontSize: 13, fontWeight: 500, color: UNITY_TEXT_DEFAULT_COLOR() }
     };
     view.options.tooltip = { trigger: 'item', formatter: (params: any) => `${params.name}: ${params.value}% (${params.percent}%)` };
@@ -624,12 +630,14 @@ export class BankOfAnthosApplicationDashboardService {
    */
   convertToUniqueVisitorsChartData(graphData: { [key: string]: any }): UnityChartDetails {
     if (Object.keys(graphData).length == 0) { return; }
+    const newCustomers = graphData?.new_customers || [];
+    if (!newCustomers.length) { return; }
     let view: UnityChartDetails = new UnityChartDetails();
     view.type = UnityChartTypes.LINE;
     view.options = this.chartConfigSvc.getDefaultLineChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.LINE);
-    const labels = graphData?.new_customers?.map(d => d.range);
-    const values = graphData?.new_customers?.map(d => d.total);
+    const labels = newCustomers.map(d => d.range);
+    const values = newCustomers.map(d => d.total);
     view.options = this.getCommonLineChartOptions(view.options, labels, values, 'Users - Unique Visitors (Estimated)', undefined, 'Unique Visitors', '#5B8FF9');
     return view;
   }
@@ -1324,7 +1332,7 @@ export class NewVsReturningCustomersWidgetViewData {
   loader: string = 'newVsReturningCustomersWidgetLoader';
   chartData: UnityChartDetails;
 }
-/** Holds the Top Countries Count bar chart data and its spinner key. */
+/** Holds the User Journey bar chart data and its spinner key. */
 export class CategoriesViewedWidgetViewData {
   loader: string = 'categoriesViewedWidgetLoader';
   chartData: UnityChartDetails;

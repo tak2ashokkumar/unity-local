@@ -13,6 +13,25 @@ export class ApplicationOverviewDashboardService {
     return this.http.get<AppType>('/apm/monitoring/parent_app_list/')
   }
 
+  convertToApplicationViewData(applications: ApplicationType[]): ApplicationType[] {
+    let viewData: ApplicationType[] = [];
+    applications.forEach(app => {
+      if (app.name === "astronomy-shop") {
+        viewData.push({ ...app, displayName: 'AstronomyShop' });
+      } else if (app.name === "bank-of-anthos") {
+        viewData.push({ ...app, displayName: 'Bank of Anthos' });
+      }
+    });
+
+    applications.forEach(app => {
+      if (app.name === "astronomy-shop") {
+        viewData.push({ ...app, displayName: 'EasyTrade' });
+      }
+    });
+
+    return viewData;
+  }
+
   getDateDropdownOptions(): DateDropdownOptionsData {
     let view = new DateDropdownOptionsData();
     view.options = _clone(customDateRangeOptions);
@@ -36,7 +55,7 @@ export const customDateRangeOptions: CustomDateRangeType[] = [
   { label: 'Last 30 days', value: 'last_30_days', valueAsFrequency: 'monthly' },
 ]
 
-export interface AppType{
+export interface AppType {
   count: number,
   next: any,
   previous: any,
@@ -44,10 +63,13 @@ export interface AppType{
 }
 
 export interface ApplicationType {
-    name: string;
-    id: number;
-    customer: number;
-    throughput: string;
-    latency: string;
-    status_code: string;
+  name: string;
+  id: number;
+  customer: number;
+  throughput: string;
+  latency: string;
+  status_code: string;
+
+  // Below properties are added for view purpose and not part of actual API response
+  displayName?: string;
 }

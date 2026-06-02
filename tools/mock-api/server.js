@@ -58,6 +58,55 @@ function paginateArray(req, data) {
   };
 }
 
+const queryIdentityParamNames = new Set([
+  "metric",
+  "key",
+  "type",
+  "app_id",
+  "graph_type"
+]);
+
+const ignoredQueryParamNames = new Set([
+  "from",
+  "to",
+  "page",
+  "page_size",
+  "search"
+]);
+
+function sanitizeFilePart(value) {
+  return String(value)
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]+/g, "_")
+    .replace(/^_+|_+$/g, "") || "empty";
+}
+
+function buildQuerySpecificFilePath(normalizedUrlPath, query) {
+  const queryEntries = Object.entries(query || {})
+    .filter(([key]) => queryIdentityParamNames.has(key) && !ignoredQueryParamNames.has(key))
+    .flatMap(([key, value]) => {
+      const values = Array.isArray(value) ? value : [value];
+      return values.map(item => [key, item]);
+    })
+    .filter(([, value]) => value !== undefined && value !== null && value !== "");
+
+  if (!queryEntries.length) {
+    return null;
+  }
+
+  queryEntries.sort(([leftKey, leftValue], [rightKey, rightValue]) => {
+    const left = `${leftKey}:${leftValue}`;
+    const right = `${rightKey}:${rightValue}`;
+    return left.localeCompare(right);
+  });
+
+  const querySuffix = queryEntries
+    .map(([key, value]) => `${sanitizeFilePart(key)}-${sanitizeFilePart(value)}`)
+    .join(".");
+
+  return path.join(baseDir, `${normalizedUrlPath}.${querySuffix}.json`);
+}
+
 if (fs.existsSync(celeryDir)) {
   fs.readdirSync(celeryDir).forEach(file => {
     if (file.endsWith(".js")) {
@@ -108,6 +157,7 @@ app.use((req, res) => {
     .replace(/\/+/g, "/");
 
   const exactFilePath = path.join(baseDir, normalizedUrlPath + ".json");
+  const querySpecificFilePath = buildQuerySpecificFilePath(normalizedUrlPath, req.query);
   const uuidMatch = normalizedUrlPath.match(/^(.*)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i);
 
   const loadMockFile = filePath => {
@@ -122,6 +172,10 @@ app.use((req, res) => {
     }
     return res.json(parsed);
   };
+
+  if (querySpecificFilePath && fs.existsSync(querySpecificFilePath)) {
+    return sendMockResponse(loadMockFile(querySpecificFilePath));
+  }
 
   if (fs.existsSync(exactFilePath)) {
     return sendMockResponse(loadMockFile(exactFilePath));
@@ -163,7 +217,7 @@ app.use((req, res) => {
     return res.json(placeholder);
   }
 
-  const filePath = path.join(baseDir, normalizedUrlPath + ".json");
+  const filePath = querySpecificFilePath || path.join(baseDir, normalizedUrlPath + ".json");
   const dir = path.dirname(filePath);
   fs.mkdirSync(dir, { recursive: true });
 
