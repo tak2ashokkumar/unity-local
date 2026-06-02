@@ -10,9 +10,9 @@
                 <span class="pl-2">{{topScope?.accounts}}</span>
             </div>
         </div>
-        <div class="col-6 m-0 p-0 d-flex px-1 align-items-center justify-content-end">
-            <form class="col-10 m-0 p-0 d-flex px-3 align-items-center justify-content-center" *ngIf="filterForm"
-                [formGroup]="filterForm">
+        <div class="col-6 m-0 p-0 d-flex px-1 align-items-center justify-content-end ">
+            <form class="col-10 m-0 p-0 d-flex px-3 align-items-center justify-content-center border-right"
+                *ngIf="filterForm" [formGroup]="filterForm">
                 <div class="form-group mb-0 col-3 pr-1">
                     <label class="m-0 p-0">Platform</label>
                     <multiselect-dropdown [options]="platformOptions" [settings]="multiselectSettings"
@@ -37,6 +37,10 @@
                         [texts]="multiselectTexts" class="form-control p-0" formControlName="accounts">
                     </multiselect-dropdown>
                 </div>
+                <button class="round-action-btn px-2 mx-2 mt-1" type="button" (click)="applyFilters()"
+                    [tooltip]="'Apply Filters'" container="body">
+                    <i class="fas fa-filter"></i>
+                </button>
             </form>
             <data-refresh-btn (refresh)="refreshData()"></data-refresh-btn>
             <button class="btn btn-pill btn-warning pull-right btn-sm ml-2" type="button" (click)="goBack()"
@@ -60,7 +64,9 @@
 
                     <div class="text-center p-1">
                         <div class="text-muted">Total VMs</div>
-                        <div class="font-lg-xl font-500 text-primary">
+                        <div class="font-lg-xl font-500 text-primary" role="link" tabindex="0" style="cursor: pointer;"
+                            (click)="openAllVmsInNewTab()" (keydown.enter)="openAllVmsInNewTab()"
+                            (keydown.space)="openAllVmsInNewTab()">
                             {{executiveSummaryViewData?.totalVMs || 0}}
                         </div>
                     </div>
@@ -123,10 +129,13 @@
                         <app-spinner [name]="'CloudTypeLoader'"></app-spinner>
                         <ng-container *ngIf="executiveSummaryWidgetData?.cloudTypeChartData">
                             <div echarts [options]="executiveSummaryWidgetData?.cloudTypeChartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height:250px;">
+                                (chartInit)="onCloudTypeChartInit($event)" [defaultHeight]="200"
+                                style="width: 100%; height:250px;">
                             </div>
                             <div class="cloud-legend-wrapper">
-                                <div class="cloud-legend-item"
+                                <button type="button" class="cloud-legend-item border-0 bg-transparent p-0 text-left"
+                                    (click)="openCloudTypeLegend(item.name)" [tooltip]="'Open linked page'"
+                                    container="body"
                                     *ngFor="let item of executiveSummaryWidgetData?.cloudTypeChartData?.options?.series[0]?.data">
                                     <div class="d-flex align-items-center">
                                         <span class="cloud-legend-dot" [style.background]="item.color">
@@ -135,7 +144,7 @@
                                             {{item.name}} {{item.value}}%
                                         </span>
                                     </div>
-                                </div>
+                                </button>
                             </div>
                         </ng-container>
                         <div *ngIf="!executiveSummaryWidgetData.cloudTypeChartData"
@@ -153,7 +162,8 @@
                         </app-spinner>
                         <ng-container *ngIf="executiveSummaryWidgetData?.powerActivityChartData">
                             <div echarts [options]="executiveSummaryWidgetData?.powerActivityChartData?.options"
-                                [defaultHeight]="200" style="width: 100%; height:250px;">
+                                (chartInit)="onPowerActivityChartInit($event)" [defaultHeight]="200"
+                                style="width: 100%; height:250px;">
                             </div>
                             <div class="power-legend-wrapper">
                                 <div class="power-legend-item">
@@ -218,21 +228,31 @@
                         </div>
                     </div>
                     <div class="mt-2" *ngIf="executiveSummaryWidgetData?.alertSeverityViewData">
-                        <div class="text-center mb-3 font-weight-600">
+                        <div class="text-center mb-3 font-weight-600" role="link" tabindex="0" style="cursor: pointer;"
+                            (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
+                            (keydown.space)="openAlertsInNewTab()" [tooltip]="'Open linked page'" container="body">
                             Alerts Severity
                         </div>
 
                         <div class="d-flex justify-content-center align-items-center flex-wrap " style="gap: 15px;">
 
-                            <span class="severity-pill severity-critical">
+                            <span class="severity-pill severity-critical" role="link" tabindex="0"
+                                style="cursor: pointer;" (click)="openAlertsInNewTab()"
+                                (keydown.enter)="openAlertsInNewTab()" (keydown.space)="openAlertsInNewTab()"
+                                [tooltip]="'Open linked page'" container="body">
                                 Critical {{executiveSummaryWidgetData?.alertSeverityViewData?.critical || '0' }}
                             </span>
 
-                            <span class="severity-pill severity-warning">
+                            <span class="severity-pill severity-warning" role="link" tabindex="0"
+                                style="cursor: pointer;" (click)="openAlertsInNewTab()"
+                                (keydown.enter)="openAlertsInNewTab()" (keydown.space)="openAlertsInNewTab()"
+                                [tooltip]="'Open linked page'" container="body">
                                 Warning {{executiveSummaryWidgetData?.alertSeverityViewData?.warning|| '0' }}
                             </span>
 
-                            <span class="severity-pill severity-info">
+                            <span class="severity-pill severity-info" role="link" tabindex="0" style="cursor: pointer;"
+                                (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
+                                (keydown.space)="openAlertsInNewTab()" [tooltip]="'Open linked page'" container="body">
                                 Info {{executiveSummaryWidgetData?.alertSeverityViewData?.info ||'0' }}
                             </span>
 
@@ -253,7 +273,7 @@
             <div class="row">
                 <div class="col-4 px-1">
                     <div class=" p-2">
-                        VM Density Per Host
+                        Host Utilization
                     </div>
                     <div class="card-body">
                         <app-spinner [name]="densityHostVm.loader"></app-spinner>
@@ -435,7 +455,7 @@
 <div class="row mx-1 py-4">
     <div class="col-12">
         <div class=" bg-transparent font-500 font-lg py-2">
-            Infrastructure Health / Hardware Status
+            Sensor Statistics
         </div>
         <div class="card round-edge equalize-card mb-3 p-4">
             <app-spinner [name]="infrastructureHealthWidgetData.loader"></app-spinner>
@@ -447,24 +467,27 @@
                             <span class="status-dot bg-success"></span>
                             <span class="px-2">PSU normal</span>
                         </div>
-                        <span
-                            class="badge bg-success-subtle text-success rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.psuNormal}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--success">
+                            {{infrastructureHealthWidgetData?.psuNormal}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-warning"></span>
                             <span class="px-2">PSU degraded</span>
                         </div>
-                        <span
-                            class="badge bg-warning-subtle text-warning rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.psuDegraded}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--warning">
+                            {{infrastructureHealthWidgetData?.psuDegraded}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-danger"></span>
                             <span class="px-2">PSU failed</span>
                         </div>
-                        <span
-                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.psuFailed}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--danger">
+                            {{infrastructureHealthWidgetData?.psuFailed}}
+                        </span>
                     </div>
                 </div>
                 <!-- Host Health Status -->
@@ -475,32 +498,36 @@
                             <span class="status-dot bg-success"></span>
                             <span class="px-2">Healthy</span>
                         </div>
-                        <span
-                            class="badge bg-success-subtle text-success rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.healthy}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--success">
+                            {{infrastructureHealthWidgetData?.healthy}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-warning"></span>
                             <span class="px-2">Warning</span>
                         </div>
-                        <span
-                            class="badge bg-warning-subtle text-warning rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.warning}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--warning">
+                            {{infrastructureHealthWidgetData?.warning}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-danger"></span>
                             <span class="px-2">Critical</span>
                         </div>
-                        <span
-                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.critical}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--danger">
+                            {{infrastructureHealthWidgetData?.critical}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-secondary"></span>
                             <span class="px-2">Maintenance</span>
                         </div>
-                        <span
-                            class="badge bg-secondary-subtle text-secondary rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.maintenance}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--secondary">
+                            {{infrastructureHealthWidgetData?.maintenance}}
+                        </span>
                     </div>
                 </div>
                 <!-- Fan / Temperature Sensors -->
@@ -511,32 +538,36 @@
                             <span class="status-dot bg-success"></span>
                             <span class="px-2">Temp normal (&lt;60°C)</span>
                         </div>
-                        <span
-                            class="badge bg-success-subtle text-success rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.tempNormal}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--success">
+                            {{infrastructureHealthWidgetData?.tempNormal}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-warning"></span>
-                            <span class="px-2">Temp Warning</span>l
+                            <span class="px-2">Temp Warning</span>
                         </div>
-                        <span
-                            class="badge bg-warning-subtle text-warning rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.tempWarning}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--warning">
+                            {{infrastructureHealthWidgetData?.tempWarning}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-danger"></span>
                             <span class="px-2">Temp Critical</span>
                         </div>
-                        <span
-                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.tempCritical}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--danger">
+                            {{infrastructureHealthWidgetData?.tempCritical}}
+                        </span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center py-2">
                         <div class="d-flex align-items-center">
                             <span class="status-dot bg-danger"></span>
                             <span class="px-2">Fan Failed</span>
                         </div>
-                        <span
-                            class="badge bg-danger-subtle text-danger rounded-pill font-lg px-2">{{infrastructureHealthWidgetData?.fanFailed}}</span>
+                        <span class="sensor-stat-count sensor-stat-count--danger">
+                            {{infrastructureHealthWidgetData?.fanFailed}}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -548,24 +579,63 @@
 
 <div class="row mx-1 py-4">
     <div class="col-12">
-        <div class=" bg-transparent font-500 font-lg py-2">
-            Performance Hotspots-Top 10 Private Cloud VM's
+        <div class="bg-transparent font-500 font-lg py-2 utilization-section-header">
+            <span>Performance Hotspots-Top 10 Private Cloud VM's</span>
+            <div class="utilization-sort-control">
+                <label for="utilization-sort-select" class="utilization-sort-label">Sort By</label>
+                <select #utilizationSortSelect id="utilization-sort-select"
+                    class="form-control form-control-sm utilization-sort-select" [value]="selectedUtilizationSort"
+                    (change)="onUtilizationSortFieldChange(utilizationSortSelect.value)">
+                    <option *ngFor="let option of utilizationSortOptions; trackBy: trackByValue" [value]="option.value">
+                        {{option.label}}
+                    </option>
+                </select>
+            </div>
         </div>
         <div class="card round-edge equalize-card mb-3 p-4 position-relative">
             <app-spinner [name]="utilizationRows.loader" [width]="0"></app-spinner>
             <div class="row">
                 <div class="col-12 px-1">
-                    <h5 class="text-center mb-3">Top 10 Utilization</h5>
                     <div class="table-responsive">
                         <table class="table table-sm utilization-table mb-0">
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>CPU Utilization</th>
-                                    <th>Memory Utilization</th>
-                                    <th>Storage Utilization</th>
-                                    <th>Disk IOPS</th>
-                                    <th>Up Time</th>
+                                    <th [ngClass]="getUtilizationHeaderClass('cpu')"
+                                        (click)="onUtilizationHeaderSort('cpu')">
+                                        <span class="utilization-sort-heading">CPU Utilization
+                                            <i *ngIf="getUtilizationSortIcon('cpu') as iconClass" class="fa ml-1"
+                                                [ngClass]="iconClass"></i>
+                                        </span>
+                                    </th>
+                                    <th [ngClass]="getUtilizationHeaderClass('memory')"
+                                        (click)="onUtilizationHeaderSort('memory')">
+                                        <span class="utilization-sort-heading">Memory Utilization
+                                            <i *ngIf="getUtilizationSortIcon('memory') as iconClass" class="fa ml-1"
+                                                [ngClass]="iconClass"></i>
+                                        </span>
+                                    </th>
+                                    <th [ngClass]="getUtilizationHeaderClass('storage')"
+                                        (click)="onUtilizationHeaderSort('storage')">
+                                        <span class="utilization-sort-heading">Storage Utilization
+                                            <i *ngIf="getUtilizationSortIcon('storage') as iconClass" class="fa ml-1"
+                                                [ngClass]="iconClass"></i>
+                                        </span>
+                                    </th>
+                                    <th [ngClass]="getUtilizationHeaderClass('diskIops')"
+                                        (click)="onUtilizationHeaderSort('diskIops')">
+                                        <span class="utilization-sort-heading">Disk IOPS
+                                            <i *ngIf="getUtilizationSortIcon('diskIops') as iconClass" class="fa ml-1"
+                                                [ngClass]="iconClass"></i>
+                                        </span>
+                                    </th>
+                                    <th [ngClass]="getUtilizationHeaderClass('upTime')"
+                                        (click)="onUtilizationHeaderSort('upTime')">
+                                        <span class="utilization-sort-heading">Up Time
+                                            <i *ngIf="getUtilizationSortIcon('upTime') as iconClass" class="fa ml-1"
+                                                [ngClass]="iconClass"></i>
+                                        </span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -574,15 +644,15 @@
                                     </td>
                                     <td>
                                         <div class="sparkline-cell">
-                                            <!-- <div echarts [options]="row.cpuChartOptions" class="sparkline-chart"></div> -->
+                                            <div echarts [options]="row.cpuChartOptions" class="sparkline-chart"></div>
                                             <span class="status-badge" [ngClass]="getStatusClass(row.cpuTone)"><span
                                                     class="text-white">{{row.cpuStatus}}%</span></span>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="sparkline-cell">
-                                            <!-- <div echarts [options]="row.memoryChartOptions" class="sparkline-chart">
-                                            </div> -->
+                                            <div echarts [options]="row.memoryChartOptions" class="sparkline-chart">
+                                            </div>
                                             <span class="status-badge" [ngClass]="getStatusClass(row.memoryTone)"><span
                                                     class="text-white">{{row.memoryStatus}}%</span></span>
                                         </div>
@@ -623,7 +693,7 @@
     </div>
 </div>
 
-<div class="row mx-1 py-4">
+<div class="row mx-1 py-4 mt-4">
     <div class="col-12">
         <div class=" bg-transparent font-500 font-lg py-2">
             Performance / Workload insights
@@ -702,6 +772,22 @@
                 Devices Analysis
             </div>
             <div class="card-body d-flex flex-column p-2 position-relative">
+                <div class="d-flex align-items-center flex-wrap my-3 mx-auto">
+                    <div class="d-flex align-items-center mr-4">
+                        <i class="fa fa-check-circle text-success mr-1"></i>
+                        <span>Active / Reachable</span>
+                    </div>
+
+                    <div class="d-flex align-items-center mr-4">
+                        <i class="fa fa-exclamation-circle text-warning mr-1"></i>
+                        <span>Partially Reachable / Warning State</span>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-exclamation-triangle text-danger mr-1"></i>
+                        <span>Offline / Critical / Unreachable</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <app-spinner [name]="idleDevicesRow.loader" [width]="0"></app-spinner>
                     <table class="table table-sm alert-table">
@@ -718,7 +804,13 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let device of idleDevicesRow?.devicesRow; trackBy: trackByIndex">
-                                <td>{{device.deviceName}}</td>
+                                <td>
+                                    <button type="button" class="btn btn-link p-0 table-link text-left"
+                                        (click)="openIdleDeviceDetails(device)" [tooltip]="'Open linked page'"
+                                        container="body">
+                                        {{device.deviceName}}
+                                    </button>
+                                </td>
                                 <td>{{device.resourceType}}</td>
                                 <td>
                                     <div class="progress-track">
@@ -749,6 +841,20 @@
                     <div *ngIf="!idleDevicesRow?.devicesRow?.length" class="text-center text-muted py-4">No data
                         available.
                     </div>
+                    <div class="idle-pagination-row" *ngIf="idleDevicesRow?.devicesRow?.length">
+                        <div class="idle-page-size">
+                            <span>Show</span>
+                            <select class="form-control form-control-sm" [value]="idleDevicesPageSize"
+                                (change)="idleDevicesPageSizeChange($event)">
+                                <option [value]="10">10</option>
+                                <option [value]="25">25</option>
+                                <option [value]="50">50</option>
+                            </select>
+                        </div>
+                        <table-pager [compact]="true" [pageNo]="idleDevicesPageNo" [pageSize]="idleDevicesPageSize"
+                            [totalCount]="idleDevicesTotal" (pageChange)="idleDevicesPageChange($event)"></table-pager>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -801,11 +907,26 @@
     <div class="col-6">
         <div class="card round-edge mb-0">
             <div class="card-header bg-transparent font-500 font-lg p-2">
-                <span
-                    class="badge badge-secondary font-lg font-500 mr-2">{{orphanedDeviceListViewData?.orphanList?.length}}</span>Orphaned
+                <span class="badge badge-secondary font-lg font-500 mr-2">{{orphanedDevicesTotal||0}}</span>Orphaned
                 Device List
             </div>
             <div class="card-body d-flex flex-column p-2 position-relative">
+                <div class="d-flex align-items-center flex-wrap my-3 mx-auto">
+                    <div class="d-flex align-items-center mr-4">
+                        <i class="fa fa-check-circle text-success mr-1"></i>
+                        <span>Active / Reachable</span>
+                    </div>
+
+                    <div class="d-flex align-items-center mr-4">
+                        <i class="fa fa-exclamation-circle text-warning mr-1"></i>
+                        <span>Partially Reachable / Warning State</span>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-exclamation-triangle text-danger mr-1"></i>
+                        <span>Offline / Critical / Unreachable</span>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <app-spinner [name]="orphanedDeviceListViewData.loader" [width]="0"></app-spinner>
                     <table class="table table-sm alert-table">
@@ -819,7 +940,13 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let device of orphanedDeviceListViewData.orphanList; trackBy: trackByIndex">
-                                <td>{{device.name}}</td>
+                                <td>
+                                    <button type="button" class="btn btn-link p-0 table-link text-left"
+                                        (click)="openOrphanedDeviceDetails(device)" [tooltip]="'Open linked page'"
+                                        container="body">
+                                        {{device.name}}
+                                    </button>
+                                </td>
                                 <td [tooltip]="device.status"> <i
                                         [ngClass]="getOrphanedStatusIconClass(device.status)"></i></td>
                                 <td>{{device.lastSeen}}</td>
@@ -827,6 +954,24 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div *ngIf="!orphanedDeviceListViewData.orphanList?.length" class="text-center text-muted py-4">No
+                        data
+                        available.
+                    </div>
+                </div>
+                <div class="orphaned-pagination-row" *ngIf="orphanedDeviceListViewData.orphanList">
+                    <div class="orphaned-page-size">
+                        <span>Show</span>
+                        <select class="form-control form-control-sm" [value]="orphanedDevicesPageSize"
+                            (change)="orphanedDevicesPageSizeChange($event)">
+                            <option [value]="10">10</option>
+                            <option [value]="25">25</option>
+                            <option [value]="50">50</option>
+                        </select>
+                    </div>
+                    <table-pager [compact]="true" [pageNo]="orphanedDevicesPageNo" [pageSize]="orphanedDevicesPageSize"
+                        [totalCount]="orphanedDevicesTotal"
+                        (pageChange)="orphanedDevicesPageChange($event)"></table-pager>
                 </div>
             </div>
         </div>
@@ -836,29 +981,34 @@
             <div class="card-header bg-transparent font-500 font-lg p-2">
                 Orphaned By Category
             </div>
-            <div class="card-body position-relative">
+            <div class="card-body position-relative orphaned-category-body">
                 <app-spinner [name]="orphanedDeviceWidgetViewData.loader" [width]="0"></app-spinner>
-                <ng-container *ngIf="orphanedDeviceWidgetViewData?.chartData">
-                    <div echarts [options]="orphanedDeviceWidgetViewData?.chartData?.options" [defaultHeight]="400"
-                        style="width: 100%; height: 400px;">
-                    </div>
-                </ng-container>
-
-                <div class="custom-legend">
-                    <div class="legend-item" *ngFor="let item of orphanedByCategory; let i = index">
-
-                        <div class="d-flex align-items-center">
-                            <span class="legend-dot" [style.background]="orphanedByCategoryColors[i]">
-                            </span>
-
-                            <span class="legend-label">
-                                {{item.category}}
-                            </span>
+                <div class="orphaned-category-content">
+                    <ng-container *ngIf="orphanedDeviceWidgetViewData?.chartData">
+                        <div echarts [options]="orphanedDeviceWidgetViewData?.chartData?.options"
+                            (chartInit)="onOrphanedCategoryChartInit($event)" [defaultHeight]="400"
+                            style="width: 100%; height: 400px;">
                         </div>
+                    </ng-container>
 
-                        <span class="legend-value">
-                            {{item.count}} ({{item.percentage}}%)
-                        </span>
+                    <div class="custom-legend">
+                        <button type="button" class="legend-item border-0 bg-transparent p-0 text-left"
+                            (click)="openOrphanedCategoryLegend(item.category)" [tooltip]="'Open linked page'"
+                            container="body" *ngFor="let item of orphanedByCategory; let i = index">
+
+                            <div class="d-flex align-items-center">
+                                <span class="legend-dot" [style.background]="orphanedByCategoryColors[i]">
+                                </span>
+
+                                <span class="legend-label">
+                                    {{item.category}}
+                                </span>
+                            </div>
+
+                            <span class="legend-value">
+                                {{item.count}} ({{item.percentage}}%)
+                            </span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -874,15 +1024,21 @@
         <div class="card round-edge equalize-card mb-3 p-4 position-relative">
             <div class="alert-summary">
                 <app-spinner [name]="alertSummaryMetrics?.loader" [width]="0"></app-spinner>
-                <div class="alert-summary-metric">
+                <div class="alert-summary-metric" role="link" tabindex="0" style="cursor: pointer;"
+                    (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
+                    (keydown.space)="openAlertsInNewTab()" [tooltip]="'Open linked page'" container="body">
                     <div>Critical Alerts</div>
                     <strong class="tone-danger">{{alertSummaryMetrics?.critical}}</strong>
                 </div>
-                <div class="alert-summary-metric">
+                <div class="alert-summary-metric" role="link" tabindex="0" style="cursor: pointer;"
+                    (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
+                    (keydown.space)="openAlertsInNewTab()" [tooltip]="'Open linked page'" container="body">
                     <div>Warning Alerts</div>
                     <strong class="tone-warning">{{alertSummaryMetrics?.warning}}</strong>
                 </div>
-                <div class="alert-summary-metric">
+                <div class="alert-summary-metric" role="link" tabindex="0" style="cursor: pointer;"
+                    (click)="openAlertsInNewTab()" (keydown.enter)="openAlertsInNewTab()"
+                    (keydown.space)="openAlertsInNewTab()" [tooltip]="'Open linked page'" container="body">
                     <div>Info Tickets</div>
                     <strong class="tone-primary">{{alertSummaryMetrics?.information}}</strong>
                 </div>
@@ -907,7 +1063,8 @@
                                     class="btn btn-link p-0 table-link">{{alert.id}}</button>
                             </td>
                             <td>{{alert.deviceName}}</td>
-                            <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td>
+                            <td><span class="severity-dot" [tooltip]="alert.severity"
+                                    [ngClass]="alert.severity">!</span></td>
                             <td>{{alert.description}}</td>
                             <td>{{alert.source}}</td>
                             <td>{{alert.acknowledged}}</td>

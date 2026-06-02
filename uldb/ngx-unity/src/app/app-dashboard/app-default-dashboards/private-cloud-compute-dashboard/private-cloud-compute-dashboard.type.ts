@@ -148,15 +148,18 @@ export interface PerformanceWorkloadDataType {
   // filters: Filters;
 }
 export interface DiskLatencyTop10Item {
-  vmName: string;
+  name: string;
+  uuid: string;
   value: number;
 }
 export interface CpuReadyWaitTop10Item {
-  vmName: string;
+  name: string;
+  uuid: string;
   value: number;
 }
 export interface SwapBalloonMemoryTop10Item {
-  vmName: string;
+  name: string;
+  uuid: string;
   value: number;
 }
 
@@ -282,6 +285,7 @@ export interface PrivateCloudStorageUtilization {
 }
 
 export interface PrivateCloudDiskIops {
+  value: number;
   label: string;
   percent: number;
   tone: PrivateCloudStatusTone;
@@ -358,9 +362,12 @@ export interface PrivateCloudTicketRow {
 export interface OrphanedDevice {
   name: string;
   status: string;
+  uuid: string;
+  deviceType: string;
   lastSeen: string;
   datacenter: string;
 }
+
 
 export interface OrphanedCategory {
   category: string;
@@ -369,19 +376,28 @@ export interface OrphanedCategory {
 }
 
 export interface OrphanedResourcesResponse {
-  orphanedDeviceList: OrphanedDevice[];
+  count: number;
+  next: string;
+  previous: string;
+  results: OrphanedDevice[];
   orphanedByCategory: OrphanedCategory[];
   totalOrphaned: number;
 }
 
+
 export interface IdleDevices {
-  idleDeviceList: IdleDeviceListItem[];
+  count: number;
+  next: string;
+  previous: string | null;
+  results: IdleDeviceListItem[];
   idleDurationDistribution: IdleDurationDistributionItem[];
 }
 export interface IdleDeviceListItem {
   deviceName: string;
   resourceType: string;
   avgCpu: AvgCpu;
+  uuid: string;
+  deviceType: string;
   avgMem: AvgMem;
   networkIO: string;
   idleDuration: string;
@@ -399,5 +415,3 @@ export interface IdleDurationDistributionItem {
   duration: string;
   count: number;
 }
-
-

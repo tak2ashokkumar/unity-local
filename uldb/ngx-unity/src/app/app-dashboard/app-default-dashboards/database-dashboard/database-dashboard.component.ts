@@ -33,7 +33,8 @@ import { SearchCriteria } from 'src/app/shared/table-functionality/search-criter
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
-import { AimlEventDetailsService } from 'src/app/shared/aiml-event-details/aiml-event-details.service';
+import { AimlAlertDetailsService } from 'src/app/shared/aiml-alert-details/aiml-alert-details.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'database-dashboard',
@@ -144,9 +145,10 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
   constructor(private svc: DatabaseDashboardService,
     private router: Router,
     private route: ActivatedRoute,
+    private location: Location,
     private spinnerService: AppSpinnerService,
     private notification: AppNotificationService,
-    private alertDetailSvc: AimlEventDetailsService,    
+    private alertDetailSvc: AimlAlertDetailsService,    
   ) { }
 
   ngOnInit(): void {
@@ -294,7 +296,7 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
         if (res) {
           // console.log("inventory resp,", res)
           this.summaryMetrics = this.svc.convertToSummaryViewData(res);
-          this.cloudTypeDistributionOptions = this.svc.convertToCloudTypeDistributionOptions(res.by_category);
+          this.cloudTypeDistributionOptions = this.svc.convertToCloudTypeDistributionOptions(res.by_cloud_type);
           this.dbCountByPlatformOptions = this.svc.convertToPlatformCountOptions(res.by_type);
           this.dbByEnvironmentOptions = this.svc.convertToEnvironmentOptions(res.by_environment);
           this.tags = this.svc.convertToTagsViewData(res.by_tags);
@@ -483,11 +485,6 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-  viewAlertDetails(uuid: string) {
-    if(!uuid) { return; }
-    this.alertDetailSvc.showEventDetails(uuid);
-  }
-
   getStatusClass(tone: DatabaseDashboardTone): string {
     return tone ? `tone-${tone}` : '';
   }
@@ -502,6 +499,73 @@ export class DatabaseDashboardComponent implements OnInit, OnDestroy {
 
   goBack() {
     goBackFromDefaultDashboard(this.router, this.route);
+  }
+
+  openDatabaseServersList(){
+    this.openRouteInNewTab('/unitycloud/devices/databases');
+  }
+
+  openDatabaseServerDetails(dbServerUUID: string){
+    if(!dbServerUUID) {return;}
+    this.openRouteInNewTab(`/unitycloud/devices/databases/${dbServerUUID}/details`);
+  }
+
+  openDatabaseDetails(dbServerUUID: string, dbUUID){   
+    this.openRouteInNewTab(`/unitycloud/devices/databases/${dbServerUUID}/details/database_details/${dbUUID}`);
+  }
+
+  openSummaryMetric(metric: DatabaseDashboardMetric) {
+    const routes: Record<string, string> = {
+      total_databases:'/unitycloud/devices/databases',
+    };
+    if (!metric || !routes[metric.key]) { return; }
+    this.openRouteInNewTab(routes[metric.key]);
+  }
+
+  onInventoryChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openRouteInNewTab(`/unitycloud/devices/databases`);
+    });
+  }
+
+  onTop10QueryRespChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      console.log("params, ",params)
+      this.openRouteInNewTab(`/unitycloud/devices/databases/${params.data.db_uuid}/details`);
+    });
+  }
+
+  onGrowthInsightsChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      console.log("params, ",params)
+      this.openRouteInNewTab(`/unitycloud/devices/databases/${params.data.db_uuid}/details`);
+    });
+  }
+
+  viewAlertDetails(uuid: string) {
+    if(!uuid) { return; }
+    this.alertDetailSvc.showAlertDetails(uuid);
+  }
+
+  openAlertsPage(metric: DatabaseDashboardAlertSummaryMetric) {
+    const routes: Record<string, string> = {
+      critical_alerts: '/services/aiml-event-mgmt/alerts',
+      high_alerts: '/services/aiml-event-mgmt/alerts',
+      // open_itsm_tickets: '/services/aiml-event-mgmt/alerts',
+      // automation_success_pct: '/services/aiml-event-mgmt/alerts',
+    };
+    if (!metric || !routes[metric.key]) { return; }
+    this.openRouteInNewTab(routes[metric.key]);
+  }
+
+  private bindChartClick(chartInstance: any, handler: (params: any) => void) {
+    chartInstance.on('click', handler);
+  }
+
+  private openRouteInNewTab(url: string) {
+    // const routeUrl = this.router.serializeUrl(this.router.createUrlTree(commands));
+    const externalUrl = this.location.prepareExternalUrl(url);
+    window.open(externalUrl, '_blank', 'noopener');
   }
 
   // private loadWidget<T>(loaderName: string, request: Observable<T>, onSuccess: (res: T) => void, onError: () => void) {

@@ -47,58 +47,6 @@ export class PrivateCloudComputeDashboardService {
 
   getFilterDropdowns(): Observable<any> {
     return this.http.get<ExecutiveSummaryWidgetType>(`/customer/widgets/dashboard_filters/`);
-    // return of({
-    //   "filters": {
-    //     "platforms": [
-    //       { "value": "All", "label": "All" },
-    //       { "value": "VMware", "label": "VMware vCenter" },
-    //       { "value": "Custom", "label": "Custom" }
-    //     ],
-    //     "datacenters": [
-    //       { "value": "All", "label": "All" },
-    //       { "value": "DC1", "label": "DC1" },
-    //       { "value": "DC2", "label": "DC2" }
-    //     ],
-    //     "accounts": [
-    //       { "value": "All", "label": "All" },
-    //       { "value": "uuid-123", "label": "treas" },
-    //       { "value": "uuid-456", "label": "custom_clouds" }
-    //     ],
-    //     "environments": [
-    //       { "value": "All", "label": "All" },
-    //       { "value": "Production", "label": "Production" },
-    //       { "value": "Development", "label": "Development" },
-    //       { "value": "Test", "label": "Test" },
-    //       { "value": "None", "label": "None" }
-    //     ],
-    //     "timeRanges": [
-    //       { "value": "1", "label": "1 Hour" },
-    //       { "value": "6", "label": "6 Hour" },
-    //       { "value": "12", "label": "12 Hour" },
-    //       { "value": "24", "label": "24 Hour" },
-    //       { "value": "168", "label": "7 Days" },
-    //       { "value": "720", "label": "30 Days" }
-    //     ],
-    //     "eventDatacenters": [
-    //       { "value": "All Datacenter", "label": "All Datacenter" },
-    //       { "value": "DC1", "label": "DC1" },
-    //       { "value": "AWS-US-EAST-1", "label": "AWS-US-EAST-1" }
-    //     ],
-    //     "eventClouds": [
-    //       { "value": "All Cloud", "label": "All Cloud" },
-    //       { "value": "VMware", "label": "VMware" },
-    //       { "value": "AWS", "label": "AWS" },
-    //       { "value": "Azure", "label": "Azure" }
-    //     ],
-    //     "deviceTypes": [
-    //       { "value": "Device Type", "label": "Device Type" },
-    //       { "value": "Server", "label": "Server" },
-    //       { "value": "Switch", "label": "Switch" },
-    //       { "value": "Router", "label": "Router" },
-    //       { "value": "Firewall", "label": "Firewall" }
-    //     ]
-    //   }
-    // })
   }
 
   buildFilterForm(
@@ -510,82 +458,6 @@ export class PrivateCloudComputeDashboardService {
     return view;
   }
 
-  // convertToVmDensityChartDataChartData(data: VmDensityPerHostItem[]) {
-  //   if (!data || !data.length) { return; }
-  //   let view: UnityChartDetails = new UnityChartDetails();
-  //   view.type = UnityChartTypes.BAR;
-  //   view.options = this.chartConfigSvc.getDefaultVerticalBarChartOptions();
-  //   view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
-
-  //   view.options = {
-  //     ...view.options,
-  //     // title: {
-  //     //   text: 'VM Density Per Host',
-  //     //   left: 'center',
-  //     //   top: 5,
-  //     //   textStyle: {
-  //     //     fontSize: 16,
-  //     //     fontWeight: 500,
-  //     //     color: '#333'
-  //     //   }
-  //     // },
-  //     tooltip: {
-  //       trigger: 'item',
-  //       formatter: (params: any) => {
-  //         return `${params.name}<br/>VM Count: ${params.value}`;
-  //       }
-  //     },
-
-  //     xAxis: {
-  //       type: 'category',
-  //       data: data.map(item => item.hostName),
-  //       axisLine: {
-  //         lineStyle: { color: '#d1d5db' }
-  //       },
-  //       axisTick: { show: false },
-  //       axisLabel: {
-  //         color: '#8a8a8a',
-  //         fontSize: 12
-  //       }
-  //     },
-
-  //     yAxis: {
-  //       type: 'value',
-  //       min: 0,
-  //       max: 40,
-  //       interval: 10,
-  //       axisLine: { show: false },
-  //       axisTick: { show: false },
-  //       axisLabel: {
-  //         color: '#8a8a8a',
-  //         fontSize: 12
-  //       },
-  //       splitLine: {
-  //         show: true,
-  //         lineStyle: {
-  //           color: '#f1f2f4'
-  //         }
-  //       }
-  //     },
-
-  //     series: [
-  //       {
-  //         name: 'VM Count',
-  //         type: 'bar',
-  //         barWidth: 52,
-  //         data: data.map((item, index) => ({
-  //           value: item.vmCount,
-  //           itemStyle: {
-  //             color: VmDensityPerHostChartColors[index % VmDensityPerHostChartColors.length],
-  //             borderRadius: [4, 4, 0, 0]
-  //           }
-  //         }))
-  //       }
-  //     ]
-  //   };
-
-  //   return view;
-  // }
 
   convertToVmCapacityChartData(data: CapacityTrendAndForecastItem[]) {
     if (!data || !data.length) { return; }
@@ -709,7 +581,6 @@ export class PrivateCloudComputeDashboardService {
   getTop10ClustersByVMsWidgetData(filters: FiltersCriteriaType): Observable<Top10ClustersByVMsData> {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<any>('/customer/widgets/top_clusters_by_vm_count/', { params });
-
   }
 
 
@@ -733,6 +604,18 @@ export class PrivateCloudComputeDashboardService {
     view.options = this.chartConfigSvc.getDefaultVerticalBarChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.BAR);
     const maxValue = Math.max(...data.map(x => x.value));
+    const barColors = [
+      '#3b82f6',
+      '#10b981',
+      '#f59e0b',
+      '#ef4444',
+      '#8b5cf6',
+      '#06b6d4',
+      '#84cc16',
+      '#f97316',
+      '#ec4899',
+      '#6366f1'
+    ];
 
 
     view.options = {
@@ -795,6 +678,9 @@ export class PrivateCloudComputeDashboardService {
           barCategoryGap: '30%',
           data: data.map((item, index) => ({
             value: item.value,
+            itemStyle: {
+              color: barColors[index % barColors.length]
+            }
           }))
         }
       ]
@@ -925,7 +811,6 @@ export class PrivateCloudComputeDashboardService {
     let params = this.convertFiltersToParams(filters)
     return this.http.get<PerformanceHotspots>('/customer/widgets/performance_hotspots/', { params });
 
-
   }
 
   convertToUtilizationViewData(data: PerformanceHotspots): PrivateCloudUtilization {
@@ -962,6 +847,7 @@ export class PrivateCloudComputeDashboardService {
       },
 
       diskIops: {
+        value: item.diskIOPS?.value ?? 0,
         label: `${item.diskIOPS?.value ?? 0}k`,
         percent: item.diskIOPS?.percentage ?? 0,
         tone: this.getProgressClass(item.diskIOPS?.percentage ?? 0)
@@ -988,6 +874,12 @@ export class PrivateCloudComputeDashboardService {
   }
 
   private getSparklineOptions(data: number[], lineColor: string, areaColor: string): EChartsOption {
+    const values = (data || []).filter(value => typeof value === 'number' && !Number.isNaN(value));
+    const minValue = values.length ? Math.min(...values) : 0;
+    const maxValue = values.length ? Math.max(...values) : 100;
+    const range = maxValue - minValue;
+    const padding = range > 0 ? range * 0.2 : Math.max(Math.abs(maxValue || 1) * 0.2, 0.5);
+
     return {
       animation: false,
       grid: { top: 2, right: 1, bottom: 2, left: 1 },
@@ -1000,8 +892,8 @@ export class PrivateCloudComputeDashboardService {
       yAxis: {
         type: 'value',
         show: false,
-        min: 0,
-        max: 100
+        min: minValue - padding,
+        max: maxValue + padding
       },
       series: [
         {
@@ -1023,8 +915,12 @@ export class PrivateCloudComputeDashboardService {
 
   //Idle Devices
 
-  getIdleDevicesData(filters?: any): Observable<IdleDevices> {
+  getIdleDevicesData(filters?: any, page = 1, pageSize = 10): Observable<IdleDevices> {
     let params = this.convertFiltersToParams(filters)
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
+
     return this.http.get<IdleDevices>('/customer/widgets/idle_devices_analysis/', { params });
 
   }
@@ -1041,12 +937,14 @@ export class PrivateCloudComputeDashboardService {
 
   transformToIdleDevicesRows(input: IdleDevices): DevicesRowViewData[] {
 
-    return (input?.idleDeviceList || []).map(item => ({
+    return (input?.results || []).map(item => ({
 
       deviceName: item.deviceName,
       resourceType: item.resourceType,
       networkIO: item.networkIO,
       idleDuration: item.idleDuration,
+      uuid: item.uuid,
+      deviceType: item.deviceType,
       status: item.status,
 
       avgCpu: {
@@ -1108,7 +1006,9 @@ export class PrivateCloudComputeDashboardService {
       series: [
         {
           type: 'pie',
-          radius: ['48%', '78%'],
+          roseType: 'area',
+          clockwise: true,
+          radius: ['28%', '78%'],
           center: ['50%', '50%'],
           avoidLabelOverlap: false,
 
@@ -1124,13 +1024,16 @@ export class PrivateCloudComputeDashboardService {
             value: item.percent,
             name: item.duration,
             itemStyle: {
-              color: colors[index % colors.length]
+              color: colors[index % colors.length],
+              borderRadius: 0,
+              borderWidth: 0
             }
           })),
 
           itemStyle: {
-            borderColor: '#ffffff',
-            borderWidth: 8
+            borderColor: 'transparent',
+            borderWidth: 0,
+            borderRadius: 0
           }
         }
       ]
@@ -1153,12 +1056,13 @@ export class PrivateCloudComputeDashboardService {
   createProgressBarChart(title: string, data: any[], maxValue?: number): EChartsOption {
 
     const max = maxValue || Math.max(...data.map(d => d.value));
+    const visualMax = max > 0 ? max * 1.15 : 1;
     const truncateVmName = (name: string) => {
       if (!name) {
         return '';
       }
 
-      return name.length > 5 ? `${name.slice(0, 5)}....` : name;
+      return name.length > 12 ? `${name.slice(0, 12)}...` : name;
     };
 
     const getColor = (value: number) => {
@@ -1171,8 +1075,8 @@ export class PrivateCloudComputeDashboardService {
 
     return {
       grid: {
-        left: 52,
-        right: 24,
+        left: 92,
+        right: 56,
         top: 12,
         bottom: 12,
         containLabel: true
@@ -1189,18 +1093,20 @@ export class PrivateCloudComputeDashboardService {
       // },
       xAxis: {
         type: 'value',
-        max,
+        max: visualMax,
         show: false
       },
       yAxis: {
         type: 'category',
         inverse: true,
-        data: data.map(d => d.vmName),
+        data: data.map(d => d.name),
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: {
           color: '#6b7280',
           fontSize: 12,
+          width: 90,
+          overflow: 'truncate',
           formatter: (value: string) => truncateVmName(value)
         }
       },
@@ -1215,7 +1121,7 @@ export class PrivateCloudComputeDashboardService {
           barWidth: 8,
           barGap: '-100%',
           silent: true,
-          data: data.map(() => max),
+          data: data.map(() => visualMax),
           itemStyle: {
             color: '#f3f4f6',
             borderRadius: 10
@@ -1236,6 +1142,7 @@ export class PrivateCloudComputeDashboardService {
           label: {
             show: true,
             position: 'right',
+            distance: 8,
             color: '#333',
             fontSize: 12,
             formatter: '{c}'
@@ -1337,19 +1244,24 @@ export class PrivateCloudComputeDashboardService {
 
   //Orphaned Devcies
 
-  getOrphanedDeviceData(filters: FiltersCriteriaType): Observable<OrphanedResourcesResponse> {
-    let params = this.convertFiltersToParams(filters)
+  getOrphanedDeviceData(filters: FiltersCriteriaType, page = 1, pageSize = 10): Observable<OrphanedResourcesResponse> {
+    let params = this.convertFiltersToParams(filters);
+    params = params.set('page', String(page));
+    params = params.set('page_size', String(pageSize));
+    params = params.set('offset', String((page - 1) * pageSize));
     return this.http.get<OrphanedResourcesResponse>('/customer/widgets/orphaned_devices_detailed/', { params });
   }
 
   convertToOrphanedDeviceListView(data: OrphanedResourcesResponse): OrphanedDeviceView {
     const viewData = new OrphanedDeviceView();
 
-    viewData.orphanList = (data?.orphanedDeviceList || []).map((item: any) => {
+    viewData.orphanList = (data?.results || []).map((item: any) => {
       return {
         name: item.name,
         status: item.status,
         lastSeen: item.lastSeen,
+        uuid: item.uuid,
+        deviceType: item.deviceType,
         datacenter: item.datacenter
       } as OrphanedDeviceList;
     });
@@ -1364,7 +1276,6 @@ export class PrivateCloudComputeDashboardService {
     view.type = UnityChartTypes.PIE;
     view.options = this.chartConfigSvc.getDefaultPieChartOptions();
     view.extensions = this.chartConfigSvc.getChartExtensions(UnityChartTypes.PIE);
-    const total = data.reduce((sum, item) => sum + item.count, 0);
 
     view.options = {
       ...view.options,
@@ -1379,20 +1290,6 @@ export class PrivateCloudComputeDashboardService {
                 `;
         }
       },
-
-      graphic: [
-        {
-          type: 'text',
-          left: 'center',
-          top: '36%',
-          style: {
-            text: `${total}`,
-            fill: '#222',
-            fontSize: 32,
-            fontWeight: 700
-          }
-        }
-      ],
 
       legend: {
         show: false,
@@ -1423,13 +1320,24 @@ export class PrivateCloudComputeDashboardService {
         {
           name: 'Orphaned By Category',
           type: 'pie',
-          radius: ['50%', '88%'],
+          roseType: 'area',
+          clockwise: false,
+          radius: ['28%', '88%'],
           center: ['50%', '50%'],
           label: {
-            show: false
+            show: true,
+            position: 'outside',
+            color: '#4b5563',
+            fontSize: 14,
+            formatter: (params: any) => `${params.data.count}`
           },
           labelLine: {
-            show: false
+            show: true,
+            length: 14,
+            length2: 10,
+            lineStyle: {
+              width: 1
+            }
           },
           data: data.map((item, index) => ({
             value: item.count,
@@ -1439,13 +1347,16 @@ export class PrivateCloudComputeDashboardService {
             percentage: item.percentage,
 
             itemStyle: {
-              color: chartColors[index]
+              color: chartColors[index],
+              borderWidth: 0,
+              borderRadius: 0
             }
           })),
 
           itemStyle: {
-            borderColor: '#ffffff',
-            borderWidth: 10
+            borderColor: 'transparent',
+            borderWidth: 0,
+            borderRadius: 0
           }
         }
       ]
@@ -1633,6 +1544,8 @@ export class OrphanedDeviceView {
 export class OrphanedDeviceList {
   name: string;
   status: string;
+  uuid: string;
+  deviceType: string
   lastSeen: string;
   datacenter: string;
 }
@@ -1747,6 +1660,8 @@ export class DevicesRowViewData {
   deviceName: string;
   resourceType: string;
   avgCpu: AvgCpu;
+  uuid: string;
+  deviceType: string;
   avgMem: AvgMem;
   networkIO: string;
   idleDuration: string;

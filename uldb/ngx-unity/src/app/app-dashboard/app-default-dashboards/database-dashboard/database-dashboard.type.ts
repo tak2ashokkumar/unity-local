@@ -15,6 +15,8 @@ export interface DatabaseDashboardMetric {
   label: string;
   value: string;
   tone?: DatabaseDashboardTone;
+  key: string;
+  link?: boolean;
 }
 
 export interface DatabaseDashboardDonutItem {
@@ -29,6 +31,8 @@ export interface DatabaseDashboardBarItem {
   value: number;
   label?: string;
   color?: string;
+  dbUuid?: string;
+  hostUuid?: string;
 }
 
 export interface DatabaseDashboardStackedBarItem {
@@ -115,7 +119,7 @@ export interface DbDashboardHealthGroup {
 //inventory
 export interface InventoryWidgetType {
   total_databases: number;
-  by_category: InventoryWidgetByCategoryType[];
+  by_cloud_type: InventoryWidgetByCategoryType[];
   by_type: InventoryWidgetByPlatformType[];
   status: InventoryWidgetSummaryStatus;
   by_environment: InventoryWidgetByEnvironment[];
@@ -123,7 +127,7 @@ export interface InventoryWidgetType {
   by_tags: InventoryWidgetByTags[];
 }
 export interface InventoryWidgetByCategoryType {
-  category: string;
+  cloud_type: string;
   count: number;
   percentage: number;
 }
@@ -156,6 +160,7 @@ export interface InventoryWidgetByVersion {
 //performance workload
 export interface DatabaseDashboardTop10Utilization {
   host_id: number;
+  db_uuid: string;
   name: string;
   cpu_usage_system_percent: number;
   cpu_usage_user_percent: number;
@@ -172,6 +177,7 @@ export interface DatabaseDashboardTop10Utilization {
 export class DatabaseDashboardTop10UtilizationViewData {
   constructor() { }
   hostId: number;
+  dbUUID: string;
   name: string;
   cpuChartOptions?: EChartsOption;
   cpuUtilizationPercent: number;
@@ -201,6 +207,8 @@ export interface DBDashboardTopQueryType {
   host_id: number;
   name: string;
   db_type: string;
+  host_uuid: string,
+  db_uuid: string
 }
 export interface DBDashboardTopResponseTimeType extends DBDashboardTopQueryType {
   response_time_ms: number;
@@ -221,12 +229,14 @@ export interface DBDashboardTopThroughputType {
   host_id: number;
   name: string;
   db_type: string;
-  transactions_per_sec: number;
   trend: DBDashboardTopThroughputTrendType[];
+  host_uuid: string,
+  db_uuid: string
 }
 export interface DBDashboardTopThroughputTrendType {
   date: string;
-  value: number;
+  // value: number;
+  transactions_per_sec: number;
 }
 export interface DBDashboardTopCacheHitRatioType extends DBDashboardTopQueryType {
   hit_ratio_pct: number;
@@ -237,7 +247,7 @@ export interface DBDashboardCapacityGrowthType {
   summary_stats: DBDashboardSummaryStats;
   top_servers: DBDashboardTopServersType[];
   top_tablespace_filesystem_usage: DBDashboardTopTableSpaceUsageType[];
-  storage_growth_trend: any[];
+  storage_growth_trend: DBDashboardStroageGrowthTrendType[];
   log_growth_rate: DBDashboardLogGrowthRateType[];
   disk_utilization: DBDashboardDiskUtilizationType[];
   log_size_by_server: DBDashboardLogSizeByServerType[];
@@ -250,6 +260,7 @@ export interface DBDashboardSummaryStats {
   avg_used_percentage: number;
 }
 export interface DBDashboardTopServersType {
+  db_uuid: string;
   name: string;
   used_percentage: number;
   free_gb: number;
@@ -266,6 +277,7 @@ export class DBDashboardTopServersViewData {
   dbSize: number;
   logSize: number;
   logGrowth: number;
+  dbUUID: string;
 }
 
 export interface DBDashboardTopTableSpaceUsageType {
@@ -273,41 +285,68 @@ export interface DBDashboardTopTableSpaceUsageType {
   disk_used_pct: number;
   disk_free_gb: number;
   disk_total_gb: number;
+  db_uuid: string;
 }
 
 export class DBDashboardTopTableSpaceUsageViewData {
   constructor() { }
+  dbUUID: string;
   name: string;
   diskUsedPct: number;
   diskFreeGb: number;
   diskTotalGb: number;
 }
 
+export interface DBDashboardStroageGrowthTrendType {
+    db_uuid: string;
+    name: string;
+    trend: DBDashboardStroageGrowthTrendItem[];
+}
+export interface DBDashboardStroageGrowthTrendItem {
+    ts: number;
+    db_size_gb: number;
+}
+
 export interface DBDashboardLogGrowthRateType {
   name: string;
   log_growth_gb_per_day: number;
+  db_uuid: string;
 }
 export interface DBDashboardDiskUtilizationType {
   name: string;
   disk_used_pct: number;
   disk_free_gb: number;
   disk_total_gb: number;
+  db_uuid: string;
 }
 export interface DBDashboardLogSizeByServerType {
   name: string;
   log_size_gb: number;
+  db_uuid: string;
 }
 export interface DBDashboardDbSizeByServerType {
   name: string;
   db_size_gb: number;
+  db_uuid: string;
 }
 export interface DBDashboardArchiveLogGrowthTrendType {
   name: string;
   trend: DBDashboardTrendType[];
+  db_uuid: string;
 }
 export interface DBDashboardTrendType {
   date: string;
   log_growth_gb: number;
+}
+
+export interface DBDashboardStorageGrowthTrendType {
+  name: string;
+  trend: DBDashboardStorageTrendType[];
+  db_uuid: string;
+}
+export interface DBDashboardStorageTrendType {
+  ts: string;
+  db_size_gb: number;
 }
 
 //Health
@@ -414,6 +453,7 @@ export interface DatabaseDashboardAlertSummaryMetric {
   value: string;
   tone: DatabaseDashboardTone;
   suffix?: string;
+  link?: boolean;
 }
 
 export class DatabaseDashboardCriticalAlertViewData {

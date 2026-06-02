@@ -1,4 +1,5 @@
 import { Overlay, ScrollStrategy } from '@angular/cdk/overlay';
+import { Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -14,9 +15,12 @@ import { IMultiSelectSettings, IMultiSelectTexts } from 'src/app/shared/multisel
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { UnityChartDetails } from 'src/app/shared/unity-chart-config.service';
 import { goBackFromDefaultDashboard } from '../app-default-dashboards.service';
-import { CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, SwapBalloonMemoryWidgetData, Top10ClustersByVMsWidgetData, TopCriticalAlertsViewData, VmDensityHost } from './private-cloud-compute-dashboard.service';
-import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
+import { DEVICE_OPTIONS, DEVICE_TYPE_MAP, PLATFORM_OPTIONS } from './private-cloud-compute-dashboard.const';
+import { CapacityAndGrowthInsightsWidgetData, chartColors, ClusterCapacityUtilTrendWidgetData, CpuReadyWidgetData, DevicesRowViewData, DiskLatencyWidgetData, ExecutiveSummaryViewData, ExecutiveSummaryWidgetData, IdleDevicesDistribution, IdleDevicesViewData, InfrastructureHealthWidgetData, OrphanedDeviceList, OrphanedDeviceView, OrphanedDeviceWidgetView, PerformanceHotspotWidgetData, PrivateCloudComputeDashboardService, RecentAlertSummaryViewData, SwapBalloonMemoryWidgetData, Top10ClustersByVMsWidgetData, TopCriticalAlertsViewData, VmDensityHost } from './private-cloud-compute-dashboard.service';
+import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, PrivateCloudUtilizationViewRow, ScopeDataType, TopHeaderDataType } from './private-cloud-compute-dashboard.type';
 
+type UtilizationSortKey = 'name' | 'cpu' | 'memory' | 'storage' | 'diskIops' | 'upTime';
+type SortDirection = 'asc' | 'desc';
 
 @Component({
   selector: 'private-cloud-compute-dashboard',
@@ -27,6 +31,10 @@ import { labelAndValueType, PrivateCloudAlertSideCard, PrivateCloudUtilization, 
 export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
   private filterFormUnsubscribe = new Subject<void>();
+  private readonly platformRouteOptions = PLATFORM_OPTIONS;
+  private readonly deviceRouteOptions = DEVICE_OPTIONS;
+  private readonly deviceTypeMap = DEVICE_TYPE_MAP;
+  private utilizationSourceRows: any[] = [];
   readonly compactBarLabelThreshold = 10;
 
   filterForm: FormGroup;
@@ -96,6 +104,15 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   performanceHotspotWidgetData: PerformanceHotspotWidgetData = new PerformanceHotspotWidgetData();
   utilizationRows: PrivateCloudUtilization = new PrivateCloudUtilization()
+  utilizationSortOptions: { value: UtilizationSortKey; label: string }[] = [
+    { value: 'cpu', label: 'CPU Utilization' },
+    { value: 'memory', label: 'Memory Utilization' },
+    { value: 'storage', label: 'Storage Utilization' },
+    { value: 'diskIops', label: 'Disk IOPS' },
+    { value: 'upTime', label: 'Up Time' }
+  ];
+  selectedUtilizationSort: UtilizationSortKey = 'cpu';
+  utilizationSortDirection: SortDirection = 'desc';
 
   idleDevicesRow: IdleDevicesViewData = new IdleDevicesViewData()
   idleDistributionRows: IdleDevicesDistribution = new IdleDevicesDistribution()
@@ -124,6 +141,15 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   orphanedByCategoryColors = chartColors;
   orphanedByCategory: any[] = []
 
+  orphanedDevicesPageNo = 1;
+  orphanedDevicesPageSize = 10;
+  orphanedDevicesTotal = 0;
+
+  idleDevicesPageNo = 1;
+  idleDevicesPageSize = 10;
+  idleDevicesTotal = 0;
+
+
 
 
 
@@ -148,7 +174,9 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     private alertDetailSvc: AimlEventDetailsService,
     private route: ActivatedRoute,
     private spinner: AppSpinnerService,
-    private notification: AppNotificationService, private overlay: Overlay) {
+    private notification: AppNotificationService,
+    private overlay: Overlay,
+    private location: Location) {
     this.ticketDatePickerScrollStrategy = this.overlay.scrollStrategies.reposition();
     this.currentCriteria = {
       sortColumn: '', sortDirection: '', searchValue: '', pageNo: 1, pageSize: PAGE_SIZES.DEFAULT_PAGE_SIZE, params: [{ 'ticket_type': null }]
@@ -209,7 +237,6 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
   private buildFilterForm() {
     this.filterFormUnsubscribe.next();
     this.filterForm = this.svc.buildFilterForm();
-    this.watchFilterChanges();
   }
 
   private initializeDefaultFilterSelections() {
@@ -225,31 +252,6 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     return (options || [])
       .map(option => option?.value)
       .filter((value): value is string => !!value);
-  }
-
-  private watchFilterChanges() {
-    this.filterForm.get('platforms').valueChanges
-      .pipe(takeUntil(this.ngUnsubscribe), takeUntil(this.filterFormUnsubscribe))
-      .subscribe(() => {
-        this.loadWidgets();
-      });
-
-    this.filterForm.get('datacenters').valueChanges
-      .pipe(takeUntil(this.ngUnsubscribe), takeUntil(this.filterFormUnsubscribe))
-      .subscribe(() => {
-        this.loadWidgets();
-      });
-    this.filterForm.get('environments').valueChanges
-      .pipe(takeUntil(this.ngUnsubscribe), takeUntil(this.filterFormUnsubscribe))
-      .subscribe(() => {
-        this.loadWidgets();
-      });
-
-    this.filterForm.get('accounts').valueChanges
-      .pipe(takeUntil(this.ngUnsubscribe), takeUntil(this.filterFormUnsubscribe))
-      .subscribe(() => {
-        this.loadWidgets();
-      });
   }
 
   loadWidgets() {
@@ -442,12 +444,16 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   getPerformanceHotspotWidgetData() {
     this.utilizationRows.utilRow = [];
+    this.utilizationSourceRows = [];
     this.spinner.start(this.loaderNames.performanceHotspot);
     this.svc.getUtilizationRows(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.spinner.stop(this.loaderNames.performanceHotspot);
       this.utilizationRows = this.svc.convertToUtilizationViewData(res);
+      this.utilizationSourceRows = [...(this.utilizationRows.utilRow || [])];
+      this.applyUtilizationSort();
     }, () => {
       this.utilizationRows.utilRow = [];
+      this.utilizationSourceRows = [];
       this.spinner.stop(this.loaderNames.performanceHotspot);
       this.notification.error(new Notification('Failed to get Performance Hotspot data. Try again later'));
     });
@@ -460,11 +466,13 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
     this.spinner.start(this.idleDevicesRow.loader);
     this.spinner.start(this.idleDistributionRows.loader);
-    this.svc.getIdleDevicesData(this.filterForm.getRawValue()).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
+    this.svc.getIdleDevicesData(this.filterForm.getRawValue(), this.idleDevicesPageNo, this.idleDevicesPageSize).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => {
       this.spinner.stop(this.idleDevicesRow.loader);
       this.spinner.stop(this.idleDistributionRows.loader);
 
       this.idleDevicesRow = this.svc.convertToDeviceIdleViewData(res)
+      this.idleDevicesTotal = res.count
+
       this.idleDistributionRows = this.svc.convertToIdleDevicesDistributionViewData(res.idleDurationDistribution)
       this.idleDistributionRows.chartData = this.svc.convertToIdleDurationDistributionChartData(this.idleDistributionRows.distributionRow)
     }, () => {
@@ -551,24 +559,78 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   getOrphanedDeviceData() {
     this.spinner.start(this.orphanedDeviceListViewData.loader);
+    this.spinner.start(this.orphanedDeviceWidgetViewData.loader);
     this.orphanedDeviceListViewData.orphanList = null;
-    this.svc.getOrphanedDeviceData(this.filterForm.getRawValue())
+    this.svc.getOrphanedDeviceData(this.filterForm.getRawValue(), this.orphanedDevicesPageNo, this.orphanedDevicesPageSize)
       .pipe(takeUntil(this.ngUnsubscribe))
       .subscribe(res => {
         if (res) {
           this.orphanedDeviceListViewData = this.svc.convertToOrphanedDeviceListView(res);
           this.orphanedByCategory = res.orphanedByCategory
+          this.orphanedDevicesTotal = res.count
           this.orphanedDeviceWidgetViewData.chartData = this.svc.convertToOrphanedByCategoryChartData(res.orphanedByCategory)
         }
         this.spinner.stop(this.orphanedDeviceListViewData.loader);
+        this.spinner.stop(this.orphanedDeviceWidgetViewData.loader);
 
       }, (_err: HttpErrorResponse) => {
         this.spinner.stop(this.orphanedDeviceListViewData.loader);
+        this.spinner.stop(this.orphanedDeviceWidgetViewData.loader);
+
         this.orphanedDeviceListViewData.orphanList = null;
         this.notification.error(new Notification('Failed to get Orphaned Device data. Try again later'));
       });
   }
 
+
+
+  orphanedDevicesPageChange(pageNo: number) {
+    if (this.orphanedDevicesPageNo === pageNo) {
+      return;
+    }
+    this.orphanedDevicesPageNo = pageNo;
+    this.getOrphanedDeviceData();
+  }
+
+  orphanedDevicesPageSizeChange(event: Event) {
+    this.orphanedDevicesPageSize = Number((event.target as HTMLSelectElement).value || 10);
+    this.orphanedDevicesPageNo = 1;
+    this.getOrphanedDeviceData();
+  }
+
+  openOrphanedDeviceDetails(device: OrphanedDeviceList) {
+    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid);
+  }
+
+  openIdleDeviceDetails(device: DevicesRowViewData) {
+    this.openDeviceDetailsInNewTab(device?.deviceType, device?.uuid);
+  }
+
+  private getMappedOrphanedDeviceType(deviceType: string): string | undefined {
+    const trimmedDeviceType = (deviceType || '').trim();
+    return Object.entries(this.deviceTypeMap).find(([key]) => key.trim() === trimmedDeviceType)?.[1];
+  }
+
+  private openDeviceDetailsInNewTab(deviceType: string, uuid: string) {
+    const devicePath = this.getMappedOrphanedDeviceType(deviceType);
+
+    if (!devicePath || !uuid) {
+      return;
+    }
+
+    const routeUrl = this.router.serializeUrl(
+      this.router.parseUrl(`/unitycloud/devices/${devicePath}/${uuid}/zbx/details`)
+    );
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+  idleDevicesPageChange(pageNo: number) {
+    if (this.idleDevicesPageNo === pageNo) {
+      return;
+    }
+    this.idleDevicesPageNo = pageNo;
+    this.getIdleDevicesData();
+  }
   getOrphanedStatusIconClass(status: string): string {
     switch (status) {
       case 'error':
@@ -589,8 +651,199 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
     goBackFromDefaultDashboard(this.router, this.route);
   }
 
+  openAllVmsInNewTab() {
+    const routeUrl = this.router.serializeUrl(this.router.createUrlTree(['/unitycloud/devices/vms/allvms']));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  openAlertsInNewTab() {
+    const routeUrl = this.router.serializeUrl(this.router.parseUrl('/services/aiml-event-mgmt/alerts'));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  onCloudTypeChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openCloudTypeRoute(params?.data?.name || params?.name);
+    });
+  }
+
+  openCloudTypeLegend(cloudType: string) {
+    this.openCloudTypeRoute(cloudType);
+  }
+
+  onPowerActivityChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, () => {
+      this.openPowerActivityRoute();
+    });
+  }
+
+  onOrphanedCategoryChartInit(chartInstance: any) {
+    this.bindChartClick(chartInstance, params => {
+      this.openOrphanedCategoryRoute(params?.data?.name || params?.name);
+    });
+  }
+
+  openOrphanedCategoryLegend(category: string) {
+    this.openOrphanedCategoryRoute(category);
+  }
+
+  onUtilizationSortFieldChange(sortKey: string) {
+    const nextSortKey = sortKey as UtilizationSortKey;
+
+    if (this.selectedUtilizationSort !== nextSortKey) {
+      this.utilizationSortDirection = nextSortKey === 'name' ? 'asc' : 'desc';
+    }
+
+    this.selectedUtilizationSort = nextSortKey;
+    this.applyUtilizationSort();
+  }
+
+  onUtilizationHeaderSort(sortKey: UtilizationSortKey) {
+    if (this.selectedUtilizationSort !== sortKey) {
+      return;
+    }
+
+    this.utilizationSortDirection = this.utilizationSortDirection === 'asc' ? 'desc' : 'asc';
+    this.applyUtilizationSort();
+  }
+
+  applyFilters() {
+    this.orphanedDevicesPageNo = 1;
+    this.idleDevicesPageNo = 1;
+    this.loadWidgets();
+  }
+
   refreshData() {
     this.loadWidgets();
+  }
+
+  private bindChartClick(chartInstance: any, handler: (params: any) => void) {
+    if (!chartInstance?.on) {
+      return;
+    }
+    if (chartInstance.off) {
+      chartInstance.off('click');
+    }
+    chartInstance.on('click', handler);
+  }
+
+  private openCloudTypeRoute(cloudType: string) {
+    const platformOption = this.getPlatformRouteOption(cloudType);
+
+    if (!platformOption?.value || !platformOption.value.startsWith('/')) {
+      return;
+    }
+
+    const routeUrl = this.router.serializeUrl(this.router.parseUrl(platformOption.value));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  private openPowerActivityRoute() {
+    const routeUrl = this.router.serializeUrl(this.router.parseUrl('/unitycloud/pccloud/'));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  private openOrphanedCategoryRoute(category: string) {
+    const deviceOption = this.getDeviceRouteOption(category);
+
+    if (!deviceOption?.value || !deviceOption.value.startsWith('/')) {
+      return;
+    }
+
+    const routeUrl = this.router.serializeUrl(this.router.parseUrl(deviceOption.value));
+    const externalUrl = this.location.prepareExternalUrl(routeUrl);
+    window.open(externalUrl, '_blank', 'noopener');
+  }
+
+  private applyUtilizationSort() {
+    const rows = [...(this.utilizationSourceRows || [])];
+
+    rows.sort((left, right) => {
+      const leftValue = this.getUtilizationSortValue(left, this.selectedUtilizationSort);
+      const rightValue = this.getUtilizationSortValue(right, this.selectedUtilizationSort);
+
+      let result = 0;
+
+      if (typeof leftValue === 'string' && typeof rightValue === 'string') {
+        result = leftValue.localeCompare(rightValue);
+      } else {
+        result = Number(leftValue) - Number(rightValue);
+      }
+
+      return this.utilizationSortDirection === 'asc' ? result : -result;
+    });
+
+    this.utilizationRows.utilRow = rows;
+  }
+
+  private getUtilizationSortValue(row: PrivateCloudUtilizationViewRow, sortKey: UtilizationSortKey): number | string {
+    switch (sortKey) {
+      case 'name':
+        return row.name || '';
+      case 'cpu':
+        return row.cpuStatus ?? 0;
+      case 'memory':
+        return row.memoryStatus ?? 0;
+      case 'storage':
+        return row.storage?.percent ?? 0;
+      case 'diskIops':
+        return row.diskIops?.value ?? 0;
+      case 'upTime':
+        return this.getUptimeSortValue(row.upTime);
+      default:
+        return 0;
+    }
+  }
+
+  private getUptimeSortValue(upTime: string): number {
+    const normalizedValue = (upTime || '').trim().toLowerCase();
+    const matches = normalizedValue.match(/(\d+(?:\.\d+)?)([dhms])/g);
+
+    if (!matches?.length) {
+      return 0;
+    }
+
+    return matches.reduce((total, match) => {
+      const parsedMatch = match.match(/(\d+(?:\.\d+)?)([dhms])/);
+
+      if (!parsedMatch) {
+        return total;
+      }
+
+      const value = Number(parsedMatch[1]);
+      const unit = parsedMatch[2];
+
+      switch (unit) {
+        case 'd':
+          return total + value * 24 * 60 * 60;
+        case 'h':
+          return total + value * 60 * 60;
+        case 'm':
+          return total + value * 60;
+        case 's':
+          return total + value;
+        default:
+          return total;
+      }
+    }, 0);
+  }
+
+  private getPlatformRouteOption(cloudType: string): labelAndValueType | undefined {
+    const normalizedCloudType = this.normalizeValue(cloudType);
+    return this.platformRouteOptions.find(option => this.normalizeValue(option.label) === normalizedCloudType);
+  }
+
+  private getDeviceRouteOption(category: string): labelAndValueType | undefined {
+    const normalizedCategory = this.normalizeValue(category);
+    return this.deviceRouteOptions.find(option => this.normalizeValue(option.label) === normalizedCategory);
+  }
+
+  private normalizeValue(value: string): string {
+    return (value || '').trim().toLowerCase();
   }
 
   getProgressClass(value: number): string {
@@ -611,6 +864,20 @@ export class PrivateCloudComputeDashboardComponent implements OnInit, OnDestroy 
 
   getStatusClass(tone?: string): string {
     return `tone-${tone || 'muted'}`;
+  }
+
+  getUtilizationHeaderClass(sortKey: UtilizationSortKey): string {
+    return this.selectedUtilizationSort === sortKey
+      ? 'utilization-sort-active utilization-sort-enabled'
+      : 'utilization-sort-disabled';
+  }
+
+  getUtilizationSortIcon(sortKey: UtilizationSortKey): string | null {
+    if (this.selectedUtilizationSort !== sortKey) {
+      return null;
+    }
+
+    return this.utilizationSortDirection === 'asc' ? 'fa-caret-up' : 'fa-caret-down';
   }
 
   trackByValue(index: number, option: labelAndValueType) {

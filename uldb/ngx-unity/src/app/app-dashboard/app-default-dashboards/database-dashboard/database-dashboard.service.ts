@@ -88,7 +88,8 @@ import {
   DBDashboardLogSizeByServerType,
   DBDashboardDbSizeByServerType,
   DBDashboardLogGrowthRateType,
-  DBDashboardArchiveLogGrowthTrendType
+  DBDashboardArchiveLogGrowthTrendType,
+  DBDashboardStroageGrowthTrendType
 } from './database-dashboard.type';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
@@ -187,18 +188,26 @@ export class DatabaseDashboardService {
       {
         label: 'Total DB instances',
         value: data?.total_databases ? data.total_databases.toLocaleString() : '0',
+        key: 'total_databases',
+        link: true
       },
       {
         label: 'Active databases',
         value: data?.status?.active ? data.status.active.toLocaleString() : '0',
+        key: 'active_databases',
+        link: false,
       },
       {
         label: 'Inactive / Dormant',
-        value: data?.status?.inactive ? data.status.inactive.toLocaleString() : '0'
+        value: data?.status?.inactive ? data.status.inactive.toLocaleString() : '0',
+        key: 'inactive_databases',
+        link: false
       },
       // { 
       //   label: 'Primary Instances', 
-      //   value: data?.primary_instance ? data.primary_instance.toLocaleString() : '0'
+      //   value: data?.primary_instance ? data.primary_instance.toLocaleString() : '0',
+      //   key: 'primary_instances',
+      //   link: false
       // }
     ];
   }
@@ -206,7 +215,7 @@ export class DatabaseDashboardService {
   convertToCloudTypeDistributionOptions(data: InventoryWidgetByCategoryType[]): EChartsOption {
     if (!data || data?.length == 0) { return; }
     let graphData = data.map(d => ({
-      name: d.category,
+      name: d.cloud_type,
       value: d.count,
       percentage: d.percentage.toFixed(0)
     }));
@@ -471,6 +480,7 @@ export class DatabaseDashboardService {
     let viewData: DatabaseDashboardTop10UtilizationViewData[] = [];
     data.forEach(row => {
       let view = new DatabaseDashboardTop10UtilizationViewData();
+      view.dbUUID = row.db_uuid ? row.db_uuid : null;
       view.name = row.name;
       // view.cpuSeries = row.cpuSeries;
       // view.cpuChartOptions = this.getSparklineOptions(row.cpuSeries, '#5d8df5', 'rgba(93, 141, 245, 0.28)'),
@@ -548,6 +558,7 @@ export class DatabaseDashboardService {
       value: Number(d.response_time_ms.toFixed(0)),
       label: `${d.response_time_ms}k`,
       // color: this.getProgressBarColor(d.response_time_ms)
+      db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
   }
@@ -559,6 +570,7 @@ export class DatabaseDashboardService {
       value: Number(d.response_time_ms.toFixed(0)),
       label: `${d.response_time_ms}ms`,
       // color: this.getProgressBarColor(d.response_time_ms)
+      db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
   }
@@ -570,6 +582,7 @@ export class DatabaseDashboardService {
       value: Number(d.active_connections.toFixed(0)),
       label: `${d.active_connections}min`,
       // color: this.getProgressBarColor(d.active_connections)
+      db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
   }
@@ -581,6 +594,7 @@ export class DatabaseDashboardService {
       value: Number(d.deadlock_count.toFixed(0)),
       label: `${d.deadlock_count}`,
       // color: this.getProgressBarColor(d.deadlock_count)
+      db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
   }
@@ -597,6 +611,7 @@ export class DatabaseDashboardService {
       value: Number(d.hit_ratio_pct.toFixed(0)),
       label: `${d.hit_ratio_pct}%`,
       // color: this.getCacheHitProgressBarColor(d.hit_ratio_pct)
+      db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || [], true);
   }
@@ -629,12 +644,13 @@ export class DatabaseDashboardService {
     const viewData: DBDashboardTopServersViewData[] = []
     data.forEach(d => {
       const view = new DBDashboardTopServersViewData();
-      view.server = d.name,
-        view.used = Number(d.used_percentage.toFixed(0)),
-        view.free = Number(d.free_gb.toFixed(0)),
-        view.dbSize = Number(d.db_size_gb.toFixed(0)),
-        view.logSize = Number(d.log_size_gb.toFixed(0)),
-        view.logGrowth = Number(d.log_growth_gb_per_day.toFixed(0))
+      view.server = d.name;
+      view.dbUUID = d.db_uuid;
+      view.used = Number(d.used_percentage.toFixed(0));
+      view.free = Number(d.free_gb.toFixed(0));
+      view.dbSize = Number(d.db_size_gb.toFixed(0));
+      view.logSize = Number(d.log_size_gb.toFixed(0));
+      view.logGrowth = Number(d.log_growth_gb_per_day.toFixed(0))
       viewData.push(view);
     });
     return viewData || [];
@@ -646,13 +662,14 @@ export class DatabaseDashboardService {
       name: d.name,
       value: Number(d.disk_used_pct.toFixed(0)),
       percentage: d.disk_used_pct.toFixed(0),
+      db_uuid: d.db_uuid ? d.db_uuid : null
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
   }
 
   convertToStorageGrowthOptions(data: any[]): EChartsOption {
     if (!data || data?.length == 0) { return; }
-    return this.getStorageGrowthOptions();
+    return this.getStorageGrowthOptions(data);
   }
 
   convertToArchiveLogGrowthOptions(data: DBDashboardArchiveLogGrowthTrendType[]): EChartsOption {
@@ -667,6 +684,7 @@ export class DatabaseDashboardService {
       name: d.name,
       value: Number(d.log_growth_gb_per_day.toFixed(2)),
       // color: '#7b3ff2'
+      db_uuid: d.db_uuid
     }));
     return this.getSimpleHorizontalBarOptions(graphData || [], max, '#7b3ff2');
   }
@@ -678,6 +696,7 @@ export class DatabaseDashboardService {
       name: d.name,
       value: Number(d.db_size_gb.toFixed(2)),
       // color: '#3d8df3'
+      db_uuid: d.db_uuid
     }));
     return this.getSimpleHorizontalBarOptions(graphData || [], max, '#3d8df3');
   }
@@ -689,6 +708,7 @@ export class DatabaseDashboardService {
       name: d.name,
       value: Number(d.log_size_gb.toFixed(2)),
       // color: '#e84a4a'
+      db_uuid: d.db_uuid
     }));
     return this.getSimpleHorizontalBarOptions(graphData || [], max, '#e84a4a');
   }
@@ -699,6 +719,7 @@ export class DatabaseDashboardService {
       name: d.name,
       value: Number(d.disk_used_pct.toFixed(0)),
       percentage: d.disk_used_pct.toFixed(0),
+      db_uuid: d.db_uuid
     }));
     return this.getHorizontalProgressBarOptions(graphData || []);
   }
@@ -765,8 +786,10 @@ export class DatabaseDashboardService {
     const summary = (data || {}) as Record<string, number | string>;
     return DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG.map(item => ({
       label: item.label,
+      key: item.key,
       value: this.formatAlertSummaryValue(summary[item.key], item.suffix),
-      tone: item.tone
+      tone: item.tone,
+      link: item.link,
     }));
   }
 
@@ -825,7 +848,7 @@ export class DatabaseDashboardService {
   }
 
   private getHorizontalProgressBarOptions(items: DatabaseDashboardBarItem[], reverseColors: boolean = false): EChartsOption {
-    const sortedData = [...items].sort((a: any, b: any) => b.value - a.value);
+    const sortedData: any = [...items].sort((a: any, b: any) => b.value - a.value);
     const maxVal = Math.max(...items.map((item: any) => item.value));
     const max = maxVal + ((maxVal * 10) / 100);
     // const labelWidth = Math.max(...items.map((item: any) => item.name.length));
@@ -892,14 +915,15 @@ export class DatabaseDashboardService {
           emphasis: {
             disabled: true
           },
-          data: sortedData.map(item => item.value)
+          // data: sortedData.map(item => item.value)
+          data: sortedData
         }
       ]
     };
   }
 
   private getSimpleHorizontalBarOptions(items: DatabaseDashboardBarItem[], max: number, color: string): EChartsOption {
-    const sortedData = [...items].sort((a: any, b: any) => b.value - a.value);
+    const sortedData: any = [...items].sort((a: any, b: any) => b.value - a.value);
     return {
       animation: false,
       // grid: { top: 10, right: 10, bottom: 20, left: 90, containLabel:true },
@@ -938,7 +962,8 @@ export class DatabaseDashboardService {
           type: 'bar',
           barWidth: 10,
           itemStyle: { color: color, borderRadius: 2 },
-          data: sortedData.map(item => item.value)
+          // data: sortedData.map(item => item.value)
+          data: sortedData
         }
       ]
     };
@@ -1025,35 +1050,95 @@ export class DatabaseDashboardService {
           areaStyle: {
             color: this.getLineAreaGradient(colors[index % colors.length])
           },
-          data: host.trend.map((item: any) => item.value)
+          // data: host.trend.map((item: any) => item)          
+          data: host.trend.map(item => ({
+            value: item.transactions_per_sec,
+            ...item,
+            db_uuid: host.db_uuid,
+            db_name: host.name
+          })),
         };
       })
     };
   }
 
-  private getStorageGrowthOptions(): EChartsOption {
+  private getStorageGrowthOptions(items: DBDashboardStroageGrowthTrendType[]): EChartsOption {
+    const allValues = items.flatMap(db => db.trend.map(t => t.db_size_gb));
+    const colors = ['#2F8BD7', '#f5a623', '#5B9E29', '#D03533', '#26A69A', '#9B59B6', '#B7D99A', '#FFD099', '#9BC9F0', '#F5A3A3']
     return {
+
       animation: false,
-      // grid: { top: 14, right: 8, bottom: 22, left: 34 },
-      grid: { left: 10, right: 10, top: 10, bottom: 20, containLabel: true },
+      legend: {
+        bottom: 0,
+        left: 0,
+        data: items.map(db => db.name),
+        icon: 'rect',
+        itemWidth: 6,
+        itemHeight: 6,
+      },
+
+      grid: { left: 10, right: 10, top: 20, bottom: 20, containLabel: true },
+      tooltip: {
+        trigger: 'axis',
+
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            color: '#d8d8d8',
+          }
+        },
+        formatter: (params: any) => {
+          return params.map((p: any) => {
+            const d = p.data;
+            return ` ${p.marker} ${p.seriesName}: ${d.db_size_gb.toFixed(2)} GB `;
+          }).join('<br/>');
+        }
+      },
       xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-        axisTick: { show: false },
-        axisLabel: { color: '#8b96a2', fontSize: 8 }
+        data: items[0].trend.map(item =>
+          new Date(item.ts * 1000).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        )
       },
+
       yAxis: {
         type: 'value',
-        splitLine: { lineStyle: { color: '#edf0f2' } },
-        axisLabel: { color: '#8b96a2', fontSize: 8 }
+        axisLabel: {
+          formatter: '{value} GB'
+        },
+        min: Math.floor(Math.min(...allValues)),
+        max: Math.ceil(Math.max(...allValues))
       },
-      series: [
-        this.getGrowthLine('DB-SRV-01', '#3d8df3', [118, 123, 129, 133, 140, 146, 151, 158, 164, 172]),
-        this.getGrowthLine('DB-SRV-02', '#56b45a', [92, 96, 99, 105, 109, 114, 119, 126, 132, 139]),
-        this.getGrowthLine('DB-SRV-03', '#e94a4a', [80, 83, 87, 91, 97, 103, 110, 118, 129, 148])
-      ]
-    };
+
+      series: items.map((db, index) => ({
+        name: db.name,
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 6,
+        showSymbol: false,
+        lineStyle: {
+          width: 3,
+          color: colors[index % colors.length]
+        },
+        itemStyle: {
+          color: colors[index % colors.length]
+        },
+        areaStyle: {
+          color: this.getLineAreaGradient(colors[index % colors.length])
+        },
+        data: db.trend.map(item => ({
+          value: item.db_size_gb,
+          ...item,
+          db_uuid: db.db_uuid,
+          db_name: db.name
+        })),
+      }))
+    }
   }
 
   private getGrowthLine(name: string, color: string, data: number[]): any {

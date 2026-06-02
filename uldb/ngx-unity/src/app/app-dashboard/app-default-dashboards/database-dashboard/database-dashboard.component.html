@@ -48,7 +48,7 @@
                             <div class="summary-metric"
                                 *ngFor="let metric of summaryMetrics; let first = first; trackBy: trackByIndex">
                                 <div class="metric-label">{{metric.label}}</div>
-                                <div class="metric-value" [ngClass]="{'metric-primary': first}">{{metric.value}}</div>
+                                <div class="metric-value" [ngClass]="{'metric-primary': first, 'pointer-link': metric.link}" [tooltip]="metric.link ? 'Open linked page' : null" (click)="metric.link && openSummaryMetric(metric)">{{metric.value}}</div>
                             </div>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                         <app-spinner [name]="loaderNames.cloudTypeDistribution" [width]="0"></app-spinner>
                         <div class="widget-title">Cloud Type Distribution</div>
                         <ng-container *ngIf="cloudTypeDistributionOptions">
-                            <div echarts [options]="cloudTypeDistributionOptions" class="cloud-type-chart"></div>
+                            <div echarts [options]="cloudTypeDistributionOptions" (chartInit)="onInventoryChartInit($event)" class="cloud-type-chart"></div>
                         </ng-container>
                         <div *ngIf="!cloudTypeDistributionOptions"
                             class="d-flex justify-content-center align-items-center"
@@ -71,7 +71,7 @@
                         <app-spinner [name]="loaderNames.platformCounts" [width]="0"></app-spinner>
                         <div class="widget-title">DB Count by Platform / Technology</div>
                         <ng-container *ngIf="dbCountByPlatformOptions">
-                            <div echarts [options]="dbCountByPlatformOptions" class="platform-chart"></div>
+                            <div echarts [options]="dbCountByPlatformOptions" (chartInit)="onInventoryChartInit($event)" class="platform-chart"></div>
                         </ng-container>
                         <div *ngIf="!dbCountByPlatformOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -138,7 +138,10 @@
                         </thead>
                         <tbody>
                             <tr *ngFor="let row of utilizationRows; trackBy: trackByIndex">
-                                <td><button type="button" class="btn btn-link p-0 table-link">{{row.name}}</button></td>
+                                <td>
+                                    <button class="btn btn-link text-decoration-none p-0 table-column-btn text-primary" type="button"
+                                        [tooltip]="'Open linked page'" (click)="openDatabaseServerDetails(row.dbUUID)">{{row.name}}</button>
+                                </td>
                                 <td>
                                     <div class="sparkline-cell">
                                         <!-- <div echarts [options]="row.cpuChartOptions" class="sparkline-chart"></div>
@@ -204,7 +207,7 @@
                         <app-spinner [name]="loaderNames.queryResponse" [width]="0"></app-spinner>
                         <div class="widget-title">Top 10 - Query Response Time (Ms)</div>
                         <ng-container *ngIf="queryResponseOptions">
-                            <div echarts [options]="queryResponseOptions" class="bar-chart"></div>
+                            <div echarts [options]="queryResponseOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!queryResponseOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -214,7 +217,7 @@
                         <app-spinner [name]="loaderNames.queryLatency" [width]="0"></app-spinner>
                         <div class="widget-title">Top 10 Query Latency (Avg / P95)</div>
                         <ng-container *ngIf="queryLatencyOptions">
-                            <div echarts [options]="queryLatencyOptions" class="bar-chart"></div>
+                            <div echarts [options]="queryLatencyOptions" (chartInit)="onTop10QueryRespChartInit($event)"  class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!queryLatencyOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -224,7 +227,7 @@
                         <app-spinner [name]="loaderNames.activeSessions" [width]="0"></app-spinner>
                         <div class="widget-title">Top 10 DBs - Active Sessions / Connections</div>
                         <ng-container *ngIf="activeSessionsOptions">
-                            <div echarts [options]="activeSessionsOptions" class="bar-chart"></div>
+                            <div echarts [options]="activeSessionsOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!activeSessionsOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -234,7 +237,7 @@
                         <app-spinner [name]="loaderNames.errorRate" [width]="0"></app-spinner>
                         <div class="widget-title">Top 10 Error Rate / Deadlocks</div>
                         <ng-container *ngIf="errorRateOptions">
-                            <div echarts [options]="errorRateOptions" class="bar-chart"></div>
+                            <div echarts [options]="errorRateOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!errorRateOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -255,7 +258,7 @@
                         <app-spinner [name]="loaderNames.cacheHitRatio" [width]="0"></app-spinner>
                         <div class="widget-title">Buffer / Cache Hit Ratio</div>
                         <ng-container *ngIf="cacheHitRatioOptions">
-                            <div echarts [options]="cacheHitRatioOptions" class="bar-chart compact-bar-chart"></div>
+                            <div echarts [options]="cacheHitRatioOptions" (chartInit)="onTop10QueryRespChartInit($event)" class="bar-chart compact-bar-chart"></div>
                         </ng-container>
                         <div *ngIf="!cacheHitRatioOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -297,8 +300,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let row of storageRows; trackBy: trackByIndex">
-                                        <td>{{row.server}}</td>
+                                    <tr *ngFor="let row of storageRows; trackBy: trackByIndex">                                        
+                                        <td>
+                                            <button class="btn btn-link text-decoration-none p-0 table-column-btn text-primary" type="button"
+                                            [tooltip]="'Open linked page'" (click)="openDatabaseServerDetails(row.dbUUID)">{{row.server}}</button>
+                                        </td>
                                         <td>{{row.used}}</td>
                                         <td>{{row.free}}</td>
                                         <td>{{row.dbSize}}</td>
@@ -319,7 +325,7 @@
                         <app-spinner [name]="loaderNames.tablespaceUsage" [width]="0"></app-spinner>
                         <div class="widget-title">Top 10 Tablespace / Filesystem Usage</div>
                         <ng-container *ngIf="tablespaceUsageOptions">
-                            <div echarts [options]="tablespaceUsageOptions" class="tablespace-chart"></div>
+                            <div echarts [options]="tablespaceUsageOptions" (chartInit)="onGrowthInsightsChartInit($event)" class="tablespace-chart"></div>
                         </ng-container>
                         <div *ngIf="!tablespaceUsageOptions" class="d-flex justify-content-center align-items-center"
                             style="width: 100%; height: 150px;">No data
@@ -352,7 +358,7 @@
                     <app-spinner [name]="loaderNames.logGrowthRate" [width]="0"></app-spinner>
                     <div class="widget-title">Top 10 Log Growth Rate</div>
                     <ng-container *ngIf="logGrowthRateOptions">
-                        <div echarts [options]="logGrowthRateOptions" class="small-bar-chart"></div>
+                        <div echarts [options]="logGrowthRateOptions" (chartInit)="onGrowthInsightsChartInit($event)" class="small-bar-chart"></div>
                     </ng-container>
                     <div *ngIf="!logGrowthRateOptions" class="d-flex justify-content-center align-items-center"
                         style="width: 100%; height: 150px;">No data
@@ -362,7 +368,7 @@
                     <app-spinner [name]="loaderNames.dbSizeByServer" [width]="0"></app-spinner>
                     <div class="widget-title">Top 10 DB Size By Server</div>
                     <ng-container *ngIf="dbSizeByServerOptions">
-                        <div echarts [options]="dbSizeByServerOptions" class="small-bar-chart"></div>
+                        <div echarts [options]="dbSizeByServerOptions" (chartInit)="onGrowthInsightsChartInit($event)" class="small-bar-chart"></div>
                     </ng-container>
                     <div *ngIf="!dbSizeByServerOptions" class="d-flex justify-content-center align-items-center"
                         style="width: 100%; height: 150px;">No data
@@ -372,7 +378,7 @@
                     <app-spinner [name]="loaderNames.logSizeByServer" [width]="0"></app-spinner>
                     <div class="widget-title">Top 10 Log Size By Server</div>
                     <ng-container *ngIf="logSizeByServerOptions">
-                        <div echarts [options]="logSizeByServerOptions" class="small-bar-chart"></div>
+                        <div echarts [options]="logSizeByServerOptions" (chartInit)="onGrowthInsightsChartInit($event)" class="small-bar-chart"></div>
                     </ng-container>
                     <div *ngIf="!logSizeByServerOptions" class="d-flex justify-content-center align-items-center"
                         style="width: 100%; height: 150px;">No data
@@ -382,7 +388,7 @@
                     <app-spinner [name]="loaderNames.diskUtilization" [width]="0"></app-spinner>
                     <div class="widget-title">Top 10 Disk Utilizations</div>
                     <ng-container *ngIf="diskUtilizationOptions">
-                        <div echarts [options]="diskUtilizationOptions" class="small-bar-chart"></div>
+                        <div echarts [options]="diskUtilizationOptions" (chartInit)="onGrowthInsightsChartInit($event)" class="small-bar-chart"></div>
                     </ng-container>
                     <div *ngIf="!diskUtilizationOptions" class="d-flex justify-content-center align-items-center"
                         style="width: 100%; height: 150px;">No data
@@ -487,7 +493,7 @@
                         <div class="alert-summary-metric"
                             *ngFor="let metric of alertSummaryMetrics; trackBy: trackByIndex">
                             <div>{{metric.label}}</div>
-                            <strong [ngClass]="getStatusClass(metric.tone)">{{metric.value}}</strong>
+                            <strong [ngClass]="getStatusClass(metric.tone)" [class.pointer-link]="metric.link" [tooltip]="metric.link ? 'Open linked page' : null" (click)="metric.link && openAlertsPage(metric)">{{metric.value}}</strong>
                         </div>
                     </div>
                 </div>
@@ -514,7 +520,7 @@
                                     <tr *ngFor="let alert of criticalAlerts; trackBy: trackByIndex">
                                         <td>                                                
                                             <button class="btn btn-link text-decoration-none p-0 table-column-btn font-xs-sm font-500" type="button"
-                                            [tooltip]="alert.id" (click)="viewAlertDetails(alert.uuid)">{{alert.id}}</button>
+                                            [tooltip]="'Open linked page'" (click)="viewAlertDetails(alert.uuid)">{{alert.id}}</button>
                                         </td>                                            
                                         <td>{{alert.deviceName}}</td>
                                         <!-- <td><span class="severity-dot" [ngClass]="alert.severity">!</span></td> -->

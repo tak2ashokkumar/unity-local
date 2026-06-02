@@ -77,6 +77,50 @@
   color: #6b7280;
 }
 
+.utilization-section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.utilization-sort-control {
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 150px;
+}
+
+.utilization-sort-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.utilization-sort-select {
+  min-width: 150px;
+  border-color: #cbd5e1;
+  color: #1f2937;
+  background-color: #fff;
+}
+
+.utilization-sort-heading {
+  display: inline-flex;
+  align-items: center;
+}
+
+.utilization-sort-enabled {
+  cursor: pointer;
+  user-select: none;
+}
+
+.utilization-sort-disabled {
+  cursor: default;
+}
+
 
 
 .distribution-row {
@@ -194,6 +238,7 @@
 
 .legend-item {
   display: flex;
+  width: 100%;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
@@ -276,20 +321,105 @@
   display: inline-block;
 }
 
-
-:host ::ng-deep .private-cloud-compute-dashboard app-spinner .spinner-wrapper {
-  background: rgba(255, 255, 255, 0.72);
-  opacity: 1;
-  border-radius: inherit;
+.sensor-stat-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
-:host ::ng-deep .private-cloud-compute-dashboard app-spinner {
+.sensor-stat-count--success {
+  color: #2e7d32;
+  background: #e8f5e9;
+}
+
+.sensor-stat-count--warning {
+  color: #b9770e;
+  background: #fff4df;
+}
+
+.sensor-stat-count--danger {
+  color: #c0392b;
+  background: #fdecec;
+}
+
+.sensor-stat-count--secondary {
+  color: #6c757d;
+  background: #edf0f2;
+}
+
+.idle-status-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #495057;
+}
+
+.legend-item i {
+  font-size: 16px;
+}
+
+.text-success {
+  color: #28a745;
+}
+
+.text-warning {
+  color: #fd7e14;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+
+.orphaned-category-body {
+  overflow: hidden;
+  padding: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.orphaned-category-content {
+  padding: 1.25rem;
+}
+
+:host ::ng-deep private-cloud-compute-dashboard .orphaned-category-body app-spinner .spinner-wrapper {
+  background: rgba(255, 255, 255, 0.72);
+  opacity: 1;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100%;
+}
+
+:host ::ng-deep private-cloud-compute-dashboard .orphaned-category-body app-spinner {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-:host ::ng-deep .private-cloud-compute-dashboard app-spinner .wave-spinner>div {
+:host ::ng-deep private-cloud-compute-dashboard .orphaned-category-body app-spinner .wave-spinner>div {
   background-color: #ff8900 !important;
 }
 
@@ -298,6 +428,11 @@
   padding: 12px 14px;
   margin-top: 18px;
   font-size: 11px;
+}
+
+.rounded-pill {
+  border-radius: 50rem !important;
+  margin-left: -5px;
 }
 
 .ticket-filter-row {
@@ -457,6 +592,46 @@
 //   }
 // }
 
+.round-action-btn {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  background: #ff8900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.orphaned-pagination-row,
+.idle-pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px 8px;
+}
+
+.orphaned-page-size,
+.idle-page-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #637282;
+  font-size: 12px;
+
+  .form-control {
+    width: 60px;
+  }
+}
+
+.orphaned-pagination-row table-pager,
+.idle-pagination-row table-pager {
+  display: block;
+  margin-left: auto;
+}
 
 .utilization-card {
   position: relative;
@@ -495,6 +670,16 @@
 
 .utilization-table {
   min-width: 960px;
+
+  th.utilization-sort-active {
+    background: #cfe4fb;
+    color: #0b66c3;
+  }
+
+  th.utilization-sort-active .utilization-sort-heading {
+    color: #0b66c3;
+    font-weight: 600;
+  }
 
   th,
   td {

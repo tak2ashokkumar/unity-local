@@ -30,10 +30,10 @@ export const DATABASE_DASHBOARD_DATABASE_OPTIONS: DatabaseDashboardFilterOption[
 ];
 
 export const DATABASE_DASHBOARD_SUMMARY_METRICS: DatabaseDashboardMetric[] = [
-  { label: 'Total DB instances', value: '128', tone: 'primary' },
-  { label: 'Active databases', value: '1,094' },
-  { label: 'Inactive / Dormant', value: '154' },
-  { label: 'Primary Instances', value: '891' }
+  { label: 'Total DB instances', key: 'total_databases', value: '128', tone: 'primary' },
+  { label: 'Active databases', key: 'active_databases', value: '1,094' },
+  { label: 'Inactive / Dormant', key: 'inactive_databases', value: '154' },
+  { label: 'Primary Instances', key: 'primary_instances', value: '891' }
 ];
 
 export const DATABASE_DASHBOARD_CLOUD_TYPE_DISTRIBUTION: DatabaseDashboardDonutItem[] = [
@@ -354,11 +354,11 @@ export const DATABASE_DASHBOARD_HEALTH_GROUPS: DbDashboardHealthGroup[] = [
 ];
 
 export const DATABASE_DASHBOARD_ALERT_SUMMARY_CONFIG: DatabaseDashboardAlertSummaryMetric[] = [
-  { key: 'critical_alerts', label: 'Critical Alerts', value: '24', tone: 'danger' },
-  { key: 'high_alerts', label: 'High Alerts', value: '67', tone: 'warning' },
-  { key: 'open_itsm_tickets', label: 'Open ITSM Tickets', value: '14', tone: 'primary' },
-  { key: 'automation_success_pct', label: 'Automation Success', value: '91', tone: 'success', suffix: '%' },
-  // { key: 'avg_mttr', label: 'Avg MTTR', value: '3.2', tone: 'muted', suffix: 'h' }
+  { key: 'critical_alerts', label: 'Critical Alerts', value: '24', tone: 'danger', link: true },
+  { key: 'high_alerts', label: 'High Alerts', value: '67', tone: 'warning', link: true },
+  { key: 'open_itsm_tickets', label: 'Open ITSM Tickets', value: '14', tone: 'primary',  link: false },
+  { key: 'automation_success_pct', label: 'Automation Success', value: '91', tone: 'success', suffix: '%', link: false },
+  // { key: 'avg_mttr', label: 'Avg MTTR', value: '3.2', tone: 'muted', suffix: 'h', link: false }
 ];
 
 export const DATABASE_DASHBOARD_CRITICAL_ALERTS: DatabaseDashboardCriticalAlertViewData[] = [
@@ -378,10 +378,14 @@ export const DATABASE_DASHBOARD_CRITICAL_ALERTS: DatabaseDashboardCriticalAlertV
 // Single api const for testing
 export const INVENTORY_RESP = {
   "total_databases": 42,
-  "by_category": [
-    { "category": "RDBMS", "count": 20, "percentage": 64.26 },
-    { "category": "NoSql", "count": 8, "percentage": 25.26 },
-    { "category": "Cloud DB", "count": 8, "percentage": 25.40 },
+  "status": {
+    "active": 38,
+    "inactive": 4
+  },
+  "by_cloud_type": [
+    { "cloud_type": "RDBMS", "count": 20, "percentage": 64.26 },
+    { "cloud_type": "NoSql", "count": 8, "percentage": 25.26 },
+    { "cloud_type": "Cloud DB", "count": 8, "percentage": 25.40 },
   ],
   "by_type": [
     { "db_type": "MySQL", "active": 20, "inactive": 10, "percentage": 42.86 },
@@ -389,10 +393,6 @@ export const INVENTORY_RESP = {
     { "db_type": "MSSQL", "active": 11, "inactive": 5, "percentage": 19.05 },
     { "db_type": "Oracle", "active": 4, "inactive": 4, "percentage": 10.52 }
   ],
-  "status": {
-    "active": 38,
-    "inactive": 4
-  },
   "by_environment": [
     { "environment": "Production", "count": 20, "percentage": 47.62 },
     { "environment": "Development", "count": 14, "percentage": 33.33 },
@@ -432,6 +432,7 @@ export const TOPUTIL_RESP = [
   // },
   {
     name: 'Cisco 1',
+    db_uuid: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     host_id: 1,
     disk_read_ops: 120,
     disk_write_ops: 10012,
@@ -446,6 +447,7 @@ export const TOPUTIL_RESP = [
   },
   {
     name: 'Cisco 2',
+    db_uuid: 'c3d4e5f6-a7b8-9012-cdef-123456789012',
     host_id: 2,
     cpu_usage_system_percent: 80,
     cpu_usage_user_percent: 34,
@@ -462,149 +464,172 @@ export const TOPUTIL_RESP = [
 
 export const TOPQUERY_RESP = {
   "top_response_time": [
-    { "host_id": 10091, "name": "prod-oracle-01", "db_type": "Oracle", "response_time_ms": 842.500 },
-    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "response_time_ms": 530.120 },
-    { "host_id": 10085, "name": "prod-postgres-01", "db_type": "PostgreSQL", "response_time_ms": 310.000 }
+    {
+      "host_id": 1234,
+      "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "db_type": "MySQL",
+      "response_time_ms": 142.350
+    }
   ],
+ 
   "top_latency": [
-    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "response_time_ms": 12.450 },
-    { "host_id": 10085, "name": "prod-postgres-01", "db_type": "PostgreSQL", "response_time_ms": 8.200 }
+    {
+      "host_id": 1235,
+      "host_uuid": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "db_uuid": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "db-server-02",
+      "db_type": "PostgreSQL",
+      "response_time_ms": 98.120
+    }
   ],
+ 
   "top_connections": [
-    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "active_connections": 312.0 },
-    { "host_id": 10086, "name": "prod-mssql-01", "db_type": "MSSQL", "active_connections": 198.0 }
+    {
+      "host_id": 1234,
+      "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "db_type": "MySQL",
+      "active_connections": 312.0
+    }
   ],
+ 
   "top_errors_deadlocks": [
-    { "host_id": 10086, "name": "prod-mssql-01", "db_type": "MSSQL", "deadlock_count": 14.0 },
-    { "host_id": 10084, "name": "prod-mysql-01", "db_type": "MySQL", "deadlock_count": 7.0 }
+    {
+      "host_id": 1236,
+      "host_uuid": "e5f6a7b8-c9d0-1234-efab-345678901234",
+      "db_uuid": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+      "name": "db-server-03",
+      "db_type": "Oracle",
+      "deadlock_count": 5.0
+    }
   ],
-
+ 
   "top_throughput": [
     {
-      "host_id": 10085, "name": "prod-postgres-01", "db_type": "PostgreSQL", "transactions_per_sec": 4820.0, "trend": [
-        { "date": "2026-05-02", "value": 1200 },
-        { "date": "2026-05-03", "value": 1800 },
-        { "date": "2026-05-04", "value": 3100 },
-        { "date": "2026-05-05", "value": 1400 },
-        { "date": "2026-05-06", "value": 1900 },
-        { "date": "2026-05-07", "value": 2600 },
-        { "date": "2026-05-08", "value": 2400 }
+      "host_id": 1234,
+      "host_uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "db_type": "MySQL",
+      "trend": [
+        {"date": "2026-05-18", "transactions_per_sec": 1240.500},
+        {"date": "2026-05-19", "transactions_per_sec": 1380.200},
+        {"date": "2026-05-20", "transactions_per_sec": 0.0},
+        {"date": "2026-05-21", "transactions_per_sec": 1190.750},
+        {"date": "2026-05-22", "transactions_per_sec": 1450.300},
+        {"date": "2026-05-23", "transactions_per_sec": 1320.100},
+        {"date": "2026-05-24", "transactions_per_sec": 980.600}
       ]
     }
   ],
+ 
   "top_cache_hit_ratio": [
-    { "host_id": 10088, "name": "dev-mysql-02", "db_type": "MySQL", "hit_ratio_pct": 61.3 },
-    { "host_id": 10086, "name": "prod-mssql-01", "db_type": "MSSQL", "hit_ratio_pct": 74.8 }
+    {
+      "host_id": 1235,
+      "host_uuid": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "db_uuid": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "db-server-02",
+      "db_type": "PostgreSQL",
+      "hit_ratio_pct": 72.450
+    }
   ]
 }
 
 export const CAPACITY_RESP = {
   "summary_stats": {
-    "total_db_size_gb": 3840.50,
-    "total_free_space_gb": 1240.75,
-    "avg_used_percentage": 67.72
+    "total_db_size_gb": 1240.50,
+    "total_free_space_gb": 380.20,
+    "avg_used_percentage": 68.45
   },
+ 
   "top_servers": [
     {
-      "name": "prod-oracle-01",
-      "used_percentage": 91.40,
-      "free_gb": 18.60,
-      "db_size_gb": 214.00,
-      "log_size_gb": 32.10,
-      "log_growth_gb_per_day": 1.2400
-    },
-    {
-      "name": 'DB-SRV-01',
-      "used_percentage": 94,
-      "free_gb": 28,
-      "db_size_gb": 412,
-      "log_size_gb": 60,
-      "log_growth_gb_per_day": 3.2
-    },
-    {
-      "name": 'DB-SRV-02',
-      "used_percentage": 87,
-      "free_gb": 65,
-      "db_size_gb": 380,
-      "log_size_gb": 55,
-      "log_growth_gb_per_day": 2.8
-    },
-    {
-      "name": 'APP-SRV-03',
-      "used_percentage": 82,
-      "free_gb": 90,
-      "db_size_gb": 290,
-      "log_size_gb": 120,
-      "log_growth_gb_per_day": 5.1
-    },
-    {
-      "name": 'WEB-SRV-01',
-      "used_percentage": 78,
-      "free_gb": 110,
-      "db_size_gb": 210,
-      "log_size_gb": 180,
-      "log_growth_gb_per_day": 7.4
-    },
-    {
-      "name": 'LOG-SRV-01',
-      "used_percentage": 76,
-      "free_gb": 120,
-      "db_size_gb": 45,
-      "log_size_gb": 435,
-      "log_growth_gb_per_day": 12.6
-    },
-    {
-      "name": 'BACKUP-01',
-      "used_percentage": 71,
-      "free_gb": 580,
-      "db_size_gb": 920,
-      "log_size_gb": 500,
-      "log_growth_gb_per_day": 1.9
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "used_percentage": 85.30,
+      "free_gb": 45.20,
+      "db_size_gb": 310.50,
+      "log_size_gb": 22.80,
+      "log_growth_gb_per_day": 0.4200
     }
   ],
+ 
   "top_tablespace_filesystem_usage": [
     {
-      "name": "prod-mssql-01",
-      "disk_used_pct": 88.30,
-      "disk_free_gb": 42.10,
-      "disk_total_gb": 360.00
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "disk_used_pct": 78.50,
+      "disk_free_gb": 120.30,
+      "disk_total_gb": 560.00
     }
   ],
-  "storage_growth_trend": [],
+ 
+  "log_growth_rate": [
+    {
+      "db_uuid": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "db-server-02",
+      "log_growth_gb_per_day": 0.6500
+    }
+  ],
+ 
+  "disk_utilization": [
+    {
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "disk_used_pct": 78.50,
+      "disk_free_gb": 120.30,
+      "disk_total_gb": 560.00
+    }
+  ],
+ 
+  "log_size_by_server": [
+    {
+      "db_uuid": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "db-server-03",
+      "log_size_gb": 38.40
+    }
+  ],
+ 
+  "db_size_by_server": [
+    {
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "db_size_gb": 310.50
+    }
+  ],
+ 
   "archive_log_growth_trend": [
     {
-      "name": "prod-oracle-01",
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
       "trend": [
-        { "date": "2026-05-02", "log_growth_gb": 1.1200 },
-        { "date": "2026-05-03", "log_growth_gb": 1.0800 },
-        { "date": "2026-05-04", "log_growth_gb": 1.3100 },
-        { "date": "2026-05-05", "log_growth_gb": 1.2400 },
-        { "date": "2026-05-06", "log_growth_gb": 1.1900 },
-        { "date": "2026-05-07", "log_growth_gb": 1.2600 },
-        { "date": "2026-05-08", "log_growth_gb": 1.2400 }
+        {"date": "2026-05-18", "log_growth_gb": 0.3800},
+        {"date": "2026-05-19", "log_growth_gb": 0.4100},
+        {"date": "2026-05-20", "log_growth_gb": 0.0000},
+        {"date": "2026-05-21", "log_growth_gb": 0.4500},
+        {"date": "2026-05-22", "log_growth_gb": 0.3900},
+        {"date": "2026-05-23", "log_growth_gb": 0.4200},
+        {"date": "2026-05-24", "log_growth_gb": 0.4400}
       ]
     }
   ],
-  "log_growth_rate": [
-    { "name": "prod-oracle-01", "log_growth_gb_per_day": 1.2400 },
-    { "name": "prod-mssql-01", "log_growth_gb_per_day": 0.8100 }
-  ],
-  "log_size_by_server": [
-    { "name": "prod-oracle-01", "log_size_gb": 32.10 },
-    { "name": "prod-mssql-01", "log_size_gb": 21.40 }
-  ],
-  "db_size_by_server": [
-    { "name": "prod-oracle-01", "db_size_gb": 214.00 },
-    { "name": "prod-mysql-01", "db_size_gb": 180.50 }
-  ],
-  "disk_utilization": [
+ 
+  "storage_growth_trend": [
     {
-      "name": "prod-mssql-01",
-      "disk_used_pct": 88.30,
-      "disk_free_gb": 42.10,
-      "disk_total_gb": 360.00
+      "db_uuid": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "db-server-01",
+      "trend": [
+        {"ts": 1748044800, "db_size_gb": 310.2341},
+        {"ts": 1748048400, "db_size_gb": 310.2890},
+        {"ts": 1748052000, "db_size_gb": 310.3120},
+        {"ts": 1748055600, "db_size_gb": 310.3450},
+        {"ts": 1748059200, "db_size_gb": 310.3780}
+      ]
     }
-  ],
+  ]
 }
 
 export const HEALTHGROWTH_RESP = {

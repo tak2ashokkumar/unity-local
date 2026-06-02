@@ -419,7 +419,9 @@ export class UnifiedAiopsCommandCentreService {
 
   private getBusinessServiceViewData(service: any): UnifiedAiopsBusinessService {
     const flatService = this.flattenPayload(service || {});
-    const uptimePercent = this.getOptionalNumberValue(this.getFirstDefinedValue(service?.uptime_pct, service?.uptimePct));
+    const availabilityPercent = this.getOptionalNumberValue(
+      this.getFirstDefinedValue(service?.availability_pct, service?.availabilityPct, service?.uptime_pct, service?.uptimePct)
+    );
     const criticalAlerts = this.getNumberFromPayload(flatService, ['critical_alerts', 'criticalAlerts', 'critical']);
     const warningAlerts = this.getNumberFromPayload(flatService, ['warning_alerts', 'warningAlerts', 'warning']);
     const infoAlerts = this.getNumberFromPayload(flatService, ['info_alerts', 'infoAlerts', 'information', 'info']);
@@ -430,9 +432,9 @@ export class UnifiedAiopsCommandCentreService {
       id: this.getIdValue(service?.id, service?.uuid, service?.business_id, service?.businessId, service?.service_id, service?.serviceId),
       serviceName: this.getBusinessServiceName(service),
       status: this.getBusinessServiceStatusTone(service?.status),
-      statusLabel: this.getBusinessServiceStatusLabel(service?.status),
-      uptime: this.getBusinessServiceUptime(service, uptimePercent),
-      degraded: this.getBusinessServiceDegraded(service, uptimePercent),
+      statusLabel: this.getBusinessServiceStatusLabel(this.getFirstDefinedValue(service?.status_label, service?.statusLabel, service?.status)),
+      uptime: this.getBusinessServiceAvailability(service, availabilityPercent),
+      degraded: this.getBusinessServiceDegraded(service, availabilityPercent),
       alerts: totalAlerts !== undefined ? this.formatNumber(totalAlerts) : this.formatNumber(criticalAlerts + warningAlerts + infoAlerts),
       alertTone: this.getBusinessServiceAlertTone(criticalAlerts, warningAlerts, infoAlerts)
     };
@@ -451,6 +453,9 @@ export class UnifiedAiopsCommandCentreService {
         return 'success';
       case 'warning':
       case 'degraded':
+      case 'partial':
+      case 'partially up':
+      case 'partially_up':
         return 'warning';
       case 'critical':
       case 'down':
@@ -467,20 +472,20 @@ export class UnifiedAiopsCommandCentreService {
     return value === undefined ? 'Unknown' : this.getReadableStackLabel(String(value));
   }
 
-  private getBusinessServiceUptime(service: any, uptimePercent: number | null): string {
-    const uptime = this.getFirstDefinedValue(service?.uptime);
-    if (uptime !== undefined) {
-      return String(uptime);
+  private getBusinessServiceAvailability(service: any, availabilityPercent: number | null): string {
+    const availability = this.getFirstDefinedValue(service?.availability, service?.uptime);
+    if (availability !== undefined) {
+      return String(availability);
     }
-    return uptimePercent !== null ? this.formatPercentage(uptimePercent) : 'NA';
+    return availabilityPercent !== null ? this.formatPercentage(availabilityPercent) : 'NA';
   }
 
-  private getBusinessServiceDegraded(service: any, uptimePercent: number | null): string {
+  private getBusinessServiceDegraded(service: any, availabilityPercent: number | null): string {
     const degraded = this.getFirstDefinedValue(service?.degraded);
     if (degraded !== undefined) {
       return String(degraded);
     }
-    return this.formatPercentage(Math.max(100 - (uptimePercent || 0), 0));
+    return this.formatPercentage(Math.max(100 - (availabilityPercent || 0), 0));
   }
 
   private getBusinessServiceAlertTone(criticalAlerts: number, warningAlerts: number, infoAlerts: number): UnifiedAiopsTone {

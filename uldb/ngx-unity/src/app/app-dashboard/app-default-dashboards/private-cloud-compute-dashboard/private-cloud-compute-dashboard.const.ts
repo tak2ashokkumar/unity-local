@@ -1,4 +1,4 @@
-import { PerformanceHotspots, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudCriticalAlert, PrivateCloudTicketDonutItem, PrivateCloudTicketRow } from "./private-cloud-compute-dashboard.type";
+import { PerformanceHotspots, PrivateCloudAlertTrendBarGroup, PrivateCloudAlertTrendLegendItem, PrivateCloudCriticalAlert, PrivateCloudTicketDonutItem, PrivateCloudTicketRow, labelAndValueType } from "./private-cloud-compute-dashboard.type";
 
 
 //Top 10 clusters
@@ -12,6 +12,130 @@ export const Top10ClustersByVMCount = [
   { host: 'TEST-01', value: 150 },
   { host: 'TEST-02', value: 120 }
 ];
+
+export const PLATFORM_OPTIONS: labelAndValueType[] = [
+  {
+    value: '/setup/integration/nutanix',
+    label: 'Nutanix'
+  },
+  {
+    value: '/unitycloud/devices/cloudcontrollers',
+    label: 'VMware vCloud'
+  },
+  {
+    value: '/setup/integration/vmware-vcenter',
+    label: 'VMware vCenter'
+  },
+  {
+    value: '/unitycloud/devices/cloudcontrollers',
+    label: 'Custom'
+  },
+  {
+    value: '/unitycloud/devices/cloudcontrollers',
+    label: 'ESXi'
+  },
+  {
+    value: '/setup/integration/unity-vcenter',
+    label: 'United Private Cloud vCenter'
+  },
+  {
+    value: '/unitycloud/devices/cloudcontrollers',
+    label: 'Hyperv'
+  },
+  {
+    value: '/unitycloud/devices/cloudcontrollers',
+    label: 'OpenStack'
+  }
+];
+
+export const DEVICE_OPTIONS: labelAndValueType[] = [
+  {
+    value: '/unitycloud/devices/switches',
+    label: 'Switches'
+  },
+  {
+    value: '/unitycloud/devices/switches',
+    label: 'Network'
+  },
+  {
+    value: '/unitycloud/publiccloud/',
+    label: 'Public Cloud Compute'
+  },
+  {
+    value: '/unitycloud/pccloud/',
+    label: 'Private Cloud Compute'
+  },
+  {
+    value: '/unitycloud/devices/firewalls',
+    label: 'Firewalls'
+  },
+  {
+    value: '/unitycloud/devices/loadbalancers',
+    label: 'Load Balancers'
+  },
+  {
+    value: '/unitycloud/devices/network-controllers',
+    label: 'SD-WAN'
+  },
+  {
+    value: '/unitycloud/devices/hypervisors',
+    label: 'Hypervisor'
+  },
+  {
+    value: '/unitycloud/devices/bmservers',
+    label: 'Baremetal Servers'
+  },
+  {
+    value: '/unitycloud/devices/macdevices',
+    label: 'Mac Devices'
+  },
+  {
+    value: '/unitycloud/devices/vms/allvms',
+    label: 'Virtual Machine'
+  },
+  {
+    value: '/unitycloud/devices/kubernetes/nodes',
+    label: 'Containers'
+  },
+  {
+    value: '/unitycloud/devices/storagedevices',
+    label: 'Storage '
+  },
+  {
+    value: '/unitycloud/devices/cloudcontrollers',
+    label: 'Cloud Controllers'
+  },
+  {
+    value: '/unitycloud/devices/mobiledevices',
+    label: 'Mobile Devices'
+  },
+  {
+    value: '/unitycloud/devices/databases',
+    label: 'Database'
+  },
+  {
+    value: '/unitycloud/devices/iot-devices',
+    label: 'IOT Devices'
+  },
+  {
+    value: '/unitycloud/devices/otherdevices',
+    label: 'Other Devices'
+  }
+];
+
+export const DEVICE_TYPE_MAP: Record<string, string> = {
+  'Baremetal Servers': 'bmservers',
+  'Switches': 'switches',
+  'Load Balancer': 'loadbalancers',
+  'Network Controllers': 'network-controllers',
+  'Hypervisors': 'hypervisors',
+  'Mac Device': 'macdevices',
+  'Virtual Machine': 'vms',
+  'Containers': 'kubernetes',
+  'Storage': 'storagedevices',
+  'Cloud Controllers': 'cloudcontrollers',
+  'Database': 'databases'
+};
 
 export const Private_CLOUD_UTILIZATION_ROWS: PerformanceHotspots = {
   "topUtilization": [

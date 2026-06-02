@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { ApplicationOverviewDashboardService, ApplicationType, DateDropdownOptionsData } from './application-overview-dashboard.service';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ApplicationOverviewDashboardService, DateDropdownOptionsData } from './application-overview-dashboard.service';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
 import { AppNotificationService } from 'src/app/shared/app-notification/app-notification.service';
 import { Notification } from 'src/app/shared/app-notification/notification.type';
@@ -18,11 +18,12 @@ import { StorageService } from 'src/app/shared/app-storage/storage.service';
   providers: [ApplicationOverviewDashboardService]
 })
 
-export class ApplicationOverviewDashboardComponent implements OnInit, OnDestroy {
+export class ApplicationOverviewDashboardComponent implements OnInit {
   private ngUnsubscribe = new Subject();
+  selectedApplication: string = 'AstronomyShop';
   dateDropdownOptions: DateDropdownOptionsData;
-  applications: ApplicationType[] = [];
-  selectedApplication: ApplicationType;
+  applicationId: number;
+  customerId: number;
 
   constructor(private svc: ApplicationOverviewDashboardService,
     private spinner: AppSpinnerService,
@@ -34,31 +35,32 @@ export class ApplicationOverviewDashboardComponent implements OnInit, OnDestroy 
 
   ngOnInit(): void {
     this.spinner.start('main');
-    this.getApplications();
+    this.getAppId();
+    setTimeout(() => {
+      this.dateDropdownOptions = this.svc.getDateDropdownOptions();
+    }, 0);
   }
 
-  ngOnDestroy() {
-    this.spinner.stop('main');
-    this.ngUnsubscribe.next();
-    this.ngUnsubscribe.complete();
-  }
-
-  getApplications() {
+  getAppId() {
     this.svc.getApplications().pipe(takeUntil(this.ngUnsubscribe)).subscribe(data => {
       if (data?.results?.length) {
-        this.applications = this.svc.convertToApplicationViewData(data.results);
-        this.selectedApplication = this.applications[0];
-        this.dateDropdownOptions = this.svc.getDateDropdownOptions();
-        this.cdr.detectChanges();
         setTimeout(() => {
+          let x = data.results.find(app => app.name === "astronomy-shop"); //To fetch the default app id
+          this.applicationId = x.id; //To fetch the default app id  
+          this.customerId = x.customer;
+          this.cdr.detectChanges();
         }, 0);
       }
       this.spinner.stop('main');
     }, (err: HttpErrorResponse) => {
       this.spinner.stop('main');
-      this.notification.error(new Notification('Error while fetching Applications. Please try again later.'));
+      this.notification.error(new Notification('Error while fetching Application id'));
     });
   };
+
+  refreshData() {
+
+  }
 
   onFilterChange(formData: any) {
     this.dateDropdownOptions.formData = formData;
@@ -66,8 +68,8 @@ export class ApplicationOverviewDashboardComponent implements OnInit, OnDestroy 
   }
 
   goToExectiveAiSummary() {
-    this.storage.put('app-data', { appId: this.selectedApplication.id, customerId: this.selectedApplication.customer }, StorageType.SESSIONSTORAGE);
-    this.router.navigate([this.selectedApplication.id, 'executive-ai-business-summary'], { relativeTo: this.route });
+    this.storage.put('app-data', { appId: this.applicationId, customerId: this.customerId }, StorageType.SESSIONSTORAGE);
+    this.router.navigate([this.applicationId, 'executive-ai-business-summary'], { relativeTo: this.route });
   }
 
   goBack() {
