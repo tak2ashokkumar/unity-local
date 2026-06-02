@@ -94,40 +94,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 px-2">
-                        <div class="card equalize-card border-0">
-                            <app-spinner [name]="orderPlcedWidgetViewData?.loader"></app-spinner>
-                            <div class="card-body p-0 d-flex flex-column justify-content-around">
-                                <ng-container *ngIf="orderPlcedWidgetViewData?.chartData">
-                                    <div echarts [options]="orderPlcedWidgetViewData?.chartData?.options"
-                                        [extentions]="orderPlcedWidgetViewData?.chartData?.extensions"
-                                        [defaultHeight]="300"></div>
-                                </ng-container>
-                                <ng-container *ngIf="!orderPlcedWidgetViewData?.chartData">
-                                    <div class="d-flex justify-content-center align-items-center" style="height:300px;">
-                                        No Orders Placed data found.
-                                    </div>
-                                </ng-container>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 px-2">
-                        <div class="card equalize-card border-0">
-                            <app-spinner [name]="newVsReturningCustomersWidgetViewData?.loader"></app-spinner>
-                            <div class="card-body p-0 d-flex flex-column justify-content-around">
-                                <ng-container *ngIf="newVsReturningCustomersWidgetViewData?.chartData">
-                                    <div echarts [options]="newVsReturningCustomersWidgetViewData?.chartData?.options"
-                                        [extentions]="newVsReturningCustomersWidgetViewData?.chartData?.extensions"
-                                        [defaultHeight]="300"></div>
-                                </ng-container>
-                                <ng-container *ngIf="!newVsReturningCustomersWidgetViewData?.chartData">
-                                    <div class="d-flex justify-content-center align-items-center" style="height:300px;">
-                                        No New Customers data found.
-                                    </div>
-                                </ng-container>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -141,7 +107,7 @@
             </div>
             <div class="card-body px-2" style="min-height:200px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
                 <div class="row mx-0">
-                    <div class="col-4 px-2"
+                    <div class="col-6 px-2"
                         style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
                         <div class="card equalize-card border-0">
                             <app-spinner [name]="categoriesViewedWidgetViewData?.loader"></app-spinner>
@@ -159,7 +125,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-4 px-2"
+                    <div class="col-6 px-2"
                         style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
                         <div class="card equalize-card border-0">
                             <app-spinner [name]="trafficSourceOverGivenPeriodWidgetViewData?.loader"></app-spinner>
@@ -173,24 +139,6 @@
                                 <ng-container *ngIf="!trafficSourceOverGivenPeriodWidgetViewData?.chartData">
                                     <div class="d-flex justify-content-center align-items-center h-100">
                                         No Traffic distribution data found.
-                                    </div>
-                                </ng-container>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-4 px-2" style="min-height:170px;max-height:441px;overflow-y: auto;overflow-x: hidden;">
-                        <div class="card equalize-card border-0">
-                            <app-spinner [name]="uniqueVisitorsWidgetViewData?.loader"></app-spinner>
-                            <div class="card-body p-0 d-flex flex-column justify-content-around">
-                                <ng-container *ngIf="uniqueVisitorsWidgetViewData?.chartData">
-                                    <div echarts [options]="uniqueVisitorsWidgetViewData?.chartData?.options"
-                                        [extentions]="uniqueVisitorsWidgetViewData?.chartData?.extensions"
-                                        [defaultHeight]="300">
-                                    </div>
-                                </ng-container>
-                                <ng-container *ngIf="!uniqueVisitorsWidgetViewData?.chartData">
-                                    <div class="d-flex justify-content-center align-items-center h-100">
-                                        No Unique Visitors data found.
                                     </div>
                                 </ng-container>
                             </div>
@@ -270,52 +218,6 @@
                                 <ng-container *ngIf="!paymentGatewayLatencyViewData">
                                     <div class="d-flex justify-content-center align-items-center h-100">
                                         No Data found.
-                                    </div>
-                                </ng-container>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Revenue & Customer Value KPIs -->
-    <div class="col-12 mb-2">
-        <div class="card round-edge equalize-card">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom p-2">
-                <span class="font-lg font-500">Revenue & Customer Value KPIs</span>
-            </div>
-            <div class="card-body">
-                <div class="row mb-2">
-                    <div class="col-6">
-                        <div class="card round-edge equalize-card border-0" style="min-height: 230px;">
-                            <app-spinner [name]="'RevenueByCategoryLoader'"></app-spinner>
-                            <div class="card-body p-0">
-                                <ng-container *ngIf="revenueByCategoryViewData">
-                                    <div echarts [options]="revenueByCategoryViewData.options"
-                                        [extentions]="revenueByCategoryViewData.extensions" [defaultHeight]="280"></div>
-                                </ng-container>
-                                <ng-container *ngIf="!revenueByCategoryViewData">
-                                    <div class="d-flex justify-content-center align-items-center h-100 text-center">
-                                        No revenue by category data found.
-                                    </div>
-                                </ng-container>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card round-edge equalize-card border-0" style="min-height: 230px;">
-                            <app-spinner [name]="'RevenueByTrafficSourceLoader'"></app-spinner>
-                            <div class="card-body p-0">
-                                <ng-container *ngIf="revenueByTrafficSourceViewData">
-                                    <div echarts [options]="revenueByTrafficSourceViewData.options"
-                                        [extentions]="revenueByTrafficSourceViewData.extensions" [defaultHeight]="280">
-                                    </div>
-                                </ng-container>
-                                <ng-container *ngIf="!revenueByTrafficSourceViewData">
-                                    <div class="d-flex justify-content-center align-items-center h-100 text-center">
-                                        No revenue by traffic source data found.
                                     </div>
                                 </ng-container>
                             </div>

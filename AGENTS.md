@@ -20,6 +20,7 @@
 - Keep service API mappings close to existing service style.
 - Consider existing naming conventions while adding new varibales / methods / functions / constants / enums.
 - OnDestroy support variable should always be ngUnsubscribe. Don't take it as destroy$ or any other.
+- Always declare interfaces with export keyword and import where ever is needed.
 
 ## SCSS
 - Mostly use bootstrap suported css unless it is explicitly needed.

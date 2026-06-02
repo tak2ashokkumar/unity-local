@@ -1486,21 +1486,21 @@ export interface OperationalAnomalyType {
   revenue_usd: RevenueItem[];
   revenue_24h_ma: RevenueItem[];
 }
-interface RevenueItem { sum: number; period: string; }
+export interface RevenueItem { sum: number; period: string; }
 
 /** Raw API record returned by `/apm/monitoring/applist/`. */
-interface AppResult {
+export interface AppResult {
   id: number; name: string; uuid: string; hostname: string; latency: string; throughput: string;
   device_id: number; content_type: number; parent_app: number; customer: number; type_of_app: string;
   parent_app_availability: string | null; parent_app_status_code: string;
 }
 /** Paginated wrapper around `AppResult` records, including aggregate KPI averages. */
-interface AppResultsResponse {
+export interface AppResultsResponse {
   count: number; next: string; previous: string; results: AppResult[];
   avg_throughput: string; avg_latency: string; avg_availability: string;
 }
 /** Raw API record returned by `apm/business_summary/top_business_events/`. */
-interface AlertData {
+export interface AlertData {
   event_type: string; affected_component: string | null; is_ack: boolean; device_type: string;
   ack_by: string | null; source_account_name: string; recovered_datetime: string | null;
   supressRule: any[]; id: number; event_datetime: string; category: string; ack_time: string | null;
@@ -1512,7 +1512,7 @@ interface AlertData {
   device_name: string; category_meta: any | null; custom_data: any | null; application_name: string;
 }
 /** Raw API record returned by `/apm/business_summary/cloud_list/`. */
-interface PrivateCloudFast {
+export interface PrivateCloudFast {
   id: number; name: string; uuid: string; platform_type: string; display_platform: string;
   vms: number; colocation_cloud: any; status: number;
 }

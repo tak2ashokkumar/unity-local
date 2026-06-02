@@ -12,14 +12,11 @@ import {
   DatabaseOverviewViewData,
   HostOverviewViewData,
   NewCustomersWidgetViewData,
-  NewVsReturningCustomersWidgetViewData,
-  OrderPlcedWidgetViewData,
   ProcessOverviewViewData,
   ReturningCustomerCategoryWidgetViewData,
   ServiceViewData,
   SessionToOrderFunnelWidgetViewData,
-  TrafficSourceOverGivenPeriodWidgetViewData,
-  UniqueVisitorsWidgetViewData
+  TrafficSourceOverGivenPeriodWidgetViewData
 } from './bank-of-anthos-application-dashboard.service';
 import { PAGE_SIZES, SearchCriteria } from 'src/app/shared/table-functionality/search-criteria';
 import { AppSpinnerService } from 'src/app/shared/app-spinner/app-spinner.service';
@@ -58,14 +55,11 @@ export class BankOfAnthosApplicationDashboardComponent implements OnInit, OnChan
 
   checkoutAbondanRateWidgetViewData: CheckoutAbondanRateWidgetViewData = new CheckoutAbondanRateWidgetViewData();
   conversionRateWidgetViewData: ConversionRateWidgetViewData = new ConversionRateWidgetViewData();
-  orderPlcedWidgetViewData: OrderPlcedWidgetViewData = new OrderPlcedWidgetViewData();
-  newVsReturningCustomersWidgetViewData: NewVsReturningCustomersWidgetViewData = new NewVsReturningCustomersWidgetViewData();
 
   // Traffic & Engagement
 
   categoriesViewedWidgetViewData: CategoriesViewedWidgetViewData = new CategoriesViewedWidgetViewData();
   trafficSourceOverGivenPeriodWidgetViewData: TrafficSourceOverGivenPeriodWidgetViewData = new TrafficSourceOverGivenPeriodWidgetViewData();
-  uniqueVisitorsWidgetViewData: UniqueVisitorsWidgetViewData = new UniqueVisitorsWidgetViewData();
 
   // Performance & Reliability
 
@@ -73,11 +67,6 @@ export class BankOfAnthosApplicationDashboardComponent implements OnInit, OnChan
   errorRateViewData: any;
   paymentFailureViewData: any;
   paymentGatewayLatencyViewData: any;
-
-  // Revenue & Customer Value
-
-  revenueByCategoryViewData: any;
-  revenueByTrafficSourceViewData: any;
 
   // Services Overview
 
@@ -138,20 +127,14 @@ export class BankOfAnthosApplicationDashboardComponent implements OnInit, OnChan
 
         this.getCheckoutAbondanRate();
         this.getConversionRate();
-        this.getOrderPlced();
-        this.getNewVsReturningCustomers();
 
         this.getCategoriesViewedWidgetViewData();
         this.getTrafficSourceOverGivenPeriod();
-        this.getUniqueVisitors();
 
         this.getApplicationResponseTimeGraph();
         this.getErrorRateGraph();
         this.getPayemntFailureRateGraph();
         this.getPaymentGatewayLatencyGraph();
-
-        this.getRevenueByCategoryGraph();
-        this.getRevenueByTrafficSourceGraph();
 
         this.getServiceOverviewData();
         this.getComponentsOverview();
@@ -326,38 +309,6 @@ export class BankOfAnthosApplicationDashboardComponent implements OnInit, OnChan
       });
   }
 
-  getOrderPlced() {
-    this.spinner.start(this.orderPlcedWidgetViewData.loader);
-    this.orderPlcedWidgetViewData.chartData = null;
-    this.svc.getOrderPlced(this.appId, this.filters)
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        if (res) {
-          this.orderPlcedWidgetViewData.chartData = this.svc.convertToOrderPlcedChartData(res);
-        }
-        this.spinner.stop(this.orderPlcedWidgetViewData.loader);
-      }, (_err: HttpErrorResponse) => {
-        this.spinner.stop(this.orderPlcedWidgetViewData.loader);
-        this.notification.error(new Notification('Failed to get Order Placed data. Try again later'));
-      });
-  }
-
-  getNewVsReturningCustomers() {
-    this.spinner.start(this.newVsReturningCustomersWidgetViewData.loader);
-    this.newVsReturningCustomersWidgetViewData.chartData = null;
-    this.svc.getNewVsReturningCustomers(this.appId, this.filters)
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        if (res) {
-          this.newVsReturningCustomersWidgetViewData.chartData = this.svc.convertToNewVsReturningCustomersChartdata(res);
-        }
-        this.spinner.stop(this.newVsReturningCustomersWidgetViewData.loader);
-      }, (_err: HttpErrorResponse) => {
-        this.spinner.stop(this.newVsReturningCustomersWidgetViewData.loader);
-        this.notification.error(new Notification('Failed to get New Vs Returning Customers data. Try again later'));
-      });
-  }
-
   // Traffic & Engagement
 
   getCategoriesViewedWidgetViewData() {
@@ -389,22 +340,6 @@ export class BankOfAnthosApplicationDashboardComponent implements OnInit, OnChan
       }, (_err: HttpErrorResponse) => {
         this.spinner.stop(this.trafficSourceOverGivenPeriodWidgetViewData.loader);
         this.notification.error(new Notification('Failed to get Traffic distribution data. Try again later'));
-      });
-  }
-
-  getUniqueVisitors() {
-    this.spinner.start(this.uniqueVisitorsWidgetViewData.loader);
-    this.uniqueVisitorsWidgetViewData.chartData = null;
-    this.svc.getUniqueVisitors(this.appId, this.filters)
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        if (res) {
-          this.uniqueVisitorsWidgetViewData.chartData = this.svc.convertToUniqueVisitorsChartData(res);
-        }
-        this.spinner.stop(this.uniqueVisitorsWidgetViewData.loader);
-      }, (_err: HttpErrorResponse) => {
-        this.spinner.stop(this.uniqueVisitorsWidgetViewData.loader);
-        this.notification.error(new Notification('Failed to get Unique Visitors data. Try again later'));
       });
   }
 
@@ -471,40 +406,6 @@ export class BankOfAnthosApplicationDashboardComponent implements OnInit, OnChan
       }, (_err: HttpErrorResponse) => {
         this.spinner.stop('PaymentGatewayLatencyLoader');
         this.notification.error(new Notification('Failed to get application latency data'));
-      });
-  }
-
-  // Revenue & Customer Value
-
-  getRevenueByCategoryGraph() {
-    this.spinner.start('RevenueByCategoryLoader');
-    this.revenueByCategoryViewData = null;
-    this.svc.getRevenueByCategoryChartData(this.appId, this.filters?.from, this.filters?.to)
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        if (res) {
-          this.revenueByCategoryViewData = this.svc.convertRevenueByCategoryChartData(res);
-        }
-        this.spinner.stop('RevenueByCategoryLoader');
-      }, (_err: HttpErrorResponse) => {
-        this.spinner.stop('RevenueByCategoryLoader');
-        this.notification.error(new Notification('Failed to get revenue by category data'));
-      });
-  }
-
-  getRevenueByTrafficSourceGraph() {
-    this.spinner.start('RevenueByTrafficSourceLoader');
-    this.revenueByTrafficSourceViewData = null;
-    this.svc.getRevenueByTrafficSourceChartData(this.appId, this.filters?.from, this.filters?.to)
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(res => {
-        if (res) {
-          this.revenueByTrafficSourceViewData = this.svc.convertRevenueByTrafficSourceChartData(res);
-        }
-        this.spinner.stop('RevenueByTrafficSourceLoader');
-      }, (_err: HttpErrorResponse) => {
-        this.spinner.stop('RevenueByTrafficSourceLoader');
-        this.notification.error(new Notification('Failed to get revenue by traffic source data'));
       });
   }
 

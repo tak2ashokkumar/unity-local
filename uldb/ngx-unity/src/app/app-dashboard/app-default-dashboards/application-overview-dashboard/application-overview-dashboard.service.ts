@@ -20,11 +20,7 @@ export class ApplicationOverviewDashboardService {
         viewData.push({ ...app, displayName: 'AstronomyShop' });
       } else if (app.name === "bank-of-anthos") {
         viewData.push({ ...app, displayName: 'Bank of Anthos' });
-      }
-    });
-
-    applications.forEach(app => {
-      if (app.name === "astronomy-shop") {
+      } else if (app.name === "easytrade") {
         viewData.push({ ...app, displayName: 'EasyTrade' });
       }
     });
